@@ -1,0 +1,291 @@
+div#flexicontent
+{ /*overflow: hidden;*/ /* clearing in beez */ }
+
+div#flexicontent .clear
+{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
+
+div#flexicontent .floattext:after /* ie fix in conditional comments (html source) */
+{content: "."; display: block; height: 0; clear: both; visibility: hidden;}
+
+div#flexicontent .floattext
+{ display:block; /* safari */ }
+
+/**
+ * @section buttons
+ *
+ * print, pdf, ...
+ */
+div#flexicontent .buttons
+{ float: right; }
+
+div#flexicontent .buttons img
+{ border: none; }
+
+div#flexicontent .buttons a
+{ padding: 0 0 0 5px; height: 16px; line-height: 16px; }
+
+
+/**
+ * @section headlines
+ *
+ */
+div#flexicontent h2 {
+}
+
+div#flexicontent h2 img {
+border: none;
+}
+
+/** 
+ * @pagination css trick to center the div without having a fixed width
+ * see http://www.cssplay.co.uk/menus/centered.html
+ */
+div.pagination {
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	float: left;
+	left: 50%;
+}
+div.pagination div.tab,
+div.pagination div.page-block {
+	position: relative;
+	right: 50%;
+}
+div.pageslinks {
+	overflow: hidden;
+	clear: both;
+	float: left;
+	width: 100%;
+}
+div#flexicontent .pagescounter {
+	text-align: center;
+}
+
+
+/**
+ * @section Categoryview
+ *
+ */
+div#flexicontent .catimg {
+margin: 0 0.5em 0.5em 0;
+float: left;
+position: relative;
+}
+
+div#flexicontent .catimg p {
+font-size: 0.9em; line-height: 180%;
+margin: 0 0 0.5em 0;
+}
+
+div#flexicontent .catdescription {
+margin: 0 0 0.5em 0;
+}
+
+div#flexicontent .subcategories {
+/* font-size: 1.2em; font-weight: bold; */
+border-bottom: 2px solid #ddd;
+padding:0.5em 0.3em; margin: 0.8em 0;
+}
+
+/**
+ * @section FLEXIcontent Item
+ *
+ */
+div#flexicontent .taglist {
+margin: 5px 0 10px; padding: 0 5px;
+}
+
+
+/**
+ * @section flexicontent Table Filter Form
+ *
+ */
+div.subcategorieslist {
+margin: 0 0 1em 0;
+}
+
+div#fc_alpha {
+margin: 0 0 1em 0;
+}
+
+div#flexicontent #fc_filter {
+margin: 0 0 1em 0; padding: 0.5em;
+border: solid 1px #ddd;
+}
+
+div#flexicontent .fc_fleft {
+float: left;
+}
+
+div#flexicontent .fc_fright {
+float: right;
+}
+div#flexicontent .fc_fright .filter {
+margin-left: 10px;
+}
+
+
+/**
+ * Comments for JComments only ;-)
+ */
+div.comments {
+	margin-top: 15px;
+}
+.comments #jc h4 {
+	font-weight: normal;
+	color: inherit;
+	margin-top: 0px;
+}
+.comments #comments a {
+	color: inherit;
+}
+.comments #comments a:hover {
+	color: #578E13;
+}
+.comments #comments div.comments-list {
+	margin-left: 0;
+}
+.comments .rbox_tr,
+.comments .rbox_tl,
+.comments .rbox_t,
+.comments .rbox_br,
+.comments .rbox_bl,
+.comments .rbox_b,
+.comments .rbox_m {
+	background: none;
+	border: none;
+}
+
+.comments .rbox {
+	border: 1px #ccc solid;
+}
+.comments .even .rbox {
+	background: #fff;
+}
+.comments .odd .rbox {
+	background: #f0f0f0;
+}
+.comments #comments-list-footer {
+	margin: 0 0 10px 0;
+}
+#comments-form p, #comments-form #comments-form-buttons, #comments-form #comments-form-error {
+	margin-left: 0px !important;
+}
+#comments-form #comments-form-message, #comments-inline-edit #comments-form-message {padding: 5px 5px 5px 25px;display: block;}
+.comments-form-message-error {background: #FFD86F url(../images/error.png) no-repeat 4px 50%;}
+.comments-form-message-info {background: #DFEEFF url(../images/information.png) no-repeat 4px 50%;}
+
+/**
+ * blog block
+ */
+#flexicontent ul.leadingblock,
+#flexicontent ul.introblock {
+	margin: 0;
+	padding: 0;
+}
+#flexicontent ul.leadingblock li {
+	padding: 0;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+	line-height: inherit;
+}
+#flexicontent ul.introblock li {
+	padding: 0;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+	line-height: inherit;
+}
+#flexicontent ul.introblock.two li {
+	width: 48%;
+}
+#flexicontent ul.introblock.two li.even {
+	margin-left: 3%
+}
+div.image.right {
+	float: right;
+	margin-left: 10px;
+}
+div.image.left {
+	float: left;
+	margin-right: 10px;
+}
+
+/**
+ * Alphabetical index
+ */
+#fc_alpha {
+	clear: both;
+	float: left;
+	overflow: hidden;
+	width: 100%;
+}
+#fc_alpha .letters {
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	float: left;
+	left: 50%;
+	position: relative;
+}
+#fc_alpha .numbers {
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	float: left;
+	left: 50%;
+	position: relative;
+	clear: both
+}
+.fc_alpha_index {
+	padding: 1px 2px;
+	border: 1px solid silver;
+	background: #efefef;
+	text-decoration: none;
+	margin-right: 2px;
+	float: left;
+	position: relative;
+	right: 50%;
+}
+span.fc_alpha_index {
+	color: silver;
+}
+
+/* lines */
+.lineinfo {
+	display: block;
+	clear: left;
+	overflow: hidden;
+	margin: 0 0 0.5em 0;
+}
+.lineinfo {
+	vertical-align: middle;
+}
+.lineinfo .element {
+	display: block;
+	float: left;
+	margin-right: 10px;
+}
+.lineinfo .element .label {
+	margin-right: 5px;
+}
+.lineinfo .element,
+.lineinfo .element .label,
+.lineinfo .element .value {
+	display: block;
+	float: left;
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<joomfish type="contentelement">
+  <name>FLEXIcontent Fields</name>
+  <author>Emmanuel Danan</author>
+  <version>1.0</version>
+  <description>Fields definition</description>
+  <reference>
+  	<table name="flexicontent_fields">
+  		<field type="referenceid" name="id" translate="0">ID</field>
+  		<field type="titletext" name="label" length="50" maxlength="250" translate="1">Label</field>
+<!--
+  		<field type="textarea" name="description" rows="10" columns="60" translate="1">Description</field>
+-->
+  		<field type="textarea" name="attribs" rows="20" columns="60" translate="1">Attributes</field>
+  		<field type="checked_out_by" name="checked_out" translate="0">Check out by</field>
+  		<field type="checked_out_date" name="checked_out_time" translate="0">Check out date</field>
+  	</table>
+  </reference>
+</joomfish>

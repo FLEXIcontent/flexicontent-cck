@@ -1,0 +1,472 @@
+<?php
+/**
+ * @version 1.5 beta 5 $Id: controller.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
+jimport('joomla.application.component.controller');
+
+/**
+ * FLEXIcontent Component Controller
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since 1.0
+ */
+class FlexicontentController extends JController
+{
+	function __construct()
+	{
+		parent::__construct();
+
+		// Register Extra task
+		$this->registerTask( 'apply'					, 'save' );
+		$this->registerTask( 'applyacl'					, 'saveacl' );
+		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
+		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
+		$this->registerTask( 'cachethumbchmod'			, 'setCacheThumbChmod' );
+		$this->registerTask( 'publishplugins'			, 'publishplugins' );
+		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
+		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
+		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
+		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
+	}
+
+	/**
+	 * Display the view
+	 */
+	function display()
+	{
+		parent::display();
+
+	}
+
+	/**
+	 * Saves the acl file
+	 *
+	 */
+	function saveacl()
+	{
+		global $mainframe, $option;
+
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+
+		// Initialize some variables
+		$option			= JRequest::getVar('option');
+		$filename		= JRequest::getVar('filename', '', 'post', 'cmd');
+		$filecontent	= JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
+
+		if (!$filecontent) {
+			$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::_( 'FLEXI_CONTENT_EMPTY' ));
+		}
+
+		// Set FTP credentials, if given
+		jimport('joomla.client.helper');
+		JClientHelper::setCredentialsFromRequest('ftp');
+		$ftp = JClientHelper::getCredentials('ftp');
+
+		$file = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.$filename;
+
+		// Try to make the acl file writeable
+		if (!$ftp['enabled'] && JPath::isOwner($file) && !JPath::setPermissions($file, '0755')) {
+			JError::raiseNotice('SOME_ERROR_CODE', JText::_( 'FLEXI_COULD_NOT_MAKE_ACL_FILE_WRITABLE' ));
+		}
+
+		jimport('joomla.filesystem.file');
+		$return = JFile::write($file, $filecontent);
+
+		// Try to make the acl file unwriteable
+		if (!$ftp['enabled'] && JPath::isOwner($file) && !JPath::setPermissions($file, '0555')) {
+			JError::raiseNotice('SOME_ERROR_CODE', JText::_( 'FLEXI_COULD_NOT_MAKE_ACL_FILE_UNWRITABLE' ));
+		}
+
+		if ($return)
+		{
+			$task = JRequest::getVar('task');
+			switch($task)
+			{
+				case 'applyacl' :
+					$mainframe->redirect('index.php?option='.$option.'&view=editacl', JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ));
+					break;
+
+				case 'saveacl'  :
+				default         :
+					$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ) );
+					break;
+			}
+		} else {
+			$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::sprintf('FLEXI_FAILED_TO_OPEN_FILE_FOR_WRITING', $file));
+		}
+	}
+	
+	/**
+	 * Method to create default type : article
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createDefaultType()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db 	=& JFactory::getDBO();
+
+		$query 	=	"INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')" ;
+		$db->setQuery($query);
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			$query 	=	"INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
+						VALUES
+							(1,1,1),
+							(2,1,2),
+							(3,1,3),
+							(4,1,4),
+							(5,1,5),
+							(6,1,6),
+							(7,1,7),
+							(8,1,8),
+							(9,1,9),
+							(10,1,10),
+							(11,1,11),
+							(12,1,12),
+							(13,1,13),
+							(14,1,14)" ;
+			$db->setQuery($query);
+			if (!$db->query()) {
+				echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			} else {
+				echo '<span class="install-ok"></span>';
+			}
+		}
+	}
+
+	/**
+	 * Method to create default fields data
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createDefaultFields()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db 	=& JFactory::getDBO();
+
+		$query 	=	"INSERT INTO #__flexicontent_fields (`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
+VALUES
+	(1,'maintext','text','Description','The main description text (introtext/fulltext)',0,1,1,0,'description.items.default',1,'display_label=0\ntrigger_onprepare_content=0',0,'0000-00-00 00:00:00',0,2),
+	(2,'created','created','Created','Creation date',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,3),
+	(3,'createdby','created_by','Created by','Item author',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,4),
+	(4,'modified','modified','Last modified','Date of the last modification',0,1,1,0,'top.items.default',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,5),
+	(5,'modifiedby','modified_by','Revised by','Name of the user which last edited the item',0,1,1,0,'top.items.default',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,6),
+	(6,'title','title','Title','The item title',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',0,1),
+	(7,'hits','hits','Hits','Number of hits',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=vues',0,'0000-00-00 00:00:00',0,7),
+	(8,'type','document_type','Document type','Document type',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,8),
+	(9,'version','version','Version','Number of version',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,9),
+	(10,'state','state','State','State',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',0,10),
+	(11,'voting','voting','Voting','The up and down voting buttons',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1\ndimension=16\nimage=components/com_flexicontent/assets/images/star-small.png',0,'0000-00-00 00:00:00',0,11),
+	(12,'favourites','favourites','Favourites','The add to favourites button',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1',0,'0000-00-00 00:00:00',0,12),
+	(13,'categories','categories','Categories','The categories assigned to this item',0,1,1,0,'top.items.default\nunder-description-line1.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',0,13),
+	(14,'tags','tags','Tags','The tags assigned to this item',0,1,1,0,'top.items.default\nunder-description-line2.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',0,14)" ;
+		$db->setQuery($query);
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+
+	/**
+	 * Method to check if the permissions of Phpthumb cache folder
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function setCacheThumbChmod()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		jimport('joomla.client.helper');
+		JClientHelper::setCredentialsFromRequest('ftp');
+		jimport('joomla.filesystem.file');
+
+		// Open phpThumb cache directory
+		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+		if (JPath::canChmod($phpthumbcache)) { 
+    		if (!JPath::setPermissions($phpthumbcache, '0666', '0777')) {
+				echo JText::_('Cannot set permissions, please do it manualy');
+    		} else {
+				echo '<span class="install-ok"></span>';
+    		}
+		} else {
+			echo JText::_('Cannot set permissions, please do it manualy');
+		}
+	}
+
+	/**
+	 * Publish FLEXIcontent plugins
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function publishplugins()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$format		= JRequest::getVar('format', '');
+		$db =& JFactory::getDBO();
+		
+		$query	= 'UPDATE #__plugins'
+				. ' SET published = 1'
+				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
+				. ' OR element = ' . $db->Quote('flexisearch')
+				. ' OR element = ' . $db->Quote('flexisystem')
+				;
+		
+		$db->setQuery($query);
+		if (!$db->query()) {
+			if ($format == 'raw') {
+				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			} else {
+				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
+				return false;
+			}
+		} else {
+			if ($format == 'raw') {
+				echo '<span class="install-ok"></span>';
+			} else {
+				return true;
+			}
+		}
+	}
+
+	/**
+	 * Method to set the default site language the items with no language
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function getItemsNoLang()
+	{
+		$db =& JFactory::getDBO();
+
+		$query 	= "SELECT item_id FROM #__flexicontent_items_ext"
+				. " WHERE language = ''"
+				;
+		$db->setQuery($query);
+		$cid = $db->loadResultArray();
+		
+		return $cid;
+	}
+
+	/**
+	 * Method to set the default site language the items with no language
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function setItemsDefaultLang($cid, $lang)
+	{
+		$db =& JFactory::getDBO();
+
+		$query 	= 'UPDATE #__flexicontent_items_ext'
+				. ' SET language = ' . $db->Quote($lang)
+				. ' WHERE item_id IN ( ' . implode(',', $cid) . ' )'
+				;
+		$db->setQuery($query);
+		$db->query();
+		
+		return true;
+	}
+
+	/**
+	 * Method to create the language datas
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createLangColumn()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db 		=& JFactory::getDBO();
+		$nullDate	= $db->getNullDate();
+
+		$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
+		$db->setQuery($query);
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			// Add site default language to the language field if empty
+			$languages 	=& JComponentHelper::getParams('com_languages');
+			$lang 		= $languages->get('site', 'en-GB');
+			$cid 		= $this->getItemsNoLang();
+		
+			if (!$this->setItemsDefaultLang($cid, $lang)) {
+				echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			} else {
+				echo '<span class="install-ok"></span>';
+			}
+		}
+	}
+	
+	/**
+	 * Method to create the versions table
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createVersionsTable()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db 		=& JFactory::getDBO();
+		$nullDate	= $db->getNullDate();
+
+		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_versions (
+	  				`id` int(11) unsigned NOT NULL auto_increment,
+					`item_id` int(11) unsigned NOT NULL default '0',
+					`version_id` int(11) unsigned NOT NULL default '0',
+					`comment` mediumtext NOT NULL,
+					`created` datetime NOT NULL default '0000-00-00 00:00:00',
+					`created_by` int(11) unsigned NOT NULL default '0',
+					`state` int(3) NOT NULL default '0',
+					PRIMARY KEY  (`id`),
+					KEY `version2item` (`item_id`,`version_id`)
+					) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
+					;
+		$db->setQuery($query);
+		
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existversions" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+
+	/**
+	 * Method to handle the versions data and to populate the new beta4 versions table
+	 * From #__flexicontent_items_versions to #__flexicontent_versions
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function populateVersionsTable()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db 		=& JFactory::getDBO();
+		$nullDate	= $db->getNullDate();
+
+		$query 	= 'SELECT item_id, version FROM #__flexicontent_items_versions'
+				. ' WHERE field_id = 2'
+				. ' ORDER BY item_id, version'
+				;
+		$db->setQuery($query);
+		$cvs = $db->loadObjectList();
+
+		$query 	= 'SELECT * FROM #__flexicontent_items_versions'
+				. ' WHERE field_id IN ( 2,3,4,5 )'
+				. ' ORDER BY item_id, version, field_id'
+				;
+		$db->setQuery($query);
+		$fvs = $db->loadObjectList();
+		
+		for ($i=0; $i<count($cvs); $i++) {
+			foreach ($fvs as $fv) {
+				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '2') $cvs[$i]->created = $fv->value;
+				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '3') $cvs[$i]->created_by = $fv->value;
+				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '4') $cvs[$i]->modified = $fv->value;
+				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '5') $cvs[$i]->modified_by = $fv->value;
+			}
+		}
+		
+		$versions = new stdClass();
+		$n = 0;
+		foreach ($cvs as $cv) {
+			$versions->$n->item_id 		= $cv->item_id;
+			$versions->$n->version_id 	= $cv->version;
+			$versions->$n->comment	 	= '';
+			$versions->$n->created 		= (isset($cv->modified) && ($cv->modified != $nullDate)) ? $cv->modified : $cv->created;
+			$versions->$n->created_by 	= (isset($cv->modified_by) && $cv->modified_by) ? $cv->modified_by : $cv->created_by;
+			$versions->$n->state	 	= 1;
+			$db->insertObject('#__flexicontent_versions', $versions->$n);
+			$n++;
+		}
+
+		echo '<span class="install-ok"></span>';
+	}
+
+	/**
+	 * Method to check if the files from beta3 still exist in the category and item view
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function deleteOldBetaFiles()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		jimport('joomla.filesystem.file');
+
+		$files 	= array (
+			'default.xml',
+			'default.php',
+			'index.html',
+			'_form.php',
+			'_form.xml'
+			);
+		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
+		$cattmpl 	= JFolder::files($catdir);		
+		$ctmpl 		= array_diff($cattmpl,$files);
+		foreach ($ctmpl as $c) {
+			JFile::delete($catdir.DS.$c);
+		}
+		
+		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+		$itemtmpl 	= JFolder::files($itemdir);		
+		$itmpl 		= array_diff($itemtmpl,$files);
+		foreach ($itmpl as $i) {
+			JFile::delete($itemdir.DS.$i);
+		}
+
+		$model = $this->getModel('flexicontent');
+		if ($model->getOldBetaFiles()) {
+			echo '<span class="install-ok"></span>';
+		} else {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		}
+	}
+}
+?>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<joomfish type="contentelement">
+  <name>FLEXIcontent Files</name>
+  <author>Emmanuel Danan</author>
+  <version>1.0</version>
+  <description>Filemanager files</description>
+  <reference>
+  	<table name="flexicontent_files">
+  		<field type="referenceid" name="id" translate="0">ID</field>
+  		<field type="titletext" name="altname" length="50" maxlength="250" translate="1">File display name</field>
+  		<field type="checked_out_by" name="checked_out" translate="0">Check out by</field>
+  		<field type="checked_out_date" name="checked_out_time" translate="0">Check out date</field>
+  	</table>
+  </reference>
+</joomfish>

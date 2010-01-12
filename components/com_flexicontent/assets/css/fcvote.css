@@ -1,0 +1,22 @@
+/* fcvote standard css */
+.fcvote {display:inline-block;vertical-align:middle;}
+.fcvote ul {padding:0!important;margin:0!important;}
+.fcvote ul li {background-position:0!important;padding:0!important;margin:0!important;}
+.fcvote ul, .fcvote ul li a:hover, .fcvote ul li.current-rating {background-color:transparent!important;background-repeat:repeat-x!important;background-position:left -1000px;}
+.fcvote ul {background-position:left top;list-style-image:none;list-style-position:outside;list-style-type:none;margin:0pt;overflow:hidden;padding:0pt;position:relative;}
+.fcvote ul li {background-image:none;display:inline;padding:0pt;}
+.fcvote ul li a, .fcvote ul li.current-rating {border:medium none;cursor:pointer;left:0pt;outline-color:-moz-use-text-color;outline-style:none;outline-width:medium;overflow:hidden;position:absolute;text-indent:-1000em;top:0pt;}
+.fcvote ul li a:hover {background-position:left bottom!important;}
+.fcvote ul li.current-rating {background-position:left center;z-index:0;}
+.fcvote li a.one{width:20%;padding:0;margin:0;z-index:6;}
+.fcvote li a.two{width:40%;padding:0;margin:0;z-index:5;}
+.fcvote li a.three{width:60%;padding:0;margin:0;z-index:4;}
+.fcvote li a.four{width:80%;padding:0;margin:0;z-index:3;}
+.fcvote li a.five{width:100%;padding:0;margin:0;z-index:2;}
+.fcvote-count{vertical-align:middle;}
+
+/* fcvote variable css */
+.fcvote {line-height:25px;}
+.fcvote ul {height:25px;width:125px;}
+.fcvote ul, .fcvote ul li a:hover, .fcvote ul li.current-rating {background-image:url(star.gif)!important;}
+.fcvote ul li a, .fcvote ul li.current-rating {height:25px;line-height:25px;}
