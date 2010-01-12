@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<author>Emmanuel Danan</author>
+	<website>www.flexicontent.org</website>
+	<email>emmanuel@vistamedia.fr</email>
+	<license>GPLv2</license>
+	<version>1.1</version>
+	<release>25 november 2009</release>
+	<description>Category layout similar to the Joomla blog layout. Title, description and image are set as category parameters</description>
+	<params addpath="/administrator/components/com_flexicontent/elements">
+		<param name="lead_num" type="text" size="3" default="1" label="FLEXI_NUM_LEADING" description="FLEXI_NUM_LEADING_DESC" />
+		<param name="intro_cols" type="list" default="2" label="FLEXI_INTRO_COLS" description="FLEXI_INTRO_COLS_DESC">
+			<option value="1">FLEXI_1_COL</option>
+			<option value="2">FLEXI_2_COLS</option>
+		</param>
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="@spacer" type="" default="" label="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" />
+		<param name="lead_strip_html" type="list" default="1" label="FLEXI_STRIP_HTML" description="FLEXI_STRIP_HTML_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="lead_cut_text" type="text" size="4" default="400" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+		<param name="lead_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="lead_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+		<param name="lead_position" type="list" default="1" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
+			<option value="0">FLEXI_IMAGE_LEFT</option>
+			<option value="1">FLEXI_IMAGE_RIGHT</option>
+		</param>		
+		<param name="lead_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="lead_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+			<option value="">FLEXI_USE_PARAMS</option>
+			<option value="s">FLEXI_SMALL</option>
+			<option value="m">FLEXI_MEDIUM</option>
+			<option value="l">FLEXI_LARGE</option>
+		</param>
+		<param name="lead_width" type="text" size="4" default="180" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+		<param name="lead_height" type="text" size="4" default="180" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+		<param name="lead_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<option value="0">FLEXI_SCALE</option>
+			<option value="1">FLEXI_CROP</option>
+		</param>		
+ 		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="@spacer" type="" default="" label="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" />
+		<param name="intro_strip_html" type="list" default="1" label="FLEXI_STRIP_HTML" description="FLEXI_STRIP_HTML_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="intro_cut_text" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+		<param name="intro_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="intro_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+		<param name="intro_position" type="list" default="1" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
+			<option value="0">FLEXI_IMAGE_LEFT</option>
+			<option value="1">FLEXI_IMAGE_RIGHT</option>
+		</param>		
+		<param name="intro_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="intro_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+			<option value="">FLEXI_USE_PARAMS</option>
+			<option value="s">FLEXI_SMALL</option>
+			<option value="m">FLEXI_MEDIUM</option>
+			<option value="l">FLEXI_LARGE</option>
+		</param>
+		<param name="intro_width" type="text" size="4" default="90" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+		<param name="intro_height" type="text" size="4" default="90" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+		<param name="intro_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<option value="0">FLEXI_SCALE</option>
+			<option value="1">FLEXI_CROP</option>
+		</param>
+	</params>
+	<fieldgroups>
+		<group>above-description-line1</group>
+		<group>above-description-line1-nolabel</group>
+		<group>above-description-line2</group>
+		<group>above-description-line2-nolabel</group>
+		<group>under-description-line1</group>
+		<group>under-description-line1-nolabel</group>
+		<group>under-description-line2</group>
+		<group>under-description-line2-nolabel</group>
+	</fieldgroups>
+	<csscategory>
+		<file>css/category.css</file>
+	</csscategory>
+	<jscategory>
+	</jscategory>	
+</metadata>

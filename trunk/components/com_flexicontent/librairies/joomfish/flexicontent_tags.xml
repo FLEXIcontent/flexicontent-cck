@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<joomfish type="contentelement">
+  <name>FLEXIcontent Tags</name>
+  <author>Emmanuel Danan</author>
+  <version>1.0</version>
+  <description>Tags</description>
+  <reference>
+  	<table name="flexicontent_tags">
+  		<field type="referenceid" name="id" translate="0">ID</field>
+  		<field type="titletext" name="name" length="50" maxlength="250" translate="1">Tag</field>
+  		<field type="text" name="alias" translate="1" posthandler="filterName">Alias</field>
+  		<field type="checked_out_by" name="checked_out" translate="0">Check out by</field>
+  		<field type="checked_out_date" name="checked_out_time" translate="0">Check out date</field>
+  	</table>
+  </reference>
+</joomfish>

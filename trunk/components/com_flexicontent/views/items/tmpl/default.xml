@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="FLEXICONTENT_ITEM">
+		<message>
+			<![CDATA[FLEXICONTENT_ITEM_TIP]]>
+		</message>
+	</layout>
+	<state>
+		<name>FLEXICONTENT_ITEM</name>
+		<description>FLEXICONTENT_ITEM_DESC</description>
+		<url addpath="/administrator/components/com_flexicontent/elements">
+			<param name="cid" type="hidden" default="0" label="FLEXI_SELECT_ONE_CATEGORY" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
+			<param name="id" type="item" default="0" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
+		</url>
+        <params> 
+            <param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
+                <option value="0">FLEXI_ROOT</option> 
+                <option value="1">FLEXI_LEVEL_1</option> 
+                <option value="2">FLEXI_LEVEL_2</option> 
+                <option value="3">FLEXI_LEVEL_3</option> 
+                <option value="4">FLEXI_LEVEL_4</option> 
+                <option value="5">FLEXI_LEVEL_5</option> 
+            </param> 
+            <param name="add_item_pathway" type="radio" default="1" label="FLEXI_ADD_ITEM_PATHWAY" description="FLEXI_ADD_ITEM_PATHWAY_DESC"> 
+                <option value="0">FLEXI_NO</option> 
+                <option value="1">FLEXI_YES</option> 
+            </param> 
+        </params> 
+	</state>
+</metadata>

@@ -1,0 +1,595 @@
+<?php
+/**
+ * @version 1.5 beta 5 $Id: flexicontent.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+// no direct access
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
+jimport('joomla.application.component.model');
+
+/**
+ * FLEXIcontent Component Model
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since		1.0
+ */
+class FlexicontentModelFlexicontent extends JModel
+{
+	/**
+	 * Constructor
+	 *
+	 * @since 1.0
+	 */
+	function __construct()
+	{
+		parent::__construct();
+	}
+	
+	/**
+	 * Method to get waiting for approval items data
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getPending()
+	{
+		$query = 'SELECT id, title, catid, created_by'
+				. ' FROM #__content'
+				. ' WHERE state = -3'
+				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' ORDER BY created DESC'
+				. ' LIMIT 5'
+				;
+
+		$this->_db->SetQuery($query);
+  		$genstats = $this->_db->loadObjectList();
+  		
+  		return $genstats;
+	}
+	
+	/**
+	 * Method to get open questions data
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getOpenquestions()
+	{
+		$query = 'SELECT id, title, catid, created_by'
+				. ' FROM #__content'
+				. ' WHERE state = -4'
+				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' ORDER BY created DESC'
+				. ' LIMIT 5'
+				;
+
+		$this->_db->SetQuery($query);
+  		$genstats = $this->_db->loadObjectList();
+  		
+  		return $genstats;
+	}
+
+	/**
+	 * Method to get in progress items data
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getInprogress()
+	{
+		$query = 'SELECT id, title, catid, created_by'
+				. ' FROM #__content'
+				. ' WHERE state = -5'
+				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' ORDER BY created DESC'
+				. ' LIMIT 5'
+				;
+
+		$this->_db->SetQuery($query);
+  		$genstats = $this->_db->loadObjectList();
+  		
+  		return $genstats;
+	}
+	
+	
+	
+	/**
+	 * Method to check if there is at least one type created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistType()
+	{
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__flexicontent_types'
+		;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count > 0) {
+			return true;
+			}
+	return false;
+	}
+
+	/**
+	 * Method to check if there is at least the default fields
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistFields()
+	{
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__flexicontent_fields'
+		;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count > 13) {
+			return true;
+			}
+	return false;
+	}
+
+	/**
+	 * Method to check if there is at least the default fields
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistFieldsPlugins()
+	{
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__plugins'
+		. ' WHERE folder = ' . $this->_db->Quote('flexicontent_fields')
+		;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count > 13) {
+			return true;
+			}
+	return false;
+	}
+
+	/**
+	 * Method to check if the search plugin is installed
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistSearchPlugin()
+	{
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__plugins'
+		. ' WHERE element = ' . $this->_db->Quote('flexisearch')
+		;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadResult() ? true : false;
+	}
+
+	/**
+	 * Method to check if the system plugin is installed
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistSystemPlugin()
+	{
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__plugins'
+		. ' WHERE element = ' . $this->_db->Quote('flexisystem')
+		;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadResult() ? true : false;
+	}
+
+	/**
+	 * Method to check if all plugins are published
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getAllPluginsPublished()
+	{
+		$query 	= 'SELECT COUNT( id )'
+				. ' FROM #__plugins'
+				. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
+				. ' OR element = ' . $this->_db->Quote('flexisearch')
+				. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
+				. ' AND published <> 1'
+				;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadResult() ? false : true;
+	}
+
+	/**
+	 * Method to check if the language column exists
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistLanguageColumn()
+	{
+        $fields = $this->_db->getTableFields('#__flexicontent_items_ext');
+		return (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+	}
+
+	/**
+	 * Method to check if the versions table is created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistVersionsTable()
+	{
+		$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_versions');
+		$this->_db->setQuery($query);
+		return $this->_db->loadResult() ? true : false;
+	}
+
+	/**
+	 * Method to check if the system plugin is installed
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistVersionsPopulated()
+	{
+		$query 	= 'SELECT COUNT( version )'
+				. ' FROM #__flexicontent_items_versions'
+				;
+		$this->_db->setQuery( $query );
+		if(!$this->_db->loadResult()) {
+			return true;
+		} else {
+			$query 	= 'SELECT COUNT( id )'
+					. ' FROM #__flexicontent_versions'
+					;
+			$this->_db->setQuery( $query );
+			return $this->_db->loadResult() ? true : false;
+		}
+	}
+
+	/**
+	 * Method to check if the permissions of Phpthumb cache folder
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getCacheThumbChmod()
+	{
+		// Open phpThumb cache directory
+		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+		return (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+	}
+
+	/**
+	 * Method to check if the files from beta3 still exist in the category and item view
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getOldBetaFiles()
+	{
+		$files 	= array (
+			'default.xml',
+			'default.php',
+			'index.html',
+			'_form.php',
+			'_form.xml'
+			);
+		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
+		$cattmpl 	= JFolder::files($catdir);		
+		$ctmpl 		= array_diff($cattmpl,$files);
+		
+		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+		$itemtmpl 	= JFolder::files($itemdir);		
+		$itmpl 		= array_diff($itemtmpl,$files);
+		
+		return ($ctmpl || $itmpl) ? false : true;
+	}
+
+	/**
+	 * Method to check if the field positions were converted
+	 * and if not, convert them
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getFieldsPositions()
+	{
+		$query 	= "SELECT name, positions"
+				. " FROM #__flexicontent_fields"
+				. " WHERE positions <> ''"
+				;
+		$this->_db->setQuery( $query );
+		$fields = $this->_db->loadObjectList();
+		
+		if ($fields) {
+			// create a temporary table to store the positions
+			$query = "
+					CREATE TABLE #__flexicontent_positions_tmp (
+					  `field` varchar(100) NOT NULL default '',
+					  `view` varchar(30) NOT NULL default '',
+					  `folder` varchar(100) NOT NULL default '',
+					  `position` varchar(255) NOT NULL default ''
+					) ENGINE=MyISAM DEFAULT CHARSET=utf8
+					";
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+
+			foreach ($fields as $field) {			
+				$field->positions = explode("\n", $field->positions);	
+				foreach ($field->positions as $pos) {
+					$pos = explode('.', $pos);
+					$query = 'INSERT INTO #__flexicontent_positions_tmp (`field`, `view`, `folder`, `position`) VALUES(' . $this->_db->Quote($field->name) . ',' . $this->_db->Quote($pos[1]) . ',' . $this->_db->Quote($pos[2]) . ',' . $this->_db->Quote($pos[0]) . ')';
+					$this->_db->setQuery($query);
+					$this->_db->query();
+				}
+			}
+
+			$templates	= flexicontent_tmpl::getTemplates();
+			$folders 	= flexicontent_tmpl::getThemes();
+			$views		= array('items', 'category');
+			
+			foreach ($folders as $folder) {
+				foreach ($views as $view) {
+					$groups = @$templates->{$view}->{$folder}->positions;
+					if ($groups) {
+						foreach ($groups as $group) {
+							$query 	= 'SELECT field'
+									. ' FROM #__flexicontent_positions_tmp'
+									. ' WHERE view = ' . $this->_db->Quote($view)
+									. ' AND folder = ' . $this->_db->Quote($folder)
+									. ' AND position = ' . $this->_db->Quote($group)
+									;
+							$this->_db->setQuery( $query );
+							$fieldstopos = $this->_db->loadResultArray();
+							
+							if ($fieldstopos) {
+								$field = implode(',', $fieldstopos);
+
+								$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
+								$this->_db->setQuery($query);
+								$this->_db->query();
+							}
+						}
+					}
+				}				
+			}
+			
+			// delete the temporary table
+			$query = 'DROP TABLE #__flexicontent_positions_tmp';
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+			
+			// delete the old positions
+			$query 	= "UPDATE #__flexicontent_fields SET positions = ''";
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+			
+			// alter ordering field for releases prior to beta5
+			$query 	= "ALTER TABLE #__flexicontent_cats_item_relations MODIFY `ordering` int(11) NOT NULL default '0'";
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+			$query 	= "ALTER TABLE #__flexicontent_fields_type_relations MODIFY `ordering` int(11) NOT NULL default '0'";
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+		}
+		return $fields;
+	}
+	
+	/**
+	 * Method to check if there is at least one category created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistcat()
+	{
+		$query 	= 'SELECT COUNT( id )'
+				. ' FROM #__categories'
+				. ' WHERE section = ' . FLEXI_SECTION
+				;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count > 0) {
+			return true;
+			}
+	return false;
+	}
+
+	/**
+	 * Method to check if FLEXI_SECTION still exists
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistsec()
+	{
+		if (FLEXI_SECTION) {
+		$query = 'SELECT COUNT( id )'
+		. ' FROM #__sections'
+		. ' WHERE id = ' . FLEXI_SECTION
+		;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count > 0) {
+			return true;
+		} else {
+			// Save the created section as flexi_section for the component
+			$component =& JComponentHelper::getParams('com_flexicontent');
+			$component->set('flexi_section', '');
+    		$cparams = $component->toString();		
+
+			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+	    
+	    	$query 	= 'UPDATE #__components'
+	    			. ' SET params = ' . $this->_db->Quote($cparams)
+	    			. ' WHERE id = ' . $flexi->id;
+	    			;
+    		$this->_db->setQuery($query);
+    		$this->_db->query();
+			return true;
+		}
+		}
+	return false;
+	}
+
+	/**
+	 * Method to check if there is at list one menu item is created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistmenu()
+	{
+		$component =& JComponentHelper::getComponent('com_flexicontent');
+
+		$menus	= &JApplication::getMenu('site', array());
+		$items	= $menus->getItems('componentid', $component->id);
+			
+		if (count($items) > 0) {
+			return true;
+			}
+	return false;
+	}
+
+
+
+	/**
+	 * Fetch the version from the schlu.net server
+	 * TODO: Cleanup
+	 */
+	 function getUpdate()
+	 {
+	 	$url = 'http://update.schlu.net/flexicontent_update.xml';
+		$data = '';
+		$check = array();
+		$check['connect'] = 0;
+		$check['version_current'] = '1.0.2';
+		$check['versionread_current'] = '1.0.2';
+
+		//try to connect via cURL
+		if(function_exists('curl_init') && function_exists('curl_exec')) {
+			$ch = @curl_init();
+			
+			@curl_setopt($ch, CURLOPT_URL, $url);
+			@curl_setopt($ch, CURLOPT_HEADER, 0);
+			//http code is greater than or equal to 300 ->fail
+			@curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+			@curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			//timeout of 5s just in case
+			@curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+						
+			$data = @curl_exec($ch);
+						
+			@curl_close($ch);
+		}
+
+		//try to connect via fsockopen
+		if(function_exists('fsockopen') && $data == '') {
+
+			$errno = 0;
+			$errstr = '';
+
+			//timeout handling: 5s for the socket and 5s for the stream = 10s
+			$fsock = @fsockopen("update.schlu.net", 80, $errno, $errstr, 5);
+		
+			if ($fsock) {
+				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
+				@fputs($fsock, "HOST: update.schlu.net\r\n");
+				@fputs($fsock, "Connection: close\r\n\r\n");
+        
+				//force stream timeout...bah so dirty
+				@stream_set_blocking($fsock, 1);
+				@stream_set_timeout($fsock, 5);
+				 
+				$get_info = false;
+				while (!@feof($fsock))
+				{
+					if ($get_info)
+					{
+						$data .= @fread($fsock, 1024);
+					}
+					else
+					{
+						if (@fgets($fsock, 1024) == "\r\n")
+						{
+							$get_info = true;
+						}
+					}
+				}        	
+				@fclose($fsock);
+				
+				//need to chack data cause http error codes aren't supported here
+				if(!strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>')) {
+					$data = '';
+				}
+			}
+		}
+
+	 	//try to connect via fopen
+		if (function_exists('fopen') && ini_get('allow_url_fopen') && $data == '') {
+		
+			//set socket timeout
+			ini_set('default_socket_timeout', 5);
+			
+			$handle = @fopen ($url, 'r');
+			
+			//set stream timeout
+			@stream_set_blocking($handle, 1);
+			@stream_set_timeout($handle, 5);
+			
+			$data	= @fread($handle, 1000);
+			
+			@fclose($handle);
+		}
+						
+		/* try to connect via file_get_contents..k..a bit stupid
+		if(function_exists('file_get_contents') && ini_get('allow_url_fopen') && $data == '') {
+			$data = @file_get_contents($url);
+		}
+		*/
+		
+		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
+			$xml = & JFactory::getXMLparser('Simple');
+			$xml->loadString($data);
+			
+			$version 				= & $xml->document->version[0];
+			$check['version'] 		= & $version->data();
+			$versionread 			= & $xml->document->versionread[0];
+			$check['versionread'] 	= & $versionread->data();
+			$released 				= & $xml->document->released[0];
+			$check['released'] 		= & $released->data();
+			$check['connect'] 		= 1;
+			$check['enabled'] 		= 1;
+			
+			$check['current'] 		= version_compare( $check['version_current'], $check['version'] );
+		}
+		
+		return $check;
+	 }
+
+}
+?>
