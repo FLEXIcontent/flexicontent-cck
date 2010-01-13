@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 5 $Id: admin.flexicontent.php 191 2009-11-23 16:45:27Z vistamedia $
+ * @version 1.5 stable $Id: admin.flexicontent.php 191 2009-11-23 16:45:27Z vistamedia $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
