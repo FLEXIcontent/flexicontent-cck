@@ -1,6 +1,7 @@
 <?php
 /**
  * @version 1.5 beta 5 $Id: flexisystem.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -54,11 +55,15 @@ class plgSystemFlexisystem extends JPlugin
 		$this->trackSaveConf();
 		if (FLEXI_SECTION) {
 			global $globalcats;
+			if (FLEXI_CACHE) {
 			// add the category tree to categories cache
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->setCaching(1); 		//force cache
 			$catscache->setLifeTime(84600); //set expiry to one day
 		    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+			} else {
+				$globalcats = $this->getCategoriesTree();
+			}
 		}
 
 		$this->redirectAdminComContent();
@@ -177,7 +182,10 @@ class plgSystemFlexisystem extends JPlugin
 		$db		=& JFactory::getDBO();
 
 		// get the category tree and append the ancestors to each node		
-		$query	= 'SELECT id, parent_id, access FROM #__categories WHERE section = ' . FLEXI_SECTION;
+		$query	= 'SELECT id, parent_id, access, title,'
+				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
+				. ' FROM #__categories'
+				. ' WHERE section = ' . FLEXI_SECTION;
 		$db->setQuery($query);
 		$cats = $db->loadObjectList();
 
@@ -186,7 +194,7 @@ class plgSystemFlexisystem extends JPlugin
 		$parents = array();
 		
     	//set depth limit
-   		$levellimit = 6;
+   		$levellimit = 10;
 		
     	foreach ($cats as $child) {
         	$parent = $child->parent_id;
@@ -234,6 +242,8 @@ class plgSystemFlexisystem extends JPlugin
 				
 				$pt = $v->parent_id;
 				$list[$id] = $v;
+				$list[$id]->title 			= $v->title;
+				$list[$id]->slug 			= $v->slug;
 				$list[$id]->ancestors 		= $ancestors;
 				$list[$id]->childrenarray 	= @$children[$id];
 
