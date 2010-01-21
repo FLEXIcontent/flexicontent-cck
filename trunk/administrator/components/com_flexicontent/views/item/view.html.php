@@ -123,7 +123,6 @@ class FlexicontentViewItem extends JView {
 
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-//		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, 'text' );
 
 		//build selectlists
 		$lists = array();
@@ -159,7 +158,7 @@ class FlexicontentViewItem extends JView {
 
 		// Details Group
 		$active = (intval($row->created_by) ? intval($row->created_by) : $user->get('id'));
-		if (FLEXI_ACCESS) {
+		if (!FLEXI_ACCESS) {
 			$form->set('access', $row->access);
 		}
 		$form->set('created_by', $active);
