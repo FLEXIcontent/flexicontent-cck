@@ -65,6 +65,7 @@ class FlexicontentViewTag extends JView {
 		}
 		JToolBarHelper::apply();
 		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
 
 

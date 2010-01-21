@@ -74,10 +74,9 @@ class FlexicontentViewCategory extends JView {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );
 		}
 
-		if ($CanCats) {
-			JToolBarHelper::apply();
-		}
+		JToolBarHelper::apply();
 		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
 
 		//Get data from the model

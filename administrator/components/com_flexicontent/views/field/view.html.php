@@ -65,6 +65,7 @@ class FlexicontentViewField extends JView {
 		}
 		JToolBarHelper::apply();
 		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
 
 		//Load pane behavior
@@ -77,7 +78,6 @@ class FlexicontentViewField extends JView {
 		$row     			= & $this->get( 'Field' );
 		$types				= & $this->get( 'Typeslist' );
 		$typesselected		= & $this->get( 'Typesselected' );
-//		$tmpls				= flexicontent_tmpl::getTemplates();
 		JHTML::_('behavior.tooltip');
 		
 		//build selectlists

@@ -39,9 +39,10 @@ class FlexicontentControllerTags extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		'edit' );
-		$this->registerTask( 'apply', 		'save' );
-		$this->registerTask( 'import', 		'import' );
+		$this->registerTask( 'add'  ,			'edit' );
+		$this->registerTask( 'apply', 			'save' );
+		$this->registerTask( 'saveandnew', 		'save' );
+		$this->registerTask( 'import', 			'import' );
 	}
 
 	/**
@@ -69,6 +70,10 @@ class FlexicontentControllerTags extends FlexicontentController
 			{
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=tag&cid[]='.(int) $model->get('id');
+					break;
+
+				case 'saveandnew' :
+					$link = 'index.php?option=com_flexicontent&view=tag';
 					break;
 
 				default :

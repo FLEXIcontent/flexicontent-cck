@@ -24,6 +24,7 @@
 
 /* Toolbar icons */
 .icon-32-person2			{ background-image: url(../images/person2_f2.png); }
+.icon-32-savenew			{ background-image: url(../images/savenew.png); }
 .icon-32-go					{ background-image: url(../../../../images/go_f2.png); }
 .icon-32-download			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-export.png); }
 .icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
