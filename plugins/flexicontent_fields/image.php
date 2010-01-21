@@ -119,7 +119,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
-		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
+		$usepopup	= $field->parameters->get( 'usepopup' ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
 
 		if ($values && $values[0] != '')
