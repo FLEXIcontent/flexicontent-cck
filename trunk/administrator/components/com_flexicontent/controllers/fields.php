@@ -41,6 +41,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Register Extra task
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
+		$this->registerTask( 'saveandnew', 		'save' );
 		$this->registerTask( 'accesspublic', 	'access' );
 		$this->registerTask( 'accessregistered','access' );
 		$this->registerTask( 'accessspecial', 	'access' );
@@ -71,6 +72,10 @@ class FlexicontentControllerFields extends FlexicontentController
 			{
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=field&cid[]='.(int) $model->get('id');
+					break;
+
+				case 'saveandnew' :
+					$link = 'index.php?option=com_flexicontent&view=field';
 					break;
 
 				default :

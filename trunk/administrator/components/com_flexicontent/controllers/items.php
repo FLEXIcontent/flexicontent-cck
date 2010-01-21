@@ -41,6 +41,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Register Extra task
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
+		$this->registerTask( 'saveandnew', 		'save' );
 		$this->registerTask( 'cancel', 			'cancel' );
 		$this->registerTask( 'copymove',		'copymove' );
 		$this->registerTask( 'restore', 		'restore' );
@@ -78,6 +79,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			{
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=item&cid='.(int) $model->get('id');
+					break;
+
+				case 'saveandnew' :
+					$link = 'index.php?option=com_flexicontent&view=item';
 					break;
 
 				default :
