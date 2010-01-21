@@ -178,8 +178,7 @@ class FlexicontentViewItems extends JView {
 		if ($CanDelete) {
 			JToolBarHelper::deleteList();
 		}
-//		if (FLEXI_ACCESS && !$CanPublish) {
-		if (FLEXI_ACCESS) {
+		if (FLEXI_ACCESS && !$CanPublish) {
 			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 
