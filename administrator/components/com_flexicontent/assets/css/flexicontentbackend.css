@@ -535,3 +535,16 @@ table.adminlist thead #filter_cats {
 	background: url(../images/bullet_add.png) no-repeat 0% 50%;
 	padding-left: 12px;
 }
+
+
+ul#ultagbox{
+	padding-left:5px;
+	margin-left:0px;
+}
+ul#ultagbox li{
+	list-style-type:none;
+	display:block;
+	height:18px;
+	min-width:80px;
+	float:left;
+}

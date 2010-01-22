@@ -51,6 +51,7 @@ class FlexicontentViewItem extends JView {
 
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
+		$cid			= is_array($cid)?$cid[0]:$cid;
 		$version = JRequest::getVar( 'version', '', 'request', 'int' );
 
 		//add css to document
@@ -95,7 +96,11 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $this->get( 'VersionList' );
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-				
+
+		$usedtags = array();
+		if ($cid) {
+			$usedtags 	= $model->getusedtags($cid);
+		}
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
 		{
@@ -244,6 +249,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
+		$this->assignRef('usedtags'		, $usedtags);
 
 		parent::display($tpl);
 	}
