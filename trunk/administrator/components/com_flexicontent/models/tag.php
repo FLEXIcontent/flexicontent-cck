@@ -254,11 +254,13 @@ class FlexicontentModelTag extends JModel
 		$obj->name	 	= $name;
 		$obj->published	= 1;
 		
-		$this->store($obj);
+		if($this->store($obj)) {
+			return true;
+		}
 
 	//	$this->_db->insertObject('#__flexicontent_tags', $obj);
 		
-		return true;
+		return false;
 	}
 
 }

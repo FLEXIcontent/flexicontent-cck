@@ -472,7 +472,7 @@ class FlexicontentModelItem extends JModel
 		$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 		$this->_db->setQuery($query);
 		$this->_db->query();
-			
+		$tags = array_unique($tags);
 		foreach($tags as $tag)
 		{
 			$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
@@ -777,9 +777,10 @@ class FlexicontentModelItem extends JModel
 	 * @return object
 	 * @since 1.0
 	 */
-	function gettags()
+	function gettags($mask="")
 	{
-		$query = 'SELECT * FROM #__flexicontent_tags WHERE published = 1 ORDER BY name';
+		$where = ($mask!="")?" name like '%$mask%' AND":"";
+		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
@@ -794,9 +795,11 @@ class FlexicontentModelItem extends JModel
 	 */
 	function getusedtags($id)
 	{
-		$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$id;
+		$query = 'SELECT DISTINCT tr.tid,t.name FROM #__flexicontent_tags_item_relations as tr '
+		. ' LEFT JOIN #__flexicontent_tags as t ON tr.tid=t.id'
+		. ' WHERE tr.itemid = ' . (int)$id;
 		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
+		$used = $this->_db->loadObjectList();
 		return $used;
 	}
 	

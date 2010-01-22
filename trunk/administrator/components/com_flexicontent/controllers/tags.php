@@ -232,10 +232,22 @@ class FlexicontentControllerTags extends FlexicontentController
 	 *  Add new Tag from item screen
 	 *
 	 */
-	function addtag(){
+	function addtag() {
 		$name 	= JRequest::getString('name', '');
 		$model 	= $this->getModel('tag');
-		$model->addtag($name);
+		$array = JRequest::getVar('cid',  0, '', 'array');
+		$cid = (int)$array[0];
+		$model->setId($cid);
+		if($cid==0) {
+			$result = $model->addtag($name);
+			if($result)
+				echo $model->_tag->id."|".$model->_tag->name;
+			//else echo "|";
+		}else{
+			$id = $model->get('id');
+			$name = $model->get('name');
+			echo $id."|".$name;
+		}
 	}
 
 	/**
