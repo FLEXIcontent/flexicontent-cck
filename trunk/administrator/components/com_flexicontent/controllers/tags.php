@@ -232,7 +232,11 @@ class FlexicontentControllerTags extends FlexicontentController
 	 *  Add new Tag from item screen
 	 *
 	 */
-	function addtag() {
+	function addtag()
+	{
+		// Check for request forgeries
+		// JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
 		$name 	= JRequest::getString('name', '');
 		$model 	= $this->getModel('tag');
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -243,7 +247,7 @@ class FlexicontentControllerTags extends FlexicontentController
 			if($result)
 				echo $model->_tag->id."|".$model->_tag->name;
 			//else echo "|";
-		}else{
+		} else {
 			$id = $model->get('id');
 			$name = $model->get('name');
 			echo $id."|".$name;

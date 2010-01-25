@@ -27,7 +27,7 @@ $this->document->addScript('components/com_flexicontent/assets/jquery-autocomple
 $this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
 $this->document->addScriptDeclaration("
 	jQuery(document).ready(function () {
-		jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw\", {
+		jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
 			width: 260,
 			matchContains: false,
 			mustMatch: false,
@@ -68,9 +68,6 @@ $this->document->addScriptDeclaration("
 
 <script language="javascript" type="text/javascript">
 window.addEvent( "domready", function() {
-    //var tags = new itemscreen('tags', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gettags'});
-    //tags.fetchscreen();
-    
     var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gethits'});
     hits.fetchscreen();
     
@@ -79,12 +76,11 @@ window.addEvent( "domready", function() {
 });
 function addToList(id, name) {
 	obj = $('ultagbox');
-	obj.innerHTML+="<li><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\" onclick=\"javascript:deleteTag(this);\" title=\"delete tag\"><img src=\"components/com_flexicontent/assets/images/publish_x_f2.png\" border=\"0\" /></a></li>";
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
 }
 function addtag(id, tagname) {
 	if(id==null) {
 		id=0;
-		//var tagname = document.adminForm.tagname.value;
 	}
 	if(tagname == '') {
 		alert('<?php echo JText::_( 'FLEXI_ENTER_TAG', true); ?>' );
@@ -93,16 +89,6 @@ function addtag(id, tagname) {
 	
 	var tag = new itemscreen();
     tag.addtag( id, tagname );
-    /*var tags = new itemscreen('tags', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gettags'});
-    var options = {
-	method: 'get',
-	//update: doname,
-	evalScripts: false,
-	success:function (html) {
-		alert(html);
-	}
-    };
-    tags.fetchscreen('showtags', options);*/
 }
 
 function reseter(task, id, div)
@@ -112,8 +98,6 @@ function reseter(task, id, div)
 	if (task == 'resethits') {
 		form.hits.value = 0;
 	} else {
-//		form.minus.value = 0;
-//		form.plus.value = 0;
 	}
 		
 	var res = new itemscreen();
@@ -226,21 +210,24 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								<?php endif; ?>
 							</table>
 						</td>
-						<td valign="top" width="345px">
+						<td valign="top" width="50%">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
 								<?php
 									$nused = count($this->usedtags);
 									for( $i = 0, $nused; $i < $nused; $i++ ) {
 										$tag = $this->usedtags[$i];
-										echo  '<li><span>'.$tag->name.'</span>';
-										echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" onclick="javascript:deleteTag(this);" align="right" title="delete tag"><img src="components/com_flexicontent/assets/images/publish_x_f2.png" border="0" /></a></li>';
+										echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+										echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 									}?>
 								</ul>
 								<br class="clear" />
 							</div>
-							<?php echo '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';?>
-							<div id="tags"><input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /></div><?php /*<input type="button" name="addtagbtn" id="addtagbtn" value="<?php echo JText::_( 'FLEXI_ADD' );?>" />*/?>
+							<div id="tags">
+								<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+								</label>
+							</div>
 						</td>
 					</tr>
 				</table>

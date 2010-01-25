@@ -671,6 +671,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @since 1.5
 	 */
 	function viewtags() {
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
 		$user	=& JFactory::getUser();
 		if (FLEXI_ACCESS) {
 			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;

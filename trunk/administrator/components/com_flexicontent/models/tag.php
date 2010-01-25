@@ -258,8 +258,6 @@ class FlexicontentModelTag extends JModel
 			return true;
 		}
 
-	//	$this->_db->insertObject('#__flexicontent_tags', $obj);
-		
 		return false;
 	}
 

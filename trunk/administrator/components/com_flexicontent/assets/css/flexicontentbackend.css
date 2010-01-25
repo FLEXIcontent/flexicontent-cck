@@ -115,61 +115,6 @@ ul.import-failed li {
 }
 
 
-/** tag selection */
-div#tags {
-	margin: 3px;
-}
-
-div#tags ul {
-	margin: 3px;
-	padding: 0px;
-}
-
-div#tags ul li {
-	width: 110px;
-	min-height: 20px;
-	display: -moz-inline-stack;
-	display: inline-block;
-	vertical-align: top;
-	margin: 2px;
-	zoom: 1;
-	*display: inline;
-	_height: 20px;
-}
-
-div#tags ul li div {
-	padding-top: 3px;
-}
-
-.qf_tagbox {
-	display: block;
-	max-height: 170px;
-  	overflow: auto;
-  	border: 1px dashed silver;
-  	background: #fff;	
-}
-
-.qf_tagidbox {
-	width: 20px;
-	display: block;
-	float: left;
-	margin-top: -4px;
-}
-
-.qf_addtag { 
-	margin-top: 10px;
-}
-
-.qf_centerimg {
-	text-align: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 0px;
-}
-
-.clear
-{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
-
 /** state toggler */
 .statetoggler {
 	list-style:none;
@@ -536,15 +481,63 @@ table.adminlist thead #filter_cats {
 	padding-left: 12px;
 }
 
-
+/* Tags list autocomplete */
 ul#ultagbox{
-	padding-left:5px;
-	margin-left:0px;
+	min-height: 26px;
+	margin: 0;
+	padding: 0;
 }
 ul#ultagbox li{
 	list-style-type:none;
 	display:block;
-	height:18px;
-	min-width:80px;
 	float:left;
 }
+.tagitem {
+	border: 1px solid silver;
+	padding: 4px 1px 3px 6px;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  95% 50%;
+	margin: 2px;
+}
+.deletetag {
+	display: block;
+	width: 18px;
+	height:13px;
+	float: right;
+	margin-left: 5px;
+	outline: none;
+}
+/** tag selection */
+div#tags {
+	margin: 8px 3px;
+}
+.qf_tagbox {
+	display: block;
+	max-height: 170px;
+  	overflow: auto;
+  	border: 1px dashed silver;
+  	background: #fff;
+  	margin: 4px 4px 0px 0px;	
+}
+
+.qf_tagidbox {
+	width: 20px;
+	display: block;
+	float: left;
+	margin-top: -4px;
+}
+
+.qf_addtag { 
+	margin-top: 10px;
+}
+
+.qf_centerimg {
+	text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
+
+.clear
+{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
+
+

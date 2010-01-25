@@ -1,9 +1,10 @@
 .ac_results {
 	padding: 0px;
-	border: 1px solid black;
+	border: 1px solid silver;
 	background-color: white;
 	overflow: hidden;
 	z-index: 99999;
+	margin: -1px 0 0 0;
 }
 
 .ac_results ul {
@@ -24,8 +25,6 @@
 	when scroll mode will be used
 	*/
 	/*width: 100%;*/
-	font: menu;
-	font-size: 12px;
 	/* 
 	it is very important, if line-height not setted or setted 
 	in relative units scroll will be broken in firefox
@@ -35,14 +34,13 @@
 }
 
 .ac_loading {
-	background: white url('indicator.gif') right center no-repeat;
+	background: white url('../images/ajax-loader.gif') right center no-repeat;
 }
 
 .ac_odd {
-	background-color: #eee;
+	background-color: #E9E9E9;
 }
 
 .ac_over {
-	background-color: #0A246A;
-	color: white;
+	background-color: #FFFFDD;
 }
