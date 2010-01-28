@@ -51,8 +51,8 @@ class FlexicontentViewItem extends JView {
 
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
-		$cid			= is_array($cid)?$cid[0]:$cid;
-		$version = JRequest::getVar( 'version', '', 'request', 'int' );
+		$cid		= is_array($cid)?$cid[0]:$cid;
+		$version 	= JRequest::getVar( 'version', '', 'request', 'int' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -134,15 +134,15 @@ class FlexicontentViewItem extends JView {
 		$lists = array();
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
 			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all'))) {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20"', false);
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="required"', false);
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', false);
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', false);
 			} else {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20"');
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="required"');
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"');
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"');
 			}
 		} else {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20"');
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="required"');
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"');
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"');
 		}
 
 		//buid types selectlist

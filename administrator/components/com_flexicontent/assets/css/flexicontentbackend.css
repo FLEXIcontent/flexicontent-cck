@@ -495,7 +495,7 @@ ul#ultagbox li{
 .tagitem {
 	border: 1px solid silver;
 	padding: 4px 1px 3px 6px;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  95% 50%;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50%;
 	margin: 2px;
 }
 .deletetag {
@@ -540,4 +540,7 @@ div#tags {
 .clear
 { border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
 
+.mcat, .scat {
+	width: 235px;
+}
 
