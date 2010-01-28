@@ -795,9 +795,11 @@ class FlexicontentModelItem extends JModel
 	 */
 	function getusedtags($id)
 	{
-		$query = 'SELECT DISTINCT tr.tid,t.name FROM #__flexicontent_tags_item_relations as tr '
-		. ' LEFT JOIN #__flexicontent_tags as t ON tr.tid=t.id'
-		. ' WHERE tr.itemid = ' . (int)$id;
+		$query 	= 'SELECT DISTINCT tr.tid,t.name FROM #__flexicontent_tags_item_relations as tr '
+				. ' LEFT JOIN #__flexicontent_tags as t ON tr.tid=t.id'
+				. ' WHERE tr.itemid = ' . (int)$id
+				. ' ORDER BY name'
+				;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadObjectList();
 		return $used;
