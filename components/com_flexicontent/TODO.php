@@ -19,39 +19,40 @@
 
 TODO
 
-Fields
+Fields (vistamedia)
 + Create a field alias system to allows multiple behaviour for a same field
 + Copy fields
-+ Allow to filter by core fields
++ Allow to filter by core fields (author, reviser, category, tag)
 
 Frontend publishing
 + The frontend publication system
 
-Trash
-+ Create a trash system for the items
+Trash & Archive - Expired items
+^ transform archive view to add a trash system for the items
+
 
 Item (backend)
 + Implement the notification feature
 
-Versioning
+Versioning (enjoyman)
 + Add a diff engine for versioning
 + Remove version feature
 + Paginate version list
 + Remove core field from versions table and improve the restore procedure
 + Add the version comments
-^ the position of the version panel for better ergonomy
+^ the position of the version panel for better ergonomy???
 
-Categories
+Categories (enjoyman)
 + Copy categories feature
 + Import category list
 + Use phpThumb for category image management
 + Upload facilities for category images
 
-Filemanager
-+ File import parameter to recuse through sub-directories
+Filemanager (vistamedia)
++ File import parameter to recurse through sub-directories
 
 Global configuration
 + Create a complete tabbed configuration screen for a better organisation
 
-Cache system
+Cache system (vistamedia)
 + Add new selective layers to improve performance
