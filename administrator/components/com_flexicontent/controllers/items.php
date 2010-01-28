@@ -687,7 +687,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 			//header("Content-type:text/json");
-			$model 	=  $this->getModel('item');
+			$model 		=  $this->getModel('item');
 			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
 			$array = array();
 			echo "[";
