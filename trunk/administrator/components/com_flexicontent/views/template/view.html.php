@@ -44,8 +44,8 @@ class FlexicontentViewTemplate extends JView {
 		//Get data from the model
 		$layout    	= & $this->get( 'Data');
 		$fields    	= & $this->get( 'Fields');
-		$used    	= & $this->get( 'UsedFields');
 		$fbypos    	= & $this->get( 'FieldsByPositions');
+		$used    	= & $this->get( 'UsedFields');
 
 		if (isset($layout->positions)) {
 			$sort = array();
