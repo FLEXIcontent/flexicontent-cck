@@ -389,9 +389,12 @@ class FlexicontentModelItem extends JModel
 		}
 
 
-		// auto assign the main category
-		// $item->catid 		= $cats[0];
-		// auto assign the main category
+		// auto assign the main category if none selected
+		if (!$item->catid) {
+			$item->catid 		= $cats[0];
+		}
+		
+		// auto assign the section
 		$item->sectionid 	= FLEXI_SECTION;
 		
 		// Get a state and parameter variables from the request

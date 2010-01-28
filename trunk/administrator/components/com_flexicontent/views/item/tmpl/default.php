@@ -484,22 +484,22 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<tr>
 				<td style="padding-top: 5px;">
+					<label for="cid">
+					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
+					</label>
+				</td>
+				<td style="padding-top: 5px;">
+					<?php echo $this->lists['cid']; ?>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding-top: 5px;">
 					<label for="catid">
 					<strong><?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?></strong>
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
 					<?php echo $this->lists['catid']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label for="cid">
-					<strong><?php echo JText::_( 'FLEXI_CATEGORIES_ADD' ); ?></strong>
-					</label>
-				</td>
-				<td>
-					<?php echo $this->lists['cid']; ?>
 				</td>
 			</tr>
 		</table>
