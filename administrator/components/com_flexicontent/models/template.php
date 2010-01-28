@@ -134,13 +134,46 @@ class FlexicontentModelTemplate extends JModel
 				;				;
 		$this->_db->setQuery($query);
 		$positions = $this->_db->loadObjectList('position');
+
+		// convert template positions to array 
+		$tmplpositions = array();
+		if (isset($this->_layout->positions)) {
+			foreach($this->_layout->positions as $p) {
+				array_push($tmplpositions, $p);
+			}
+		}
 		
 		foreach ($positions as $pos) {
-			$pos->fields = explode(',', $pos->fields);
+			if (!in_array($pos->position, $tmplpositions)) {
+				$this->deletePosition($pos->position);
+				unset($pos);
+			} else {
+				$pos->fields = explode(',', $pos->fields);
+			}
 		}		
 		return $positions;
 	}
 
+
+	/**
+	 * Method cleanup template in case of removing positions
+	 *
+	 * @access public
+	 * @return void
+	 */
+	function deletePosition($pos)
+	{
+		$query  = 'DELETE FROM #__flexicontent_templates'
+				. ' WHERE template = ' . $this->_db->Quote($this->_folder)
+				. ' AND layout = ' . $this->_db->Quote($this->_type)
+				. ' AND position = ' . $this->_db->Quote($pos)
+				;
+		$this->_db->setQuery( $query );
+		if (!$this->_db->query()) {
+			JError::raiseWarning( 500, $this->_db->getError() );
+		}
+	}
+	
 	/**
 	 * Method to get all available fields
 	 *
@@ -185,6 +218,7 @@ class FlexicontentModelTemplate extends JModel
 					;
 			$this->_db->setQuery($query);
 			$this->_db->query();
+			// don't forget to check if no field was prevouilsly altered
 		}
 		
 		return true;
