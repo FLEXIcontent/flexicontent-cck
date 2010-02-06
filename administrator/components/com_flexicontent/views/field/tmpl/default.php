@@ -193,10 +193,10 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	
 		</td>
 
-		<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+		<td valign="top" width="40%" style="padding: 7px 0 0 5px">
 			<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 				<tr>
-					<td>
+					<td width="40%">
 						<label for="tid">
 						<strong><?php echo JText::_( 'FLEXI_TYPES' ); ?>: *</strong>
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_TYPES_NOTES' );?>">
