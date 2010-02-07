@@ -147,6 +147,7 @@ class FlexicontentFields
 		$item->modified		= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;
 
 		$item->creator 		= @$author->name 		? $author->name 	: '' ;
+		$item->author 		= $item->creator ;
 		$item->cmail 		= @$author->email 		? $author->email 	: '' ;
 		$item->modifier		= @$modifier->name 		? $modifier->name 	: $item->creator;
 		$item->mmail		= @$modifier->email 	? $modifier->email 	: $item->cmail;
@@ -425,7 +426,7 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
-		$query 	= 'SELECT i.id, u.name, u.username, u.email FROM #__content AS i'
+		$query 	= 'SELECT i.id, u.name, i.created_by_alias as alias, u.username, u.email FROM #__content AS i'
 				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 				. ' WHERE i.id IN (' . implode(',', $cids) . ')'
 				;
