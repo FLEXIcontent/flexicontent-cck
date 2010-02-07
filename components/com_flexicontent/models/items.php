@@ -125,6 +125,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function &getItem( )
 	{
+		global $mainframe;
+		
 		/*
 		* Load the Item data
 		*/
@@ -668,9 +670,6 @@ class FlexicontentModelItems extends JModel
 		$this->_item	=& $item;
 
 
-//dump($this->_item,'this->_item');
-
-
 		///////////////////////////////
 		// store extra fields values //
 		///////////////////////////////
@@ -684,47 +683,6 @@ class FlexicontentModelItems extends JModel
 		
 		// versioning backup procedure
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-
-
-//dump($item,'item');
-
-		// first see if versioning feature is enabled
-/*
-		if ($cparams->get('use_versioning'))
-		{
-			$oldversion = (int)$item->version - 1;
-
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_fields_item_relations'
-					. ' WHERE item_id = '. (int) $item->id
-					;
-			$this->_db->setQuery($query);
-			$oldrecords = $this->_db->loadObjectList();
-		
-			foreach ($oldrecords as $oldrecord)
-			{
-				$oldrecord->version = $oldversion;
-				$this->_db->insertObject('#__flexicontent_items_versions', $oldrecord);
-			}
-		}
-		
-		// delete old versions
-		$vcount	= $this->getVersionsCount();
-		$vmax	= $cparams->get('nr_versions', 10);
-
-		if ($vcount > $vmax)
-		{
-			$lastversion = $this->getFirstVersion($vmax);
-			// on efface les versions en trop
-			$query = 'DELETE'
-					.' FROM #__flexicontent_items_versions'
-					.' WHERE item_id = ' . (int)$this->_id
-					.' AND version <' . $lastversion
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-		}
-*/
 
 		// delete old values
 		$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
@@ -743,7 +701,6 @@ class FlexicontentModelItems extends JModel
 		$post['modified_by'] 	= $item->modified_by;
 		$post['version'] 		= $item->version++;
 
-//dump($post);
 		// intialize the searchindex for fulltext search
 		$searchindex = '';
 		
@@ -752,8 +709,6 @@ class FlexicontentModelItems extends JModel
 		{
 			foreach($fields as $field)
 			{
-//dump($field,'$results');
-//dump($post[$field->name],'$post[$field->name]');
 				// process field mambots onBeforeSaveField
 				$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 				// add the new values to the database 
@@ -800,8 +755,6 @@ class FlexicontentModelItems extends JModel
 
 				// process field mambots onAfterSaveField
 				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-				
-//dump($field,$field->name);
 				
 				$searchindex 	.= $field->search;
 			}
@@ -914,8 +867,6 @@ class FlexicontentModelItems extends JModel
 		$obj->published	= 1;
 
 		$this->storetag($obj);
-
-		//	$this->_db->insertObject('#__flexicontent_tags', $obj);
 
 		return true;
 	}
@@ -1034,78 +985,5 @@ class FlexicontentModelItems extends JModel
 		return $tparams;
 	}
 
-	/**
-	 * Method to get the value of an extrafield
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-/*
-	function getExtrafieldvalue($fieldid)
-	{
-		$query = 'SELECT value'
-				.' FROM #__flexicontent_fields_item_relations AS firel'
-				.' WHERE firel.item_id = ' . (int)$this->_id
-				.' AND firel.field_id = ' . (int)$fieldid
-				.' ORDER BY firel.valueorder ASC'
-				;
-		$this->_db->setQuery($query);
-		$field_value = $this->_db->loadResultArray();
-
-		return $field_value;
-
-	}
-*/
-	
-	/**
-	 * Method to get extrafields which belongs to the item type
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-/*
-	function getExtrafields()
-	{
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-
-		$query = 'SELECT attribs'
-				.' FROM #__content'
-				.' WHERE id = ' . (int)$this->_id
-				;
-		$this->_db->setQuery($query);
-		$attribs = $this->_db->loadResult();
-
-		$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
-		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
-
-		$query = 'SELECT fi.*, i.created AS creation'
-				.' FROM #__flexicontent_fields AS fi'
-				.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				.' LEFT JOIN #__content AS i ON ie.item_id = i.id'
-				. $joinaccess
-				.' WHERE i.id = ' . (int)$this->_id
-				. $andaccess
-				.' AND fi.published = 1'
-				.' GROUP BY fi.id'
-				.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-				;
-		$this->_db->setQuery($query);
-		$fields = $this->_db->loadObjectList('name');
-
-		foreach ($fields as $field)
-		{
-			// we append some values to the field object
-			$field->item_id 	= (int)$this->_id;
-			$field->positions 	= explode("\n", $field->positions);
-			$field->value 		= $this->getExtrafieldvalue($field->id);
-			$field->parameters 	= new JParameter( $field->attribs );
-			$field->search		= '';
-		}
-
-		return $fields;
-	}
-*/
 }
 ?>
