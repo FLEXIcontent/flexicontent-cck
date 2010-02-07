@@ -69,7 +69,9 @@ class FlexicontentViewItems extends JView
 		}
 		//special to hide the joomfish language selector on item views
 		$css = '#jflanguageselection { visibility:hidden; }'; 
-		$document->addStyleDeclaration($css);
+		if ($params->get('disable_lang_select', 1)) {
+			$document->addStyleDeclaration($css);
+		}
 		
 		//get item data
 		$item 	= & $this->get('Item');
@@ -129,7 +131,9 @@ class FlexicontentViewItems extends JView
 		// Get the menu item object		
 		if (is_object($menu)) {
 			$menu_params = new JParameter( $menu->params );
-			if (!$menu_params->get( 'page_title')) {
+// Modification by Thorax for item title
+			if ($menu_params->get( 'page_title', 1)) {
+//			if (!$menu_params->get( 'page_title')) {
 				$params->set('page_title',	$item->title);
 			}
 		} else {
