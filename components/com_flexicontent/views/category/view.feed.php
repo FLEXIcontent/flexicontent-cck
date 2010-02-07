@@ -41,7 +41,8 @@ class FlexicontentViewCategory extends JView
 		
 		$doc 		= & JFactory::getDocument();
 		$params 	= & $mainframe->getParams();
-		$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=category&cid='.JRequest::getVar('cid',null, '', 'int'));
+		$doc->link 	= JRoute::_(FlexicontentHelperRoute::getCategoryRoute(JRequest::getVar('cid',null, '', 'int')));
+//		$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=category&cid='.JRequest::getVar('cid',null, '', 'int'));
 		
 		JRequest::setVar('limit', $mainframe->getCfg('feed_limit'));
 		$category 	= & $this->get('Category');
@@ -55,7 +56,8 @@ class FlexicontentViewCategory extends JView
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_('index.php?option=com_flexicontent&view=items&cid='. $category->slug .'&id='.$row->slug );
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug));
+//			$link = JRoute::_('index.php?option=com_flexicontent&view=items&cid='. $category->slug .'&id='.$row->slug );
 
 			// strip html from feed item description text
 			$description	= ($params->get('feed_summary', 0) ? $row->introtext.$row->fulltext : $row->introtext);
