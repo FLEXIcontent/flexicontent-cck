@@ -43,9 +43,13 @@ class flexicontent_html
 			$cleantext = preg_replace( $pattern, '', $cleantext );
 		}
 		
+		$length = JString::strlen(htmlspecialchars( $cleantext ));
+
 		// cut the text if required
 		if ($chars) {
+			if ($length > $chars) {
 			$cleantext = JString::substr( htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8'), 0, $chars ).'...';
+		}
 		}
 		
 		return $cleantext;
