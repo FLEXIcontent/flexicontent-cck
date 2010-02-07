@@ -26,6 +26,10 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
+		<param name="disable_lang_select" type="radio" default="1" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
+			<option value="0">FLEXI_No</option>
+			<option value="1">FLEXI_Yes</option>
+		</param>
 
 		<param name="@spacer" type="spacer" default="" label="" description=""  menu="hide" />
 
