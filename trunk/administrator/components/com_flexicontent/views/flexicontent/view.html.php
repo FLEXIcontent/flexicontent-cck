@@ -123,7 +123,7 @@ class FlexicontentViewFlexicontent extends JView
 				$toolbar=&JToolBar::getInstance('toolbar');
 				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 			}
-			JToolBarHelper::preferences('com_flexicontent', '550', '570', 'Configuration');
+			JToolBarHelper::preferences('com_flexicontent', '550', '650', 'Configuration');
 		}		
 		
 		if (FLEXI_ACCESS) {
