@@ -40,6 +40,7 @@ class JElementItemlayout extends JElement
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->items;
 		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
+		$view	= JRequest::getVar('view');
 
 		$lays = array();
 		foreach ($tmpls as $tmpl) {
@@ -95,7 +96,9 @@ window.addEvent('domready', function(){
 		$doc->addScriptDeclaration($js);
 
 		if ($tmpls !== false) {
-			$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' )); 
+			if ($view != 'type') {
+				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
+			}
 			foreach ($tmpls as $tmpl) {
 				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
 			}
