@@ -71,10 +71,6 @@ class FlexicontentViewFavourites extends JView
 			$params->set('page_title',	JText::_( 'FLEXI_MY_FAVOURITES' ));
 		}
 		
-		//pathway
-		$pathway 	= & $mainframe->getPathWay();
-		$pathway->addItem( $params->get('page_title'), JRoute::_('index.php?view=favourites'));
-		
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 		
