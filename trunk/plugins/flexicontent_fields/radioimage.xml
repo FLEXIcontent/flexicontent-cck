@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
-	<name>Radio image buttons</name>
+	<name>FLEXIcontent - Radio Image Buttons</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
