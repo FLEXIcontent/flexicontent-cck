@@ -35,8 +35,19 @@ class JElementSeparator extends JElement
 	 */
 	var	$_name = 'separator';
 	
+
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		return '<span style="padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;">'.JText::_($value).'</div>';
+		$level = $node->attributes('level');
+		if ($level == 'level2') {
+			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
+		} else if ($level == 'level3') {
+			$style = 'padding: 5px 4px 5px 5px; font-weight: bold;';
+		} else {
+			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
+		}
+		
+		return '<span style="'.$style.'">'.JText::_($value).'</div>';
 	}
+
 }
