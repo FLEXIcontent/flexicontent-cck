@@ -641,10 +641,9 @@
 				{
 					var link 	= newSlide.find('a'),
 						related = $('a[rel='+imageData.gallery.rel+']');
-						console.warn(related)
-					test = link.colorbox({href: $(imageData.image).attr('alt'), photo: true, slideshow: true, title: false});
+					link.colorbox({href: $(imageData.image).attr('alt'), photo: true, slideshow: false, title: false});
 				}
-				console.warn(imageData.gallery.rel, test)
+				//console.warn(imageData.gallery.rel, test)
 				var newCaption = 0;
 				if (this.$captionContainer) {
 					// Construct new hidden caption for the image
