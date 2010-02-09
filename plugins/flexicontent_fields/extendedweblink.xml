@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
-	<name>Extended Weblink</name>
+	<name>FLEXIcontent - Extended Weblink</name>
 	<author>Stian Didriksen</author>
 	<creationDate>February 2010</creationDate>
 	<copyright>Copyright (C) 2010 ProThemer</copyright>
