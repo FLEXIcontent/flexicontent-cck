@@ -339,7 +339,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$target = $field->parameters->get( 'target', false ) ? ' target="'.$field->parameters->get( 'target').'"' : null;
 			$text   = $uselinktext && isset($value['linktext']) ? $value['linktext'] : null;
 			if(!$text) $text = $usetitle ? $value['title'] : $this->cleanurl($value['link']);
-			$field->{$prop}[]	= $value ? '<a href="' . JRoute::_( 'index.php?fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=extendedweblink' ) . '"'.$id.$class.$target.' title="' . $value['title'] . '">'.( $text ).'</a>' : '';
+			$field->{$prop}[]	= $value ? '<a href="' . JRoute::_( 'index.php?fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' ) . '"'.$id.$class.$target.' title="' . $value['title'] . '">'.( $text ).'</a>' : '';
 			$n++;
 			}
 		$field->{$prop} = implode($separatorf, $field->{$prop});
