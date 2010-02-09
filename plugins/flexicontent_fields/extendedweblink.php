@@ -195,7 +195,6 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 						<td><input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 						</tr>
 						'.$linktext.'
-						'.$target.'
 						'.$class.'
 						'.$id.'
 					</tbody></table>
