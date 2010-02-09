@@ -49,10 +49,6 @@
 			<option value="_self">open in the same frame</option>
 			<option value="_top">open in the full body of the window</option>
 		</param>
-		<param name="use_target" type="radio" default="0" label="FLEXI_FIELD_USE_TARGET" description="FLEXI_FIELD_USE_TARGET_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
 		<param name="default_class" type="text" default="" label="FLEXI_FIELD_DEFAULT_CLASS" description="FLEXI_FIELD_DEFAULT_CLASS_DESC" />
 		<param name="use_class" type="radio" default="0" label="FLEXI_FIELD_USE_CLASS" description="FLEXI_FIELD_USE_CLASS_DESC">
 			<option value="0">No</option>
