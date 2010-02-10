@@ -793,6 +793,59 @@ class flexicontent_html
 		$lang = $languages->get('site', 'en-GB');
 		return $lang;		
 	}
+	
+	 function nl2space($string) {
+		if(gettype($string)!="string") return false;
+		$strlen = strlen($string);
+		$array = array();
+		$str = "";
+		for($i=0;$i<$strlen;$i++) {
+			if(ord($string[$i])===ord("\n")) {
+				$str .= ' ';
+				continue;
+			}
+			$str .= $string[$i];
+		}
+		return $str;
+	 }
+	function flexiDiff($old, $new){
+		$maxlen =0;
+		foreach($old as $oindex => $ovalue){
+			$nkeys = array_keys($new, $ovalue);
+			foreach($nkeys as $nindex){
+				$matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
+				$matrix[$oindex - 1][$nindex - 1] + 1 : 1;
+				if($matrix[$oindex][$nindex] > $maxlen){
+					$maxlen = $matrix[$oindex][$nindex];
+					$omax = $oindex + 1 - $maxlen;
+					$nmax = $nindex + 1 - $maxlen;
+				}
+			}
+		}
+		if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
+		return array_merge(flexicontent_html::flexiDiff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+		array_slice($new, $nmax, $maxlen),
+		flexicontent_html::flexiDiff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+	}
+	 
+	function flexiHtmlDiff($old, $new){
+		//echo "<xmp>";var_dump(explode(' ', $old), explode(' ', $new));echo "</xmp>";
+		//return array(array(),array());
+		$diff = flexicontent_html::flexiDiff(explode(' ', $old), explode(' ', $new));
+		$ret_d = "";
+		$ret_i= "";
+			
+		foreach($diff as $k){
+			if(is_array($k)) {
+				$ret_d .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'');
+				$ret_i .= (!empty($k['i'])?"<ins>".implode(' ',$k['i'])."</ins> ":'');
+			}else {
+				$ret_d .= $k . ' ';
+				$ret_i .= $k . ' ';
+			}
+		}
+		return array($ret_d, $ret_i);
+	}
 }
 
 class flexicontent_upload
