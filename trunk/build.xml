@@ -3,140 +3,150 @@
 
 	<target name="build">
 	
-		<delete dir="tmp" includeemptydirs="true" />
+		<delete dir="flexipack" includeemptydirs="true" />
 		
-		<copy todir="tmp/admin" >
+		<copy todir="flexipack/admin" >
 			<fileset dir="administrator/components/com_flexicontent">
 				<exclude name=".**" />
 			</fileset>
 		</copy>
 		
-		<copy todir="tmp/site" >
+		<copy todir="flexipack/site" >
 			<fileset dir="components/com_flexicontent">
 				<exclude name=".**" />
+				<exclude name="medias" />
+				<exclude name="medias/**" />
+				<exclude name="uploads" />
+				<exclude name="uploads/**" />
 			</fileset>
 		</copy>
 		
 		<!-- plugins -->
-		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="tmp/plugins/checkbox/checkbox.php" />
-		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="tmp/plugins/checkbox/checkbox.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_checkbox.ini" tofile="tmp/plugins/checkbox/en-GB.plg_flexicontent_fields_checkbox.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_checkbox.ini" tofile="tmp/plugins/checkbox/fr-FR.plg_flexicontent_fields_checkbox.ini" />
+		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="flexipack/plugins/checkbox/checkbox.php" />
+		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="flexipack/plugins/checkbox/checkbox.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_checkbox.ini" tofile="flexipack/plugins/checkbox/en-GB.plg_flexicontent_fields_checkbox.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_checkbox.ini" tofile="flexipack/plugins/checkbox/fr-FR.plg_flexicontent_fields_checkbox.ini" />
 		
-		<copy file="plugins/flexicontent_fields/checkboximage.php" tofile="tmp/plugins/checkboximage/checkboximage.php" />
-		<copy file="plugins/flexicontent_fields/checkboximage.xml" tofile="tmp/plugins/checkboximage/checkboximage.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_checkboximage.ini" tofile="tmp/plugins/checkboximage/en-GB.plg_flexicontent_fields_checkboximage.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_checkboximage.ini" tofile="tmp/plugins/checkboximage/fr-FR.plg_flexicontent_fields_checkboximage.ini" />
+		<copy file="plugins/flexicontent_fields/checkboximage.php" tofile="flexipack/plugins/checkboximage/checkboximage.php" />
+		<copy file="plugins/flexicontent_fields/checkboximage.xml" tofile="flexipack/plugins/checkboximage/checkboximage.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_checkboximage.ini" tofile="flexipack/plugins/checkboximage/en-GB.plg_flexicontent_fields_checkboximage.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_checkboximage.ini" tofile="flexipack/plugins/checkboximage/fr-FR.plg_flexicontent_fields_checkboximage.ini" />
 		
-		<copy file="plugins/flexicontent_fields/core.php" tofile="tmp/plugins/core/core.php" />
-		<copy file="plugins/flexicontent_fields/core.xml" tofile="tmp/plugins/core/core.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_core.ini" tofile="tmp/plugins/core/en-GB.plg_flexicontent_fields_core.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_core.ini" tofile="tmp/plugins/core/fr-FR.plg_flexicontent_fields_core.ini" />
+		<copy file="plugins/flexicontent_fields/core.php" tofile="flexipack/plugins/core/core.php" />
+		<copy file="plugins/flexicontent_fields/core.xml" tofile="flexipack/plugins/core/core.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_core.ini" tofile="flexipack/plugins/core/en-GB.plg_flexicontent_fields_core.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_core.ini" tofile="flexipack/plugins/core/fr-FR.plg_flexicontent_fields_core.ini" />
 		
-		<copy file="plugins/flexicontent_fields/date.php" tofile="tmp/plugins/date/date.php" />
-		<copy file="plugins/flexicontent_fields/date.xml" tofile="tmp/plugins/date/date.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_date.ini" tofile="tmp/plugins/date/en-GB.plg_flexicontent_fields_date.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_date.ini" tofile="tmp/plugins/date/fr-FR.plg_flexicontent_fields_date.ini" />
+		<copy file="plugins/flexicontent_fields/date.php" tofile="flexipack/plugins/date/date.php" />
+		<copy file="plugins/flexicontent_fields/date.xml" tofile="flexipack/plugins/date/date.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_date.ini" tofile="flexipack/plugins/date/en-GB.plg_flexicontent_fields_date.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_date.ini" tofile="flexipack/plugins/date/fr-FR.plg_flexicontent_fields_date.ini" />
 		
-		<copy file="plugins/flexicontent_fields/email.php" tofile="tmp/plugins/email/email.php" />
-		<copy file="plugins/flexicontent_fields/email.xml" tofile="tmp/plugins/email/email.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_email.ini" tofile="tmp/plugins/email/en-GB.plg_flexicontent_fields_email.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_email.ini" tofile="tmp/plugins/email/fr-FR.plg_flexicontent_fields_email.ini" />
+		<copy file="plugins/flexicontent_fields/email.php" tofile="flexipack/plugins/email/email.php" />
+		<copy file="plugins/flexicontent_fields/email.xml" tofile="flexipack/plugins/email/email.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_email.ini" tofile="flexipack/plugins/email/en-GB.plg_flexicontent_fields_email.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_email.ini" tofile="flexipack/plugins/email/fr-FR.plg_flexicontent_fields_email.ini" />
 		
-		<copy file="plugins/flexicontent_fields/file.php" tofile="tmp/plugins/file/file.php" />
-		<copy file="plugins/flexicontent_fields/file.xml" tofile="tmp/plugins/file/file.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_file.ini" tofile="tmp/plugins/file/en-GB.plg_flexicontent_fields_file.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_file.ini" tofile="tmp/plugins/file/fr-FR.plg_flexicontent_fields_file.ini" />
+		<copy file="plugins/flexicontent_fields/file.php" tofile="flexipack/plugins/file/file.php" />
+		<copy file="plugins/flexicontent_fields/file.xml" tofile="flexipack/plugins/file/file.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_file.ini" tofile="flexipack/plugins/file/en-GB.plg_flexicontent_fields_file.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_file.ini" tofile="flexipack/plugins/file/fr-FR.plg_flexicontent_fields_file.ini" />
 		
-		<copy file="plugins/flexicontent_fields/image.php" tofile="tmp/plugins/image/image.php" />
-		<copy file="plugins/flexicontent_fields/image.xml" tofile="tmp/plugins/image/image.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_image.ini" tofile="tmp/plugins/image/en-GB.plg_flexicontent_fields_image.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_image.ini" tofile="tmp/plugins/image/fr-FR.plg_flexicontent_fields_image.ini" />
-		<copy todir="tmp/plugins/image/image" >
+		<copy file="plugins/flexicontent_fields/image.php" tofile="flexipack/plugins/image/image.php" />
+		<copy file="plugins/flexicontent_fields/image.xml" tofile="flexipack/plugins/image/image.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_image.ini" tofile="flexipack/plugins/image/en-GB.plg_flexicontent_fields_image.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_image.ini" tofile="flexipack/plugins/image/fr-FR.plg_flexicontent_fields_image.ini" />
+		<copy todir="flexipack/plugins/image/image" >
 			<fileset dir="plugins/flexicontent_fields/image">
 				<exclude name=".**" />
 			</fileset>
 		</copy>
 		
-		<copy file="plugins/flexicontent_fields/radio.php" tofile="tmp/plugins/radio/radio.php" />
-		<copy file="plugins/flexicontent_fields/radio.xml" tofile="tmp/plugins/radio/radio.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_radio.ini" tofile="tmp/plugins/radio/en-GB.plg_flexicontent_fields_radio.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_radio.ini" tofile="tmp/plugins/radio/fr-FR.plg_flexicontent_fields_radio.ini" />
+		<copy file="plugins/flexicontent_fields/radio.php" tofile="flexipack/plugins/radio/radio.php" />
+		<copy file="plugins/flexicontent_fields/radio.xml" tofile="flexipack/plugins/radio/radio.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_radio.ini" tofile="flexipack/plugins/radio/en-GB.plg_flexicontent_fields_radio.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_radio.ini" tofile="flexipack/plugins/radio/fr-FR.plg_flexicontent_fields_radio.ini" />
 		
-		<copy file="plugins/flexicontent_fields/radioimage.php" tofile="tmp/plugins/radioimage/radioimage.php" />
-		<copy file="plugins/flexicontent_fields/radioimage.xml" tofile="tmp/plugins/radioimage/radioimage.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_radioimage.ini" tofile="tmp/plugins/radioimage/en-GB.plg_flexicontent_fields_radioimage.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_radioimage.ini" tofile="tmp/plugins/radioimage/fr-FR.plg_flexicontent_fields_radioimage.ini" />
+		<copy file="plugins/flexicontent_fields/radioimage.php" tofile="flexipack/plugins/radioimage/radioimage.php" />
+		<copy file="plugins/flexicontent_fields/radioimage.xml" tofile="flexipack/plugins/radioimage/radioimage.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_radioimage.ini" tofile="flexipack/plugins/radioimage/en-GB.plg_flexicontent_fields_radioimage.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_radioimage.ini" tofile="flexipack/plugins/radioimage/fr-FR.plg_flexicontent_fields_radioimage.ini" />
 		
-		<copy file="plugins/flexicontent_fields/select.php" tofile="tmp/plugins/select/select.php" />
-		<copy file="plugins/flexicontent_fields/select.xml" tofile="tmp/plugins/select/select.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_select.ini" tofile="tmp/plugins/select/en-GB.plg_flexicontent_fields_select.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_select.ini" tofile="tmp/plugins/select/fr-FR.plg_flexicontent_fields_select.ini" />
+		<copy file="plugins/flexicontent_fields/select.php" tofile="flexipack/plugins/select/select.php" />
+		<copy file="plugins/flexicontent_fields/select.xml" tofile="flexipack/plugins/select/select.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_select.ini" tofile="flexipack/plugins/select/en-GB.plg_flexicontent_fields_select.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_select.ini" tofile="flexipack/plugins/select/fr-FR.plg_flexicontent_fields_select.ini" />
 		
-		<copy file="plugins/flexicontent_fields/selectmultiple.php" tofile="tmp/plugins/selectmultiple/selectmultiple.php" />
-		<copy file="plugins/flexicontent_fields/selectmultiple.xml" tofile="tmp/plugins/selectmultiple/selectmultiple.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_selectmultiple.ini" tofile="tmp/plugins/selectmultiple/en-GB.plg_flexicontent_fields_selectmultiple.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_selectmultiple.ini" tofile="tmp/plugins/selectmultiple/fr-FR.plg_flexicontent_fields_selectmultiple.ini" />
+		<copy file="plugins/flexicontent_fields/selectmultiple.php" tofile="flexipack/plugins/selectmultiple/selectmultiple.php" />
+		<copy file="plugins/flexicontent_fields/selectmultiple.xml" tofile="flexipack/plugins/selectmultiple/selectmultiple.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_selectmultiple.ini" tofile="flexipack/plugins/selectmultiple/en-GB.plg_flexicontent_fields_selectmultiple.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_selectmultiple.ini" tofile="flexipack/plugins/selectmultiple/fr-FR.plg_flexicontent_fields_selectmultiple.ini" />
 		
-		<copy file="plugins/flexicontent_fields/text.php" tofile="tmp/plugins/text/text.php" />
-		<copy file="plugins/flexicontent_fields/text.xml" tofile="tmp/plugins/text/text.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_text.ini" tofile="tmp/plugins/text/en-GB.plg_flexicontent_fields_text.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_text.ini" tofile="tmp/plugins/text/fr-FR.plg_flexicontent_fields_text.ini" />
+		<copy file="plugins/flexicontent_fields/text.php" tofile="flexipack/plugins/text/text.php" />
+		<copy file="plugins/flexicontent_fields/text.xml" tofile="flexipack/plugins/text/text.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_text.ini" tofile="flexipack/plugins/text/en-GB.plg_flexicontent_fields_text.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_text.ini" tofile="flexipack/plugins/text/fr-FR.plg_flexicontent_fields_text.ini" />
 		
-		<copy file="plugins/flexicontent_fields/textarea.php" tofile="tmp/plugins/textarea/textarea.php" />
-		<copy file="plugins/flexicontent_fields/textarea.xml" tofile="tmp/plugins/textarea/textarea.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_textarea.ini" tofile="tmp/plugins/textarea/en-GB.plg_flexicontent_fields_textarea.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_textarea.ini" tofile="tmp/plugins/textarea/fr-FR.plg_flexicontent_fields_textarea.ini" />
+		<copy file="plugins/flexicontent_fields/textarea.php" tofile="flexipack/plugins/textarea/textarea.php" />
+		<copy file="plugins/flexicontent_fields/textarea.xml" tofile="flexipack/plugins/textarea/textarea.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_textarea.ini" tofile="flexipack/plugins/textarea/en-GB.plg_flexicontent_fields_textarea.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_textarea.ini" tofile="flexipack/plugins/textarea/fr-FR.plg_flexicontent_fields_textarea.ini" />
 		
-		<copy file="plugins/flexicontent_fields/weblink.php" tofile="tmp/plugins/weblink/weblink.php" />
-		<copy file="plugins/flexicontent_fields/weblink.xml" tofile="tmp/plugins/weblink/weblink.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_weblink.ini" tofile="tmp/plugins/weblink/en-GB.plg_flexicontent_fields_weblink.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_weblink.ini" tofile="tmp/plugins/weblink/fr-FR.plg_flexicontent_fields_weblink.ini" />
+		<copy file="plugins/flexicontent_fields/weblink.php" tofile="flexipack/plugins/weblink/weblink.php" />
+		<copy file="plugins/flexicontent_fields/weblink.xml" tofile="flexipack/plugins/weblink/weblink.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_weblink.ini" tofile="flexipack/plugins/weblink/en-GB.plg_flexicontent_fields_weblink.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_weblink.ini" tofile="flexipack/plugins/weblink/fr-FR.plg_flexicontent_fields_weblink.ini" />
 		
-		<copy file="plugins/flexicontent_fields/extendedweblink.php" tofile="tmp/plugins/extendedweblink/extendedweblink.php" />
-		<copy file="plugins/flexicontent_fields/extendedweblink.xml" tofile="tmp/plugins/extendedweblink/extendedweblink.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_extendedweblink.ini" tofile="tmp/plugins/extendedweblink/en-GB.plg_flexicontent_fields_extendedweblink.ini" />
-		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_extendedweblink.ini" tofile="tmp/plugins/extendedweblink/fr-FR.plg_flexicontent_fields_extendedweblink.ini" />-->
+		<copy file="plugins/flexicontent_fields/extendedweblink.php" tofile="flexipack/plugins/extendedweblink/extendedweblink.php" />
+		<copy file="plugins/flexicontent_fields/extendedweblink.xml" tofile="flexipack/plugins/extendedweblink/extendedweblink.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_extendedweblink.ini" tofile="flexipack/plugins/extendedweblink/en-GB.plg_flexicontent_fields_extendedweblink.ini" />
+		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_extendedweblink.ini" tofile="flexipack/plugins/extendedweblink/fr-FR.plg_flexicontent_fields_extendedweblink.ini" />-->
 		
-		<copy file="plugins/flexicontent_fields/linkslist.php" tofile="tmp/plugins/linkslist/linkslist.php" />
-		<copy file="plugins/flexicontent_fields/linkslist.xml" tofile="tmp/plugins/linkslist/linkslist.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_linkslist.ini" tofile="tmp/plugins/linkslist/en-GB.plg_flexicontent_fields_linkslist.ini" />
-		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_linkslist.ini" tofile="tmp/plugins/linkslist/fr-FR.plg_flexicontent_fields_linkslist.ini" />-->
+		<copy file="plugins/flexicontent_fields/linkslist.php" tofile="flexipack/plugins/linkslist/linkslist.php" />
+		<copy file="plugins/flexicontent_fields/linkslist.xml" tofile="flexipack/plugins/linkslist/linkslist.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/en-GB.plg_flexicontent_fields_linkslist.ini" />
+		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/fr-FR.plg_flexicontent_fields_linkslist.ini" />-->
 		
-		<copy file="plugins/flexicontent_fields/minigallery.php" tofile="tmp/plugins/minigallery/minigallery.php" />
-		<copy file="plugins/flexicontent_fields/minigallery.xml" tofile="tmp/plugins/minigallery/minigallery.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_minigallery.ini" tofile="tmp/plugins/minigallery/en-GB.plg_flexicontent_fields_minigallery.ini" />
-		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_minigallery.ini" tofile="tmp/plugins/minigallery/fr-FR.plg_flexicontent_fields_minigallery.ini" />-->
-		<copy todir="tmp/plugins/minigallery/minigallery" >
+		<copy file="plugins/flexicontent_fields/minigallery.php" tofile="flexipack/plugins/minigallery/minigallery.php" />
+		<copy file="plugins/flexicontent_fields/minigallery.xml" tofile="flexipack/plugins/minigallery/minigallery.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_minigallery.ini" tofile="flexipack/plugins/minigallery/en-GB.plg_flexicontent_fields_minigallery.ini" />
+		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_minigallery.ini" tofile="flexipack/plugins/minigallery/fr-FR.plg_flexicontent_fields_minigallery.ini" />-->
+		<copy todir="flexipack/plugins/minigallery/minigallery" >
 			<fileset dir="plugins/flexicontent_fields/minigallery">
 				<exclude name=".**" />
 			</fileset>
 		</copy>
 		
-		<copy file="plugins/search/flexisearch.php" tofile="tmp/plugins/search/flexisearch.php" />
-		<copy file="plugins/search/flexisearch.xml" tofile="tmp/plugins/search/flexisearch.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="tmp/plugins/search/en-GB.plg_search_flexisearch.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_search_flexisearch.ini" tofile="tmp/plugins/search/fr-FR.plg_search_flexisearch.ini" />
+		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
+		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexisearch.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/fr-FR.plg_search_flexisearch.ini" />
 		
-		<copy file="plugins/system/flexisystem.php" tofile="tmp/plugins/system/flexisystem.php" />
-		<copy file="plugins/system/flexisystem.xml" tofile="tmp/plugins/system/flexisystem.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="tmp/plugins/system/en-GB.plg_system_flexisystem.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexisystem.ini" tofile="tmp/plugins/system/fr-FR.plg_system_flexisystem.ini" />
+		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/system/flexisystem.php" />
+		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/fr-FR.plg_system_flexisystem.ini" />
 		
-		<move file="tmp/admin/install.php" tofile="tmp/install.php" />
-		<move file="tmp/admin/manifest.xml" tofile="tmp/manifest.xml" />
-		<move file="tmp/admin/uninstall.php" tofile="tmp/uninstall.php" />
+		<move file="flexipack/admin/install.php" tofile="flexipack/install.php" />
+		<move file="flexipack/admin/manifest.xml" tofile="flexipack/manifest.xml" />
+		<move file="flexipack/admin/uninstall.php" tofile="flexipack/uninstall.php" />
 		
-		<copy file="administrator/language/en-GB/en-GB.com_flexicontent.ini" tofile="tmp/admin/language/en-GB.com_flexicontent.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.com_flexicontent.ini" tofile="tmp/admin/language/fr-FR.com_flexicontent.ini" />
-		<copy file="language/en-GB/en-GB.com_flexicontent.ini" tofile="tmp/site/language/en-GB.com_flexicontent.ini" />
-		<copy file="language/fr-FR/fr-FR.com_flexicontent.ini" tofile="tmp/site/language/fr-FR.com_flexicontent.ini" />
+		<copy file="administrator/language/en-GB/en-GB.com_flexicontent.ini" tofile="flexipack/admin/language/en-GB.com_flexicontent.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.com_flexicontent.ini" tofile="flexipack/admin/language/fr-FR.com_flexicontent.ini" />
+		<copy file="language/en-GB/en-GB.com_flexicontent.ini" tofile="flexipack/site/language/en-GB.com_flexicontent.ini" />
+		<copy file="language/fr-FR/fr-FR.com_flexicontent.ini" tofile="flexipack/site/language/fr-FR.com_flexicontent.ini" />
 		
+		<tar destfile="com_flexicontent.tar.gz" basedir="flexipack" compression="gzip"/>
+<!--
+		<tar destfile="com_flexicontent.tar" compression="gzip">
+			<fileset dir="flexipack" />
+		</tar>
 		<zip destfile="com_flexicontent.zip">
-			<fileset dir="tmp" />
+			<fileset dir="flexipack" />
 		</zip>
+-->
 		
-		<delete dir="tmp" includeemptydirs="true" />
+		<delete dir="flexipack" includeemptydirs="true" />
 		
 	</target>
 </project>
