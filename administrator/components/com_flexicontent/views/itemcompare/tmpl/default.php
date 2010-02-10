@@ -44,8 +44,12 @@ defined('_JEXEC') or die('Restricted access');
 								if ($field->field_type == 'maintext') {
 									$field->label 			= $this->tparams->get('maintext_label', $field->label);
 									$field->description 	= $this->tparams->get('maintext_desc', $field->description);
-									$field->display			= $field->value ? nl2br($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );
+									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );
+									
+									$field->displayversion		= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
 								}
+								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+								$html = flexicontent_html::flexiHtmlDiff($field->display, $field->displayversion);
 						?>
 						<tr>
 							<td class="key">
@@ -55,9 +59,9 @@ defined('_JEXEC') or die('Restricted access');
 							</td>
 							<td valign="top">
 								<?php
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 								if(isset($field->display)){
-									echo $field->display;
+									//echo $field->display;
+									echo $html[0];
 								} else {
 									echo $noplugin;
 								}
@@ -65,13 +69,9 @@ defined('_JEXEC') or die('Restricted access');
 							</td>
 							<td valign="top">
 								<?php
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-								if ($field->field_type == 'maintext') {
-									$field->displayversion		= $field->version ? nl2br($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
-								}
-								
 								if(isset($field->displayversion)){
-									echo $field->displayversion;
+									//echo $field->displayversion;
+									echo $html[1];
 								} else {
 									echo $noplugin;
 								}
@@ -83,7 +83,7 @@ defined('_JEXEC') or die('Restricted access');
 						}
 						?>
 					</table>
-			</td>
+			<?php //echo "<xmp>";var_dump($html);echo "</xmp>";?></td>
 		</tr>
 	</table>
 </div>
