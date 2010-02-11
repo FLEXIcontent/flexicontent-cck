@@ -90,7 +90,7 @@ class plgSystemFlexisystem extends JPlugin
 
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
-					$urlItems .= '&controller=items&task=edit&cid='.intval($cid);
+					$urlItems .= '&controller=items&task=edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
 				} else {
 					$urlItems .= '&view=items';
 				}
