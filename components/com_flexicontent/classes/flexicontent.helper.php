@@ -48,8 +48,8 @@ class flexicontent_html
 		// cut the text if required
 		if ($chars) {
 			if ($length > $chars) {
-			$cleantext = JString::substr( htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8'), 0, $chars ).'...';
-		}
+				$cleantext = JString::substr( htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8'), 0, $chars ).'...';
+			}
 		}
 		
 		return $cleantext;
@@ -93,8 +93,6 @@ class flexicontent_html
 	{
 		if ($params->get( 'show_print_icon' )) {
 
-			JHTML::_('behavior.tooltip');
-
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 
 			// checks template image directory for image, if non found default are loaded
@@ -131,7 +129,6 @@ class flexicontent_html
 	{
 		if ($params->get('show_email_icon')) {
 
-			JHTML::_('behavior.tooltip');
 			$uri    =& JURI::getInstance();
 			$base  	= $uri->toString( array('scheme', 'host', 'port'));
 			
@@ -175,8 +172,6 @@ class flexicontent_html
 	{
 		if ($params->get('show_pdf_icon')) {
 
-			JHTML::_('behavior.tooltip');
-
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'pdf_button.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
@@ -206,8 +201,6 @@ class flexicontent_html
 
 		if ($user->authorize('com_flexicontent', 'edit') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) {
 
-			JHTML::_('behavior.tooltip');
-
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 			} else {
@@ -236,8 +229,6 @@ class flexicontent_html
 
 		if ($user->authorize('com_flexicontent', 'add')) {
 
-			JHTML::_('behavior.tooltip');
-
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD' ));
 			} else {
@@ -265,45 +256,40 @@ class flexicontent_html
 	{
 		$user		= & JFactory::getUser();
 
-//		if ($user->authorize('com_flexicontent', 'state') && $params->get('show_state_icon')) {
+		if ( $state == 1 ) {
+			$img = 'tick.png';
+			$alt = JText::_( 'FLEXI_PUBLISHED' );
+			$state = 1;
+		} else if ( $state == 0 ) {
+			$img = 'publish_x.png';
+			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
+			$state = 0;
+		} else if ( $state == -1 ) {
+			$img = 'disabled.png';
+			$alt = JText::_( 'FLEXI_ARCHIVED' );
+			$state = -1;
+		} else if ( $state == -3 ) {
+			$img = 'publish_r.png';
+			$alt = JText::_( 'FLEXI_PENDING' );
+			$state = -3;
+		} else if ( $state == -4 ) {
+			$img = 'publish_y.png';
+			$alt = JText::_( 'FLEXI_TO_WRITE' );
+			$state = -4;
+		} else if ( $state == -5 ) {
+			$img = 'publish_g.png';
+			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
+			$state = -5;
+		}
 
-			JHTML::_('behavior.tooltip');
-
-			if ( $state == 1 ) {
-				$img = 'tick.png';
-				$alt = JText::_( 'FLEXI_PUBLISHED' );
-				$state = 1;
-			} else if ( $state == 0 ) {
-				$img = 'publish_x.png';
-				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-				$state = 0;
-			} else if ( $state == -1 ) {
-				$img = 'disabled.png';
-				$alt = JText::_( 'FLEXI_ARCHIVED' );
-				$state = -1;
-			} else if ( $state == -3 ) {
-				$img = 'publish_r.png';
-				$alt = JText::_( 'FLEXI_PENDING' );
-				$state = -3;
-			} else if ( $state == -4 ) {
-				$img = 'publish_y.png';
-				$alt = JText::_( 'FLEXI_TO_WRITE' );
-				$state = -4;
-			} else if ( $state == -5 ) {
-				$img = 'publish_g.png';
-				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-				$state = -5;
-			}
-
-			$text = JText::_( 'FLEXI_STATE' );
-			
-			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', $img, 'components/com_flexicontent/assets/images/', NULL, NULL, $alt, 'class="editlinktip hasTip" title="'.$text.'::'.$alt.'"' );
-			} else {
-				$image = '&nbsp;'. $alt;
-			}
-			return $image;
-//		}
+		$text = JText::_( 'FLEXI_STATE' );
+		
+		if ( $params->get('show_icons') ) {
+			$image = JHTML::_('image.site', $img, 'components/com_flexicontent/assets/images/', NULL, NULL, $alt, 'class="editlinktip hasTip" title="'.$text.'::'.$alt.'"' );
+		} else {
+			$image = '&nbsp;'. $alt;
+		}
+		return $image;
 		return;
 	}
 
@@ -316,8 +302,6 @@ class flexicontent_html
 	 */
 	function ratingbar($item)
 	{
-		JHTML::_('behavior.tooltip');
-		
 		//sql calculation doesn't work with negative values and thus only minus votes will not be taken into account
 		if ($item->votes == 0) {
 			return JText::_( 'FLEXI_NOT_YET_RATED' );
@@ -341,8 +325,6 @@ class flexicontent_html
 	 */
 	function voteicons($item, &$params)
 	{
-		JHTML::_('behavior.tooltip');
-		
 		if ( $params->get('show_icons') ) {
 			$voteup = JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) );
 			$votedown = JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) );
@@ -509,8 +491,6 @@ class flexicontent_html
 		$js			= $live_path.'components/com_flexicontent/assets/js/fcfav.js';
 		$document->addScript($js);
 		
-		JHTML::_('behavior.tooltip');
-
          	$output = "
 			<script type=\"text/javascript\" language=\"javascript\">
 			<!--
@@ -811,7 +791,7 @@ class flexicontent_html
 
 
 
-	  /**
+	/**
 		Diff implemented in pure php, written from scratch.
 		Copyright (C) 2003  Daniel Unterberger <diff.phpnet@holomind.de>
 		Copyright (C) 2005  Nils Knappmeier next version 
@@ -831,7 +811,7 @@ class flexicontent_html
 		Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 		
 		http://www.gnu.org/licenses/gpl.html
-
+		
 		About:
 		I searched a function to compare arrays and the array_diff()
 		was not specific enough. It ignores the order of the array-values.
@@ -839,93 +819,96 @@ class flexicontent_html
 		but this you can use directly in your code and adopt for your needs.
 		Simply adopt the formatline-function. with the third-parameter of arr_diff()
 		you can hide matching lines. Hope someone has use for this.
-
+		
 		Contact: d.u.diff@holomind.de <daniel unterberger>
-	    **/
-
+	**/
 	    
 	## PHPDiff returns the differences between $old and $new, formatted
 	## in the standard diff(1) output format.
+
 	function PHPDiff($t1,$t2) 
 	{
-	   # split the source text into arrays of lines
-	   //$t1 = explode("\n",$old);
-	   $x=array_pop($t1); 
-	   if ($x>'') $t1[]="$x\n\\ No newline at end of file";
-	   //$t2 = explode("\n",$new);
-	   $x=array_pop($t2); 
-	   if ($x>'') $t2[]="$x\n\\ No newline at end of file";
+		# split the source text into arrays of lines
+		//$t1 = explode("\n",$old);
+		$x=array_pop($t1); 
+		if ($x>'') $t1[]="$x\n\\ No newline at end of file";
+		//$t2 = explode("\n",$new);
+		$x=array_pop($t2); 
+		if ($x>'') $t2[]="$x\n\\ No newline at end of file";
+		
+		# build a reverse-index array using the line as key and line number as value
+		# don't store blank lines, so they won't be targets of the shortest distance
+		# search
+		foreach($t1 as $i=>$x) if ($x>'') $r1[$x][]=$i;
+		foreach($t2 as $i=>$x) if ($x>'') $r2[$x][]=$i;
+		
+		$a1=0; $a2=0;   # start at beginning of each list
+		$actions=array();
+		
+		# walk this loop until we reach the end of one of the lists
+		while ($a1<count($t1) && $a2<count($t2))
+		{
+			# if we have a common element, save it and go to the next
+			if ($t1[$a1]==$t2[$a2]) { $actions[]=4; $a1++; $a2++; continue; } 
+			
+			# otherwise, find the shortest move (Manhattan-distance) from the
+			# current location
+			$best1=count($t1); $best2=count($t2);
+			$s1=$a1; $s2=$a2;
+			while(($s1+$s2-$a1-$a2) < ($best1+$best2-$a1-$a2)) {
+			$d=-1;
+			foreach((array)@$r1[$t2[$s2]] as $n) 
+			if ($n>=$s1) { $d=$n; break; }
+			if ($d>=$s1 && ($d+$s2-$a1-$a2)<($best1+$best2-$a1-$a2))
+			{ $best1=$d; $best2=$s2; }
+			$d=-1;
+			foreach((array)@$r2[$t1[$s1]] as $n) 
+			if ($n>=$s2) { $d=$n; break; }
+			if ($d>=$s2 && ($s1+$d-$a1-$a2)<($best1+$best2-$a1-$a2))
+			{ $best1=$s1; $best2=$d; }
+			$s1++; $s2++;
+			}
+			while ($a1<$best1) { $actions[]=1; $a1++; }  # deleted elements
+			while ($a2<$best2) { $actions[]=2; $a2++; }  # added elements
+		}
 
-	   # build a reverse-index array using the line as key and line number as value
-	   # don't store blank lines, so they won't be targets of the shortest distance
-	   # search
-	   foreach($t1 as $i=>$x) if ($x>'') $r1[$x][]=$i;
-	   foreach($t2 as $i=>$x) if ($x>'') $r2[$x][]=$i;
-
-	   $a1=0; $a2=0;   # start at beginning of each list
-	   $actions=array();
-
-	   # walk this loop until we reach the end of one of the lists
-	   while ($a1<count($t1) && $a2<count($t2)) {
-	     # if we have a common element, save it and go to the next
-	     if ($t1[$a1]==$t2[$a2]) { $actions[]=4; $a1++; $a2++; continue; } 
-
-	     # otherwise, find the shortest move (Manhattan-distance) from the
-	     # current location
-	     $best1=count($t1); $best2=count($t2);
-	     $s1=$a1; $s2=$a2;
-	     while(($s1+$s2-$a1-$a2) < ($best1+$best2-$a1-$a2)) {
-	       $d=-1;
-	       foreach((array)@$r1[$t2[$s2]] as $n) 
-		 if ($n>=$s1) { $d=$n; break; }
-	       if ($d>=$s1 && ($d+$s2-$a1-$a2)<($best1+$best2-$a1-$a2))
-		 { $best1=$d; $best2=$s2; }
-	       $d=-1;
-	       foreach((array)@$r2[$t1[$s1]] as $n) 
-		 if ($n>=$s2) { $d=$n; break; }
-	       if ($d>=$s2 && ($s1+$d-$a1-$a2)<($best1+$best2-$a1-$a2))
-		 { $best1=$s1; $best2=$d; }
-	       $s1++; $s2++;
-	     }
-	     while ($a1<$best1) { $actions[]=1; $a1++; }  # deleted elements
-	     while ($a2<$best2) { $actions[]=2; $a2++; }  # added elements
-	  }
-
-	  # we've reached the end of one list, now walk to the end of the other
-	  while($a1<count($t1)) { $actions[]=1; $a1++; }  # deleted elements
-	  while($a2<count($t2)) { $actions[]=2; $a2++; }  # added elements
-
-	  # and this marks our ending point
-	  $actions[]=8;
-
-	  # now, let's follow the path we just took and report the added/deleted
-	  # elements into $out.
-	  $op = 0;
-	  $x0=$x1=0; $y0=$y1=0;
-	  $out1 = array();
-	  $out2 = array();
-	  foreach($actions as $act) {
-	    if ($act==1) { $op|=$act; $x1++; continue; }
-	    if ($act==2) { $op|=$act; $y1++; continue; }
-	    if ($op>0) {
-	      //$xstr = ($x1==($x0+1)) ? $x1 : ($x0+1).",$x1";
-	      //$ystr = ($y1==($y0+1)) ? $y1 : ($y0+1).",$y1";
-	      /*if ($op==1) $out[] = "{$xstr}d{$y1}";
-	      elseif ($op==3) $out[] = "{$xstr}c{$ystr}";*/
-	      while ($x0<$x1) { $out1[] = $x0; $x0++; }   # deleted elems
-	      /*if ($op==2) $out[] = "{$x1}a{$ystr}";
-	      elseif ($op==3) $out[] = '---';*/
-	      while ($y0<$y1) { $out2[] = $y0; $y0++; }   # added elems
-	    }
-	    $x1++; $x0=$x1;
-	    $y1++; $y0=$y1;
-	    $op=0;
-	  }
-	  //$out1[] = '';
-	  //$out2[] = '';
-	  return array($out1, $out2);
+		# we've reached the end of one list, now walk to the end of the other
+		while($a1<count($t1)) { $actions[]=1; $a1++; }  # deleted elements
+		while($a2<count($t2)) { $actions[]=2; $a2++; }  # added elements
+		
+		# and this marks our ending point
+		$actions[]=8;
+		
+		# now, let's follow the path we just took and report the added/deleted
+		# elements into $out.
+		$op = 0;
+		$x0=$x1=0; $y0=$y1=0;
+		$out1 = array();
+		$out2 = array();
+		foreach($actions as $act) {
+			if ($act==1) { $op|=$act; $x1++; continue; }
+			if ($act==2) { $op|=$act; $y1++; continue; }
+			if ($op>0) {
+				//$xstr = ($x1==($x0+1)) ? $x1 : ($x0+1).",$x1";
+				//$ystr = ($y1==($y0+1)) ? $y1 : ($y0+1).",$y1";
+				/*if ($op==1) $out[] = "{$xstr}d{$y1}";
+				elseif ($op==3) $out[] = "{$xstr}c{$ystr}";*/
+				while ($x0<$x1) { $out1[] = $x0; $x0++; }   # deleted elems
+				/*if ($op==2) $out[] = "{$x1}a{$ystr}";
+				elseif ($op==3) $out[] = '---';*/
+				while ($y0<$y1) { $out2[] = $y0; $y0++; }   # added elems
+			}
+			$x1++; $x0=$x1;
+			$y1++; $y0=$y1;
+			$op=0;
+		}
+		//$out1[] = '';
+		//$out2[] = '';
+		return array($out1, $out2);
 	}
-	function flexiHtmlDiff($old, $new, $mode=0) {
+
+	function flexiHtmlDiff($old, $new, $mode=0)
+	{
 		$t1 = explode(" ",$old);
 		$t2 = explode(" ",$new);
 		$out = flexicontent_html::PHPDiff( $t1, $t2 );
