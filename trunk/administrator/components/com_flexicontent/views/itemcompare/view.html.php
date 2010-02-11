@@ -39,6 +39,7 @@ class FlexicontentViewItemcompare extends JView {
 		$template 	= $mainframe->getTemplate();
 		$dispatcher = & JDispatcher::getInstance();
 		$rev		= JRequest::getInt('version','','request');
+		$codemode = JRequest::getInt('codemode',0);
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
@@ -79,6 +80,7 @@ class FlexicontentViewItemcompare extends JView {
 		$this->assignRef('versions'		, $versions);
 		$this->assignRef('rev'			, $rev);
 		$this->assignRef('tparams'		, $tparams);
+		$this->assignRef('codemode', $codemode);
 
 		parent::display($tpl);
 	}
