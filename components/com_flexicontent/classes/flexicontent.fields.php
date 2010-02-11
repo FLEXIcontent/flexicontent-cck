@@ -145,8 +145,7 @@ class FlexicontentFields
 		$item->params		= $item->parameters;
 		$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
 		$item->modified		= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;
-
-		$item->creator 		= @$author->name 		? $author->name 	: '' ;
+		$item->creator 		= @$author->alias ? $author->alias : (@$author->name 		? $author->name 	: '') ;
 		$item->author 		= $item->creator ;
 		$item->cmail 		= @$author->email 		? $author->email 	: '' ;
 		$item->modifier		= @$modifier->name 		? $modifier->name 	: $item->creator;
