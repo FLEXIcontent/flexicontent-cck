@@ -43,7 +43,7 @@ class FlexicontentFields
 		$itemcache 	=& JFactory::getCache('com_flexicontent_items');
 		$itemcache->setCaching(FLEXI_CACHE); 		//force cache
 		$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	//set expiry to one hour
-		$itemcache->gc(); 							//auto-clean expired item cache
+		if (FLEXI_GC) $itemcache->gc(); 			//auto-clean expired item cache
 
 		// @TODO : move to the constructor
 		$taglist			= FlexicontentFields::_getTags($items);
