@@ -132,58 +132,93 @@ class FlexicontentModelItems extends JModel
 		*/
 		if ($this->_loadItem())
 		{
+			// Get the paramaters of the active menu item
+			$params = & $mainframe->getParams('com_flexicontent');
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
 			$gid	= (int) $user->get('gid');
-
-
+			
 			// Is the category published?
-			if (!$this->_item->catpublished && $this->_item->catid)
-			{
-				JError::raiseError( 404, JText::_("CATEGORY NOT PUBLISHED") );
+			if (!$this->_item->catpublished && $this->_item->catid) {
+				JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
 			}
 
 			// Do we have access to the category?
-			if ($this->_item->catid)
-			{
-				$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->cataccess <= $aid;
+			if ($this->_item->catid) {
+				$canreadcat = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->cataccess <= $aid;
+				if (!@$canreadcat)
+				{
+					if (!$aid) {
+						// Redirect to login
+						$uri		= JFactory::getURI();
+						$return		= $uri->toString();
+		
+						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+						$url .= '&return='.base64_encode($return);
+		
+						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+					} else {
+						// Redirect to unauthorized page or 403
+						if ($params->get('unauthorized_page', '')) {
+							$mainframe->redirect($params->get('unauthorized_page'));				
+						} else {
+							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+							return false;
+						}
+					}
+				}
+			} else {
+				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
+				return false;
 			}
 			
-			if (!@$canread)
-			{
-				if (!$aid) {
-					// Redirect to login
-					$uri		= JFactory::getURI();
-					$return		= $uri->toString();
-	
-					$url  = 'index.php?option=com_user&view=login';
-					$url .= '&return='.base64_encode($return);;
-	
-					$mainframe->redirect($url, JText::_('You must login first') );
-				} else {
-					JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-					return false;
-				}
-			}
-
 			// Do we have access to the content itself
-			if ($this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 )
+			if ($this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
 			{
 				if (!$aid) {
 					// Redirect to login
 					$uri		= JFactory::getURI();
 					$return		= $uri->toString();
 	
-					$url  = 'index.php?option=com_user&view=login';
-					$url .= '&return='.base64_encode($return);;
+					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+					$url .= '&return='.base64_encode($return);
 	
-					$mainframe->redirect($url, JText::_('You must login first') );
+					$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
 				} else {
-					JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-					return false;
+					// Redirect to unauthorized page or 403
+					if ($params->get('unauthorized_page', '')) {
+						$mainframe->redirect($params->get('unauthorized_page'));				
+					} else {
+						JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+						return false;
+					}
+				}
+			} else { // otherwise check for the standard states
+				$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				if (!@$canreaditem)
+				{
+					if (!$aid) {
+						// Redirect to login
+						$uri		= JFactory::getURI();
+						$return		= $uri->toString();
+		
+						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+						$url .= '&return='.base64_encode($return);
+		
+						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+					} else {
+						// Redirect to unauthorized page or 403
+						if ($params->get('unauthorized_page', '')) {
+							$mainframe->redirect($params->get('unauthorized_page'));				
+						} else {
+							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+							return false;
+						}
+					}
 				}
 			}
 
+/*
 			//add the author email in order to display the gravatar
 			$query = 'SELECT email'
 			. ' FROM #__users'
@@ -219,6 +254,7 @@ class FlexicontentModelItems extends JModel
 			if ($this->_item->modified == $this->_db->getNulldate()) {
 				$this->_item->modified = null;
 			}
+*/
 
 			//check session if uservisit already recorded
 			$session 	=& JFactory::getSession();
