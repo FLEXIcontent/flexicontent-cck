@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: admin.flexicontent.php 191 2009-11-23 16:45:27Z vistamedia $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -40,7 +40,7 @@ if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $params->get('flexi_secti
 if (!defined('FLEXI_ACCESS')) define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 define('FLEXI_VERSION',	'1.5');
-define('FLEXI_RELEASE',	'beta 5');
+define('FLEXI_RELEASE',	'stable');
 
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
