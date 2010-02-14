@@ -222,11 +222,9 @@ class FlexicontentModelTags extends JModel
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 
-		$states = '1, -5';
-		if ((int)$user->get('gid') > 19) {
-			$states .= ', 0 , -3, -4';
-		}
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
+
 		$where .= ' AND i.sectionid = '.FLEXI_SECTION;
 
 		/*
