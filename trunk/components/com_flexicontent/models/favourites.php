@@ -113,22 +113,47 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildQuery()
 	{   	
+		global $mainframe;
+
+		$user		= & JFactory::getUser();
+		$gid		= (int) $user->get('aid');
+        // Get the WHERE and ORDER BY clauses for the query
+		$params 	= & $mainframe->getParams('com_flexicontent');
+		// show unauthorized items
+		$show_noauth = $params->get('show_noauth', 0);
+
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $gid . ')';
+				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+			} else {
+				$andaccess   = ' AND mc.access <= '.$gid;
+				$andaccess  .= ' AND i.access <= '.$gid;
+			}
+		}
+
         // Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
 
-		$query = 'SELECT DISTINCT f.itemid, i.*, ie.*,'
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-		. ' LEFT JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
-		. $where
-		. ' GROUP BY i.id'
-		. $orderby
-         ;
+		$query 	= 'SELECT DISTINCT f.itemid, i.*, ie.*,'
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				. ' FROM #__content AS i'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+				. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+				. ' LEFT JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
+		        . $joinaccess
+		        . $where
+		        . $andaccess
+				. ' GROUP BY i.id'
+				. $orderby
+				;
          
          return $query;
 	}
@@ -165,10 +190,9 @@ class FlexicontentModelFavourites extends JModel
 
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE f.userid = '.(int)$user->get('id');
-		$where .= ' AND c.access <= '.$gid;
 		
 		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
+		if ((int)$user->get('gid') > 19) {
 			$states .= ', 0 , -3, -4';
 		}
 		$where .= ' AND i.state IN ('.$states.')';
@@ -185,9 +209,6 @@ class FlexicontentModelFavourites extends JModel
 			if ($filter)
 			{
 				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
-				// clean filter variables
-				//$filter	 = $this->_db->getEscaped( trim(JString::strtolower( $filter ) ) );
-				//$where 	.= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $filter, true ).'%', false );
 			}
 		}
 		return $where;

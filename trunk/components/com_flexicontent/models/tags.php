@@ -137,7 +137,29 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildQuery()
 	{   	
+		global $mainframe;
+
+		$user		= & JFactory::getUser();
+		$gid		= (int) $user->get('aid');
         // Get the WHERE and ORDER BY clauses for the query
+		$params 	= & $mainframe->getParams('com_flexicontent');
+		// show unauthorized items
+		$show_noauth = $params->get('show_noauth', 0);
+
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $gid . ')';
+				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+			} else {
+				$joinaccess	 = '';
+				$andaccess   = ' AND mc.access <= '.$gid;
+				$andaccess  .= ' AND i.access <= '.$gid;
+			}
+		}
+
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
 
@@ -149,7 +171,10 @@ class FlexicontentModelTags extends JModel
          . ' INNER JOIN #__flexicontent_tags_item_relations AS t ON t.itemid = i.id'
          . ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
          . ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+         . ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+         . $joinaccess
          . $where
+         . $andaccess
          . ' GROUP BY i.id'
          . $orderby
          ;
@@ -198,15 +223,11 @@ class FlexicontentModelTags extends JModel
 		}
 
 		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
+		if ((int)$user->get('gid') > 19) {
 			$states .= ', 0 , -3, -4';
 		}
 		$where .= ' AND i.state IN ('.$states.')';
 		$where .= ' AND i.sectionid = '.FLEXI_SECTION;
-		$where .= ' AND i.access <= '.$gid;
-		
-		// Second is to only select items assigned to category the user has access to
-		$where .= ' AND c.access <= '.$gid;
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

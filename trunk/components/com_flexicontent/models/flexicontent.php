@@ -98,6 +98,7 @@ class FlexicontentModelFlexicontent extends JModel
 	
 	/**
 	 * Method to build the Categories query
+	 * This method creates the first level categories and their assigned item count
 	 *
 	 * @access private
 	 * @return string
@@ -117,23 +118,38 @@ class FlexicontentModelFlexicontent extends JModel
 		$lang 		= JRequest::getWord('lang', '' );
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
+		// show unauthorized items
+		$show_noauth = $params->get('show_noauth', 0);
 
 		// Build where clause
-		$where = ' WHERE cc.published = 1';
-		$where .= ' AND cc.section = '.FLEXI_SECTION;
-		$where .= ' AND cc.parent_id = '.$rootcat;
-		$where .= ' AND cc.access <= '.$gid;
+		$where  = ' WHERE cc.published = 1';
+		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
 		if (FLEXI_FISH && $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
-		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
-			$states .= ', 0 , -3, -4';
-		}
+
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
-		$where .= ' AND c.id = cc.id';
 		
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+				$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
+				$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int)$gid . ')';
+				$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int)$gid . ')';
+				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			} else {
+				$subjoin  = '';
+				$suband   = ' AND cc.access <= '.(int)$gid;
+				$suband  .= ' AND i.access <= '.(int)$gid;
+				$join	  = '';
+				$and   	  = ' AND c.access <= '.(int)$gid;
+			}
+		}
+
 		$query = 'SELECT c.*,'
 				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
 					. ' ('
@@ -142,18 +158,19 @@ class FlexicontentModelFlexicontent extends JModel
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
+					. $subjoin
 					. $where
-					. ' GROUP BY cc.id'
+					. $suband
 					. ')' 
 					. ' AS assigneditems'
 				. ' FROM #__categories AS c'
+				. $join
 				. ' WHERE c.published = 1'
 				. ' AND c.section = '.FLEXI_SECTION
 				. ' AND c.parent_id = '.$rootcat
-				. ' AND c.access <= '.$gid
+				. $and
 				. ' ORDER BY '.$ordering
 				;
-
 		return $query;
 	}
 
@@ -174,13 +191,27 @@ class FlexicontentModelFlexicontent extends JModel
 		$params 	=& $mainframe->getParams('com_flexicontent');
 		// Get the root category from this directory
 		$rootcat	= $params->get('rootcat');
+		// show unauthorized items
+		$show_noauth = $params->get('show_noauth', 0);
 		
-		$query = 'SELECT c.id'
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			} else {
+				$join	  = '';
+				$and   	  = ' AND c.access <= '.(int)$gid;
+			}
+		}
+
+		$query 	= 'SELECT c.id'
 				. ' FROM #__categories AS c'
+				. $join
 				. ' WHERE c.published = 1'
 				. ' AND c.section = '.FLEXI_SECTION
 				. ' AND c.parent_id = ' . $rootcat
-				. ' AND c.access <= ' . $gid
+				. $and
 				;
 
 		return $query;
@@ -216,30 +247,45 @@ class FlexicontentModelFlexicontent extends JModel
 
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
-		$ordering	= 'ordering ASC';
+		$ordering	= 'c.ordering ASC';
 		// Get the components parameters
 		$params 	=& $mainframe->getParams('com_flexicontent');
-		// shortcode of the site active language (joomfish)
+		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
+		// show unauthorized items
+		$show_noauth = $params->get('show_noauth', 0);
 
-		//build where clause
-		$where = ' WHERE cc.published = 1';
-		$where .= ' AND cc.section = '.FLEXI_SECTION;
-		$where .= ' AND cc.parent_id = '.(int)$id;
-		$where .= ' AND cc.access <= '.$gid;
+		// Build where clause
+		$where  = ' WHERE cc.published = 1';
+		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
 		if (FLEXI_FISH && $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
-		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
-			$states .= ', 0 , -3, -4';
-		}
+
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
-		$where .= ' AND c.id = cc.id';
 		
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+				$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
+				$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int)$gid . ')';
+				$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int)$gid . ')';
+				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			} else {
+				$subjoin  = '';
+				$suband   = ' AND cc.access <= '.(int)$gid;
+				$suband  .= ' AND i.access <= '.(int)$gid;
+				$join	  = '';
+				$and   	  = ' AND c.access <= '.(int)$gid;
+			}
+		}
+
 		$query = 'SELECT c.*,'
 				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
 					. ' ('
@@ -248,8 +294,9 @@ class FlexicontentModelFlexicontent extends JModel
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
+					. $subjoin
 					. $where
-					. ' GROUP BY cc.id'
+					. $suband
 					. ')' 
 					. ' AS assignedsubitems,'
 					. ' ('
@@ -260,10 +307,11 @@ class FlexicontentModelFlexicontent extends JModel
 					. ')' 
 					. ' AS assignedcats'
 				. ' FROM #__categories AS c'
+				. $join
 				. ' WHERE c.published = 1'
 				. ' AND c.section = '.FLEXI_SECTION
 				. ' AND c.parent_id = '.(int)$id
-				. ' AND c.access <= '.$gid
+				. $and
 				. ' ORDER BY '.$ordering
 				;
 
@@ -298,20 +346,20 @@ class FlexicontentModelFlexicontent extends JModel
 			$and = ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 
-		$query = 'SELECT DISTINCT i.*, ie.*, c.title AS cattitle,'
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
-		. ' FROM #__flexicontent_items AS i'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-		. ' WHERE c.published = 1'
-		. ' AND c.section = '.FLEXI_SECTION
-		. ' AND c.access <= '.$gid
-		. $and
-		. ' AND i.state IN (1, -5)'
-		. ' LIMIT '. $limit
-		;
+		$query 	= 'SELECT DISTINCT i.*, ie.*, c.title AS cattitle,'
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+				. ' FROM #__flexicontent_items AS i'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+				. ' WHERE c.published = 1'
+				. ' AND c.section = '.FLEXI_SECTION
+				. ' AND c.access <= '.$gid
+				. $and
+				. ' AND i.state IN (1, -5)'
+				. ' LIMIT '. $limit
+				;
 		
 		$this->_db->setQuery($query);
 		$feed = $this->_db->loadObjectList();

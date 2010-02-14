@@ -40,6 +40,11 @@
 		<param name="readmore" type="text" size="25" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
 	</params>
 	<params group="metadata">
+		<param name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="custom_ititle" type="text" size="33" default="" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" />
 		<param name="description" type="textarea" rows="5" cols="30" default="" label="FLEXI_Description" description="FLEXI_METADESC" />
 		<param name="keywords" type="textarea" rows="5" cols="30" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" />
 		<param name="robots" type="text" size="20" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />

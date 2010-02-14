@@ -89,23 +89,11 @@ class FlexicontentViewItems extends JView
 			$pane = & JPane::getInstance('Tabs');
 			$this->assignRef('pane', $pane);
 		}
-		JHTML::_('behavior.tooltip');
 
 		if (($item->id == 0))
 		{	
-			if (!$aid) {
-				// Redirect to login
-				$uri		= JFactory::getURI();
-				$return		= $uri->toString();
-
-				$url  = 'index.php?option=com_user&view=login';
-				$url .= '&return='.base64_encode($return);;
-
-				$mainframe->redirect($url, JText::_('You must login first') );
-			} else {
-				$id	= JRequest::getInt('id', 0);
-				return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND', $id ) );
-			}
+			$id	= JRequest::getInt('id', 0);
+			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND', $id ) );
 		}
 
 		// Pathway need to be improved
@@ -129,11 +117,10 @@ class FlexicontentViewItems extends JView
 		 */
 
 		// Get the menu item object		
+// dump($menu,'menu');
 		if (is_object($menu)) {
 			$menu_params = new JParameter( $menu->params );
-// Modification by Thorax for item title
-			if ($menu_params->get( 'page_title', 1)) {
-//			if (!$menu_params->get( 'page_title')) {
+			if (!$menu_params->get( 'page_title')) {
 				$params->set('page_title',	$item->title);
 			}
 		} else {
@@ -180,21 +167,6 @@ class FlexicontentViewItems extends JView
 			}
 		}
 		
-		if ($user->authorize('com_flexicontent', 'state') && $params->get('show_state_icon')) {
-			JHTML::_('behavior.mootools');
-			$document->addScript( 'components/com_flexicontent/assets/js/stateselector.js' );
-			
-			$js = "window.onDomReady(stateselector.init.bind(stateselector));
-
-			function dostate(state, id)
-			{	
-				var change = new processstate();
-   				 change.dostate( state, id );
-			}";
-			
-			$document->addScriptDeclaration($js);
-		}
-		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		
 		// increment the hit counter
@@ -202,31 +174,6 @@ class FlexicontentViewItems extends JView
 		{
 			$model =& $this->getModel();
 			$model->hit();
-		}
-
-		$aid		= $user->get('aid');
-		$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $item->id) : $item->access <= $aid;
-
-		if ($canread) {
-			$item->readmore_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
-		} else {
-			if ( ! $aid )
-			{
-				// Redirect to login
-				$uri		= JFactory::getURI();
-				$return		= $uri->toString();
-
-				$url  = 'index.php?option=com_user&view=login';
-				$url .= '&return='.base64_encode($return);;
-
-				//$url	= JRoute::_($url, false);
-				$mainframe->redirect($url, JText::_('You must login first') );
-			}
-			else
-			{
-				JError::raiseWarning( 403, JText::_('ALERTNOTAUTH') );
-				return;
-			}
 		}
 
 		$themes		= flexicontent_tmpl::getTemplates();
