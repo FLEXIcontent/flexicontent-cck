@@ -191,11 +191,9 @@ class FlexicontentModelFavourites extends JModel
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE f.userid = '.(int)$user->get('id');
 		
-		$states = '1, -5';
-		if ((int)$user->get('gid') > 19) {
-			$states .= ', 0 , -3, -4';
-		}
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
+
 		$where .= ' AND i.sectionid = '.FLEXI_SECTION;
 
 		/*

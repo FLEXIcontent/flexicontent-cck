@@ -274,10 +274,7 @@ class FlexicontentModelCategory extends JModel
 		$where = ' WHERE rel.catid = '.$this->_id;
 
 		// Second is to only select items the user has access to
-		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
-			$states .= ', 0 , -3, -4';
-		}
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 		
 		// is the content current?
@@ -416,11 +413,9 @@ class FlexicontentModelCategory extends JModel
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 
-		$states = '1, -5';
-		if ($user->authorize('com_flexicontent', 'state')) {
-			$states .= ', 0 , -3, -4';
-		}
+		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
+
 		$where .= ' AND rel.catid IN ('. $globalcats[$id]->descendants. ')';
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
