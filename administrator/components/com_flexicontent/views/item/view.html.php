@@ -31,7 +31,7 @@ class FlexicontentViewItem extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe;
+		global $mainframe, $globalcats;
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -88,7 +88,6 @@ class FlexicontentViewItem extends JView {
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
 		$subscribers 	= & $this->get( 'SubscribersCount' );
-		$categories		= flexicontent_cats::getCategoriesTree(1);
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
 		$types			= & $this->get( 'Typeslist' );
@@ -96,6 +95,9 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $this->get( 'VersionList' );
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
+
+//		$categories = flexicontent_cats::getCategoriesTree(1);
+		$categories = $globalcats;
 
 		$usedtags = array();
 		if ($cid) {
@@ -134,19 +136,19 @@ class FlexicontentViewItem extends JView {
 		$lists = array();
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
 			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all'))) {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', false);
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', false);
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true, false);
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true, false);
 			} else {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"');
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"');
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
 			}
 		} else {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"');
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"');
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
 		}
 
 		//buid types selectlist
-		$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"' );
+		$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', true );
 	
 		// build granular access list
 		if (FLEXI_ACCESS) {

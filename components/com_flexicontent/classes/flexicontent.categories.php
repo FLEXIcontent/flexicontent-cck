@@ -130,6 +130,7 @@ class flexicontent_cats
         	array_push($list, $child);
         	$children[$parent] = $list;
     	}
+
     	//get list of the items
     	$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
 
@@ -157,7 +158,6 @@ class flexicontent_cats
 				
 				if ( $type ) {
 					$pre    = '<sup>|_</sup>&nbsp;';
-//					$spacer = '.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 					$spacer = '.&nbsp;&nbsp;&nbsp;';
 				} else {
 					$pre    = '- ';
@@ -200,7 +200,7 @@ class flexicontent_cats
 	 * @param string $class
 	 * @return void
 	 */
-	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $filter = true)
+	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true)
 	{
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
@@ -218,16 +218,18 @@ class flexicontent_cats
 		}
 		
 		foreach ($list as $item) {
-			if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
-				$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
-			} else if ($filter) {
-				if (FLEXI_ACCESS && (!in_array($item->id, $usercats)) && ($user->gid < 25)) {
+			if ((!$published) || ($published && $item->published)) {
+				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+				} else if ($filter) {
+					if (FLEXI_ACCESS && (!in_array($item->id, $usercats)) && ($user->gid < 25)) {
+						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+					} else {
+						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
+					}
 				} else {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 				}
-			} else {
-				$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 			}
 		}
 		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected );
