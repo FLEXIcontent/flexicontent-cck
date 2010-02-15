@@ -193,8 +193,8 @@ class FlexicontentViewItems extends JView {
 		if (FLEXI_FISH) {
 			$langs	= & $this->get( 'Languages' );
 		}
-//		$categories	= flexicontent_cats::getCategoriesTree();
-		$categories = $globalcats;
+		$categories	= flexicontent_cats::getCategoriesTree();
+		//$categories = $globalcats;
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );

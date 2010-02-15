@@ -455,11 +455,19 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td class="versions"><?php echo '#' . $version->nr; ?></td>
 				<td class="versions"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
 				<td class="versions"><?php echo ($version->nr == 1) ? $this->row->creator : $version->modifier; ?></td>
-				<td class="versions" align="center"><?php // echo $comment; ?><a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x: 850, y: 575}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::_( 'FLEXI_REVERT_TO_THIS_VERSION' ); ?>"><?php echo $revert; ?></td>
+				<td class="versions" align="center"><?php // echo $comment;
+				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+				<?php }else{
+				?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x: 850, y: 575}}"><?php echo $view; ?></a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::_( 'FLEXI_REVERT_TO_THIS_VERSION' ); ?>"><?php echo $revert;
+				}?></td>
 			</tr>
 			<?php
 				endif;
 			endforeach;
+			/*
 			$currentdate =& JFactory::getDate();
 			$currentdate = $currentdate->toUnix();
 			?>
@@ -469,7 +477,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td class="versions-first"><?php echo $this->row->modifier; ?></td>
 				<td class="versions-first" align="center"><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a></td>
 			</tr>
-			<?php endif; ?>
+			<?php */ endif; ?>
 		</table>
 		<?php endif; ?>
 		
@@ -541,7 +549,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
-<input type="hidden" name="version" value="<?php echo $this->row->version; ?>" />
+<input type="hidden" name="version" value="<?php echo $this->version?$this->version:$this->row->version; ?>" />
 <input type="hidden" name="oldstate" value="<?php echo $this->row->state; ?>" />
 <input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
 <?php if (!FLEXI_FISH) : ?>
