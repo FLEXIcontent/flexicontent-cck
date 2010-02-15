@@ -125,7 +125,7 @@ class FlexicontentModelItems extends JModel
 	 */
 	function &getItem( )
 	{
-		global $mainframe;
+		global $mainframe, $globalcats;
 		
 		/*
 		* Load the Item data
@@ -137,10 +137,13 @@ class FlexicontentModelItems extends JModel
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
 			$gid	= (int) $user->get('gid');
+			$cid	= JRequest::getInt('cid');
 			
 			// Is the category published?
-			if (!$this->_item->catpublished && $this->_item->catid) {
-				JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
+			if ($cid) {
+				if (!$globalcats[$cid]->published) {
+					JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
+				}
 			}
 
 			// Do we have access to the category?
