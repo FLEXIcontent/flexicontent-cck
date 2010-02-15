@@ -115,16 +115,22 @@ class FlexicontentViewItems extends JView
 		 * Because the application sets a default page title,
 		 * we need to get it right from the menu item itself
 		 */
-
-		// Get the menu item object		
-// dump($menu,'menu');
-		if (is_object($menu)) {
-			$menu_params = new JParameter( $menu->params );
-			if (!$menu_params->get( 'page_title')) {
+		if ($params->get('override_title', 0)) {
+			if ($params->get('custom_ititle', '')) {
+				$params->set('page_title',	$params->get('custom_ititle'));				
+			} else {
 				$params->set('page_title',	$item->title);
 			}
 		} else {
-			$params->set('page_title',	$item->title);
+			// Get the menu item object		
+			if (is_object($menu)) {
+				$menu_params = new JParameter( $menu->params );
+				if (!$menu_params->get( 'page_title')) {
+					$params->set('page_title',	$item->title);
+				}
+			} else {
+				$params->set('page_title',	$item->title);
+			}
 		}
 
 		/*
@@ -133,7 +139,7 @@ class FlexicontentViewItems extends JView
 		 * First is to check if we have a category id, if yes add it.
 		 * If we haven't one than we accessed this screen direct via the menu and don't add the parent category
 		 */
-		if($cid) {
+		if($cid && $params->get('addcat_title', 1)) {
 			$parentcat = array_pop($parents);
 			$doc_title = $parentcat->title.' - '.$params->get( 'page_title' );
 		} else {

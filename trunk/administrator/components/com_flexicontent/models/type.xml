@@ -39,6 +39,15 @@
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
+		<param name="" type="separator" default="FLEXI_SEO_CONF" level="level1" menu="hide" />
+		<param name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 <!--
 		<param name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE">
 			<option value="0">Hide</option>
