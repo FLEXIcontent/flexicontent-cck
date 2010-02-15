@@ -359,7 +359,6 @@ class FlexicontentViewItems extends JView
 		//Get the item from the model
 		$item 		= & $this->get('Item');
 		//get the categories tree
-		$categories = flexicontent_cats::getCategoriesTree(1);
 		$categories = $globalcats;
 		//get ids of selected categories (edit action)
 		$selectedcats = & $this->get( 'Catsselected' );

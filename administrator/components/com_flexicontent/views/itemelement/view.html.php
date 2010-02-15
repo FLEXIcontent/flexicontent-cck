@@ -59,7 +59,6 @@ class FlexicontentViewItemelement extends JView {
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
 
-//		$categories	= flexicontent_cats::getCategoriesTree();
 		$categories = $globalcats;
 		
 		// build the categories select list for filter

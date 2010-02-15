@@ -85,7 +85,6 @@ class FlexicontentViewCategory extends JView {
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
 		
-//		$categories = flexicontent_cats::getCategoriesTree(0);
 		$categories = $globalcats;
 
 		//fail if checked out not by 'me'
