@@ -52,7 +52,7 @@ class FlexicontentViewItem extends JView {
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
 		$cid		= is_array($cid)?$cid[0]:$cid;
-		$version 	= JRequest::getVar( 'version', '', 'request', 'int' );
+		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -88,6 +88,7 @@ class FlexicontentViewItem extends JView {
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
 		$subscribers 	= & $this->get( 'SubscribersCount' );
+		$categories		= flexicontent_cats::getCategoriesTree(1);
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
 		$types			= & $this->get( 'Typeslist' );
@@ -97,7 +98,7 @@ class FlexicontentViewItem extends JView {
 		$languages		= & $this->get( 'Languages' );
 
 //		$categories = flexicontent_cats::getCategoriesTree(1);
-		$categories = $globalcats;
+		//$categories = $globalcats;
 
 		$usedtags = array();
 		if ($cid) {
@@ -202,7 +203,8 @@ class FlexicontentViewItem extends JView {
 		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
-
+		if(!$canPublish)
+			$row->state=-3;
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
 		
 		if (FLEXI_FISH) {

@@ -184,7 +184,8 @@ class FlexicontentModelItems extends JModel
 		$status['allfi'] 		= $allfi;
 		$status['nofi'] 		= array_diff($allids,$allfi);
 		$status['countnofi'] 	= count($status['nofi']);
-		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
+		//$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
+		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
 		return $status;

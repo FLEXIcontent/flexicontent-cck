@@ -926,6 +926,20 @@ class flexicontent_html
 		$html2 = implode(" ", $html2);
 		return array($html1, $html2);
 	}
+	function getJCoreFields() {
+		return array(
+			'maintext'=>'text',
+			'created'=>'created',
+			'createdby'=>'created_by',
+			'modified'=>'modified',
+			'modifiedby'=>'modified_by',
+			'title'=>'title',
+			'hits'=>'hits',
+			'type'=>'document_type',
+			'version'=>'version',
+			'state'=>'state'
+		);
+	}
 }
 
 class flexicontent_upload
