@@ -88,7 +88,6 @@ class FlexicontentViewItem extends JView {
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
 		$subscribers 	= & $this->get( 'SubscribersCount' );
-		$categories		= flexicontent_cats::getCategoriesTree(1);
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
 		$types			= & $this->get( 'Typeslist' );
@@ -97,8 +96,7 @@ class FlexicontentViewItem extends JView {
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
 
-//		$categories = flexicontent_cats::getCategoriesTree(1);
-		//$categories = $globalcats;
+		$categories = $globalcats;
 
 		$usedtags = array();
 		if ($cid) {

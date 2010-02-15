@@ -100,7 +100,6 @@ class FlexicontentViewCategories extends JView {
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
-//		$categories = flexicontent_cats::getCategoriesTree(0);
 		$categories = $globalcats;
 
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
