@@ -349,16 +349,18 @@ class FlexicontentViewItems extends JView
 	 */
 	function _buildEditLists()
 	{
+		global $globalcats;
 		//Get the item from the model
 		$item 		= & $this->get('Item');
 		//get the categories tree
 		$categories = flexicontent_cats::getCategoriesTree(1);
+		$categories = $globalcats;
 		//get ids of selected categories (edit action)
 		$selectedcats = & $this->get( 'Catsselected' );
 		
 		//build selectlist
 		$lists = array();
-		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'class="inputbox required validate-cid" multiple="multiple" size="8"');
+		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'class="inputbox required validate-cid" multiple="multiple" size="8"', true);
 		
 		$state = array();
 		$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );

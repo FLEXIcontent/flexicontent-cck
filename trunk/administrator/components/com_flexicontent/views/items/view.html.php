@@ -31,7 +31,7 @@ class FlexicontentViewItems extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe;
+		global $mainframe, $globalcats;
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -193,7 +193,8 @@ class FlexicontentViewItems extends JView {
 		if (FLEXI_FISH) {
 			$langs	= & $this->get( 'Languages' );
 		}
-		$categories	= flexicontent_cats::getCategoriesTree();
+//		$categories	= flexicontent_cats::getCategoriesTree();
+		$categories = $globalcats;
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
@@ -205,7 +206,7 @@ class FlexicontentViewItems extends JView {
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
 		
 		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false);
+		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false, false);
 
 		//build type select list
 		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"');
@@ -301,7 +302,7 @@ class FlexicontentViewItems extends JView {
 
 	function _displayCopyMove($tpl = null, $cid)
 	{
-		global $mainframe;
+		global $mainframe, $globalcats;
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -370,6 +371,7 @@ class FlexicontentViewItems extends JView {
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$categories	= flexicontent_cats::getCategoriesTree();
+		$categories = $globalcats;
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
@@ -381,9 +383,9 @@ class FlexicontentViewItems extends JView {
 		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', 'class="inputbox" size="1"', 'value', 'text', $state );
 		
 		// build the main category select list
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false);
+		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
 		// build the secondary categories select list
-		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false);
+		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
 
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);

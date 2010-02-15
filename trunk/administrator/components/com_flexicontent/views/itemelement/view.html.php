@@ -31,7 +31,7 @@ class FlexicontentViewItemelement extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		global $mainframe, $option, $globalcats;
 
 		//initialise variables
 		$db			= & JFactory::getDBO();
@@ -59,9 +59,11 @@ class FlexicontentViewItemelement extends JView {
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
 
-		$categories	= flexicontent_cats::getCategoriesTree();
+//		$categories	= flexicontent_cats::getCategoriesTree();
+		$categories = $globalcats;
+		
 		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false);
+		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false, false);
 
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;

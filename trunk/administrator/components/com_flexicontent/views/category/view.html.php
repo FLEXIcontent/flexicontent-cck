@@ -31,7 +31,7 @@ class FlexicontentViewCategory extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe;
+		global $mainframe, $globalcats;
 
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();
@@ -82,10 +82,12 @@ class FlexicontentViewCategory extends JView {
 		//Get data from the model
 		$model		= & $this->getModel();
 		$row     	= & $this->get( 'Category' );
-		$categories = flexicontent_cats::getCategoriesTree(0);
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
 		
+//		$categories = flexicontent_cats::getCategoriesTree(0);
+		$categories = $globalcats;
+
 		//fail if checked out not by 'me'
 		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
@@ -117,8 +119,8 @@ class FlexicontentViewCategory extends JView {
 
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
 			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) || $CanCats) {
-				$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"', false);
-				$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false);
+				$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"', false, false);
+				$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
 			} else {
 				$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"');
 				$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');

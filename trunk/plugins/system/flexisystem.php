@@ -182,10 +182,12 @@ class plgSystemFlexisystem extends JPlugin
 		$db		=& JFactory::getDBO();
 
 		// get the category tree and append the ancestors to each node		
-		$query	= 'SELECT id, parent_id, access, title,'
+		$query	= 'SELECT id, parent_id, published, access, title,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION;
+				. ' WHERE section = ' . FLEXI_SECTION
+				. ' ORDER BY parent_id, ordering'
+				;
 		$db->setQuery($query);
 		$cats = $db->loadObjectList();
 
@@ -207,7 +209,7 @@ class plgSystemFlexisystem extends JPlugin
     	$parents = array_unique($parents);
 
     	//get list of the items
-    	$globalcats = plgSystemFlexisystem::_getCatAncestors(0, array(), $children, max(0, $levellimit-1));
+    	$globalcats = plgSystemFlexisystem::_getCatAncestors(0, '', array(), $children, true, max(0, $levellimit-1));
 
     	foreach ($globalcats as $cat) {
     		$cat->ancestorsonlyarray	= $cat->ancestors;
@@ -228,7 +230,7 @@ class plgSystemFlexisystem extends JPlugin
     * @access private
     * @return array
     */
-	function _getCatAncestors( $id, $list, &$children, $maxlevel=9999, $level=0, $ancestors=null )
+	function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		if (!$ancestors) $ancestors = array();
 		
@@ -240,8 +242,31 @@ class plgSystemFlexisystem extends JPlugin
 					$ancestors[] 	= $v->parent_id;
 				} 
 				
+				if ( $type ) {
+					$pre    = '<sup>|_</sup>&nbsp;';
+					$spacer = '.&nbsp;&nbsp;&nbsp;';
+				} else {
+					$pre    = '- ';
+					$spacer = '&nbsp;&nbsp;';
+				}
+
+				if ($title) {
+					if ( $v->parent_id == 0 ) {
+						$txt    = ''.$v->title;
+					} else {
+						$txt    = $pre.$v->title;
+					}
+				} else {
+					if ( $v->parent_id == 0 ) {
+						$txt    = '';
+					} else {
+						$txt    = $pre;
+					}
+				}
+
 				$pt = $v->parent_id;
 				$list[$id] = $v;
+				$list[$id]->treename 		= "$indent$txt";
 				$list[$id]->title 			= $v->title;
 				$list[$id]->slug 			= $v->slug;
 				$list[$id]->ancestors 		= $ancestors;
@@ -249,7 +274,7 @@ class plgSystemFlexisystem extends JPlugin
 
 				$list[$id]->children 		= count( @$children[$id] );
 
-				$list = plgSystemFlexisystem::_getCatAncestors( $id, $list, $children, $maxlevel, $level+1, $ancestors );
+				$list = plgSystemFlexisystem::_getCatAncestors( $id, $indent.$spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors );
 			}
 		}
 		return $list;
