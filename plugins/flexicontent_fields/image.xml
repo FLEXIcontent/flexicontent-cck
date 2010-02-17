@@ -83,6 +83,10 @@
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
+		<param name="autoupload" type="radio" default="1" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
 		<param name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
 			<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>
 			<option value="2">FLEXI_FIELD_IMAGE_ROKBOX</option>
