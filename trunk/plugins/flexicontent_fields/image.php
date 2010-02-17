@@ -72,6 +72,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		else
 		{
 			// else display the form for adding a new image
+			$onchange = $field->parameters->get('autoupload', 1)?'  onchange="javascript: submitbutton(\'apply\')"':'';
 			$field->html	.= '
 			<div style="float:left; margin-right: 5px;">
 				<div class="empty_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>
@@ -88,7 +89,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'" onchange="javascript: submitbutton(\'apply\')" type="file" /></td>
+						<td><input name="'.$field->name.'"'.$onchange.' type="file" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).':</td>
