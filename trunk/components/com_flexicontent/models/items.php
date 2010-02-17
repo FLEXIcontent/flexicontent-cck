@@ -221,7 +221,6 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 
-/*
 			//add the author email in order to display the gravatar
 			$query = 'SELECT email'
 			. ' FROM #__users'
@@ -257,7 +256,6 @@ class FlexicontentModelItems extends JModel
 			if ($this->_item->modified == $this->_db->getNulldate()) {
 				$this->_item->modified = null;
 			}
-*/
 
 			//check session if uservisit already recorded
 			$session 	=& JFactory::getSession();

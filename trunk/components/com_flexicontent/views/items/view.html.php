@@ -80,7 +80,7 @@ class FlexicontentViewItems extends JView
 		$params->merge($iparams);
 
 		// Bind Fields
-		$item 	= FlexicontentFields::getFields($item, 'items', $params);
+		$item 	= FlexicontentFields::getFields($item, 'items', $params, $aid);
 		$item	= $item[0];
 
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
@@ -90,10 +90,10 @@ class FlexicontentViewItems extends JView
 			$this->assignRef('pane', $pane);
 		}
 
-		if (($item->id == 0))
+		if ($item->id == 0)
 		{	
 			$id	= JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND', $id ) );
+			return JError::raiseError( 404, JText::sprintf( 'MANU ITEM #%d NOT FOUND', $id ) );
 		}
 
 		// Pathway need to be improved

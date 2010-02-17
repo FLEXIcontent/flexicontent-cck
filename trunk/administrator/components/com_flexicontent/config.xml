@@ -138,10 +138,6 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="advcache_time" type="text" default="3600" label="FLEXI_ADV_CACHE_TIME" description="FLEXI_ADV_CACHE_TIME_DESC" menu="hide" />
-		<param name="advcache_guest" type="radio" default="1" label="FLEXI_ADV_CACHE_GUEST" description="FLEXI_ADV_CACHE_GUEST_DESC" menu="hide">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
 		<param name="purge_gc" type="radio" default="1" label="FLEXI_GC" description="FLEXI_GC_DESC" menu="hide">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

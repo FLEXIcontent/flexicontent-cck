@@ -44,7 +44,6 @@ table#itemcompare s{
 						</tr>
 						<?php
 						foreach ($this->fields as $field)
-						//dump($field,'field');
 						{
 							// used to hide the core fields from this listing
 							if ( $field->iscore == 0 || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext'))) ) {
@@ -52,9 +51,8 @@ table#itemcompare s{
 								if ($field->field_type == 'maintext') {
 									$field->label 			= $this->tparams->get('maintext_label', $field->label);
 									$field->description 	= $this->tparams->get('maintext_desc', $field->description);
-									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );
-									
-									$field->displayversion		= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
+									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );									
+									$field->displayversion	= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
 								}
 								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 								$html = flexicontent_html::flexiHtmlDiff($field->displayversion, $field->display, $this->codemode);
@@ -67,9 +65,12 @@ table#itemcompare s{
 							</td>
 							<td valign="top">
 								<?php
-								if(isset($field->displayversion)){
-									//echo $field->displayversion;
-									echo $html[0];
+								if (isset($field->displayversion)) {
+									if (($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
+										echo $html[0];
+									} else {
+										echo $field->displayversion;
+									}
 								} else {
 									echo $noplugin;
 								}
@@ -77,9 +78,12 @@ table#itemcompare s{
 							</td>
 							<td valign="top">
 								<?php
-								if(isset($field->display)){
-									//echo $field->display;
-									echo $html[1];
+								if (isset($field->display)) {
+									if (($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
+										echo $html[1];
+									} else {
+										echo $field->display;
+									}
 								} else {
 									echo $noplugin;
 								}

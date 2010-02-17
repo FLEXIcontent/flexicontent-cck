@@ -230,6 +230,10 @@ class FlexicontentModelItemcompare extends JModel
 	 */
 	function getExtrafieldvalue($fieldid)
 	{
+		if ($fieldid == 1) {
+			$field_value = array();
+			array_push($field_value, $this->_item->text);
+		} else {
 		$query = 'SELECT value'
 				.' FROM #__flexicontent_fields_item_relations AS firel'
 				.' WHERE firel.item_id = ' . (int)$this->_id
@@ -238,7 +242,7 @@ class FlexicontentModelItemcompare extends JModel
 				;
 		$this->_db->setQuery($query);
 		$field_value = $this->_db->loadResultArray();
-
+		}
 		return $field_value;
 	}
 

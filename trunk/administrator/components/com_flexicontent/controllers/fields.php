@@ -45,6 +45,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$this->registerTask( 'accesspublic', 	'access' );
 		$this->registerTask( 'accessregistered','access' );
 		$this->registerTask( 'accessspecial', 	'access' );
+		$this->registerTask( 'copy', 			'copy' );
 	}
 
 	/**
@@ -86,6 +87,8 @@ class FlexicontentControllerFields extends FlexicontentController
 
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 
 		} else {
 
@@ -122,6 +125,10 @@ class FlexicontentControllerFields extends FlexicontentController
 
 			$total = count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_PUBLISHED' );
+			$cache = &JFactory::getCache('com_flexicontent');
+			$cache->clean();
+			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -155,6 +162,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_UNPUBLISHED' );
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -188,6 +197,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			$msg = count($cid).' '.JText::_( 'FLEXI_FIELDS_DELETED' );
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -339,6 +350,51 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=fields' );
 	}
+
+	/**
+	 * Logic to copy the fields
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function copy( )
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		
+		$cf = 0;
+		$ncf = 0;
+		foreach ($cid as $id) {
+			if ($id < 15) {
+				$cf++;
+			} else {
+				$ncf++;
+			}
+		}
+
+		$model = $this->getModel('fields');
+		
+		if(!$model->copy( $cid )) {
+			JError::raiseWarning(500, JText::_( 'FLEXI_FIELDS_COPY_FAILED' ));
+		} else {
+			$msg = '';
+			if ($ncf) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', $ncf) . ' ';
+			}
+			if ($cf) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', $cf);
+			}
+			$cache = &JFactory::getCache('com_flexicontent');
+			$cache->clean();
+		}
+		
+		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg );
+	}
+
+
 	function getfieldspecificproperties() {
 		//$id		= JRequest::getVar( 'id', 0 );
 		JRequest::setVar( 'view', 'field' );
