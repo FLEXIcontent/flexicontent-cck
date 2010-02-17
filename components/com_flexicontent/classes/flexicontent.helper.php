@@ -926,6 +926,7 @@ class flexicontent_html
 		$html2 = implode(" ", $html2);
 		return array($html1, $html2);
 	}
+
 	function getJCoreFields() {
 		return array(
 			'maintext'=>'text',

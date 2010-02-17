@@ -123,9 +123,9 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				<?php echo $access; ?>
 			</td>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $ordering ); ?></span>
 
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 

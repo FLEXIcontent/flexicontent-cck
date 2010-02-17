@@ -27,7 +27,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getFields($items, $view = 'items', $params = null)
+	function getFields($items, $view = 'items', $params = null, $aid = 0)
 	{
 		if (!$items) return;
 		
@@ -78,13 +78,24 @@ class FlexicontentFields
 				}
 			}
 
-			if ((!$user->guest && FLEXI_CACHE_GUEST) || !FLEXI_CACHE) {
-				$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view);
+			if (FLEXI_ACCESS) {
+				if ((($user->gmid == '0') || ($user->gmid == '0,1')) && FLEXI_CACHE) {
+					$hits = $items[$i]->hits;
+					$items[$i]->hits = 0;
+					$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
+					$items[$i]->hits = $hits;
+				} else {
+					$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
+				}
 			} else {
-				$hits = $items[$i]->hits;
-				$items[$i]->hits = 0;
-				$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view);
-				$items[$i]->hits = $hits;
+				if (FLEXI_CACHE) {
+					$hits = $items[$i]->hits;
+					$items[$i]->hits = 0;
+					$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
+					$items[$i]->hits = $hits;
+				} else {
+					$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
+				}
 			}
 
 			if ($items[$i]->fields)
@@ -109,7 +120,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getItemFields($item, $var)
+	function getItemFields($item, $var, $aid)
 	{
 		$db =& JFactory::getDBO();
 
@@ -128,15 +139,19 @@ class FlexicontentFields
 		$typename	= $var['typenames'];
 		$vote		= $var['votes'];
 
+		$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
+		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+
 		$query 	= 'SELECT fi.*'
-				.' FROM #__flexicontent_fields AS fi'
-				.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				.' WHERE ie.item_id = ' . (int)$item->id
-				.' AND fi.access <= ' . $gid
-				.' AND fi.published = 1'
-				.' GROUP BY fi.id'
-				.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+				. ' FROM #__flexicontent_fields AS fi'
+				. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+				. $joinaccess
+				. ' WHERE ie.item_id = ' . (int)$item->id
+				. ' AND fi.published = 1'
+				. $andaccess
+				. ' GROUP BY fi.id'
+				. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
 				;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');

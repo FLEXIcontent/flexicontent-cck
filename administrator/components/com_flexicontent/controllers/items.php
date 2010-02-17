@@ -519,7 +519,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$id			= JRequest::getInt( 'cid', 0 );
+		$id			= JRequest::getInt( 'id', 0 );
 		$version	= JRequest::getVar( 'version', '', 'request', 'int' );
 		$model		= $this->getModel('item');
 

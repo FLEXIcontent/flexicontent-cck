@@ -447,6 +447,52 @@ class FlexicontentModelFields extends JModel
 	}
 
 	/**
+	 * Method to get the last id
+	 *
+	 * @access	private
+	 * @return	int
+	 * @since	1.5
+	 */
+	function _getLastId()
+	{
+		$query  = 'SELECT MAX(id)'
+				. ' FROM #__flexicontent_fields'
+				;
+		$this->_db->setQuery($query);
+		$lastid = $this->_db->loadResult();
+		
+		return (int)$lastid;
+	}
+
+	/**
+	 * Method to copy fields
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function copy($cid = array())
+	{
+		if (count( $cid ))
+		{
+			foreach ($cid as $id) {
+				// only non core fields
+				if ($id > 14) {
+					$field  =& $this->getTable('flexicontent_fields', '');
+					$field->load($id);
+					$field->id = 0;
+					$field->name = 'field' . ($this->_getLastId() + 1);
+					$field->label = $field->label . ' [copy]';
+					$field->check();
+					$field->store();
+				}				
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Method to get types list when performing an edit action
 	 * 
 	 * @return array

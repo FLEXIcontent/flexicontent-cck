@@ -48,8 +48,15 @@ function &plgSearchFlexisearchAreas() {
  */
 function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 {
-	$db		=& JFactory::getDBO();
-	$user	=& JFactory::getUser();
+	global $mainframe;
+
+	$db		= & JFactory::getDBO();
+	$user	= & JFactory::getUser();
+	$gid	= (int) $user->get('aid');
+    // Get the WHERE and ORDER BY clauses for the query
+	$params 	= & $mainframe->getParams('com_flexicontent');
+	// show unauthorized items
+	$show_noauth = $params->get('show_noauth', 0);
 
 	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
@@ -82,10 +89,7 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 
 		case 'all':
 			$words = explode( ' ', $text );
-			$newtext = '';
-			foreach ($words as $word) {
-				$newtext .= '+' . $word . ' ';
-			}
+			$newtext = '+' . implode( ' +', $words );
 			$text		= $db->Quote( $db->getEscaped( $newtext, true ), false );
 			$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 			break;
@@ -119,29 +123,41 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 			break;
 	}
 	
-	$query = 'SELECT DISTINCT a.title AS title,'
-	. ' a.created AS created,'
-	. ' ie.search_index AS text,'
-	. ' "2" AS browsernav,'
-	. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
-	. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-	. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
-	. ' FROM #__content AS a'
-	. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
-	. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id'
-	. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-	. ' WHERE ( '.$where.' )'
-	. ' AND a.state IN (1, -4)'
-	. ' AND c.published = 1'
-	. ' AND c.access <= '.(int) $user->get('aid')
-	. ' AND a.access <= '.(int) $user->get('aid')
-	. ' GROUP BY a.id'
-	. ' ORDER BY '. $order
-	;
+	// Select only items user has access to if he is not allowed to show unauthorized items
+	if (!$show_noauth) {
+		if (FLEXI_ACCESS) {
+			$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+			$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')';
+			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $gid . ')';
+		} else {
+			$joinaccess	 = '';
+			$andaccess   = ' AND c.access <= '.$gid;
+			$andaccess  .= ' AND a.access <= '.$gid;
+		}
+	}
+
+	$query 	= 'SELECT DISTINCT a.title AS title,'
+			. ' a.created AS created,'
+			. ' ie.search_index AS text,'
+			. ' "2" AS browsernav,'
+			. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+			. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
+			. ' FROM #__content AS a'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
+			. ' LEFT JOIN #__categories AS c ON c.id = a.catid'
+			. $joinaccess
+			. ' WHERE ( '.$where.' )'
+			. ' AND a.state IN (1, -5)'
+			. ' AND c.published = 1'
+			. $andaccess
+			. ' ORDER BY '. $order
+			;
 
 	$db->setQuery( $query, 0, $limit );
 	$list = $db->loadObjectList();
-	
+
 	if(isset($list))
 	{
 		foreach($list as $key => $row) {

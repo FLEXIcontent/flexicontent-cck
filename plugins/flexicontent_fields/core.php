@@ -178,7 +178,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				break;
 			}
 
-			$text = $values ? $values[0] : '';
+			$text = $item->text ? $item->text : '';
 
 			// Search for the {readmore} tag and split the text up accordingly.
 			$text = str_replace('<br>', '<br />', $text);

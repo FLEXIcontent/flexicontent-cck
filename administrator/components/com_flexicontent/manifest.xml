@@ -109,7 +109,6 @@
 			<param name="enable_flash" default="0" />
 			<param name="advcache" default="1" />
 			<param name="advcache_time" default="3600" />
-			<param name="advcache_guest" default="1" />
 			<param name="purge_gc" default="1" />
 		</params>
 	</administration>

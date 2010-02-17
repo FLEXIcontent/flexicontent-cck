@@ -52,7 +52,7 @@ class FlexicontentViewItem extends JView {
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
 		$cid		= is_array($cid)?$cid[0]:$cid;
-		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+		$version 	= JRequest::getVar( 'version', '', 'request', 'int' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -201,8 +201,7 @@ class FlexicontentViewItem extends JView {
 		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
-		if(!$canPublish)
-			$row->state=-3;
+
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
 		
 		if (FLEXI_FISH) {
@@ -251,7 +250,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
-		$this->assignRef('usedtags'		, $usedtags);
+		$this->assignRef('usedtags'			, $usedtags);
 
 		parent::display($tpl);
 	}

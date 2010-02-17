@@ -48,6 +48,8 @@ class FlexicontentViewCategory extends JView
 		$params 	= & $mainframe->getParams('com_flexicontent');
 		$uri 		= & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
+		$user		= & JFactory::getUser();
+		$aid		= (int) $user->get('aid');
 
 		// Request variables
 		$limitstart		= JRequest::getInt('limitstart');
@@ -80,7 +82,7 @@ class FlexicontentViewCategory extends JView
 
 		// Bind Fields
 		if ($format != 'feed') {
-			$items 	= FlexicontentFields::getFields($items, 'category', $params);
+			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
         //Set layout

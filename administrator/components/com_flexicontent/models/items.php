@@ -181,10 +181,10 @@ class FlexicontentModelItems extends JModel
 		$status['allcat'] 		= $allcat;
 		$status['nocat'] 		= array_diff($allids,$allcat);
 		$status['countnocat'] 	= count($status['nocat']);
-		$status['allfi'] 		= $allfi;
-		$status['nofi'] 		= array_diff($allids,$allfi);
-		$status['countnofi'] 	= count($status['nofi']);
-		//$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
+//		$status['allfi'] 		= $allfi;
+//		$status['nofi'] 		= array_diff($allids,$allfi);
+//		$status['countnofi'] 	= count($status['nofi']);
+//		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
 		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
@@ -259,6 +259,7 @@ class FlexicontentModelItems extends JModel
 		}
 
 					
+/*
 		// insert fields to items relations
 		$itemfields = array();
 		foreach ($rows as $row) {
@@ -311,6 +312,7 @@ class FlexicontentModelItems extends JModel
 		$this->_db->setQuery($query);
 		$this->_db->query();
 //		if (!$this->_db->query()) return '$itemfields10';
+*/
 
 		return; //JText::_('All required datas were successfully inserted');
 	}
@@ -583,6 +585,7 @@ class FlexicontentModelItems extends JModel
 				
 				foreach($fields as $field)
 				{
+/*
 					if ($field->field_id == 2 || $field->field_id == 4) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->created) . ')'
@@ -592,6 +595,12 @@ class FlexicontentModelItems extends JModel
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->title) . ')'
 								;
 					} else {
+						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
+								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
+								;
+					}
+*/
+					if ($field->iscore != 1) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;

@@ -99,6 +99,7 @@ class FlexicontentViewFields extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
+		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'Copy' );
 		JToolBarHelper::publishList();
 		JToolBarHelper::unpublishList();
 		JToolBarHelper::addNew();

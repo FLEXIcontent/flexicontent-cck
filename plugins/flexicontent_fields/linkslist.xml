@@ -19,7 +19,7 @@
 		</param>
 	</params>
 	<params group="group-linkslist">
-		<param name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+		<param name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
 		<param name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
 			<option value="ul">Unordered list</option>
 			<option value="ol">Ordered list</option>
