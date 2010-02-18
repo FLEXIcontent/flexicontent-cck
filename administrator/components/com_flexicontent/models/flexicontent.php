@@ -48,10 +48,18 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getPending()
 	{
+		if (FLEXIACCESS) {
+			$user 	=& JFactory::getUser();
+			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+		} else {
+			$mine 	= 0;
+		}
+		
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -3'
 				. ' AND sectionid = ' . FLEXI_SECTION
+				. ($mine ? ' AND created_by = '.$user->id : '')
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
@@ -70,10 +78,18 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getOpenquestions()
 	{
+		if (FLEXIACCESS) {
+			$user 	=& JFactory::getUser();
+			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+		} else {
+			$mine 	= 0;
+		}
+
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -4'
 				. ' AND sectionid = ' . FLEXI_SECTION
+				. ($mine ? ' AND created_by = '.$user->id : '')
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
@@ -92,10 +108,18 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getInprogress()
 	{
+		if (FLEXIACCESS) {
+			$user 	=& JFactory::getUser();
+			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+		} else {
+			$mine 	= 0;
+		}
+
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -5'
 				. ' AND sectionid = ' . FLEXI_SECTION
+				. ($mine ? ' AND created_by = '.$user->id : '')
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
