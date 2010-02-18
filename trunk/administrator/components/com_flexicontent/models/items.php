@@ -445,6 +445,15 @@ class FlexicontentModelItems extends JModel
 		$where[] = ' i.state != -2';
 		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
 
+		// if FLEXIaccess only authorize user to see its own items
+		if (FLEXIACCESS) {
+			$user 	=& JFactory::getUser();
+			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+			if (@$mine) {
+				$where[] = 'i.created_by = ' . $user->id;
+			}
+		}
+
 		// get not associated items to remove them from the displayed datas
 		$unassociated = $this->getUnassociatedItems();
 		if ($unassociated) {
