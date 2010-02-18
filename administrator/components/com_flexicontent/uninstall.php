@@ -50,6 +50,9 @@ $flexiplugins = array(
 	"text"=>"flexicontent_fields",
 	"textarea"=>"flexicontent_fields",
 	"weblink"=>"flexicontent_fields",
+	"extendedweblink"=>"flexicontent_fields",
+	"linkslist"=>"flexicontent_fields",
+	"minigallery"=>"flexicontent_fields",
 	"flexisearch"=>"search",
 	"flexisystem"=>"system"
 );
