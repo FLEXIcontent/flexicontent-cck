@@ -163,6 +163,25 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
+<?php if (!$this->nooldfieldsdata) : ?>
+<script type="text/javascript">
+	window.addEvent('domready', function(){
+		$('oldfieldsdata').addEvent('click', function(e) {
+			$('oldfieldsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo JUtility::getToken();?>=1&format=raw";
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('oldfieldsdata-log')
+			});
+			ajax.request.delay(500, ajax);
+		});
+	});
+</script>
+<?php endif; ?>
+
 		<table class="adminlist" cellspacing="0" cellpadding="0" border="0" width="100%">
 			<tr>
 				<td class="key">
@@ -173,7 +192,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				</td>
 			</tr>
 			<tr>
-				<td class="key" style="width:300px;">
+				<td class="key" style="width:280px;">
 					<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
 				</td>
 				<td id="existtype-log">
@@ -188,32 +207,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</td>
 			</tr>
-<!--
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_STANDARD_FIELD_PLUGINS_INSTALLED' ); ?>
-				</td>
-				<td>
-					<?php echo $this->existfplg ? '<span class="install-ok"></span>' : '<span class="install-notok"></span>'.JText::_( 'Please re-install the component and click on "'.JText::_( 'FLEXI_UPDATE' ).' install"' ) ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_SYSTEM_PLUGIN_INSTALLED' ); ?>
-				</td>
-				<td>
-					<?php echo $this->existsyplg ? '<span class="install-ok"></span>' : '<span class="install-notok"></span>'.JText::_( 'Please re-install the component and click on "'.JText::_( 'FLEXI_UPDATE' ).' install"' ) ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_SEARCH_PLUGIN_INSTALLED' ); ?>
-				</td>
-				<td>
-					<?php echo $this->existseplg ? '<span class="install-ok"></span>' : '<span class="install-notok"></span>'.JText::_( 'Please re-install the component and click on "'.JText::_( 'FLEXI_UPDATE' ).' install"' ) ; ?>
-				</td>
-			</tr>
--->
 			<tr>
 				<td class="key">
 					<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
@@ -252,6 +245,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				</td>
 				<td id="oldbetafiles-log">
 					<?php echo $this->oldbetafiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="key">
+					<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
+				</td>
+				<td id="oldfieldsdata-log">
+					<?php echo $this->oldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</td>
 			</tr>
 	</table>
