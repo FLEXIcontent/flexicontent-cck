@@ -24,6 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 				
@@ -69,10 +70,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
                 </fieldset>
                 <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component'); ?>" />
             </form>
-<?php
-echo $this->pane->endPanel();
-echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' );
-?>
+			<?php
+			echo $this->pane->endPanel();
+			endif;
+			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' );
+			?>
 			<!-- File URL Form -->
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
 				<fieldset>

@@ -20,50 +20,53 @@ defined('_JEXEC') or die('Restricted access');
 
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
-$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
-$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
-$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
-
-$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
-$this->document->addScriptDeclaration("
-	jQuery(document).ready(function () {
-		jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
-			width: 260,
-			matchContains: false,
-			mustMatch: false,
-			selectFirst: false,
-			dataType: \"json\",
-			parse: function(data) {
-				return jQuery.map(data, function(row) {
-					return {
-						data: row,
-						value: row.name,
-						result: row.name
-					};
-				});
-			},
-			formatItem: function(row) {
-				return row.name;
-			}
-		}).result(function(e, row) {
-			jQuery(\"#input-tags\").attr('tagid',row.id);
-			jQuery(\"#input-tags\").attr('tagname',row.name);
-			addToList(row.id, row.name);
-		}).keydown(function(event) {
-			if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
-				addtag(0, jQuery(\"#input-tags\").attr('value'));
-				resetField();
-			}else if(event.keyCode==13) {
-				resetField();
+if ($this->CanUseTags)
+{
+	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
+	
+	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function () {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+				width: 260,
+				matchContains: false,
+				mustMatch: false,
+				selectFirst: false,
+				dataType: \"json\",
+				parse: function(data) {
+					return jQuery.map(data, function(row) {
+						return {
+							data: row,
+							value: row.name,
+							result: row.name
+						};
+					});
+				},
+				formatItem: function(row) {
+					return row.name;
+				}
+			}).result(function(e, row) {
+				jQuery(\"#input-tags\").attr('tagid',row.id);
+				jQuery(\"#input-tags\").attr('tagname',row.name);
+				addToList(row.id, row.name);
+			}).keydown(function(event) {
+				if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
+					addtag(0, jQuery(\"#input-tags\").attr('value'));
+					resetField();
+				}else if(event.keyCode==13) {
+					resetField();
+				}
+			});
+			function resetField() {
+				jQuery(\"#input-tags\").attr('tagid',0);
+				jQuery(\"#input-tags\").attr('tagname','');
+				jQuery(\"#input-tags\").attr('value','');
 			}
 		});
-		function resetField() {
-			jQuery(\"#input-tags\").attr('tagid',0);
-			jQuery(\"#input-tags\").attr('tagname','');
-			jQuery(\"#input-tags\").attr('value','');
-		}
-	});
-");
+	");
+}
 ?>
 
 <script language="javascript" type="text/javascript">
@@ -217,17 +220,25 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									$nused = count($this->usedtags);
 									for( $i = 0, $nused; $i < $nused; $i++ ) {
 										$tag = $this->usedtags[$i];
-										echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-										echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-									}?>
+										if ($this->CanUseTags) {
+											echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+										} else {
+											echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" align="right"></a></li>';
+										}
+									}
+									?>
 								</ul>
 								<br class="clear" />
 							</div>
+							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
 								<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
 								</label>
 							</div>
+							<?php endif; ?>
 						</td>
 					</tr>
 				</table>
@@ -436,7 +447,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		</table>
 		
-		<?php if ($this->cparams->get('use_versioning', 1)) : ?>
+		<?php if ($this->cparams->get('use_versioning', 1) && $this->CanVersion) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>

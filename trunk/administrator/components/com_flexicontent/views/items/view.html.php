@@ -134,9 +134,10 @@ class FlexicontentViewItems extends JView {
 			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
 			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
+			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
 			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
 			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? 0 : 1;
+			$CanCopy	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid) : 1;
 		} else {
 			$CanAdd 		= 1;
 			$CanEdit		= 1;
@@ -149,9 +150,10 @@ class FlexicontentViewItems extends JView {
 			$CanArchives	= 1;
 			$CanFiles		= 1;
 			$CanStats		= 1;
+			$CanTemplates	= 1;
 			$CanRights		= 1;
 			$CanOrder		= 1;
-			$CanTemplates	= 1;
+			$CanCopy		= 1;
 		}
 
 		//Create Submenu
@@ -170,7 +172,9 @@ class FlexicontentViewItems extends JView {
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
 		if ($CanAdd) {
 			JToolBarHelper::addNew();
-			JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
+			if ($CanCopy) {
+				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
+			}
 		}
 		if ($CanEdit) {
 			JToolBarHelper::editList();
