@@ -44,6 +44,8 @@ class FlexicontentController extends JController
 		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
+		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
+
 	}
 
 	/**
@@ -468,5 +470,47 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
+
+	/**
+	 * Method to delete old core fields data in the fields_items_relations table
+	 * Delete also old versions fields data
+	 * Alter value fields to mediumtext in order to store large items
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function cleanupOldTables()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db =& JFactory::getDBO();
+
+		$queries 	= array();
+		// alter some table field types
+		$queries[] 	= "ALTER TABLE #__flexicontent_fields_item_relations CHANGE `value` `value` MEDIUMTEXT" ;
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_versions CHANGE `value` `value` MEDIUMTEXT" ;
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `search_index` `search_index` MEDIUMTEXT" ;
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_items` `sub_items` TEXT" ;
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_categories` `sub_categories` TEXT" ;
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `related_items` `related_items` TEXT" ;
+		// delete unused records
+		$queries[] 	= "DELETE FROM #__flexicontent_fields_item_relations WHERE field_id < 14" ;
+		$queries[] 	= "DELETE FROM #__flexicontent_items_versions WHERE field_id IN (2, 3, 4, 5, 6, 7, 9, 10 )" ;
+
+		foreach ($queries as $query) {
+			$db->setQuery($query);
+			$db->query();
+		}
+
+		$model = $this->getModel('flexicontent');
+		if ($model->getNoOldFieldsData()) {
+			echo '<span class="install-ok"></span>';
+		} else {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		}
+	}
+
 }
 ?>

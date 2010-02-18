@@ -107,6 +107,7 @@ class FlexicontentViewFlexicontent extends JView
 		$cachethumb			= & $this->get( 'CacheThumbChmod' );
 		$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 		$fieldspositions	= & $this->get( 'FieldsPositions' );
+		$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
 		
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
@@ -140,7 +141,7 @@ class FlexicontentViewFlexicontent extends JView
 			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
 			$CanPlugins	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_plugins', 'manage', 'users', $user->gmid) : 1;
 			$CanComments 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_jcomments', 'manage', 'users', $user->gmid) : $CanComments;
-			$CanTemplates	= 1;
+			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
 		} else {
 			$CanAdd			= 1;
 			$CanAddCats 	= 1;
@@ -202,6 +203,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existversionsdata'	, $existversionsdata);
 		$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
+		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
 
 		// assign Rights to the template
 		$this->assignRef('CanAdd'		, $CanAdd);

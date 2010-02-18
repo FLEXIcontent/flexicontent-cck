@@ -396,6 +396,24 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		return $fields;
 	}
+
+
+	/**
+	 * Method to check if there are still old core fields data in the fields_items_relations table
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getNoOldFieldsData()
+	{
+		$query 	= 'SELECT COUNT( item_id )'
+				. ' FROM #__flexicontent_fields_item_relations'
+				. ' WHERE field_id < 15'
+				;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadResult() ? false : true;
+	}
+
 	
 	/**
 	 * Method to check if there is at least one category created
