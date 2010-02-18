@@ -45,7 +45,6 @@ class FlexicontentController extends JController
 		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
-
 	}
 
 	/**
@@ -503,6 +502,9 @@ VALUES
 			$db->setQuery($query);
 			$db->query();
 		}
+
+		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache->clean();
 
 		$model = $this->getModel('flexicontent');
 		if ($model->getNoOldFieldsData()) {
