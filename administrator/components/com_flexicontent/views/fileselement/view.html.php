@@ -85,6 +85,12 @@ class FlexicontentViewFileselement extends JView
 		";
 		$document->addScriptDeclaration($js);
 		
+		if (FLEXI_ACCESS) {
+			$CanUpload	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanUpload	= 1;
+		}
+
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
@@ -155,6 +161,7 @@ class FlexicontentViewFileselement extends JView
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('files' 		, $files);
 		$this->assignRef('fieldid' 		, $fieldid);
+		$this->assignRef('CanUpload' 	, $CanUpload);
 
 		parent::display($tpl);
 

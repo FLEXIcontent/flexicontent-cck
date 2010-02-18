@@ -24,6 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 		    <?php if ($this->require_ftp): ?>
@@ -94,10 +95,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
                 </fieldset>
                 <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
             </form>
-<?php
-echo $this->pane->endPanel();
-echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' );
-?>
+			<?php
+			echo $this->pane->endPanel();
+			endif;
+			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' );
+			?>
 			<!-- File URL Form -->
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
 				<fieldset>
@@ -140,10 +142,11 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' );
 				</fieldset>
                 <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-<?php
-echo $this->pane->endPanel();
-echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' );
-?>
+			<?php
+			echo $this->pane->endPanel();
+			if ($this->CanUpload) :
+			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' );
+			?>
 			<!-- File from server Form -->
 			<form action="index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=addlocal&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
 				<fieldset>
@@ -211,10 +214,11 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server'
 				</fieldset>
                 <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-<?php
-echo $this->pane->endPanel();
-echo $this->pane->endPane();
-?>
+			<?php
+			echo $this->pane->endPanel();
+			endif;
+			echo $this->pane->endPane();
+			?>
 		</td>
 	</tr>
 </table>

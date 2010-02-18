@@ -24,6 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 				
@@ -55,10 +56,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<input type="hidden" name="secure" value="0" />
                 <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component&layout=image&filter_secure=M'); ?>" />
             </form>
-<?php
-echo $this->pane->endPanel();
-echo $this->pane->endPane();
-?>
+			<?php
+			echo $this->pane->endPanel();
+			endif;
+			echo $this->pane->endPane();
+			?>
 		</td>
 	</tr>
 </table>

@@ -108,6 +108,17 @@ class FlexicontentViewItem extends JView {
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, $row ));
 		}
 		
+		if (FLEXI_ACCESS) {
+			$CanParams	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
+			$CanVersion	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'versioning', 'users', $user->gmid) : 1;
+			$CanUseTags	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+		} else {
+			$CanParams	= 1;
+			$CanVersion	= 1;
+			$CanUseTags = 1;
+		}
+		if (!$CanParams) 	$document->addStyleDeclaration('#det-pane {display:none;}');
+
 		// set default values
 		$canPublish 	= 1;
 		$canPublishOwn	= 1;
@@ -251,6 +262,8 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
 		$this->assignRef('usedtags'			, $usedtags);
+		$this->assignRef('CanVersion'		, $CanVersion);
+		$this->assignRef('CanUseTags'		, $CanUseTags);
 
 		parent::display($tpl);
 	}
