@@ -48,7 +48,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getPending()
 	{
-		if (FLEXIACCESS) {
+		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
 		} else {
@@ -78,7 +78,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getOpenquestions()
 	{
-		if (FLEXIACCESS) {
+		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
 		} else {
@@ -108,7 +108,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getInprogress()
 	{
-		if (FLEXIACCESS) {
+		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
 		} else {
