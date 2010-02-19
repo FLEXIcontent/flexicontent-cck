@@ -446,7 +446,7 @@ class FlexicontentModelItems extends JModel
 		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
 
 		// if FLEXIaccess only authorize user to see its own items
-		if (FLEXIACCESS) {
+		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
 			if (@$mine) {
