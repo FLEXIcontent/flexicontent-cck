@@ -49,17 +49,17 @@ class FlexicontentModelFlexicontent extends JModel
 	function getPending()
 	{
 		if (FLEXI_ACCESS) {
-			$user 	=& JFactory::getUser();
-			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+			$user 		=& JFactory::getUser();
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
-			$mine 	= 0;
+			$allitems 	= 1;
 		}
 		
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -3'
 				. ' AND sectionid = ' . FLEXI_SECTION
-				. ($mine ? ' AND created_by = '.$user->id : '')
+				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
@@ -79,17 +79,17 @@ class FlexicontentModelFlexicontent extends JModel
 	function getOpenquestions()
 	{
 		if (FLEXI_ACCESS) {
-			$user 	=& JFactory::getUser();
-			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+			$user 		=& JFactory::getUser();
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
-			$mine 	= 0;
+			$allitems 	= 1;
 		}
 
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -4'
 				. ' AND sectionid = ' . FLEXI_SECTION
-				. ($mine ? ' AND created_by = '.$user->id : '')
+				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
@@ -109,17 +109,17 @@ class FlexicontentModelFlexicontent extends JModel
 	function getInprogress()
 	{
 		if (FLEXI_ACCESS) {
-			$user 	=& JFactory::getUser();
-			$mine	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'useritemsonly', 'users', $user->gmid) : 0;
+			$user 		=& JFactory::getUser();
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
-			$mine 	= 0;
+			$allitems 	= 1;
 		}
 
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -5'
 				. ' AND sectionid = ' . FLEXI_SECTION
-				. ($mine ? ' AND created_by = '.$user->id : '')
+				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				. ' LIMIT 5'
 				;
@@ -317,8 +317,8 @@ class FlexicontentModelFlexicontent extends JModel
 			'default.xml',
 			'default.php',
 			'index.html',
-			'_form.php',
-			'_form.xml'
+			'form.php',
+			'form.xml'
 			);
 		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
 		$cattmpl 	= JFolder::files($catdir);		
@@ -525,7 +525,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	 function getUpdate()
 	 {
-	 	$url = 'http://update.schlu.net/flexicontent_update.xml';
+	 	$url = 'http://update.flexicontent/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
