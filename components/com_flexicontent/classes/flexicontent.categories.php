@@ -206,7 +206,9 @@ class flexicontent_cats
 		$cid = JRequest::getVar('cid');
 		
 		if (FLEXI_ACCESS) {
-			$usercats = FAccess::checkUserCats($user->gmid);
+			$usercats 		= FAccess::checkUserCats($user->gmid);
+			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
+			$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
 		}
 
 		$catlist 	= array();
@@ -223,9 +225,12 @@ class flexicontent_cats
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 				} else if ($filter) {
 					if (FLEXI_ACCESS && (!in_array($item->id, $usercats)) && ($user->gid < 25)) {
-						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+						if ($viewallcats) { // only disable cats in the list else don't show them at all
+							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+						}
 					} else {
-						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
+						// FLEXIaccess rule $viewtree enables tree view
+						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}
 				} else {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );

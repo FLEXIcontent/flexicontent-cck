@@ -188,52 +188,95 @@ margin-left: 10px;
  *
  */
 
-div.qf_edit form fieldset {
-margin: 0 0 1em 0;
-padding: 1em;
-border: 1px solid #ddd;
+/* Form elements */
+div.flexi_edit form input,
+div.flexi_edit form button,
+div.flexi_edit form select,
+div.flexi_edit form textarea {
+	margin: 0 0 0.5em 0;
+	padding: 0.2em;
+	border: 1px solid #ddd;
+	cursor: pointer;
+	background-color: #fff;
+}
+div.flexi_edit form input.invalid,
+div.flexi_edit form select.invalid,
+div.flexi_edit form textarea.invalid {
+	border: 1px dotted red;
+}
+    
+.flexi_edit form label {
+	width: 9em;
+	margin: 0;
+	padding: 0;
+	float: left;
+	display: block;
+	vertical-align: top;
 }
 
-    div.qf_edit form legend {
-    padding: 0.3em;
-    font-weight: bold;
-    }
+/* Tags */
+div#tags {
+	margin: 3px;
+}
+div#tags input {margin-right: 0.5em;}
 
-    div.qf_edit form label {
-    width: 9em;
-    margin: 0; padding: 0;
-    float: left; display: block;
-    vertical-align: top;
-    }
-
-    div.qf_edit form input,
-    div.qf_edit form button,
-    div.qf_edit form select,
-    div.qf_edit form textarea {
-    margin: 0 0 0.5em 0; padding: 0.2em;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    background-color: #fff;
-    }
-    
-/** save buttons */
-div.qf_save_buttons {
-margin: 0 0 1em 0;
-float: right;
+div#tags ul {
+	margin: 3px;
+	padding: 0px;
 }
 
-    div.qf_save_buttons button {
-    font-size: 1.5em;
-    cursor: pointer;
-    }
-    
-div.qf_box_left,
-div.qf_box_right {
-width: 45%;
+div#tags ul li {
+	width: 110px;
+	min-height: 20px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px;
+	zoom: 1;
+	*display: inline;
+	_height: 20px;
+}
+
+div#tags ul li div {
+	padding-top: 3px;
+}
+
+div#tags .flexi_tagbox {
+	display: block;
+	max-height: 170px;
+  	overflow: auto;
+  	border: 1px dashed silver;
+  	background: #fff;	
+}
+
+
+/* Fieldsets */
+.flexi_edit form fieldset {
+	margin: 0 0 1em 0;
+	padding: 1em;
+	border: 1px solid #ddd;
+}
+.flexi_general {}
+.flexi_tags {}
+.flexi_fields {}
+.flexi_meta {}
+
+/* Buttons */
+.flexi_buttons {
+	margin: 0 0 1em 0;
+	float: right;
+}
+.flexi_buttons button {
+	cursor: pointer;
+}
+
+/* Meta */  
+div.flexi_box_left {
+width: 47%;
 float: left;
 }
-
-div.qf_box_right {
+div.flexi_box_right {
+width: 47%;
 float: right;
 }
 
