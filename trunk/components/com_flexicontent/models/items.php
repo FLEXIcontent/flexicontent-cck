@@ -707,6 +707,7 @@ class FlexicontentModelItems extends JModel
 		$this->_item	=& $item;
 
 
+/*
 		///////////////////////////////
 		// store extra fields values //
 		///////////////////////////////
@@ -811,6 +812,7 @@ class FlexicontentModelItems extends JModel
 				return false;
 			}
 		}
+*/
 
 		return $this->_item->id;
 	}

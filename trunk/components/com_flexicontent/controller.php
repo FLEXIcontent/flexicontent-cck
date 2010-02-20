@@ -115,7 +115,7 @@ class FlexicontentController extends JController
 
 		//general access check
 		if (!$user->authorize('com_flexicontent', 'add')) {
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		}
 
 		// Get/Create the model
@@ -181,12 +181,12 @@ class FlexicontentController extends JController
 		if ($isNew) {
 
 			//Get categories for information mail
-			$query = 'SELECT DISTINCT c.id, c.title,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-			. ' FROM #__categories AS c'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-			. ' WHERE rel.itemid = '.(int) $model->get('id')
-			;
+			$query 	= 'SELECT DISTINCT c.id, c.title,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+					. ' FROM #__categories AS c'
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+					. ' WHERE rel.itemid = '.(int) $model->get('id')
+					;
 
 			$db->setQuery( $query );
 
@@ -205,9 +205,9 @@ class FlexicontentController extends JController
 			}
 
 			//get list of admins who receive system mails
-			$query = 'SELECT id, email, name' .
-			' FROM #__users' .
-			' WHERE sendEmail = 1';
+			$query 	= 'SELECT id, email, name'
+					. ' FROM #__users'
+					. ' WHERE sendEmail = 1';
 			$db->setQuery($query);
 			if (!$db->query()) {
 				JError::raiseError( 500, $db->stderr(true));
