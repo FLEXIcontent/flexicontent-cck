@@ -204,7 +204,7 @@ class flexicontent_cats
 	{
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
-		
+		$viewtree = 1;
 		if (FLEXI_ACCESS) {
 			$usercats 		= FAccess::checkUserCats($user->gmid);
 			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
