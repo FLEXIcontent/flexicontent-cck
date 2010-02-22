@@ -888,9 +888,18 @@ class FlexicontentModelItem extends JModel
 	 * @return array
 	 * @since 1.0
 	 */
-	function getUsedtagsArray()
+	function getUsedtagsArray($id=0)
 	{
-		if(!isset($this->_item->tags)||!is_array($this->_item->tags)) $this->_item->tags = array();
+		if(!isset($this->_item->tags)||!is_array($this->_item->tags)) {
+			if(!$id) $this->_item->tags = array();
+			else {
+				$query 	= 'SELECT tid FROM #__flexicontent_tags_item_relations'
+					. " WHERE itemid ='$id'"
+					;
+				$this->_db->setQuery($query);
+				$this->_item->tags = $this->_db->loadResultArray;
+			}
+		}
 		return $this->_item->tags;
 	}
 	function getUsedtags($A)
