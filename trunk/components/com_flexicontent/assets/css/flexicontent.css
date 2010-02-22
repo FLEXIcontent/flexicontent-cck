@@ -102,34 +102,6 @@ margin: 5px 0 10px; padding: 0 5px;
 
 
 /**
- * @section flexicontent Table Filter Form
- *
- */
-div.subcategorieslist {
-margin: 0 0 1em 0;
-}
-
-div#fc_alpha {
-margin: 0 0 1em 0;
-}
-
-div#flexicontent #fc_filter {
-margin: 0 0 1em 0; padding: 0.5em;
-border: solid 1px #ddd;
-}
-
-div#flexicontent .fc_fleft {
-float: left;
-}
-
-div#flexicontent .fc_fright {
-float: right;
-}
-div#flexicontent .fc_fright .filter {
-margin-left: 10px;
-}
-
-/**
  * @section FLEXIcontent Table
  *
  */
