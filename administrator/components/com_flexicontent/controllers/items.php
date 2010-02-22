@@ -624,7 +624,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$used = null;
 
 		if ($id) {
-			$used 	= $model->getusedtags($id);
+			$used 	= $model->getUsedtagsArray($id);
 		}
 		if(!is_array($used)){
 			$used = array();
