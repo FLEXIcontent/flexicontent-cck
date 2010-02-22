@@ -446,7 +446,7 @@ class FlexicontentModelItem extends JModel
 		$details	= JRequest::getVar( 'details', array(), 'post', 'array');
 		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-//		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
+		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		unset($data['state']);
 		// bind it to the table
 		if (!$item->bind($data)) {
