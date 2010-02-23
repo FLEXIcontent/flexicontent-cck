@@ -85,7 +85,7 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $this->get( 'VersionList' );
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-
+		$lastversion = $row->getLastVersion();
 		$categories = $globalcats;
 
 		$usedtags = array();
@@ -251,6 +251,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('fields'			, $fields);
 		$this->assignRef('versions'			, $versions);
 		$this->assignRef('version'			, $version);
+		$this->assignRef('lastversion',		$lastversion);
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
