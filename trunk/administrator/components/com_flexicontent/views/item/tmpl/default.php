@@ -174,10 +174,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									<td>
 									<?php
 									if (($this->canPublish || $this->canPublish) && ($this->row->id))	:
-									echo $this->lists['state'];
+									echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;' . JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
 									else :
 									echo $this->published;
 									echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
+									echo '<input type="hidden" name="vstate" value="1" />';
 									endif;
 									?>
 									</td>
@@ -238,17 +239,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								</label>
 							</div>
 							<?php endif; ?>
-							<label for="published">
-								<?php echo JText::_( 'Save this version as' ).':'; ?>
-							</label>
-							<?php
-								if (($this->canPublish || $this->canPublish) && ($this->row->id))	:
-								echo $this->lists['vstate'];
-								else :
-								echo 'Draft';
-								echo '<input type="hidden" name="vstate" value="1" />';
-								endif;
-							?>
 						</td>
 					</tr>
 				</table>
@@ -429,7 +419,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'Current version' ); ?></strong>
+				<strong><?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?></strong>
 			</td>
 			<td>
 				#<?php echo $this->row->version;?>
@@ -437,7 +427,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'Viewing version' ); ?></strong>
+				<strong><?php echo JText::_( 'FLEXI_WORKING_VERSION' ); ?></strong>
 			</td>
 			<td>
 				#<?php echo $this->version?$this->version:$this->row->version;?>
