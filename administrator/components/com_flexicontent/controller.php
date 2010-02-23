@@ -495,7 +495,7 @@ VALUES
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_categories` `sub_categories` TEXT" ;
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `related_items` `related_items` TEXT" ;
 		// delete unused records
-		$queries[] 	= "DELETE FROM #__flexicontent_fields_item_relations WHERE field_id < 14" ;
+		$queries[] 	= "DELETE FROM #__flexicontent_fields_item_relations WHERE field_id < 15" ;
 		$queries[] 	= "DELETE FROM #__flexicontent_items_versions WHERE field_id IN (2, 3, 4, 5, 6, 7, 9, 10 )" ;
 
 		foreach ($queries as $query) {
