@@ -502,7 +502,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td class="versions"><?php echo ($version->nr == 1) ? $this->row->creator : $version->modifier; ?></td>
 				<td class="versions" align="center"><a href="#" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
 				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
 					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::_( 'FLEXI_REVERT_TO_THIS_VERSION' ); ?>"><?php echo $revert; ?>
