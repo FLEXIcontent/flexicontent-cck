@@ -208,6 +208,10 @@ class FlexicontentViewItem extends JView {
 			$row->state=-3;
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
 		
+		//build version state list
+		$vstate[] = JHTML::_('select.option',  1, JText::_( 'Draft' ) );
+		$vstate[] = JHTML::_('select.option',  2, JText::_( 'Publish Item' ) ); 
+		$lists['vstate'] = JHTML::_('select.genericlist',   $vstate, 'vstate', '', 'value', 'text', 1 );
 		if (FLEXI_FISH) {
 		//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);

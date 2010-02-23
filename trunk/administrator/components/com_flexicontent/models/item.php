@@ -447,7 +447,7 @@ class FlexicontentModelItem extends JModel
 		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		unset($data['state']);
+		//unset($data['state']);
 		// bind it to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
@@ -464,7 +464,7 @@ class FlexicontentModelItem extends JModel
 		$version = $item->getLastVersion();
 		$isnew = false;
 		$tags = array_unique($tags);
-		if( ($isnew = !$item->id) || ((int)$post['state']==1) ) {
+		if( ($isnew = !$item->id) || ((int)$post['vstate']==2) ) {
 			$item->modified 		= $nullDate;
 			$item->modified_by 	= 0;
 			// Are we saving from an item edit?
@@ -569,7 +569,7 @@ class FlexicontentModelItem extends JModel
 				$this->setError($item->getError());
 				return false;
 			}
-			if((int)$post['state']==1) {
+			if((int)$post['vstate']==1) {
 				$item->version = $isnew?1:($version+1);
 			}
 			//$version = $item
@@ -587,7 +587,7 @@ class FlexicontentModelItem extends JModel
 
 			$this->_item	=& $item;
 			
-			if((int)$post['state']==1) {
+			if((int)$post['vstate']==1) {
 				//store tag relation
 				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 				$this->_db->setQuery($query);
@@ -613,7 +613,7 @@ class FlexicontentModelItem extends JModel
 				return false;
 			}
 			
-			if((int)$post['state']==1) {
+			if((int)$post['vstate']==1) {
 				// delete only relations which are not part of the categories array anymore to avoid loosing ordering
 				$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
 						. ' WHERE itemid = '.$item->id
@@ -685,7 +685,7 @@ class FlexicontentModelItem extends JModel
 
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$searchindex = '';
-			if((int)$post['state']==1) {
+			if((int)$post['vstate']==1) {
 				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
 				$this->_db->setQuery($query);
 				$this->_db->query();
@@ -713,7 +713,7 @@ class FlexicontentModelItem extends JModel
 								$obj->value			= $postvalue;
 							}
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							if( ((int)$post['state']==1) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
+							if( ((int)$post['vstate']==1) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
 								unset($obj->version);
 								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							}
@@ -733,7 +733,7 @@ class FlexicontentModelItem extends JModel
 							$obj->value			= $post[$field->name];
 						}
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-						if( ((int)$post['state']==1) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
+						if( ((int)$post['vstate']==1) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
 							unset($obj->version);
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
