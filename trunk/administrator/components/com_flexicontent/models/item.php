@@ -140,8 +140,10 @@ class FlexicontentModelItem extends JModel
 			$item  	=& $this->getTable('flexicontent_items', '');
 			$item->load($this->_id);
 			$current_version = $item->version;
-			JRequest::setVar( 'version', $lastversion = $item->getLastVersion());
-			$version 	= JRequest::getVar( 'version', $lastversion, 'request', 'int' );
+			$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+			$lastversion = $item->getLastVersion();
+			if($version==0) 
+				JRequest::setVar( 'version', $version = $lastversion);
 			$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";

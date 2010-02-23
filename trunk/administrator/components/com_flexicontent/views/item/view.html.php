@@ -76,8 +76,9 @@ class FlexicontentViewItem extends JView {
 		//Get data from the model
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
-		JRequest::setVar( 'version', $lastversion = $row->getLastVersion());
-		$version 	= JRequest::getVar( 'version', $lastversion, 'request', 'int' );
+		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+		if($version==0)
+			JRequest::setVar( 'version', $version = $lastversion = $row->getLastVersion());
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
