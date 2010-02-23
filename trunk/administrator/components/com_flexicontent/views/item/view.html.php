@@ -52,7 +52,6 @@ class FlexicontentViewItem extends JView {
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
 		$cid		= is_array($cid)?$cid[0]:$cid;
-		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -77,6 +76,8 @@ class FlexicontentViewItem extends JView {
 		//Get data from the model
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
+		JRequest::setVar( 'version', $lastversion = $row->getLastVersion());
+		$version 	= JRequest::getVar( 'version', $lastversion, 'request', 'int' );
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
