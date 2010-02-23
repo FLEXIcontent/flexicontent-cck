@@ -238,6 +238,17 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								</label>
 							</div>
 							<?php endif; ?>
+							<label for="published">
+								<?php echo JText::_( 'Save this version as' ).':'; ?>
+							</label>
+							<?php
+								if (($this->canPublish || $this->canPublish) && ($this->row->id))	:
+								echo $this->lists['vstate'];
+								else :
+								echo 'Draft';
+								echo '<input type="hidden" name="vstate" value="1" />';
+								endif;
+							?>
 						</td>
 					</tr>
 				</table>
