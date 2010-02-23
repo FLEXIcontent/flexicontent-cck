@@ -252,7 +252,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
 				</td>
 				<td id="oldfieldsdata-log">
-					<?php echo $this->oldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</td>
 			</tr>
 	</table>

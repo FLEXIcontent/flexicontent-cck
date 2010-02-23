@@ -445,8 +445,8 @@ VALUES
 			'default.xml',
 			'default.php',
 			'index.html',
-			'_form.php',
-			'_form.xml'
+			'form.php',
+			'form.xml'
 			);
 		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
 		$cattmpl 	= JFolder::files($catdir);		
