@@ -915,12 +915,12 @@ class flexicontent_html
 		$html1 = array();
 		$html2 = array();
 		foreach($t1 as $k=>$o) {
-			if(in_array($k, $out[0])) $html1[] = "<s>".($mode?"<xmp>":"").$o.($mode?"</xmp>":"")."</s>";
-			else $html1[] = ($mode?"<xmp>":"").$o.($mode?"</xmp>":"");
+			if(in_array($k, $out[0])) $html1[] = "<s>".($mode?htmlspecialchars($o, ENT_QUOTES):$o)."</s>";
+			else $html1[] = ($mode?htmlspecialchars($o, ENT_QUOTES)."<br />":$o);
 		}
 		foreach($t2 as $k=>$n) {
-			if(in_array($k, $out[1])) $html2[] = "<u>".($mode?"<xmp>":"").$n.($mode?"</xmp>":"")."</u>";
-			else $html2[] = ($mode?"<xmp>":"").$n.($mode?"</xmp>":"");
+			if(in_array($k, $out[1])) $html2[] = "<u>".($mode?htmlspecialchars($n, ENT_QUOTES):$n)."</u>";
+			else $html2[] = ($mode?htmlspecialchars($n, ENT_QUOTES)."<br />":$n);
 		}
 		$html1 = implode(" ", $html1);
 		$html2 = implode(" ", $html2);
