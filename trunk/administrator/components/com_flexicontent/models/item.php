@@ -258,6 +258,7 @@ class FlexicontentModelItem extends JModel
 				$v->version_id		= (int)$current_version;
 				$v->created 	= $item->created;
 				$v->created_by 	= $item->created_by;
+				//$v->comment		= 'kept current version to version table.';
 				//echo "insert into __flexicontent_versions<br />";
 				$this->_db->insertObject('#__flexicontent_versions', $v);
 			}
@@ -434,8 +435,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data)
-	{
+	function store($data) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -748,9 +748,10 @@ class FlexicontentModelItem extends JModel
 				$v->created 	= $v->modified;
 				$v->created_by 	= $v->modified_by;
 			}
+			
+			$v->comment		= isset($post['versioncomment'])?htmlspecialchars($post['versioncomment'], ENT_QUOTES):'';
 			unset($v->modified);
 			unset($v->modified_by);
-			
 			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
 		

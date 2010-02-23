@@ -20,8 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
-if ($this->CanUseTags)
-{
+if ($this->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -73,7 +72,7 @@ if ($this->CanUseTags)
 window.addEvent( "domready", function() {
     var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gethits'});
     hits.fetchscreen();
-    
+
     var votes = new itemscreen('votes', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'getvotes'});
     votes.fetchscreen();
 });
@@ -414,7 +413,23 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<strong><?php echo JText::_( 'FLEXI_REVISED' ); ?></strong>
 			</td>
 			<td>
-				<?php echo $this->row->version;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
+				<?php echo $this->lastversion;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong><?php echo JText::_( 'Current version' ); ?></strong>
+			</td>
+			<td>
+				#<?php echo $this->row->version;?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong><?php echo JText::_( 'Viewing version' ); ?></strong>
+			</td>
+			<td>
+				#<?php echo $this->version?$this->version:$this->row->version;?>
 			</td>
 		</tr>
 		<tr>
@@ -450,6 +465,14 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		<?php if ($this->cparams->get('use_versioning', 1) && $this->CanVersion) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
+				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'Version Comment' ); ?></th>
+			</tr>
+			<tr>
+				<td><textarea name='versioncomment' cols='40' rows='5'></textarea></td>
+			</tr>
+		</table>
+		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
+			<tr>
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
@@ -466,7 +489,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td class="versions"><?php echo '#' . $version->nr; ?></td>
 				<td class="versions"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
 				<td class="versions"><?php echo ($version->nr == 1) ? $this->row->creator : $version->modifier; ?></td>
-				<td class="versions" align="center"><?php // echo $comment;
+				<td class="versions" align="center"><a href="#" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
 				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
