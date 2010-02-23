@@ -432,7 +432,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$query 	= 'SELECT COUNT( item_id )'
 				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id < 15'
+				. ' WHERE field_id < 13'
 				;
 		$this->_db->setQuery( $query );
 		return $this->_db->loadResult() ? false : true;
