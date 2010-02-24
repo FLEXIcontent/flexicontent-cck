@@ -328,7 +328,13 @@ fieldset.fieldgroups legend span img {
 }
 .versions {
 	border-bottom: 1px dotted silver;
-	padding: 2px;
+	padding: 4px 0;
+}
+.versions img {
+	vertical-align: middle;
+}
+.active-version {
+	background: #FFFFDD;
 }
 /* Credits */
 div.credits {
