@@ -155,7 +155,7 @@ class FlexicontentModelItem extends JModel
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
 					$item->$fieldname = unserialize($f->value);
 				}else
-				$item->$fieldname = $f->value;
+					$item->$fieldname = $f->value;
 			}
 			if(!isset($item->tags)||!is_array($item->tags)) {
 				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
@@ -715,7 +715,6 @@ class FlexicontentModelItem extends JModel
 								unset($obj->version);
 								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							}
-							
 							$i++;
 						}
 					}else if ($post[$field->name]) {
