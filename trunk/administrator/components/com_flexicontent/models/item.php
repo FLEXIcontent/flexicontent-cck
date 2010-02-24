@@ -585,7 +585,7 @@ class FlexicontentModelItem extends JModel
 
 			$this->_item	=& $item;
 			
-			if($post['vstate']==2) {
+			//if($post['vstate']==2) {
 				//store tag relation
 				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 				$this->_db->setQuery($query);
@@ -596,7 +596,7 @@ class FlexicontentModelItem extends JModel
 					$this->_db->setQuery($query);
 					$this->_db->query();
 				}
-			}
+			//}
 
 			// Store categories to item relations
 
@@ -611,7 +611,7 @@ class FlexicontentModelItem extends JModel
 				return false;
 			}
 			
-			if($isnew || $post['vstate']==2) {
+			//if($isnew || $post['vstate']==2) {
 				// delete only relations which are not part of the categories array anymore to avoid loosing ordering
 				$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
 						. ' WHERE itemid = '.$item->id
@@ -639,7 +639,7 @@ class FlexicontentModelItem extends JModel
 						$this->_db->query();
 					}
 				}
-			}
+			//}
 		}else {
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
