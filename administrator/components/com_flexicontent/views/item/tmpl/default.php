@@ -469,12 +469,13 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'Version Comment' ); ?></th>
 			</tr>
 			<tr>
-				<td><textarea name='versioncomment' cols='40' rows='5'></textarea></td>
+				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
 			</tr>
 		</table>
-		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
+		<?php if ($this->CanVersion) : ?>
+		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;" cellpadding="0" cellspacing="0">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
+				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
 			<tr>
@@ -484,9 +485,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			else :
 			JHTML::_('behavior.modal', 'a.modal-versions');
 			foreach ($this->versions as $version) :
+				$class = ($version->nr == $this->version) ? ' class="active-version"' : '';
 				if ((int)$version->nr > 0) :
 			?>
-			<tr>
+			<tr<?php echo $class; ?>>
 				<td class="versions"><?php echo '#' . $version->nr; ?></td>
 				<td class="versions"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
 				<td class="versions"><?php echo ($version->nr == 1) ? $this->row->creator : $version->modifier; ?></td>
@@ -495,7 +497,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::_( 'FLEXI_REVERT_TO_THIS_VERSION' ); ?>"><?php echo $revert; ?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
 				<?php }?></td>
 			</tr>
 			<?php
@@ -513,6 +515,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<?php */ endif; ?>
 		</table>
+		<?php endif; ?>
 		<?php endif; ?>
 		
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
