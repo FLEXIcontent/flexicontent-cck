@@ -927,8 +927,9 @@ class flexicontent_html
 		return array($html1, $html2);
 	}
 
-	function getJCoreFields() {
-		return array(
+	function getJCoreFields($ffield=NULL) {
+		$flexifield = array(
+			'text'=>'introtext',
 			'maintext'=>'text',
 			'created'=>'created',
 			'createdby'=>'created_by',
@@ -936,10 +937,45 @@ class flexicontent_html
 			'modifiedby'=>'modified_by',
 			'title'=>'title',
 			'hits'=>'hits',
-			'type'=>'document_type',
+			//'type'=>'document_type',
 			'version'=>'version',
 			'state'=>'state'
 		);
+		if($ffield===NULL) return $flexifield;
+		return isset($flexifield[$ffield])?$flexifield[$ffield]:NULL;
+	}
+	function getFlexiFieldId($jfield=NULL) {
+		$flexifields = array(
+			'introtext'=>1,
+			'text'=>1,
+			'created'=>2,
+			'created_by'=>3,
+			'modified'=>4,
+			'modified_by'=>5,
+			'title'=>6,
+			'hits'=>7,
+			'version'=>9,
+			'state'=>10,
+			'catid'=>13,
+		);
+		if($jfield===NULL) return $flexifields;
+		return isset($flexifields[$jfield])?$flexifields[$jfield]:0;
+	}
+	function getFlexiField($jfield=NULL) {
+		$flexifields = array(
+			'introtext'=>'text',
+			'fulltext'=>'text',
+			'created'=>'created',
+			'created_by'=>'createdby',
+			'modified'=>'modified',
+			'modified_by'=>'modifiedby',
+			'title'=>'title',
+			'hits'=>'hits',
+			'version'=>'version',
+			'state'=>'state'
+		);
+		if($jfield===NULL) return $flexifields;
+		return isset($flexifields[$jfield])?$flexifields[$jfield]:0;
 	}
 }
 
