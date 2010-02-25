@@ -78,7 +78,7 @@ if ($this->CanUseTags) {
 				</tr>\\
 				\"+str+\"\\
 				</table>\");
-				var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});
+				var JTooltips = new Tips($$('table.versionlist tr td a.hasTip'), { maxTitleChars: 50, fixed: false});
 			}});
 			jQuery(\"#pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
