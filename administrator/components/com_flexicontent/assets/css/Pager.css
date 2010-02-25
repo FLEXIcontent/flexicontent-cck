@@ -1,0 +1,37 @@
+﻿#pager ul.pages {
+display:block;
+border:none;
+text-transform:uppercase;
+font-size:10px;
+margin:0;
+margin-bottom:10px;
+vertical-align:top;
+padding:0;
+clear:both;
+}
+
+#pager ul.pages li {
+list-style:none;
+float:left;
+border:1px dotted #ccc;
+text-decoration:none;
+margin:0;
+margin-left:5px;
+padding:5px;
+}
+
+#pager ul.pages li:hover {
+border:1px solid #003f7e;
+}
+
+#pager ul.pages li.pgEmpty {
+border:1px dotted #eee;
+color:#eee;
+}
+
+#pager ul.pages li.pgCurrent {
+border:1px solid #003f7e;
+color:#000;
+font-weight:700;
+background-color:#eee;
+}

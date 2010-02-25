@@ -85,6 +85,9 @@ class FlexicontentViewItem extends JView {
 		$types			= & $this->get( 'Typeslist' );
 		$typesselected	= & $this->get( 'Typesselected' );
 		$versions		= & $this->get( 'VersionList' );
+		$versioncount	= & $this->get( 'VersionCount' );
+		$versionsperpage = $cparams->get('versionsperpage', 10);
+		$pagecount	= ceil($versioncount/$versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
 		$lastversion = $row->getLastVersion();
@@ -256,6 +259,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('subscribers'		, $subscribers);
 		$this->assignRef('fields'			, $fields);
 		$this->assignRef('versions'			, $versions);
+		$this->assignRef('pagecount'			, $pagecount);
 		$this->assignRef('version'			, $version);
 		$this->assignRef('lastversion',		$lastversion);
 		$this->assignRef('cparams'			, $cparams);

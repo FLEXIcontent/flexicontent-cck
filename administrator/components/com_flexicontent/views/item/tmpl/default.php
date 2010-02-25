@@ -24,8 +24,10 @@ if ($this->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
+	$this->document->addScript('components/com_flexicontent/assets/js/jquery.pager.js');
 	
 	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
@@ -64,6 +66,22 @@ if ($this->CanUseTags) {
 				jQuery(\"#input-tags\").attr('value','');
 			}
 		});
+		jQuery(document).ready(function() {
+			jQuery(\"#pager\").pager({ pagenumber: 1, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+		});
+
+		PageClick = function(pageclickednumber) {
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
+			<tr>\\
+				<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
+			</tr>\\
+			\"+str+\"\\
+			</table>\");
+			}});
+			jQuery(\"#pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			//jQuery(\"#result\").html(\"Clicked Page \" + pageclickednumber);
+		}
 	");
 }
 ?>
@@ -473,9 +491,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 		</table>
 		<?php if ($this->CanVersion) : ?>
-		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;" cellpadding="0" cellspacing="0">
+		<div id="result" >
+		<table width="100%" class="versionlist" cellpadding="0" cellspacing="0">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
+				<th colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
 			<tr>
@@ -515,6 +534,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<?php */ endif; ?>
 		</table>
+		</div>
+		<div id="pager"></div>
+		<div class="clear"></div>
 		<?php endif; ?>
 		<?php endif; ?>
 		

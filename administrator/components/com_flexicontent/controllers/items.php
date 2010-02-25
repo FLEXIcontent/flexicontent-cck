@@ -51,6 +51,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'accesspublic', 	'access' );
 		$this->registerTask( 'accessregistered','access' );
 		$this->registerTask( 'accessspecial', 	'access' );
+		$this->registerTask( 'getversionlist', 'getversionlist');
 	}
 
 	/**
@@ -747,6 +748,41 @@ class FlexicontentControllerItems extends FlexicontentController
 			echo $hits;
 		} else {
 			echo 0;
+		}
+	}
+	function getversionlist() {
+		$id 	= JRequest::getInt('id', 0);
+		if(!$id) return;
+		$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
+		$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
+		$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
+
+		$model 	= $this->getModel('item');
+		$model->_id = $id;
+		$item = $model->getItem(true);
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$versionsperpage = $cparams->get('versionsperpage', 10);
+
+		$currentversion = $item->version;
+		$page=JRequest::getInt('page', 0);
+		$versioncount = $model->getVersionCount();
+		$numpage = ceil($versioncount/$versionsperpage);
+		if($page>$numpage) $page = $numpage;
+		elseif($page<1) $page = 1;
+		$limitstart = ($page-1)*$versionsperpage;
+		JRequest::setVar('limitstart', $limitstart);
+		$versions = $model->getVersionList();
+		foreach($versions as $v) {
+			echo "<tr><td class='versions'>#".$v->nr."</td>
+				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' ))."</td>
+				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
+				<td class='versions' align='center'><a href='#' class='hasTip' title='Comment::".$v->comment."'>".$comment."</a>";
+				if((int)$v->nr==(int)$currentversion) {//is current version?
+					echo "<a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&view=item&cid=".$item->id."&version=".$v->nr."\");' href='#'>".JText::_( 'FLEXI_CURRENT' )."</a>";
+				}else{
+					echo "<a class='modal-versions' href='index.php?option=com_flexicontent&view=itemcompare&cid[]=".$item->id."&version=".$v->nr."&tmpl=component' title='".JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' )."' rel='{handler: \"iframe\", size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}'>".$view."</a><a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&controller=items&task=edit&cid=".$item->id."&version=".$v->nr."&".JUtility::getToken()."=1\");' href='#' title='".JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr )."'>".$revert;
+				}
+				echo "</td></tr>";
 		}
 	}
 }

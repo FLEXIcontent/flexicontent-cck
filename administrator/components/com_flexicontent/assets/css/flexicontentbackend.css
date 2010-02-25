@@ -550,3 +550,12 @@ div#tags {
 	width: 235px;
 }
 
+div#result table.versionlist{
+	border: 1px dashed silver;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+div#result table.versionlist th{
+	border-bottom: 1px dotted silver;
+	padding: 2px 0 6px 0;
+}
