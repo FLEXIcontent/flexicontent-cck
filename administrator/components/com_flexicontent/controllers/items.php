@@ -750,8 +750,13 @@ class FlexicontentControllerItems extends FlexicontentController
 			echo 0;
 		}
 	}
+	
 	function getversionlist() {
-		$id 	= JRequest::getInt('id', 0);
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
+		$id 		= JRequest::getInt('id', 0);
+		$active 	= JRequest::getInt('active', 0);
 		if(!$id) return;
 		$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
 		$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
@@ -773,7 +778,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::setVar('limitstart', $limitstart);
 		$versions = $model->getVersionList();
 		foreach($versions as $v) {
-			echo "<tr><td class='versions'>#".$v->nr."</td>
+			$class = ($v->nr == $active) ? ' class="active-version"' : '';
+			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>
 				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' ))."</td>
 				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
 				<td class='versions' align='center'><a href='#' class='hasTip' title='Comment::".$v->comment."'>".$comment."</a>";

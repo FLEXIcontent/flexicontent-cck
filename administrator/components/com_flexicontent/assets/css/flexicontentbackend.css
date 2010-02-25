@@ -336,6 +336,15 @@ fieldset.fieldgroups legend span img {
 .active-version {
 	background: #FFFFDD;
 }
+#pager {
+	clear:both;
+	float:left;
+	overflow:hidden;
+	width:100%;
+	margin-bottom: 5px;
+}
+#result {
+}
 /* Credits */
 div.credits {
 	margin-top: 15px;
@@ -553,7 +562,7 @@ div#tags {
 div#result table.versionlist{
 	border: 1px dashed silver;
 	padding: 5px;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
 }
 div#result table.versionlist th{
 	border-bottom: 1px dotted silver;

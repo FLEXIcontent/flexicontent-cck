@@ -20,6 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
@@ -71,7 +72,7 @@ if ($this->CanUseTags) {
 		});
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&active=".$this->version."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
@@ -133,6 +134,14 @@ function deleteTag(obj) {
 	parent = $($(obj).getParent());
 	parent.remove();
 }
+jQuery(document).ready(function($){
+//autogrow
+$("#versioncomment").autogrow({
+	minHeight: 26,
+	maxHeight: 250,
+	lineHeight: 12
+	});
+})
 </script>
 <?php
 //Set the info image
@@ -481,7 +490,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		</table>
 		
-		<?php if ($this->cparams->get('use_versioning', 1) && $this->CanVersion) : ?>
+		<?php if ($this->cparams->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'Version Comment' ); ?></th>
@@ -492,9 +501,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</table>
 		<?php if ($this->CanVersion) : ?>
 		<div id="result" >
-		<table width="100%" class="versionlist" cellpadding="0" cellspacing="0">
+		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">
 			<tr>
-				<th colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
+				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
 			<tr>
@@ -508,9 +517,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				if ((int)$version->nr > 0) :
 			?>
 			<tr<?php echo $class; ?>>
-				<td class="versions"><?php echo '#' . $version->nr; ?></td>
-				<td class="versions"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
-				<td class="versions"><?php echo ($version->nr == 1) ? $this->row->creator : $version->modifier; ?></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="#" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
 				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>

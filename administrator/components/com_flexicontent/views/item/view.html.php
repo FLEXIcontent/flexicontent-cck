@@ -159,7 +159,11 @@ class FlexicontentViewItem extends JView {
 	
 		// build granular access list
 		if (FLEXI_ACCESS) {
+			if (isset($user->level)) {
 			$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+			} else {
+				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+			}
 		}
 		
 		// Create the type parameters
