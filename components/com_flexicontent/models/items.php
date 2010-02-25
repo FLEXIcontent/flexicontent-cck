@@ -148,7 +148,27 @@ class FlexicontentModelItems extends JModel
 
 			// Do we have access to the category?
 			if ($this->_item->catid) {
+				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
+				foreach ($ancestors as $cat) {
+					if (FLEXI_ACCESS) {
+						if (FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $cat)) {
+							$canreadcat = true;
+						} else {
+							$canreadcat = false;
+							break;
+						}
+					} else {
+						if ($globalcats[$cat]->access <= $aid) {
+							$canreadcat = true;
+						} else {
+							$canreadcat = false;
+							break;
+						}
+					}
+				}
+/*
 				$canreadcat = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->cataccess <= $aid;
+*/
 				if (!@$canreadcat)
 				{
 					if (!$aid) {
