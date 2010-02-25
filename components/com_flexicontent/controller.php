@@ -673,16 +673,20 @@ class FlexicontentController extends JController
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
+		$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
+		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+
 		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
 				.' FROM #__flexicontent_fields_item_relations AS rel'
 				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+				. $joinaccess
 				.' WHERE rel.item_id = ' . (int)$contentid
 				.' AND rel.field_id = ' . (int)$fieldid
 				.' AND f.id = ' . (int)$id
-				.' AND c.access <= ' . $gid
-				.' AND fi.access <= ' . $gid
+//				.' AND c.access <= ' . $gid
+				. $andaccess
 				;
 		$db->setQuery($query);
 		$file = $db->loadObject();
