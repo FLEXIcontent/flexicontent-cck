@@ -90,9 +90,9 @@ class FlexicontentModelItem extends JModel
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getItem()
-	{		
-		if ($this->_loadItem())
+	function &getItem($loadcurrent=false)
+	{
+		if ($this->_loadItem($loadcurrent))
 		{		
 			if (JString::strlen($this->_item->fulltext) > 1) {
 				$this->_item->text = $this->_item->introtext . "<hr id=\"system-readmore\" />" . $this->_item->fulltext;
@@ -133,7 +133,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem()
+	function _loadItem($loadcurrent=false)
 	{
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
@@ -143,13 +143,12 @@ class FlexicontentModelItem extends JModel
 			$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 			$lastversion = $item->getLastVersion();
 			if($version==0) 
-				JRequest::setVar( 'version', $version = $lastversion);
+				JRequest::setVar( 'version', $version = $loadcurrent?$current_version:$lastversion);
 			$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
 			$this->_db->setQuery($query);
 			$fields = $this->_db->loadObjectList();
-
 			foreach($fields as $f) {
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
@@ -1124,16 +1123,36 @@ class FlexicontentModelItem extends JModel
 	 */
 	function getVersionList()
 	{
+		$limitstart = JRequest::getVar('limitstart', 0);
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
 				.' WHERE item_id = ' . (int)$this->_id
 				.' ORDER BY version_id ASC'
+				. ' LIMIT '.$limitstart.','.$versionsperpage
 				;
 		$this->_db->setQuery($query);
-		$versions = $this->_db->loadObjectList();
-
-		return $versions;
-	}	
+		return $this->_db->loadObjectList();
+	}
+	function getVersionCount()
+	{
+		$query 	= 'SELECT count(*) as num'
+				.' FROM #__flexicontent_versions AS v'
+				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
+				.' WHERE item_id = ' . (int)$this->_id
+				;
+		$this->_db->setQuery($query);
+		return $this->_db->loadResult();
+	}
+	function getCurrentVersion() {
+		$query 	= 'SELECT version'
+				.' FROM #__content'
+				.' WHERE id = ' . (int)$this->_id
+				;
+		$this->_db->setQuery($query);
+		return $this->_db->loadResult();
+	}
 }
 ?>
