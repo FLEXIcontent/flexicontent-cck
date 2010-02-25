@@ -73,14 +73,14 @@ if ($this->CanUseTags) {
 		PageClick = function(pageclickednumber) {
 			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
-			<tr>\\
-				<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
-			</tr>\\
-			\"+str+\"\\
-			</table>\");
+				<tr>\\
+					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
+				</tr>\\
+				\"+str+\"\\
+				</table>\");
+				var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});
 			}});
 			jQuery(\"#pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
-			//jQuery(\"#result\").html(\"Clicked Page \" + pageclickednumber);
 		}
 	");
 }
