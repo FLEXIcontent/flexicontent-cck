@@ -46,6 +46,7 @@ class FlexicontentViewFileselement extends JView
 		$document	= & JFactory::getDocument();
 		$pane   	= & JPane::getInstance('Tabs');
 		$db  		= & JFactory::getDBO();
+		$user  		= & JFactory::getUser();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
 		
