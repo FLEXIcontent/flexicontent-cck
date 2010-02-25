@@ -614,10 +614,10 @@ window.addEvent('domready', function(){
 				<?php echo $row->author; ?>
 			</td>
 			<td nowrap="nowrap" class="col_created">
-				<?php echo JHTML::_('date',  $row->created, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' ) ); ?>
+				<?php echo JHTML::_('date',  $row->created, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' ) ); ?>
 			</td>
 			<td nowrap="nowrap" class="col_revised">
-				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, JText::_('FLEXI_DATE_FORMAT_FLEXI_VERSIONS')) : JText::_('FLEXI_NEVER'); ?>
+				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, JText::_('FLEXI_DATE_FORMAT_FLEXI_ITEMS')) : JText::_('FLEXI_NEVER'); ?>
 			</td>
 			<td align="center">
 				<?php echo $row->hits; ?>
