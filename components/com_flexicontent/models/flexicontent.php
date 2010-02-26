@@ -133,6 +133,10 @@ class FlexicontentModelFlexicontent extends JModel
 		$where .= ' AND i.state IN ('.$states.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
+		$subjoin 	= '';
+		$suband 	= '';
+		$join 		= '';
+		$and 		= '';
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
@@ -195,6 +199,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$show_noauth = $params->get('show_noauth', 0);
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
+		$join 		= '';
+		$and 		= '';
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
@@ -269,6 +275,10 @@ class FlexicontentModelFlexicontent extends JModel
 		$where .= ' AND i.state IN ('.$states.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
+		$subjoin 	= '';
+		$suband 	= '';
+		$join 		= '';
+		$and 		= '';
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
@@ -278,10 +288,8 @@ class FlexicontentModelFlexicontent extends JModel
 				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
 			} else {
-				$subjoin  = '';
 				$suband   = ' AND cc.access <= '.(int)$gid;
 				$suband  .= ' AND i.access <= '.(int)$gid;
-				$join	  = '';
 				$and   	  = ' AND c.access <= '.(int)$gid;
 			}
 		}
