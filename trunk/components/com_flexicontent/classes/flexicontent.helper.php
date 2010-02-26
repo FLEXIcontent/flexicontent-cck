@@ -929,15 +929,14 @@ class flexicontent_html
 
 	function getJCoreFields($ffield=NULL) {
 		$flexifield = array(
-			'text'=>'introtext',
-			'maintext'=>'text',
+			'text'=>'maintext',
 			'created'=>'created',
-			'createdby'=>'created_by',
+			'created_by'=>'createdby',
 			'modified'=>'modified',
-			'modifiedby'=>'modified_by',
+			'modified_by'=>'modifiedby',
 			'title'=>'title',
 			'hits'=>'hits',
-			//'type'=>'document_type',
+			//'document_type'=>'type',
 			'version'=>'version',
 			'state'=>'state'
 		);

@@ -196,7 +196,8 @@ class FlexicontentModelItem extends JModel {
 				$jcorefields = flexicontent_html::getJCoreFields();
 				$catflag = false;
 				$tagflag = false;
-				if($fields) {
+				$clean_database = true;
+				if(!$clean_database && $fields) {
 					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$this->_id;
 					$this->_db->setQuery($query);
 					$this->_db->query();
@@ -226,7 +227,7 @@ class FlexicontentModelItem extends JModel {
 					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
 					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					//echo "insert into __flexicontent_items_versions<br />";
-					if( !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
+					if( !$clean_database && !isset($jcorefields[$field->name]) && !in_array($field->field_type, $jcorefields)) {
 						unset($obj->version);
 						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						//echo "insert into __flexicontent_fields_item_relations<br />";
@@ -698,11 +699,6 @@ class FlexicontentModelItem extends JModel {
 					// process field mambots onBeforeSaveField
 					$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
-					if( ( ($field->field_type=='categories') && ($field->name=='categories') )
-					|| ( ($field->field_type=='tags') && ($field->name=='tags') )
-					|| ( ($field->field_type=='type') && ($field->name=='document_type') ) ) {
-					
-					}
 					// add the new values to the database 
 					if (is_array($post[$field->name])) {
 						$postvalues = $post[$field->name];
@@ -722,8 +718,8 @@ class FlexicontentModelItem extends JModel {
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							if(
 								($isnew || ($post['vstate']==2) )
-								&& !isset($jcorefields[$field->field_type])
-								&& !in_array($field->name, $jcorefields)
+								&& !isset($jcorefields[$field->name])
+								&& !in_array($field->field_type, $jcorefields)
 								&& ( ($field->field_type!='categories') || ($field->name!='categories') )
 								&& ( ($field->field_type!='tags') || ($field->name!='tags') )
 							) {
@@ -747,8 +743,8 @@ class FlexicontentModelItem extends JModel {
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
 							($isnew || ($post['vstate']==2) )
-							&& !isset($jcorefields[$field->field_type])
-							&& !in_array($field->name, $jcorefields)
+							&& !isset($jcorefields[$field->name])
+							&& !in_array($field->field_type, $jcorefields)
 							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
 							&& ( ($field->field_type!='tags') || ($field->name!='tags') )
 						) {
