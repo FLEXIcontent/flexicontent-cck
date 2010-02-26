@@ -322,7 +322,7 @@ class flexicontent_items extends JTable{
 		$this->_db->setQuery($query, 0, 1);
 		$lastversion = $this->_db->loadResult();
 		
-		return $lastversion;
+		return (int)$lastversion;
 	}
 	/**
 	* Converts record to XML
