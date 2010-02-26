@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItem extends JModel
-{
+class FlexicontentModelItem extends JModel {
 	/**
 	 * Item data
 	 *
@@ -133,8 +132,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem($loadcurrent=false)
-	{
+	function _loadItem($loadcurrent=false) {
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
 			$item  	=& $this->getTable('flexicontent_items', '');
@@ -198,6 +196,11 @@ class FlexicontentModelItem extends JModel
 				$jcorefields = flexicontent_html::getJCoreFields();
 				$catflag = false;
 				$tagflag = false;
+				if($fields) {
+					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$this->_id;
+					$this->_db->setQuery($query);
+					$this->_db->query();
+				}
 				foreach($fields as $field) {
 					// process field mambots onBeforeSaveField
 					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
@@ -210,11 +213,13 @@ class FlexicontentModelItem extends JModel
 					$obj->version		= (int)$current_version;
 					// @TODO : move in the plugin code
 					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
-						$obj->value = serialize($item->categories);
-						$catflag = true;
+						continue;
+						//$obj->value = serialize($item->categories);
+						//$catflag = true;
 					}elseif( ($field->field_type=='tags') && ($field->name=='tags') ) {
-						$obj->value = serialize($item->tags);
-						$tagflag = true;
+						continue;
+						//$obj->value = serialize($item->tags);
+						//$tagflag = true;
 					}else{
 						$obj->value			= $field->value;
 					}
@@ -693,6 +698,11 @@ class FlexicontentModelItem extends JModel
 					// process field mambots onBeforeSaveField
 					$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
+					if( ( ($field->field_type=='categories') && ($field->name=='categories') )
+					|| ( ($field->field_type=='tags') && ($field->name=='tags') )
+					|| ( ($field->field_type=='type') && ($field->name=='document_type') ) ) {
+					
+					}
 					// add the new values to the database 
 					if (is_array($post[$field->name])) {
 						$postvalues = $post[$field->name];
@@ -710,7 +720,13 @@ class FlexicontentModelItem extends JModel
 								$obj->value			= $postvalue;
 							}
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							if( ($isnew || ($post['vstate']==2) ) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
+							if(
+								($isnew || ($post['vstate']==2) )
+								&& !isset($jcorefields[$field->field_type])
+								&& !in_array($field->name, $jcorefields)
+								&& ( ($field->field_type!='categories') || ($field->name!='categories') )
+								&& ( ($field->field_type!='tags') || ($field->name!='tags') )
+							) {
 								unset($obj->version);
 								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							}
@@ -729,7 +745,13 @@ class FlexicontentModelItem extends JModel
 							$obj->value			= $post[$field->name];
 						}
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-						if( ($isnew || ($post['vstate']==2) ) && !isset($jcorefields[$field->field_type]) && !in_array($field->name, $jcorefields)) {
+						if(
+							($isnew || ($post['vstate']==2) )
+							&& !isset($jcorefields[$field->field_type])
+							&& !in_array($field->name, $jcorefields)
+							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
+							&& ( ($field->field_type!='tags') || ($field->name!='tags') )
+						) {
 							unset($obj->version);
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
