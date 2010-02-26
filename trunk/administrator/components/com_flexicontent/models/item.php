@@ -190,9 +190,6 @@ class FlexicontentModelItem extends JModel {
 				$item->modified = $nullDate;
 				$item->state = -4;
 			}
-			echo "<xmp>";
-			var_dump($item);
-			echo "</xmp>";
 			if($version == $current_version) {
 				$item->text = $item->introtext;
 			}
