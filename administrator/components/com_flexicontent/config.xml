@@ -10,6 +10,10 @@
 			<option value="2">FLEXI_JOMCOMMENTS</option>
 		</param>
 		<param name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" menu="hide" />
+		<param name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="disablecss" type="radio" default="0" label="FLEXI_DISABLE_FRONT_CSS" description="FLEXI_DISABLE_FRONT_CSS_DESC" menu="hide">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -40,18 +44,22 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
-		<param name="nr_versions" type="radio" default="5" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" menu="hide">
+		<param name="nr_versions" type="radio" default="10" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" menu="hide">
 			<option value="5">FLEXI_5</option>
 			<option value="10">FLEXI_10</option>
 			<option value="20">FLEXI_20</option>
 			<option value="50">FLEXI_50</option>
 			<option value="100">FLEXI_100_(not_recommended)</option>
 		</param>
-		<param name="versionsperpage" type="radio" default="10" label="Number versions display per page." description="Number versions display per page." menu="hide">
+		<param name="versionsperpage" type="radio" default="5" label="FLEXI_VERSION_PER_PAGE" description="FLEXI_VERSION_PER_PAGE_DESC" menu="hide">
 			<option value="5">FLEXI_5</option>
 			<option value="10">FLEXI_10</option>
 			<option value="20">FLEXI_20</option>
 			<option value="50">FLEXI_50</option>
+		</param>
+		<param name="auto_approve" type="radio" default="1" label="FLEXI_AUTO_APPROVE" description="FLEXI_AUTO_APPROVE_DESC" menu="hide">
+			<option value="0">FLEXI_No</option>
+			<option value="1">FLEXI_Yes</option>
 		</param>
 <!-- 		<param name="disable_versioning" type="usergroup" multiple="true" size="10" default="" label="FLEXI_DISABLE_VERSIONING" description="FLEXI_DISABLE_VERSIONING_DESC" menu="hide" /> -->
 
