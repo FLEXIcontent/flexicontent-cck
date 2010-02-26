@@ -137,6 +137,7 @@ class FlexicontentModelItem extends JModel {
 		if (empty($this->_item)) {
 			$item  	=& $this->getTable('flexicontent_items', '');
 			$item->load($this->_id);
+			$isnew = ( ($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 			$lastversion = $item->getLastVersion();
@@ -151,8 +152,9 @@ class FlexicontentModelItem extends JModel {
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
 					$item->$fieldname = unserialize($f->value);
-				}else
+				}else{
 					$item->$fieldname = $f->value;
+				}
 			}
 			if(!isset($item->tags)||!is_array($item->tags)) {
 				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
@@ -182,9 +184,33 @@ class FlexicontentModelItem extends JModel {
 				$item->version = 0;
 				$item->score = 0;
 			}
+			if($isnew) {
+				$nullDate	= $this->_db->getNullDate();
+				$item->created = $nullDate;
+				$item->modified = $nullDate;
+				$item->state = -4;
+			}
+			echo "<xmp>";
+			var_dump($item);
+			echo "</xmp>";
+			if($version == $current_version) {
+				$item->text = $item->introtext;
+			}
 			$this->_item = &$item;
 			$lastversion = $item->getLastVersion();
-			if($this->_id && $current_version>$lastversion) {
+			if(!$isnew && $current_version>$lastversion) {
+				//echo "<xmp>";var_dump(get_object_vars($item));echo "</xmp>";
+				/*$vars = get_object_vars($item);
+				$fieldtype = array();
+				foreach($vars as $k=>$v) {
+					if( !($fieldid = flexicontent_html::getFlexiFieldId($k)) || ($k=='created') || ($k=='created_by') ) continue;
+					if(!isset($fieldtype[$fieldid])) {
+						$query = "SELECT * FROM #__flexicontent_fields WHERE id='$fieldid';";
+						$this->_db->setQuery($query)
+						$fieldtype[$fieldid] = $this->_db->loadObject();
+					}
+				}
+				return (boolean) $this->_item;*/
 				global $mainframe;
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"

@@ -337,7 +337,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								{
 									$field->label = $this->tparams->get('maintext_label', $field->label);
 									$field->description = $this->tparams->get('maintext_desc', $field->description);
-									$maintext = ($this->version>0)?@$field->value[0]:$this->row->text;
+									$maintext = ($this->version!=$this->row->version)?@$field->value[0]:$this->row->text;
 									if ($this->tparams->get('hide_html', 0))
 									{
 										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
