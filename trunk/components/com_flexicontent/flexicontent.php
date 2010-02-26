@@ -31,6 +31,9 @@ $params =& JComponentHelper::getParams('com_flexicontent');
 define('COM_FLEXICONTENT_FILEPATH',    JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
 define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
 
+// Tooltips
+if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
+
 // define section
 if (!defined('FLEXI_SECTION')) 		define('FLEXI_SECTION', $params->get('flexi_section'));
 if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);

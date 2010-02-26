@@ -70,13 +70,16 @@
 			<param name="flexi_section" default="" />
 			<param name="comments" default="0" />
 			<param name="support_url" default="" />
+			<param name="add_tooltips" default="1" />
 			<param name="disablecss" default="0" />
 			<param name="flexi_fish" default="0" />
 			<param name="filtercat" default="0" />
 			<param name="filtertag" default="0" />
 			<param name="disable_lang_select" default="1" />
 			<param name="use_versioning" default="1" />
-			<param name="nr_versions" default="5" />
+			<param name="nr_versions" default="10" />
+			<param name="versionsperpage" default="5" />
+			<param name="auto_approve" default="1" />
 <!-- 			
 			<param name="disable_versioning" default="" />
 -->

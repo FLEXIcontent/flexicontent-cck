@@ -200,12 +200,21 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									</td>
 									<td>
 									<?php
-									if (($this->canPublish || $this->canPublish) && ($this->row->id))	:
-									echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;' . JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
+									if (($this->canPublish) && ($this->row->id)) :
+										echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
+											if (!$this->cparams->get('auto_approve', 1)) :
+												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
+											else :
+												echo '<input type="hidden" name="vstate" value="2" />';
+											endif;
 									else :
-									echo $this->published;
-									echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
-									echo '<input type="hidden" name="vstate" value="1" />';
+										echo $this->published;
+										echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
+											if (!$this->cparams->get('auto_approve', 1)) :
+												echo '<input type="hidden" name="vstate" value="1" />';
+											else :
+												echo '<input type="hidden" name="vstate" value="2" />';
+											endif;
 									endif;
 									?>
 									</td>
@@ -493,7 +502,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		<?php if ($this->cparams->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'Version Comment' ); ?></th>
+				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>
 			</tr>
 			<tr>
 				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
