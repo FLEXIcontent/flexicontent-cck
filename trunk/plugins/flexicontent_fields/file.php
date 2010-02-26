@@ -176,7 +176,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 						</ul>
 						<div class=\"button-add\">
 							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler:'iframe',size:{x:window.getSize().scrollSize.x-80, y: window.getSize().size.y-80}, onShow:$('sbox-window').setStyles({'padding': 0})}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 							</div>
 						</div>
 						";
