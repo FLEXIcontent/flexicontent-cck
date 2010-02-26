@@ -927,19 +927,22 @@ class flexicontent_html
 		return array($html1, $html2);
 	}
 
-	function getJCoreFields($ffield=NULL) {
+	function getJCoreFields($ffield=NULL, $mapcorefield=false) {
 		$flexifield = array(
 			'text'=>'maintext',
 			'created'=>'created',
 			'created_by'=>'createdby',
-			'modified'=>'modified',
-			'modified_by'=>'modifiedby',
+			//'modified'=>'modified',
+			//'modified_by'=>'modifiedby',
 			'title'=>'title',
 			'hits'=>'hits',
 			//'document_type'=>'type',
 			'version'=>'version',
 			'state'=>'state'
 		);
+		if($mapcorefield) {
+			$flexifield['introtext'] = 'maintext';
+		}
 		if($ffield===NULL) return $flexifield;
 		return isset($flexifield[$ffield])?$flexifield[$ffield]:NULL;
 	}
