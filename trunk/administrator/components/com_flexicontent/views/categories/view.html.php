@@ -124,7 +124,7 @@ class FlexicontentViewCategories extends JView {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.ordering');
+		$ordering = ($lists['order'] == 'c.ordering') ? 'c.ordering' : '';
 
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);
