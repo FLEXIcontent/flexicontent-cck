@@ -80,6 +80,14 @@ if ($this->CanUseTags) {
 				\"+str+\"\\
 				</table>\");
 				var JTooltips = new Tips($$('table.versionlist tr td a.hasTip'), { maxTitleChars: 50, fixed: false});
+
+				SqueezeBox.initialize({});
+				$$('a.modal-versions').each(function(el) {
+					el.addEvent('click', function(e) {
+						new Event(e).stop();
+						SqueezeBox.fromElement(el);
+					});
+				});
 			}});
 			jQuery(\"#pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
