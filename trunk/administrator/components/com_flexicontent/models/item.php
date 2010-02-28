@@ -135,11 +135,11 @@ class FlexicontentModelItem extends JModel {
 	function _loadItem($loadcurrent=false) {
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
-			$item  	=& $this->getTable('flexicontent_items', '');
+			$item =& $this->getTable('flexicontent_items', '');
 			$item->load($this->_id);
-			$isnew = ( ($this->_id <= 0) || !$this->_id);
+			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
-			$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			$lastversion = $item->getLastVersion();
 			if($version==0) 
 				JRequest::setVar( 'version', $version = $loadcurrent?$current_version:$lastversion);
@@ -185,11 +185,15 @@ class FlexicontentModelItem extends JModel {
 				$item->score = 0;
 			}
 			if($isnew) {
+				$createdate = & JFactory::getDate();
 				$nullDate	= $this->_db->getNullDate();
-				$item->created = $nullDate;
-				$item->modified = $nullDate;
-				$item->state = -4;
+				$item->created 		= $createdate->toUnix();
+				$item->modified 	= $nullDate;
+				$item->publish_up 	= $createdate->toUnix();
+				$item->publish_down = JText::_( 'FLEXI_NEVER' );
+				$item->state 		= -4;
 			}
+
 			if($version == $current_version) {
 				$item->text = $item->introtext;
 			}
