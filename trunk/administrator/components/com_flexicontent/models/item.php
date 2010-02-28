@@ -497,9 +497,21 @@ class FlexicontentModelItem extends JModel {
 		$version = $item->getLastVersion();
 		$isnew = false;
 		$tags = array_unique($tags);
-		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
-			$item->modified 		= $nullDate;
-			$item->modified_by 	= 0;
+		
+		if( ($isnew = !$item->id) || ($post['vstate']==2) )
+		{
+			
+			$config =& JFactory::getConfig();
+			$tzoffset = $config->getValue('config.offset');
+
+			if ($isnew = !$item->id) {
+				$item->modified 	= $nullDate;
+				$item->modified_by 	= 0;
+			} else {
+				$mdate =& JFactory::getDate();
+				$item->modified 	= $mdate->toMySQL();
+				$item->modified_by 	= (int)$user->id;
+			}
 			// Are we saving from an item edit?
 			// This code comes directly from the com_content
 
@@ -509,8 +521,6 @@ class FlexicontentModelItem extends JModel {
 				$item->created 	.= ' 00:00:00';
 			}
 
-			$config =& JFactory::getConfig();
-			$tzoffset = $config->getValue('config.offset');
 			$date =& JFactory::getDate($item->created, $tzoffset);
 			$item->created = $date->toMySQL();
 
