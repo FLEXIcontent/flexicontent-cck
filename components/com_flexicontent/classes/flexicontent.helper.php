@@ -1387,5 +1387,16 @@ class FLEXIUtilities {
 		
 		return (int)$lastversion;
 	}
+	function getLastItemVersion($id) {
+		$db =& JFactory::getDBO();
+		$query = 'SELECT max(version) as version'
+				.' FROM #__flexicontent_items_versions'
+				.' WHERE item_id = ' . (int)$id
+				;
+		$db->setQuery($query, 0, 1);
+		$lastversion = $db->loadResult();
+		
+		return (int)$lastversion;
+	}
 }
 ?>
