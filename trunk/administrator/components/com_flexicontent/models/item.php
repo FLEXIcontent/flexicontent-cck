@@ -20,9 +20,6 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.model');
-if(!class_exists('FLEXIUtilities')) {
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
-}
 /**
  * FLEXIcontent Component Category Model
  *
