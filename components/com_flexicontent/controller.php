@@ -673,8 +673,12 @@ class FlexicontentController extends JController
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
-		$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
-		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+		// is the field available
+		$andaccess 		= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
+		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+		// is the item available
+		$andaccess2 	= FLEXI_ACCESS ? ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')' : ' AND c.access <= '.$gid ;
+		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"' : '' ;
 
 		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
 				.' FROM #__flexicontent_fields_item_relations AS rel'
@@ -682,11 +686,12 @@ class FlexicontentController extends JController
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
 				. $joinaccess
+				. $joinaccess2
 				.' WHERE rel.item_id = ' . (int)$contentid
 				.' AND rel.field_id = ' . (int)$fieldid
 				.' AND f.id = ' . (int)$id
-//				.' AND c.access <= ' . $gid
 				. $andaccess
+				. $andaccess2
 				;
 		$db->setQuery($query);
 		$file = $db->loadObject();
@@ -807,15 +812,24 @@ class FlexicontentController extends JController
 		$contentid 	= JRequest::getInt( 'cid', 0 );
 		$order 		= JRequest::getInt( 'ord', 0 );
 
+		// is the field available
+		$andaccess 		= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
+		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+		// is the item available
+		$andaccess2 	= FLEXI_ACCESS ? ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')' : ' AND c.access <= '.$gid ;
+		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"' : '' ;
+
 		$query  = 'SELECT value'
 				.' FROM #__flexicontent_fields_item_relations AS rel'
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+				. $joinaccess
+				. $joinaccess2
 				.' WHERE rel.item_id = ' . (int)$contentid
 				.' AND rel.field_id = ' . (int)$fieldid
 				.' AND rel.valueorder = ' . (int)$order
-				.' AND c.access <= ' . $gid
-				.' AND fi.access <= ' . $gid
+				. $andaccess
+				. $andaccess2
 				;
 		$db->setQuery($query);
 		$link = $db->loadResult();
