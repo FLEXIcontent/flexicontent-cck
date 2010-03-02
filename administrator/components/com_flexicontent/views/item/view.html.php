@@ -19,7 +19,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
-
+if(!class_exists('FLEXIUtilities')) {
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
+}
 /**
  * View class for the FLEXIcontent item screen
  *
@@ -78,7 +80,7 @@ class FlexicontentViewItem extends JView {
 		$row     		= & $this->get( 'Item' );
 		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 		if($version==0)
-			JRequest::setVar( 'version', $version = $lastversion = $row->getLastVersion());
+			JRequest::setVar( 'version', $version = $lastversion = FLEXIUtilities::getLastVersion($row->id));
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
@@ -90,7 +92,7 @@ class FlexicontentViewItem extends JView {
 		$pagecount	= ceil($versioncount/$versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-		$lastversion = $row->getLastVersion();
+		$lastversion = FLEXIUtilities::getLastVersion($row->id);
 		$categories = $globalcats;
 
 		$usedtags = array();

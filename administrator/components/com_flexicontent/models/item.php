@@ -20,7 +20,9 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.model');
-
+if(!class_exists('FLEXIUtilities')) {
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
+}
 /**
  * FLEXIcontent Component Category Model
  *
@@ -140,7 +142,7 @@ class FlexicontentModelItem extends JModel {
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$lastversion = $item->getLastVersion();
+			$lastversion = FLEXIUtilities::getLastVersion($this->_id);
 			if($version==0) 
 				JRequest::setVar( 'version', $version = $loadcurrent?$current_version:$lastversion);
 			$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
@@ -167,7 +169,7 @@ class FlexicontentModelItem extends JModel {
 				$item->categories = $this->_db->loadResultArray();
 			}
 			$item->id = $this->_id;
-			
+
 			$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 					." FROM #__flexicontent_items_ext as ie "
 					. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
@@ -198,7 +200,7 @@ class FlexicontentModelItem extends JModel {
 				$item->text = $item->introtext;
 			}
 			$this->_item = &$item;
-			$lastversion = $item->getLastVersion();
+			$lastversion = FLEXIUtilities::getLastVersion($item->id);
 			if(!$isnew && $current_version>$lastversion) {
 				//echo "<xmp>";var_dump(get_object_vars($item));echo "</xmp>";
 				/*$vars = get_object_vars($item);
@@ -494,7 +496,7 @@ class FlexicontentModelItem extends JModel {
 		
 		$nullDate	= $this->_db->getNullDate();
 		//$item->version++;
-		$version = $item->getLastVersion();
+		$version = FLEXIUtilities::getLastVersion($item->id);
 		$isnew = false;
 		$tags = array_unique($tags);
 		

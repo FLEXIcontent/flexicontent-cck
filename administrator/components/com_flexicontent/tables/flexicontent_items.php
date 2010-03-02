@@ -306,24 +306,7 @@ class flexicontent_items extends JTable{
 
 		return true;
 	}
-	/**
-	 * Method to get the last version kept
-	 * 
-	 * @return int
-	 * @since 1.5
-	 */
-	function getLastVersion()
-	{
-		$query = 'SELECT version_id'
-				.' FROM #__flexicontent_versions'
-				.' WHERE item_id = ' . (int)$this->id
-				.' ORDER BY version_id DESC'
-				;
-		$this->_db->setQuery($query, 0, 1);
-		$lastversion = $this->_db->loadResult();
-		
-		return (int)$lastversion;
-	}
+	
 	/**
 	* Converts record to XML
 	* @param boolean Map foreign keys to text values
