@@ -62,6 +62,6 @@
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_minigallery.ini</language>
-<!-- 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_minigallery.ini</language> -->
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_minigallery.ini</language>
 	</languages>
 </install>
