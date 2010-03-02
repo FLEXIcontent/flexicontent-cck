@@ -1368,4 +1368,24 @@ class flexicontent_images
 	}
 
 }
+class FLEXIUtilities {
+	/**
+	 * Method to get the last version kept
+	 * 
+	 * @return int
+	 * @since 1.5
+	 */
+	function getLastVersion($id) {
+		$db =& JFactory::getDBO();
+		$query = 'SELECT version_id'
+				.' FROM #__flexicontent_versions'
+				.' WHERE item_id = ' . (int)$id
+				.' ORDER BY version_id DESC'
+				;
+		$db->setQuery($query, 0, 1);
+		$lastversion = $db->loadResult();
+		
+		return (int)$lastversion;
+	}
+}
 ?>

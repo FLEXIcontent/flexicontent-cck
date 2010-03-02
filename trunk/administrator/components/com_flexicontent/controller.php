@@ -19,7 +19,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.controller');
-
+if(!class_exists('FLEXIUtilities')) {
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
+}
 /**
  * FLEXIcontent Component Controller
  *
@@ -494,6 +496,107 @@ VALUES
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_items` `sub_items` TEXT" ;
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_categories` `sub_categories` TEXT" ;
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `related_items` `related_items` TEXT" ;
+
+		foreach ($queries as $query) {
+			$db->setQuery($query);
+			$db->query();
+		}
+		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$db->setQuery($query);
+		$rows = $db->loadObjectList();
+		global $mainframe;
+		foreach($rows as $row) {
+			$lastversion = FLEXIUtilities::getLastVersion($row->id);
+			if($row->version > $lastversion) {
+				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
+						." FROM #__flexicontent_fields_item_relations as fir"
+						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
+						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
+						." WHERE fir.item_id='".$row->id."';";
+				$db->setQuery($query);
+				$fields = $db->loadObjectList();
+				$jcorefields = flexicontent_html::getJCoreFields();
+				$catflag = false;
+				$tagflag = false;
+				/*$clean_database = true;
+				if(!$clean_database && $fields) {
+					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
+					$db->setQuery($query);
+					$db->query();
+				}*/
+				foreach($fields as $field) {
+					// process field mambots onBeforeSaveField
+					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+
+					// add the new values to the database 
+					$obj = new stdClass();
+					$obj->field_id 		= $field->id;
+					$obj->item_id 		= $row->id;
+					$obj->valueorder	= $field->valueorder;
+					$obj->version		= (int)$row->version;
+					// @TODO : move in the plugin code
+					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
+						continue;
+						//$obj->value = serialize($item->categories);
+						//$catflag = true;
+					}elseif( ($field->field_type=='tags') && ($field->name=='tags') ) {
+						continue;
+						//$obj->value = serialize($item->tags);
+						//$tagflag = true;
+					}else{
+						$obj->value			= $field->value;
+					}
+					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
+					$db->insertObject('#__flexicontent_items_versions', $obj);
+					//echo "insert into __flexicontent_items_versions<br />";
+					if( !isset($jcorefields[$field->name]) && !in_array($field->field_type, $jcorefields)) {
+						unset($obj->version);
+						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						//echo "insert into __flexicontent_fields_item_relations<br />";
+					}
+					// process field mambots onAfterSaveField
+					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+					//$searchindex 	.= @$field->search;
+				}
+				if(!$catflag) {
+					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
+					$db->setQuery($query);
+					$categories = $db->loadResultArray();
+					$obj = new stdClass();
+					$obj->field_id 		= 13;
+					$obj->item_id 		= $row->id;
+					$obj->valueorder	= 1;
+					$obj->version		= (int)$row->version;
+					$obj->value		= serialize($categories);
+					$db->insertObject('#__flexicontent_items_versions', $obj);
+					//unset($obj->version);
+					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+				}
+				if(!$tagflag) {
+					$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
+					$db->setQuery($query);
+					$tags = $db->loadResultArray();
+					$obj = new stdClass();
+					$obj->field_id 		= 14;
+					$obj->item_id 		= $row->id;
+					$obj->valueorder	= 1;
+					$obj->version		= (int)$row->version;
+					$obj->value		= serialize($tags);
+					$db->insertObject('#__flexicontent_items_versions', $obj);
+					//unset($obj->version);
+					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+				}
+				$v = new stdClass();
+				$v->item_id 		= (int)$row->id;
+				$v->version_id		= (int)$row->version;
+				$v->created 	= $row->created;
+				$v->created_by 	= $row->created_by;
+				//$v->comment		= 'kept current version to version table.';
+				//echo "insert into __flexicontent_versions<br />";
+				$db->insertObject('#__flexicontent_versions', $v);
+			}
+		}
+		$queries 	= array();
 		// delete unused records
 		$queries[] 	= "DELETE FROM #__flexicontent_fields_item_relations WHERE field_id < 15" ;
 		$queries[] 	= "DELETE FROM #__flexicontent_items_versions WHERE field_id IN (2, 3, 4, 5, 6, 7, 9, 10 )" ;
