@@ -19,9 +19,6 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
-if(!class_exists('FLEXIUtilities')) {
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
-}
 /**
  * View class for the FLEXIcontent item screen
  *
