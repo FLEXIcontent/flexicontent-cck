@@ -632,36 +632,30 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		return $check;
 	 }
-	function checkCurrentVersionData($id=NULL) {
+	function checkCurrentVersionData($current_versions=array(), $last_versions) {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
-		$and = "";
-		if($id) $and = " AND id='$id'";
-		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."'$and;";
-		$db->setQuery($query);
-		$rows = $db->loadObjectList();
-		global $mainframe;
-		foreach($rows as $row) {
-			$lastversion = FLEXIUtilities::getLastVersion($row->id);
-			$lastitemversion = FLEXIUtilities::getLastItemVersion($row->id);
-			if( ($row->version > $lastversion) || ($row->version > $lastitemversion)) {
-				return false;//
-			}
+		//$and = "";
+		if(!$current_versions) {
+			$current_versions = FLEXIUtilities::getCurrentVersions();
 		}
-		return true;
+		if(!$last_versions) {
+			$last_versions = FLEXIUtilities::getLastVersions();
+		}
+		return array_diff_assoc_recursive($current_versions, $last_versions);
 	}
 	function addCurrentVersionData() {
 		// add the current version data
 		$query = "SELECT id,version,created,created_by,introtext,fulltext FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 		$db->setQuery($query);
-		$rows = $db->loadObjectList();
-		global $mainframe;
-		foreach($rows as $row) {
-			if(!$this->checkCurrentVersionData($row->id)) {
+		$rows = $db->loadObjectList('id');
+		$diff_arrays = $this->checkCurrentVersionData();
+		foreach($diff_arrays as $row) {
+			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"
 						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
 						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
-						." WHERE fir.item_id='".$row->id."';";
+						." WHERE fir.item_id='".$row["id"]."';";
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
 				$jcorefields = flexicontent_html::getJCoreFields();
@@ -670,7 +664,12 @@ class FlexicontentModelFlexicontent extends JModel
 				$f = new stdClass();
 				$f->id=1;
 				$f->valueorder=1;
-				$f->value=$row->introtext.$row->fulltext;
+				 // append the text property to the object
+				if (JString::strlen($rows[$row['id']]->fulltext) > 1) {
+					$f->value = $rows[$row['id']]->introtext . '<hr id="system-readmore" />' . $rows[$row['id']]->fulltext;
+				} else {
+					$f->value = $rows[$row['id']]->introtext;
+				}
 				$fields[] = $f;
 				foreach($fields as $field) {
 					// process field mambots onBeforeSaveField
@@ -679,9 +678,9 @@ class FlexicontentModelFlexicontent extends JModel
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $row->id;
+					$obj->item_id 		= $row["id"];
 					$obj->valueorder	= $field->valueorder;
-					$obj->version		= (int)$row->version;
+					$obj->version		= (int)$rows[$row['id']]->version;
 					// @TODO : move in the plugin code
 					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
 						continue;
@@ -707,38 +706,38 @@ class FlexicontentModelFlexicontent extends JModel
 					//$searchindex 	.= @$field->search;
 				}
 				if(!$catflag) {
-					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
+					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row["id"]."';";
 					$db->setQuery($query);
 					$categories = $db->loadResultArray();
 					$obj = new stdClass();
 					$obj->field_id 		= 13;
-					$obj->item_id 		= $row->id;
+					$obj->item_id 		= $row["id"];
 					$obj->valueorder	= 1;
-					$obj->version		= (int)$row->version;
+					$obj->version		= (int)$rows[$row["id"]]->version;
 					$obj->value		= serialize($categories);
 					$db->insertObject('#__flexicontent_items_versions', $obj);
 					//unset($obj->version);
 					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 				}
 				if(!$tagflag) {
-					$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
+					$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row["id"]."';";
 					$db->setQuery($query);
 					$tags = $db->loadResultArray();
 					$obj = new stdClass();
 					$obj->field_id 		= 14;
-					$obj->item_id 		= $row->id;
+					$obj->item_id 		= $row["id"];
 					$obj->valueorder	= 1;
-					$obj->version		= (int)$row->version;
+					$obj->version		= (int)$rows[$row["id"]]->version;
 					$obj->value		= serialize($tags);
 					$db->insertObject('#__flexicontent_items_versions', $obj);
 					//unset($obj->version);
 					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 				}
 				$v = new stdClass();
-				$v->item_id 		= (int)$row->id;
-				$v->version_id		= (int)$row->version;
-				$v->created 	= $row->created;
-				$v->created_by 	= $row->created_by;
+				$v->item_id 		= (int)$row["id"];
+				$v->version_id		= (int)$rows[$row["id"]]->version;
+				$v->created 	= $rows[$row['id']]->created;
+				$v->created_by 	= $rows[$row['id']]->created_by;
 				//$v->comment		= 'kept current version to version table.';
 				//echo "insert into __flexicontent_versions<br />";
 				$db->insertObject('#__flexicontent_versions', $v);

@@ -1375,17 +1375,33 @@ class FLEXIUtilities {
 	 * @return int
 	 * @since 1.5
 	 */
-	function getLastVersion($id) {
-		$db =& JFactory::getDBO();
-		$query = 'SELECT version_id'
-				.' FROM #__flexicontent_versions'
-				.' WHERE item_id = ' . (int)$id
-				.' ORDER BY version_id DESC'
-				;
-		$db->setQuery($query, 0, 1);
-		$lastversion = $db->loadResult();
-		
-		return (int)$lastversion;
+	function getLastVersion($id=NULL, $justvalue=false, $force=false) {
+		global $g_lastversions;
+		if( ($g_lastversions==NULL) || ($force) ) {
+			$query = "SELECT item_id as id,max(version_id) as version FROM #__flexicontent_versions WHERE 1 GROUP BY item_id;";
+			$db->setQuery($query);
+			$rows = $db->loadAssoc();
+			$g_lastversions =  array();
+			foreach($rows as $row) {
+				$g_lastversions[$row["id"]] = $row;
+			}
+		}
+		if($id) return $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
+		return @$g_lastversions;
+	}
+	function getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
+		global $g_currentversions;
+		if( ($g_currentversions==NULL) || ($force) ) {
+			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+			$db->setQuery($query);
+			$rows = $db->loadAssoc();
+			$g_currentversions = array();
+			foreach($rows as $row) {
+				$g_currentversions[$row["id"]] = $row;
+			}
+		}
+		if($id) return $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
+		return @$g_currentversions;
 	}
 	function getLastItemVersion($id) {
 		$db =& JFactory::getDBO();
@@ -1397,6 +1413,38 @@ class FLEXIUtilities {
 		$lastversion = $db->loadResult();
 		
 		return (int)$lastversion;
+	}
+}
+if(!function_exists('array_diff_assoc_recursive')) {
+	function array_diff_assoc_recursive($array1, $array2)
+	{
+	    foreach($array1 as $key => $value)
+	    {
+		if(is_array($value))
+		{
+		      if(!isset($array2[$key]))
+		      {
+			  $difference[$key] = $value;
+		      }
+		      elseif(!is_array($array2[$key]))
+		      {
+			  $difference[$key] = $value;
+		      }
+		      else
+		      {
+			  $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+			  if($new_diff != FALSE)
+			  {
+				$difference[$key] = $new_diff;
+			  }
+		      }
+		  }
+		  elseif(!isset($array2[$key]) || $array2[$key] != $value)
+		  {
+		      $difference[$key] = $value;
+		  }
+	    }
+	    return !isset($difference) ? array() : $difference;
 	}
 }
 ?>

@@ -139,7 +139,7 @@ class FlexicontentModelItem extends JModel {
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$lastversion = FLEXIUtilities::getLastVersion($this->_id);
+			$lastversion = FLEXIUtilities::getLastVersions($this->_id, true);
 			if($version==0) 
 				JRequest::setVar( 'version', $version = $loadcurrent?$current_version:$lastversion);
 			$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
@@ -197,7 +197,7 @@ class FlexicontentModelItem extends JModel {
 				$item->text = $item->introtext;
 			}
 			$this->_item = &$item;
-			$lastversion = FLEXIUtilities::getLastVersion($item->id);
+			$lastversion = FLEXIUtilities::getLastVersions($item->id, true);
 			if(!$isnew && $current_version>$lastversion) {
 				//echo "<xmp>";var_dump(get_object_vars($item));echo "</xmp>";
 				/*$vars = get_object_vars($item);
@@ -493,7 +493,7 @@ class FlexicontentModelItem extends JModel {
 		
 		$nullDate	= $this->_db->getNullDate();
 		//$item->version++;
-		$version = FLEXIUtilities::getLastVersion($item->id);
+		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$isnew = false;
 		$tags = array_unique($tags);
 		
