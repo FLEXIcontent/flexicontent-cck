@@ -503,7 +503,7 @@ VALUES
 		$rows = $db->loadObjectList();
 		global $mainframe;
 		foreach($rows as $row) {
-			$lastversion = FLEXIUtilities::getLastVersion($row->id);
+			$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 			if($row->version > $lastversion) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"
@@ -613,6 +613,5 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
-
 }
 ?>
