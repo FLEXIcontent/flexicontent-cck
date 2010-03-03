@@ -36,7 +36,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<td>
 						<div id="cpanel">
 						<?php
-						if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata))
+						if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata) || ($this->missingversion))
 						{
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
@@ -159,7 +159,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			
-			if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata))
+			if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata) || ($this->missingversion))
 			{
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
