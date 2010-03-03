@@ -645,6 +645,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	function addCurrentVersionData() {
 		// add the current version data
+		$db = &$this->_db;
 		$query = "SELECT id,version,created,created_by,introtext,fulltext FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
