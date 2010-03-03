@@ -240,10 +240,11 @@ class FlexicontentModelItems extends JModel
 		}
 		$catrel = implode(', ', $catrel);
 
+		$nullDate	= $this->_db->getNullDate();
+		
 		$query = 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . $catrel;
 		$this->_db->setQuery($query);
 		$this->_db->query();
-		//if (!$this->_db->query()) return JText::_('Failed to insert all/some categories to items relations');
 
 		$languages =& JComponentHelper::getParams('com_languages');
 		$lang = $languages->get('site', 'en-GB');
@@ -274,71 +275,16 @@ class FlexicontentModelItems extends JModel
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
 			$v = new stdClass();
-			$v->item_id 		= (int)$row->id;
-			$v->version_id		= (int)$row->version;
+			$v->item_id 	= (int)$row->id;
+			$v->version_id	= (int)$row->version;
+			$v->created 	= ($row->modified && ($row->modified != $nullDate)) ? $row->modified : $row->created;
 			$v->created 	= $row->created;
 			$v->created_by 	= $row->created_by;
 			$v->comment		= '';
 			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
 
-					
-/*
-		// insert fields to items relations
-		$itemfields = array();
-		foreach ($rows as $row) {
-			$itemfields1 	= '(1, '.(int)$row->id.', 1, '.$this->_db->Quote($row->text).')';
-			$query 			= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields1;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-			//if (!$this->_db->query()) return JText::_('Failed to insert all/some fields to items relations');
-
-			$itemfields2[] 	= '(2, '.(int)$row->id.', 1, '.$this->_db->Quote($row->created).')';
-			$itemfields3[] 	= '(3, '.(int)$row->id.', 1, '.$this->_db->Quote($row->created_by).')';
-			$itemfields4[] 	= '(4, '.(int)$row->id.', 1, '.$this->_db->Quote($row->modified).')';
-			$itemfields5[] 	= '(5, '.(int)$row->id.', 1, '.$this->_db->Quote($row->modified_by).')';
-			$itemfields6[] 	= '(6, '.(int)$row->id.', 1, '.$this->_db->Quote($row->title).')';
-			$itemfields10[] = '(10, '.(int)$row->id.', 1, '.$this->_db->Quote($row->state).')';
-		}
-		$itemfields2 	= implode(', ', $itemfields2);
-		$itemfields3 	= implode(', ', $itemfields3);
-		$itemfields4 	= implode(', ', $itemfields4);
-		$itemfields5 	= implode(', ', $itemfields5);
-		$itemfields6 	= implode(', ', $itemfields6);
-		$itemfields10 	= implode(', ', $itemfields10);
-
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields2;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields2';
-
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields3;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields3';
-
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields4;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields4';
-
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields5;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields5';
-
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields6;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields6';
-		
-		$query = 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`) VALUES ' . $itemfields10;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-//		if (!$this->_db->query()) return '$itemfields10';
-*/
-
-		return; //JText::_('All required datas were successfully inserted');
+		return;
 	}
 
 	/**
