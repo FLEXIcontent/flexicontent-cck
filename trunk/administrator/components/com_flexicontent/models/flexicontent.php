@@ -643,10 +643,12 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		return array_diff_assoc_recursive($current_versions, $last_versions);
 	}
+
 	function addCurrentVersionData() {
 		// add the current version data
-		$db = &$this->_db;
-		$query = "SELECT id,version,created,created_by,introtext,fulltext FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$db 		= &$this->_db;
+		$nullDate	= $db->getNullDate();
+		$query = "SELECT id,version,created,modified,created_by,introtext,fulltext FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->checkCurrentVersionData();
@@ -737,8 +739,8 @@ class FlexicontentModelFlexicontent extends JModel
 				$v = new stdClass();
 				$v->item_id 		= (int)$row["id"];
 				$v->version_id		= (int)$rows[$row["id"]]->version;
-				$v->created 	= $rows[$row['id']]->created;
-				$v->created_by 	= $rows[$row['id']]->created_by;
+				$v->created 		= ($rows[$row['id']]->modified && ($rows[$row['id']]->modified != $nullDate)) ? $rows[$row['id']]->modified : $rows[$row['id']]->created;
+				$v->created_by 		= $rows[$row['id']]->created_by;
 				//$v->comment		= 'kept current version to version table.';
 				//echo "insert into __flexicontent_versions<br />";
 				$db->insertObject('#__flexicontent_versions', $v);
