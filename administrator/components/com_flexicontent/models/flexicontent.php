@@ -641,14 +641,15 @@ class FlexicontentModelFlexicontent extends JModel
 		if(!$last_versions) {
 			$last_versions = FLEXIUtilities::getLastVersions();
 		}
-		return array_diff_assoc_recursive($current_versions, $last_versions);
+		return diff_version($current_versions, $last_versions);
 	}
 
 	function addCurrentVersionData() {
 		// add the current version data
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
-		$query = "SELECT id,version,created,modified,created_by,introtext,fulltext FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$query = "SELECT id,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->checkCurrentVersionData();
@@ -659,6 +660,7 @@ class FlexicontentModelFlexicontent extends JModel
 						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
 						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
 						." WHERE fir.item_id='".$row["id"]."';";
+
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
 				$jcorefields = flexicontent_html::getJCoreFields();
@@ -667,6 +669,8 @@ class FlexicontentModelFlexicontent extends JModel
 				$f = new stdClass();
 				$f->id=1;
 				$f->valueorder=1;
+				$f->field_type="maintext";
+				$f->name="text";
 				 // append the text property to the object
 				if (JString::strlen($rows[$row['id']]->fulltext) > 1) {
 					$f->value = $rows[$row['id']]->introtext . '<hr id="system-readmore" />' . $rows[$row['id']]->fulltext;
@@ -746,6 +750,7 @@ class FlexicontentModelFlexicontent extends JModel
 				$db->insertObject('#__flexicontent_versions', $v);
 			}
 		}
+		return true;
 	}
 }
 ?>

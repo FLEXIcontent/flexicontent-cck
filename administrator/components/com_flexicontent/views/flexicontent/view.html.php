@@ -110,9 +110,7 @@ class FlexicontentViewFlexicontent extends JView
 		$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
 		$model 				= $this->getModel('flexicontent');
 		$missingversion		= $model->checkCurrentVersionData();
-		
-var_export($missingversion);
-	
+
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
 

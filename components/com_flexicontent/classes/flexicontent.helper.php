@@ -1417,36 +1417,17 @@ class FLEXIUtilities {
 		return (int)$lastversion;
 	}
 }
-if(!function_exists('array_diff_assoc_recursive')) {
-	function array_diff_assoc_recursive($array1, $array2)
-	{
-	    foreach($array1 as $key => $value)
-	    {
-		if(is_array($value))
-		{
-		      if(!isset($array2[$key]))
-		      {
-			  $difference[$key] = $value;
-		      }
-		      elseif(!is_array($array2[$key]))
-		      {
-			  $difference[$key] = $value;
-		      }
-		      else
-		      {
-			  $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
-			  if($new_diff != FALSE)
-			  {
-				$difference[$key] = $new_diff;
-			  }
-		      }
-		  }
-		  elseif(!isset($array2[$key]) || $array2[$key] != $value)
-		  {
-		      $difference[$key] = $value;
-		  }
-	    }
-	    return !isset($difference) ? array() : $difference;
+if(!function_exists('diff_version')) {
+	function diff_version($array1, $array2) {
+		$difference = $array1;
+		foreach($array1 as $key1 => $value1) {
+			foreach($array2 as $key2=> $value2) {
+				if( ($value1["id"]==$value2["id"]) && ($value1["version"]==$value2["version"]) ) {
+					unset($difference[$key1]);
+				}
+			}
+		}
+		return $difference;
 	}
 }
 ?>
