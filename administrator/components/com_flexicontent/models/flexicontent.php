@@ -648,7 +648,7 @@ class FlexicontentModelFlexicontent extends JModel
 		// add the current version data
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
-		$query = "SELECT id,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$query = "SELECT id,catid,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
@@ -676,6 +676,9 @@ class FlexicontentModelFlexicontent extends JModel
 					$f->value = $rows[$row['id']]->introtext . '<hr id="system-readmore" />' . $rows[$row['id']]->fulltext;
 				} else {
 					$f->value = $rows[$row['id']]->introtext;
+				}
+				if(substr($f->value, 0, 3)!="<p>") {
+					$f->value = "<p>".$f->value."</p>";
 				}
 				$fields[] = $f;
 				foreach($fields as $field) {
@@ -716,6 +719,9 @@ class FlexicontentModelFlexicontent extends JModel
 					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row["id"]."';";
 					$db->setQuery($query);
 					$categories = $db->loadResultArray();
+					if(!$categories) {
+						$categories = array($rows[$row["id"]]->catid);
+					}
 					$obj = new stdClass();
 					$obj->field_id 		= 13;
 					$obj->item_id 		= $row["id"];
