@@ -86,8 +86,17 @@ class FlexicontentViewItem extends JView {
 		$versioncount	= & $this->get( 'VersionCount' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$pagecount	= (int)ceil($versioncount/$versionsperpage);
-		JRequest::setVar('limitstart', ($pagecount-1)*$versionsperpage);
-		$versions		= & $this->get( 'VersionList' );
+		$allversions		= & $model->getVersionList();//get all versions.
+		$current_page = 0;
+		$k=1;
+		foreach($allversions as $v) {
+			if( $k && (($k%$versionsperpage)==0) ) 
+				$current_page++;
+			if($v->nr==$version) break;
+			$k++;
+		}
+
+		$versions		= & $model->getVersionList($current_page*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
