@@ -645,6 +645,9 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	function addCurrentVersionData() {
+		//clean old categories cache.
+		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache->clean();
 		// add the current version data
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
@@ -653,6 +656,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->checkCurrentVersionData();
+		
 		foreach($diff_arrays as $row) {
 			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
@@ -719,8 +723,12 @@ class FlexicontentModelFlexicontent extends JModel
 					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row["id"]."';";
 					$db->setQuery($query);
 					$categories = $db->loadResultArray();
-					if(!$categories) {
-						$categories = array($rows[$row["id"]]->catid);
+
+					if(!$categories || !count($categories)) {
+						$categories = array($catid = $rows[$row["id"]]->catid);
+						$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row["id"]."', '0');";
+						$db->setQuery($query);
+						$db->query();
 					}
 					$obj = new stdClass();
 					$obj->field_id 		= 13;
