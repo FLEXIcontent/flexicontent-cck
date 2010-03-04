@@ -233,7 +233,7 @@ class FlexicontentModelItems extends JModel
 			$catrel[] = '('.(int)$row->catid.', '.(int)$row->id.')';
 			// append the text property to the object
 			if (JString::strlen($row->fulltext) > 1) {
-				$row->text = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
+				$row->text = $row->introtext = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
 			} else {
 				$row->text = $row->introtext;
 			}			
@@ -257,8 +257,8 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery($query);
 			$this->_db->query();
 			//if (!$this->_db->query()) return JText::_('Failed to insert all/some items_ext data');
-			$row->introtext .= $row->fulltext;
-			$fields		= get_object_vars($row);
+			//$row->introtext .= $row->fulltext;
+			/*$fields		= get_object_vars($row);
 			foreach($fields as $k=>$f) {
 				if( ($k=='id') || ($k=='introtext') || ($k=='fulltext') ) continue;
 				$fieldid=flexicontent_html::getFlexiFieldId($k);
@@ -281,7 +281,7 @@ class FlexicontentModelItems extends JModel
 			$v->created 	= $row->created;
 			$v->created_by 	= $row->created_by;
 			$v->comment		= '';
-			$this->_db->insertObject('#__flexicontent_versions', $v);
+			$this->_db->insertObject('#__flexicontent_versions', $v);*/
 		}
 
 		return;
