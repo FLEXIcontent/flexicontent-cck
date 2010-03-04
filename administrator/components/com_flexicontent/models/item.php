@@ -199,18 +199,6 @@ class FlexicontentModelItem extends JModel {
 			$this->_item = &$item;
 			$lastversion = FLEXIUtilities::getLastVersions($item->id, true);
 			if(!$isnew && $current_version>$lastversion) {
-				//echo "<xmp>";var_dump(get_object_vars($item));echo "</xmp>";
-				/*$vars = get_object_vars($item);
-				$fieldtype = array();
-				foreach($vars as $k=>$v) {
-					if( !($fieldid = flexicontent_html::getFlexiFieldId($k)) || ($k=='created') || ($k=='created_by') ) continue;
-					if(!isset($fieldtype[$fieldid])) {
-						$query = "SELECT * FROM #__flexicontent_fields WHERE id='$fieldid';";
-						$this->_db->setQuery($query)
-						$fieldtype[$fieldid] = $this->_db->loadObject();
-					}
-				}
-				return (boolean) $this->_item;*/
 				global $mainframe;
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"
@@ -479,27 +467,25 @@ class FlexicontentModelItem extends JModel {
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
-		//unset($data['state']);
+
 		// bind it to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
 		$item->bind($details);
 
 		// sanitise id field
 		$item->id = (int) $item->id;
 		
 		$nullDate	= $this->_db->getNullDate();
-		//$item->version++;
+
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
+		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$isnew = false;
 		$tags = array_unique($tags);
 		
-		if( ($isnew = !$item->id) || ($post['vstate']==2) )
-		{
-			
+		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
 			$config =& JFactory::getConfig();
 			$tzoffset = $config->getValue('config.offset');
 
@@ -557,7 +543,7 @@ class FlexicontentModelItem extends JModel {
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
-			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
+			$params		= JRequest::getVar( 'params', null, 'post', 'array' );
 
 			// Build parameter INI string
 			if (is_array($params))
@@ -611,7 +597,7 @@ class FlexicontentModelItem extends JModel {
 				$this->setError($item->getError());
 				return false;
 			}
-			$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$item->version);
+			$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
 			// Store it in the db
 			if (!$item->store()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -810,13 +796,13 @@ class FlexicontentModelItem extends JModel {
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > ($vmax+1)) {
-			$lastversion = $this->getFirstVersion($vmax, $item->version);
+			$deleted_version = $this->getFirstVersion($vmax, $current_version);
 			// on efface les versions en trop
 			$query = 'DELETE'
 					.' FROM #__flexicontent_items_versions'
 					.' WHERE item_id = ' . (int)$this->_id
-					.' AND version <' . $lastversion
-					.' AND version!=' . (int)$item->version
+					.' AND version <' . $deleted_version
+					.' AND version!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
 			$this->_db->query();
@@ -824,8 +810,8 @@ class FlexicontentModelItem extends JModel {
 			$query = 'DELETE'
 					.' FROM #__flexicontent_versions'
 					.' WHERE item_id = ' . (int)$this->_id
-					.' AND version_id <' . $lastversion
-					.' AND version_id!=' . (int)$item->version
+					.' AND version_id <' . $deleted_version
+					.' AND version_id!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
 			$this->_db->query();
@@ -1154,18 +1140,17 @@ class FlexicontentModelItem extends JModel {
 	 * @return int
 	 * @since 1.5
 	 */
-	function getFirstVersion($max, $used_version)
+	function getFirstVersion($max, $current_version)
 	{
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$this->_id
-				.' AND version_id!=' . (int)$used_version
+				.' AND version_id!=' . (int)$current_version
 				.' ORDER BY version_id DESC'
 				;
 		$this->_db->setQuery($query, ($max-1), 1);
-		//echo $this->_db->_sql;
+		echo $this->_db->_sql.",max : $max<br />";
 		$firstversion = $this->_db->loadResult();
-		
 		return $firstversion;
 	}
 

@@ -634,8 +634,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
-<input type="hidden" name="version" value="<?php echo $this->version?$this->version:$this->row->version; ?>" />
-<!-- input type="hidden" name="oldstate" value="<?php //echo $this->row->state; ?>" / -->
 <input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
 <input type="hidden" name="oldtitle" value="<?php echo $this->row->title; ?>" />
 <input type="hidden" name="oldtext" value="<?php echo $this->row->text; ?>" />
