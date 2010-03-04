@@ -1160,17 +1160,14 @@ class FlexicontentModelItem extends JModel {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getVersionList()
+	function getVersionList($limitstart=0, $versionsperpage=0)
 	{
-		$limitstart = JRequest::getVar('limitstart', 0);
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
 				.' WHERE item_id = ' . (int)$this->_id
 				.' ORDER BY version_id ASC'
-				. ' LIMIT '.$limitstart.','.$versionsperpage
+				. ($versionsperpage?' LIMIT '.$limitstart.','.$versionsperpage:'')
 				;
 		$this->_db->setQuery($query);
 		return $this->_db->loadObjectList();
