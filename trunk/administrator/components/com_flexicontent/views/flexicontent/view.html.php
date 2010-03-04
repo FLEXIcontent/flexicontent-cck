@@ -67,7 +67,7 @@ class FlexicontentViewFlexicontent extends JView
 			$files->fields->source 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_fields.xml';
 			$files->files->dest 	= JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_files.xml';
 			$files->files->source 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_files.xml';
-			$files->tags->dest 	= JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_tags.xml';
+			$files->tags->dest 		= JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_tags.xml';
 			$files->tags->source 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_tags.xml';
 
 			foreach ($files as $file) {
@@ -108,7 +108,11 @@ class FlexicontentViewFlexicontent extends JView
 		$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 		$fieldspositions	= & $this->get( 'FieldsPositions' );
 		$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
+		$model 				= $this->getModel('flexicontent');
+		$missingversion		= $model->checkCurrentVersionData();
 		
+var_export($missingversion);
+	
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
 
@@ -204,6 +208,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
+		$this->assignRef('missingversion'		, $missingversion);
 
 		// assign Rights to the template
 		$this->assignRef('CanAdd'		, $CanAdd);

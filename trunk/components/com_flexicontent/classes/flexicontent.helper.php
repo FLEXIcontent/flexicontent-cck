@@ -1381,7 +1381,7 @@ class FLEXIUtilities {
 			$db =& JFactory::getDBO();
 			$query = "SELECT item_id as id,max(version_id) as version FROM #__flexicontent_versions WHERE 1 GROUP BY item_id;";
 			$db->setQuery($query);
-			$rows = $db->loadAssoc();
+			$rows = $db->loadAssocList();
 			$g_lastversions =  array();
 			foreach($rows as $row) {
 				$g_lastversions[$row["id"]] = $row;
@@ -1396,7 +1396,7 @@ class FLEXIUtilities {
 			$db =& JFactory::getDBO();
 			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 			$db->setQuery($query);
-			$rows = $db->loadAssoc();
+			$rows = $db->loadAssocList();
 			$g_currentversions = array();
 			foreach($rows as $row) {
 				$g_currentversions[$row["id"]] = $row;

@@ -632,7 +632,7 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		return $check;
 	 }
-	function checkCurrentVersionData($current_versions=array(), $last_versions) {
+	function checkCurrentVersionData($current_versions=array(), $last_versions=array()) {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
 		if(!$current_versions) {

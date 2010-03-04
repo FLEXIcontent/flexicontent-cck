@@ -44,6 +44,7 @@ class FlexicontentController extends JController
 		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
+		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
 	}
 
 	/**
@@ -611,6 +612,16 @@ VALUES
 			echo '<span class="install-ok"></span>';
 		} else {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		}
+	}
+	
+	function addCurrentVersionData()
+	{
+		$model = $this->getModel('flexicontent');
+		if ($model->addCurrentVersionData()) {
+			echo '<span class="install-ok"></span>';
+		} else {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
 }

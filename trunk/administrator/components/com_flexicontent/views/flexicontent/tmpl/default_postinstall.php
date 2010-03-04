@@ -181,6 +181,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
+<?php if ($this->missingversion) : ?>
+<script type="text/javascript">
+	window.addEvent('domready', function(){
+		$('missingversion').addEvent('click', function(e) {
+			$('missingversion-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo JUtility::getToken();?>=1&format=raw";
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('missingversion-log')
+			});
+			ajax.request.delay(500, ajax);
+		});
+	});
+</script>
+<?php endif; ?>
 
 		<table class="adminlist" cellspacing="0" cellpadding="0" border="0" width="100%">
 			<tr>
@@ -253,6 +271,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				</td>
 				<td id="oldfieldsdata-log">
 					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="key">
+					<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
+				</td>
+				<td id="missingversion-log">
+					<?php echo !$this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</td>
 			</tr>
 	</table>
