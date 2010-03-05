@@ -70,7 +70,7 @@ if ($this->CanUseTags) {
 			}
 		});
 		jQuery(document).ready(function() {
-			jQuery(\"#pager\").pager({ pagenumber: 1, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			jQuery(\"#pager\").pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		});
 
 		PageClick = function(pageclickednumber) {
