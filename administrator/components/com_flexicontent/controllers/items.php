@@ -775,8 +775,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		if($page>$numpage) $page = $numpage;
 		elseif($page<1) $page = 1;
 		$limitstart = ($page-1)*$versionsperpage;
-		JRequest::setVar('limitstart', $limitstart);
 		$versions = $model->getVersionList();
+		$versions	= & $model->getVersionList($limitstart, $versionsperpage);
 		foreach($versions as $v) {
 			$class = ($v->nr == $active) ? ' class="active-version"' : '';
 			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>

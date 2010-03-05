@@ -87,7 +87,7 @@ class FlexicontentViewItem extends JView {
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$pagecount	= (int)ceil($versioncount/$versionsperpage);
 		$allversions		= & $model->getVersionList();//get all versions.
-		$current_page = 0;
+		$current_page = 1;
 		$k=1;
 		foreach($allversions as $v) {
 			if( $k && (($k%$versionsperpage)==0) ) 
@@ -96,7 +96,7 @@ class FlexicontentViewItem extends JView {
 			$k++;
 		}
 
-		$versions		= & $model->getVersionList($current_page*$versionsperpage, $versionsperpage);
+		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
@@ -281,6 +281,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('usedtags'			, $usedtags);
 		$this->assignRef('CanVersion'		, $CanVersion);
 		$this->assignRef('CanUseTags'		, $CanUseTags);
+		$this->assignRef('current_page'		, $current_page);
 
 		parent::display($tpl);
 	}
