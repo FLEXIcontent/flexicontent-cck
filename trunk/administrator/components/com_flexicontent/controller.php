@@ -617,6 +617,9 @@ VALUES
 	
 	function addCurrentVersionData()
 	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
 		$model = $this->getModel('flexicontent');
 		if ($model->addCurrentVersionData()) {
 			echo '<span class="install-ok"></span>';
