@@ -57,8 +57,10 @@ if ($this->CanUseTags) {
 				if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
 					addtag(0, jQuery(\"#input-tags\").attr('value'));
 					resetField();
+					return false;
 				}else if(event.keyCode==13) {
 					resetField();
+					return false;
 				}
 			});
 			function resetField() {
