@@ -632,9 +632,15 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		return $check;
 	 }
-	function checkCurrentVersionData($current_versions=array(), $last_versions=array()) {
+	
+	function checkCurrentVersionData($current_versions=array(), $last_versions=array())
+	{
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
+
+		// check if the section was chosen to avoid adding data on static contents
+		if (!FLEXI_SECTION) return false;
+		
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
 		}
@@ -644,7 +650,11 @@ class FlexicontentModelFlexicontent extends JModel
 		return diff_version($current_versions, $last_versions);
 	}
 
-	function addCurrentVersionData() {
+	function addCurrentVersionData()
+	{
+		// check if the section was chosen to avoid adding data on static contents
+		if (!FLEXI_SECTION) return true;
+
 		//clean old categories cache.
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
