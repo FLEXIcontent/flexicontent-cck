@@ -65,9 +65,9 @@ class FlexicontentModelFlexicontent extends JModel
 				;
 
 		$this->_db->SetQuery($query);
-  		$genstats = $this->_db->loadObjectList();
-  		
-  		return $genstats;
+		$genstats = $this->_db->loadObjectList();
+		
+		return $genstats;
 	}
 	
 	/**
@@ -95,9 +95,9 @@ class FlexicontentModelFlexicontent extends JModel
 				;
 
 		$this->_db->SetQuery($query);
-  		$genstats = $this->_db->loadObjectList();
-  		
-  		return $genstats;
+		$genstats = $this->_db->loadObjectList();
+		
+		return $genstats;
 	}
 
 	/**
@@ -125,9 +125,9 @@ class FlexicontentModelFlexicontent extends JModel
 				;
 
 		$this->_db->SetQuery($query);
-  		$genstats = $this->_db->loadObjectList();
-  		
-  		return $genstats;
+		$genstats = $this->_db->loadObjectList();
+		
+		return $genstats;
 	}
 	
 	
@@ -252,7 +252,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistLanguageColumn()
 	{
-        $fields = $this->_db->getTableFields('#__flexicontent_items_ext');
+		$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
 		return (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
 	}
 
@@ -482,16 +482,16 @@ class FlexicontentModelFlexicontent extends JModel
 			// Save the created section as flexi_section for the component
 			$component =& JComponentHelper::getParams('com_flexicontent');
 			$component->set('flexi_section', '');
-    		$cparams = $component->toString();		
+			$cparams = $component->toString();
 
 			$flexi =& JComponentHelper::getComponent('com_flexicontent');
-	    
-	    	$query 	= 'UPDATE #__components'
-	    			. ' SET params = ' . $this->_db->Quote($cparams)
-	    			. ' WHERE id = ' . $flexi->id;
-	    			;
-    		$this->_db->setQuery($query);
-    		$this->_db->query();
+
+			$query 	= 'UPDATE #__components'
+					. ' SET params = ' . $this->_db->Quote($cparams)
+					. ' WHERE id = ' . $flexi->id;
+					;
+			$this->_db->setQuery($query);
+			$this->_db->query();
 			return true;
 		}
 		}
@@ -520,17 +520,17 @@ class FlexicontentModelFlexicontent extends JModel
 
 
 	/**
-	 * Fetch the version from the schlu.net server
+	 * Fetch the version from the flexicontent.org server
 	 * TODO: Cleanup
 	 */
-	 function getUpdate()
-	 {
-	 	$url = 'http://update.flexicontent/flexicontent_update.xml';
+	function getUpdate()
+	{
+		$url = 'http://update.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
-		$check['version_current'] = '1.0.2';
-		$check['versionread_current'] = '1.0.2';
+		$check['version_current'] = '1.5.1';
+		$check['versionread_current'] = '1.5.1';
 
 		//try to connect via cURL
 		if(function_exists('curl_init') && function_exists('curl_exec')) {
@@ -556,13 +556,13 @@ class FlexicontentModelFlexicontent extends JModel
 			$errstr = '';
 
 			//timeout handling: 5s for the socket and 5s for the stream = 10s
-			$fsock = @fsockopen("update.schlu.net", 80, $errno, $errstr, 5);
+			$fsock = @fsockopen("update.flexicontent.org", 80, $errno, $errstr, 5);
 		
 			if ($fsock) {
 				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
-				@fputs($fsock, "HOST: update.schlu.net\r\n");
+				@fputs($fsock, "HOST: update.flexicontent.org\r\n");
 				@fputs($fsock, "Connection: close\r\n\r\n");
-        
+
 				//force stream timeout...bah so dirty
 				@stream_set_blocking($fsock, 1);
 				@stream_set_timeout($fsock, 5);
@@ -581,17 +581,17 @@ class FlexicontentModelFlexicontent extends JModel
 							$get_info = true;
 						}
 					}
-				}        	
+				}
 				@fclose($fsock);
 				
-				//need to chack data cause http error codes aren't supported here
+				//need to check data cause http error codes aren't supported here
 				if(!strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>')) {
 					$data = '';
 				}
 			}
 		}
 
-	 	//try to connect via fopen
+		//try to connect via fopen
 		if (function_exists('fopen') && ini_get('allow_url_fopen') && $data == '') {
 		
 			//set socket timeout
@@ -631,7 +631,7 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		
 		return $check;
-	 }
+	}
 	
 	function checkCurrentVersionData($current_versions=array(), $last_versions=array())
 	{
