@@ -1416,7 +1416,7 @@ class FLEXIUtilities {
 		
 		return (int)$lastversion;
 	}
-	function currentExists() {
+	function currentMissing() {
 		$db =& JFactory::getDBO();
 		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
 				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
