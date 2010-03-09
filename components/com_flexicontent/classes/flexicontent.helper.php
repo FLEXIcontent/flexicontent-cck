@@ -1416,6 +1416,22 @@ class FLEXIUtilities {
 		
 		return (int)$lastversion;
 	}
+	function currentExists() {
+		$db =& JFactory::getDBO();
+		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
+				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+				" WHERE sectionid='".FLEXI_SECTION."';";
+		$db->setQuery($query);
+		$rows = $db->loadObjectList("id");
+		$status = false;
+		foreach($rows as $r) {
+			if(!$r->iversion) {
+				$status = true;
+				break;
+			}
+		}
+		return $status;
+	}
 }
 if(!function_exists('diff_version')) {
 	function diff_version($array1, $array2) {
