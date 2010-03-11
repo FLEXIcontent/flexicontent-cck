@@ -428,7 +428,7 @@ class FlexicontentModelCategory extends JModel
 			}
 		}
 
-		$query 	= 'SELECT COUNT(*)'
+		$query 	= 'SELECT DISTINCT itemid'
 				. ' FROM #__flexicontent_cats_item_relations AS rel'
 				. ' LEFT JOIN #__content AS i ON rel.itemid = i.id'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
@@ -439,7 +439,7 @@ class FlexicontentModelCategory extends JModel
 				;
 		
 		$this->_db->setQuery($query);
-		$assigneditems = $this->_db->loadResult();
+		$assigneditems = count($this->_db->loadResultArray());
 
 		return $assigneditems;
 	}
@@ -494,7 +494,8 @@ class FlexicontentModelCategory extends JModel
 	function getChilds()
 	{
 		$query = $this->_buildChildsquery();
-		$this->_childs = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+		$this->_childs = $this->_getList($query);
+//		$this->_childs = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 
 		$k = 0;
 		$count = count($this->_childs);
