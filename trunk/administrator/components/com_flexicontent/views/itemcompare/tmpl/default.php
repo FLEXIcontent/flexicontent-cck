@@ -30,7 +30,9 @@ table#itemcompare s{
 	<table cellspacing="0" cellpadding="0" border="0" width="100%" id="itemcompare">
 		<tr>
 			<td valign="top">
-					<div align="left"><a href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id;?>&version=<?php echo $this->rev;?>&tmpl=component&codemode=<?php echo $this->codemode?0:1;?>"><?php echo JText::_(($this->codemode?'View Mode':'Code Mode'));?></a></div>
+					<?php if (!$this->cparams->get('disable_diff')) : ?>
+					<div align="left"><a href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id;?>&version=<?php echo $this->rev;?>&tmpl=component&codemode=<?php echo $this->codemode?0:1;?>"><?php echo JText::_(($this->codemode?'FLEXI_VERSION_VIEW_MODE':'FLEXI_VERSION_CODE_MODE'));?></a></div>
+					<?php endif; ?>
 					<table class="admintable">
 						<tr>
 							<th align="right" width="16%" style="font-size:16px;">
@@ -43,6 +45,11 @@ table#itemcompare s{
 							</th>
 						</tr>
 						<?php
+/*
+echo "<xmp>";
+var_export($this->cparams);
+echo "</xmp>";
+*/
 						foreach ($this->fields as $field)
 						{
 							// used to hide the core fields from this listing
@@ -66,7 +73,7 @@ table#itemcompare s{
 							<td valign="top">
 								<?php
 								if (isset($field->displayversion)) {
-									if (($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
+									if ((!$this->cparams->get('disable_diff')) && (($field->field_type == 'maintext') || ($field->field_type == 'textarea'))) {
 										echo $html[0];
 									} else {
 										echo $field->displayversion;
@@ -79,7 +86,7 @@ table#itemcompare s{
 							<td valign="top">
 								<?php
 								if (isset($field->display)) {
-									if (($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
+									if ((!$this->cparams->get('disable_diff')) && (($field->field_type == 'maintext') || ($field->field_type == 'textarea'))) {
 										echo $html[1];
 									} else {
 										echo $field->display;

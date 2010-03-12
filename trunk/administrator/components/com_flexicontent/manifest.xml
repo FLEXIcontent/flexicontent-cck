@@ -80,6 +80,7 @@
 			<param name="nr_versions" default="10" />
 			<param name="versionsperpage" default="5" />
 			<param name="auto_approve" default="1" />
+			<param name="disable_diff" default="0" />
 <!-- 			
 			<param name="disable_versioning" default="" />
 -->

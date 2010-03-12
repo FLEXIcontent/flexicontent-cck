@@ -61,6 +61,10 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
+		<param name="disable_diff" type="radio" default="0" label="FLEXI_DISABLE_HTML_DIFF" description="FLEXI_DISABLE_HTML_DIFF_DESC" menu="hide">
+			<option value="0">FLEXI_No</option>
+			<option value="1">FLEXI_Yes</option>
+		</param>
 <!-- 		<param name="disable_versioning" type="usergroup" multiple="true" size="10" default="" label="FLEXI_DISABLE_VERSIONING" description="FLEXI_DISABLE_VERSIONING_DESC" menu="hide" /> -->
 
 		<param name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" level="level1" menu="hide" />
