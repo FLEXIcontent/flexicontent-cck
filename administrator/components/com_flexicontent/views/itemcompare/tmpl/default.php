@@ -45,11 +45,6 @@ table#itemcompare s{
 							</th>
 						</tr>
 						<?php
-/*
-echo "<xmp>";
-var_export($this->cparams);
-echo "</xmp>";
-*/
 						foreach ($this->fields as $field)
 						{
 							// used to hide the core fields from this listing
