@@ -207,34 +207,33 @@ div#flexicontent .fc_fright .filter {
 	margin-left: 10px;
 }
 
-/**
- * @section Edit Form
- *
- */
-div.qf_edit form fieldset {
-	border: 1px solid #dddddd;
-	margin: 0 0 1em 0;
-	padding: 1em;
+/** Item submission Form **/
+ 
+div.flexi_edit .flexi_buttons {
+	float: right;
 }
-
-div.qf_edit form legend {
-	font-weight: bold;
-	padding: 0.3em;
-}
-
-div.qf_edit form label {
+div.flexi_edit .flexi_label {
+	width: 9em;
 	display: block;
 	float: left;
-	margin: 0;
-	padding: 0;
-	vertical-align: top;
-	width: 9em;
+	vertical-align: middle;
+}
+div.flexi_edit .flexi_label.invalid {
+	font-weight: bold;
+}
+div.flexi_edit .flexi_formblock {
+	clear: both;
 }
 
-div.qf_edit form input,
-div.qf_edit form button,
-div.qf_edit form select,
-div.qf_edit form textarea {
+div.flexi_edit fieldset {
+	border: 1px solid #dddddd;
+	margin-bottom: 1em;
+}
+
+div.flexi_edit form input,
+div.flexi_edit form button,
+div.flexi_edit form select,
+div.flexi_edit form textarea {
 	background-color: #ffffff;
 	border: 1px solid #dddddd;
 	cursor: pointer;
@@ -242,26 +241,61 @@ div.qf_edit form textarea {
 	padding: 0.2em;
 }
 
-/* save buttons */
-div.qf_save_buttons {
-	float: right;
-	margin: 0 0 1em 0;
+div.flexi_edit form input.invalid,
+div.flexi_edit form select.invalid {
+	border: 1px dotted #ff0000;
 }
 
-div.qf_save_buttons button {
-	cursor: pointer;
-	font-size: 1.5em;
-}
-
-div.qf_box_left,
-div.qf_box_right {
+div.flexi_box_left,
+div.flexi_box_right {
 	float: left;
 	width: 45%;
 }
 
-div.qf_box_right {
+div.flexi_box_right {
 	float: right;
 }
+
+/** Tags **/
+
+div#tags {
+	margin: 3px;
+}
+
+.flexi_tagbox {
+	display: block;
+	max-height: 170px;
+  	overflow: auto;
+/*   	border: 1px dashed silver; */
+  	background: #fff;	
+}
+
+.flexi_tagbox ul {
+	margin: 3px;
+	padding: 0px;
+}
+.flexi_tagbox ul li {
+	width: 130px;
+	min-height: 20px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px;
+	zoom: 1;
+	*display: inline;
+	_height: 20px;
+}
+
+.flexi_tagbox ul li div {
+	padding-top: 3px;
+}
+.flexi_tagbox input {
+	width: 20px;
+	display: block;
+	float: left;
+	margin-top: -4px;
+}
+
 
 /** rating bar **/
 div#flexicontent .qf_ratingbarcontainer {
