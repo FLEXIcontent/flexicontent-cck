@@ -212,10 +212,20 @@ class FlexicontentModelFileselement extends JModel
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 'filter_url', '', 'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 'filter_secure', '', 'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 'filter_ext', '', 'alnum' );
+		$user				= & JFactory::getUser();
 
 		$where = array();
 		
+		if (FLEXI_ACCESS) {
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanViewAllFiles	= 1;
+		}
 		
+		if ( !$CanViewAllFiles ) {
+			$where[] = ' uploaded_by = ' . (int)$user->id;
+		}
+
 		if ( $filter_uploader ) {
 			$where[] = ' uploaded_by = ' . $filter_uploader;
 		}

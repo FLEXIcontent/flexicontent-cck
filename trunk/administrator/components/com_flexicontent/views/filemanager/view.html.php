@@ -68,27 +68,29 @@ class FlexicontentViewFilemanager extends JView
 				
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 	'manage', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-			$CanUpload	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanCats 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+			$CanTypes 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
+			$CanFields 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
+			$CanTags 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
+			$CanArchives 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
+			$CanFiles	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
+			$CanStats	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
+			$CanRights	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 	'manage', 'users', $user->gmid) : 1;
+			$CanTemplates		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
+			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
 		} else {
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanTemplates	= 1;
-			$CanUpload		= 1;
+			$CanCats 			= 1;
+			$CanTypes 			= 1;
+			$CanFields			= 1;
+			$CanTags 			= 1;
+			$CanArchives		= 1;
+			$CanFiles			= 1;
+			$CanStats			= 1;
+			$CanRights			= 1;
+			$CanTemplates		= 1;
+			$CanUpload			= 1;
+			$CanViewAllFiles	= 1;
 		}
 
 		if (!$CanFiles) {
@@ -162,13 +164,14 @@ class FlexicontentViewFilemanager extends JView
 		//assign data to template
 		$this->assign('require_ftp'		, $ftp);
 		
-		$this->assignRef('session'		, JFactory::getSession());
-		$this->assignRef('pane'			, $pane);
-		$this->assignRef('params'		, $params);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('CanUpload' 	, $CanUpload);
+		$this->assignRef('session'			, JFactory::getSession());
+		$this->assignRef('pane'				, $pane);
+		$this->assignRef('params'			, $params);
+		$this->assignRef('lists'      		, $lists);
+		$this->assignRef('rows'      		, $rows);
+		$this->assignRef('pageNav' 			, $pageNav);
+		$this->assignRef('CanUpload' 		, $CanUpload);
+		$this->assignRef('CanViewAllFiles' 	, $CanViewAllFiles);
 
 		parent::display($tpl);
 

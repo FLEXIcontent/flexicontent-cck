@@ -139,7 +139,7 @@ echo $this->pane->endPane();
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php echo $this->lists['uploader']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>

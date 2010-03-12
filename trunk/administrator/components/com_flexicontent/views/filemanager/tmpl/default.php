@@ -238,8 +238,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php echo $this->lists['uploader']; ?>
-			 	<?php // echo $this->lists['assigned']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
