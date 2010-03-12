@@ -87,9 +87,11 @@ class FlexicontentViewFileselement extends JView
 		$document->addScriptDeclaration($js);
 		
 		if (FLEXI_ACCESS) {
-			$CanUpload	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
 		} else {
-			$CanUpload	= 1;
+			$CanUpload			= 1;
+			$CanViewAllFiles	= 1;
 		}
 
 		//Get data from the model
@@ -154,15 +156,16 @@ class FlexicontentViewFileselement extends JView
 		$files .= $file;
 		
 		//assign data to template
-		$this->assignRef('session'		, JFactory::getSession());
-		$this->assignRef('params'		, $params);
-		$this->assignRef('pane'			, $pane);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('files' 		, $files);
-		$this->assignRef('fieldid' 		, $fieldid);
-		$this->assignRef('CanUpload' 	, $CanUpload);
+		$this->assignRef('session'			, JFactory::getSession());
+		$this->assignRef('params'			, $params);
+		$this->assignRef('pane'				, $pane);
+		$this->assignRef('lists'    	  	, $lists);
+		$this->assignRef('rows'     	 	, $rows);
+		$this->assignRef('pageNav' 			, $pageNav);
+		$this->assignRef('files' 			, $files);
+		$this->assignRef('fieldid' 			, $fieldid);
+		$this->assignRef('CanUpload' 		, $CanUpload);
+		$this->assignRef('CanViewAllFiles' 	, $CanViewAllFiles);
 
 		parent::display($tpl);
 

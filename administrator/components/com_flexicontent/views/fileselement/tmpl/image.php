@@ -77,7 +77,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			</td>
 			<td nowrap="nowrap">
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php echo $this->lists['uploader']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
