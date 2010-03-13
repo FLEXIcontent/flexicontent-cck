@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: types.php 144 2009-10-31 07:58:27Z vistamedia $
+ * @version 1.5 stable $Id: types.php 144 2009-10-31 07:58:27Z vistamedia $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

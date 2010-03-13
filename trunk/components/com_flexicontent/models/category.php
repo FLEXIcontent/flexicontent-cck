@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 5 $Id: category.php 188 2009-11-20 11:27:41Z vistamedia $
+ * @version 1.5 stable $Id: category.php 188 2009-11-20 11:27:41Z vistamedia $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
