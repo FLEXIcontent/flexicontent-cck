@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 5 $Id: flexisystem.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @version 1.5 stable $Id: flexisystem.php 183 2009-11-18 10:30:48Z vistamedia $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent

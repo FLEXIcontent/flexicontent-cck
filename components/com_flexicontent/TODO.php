@@ -1,5 +1,5 @@
 /**
- * @version 1.5 beta 5 $Id: TODO.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @version 1.5 stable $Id: TODO.php 183 2009-11-18 10:30:48Z vistamedia $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -25,7 +25,8 @@ Fields (vistamedia)
 + Allow to filter by core fields (author, reviser, category, tag)
 
 Frontend publishing
-+ The frontend publication system
++ The frontend publication system for non article types
++ The frontend editing
 
 Trash & Archive - Expired items
 ^ transform archive view to add a trash system for the items
