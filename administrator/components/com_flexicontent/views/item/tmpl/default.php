@@ -210,7 +210,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									</td>
 									<td>
 									<?php
-									if (($this->canPublish) && ($this->row->id)) :
+									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
 										echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];

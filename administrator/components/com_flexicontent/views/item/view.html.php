@@ -99,14 +99,14 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
-		$categories = $globalcats;
+		$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
+		$categories 	= $globalcats;
 
 		$usedtags = array();
 		if ($cid) {
 			//$usedtags 	= $model->getusedtags($cid);
-			$usedtagsA = & $this->get( 'UsedtagsArray' );
-			$usedtags = $model->getUsedtags($usedtagsA);
+			$usedtagsA 	= & $this->get( 'UsedtagsArray' );
+			$usedtags 	= $model->getUsedtags($usedtagsA);
 		}
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
@@ -138,10 +138,17 @@ class FlexicontentViewItem extends JView {
 			}
 			if (FLEXI_ACCESS && ($user->gid < 25)) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-				//dump($rights);
+				$canEdit 		= in_array('edit', $rights);
+				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
 				$canPublish 	= in_array('publish', $rights);
 				$canPublishOwn	= (in_array('publishown', $rights) && ($row->created_by == $user->id));
 				$canRight 		= in_array('right', $rights);
+
+				// check if the user can really edit the item
+				if ($canEdit || $canEditOwn || ($lastversion < 3)) {
+				} else {
+					$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS' ));
+				}
 			}
 		}
 
@@ -223,7 +230,7 @@ class FlexicontentViewItem extends JView {
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
 		if(!$canPublish)
-			$row->state=-3;
+			$row->state = $row->state ? $row->state : -4;
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
 		
 		//build version state list
@@ -272,9 +279,9 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('subscribers'		, $subscribers);
 		$this->assignRef('fields'			, $fields);
 		$this->assignRef('versions'			, $versions);
-		$this->assignRef('pagecount'			, $pagecount);
+		$this->assignRef('pagecount'		, $pagecount);
 		$this->assignRef('version'			, $version);
-		$this->assignRef('lastversion',		$lastversion);
+		$this->assignRef('lastversion'		, $lastversion);
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
