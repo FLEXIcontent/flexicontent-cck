@@ -1432,6 +1432,43 @@ class FLEXIUtilities {
 		}
 		return $status;
 	}
+	/**
+	 * Method to get the first version kept
+	 * 
+	 * @return int
+	 * @since 1.5
+	 */
+	function getFirstVersion($id, $max, $current_version)
+	{
+		$db =& JFactory::getDBO();
+		$query = 'SELECT version_id'
+				.' FROM #__flexicontent_versions'
+				.' WHERE item_id = ' . (int)$id
+				.' AND version_id!=' . (int)$current_version
+				.' ORDER BY version_id DESC'
+				;
+		$db->setQuery($query, ($max-1), 1);
+		$firstversion = $db->loadResult();
+		return $firstversion;
+	}
+	/**
+	 * Method to get the versions count
+	 * 
+	 * @return int
+	 * @since 1.5
+	 */
+	function getVersionsCount($id)
+	{
+		$db =& JFactory::getDBO();
+		$query = 'SELECT COUNT(*)'
+				.' FROM #__flexicontent_versions'
+				.' WHERE item_id = ' . (int)$id
+				;
+		$db->setQuery($query);
+		$versionscount = $db->loadResult();
+		
+		return $versionscount;
+	}
 }
 if(!function_exists('diff_version')) {
 	function diff_version($array1, $array2) {

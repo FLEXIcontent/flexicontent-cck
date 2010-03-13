@@ -458,7 +458,7 @@ class FlexicontentModelItem extends JModel {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
 		
@@ -792,11 +792,11 @@ class FlexicontentModelItem extends JModel {
 		}
 		
 		// delete old versions
-		$vcount	= $this->getVersionsCount();
+		$vcount	= FLEXIUtilities::getVersionsCount();
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > ($vmax+1)) {
-			$deleted_version = $this->getFirstVersion($vmax, $current_version);
+			$deleted_version = FLEXIUtilities::getFirstVersion($this->_id, $vmax, $current_version);
 			// on efface les versions en trop
 			$query = 'DELETE'
 					.' FROM #__flexicontent_items_versions'
@@ -1114,44 +1114,6 @@ class FlexicontentModelItem extends JModel {
 			$field->parameters 	= new JParameter($field->attribs);
 		}
 		return $fields;
-	}
-
-	/**
-	 * Method to get the versions count
-	 * 
-	 * @return int
-	 * @since 1.5
-	 */
-	function getVersionsCount()
-	{
-		$query = 'SELECT COUNT(*)'
-				.' FROM #__flexicontent_versions'
-				.' WHERE item_id = ' . (int)$this->_id
-				;
-		$this->_db->setQuery($query);
-		$versionscount = $this->_db->loadResult();
-		
-		return $versionscount;
-	}
-	
-	/**
-	 * Method to get the first version kept
-	 * 
-	 * @return int
-	 * @since 1.5
-	 */
-	function getFirstVersion($max, $current_version)
-	{
-		$query = 'SELECT version_id'
-				.' FROM #__flexicontent_versions'
-				.' WHERE item_id = ' . (int)$this->_id
-				.' AND version_id!=' . (int)$current_version
-				.' ORDER BY version_id DESC'
-				;
-		$this->_db->setQuery($query, ($max-1), 1);
-		echo $this->_db->_sql.",max : $max<br />";
-		$firstversion = $this->_db->loadResult();
-		return $firstversion;
 	}
 
 	/**
