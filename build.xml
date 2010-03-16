@@ -107,6 +107,7 @@
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/en-GB.plg_flexicontent_fields_linkslist.ini" />
 		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/fr-FR.plg_flexicontent_fields_linkslist.ini" />-->
 		
+<!--
 		<copy file="plugins/flexicontent_fields/minigallery.php" tofile="flexipack/plugins/minigallery/minigallery.php" />
 		<copy file="plugins/flexicontent_fields/minigallery.xml" tofile="flexipack/plugins/minigallery/minigallery.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_minigallery.ini" tofile="flexipack/plugins/minigallery/en-GB.plg_flexicontent_fields_minigallery.ini" />
@@ -116,6 +117,7 @@
 				<exclude name=".**" />
 			</fileset>
 		</copy>
+-->
 		
 		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
 		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />

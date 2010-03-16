@@ -35,6 +35,10 @@
 	<params group="group-createdby"><!-- created by (author) -->
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+			<option value="1">FLEXI_DISPLAY_NAME</option>
+			<option value="2">FLEXI_DISPLAY_USERNAME</option>
+		</param>
 	</params>
 	<params group="group-modified"><!-- modified date -->
 		<param name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
@@ -51,6 +55,10 @@
 	<params group="group-modifiedby"><!-- modified by (modifier) -->
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+			<option value="1">FLEXI_DISPLAY_NAME</option>
+			<option value="2">FLEXI_DISPLAY_USERNAME</option>
+		</param>
 	</params>
 	<params group="group-hits"><!-- hits -->
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
