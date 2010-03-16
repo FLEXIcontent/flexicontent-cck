@@ -659,6 +659,9 @@ class FlexicontentModelFlexicontent extends JModel
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_SECTION) return true;
 
+		// @TODO: move somewhere else
+		$this->formatFlexiPlugins();
+		
 		//clean old categories cache.
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
@@ -779,6 +782,24 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 		return true;
+	}
+	
+	function formatFlexiPlugins()
+	{
+		$db 	= & $this->_db;
+		$query	= 'SELECT id, name FROM #__plugins'
+				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
+				;
+		$db->setQuery($query);
+		$flexiplugins = $db->loadObjectList();
+		
+		foreach ($flexiplugins as $fp) {
+			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
+				$query = 'UPDATE #__plugins SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE id = ' . (int)$fp->id;
+				$db->setQuery($query);
+				$db->Query();
+			}
+		}
 	}
 }
 ?>
