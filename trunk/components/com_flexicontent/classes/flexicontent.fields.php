@@ -163,8 +163,10 @@ class FlexicontentFields
 		$item->creator 		= @$author->alias ? $author->alias : (@$author->name 		? $author->name 	: '') ;
 		$item->author 		= $item->creator ;
 		$item->cmail 		= @$author->email 		? $author->email 	: '' ;
+		$item->cuname 		= @$author->username 	? $author->username 	: '' ;
 		$item->modifier		= @$modifier->name 		? $modifier->name 	: $item->creator;
 		$item->mmail		= @$modifier->email 	? $modifier->email 	: $item->cmail;
+		$item->muname		= @$modifier->muname 	? $modifier->muname : $item->cuname;
 		$item->favs			= $favourites;
 		$item->fav			= $favoured;
 		$item->typename		= @$typename->name 		? $typename->name 	: JText::_('Article');

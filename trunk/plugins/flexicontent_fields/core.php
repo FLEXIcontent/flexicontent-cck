@@ -39,7 +39,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
 		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
-		$customdate			= $field->parameters->get( 'custom_date', '' ) ;
+		$customdate			= $field->parameters->get( 'custom_date', '' ) ;		
 						
 		if($pretext) $pretext = $pretext . ' ';
 
@@ -76,8 +76,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 			
 			case 'createdby': // created by
-			if ($view == 'category') { $field->display = $item->author; break; }
-			$field->display = $pretext.$item->creator;
+			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
 			break;
 
 			case 'modified': // modified
@@ -86,7 +85,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 			
 			case 'modifiedby': // modified by
-			$field->display = $pretext.$item->modifier.$posttext;
+			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
 			break;
 
 			case 'title': // hits
