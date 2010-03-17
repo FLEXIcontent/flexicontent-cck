@@ -76,8 +76,9 @@ class FlexicontentViewItem extends JView {
 		$model			= & $this->getModel();
 		$row     		= & $this->get( 'Item' );
 		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 		if($version==0)
-			JRequest::setVar( 'version', $version = $lastversion = FLEXIUtilities::getLastVersions($row->id, true));
+			JRequest::setVar( 'version', $version = $lastversion);
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
@@ -99,7 +100,7 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-		$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
+		//$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
 		$categories 	= $globalcats;
 
 		$usedtags = array();
@@ -263,7 +264,6 @@ class FlexicontentViewItem extends JView {
 			$published = JText::_( 'FLEXI_TO_WRITE' );
 			break;
 		}
-		
 		//assign data to template
 		$this->assignRef('document'     	, $document);
 		$this->assignRef('lists'      		, $lists);

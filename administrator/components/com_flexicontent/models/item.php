@@ -134,19 +134,28 @@ class FlexicontentModelItem extends JModel {
 	function _loadItem($loadcurrent=false) {
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			$use_versioning = $cparams->get('use_versioning', 1);
 			$item =& $this->getTable('flexicontent_items', '');
 			$item->load($this->_id);
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$lastversion = FLEXIUtilities::getLastVersions($this->_id, true);
+			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
 			if($version==0) 
-				JRequest::setVar( 'version', $version = $loadcurrent?$current_version:$lastversion);
-			$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
+				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
+			if($use_versioning) {
+				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
+			}else{
+				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_fields_item_relations as iv "
+					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
+					." WHERE iv.item_id='".$this->_id."';";
+			}
 			$this->_db->setQuery($query);
-			$fields = $this->_db->loadObjectList();
+			$fields = $this->_db->loadObjectList();echo mysql_error();
+			$fields = $fields?$fields:array();
 			foreach($fields as $f) {
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
@@ -197,9 +206,8 @@ class FlexicontentModelItem extends JModel {
 				$item->text = $item->introtext;
 			}
 			$this->_item = &$item;
-			$lastversion = FLEXIUtilities::getLastVersions($item->id, true);
-			if(!$isnew && $current_version>$lastversion) {
-				global $mainframe;
+			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
+				$mainframe = &JFactory::getApplication();
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"
 						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
@@ -280,6 +288,7 @@ class FlexicontentModelItem extends JModel {
 				//$v->comment		= 'kept current version to version table.';
 				//echo "insert into __flexicontent_versions<br />";
 				$this->_db->insertObject('#__flexicontent_versions', $v);
+				//$this->_item->version=$current_version;
 			}
 			return (boolean) $this->_item;
 		}
@@ -484,6 +493,8 @@ class FlexicontentModelItem extends JModel {
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$isnew = false;
 		$tags = array_unique($tags);
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
 			$config =& JFactory::getConfig();
@@ -597,7 +608,11 @@ class FlexicontentModelItem extends JModel {
 				$this->setError($item->getError());
 				return false;
 			}
-			$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
+			if(!$use_versioning) {
+				$item->version = $current_version+1;
+			}else{
+				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
+			}
 			// Store it in the db
 			if (!$item->store()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -697,9 +712,8 @@ class FlexicontentModelItem extends JModel {
 		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
 		
 		// versioning backup procedure
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		// first see if versioning feature is enabled
-		if ($cparams->get('use_versioning', 1)) {
+		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id 		= (int)$item->id;
 			$v->version_id		= (int)$version+1;
@@ -792,7 +806,7 @@ class FlexicontentModelItem extends JModel {
 		}
 		
 		// delete old versions
-		$vcount	= FLEXIUtilities::getVersionsCount();
+		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > ($vmax+1)) {
@@ -942,7 +956,7 @@ class FlexicontentModelItem extends JModel {
 	function getUsedtags($A)
 	{
 		$query 	= 'SELECT *,t.id as tid FROM #__flexicontent_tags as t '
-				. ' WHERE t.id IN (' . implode(',', $A).')'
+				. ' WHERE t.id IN (\'' . implode("','", $A).'\')'
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
