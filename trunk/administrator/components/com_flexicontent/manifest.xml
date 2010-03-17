@@ -8,7 +8,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.2 Stable</version>
+	<version>1.5.2 Stable (build 166)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
@@ -81,16 +81,9 @@
 			<param name="versionsperpage" default="5" />
 			<param name="auto_approve" default="1" />
 			<param name="disable_diff" default="0" />
-<!-- 			
-			<param name="disable_versioning" default="" />
--->
 			<param name="show_title" default="1" />
 			<param name="link_titles" default="1" />
 			<param name="show_readmore" default="1" />
-<!--
-			<param name="show_noauth" default="0" />
-			<param name="show_intro" default="1" />
--->
 			<param name="show_icons" default="1" />
 			<param name="show_pdf_icon" default="1" />
 			<param name="show_print_icon" default="1" />
@@ -134,7 +127,9 @@
 	<plugin name="weblink" folder="plugins/weblink">Weblink field</plugin>
 	<plugin name="extendedweblink" folder="plugins/extendedweblink">Extended Weblink field</plugin>
 	<plugin name="linkslist" folder="plugins/linkslist">Links list field</plugin>
+	<!--
 	<plugin name="minigallery" folder="plugins/minigallery">Minigallery field</plugin>
+	-->
 	<plugin name="flexisearch" folder="plugins/search">Search plugin for FLEXIcontent</plugin>
 	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
 </additional>
