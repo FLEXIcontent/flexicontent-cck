@@ -96,7 +96,7 @@ class FlexicontentHelperRoute
 
 		$menus	= &JApplication::getMenu('site', array());
 		$items	= $menus->getItems('componentid', $component->id);
-
+		$items = $items?$items:array();
 		$match = null;
 
 		foreach($items as $item)
@@ -124,7 +124,7 @@ class FlexicontentHelperRoute
 
 		$menus	= &JApplication::getMenu('site', array());
 		$items	= $menus->getItems('componentid', $component->id);
-
+		$items = $items?$items:array();
 		$match = null;
 
 		foreach($needles as $needle => $id)
