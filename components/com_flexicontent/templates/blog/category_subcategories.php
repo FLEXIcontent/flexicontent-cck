@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: blog_subcategories.php 127 2009-10-14 15:28:59Z vistamedia $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

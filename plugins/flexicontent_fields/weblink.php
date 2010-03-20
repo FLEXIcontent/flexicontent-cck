@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: weblink.php 175 2009-11-07 10:24:30Z vistamedia $
+ * @version 1.0 $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.weblink

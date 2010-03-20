@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: flexisearch.php 29 2009-06-19 19:51:29Z vistamedia $
+ * @version 1.0 $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

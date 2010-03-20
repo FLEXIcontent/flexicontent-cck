@@ -1,5 +1,5 @@
 /**
- * @version 1.5 stable $Id: CHANGELOG.php 85 2009-10-10 13:48:04Z vistamedia $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

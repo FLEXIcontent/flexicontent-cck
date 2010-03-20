@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: flexicontent_categories.php 11 2009-06-14 10:25:23Z vistamedia $
+* @version		$Id$
 * @package		Joomla.Framework
 * @subpackage	Table
 * @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
