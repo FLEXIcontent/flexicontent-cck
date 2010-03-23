@@ -77,7 +77,7 @@ class FlexicontentViewItem extends JView {
 		$row     		= & $this->get( 'Item' );
 		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
-		if($version==0)
+		if(($version==0)||!$cparams->get('use_versioning', 1))
 			JRequest::setVar( 'version', $version = $lastversion);
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
