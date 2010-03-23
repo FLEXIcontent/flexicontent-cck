@@ -609,7 +609,7 @@ class FlexicontentModelItem extends JModel {
 				return false;
 			}
 			if(!$use_versioning) {
-				$item->version = $current_version+1;
+				$item->version = $isnew?1:($current_version+1);
 			}else{
 				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
 			}
