@@ -652,7 +652,9 @@ class FlexicontentModelFlexicontent extends JModel
 
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_SECTION) return false;
-		return FLEXIUtilities::currentMissing();
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$use_versioning = $cparams->get('use_versioning', 1);
+		return ($use_versioning&&FLEXIUtilities::currentMissing());
 	}
 	function addCurrentVersionData()
 	{
