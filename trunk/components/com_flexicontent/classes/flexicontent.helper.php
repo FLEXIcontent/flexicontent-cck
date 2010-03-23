@@ -1402,6 +1402,7 @@ class FLEXIUtilities {
 				$g_currentversions[$row["id"]] = $row;
 			}
 		}
+		if(!$id && $justvalue) return 0;
 		if($id) return $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
 		return @$g_currentversions;
 	}

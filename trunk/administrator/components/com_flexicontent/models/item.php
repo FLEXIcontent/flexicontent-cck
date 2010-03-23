@@ -618,7 +618,6 @@ class FlexicontentModelItem extends JModel {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			
 			if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
@@ -626,7 +625,7 @@ class FlexicontentModelItem extends JModel {
 			}
 
 			$this->_item	=& $item;
-			
+
 			//if($post['vstate']==2) {
 				//store tag relation
 				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
@@ -652,35 +651,34 @@ class FlexicontentModelItem extends JModel {
 				$this->setError('FLEXI_SELECT_CATEGORY');
 				return false;
 			}
-			
+
 			//if($isnew || $post['vstate']==2) {
-				// delete only relations which are not part of the categories array anymore to avoid loosing ordering
-				$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
-						. ' WHERE itemid = '.$item->id
-						. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
-						;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-				
-				// draw an array of the used categories
-				$query 	= 'SELECT catid'
-						. ' FROM #__flexicontent_cats_item_relations'
-						. ' WHERE itemid = '.$item->id
-						;
-				$this->_db->setQuery($query);
-				$used = $this->_db->loadResultArray();
-				
-				foreach($cats as $cat)
-				{
-					// insert only the new records
-					if (!in_array($cat, $used)) {
-						$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-								.' VALUES(' . $cat . ',' . $item->id . ')'
-								;
-						$this->_db->setQuery($query);
-						$this->_db->query();
-					}
+			// delete only relations which are not part of the categories array anymore to avoid loosing ordering
+			$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
+					. ' WHERE itemid = '.$item->id
+					. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
+					;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+
+			// draw an array of the used categories
+			$query 	= 'SELECT catid'
+					. ' FROM #__flexicontent_cats_item_relations'
+					. ' WHERE itemid = '.$item->id
+					;
+			$this->_db->setQuery($query);
+			$used = $this->_db->loadResultArray();
+
+			foreach($cats as $cat) {
+				// insert only the new records
+				if (!in_array($cat, $used)) {
+					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
+							.' VALUES(' . $cat . ',' . $item->id . ')'
+							;
+					$this->_db->setQuery($query);
+					$this->_db->query();
 				}
+			}
 			//}
 		}else {
 			$datenow =& JFactory::getDate();
@@ -721,62 +719,38 @@ class FlexicontentModelItem extends JModel {
 			$v->modified_by		= $item->modified_by;
 			$v->created 	= $item->created;
 			$v->created_by 	= $item->created_by;
-
+		}
+		if($post['vstate']==2) {
+			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
+		if ($fields) {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$searchindex = '';
-			if($post['vstate']==2) {
-				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-			}
-			if ($fields) {
-				$jcorefields = flexicontent_html::getJCoreFields();
-				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+			$jcorefields = flexicontent_html::getJCoreFields();
+			foreach($fields as $field) {
+				// process field mambots onBeforeSaveField
+				$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
-					// add the new values to the database 
-					if (is_array($post[$field->name])) {
-						$postvalues = $post[$field->name];
-						$i = 1;
-						foreach ($postvalues as $postvalue) {
-							$obj = new stdClass();
-							$obj->field_id 		= $field->id;
-							$obj->item_id 		= $field->item_id;
-							$obj->valueorder	= $i;
-							$obj->version		= $v->version_id;
-							// @TODO : move to the plugin code
-							if (is_array($postvalue)) {
-								$obj->value			= serialize($postvalue);
-							} else {
-								$obj->value			= $postvalue;
-							}
-							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							if(
-								($isnew || ($post['vstate']==2) )
-								&& !isset($jcorefields[$field->name])
-								&& !in_array($field->field_type, $jcorefields)
-								&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-								&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-							) {
-								unset($obj->version);
-								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-							}
-							$i++;
-						}
-					}else if ($post[$field->name]) {
+				// add the new values to the database 
+				if (is_array($post[$field->name])) {
+					$postvalues = $post[$field->name];
+					$i = 1;
+					foreach ($postvalues as $postvalue) {
 						$obj = new stdClass();
 						$obj->field_id 		= $field->id;
 						$obj->item_id 		= $field->item_id;
-						$obj->valueorder	= 1;
-						$obj->version		= $v->version_id;
-						// @TODO : move in the plugin code
-						if (is_array($post[$field->name])) {
-							$obj->value			= serialize($post[$field->name]);
+						$obj->valueorder	= $i;
+						$obj->version		= (int)$version+1;
+						// @TODO : move to the plugin code
+						if (is_array($postvalue)) {
+							$obj->value			= serialize($postvalue);
 						} else {
-							$obj->value			= $post[$field->name];
+							$obj->value			= $postvalue;
 						}
-						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+						if ($use_versioning)
+							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
 							($isnew || ($post['vstate']==2) )
 							&& !isset($jcorefields[$field->name])
@@ -787,13 +761,39 @@ class FlexicontentModelItem extends JModel {
 							unset($obj->version);
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
+						$i++;
 					}
-					// process field mambots onAfterSaveField
-					$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-					$searchindex 	.= @$field->search;
+				}else if ($post[$field->name]) {
+					$obj = new stdClass();
+					$obj->field_id 		= $field->id;
+					$obj->item_id 		= $field->item_id;
+					$obj->valueorder	= 1;
+					$obj->version		= (int)$version+1;
+					// @TODO : move in the plugin code
+					if (is_array($post[$field->name])) {
+						$obj->value			= serialize($post[$field->name]);
+					} else {
+						$obj->value			= $post[$field->name];
+					}
+					if($use_versioning)
+						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					if(
+						($isnew || ($post['vstate']==2) )
+						&& !isset($jcorefields[$field->name])
+						&& !in_array($field->field_type, $jcorefields)
+						&& ( ($field->field_type!='categories') || ($field->name!='categories') )
+						&& ( ($field->field_type!='tags') || ($field->name!='tags') )
+					) {
+						unset($obj->version);
+						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+					}
 				}
+				// process field mambots onAfterSaveField
+				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+				$searchindex 	.= @$field->search;
 			}
-			
+		}
+		if ($use_versioning) {
 			if ($v->modified != $nullDate) {
 				$v->created 	= $v->modified;
 				$v->created_by 	= $v->modified_by;
