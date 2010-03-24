@@ -256,13 +256,13 @@ class FlexicontentModelType extends JModel
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		
+		$insertid = $this->_db->insertid();
 		$this->_type	=& $type;
 
 		$core = $this->_getCoreFields();
 		
 		// only insert default relations if the type is new
-		if ($this->_db->insertid()) {			
+		if ($insertid) {
 			foreach ($core as $fieldid) {
 				$obj = new stdClass();
 				$obj->field_id	 	= (int)$fieldid;
