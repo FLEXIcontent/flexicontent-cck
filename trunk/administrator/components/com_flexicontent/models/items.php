@@ -242,7 +242,7 @@ class FlexicontentModelItems extends JModel
 
 		$nullDate	= $this->_db->getNullDate();
 		
-		$query = 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . $catrel;
+		$query = 'REPLACE INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . $catrel;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 
@@ -253,35 +253,9 @@ class FlexicontentModelItems extends JModel
 		$itemext = array();
 		foreach ($rows as $row) {
 			$itemext = '('.(int)$row->id.', 1, '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
-			$query = 'INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
+			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();
-			//if (!$this->_db->query()) return JText::_('Failed to insert all/some items_ext data');
-			//$row->introtext .= $row->fulltext;
-			/*$fields		= get_object_vars($row);
-			foreach($fields as $k=>$f) {
-				if( ($k=='id') || ($k=='introtext') || ($k=='fulltext') ) continue;
-				$fieldid=flexicontent_html::getFlexiFieldId($k);
-				$obj = new stdClass();
-				$obj->field_id 		= $fieldid;
-				$obj->item_id 		= $row->id;
-				$obj->valueorder	= 1;
-				$obj->version		= $row->version;
-				// @TODO : move to the plugin code
-				if($k=='catid')
-					$obj->value			= serialize($f);
-				else
-					$obj->value			= $f;
-				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-			}
-			$v = new stdClass();
-			$v->item_id 	= (int)$row->id;
-			$v->version_id	= (int)$row->version;
-			$v->created 	= ($row->modified && ($row->modified != $nullDate)) ? $row->modified : $row->created;
-			$v->created 	= $row->created;
-			$v->created_by 	= $row->created_by;
-			$v->comment		= '';
-			$this->_db->insertObject('#__flexicontent_versions', $v);*/
 		}
 
 		return;

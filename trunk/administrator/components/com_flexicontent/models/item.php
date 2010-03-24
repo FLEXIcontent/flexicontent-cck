@@ -953,8 +953,20 @@ class FlexicontentModelItem extends JModel {
 		}
 		return $this->_item->tags;
 	}
+
+	/**
+	 * Method to get the list of the used tags
+	 * 
+	 * @param 	array
+	 * @return 	array
+	 * @since 	1.5.2
+	 */
 	function getUsedtags($A)
 	{
+		if (empty($A)) {
+			return array();
+		}
+		
 		$query 	= 'SELECT *,t.id as tid FROM #__flexicontent_tags as t '
 				. ' WHERE t.id IN (\'' . implode("','", $A).'\')'
 				. ' ORDER BY name ASC'
