@@ -36,25 +36,25 @@ $db =& JFactory::getDBO();
 
 //if you have new flexi plugins add here
 $flexiplugins = array(
-	"checkbox"=>"flexicontent_fields",
-	"checkboximage"=>"flexicontent_fields",
-	"core"=>"flexicontent_fields",
-	"date"=>"flexicontent_fields",
-	"email"=>"flexicontent_fields",
-	"file"=>"flexicontent_fields",
-	"image"=>"flexicontent_fields",
-	"radio"=>"flexicontent_fields",
-	"radioimage"=>"flexicontent_fields",
-	"select"=>"flexicontent_fields",
-	"selectmultiple"=>"flexicontent_fields",
-	"text"=>"flexicontent_fields",
-	"textarea"=>"flexicontent_fields",
-	"weblink"=>"flexicontent_fields",
-	"extendedweblink"=>"flexicontent_fields",
-	"linkslist"=>"flexicontent_fields",
-	"minigallery"=>"flexicontent_fields",
-	"flexisearch"=>"search",
-	"flexisystem"=>"system"
+	"checkbox"			=>	"flexicontent_fields",
+	"checkboximage"		=>	"flexicontent_fields",
+	"core"				=>	"flexicontent_fields",
+	"date"				=>	"flexicontent_fields",
+	"email"				=>	"flexicontent_fields",
+	"file"				=>	"flexicontent_fields",
+	"image"				=>	"flexicontent_fields",
+	"radio"				=>	"flexicontent_fields",
+	"radioimage"		=>	"flexicontent_fields",
+	"select"			=>	"flexicontent_fields",
+	"selectmultiple"	=>	"flexicontent_fields",
+	"text"				=>	"flexicontent_fields",
+	"textarea"			=>	"flexicontent_fields",
+	"weblink"			=>	"flexicontent_fields",
+	"extendedweblink"	=>	"flexicontent_fields",
+	"linkslist"			=>	"flexicontent_fields",
+	"minigallery"		=>	"flexicontent_fields",
+	"flexisearch"		=>	"search",
+	"flexisystem"		=>	"system"
 );
 // additional extensions
 $add =& $this->manifest->getElementByPath('additional');
