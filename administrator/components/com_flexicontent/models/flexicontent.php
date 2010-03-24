@@ -58,13 +58,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -3'
-				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_SECTION
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
-				. ' LIMIT 5'
 				;
 
-		$this->_db->SetQuery($query);
+		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
 		
 		return $genstats;
@@ -88,13 +87,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -4'
-				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_SECTION
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
-				. ' LIMIT 5'
 				;
 
-		$this->_db->SetQuery($query);
+		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
 		
 		return $genstats;
@@ -118,13 +116,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -5'
-				. ' AND sectionid = ' . FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_SECTION
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
-				. ' LIMIT 5'
 				;
 
-		$this->_db->SetQuery($query);
+		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
 		
 		return $genstats;
