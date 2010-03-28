@@ -98,7 +98,7 @@ class plgSystemFlexisystem extends JPlugin
 				$app->redirect($urlItems,'');
 				return false;
 
-			} else if ($option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
+			} elseif ($option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
 				// url to redirect
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
@@ -108,7 +108,7 @@ class plgSystemFlexisystem extends JPlugin
 				}
 				return false;
 			
-			} else if ($option == 'com_categories' && $applicationName == 'administrator' && $user->gid <= $mincats) {
+			} elseif ($option == 'com_categories' && $applicationName == 'administrator' && $user->gid <= $mincats) {
 				// url to redirect
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
@@ -116,20 +116,6 @@ class plgSystemFlexisystem extends JPlugin
 				if ($section == 'com_content') {
 					$app->redirect($urlItems,'');
 				}
-				return false;
-
-			} elseif (($option != 'com_content' && $option != 'com_login') && $applicationName == 'administrator' && $user->gid < 25) {
-				// @todo : must be placed in the flexiaccess plugin
-				// url to redirect
-				$urlIndex	= JURI::current();
-				$message	= JText::_('ALERTNOTAUTH');
-
-				if (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) {
-					if(!FAccess::checkComponentAccess($option,'manage','users',$user->gmid)) {
-						$app->redirect($urlIndex, $message);
-					}
-				}
- 
 				return false;
 			}
 		}
