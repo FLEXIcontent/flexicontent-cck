@@ -42,9 +42,10 @@ class FlexicontentViewQfcategoryelement extends JView {
 		JHTML::_('behavior.modal');
 
 		//get var
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.title', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.menucategories.filter_order', 		'filter_order', 	'c.title', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.menucategories.filter_state', 		'filter_state', 	'*', 'word' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.menucategories.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//prepare the document
@@ -56,6 +57,9 @@ class FlexicontentViewQfcategoryelement extends JView {
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
+
+		//publish unpublished filter
+		$lists['state']	= JHTML::_('grid.state', $filter_state );
 
 		// search filter
 		$lists['search']= $search;

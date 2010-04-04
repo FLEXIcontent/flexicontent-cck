@@ -111,8 +111,6 @@ class FlexicontentModelCategories extends JModel
 		//select the records
 		//note, since this is a tree we have to do the limits code-side
 		if ($search) {			
-			
-			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
 					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
