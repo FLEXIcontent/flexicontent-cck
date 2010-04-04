@@ -49,6 +49,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->value[0] = $default_value;
 		} elseif (!$field->value) {
 			$field->value[0] = '';
+		} else {
+			for ($n=0; $n<count($field->value); $n++) {
+				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );			
+			}
 		}
 		
 		if ($multiple) // handle multiple records
