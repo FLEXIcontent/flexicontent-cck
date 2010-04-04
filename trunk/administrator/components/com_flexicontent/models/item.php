@@ -474,7 +474,7 @@ class FlexicontentModelItem extends JModel {
 		$details	= JRequest::getVar( 'details', array(), 'post', 'array');
 		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
+		$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
 
 		// bind it to the table
@@ -680,7 +680,7 @@ class FlexicontentModelItem extends JModel {
 				}
 			}
 			//}
-		}else {
+		} else {
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
 			$item->modified_by 		= $user->get('id');
@@ -717,8 +717,8 @@ class FlexicontentModelItem extends JModel {
 			$v->version_id		= (int)$version+1;
 			$v->modified		= $item->modified;
 			$v->modified_by		= $item->modified_by;
-			$v->created 	= $item->created;
-			$v->created_by 	= $item->created_by;
+			$v->created 		= $item->created;
+			$v->created_by 		= $item->created_by;
 		}
 		if($post['vstate']==2) {
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
@@ -763,7 +763,7 @@ class FlexicontentModelItem extends JModel {
 						}
 						$i++;
 					}
-				}else if ($post[$field->name]) {
+				} else if ($post[$field->name]) {
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
 					$obj->item_id 		= $field->item_id;
@@ -791,6 +791,25 @@ class FlexicontentModelItem extends JModel {
 				// process field mambots onAfterSaveField
 				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 				$searchindex 	.= @$field->search;
+			}
+	
+			// store the extended data if the version is approved
+			if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
+				$item->search_index = $searchindex;
+				// Make sure the data is valid
+				if (!$item->check()) {
+					$this->setError($item->getError());
+					return false;
+				}
+				// Store it in the db
+				if (!$item->store()) {
+					$this->setError($this->_db->getErrorMsg());
+					return false;
+				}
+/*
+				dump($searchindex,'search');
+				dump($item,'item');
+*/
 			}
 		}
 		if ($use_versioning) {

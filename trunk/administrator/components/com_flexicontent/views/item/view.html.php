@@ -243,6 +243,8 @@ class FlexicontentViewItem extends JView {
 		if (FLEXI_FISH) {
 		//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
+		} else {
+			$row->language = flexicontent_html::getSiteDefaultLang();
 		}
 		
 		switch ($row->state) {
