@@ -29,9 +29,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-			  <?php
-			  echo $this->lists['state'];
-				?>
+			  <?php echo $this->lists['state']; ?>
 			</td>
 		</tr>
 	</table>

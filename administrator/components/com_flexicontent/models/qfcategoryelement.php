@@ -103,17 +103,16 @@ class FlexicontentModelQfcategoryelement extends JModel
 		
 		$params 			=& JComponentHelper::getParams('com_flexicontent');
 		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.search', 'search', '', 'string' );
+		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
+		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
+		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		
+
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.ordering';
 		
 		$where = array();
-		$where[] = 'c.section = ' . FLEXI_SECTION;
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
 				$where[] = 'c.published = 1';
@@ -122,27 +121,31 @@ class FlexicontentModelQfcategoryelement extends JModel
 			}
 		}
 		
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		$where 		= ( count( $where ) ? ' AND ' . implode( ' AND ', $where ) : '' );
 		
 		//select the records
 		//note, since this is a tree we have to do the limits code-side
 		if ($search) {			
-			
-			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
 					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
+					. ' AND c.section = ' . FLEXI_SECTION
 					. $where
 					;
 			$this->_db->setQuery( $query );
 			$search_rows = $this->_db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname'
+		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned'
 					. ' FROM #__categories AS c'
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 					. ' LEFT JOIN #__groups AS g ON g.id = c.access'
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
+					. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
+					. ' WHERE c.section = ' . FLEXI_SECTION
+					. ' AND sec.scope = ' . $this->_db->Quote('content')
 					. $where
+					. ' GROUP BY c.id'
 					. $orderby
 					;
 		$this->_db->setQuery( $query );
@@ -166,6 +169,11 @@ class FlexicontentModelQfcategoryelement extends JModel
 
     	//eventually only pick out the searched items.
 		if ($search) {
+
+echo '<xmp>';
+var_export($search);
+echo '</xmp>';
+
 			$list1 = array();
 
 			foreach ($search_rows as $sid )
