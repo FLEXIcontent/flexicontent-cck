@@ -490,6 +490,7 @@ class FlexicontentModelItem extends JModel {
 		$nullDate	= $this->_db->getNullDate();
 
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
+		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$isnew = false;
 		$tags = array_unique($tags);
@@ -740,7 +741,7 @@ class FlexicontentModelItem extends JModel {
 					foreach ($postvalues as $postvalue) {
 						$obj = new stdClass();
 						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $field->item_id;
+						$obj->item_id 		= $item->id;
 						$obj->valueorder	= $i;
 						$obj->version		= (int)$version+1;
 						// @TODO : move to the plugin code
@@ -766,7 +767,7 @@ class FlexicontentModelItem extends JModel {
 				} else if ($post[$field->name]) {
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $field->item_id;
+					$obj->item_id 		= $item->id;
 					$obj->valueorder	= 1;
 					$obj->version		= (int)$version+1;
 					// @TODO : move in the plugin code
