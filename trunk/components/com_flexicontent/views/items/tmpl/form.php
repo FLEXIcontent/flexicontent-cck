@@ -162,13 +162,90 @@ if($cid = $this->params->get("cid")) {
 		</fieldset>
 		<?php endif; ?>
 
-		<fieldset class="flexi_fields">
+		<?php /*<fieldset class="flexi_fields">
 			<legend>
 			<?php echo JText::_( 'FLEXI_ITEM_TYPE_ARTICLE' ); ?>
 			<?php // echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 			</legend>
 			<?php echo $this->editor->display( 'text', $this->item->text, '100%;', '350', '75', '20', array('pagebreak','image') ); ?>
-		</fieldset>
+		</fieldset>*/?>
+		
+		
+		<?php
+				if ($this->fields) {
+					$this->document->addScriptDeclaration("
+					window.addEvent('domready', function() {
+						$$('#type_id').addEvent('change', function(ev) {
+							$('fc-change-error').setStyle('display', 'block');
+							});
+						});
+					");
+				?>
+
+				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+				
+				<fieldset>
+					<legend>
+						<?php echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+					</legend>
+					
+					<table class="admintable" width="100%">
+						<?php
+						foreach ($this->fields as $field) {
+							// used to hide the core fields from this listing
+							if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
+							// set the specific label for the maintext field
+								if ($field->field_type == 'maintext')
+								{
+									$field->label = $this->tparams->get('maintext_label', $field->label);
+									$field->description = $this->tparams->get('maintext_desc', $field->description);
+									//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
+									$maintext = $this->item->text;
+									if ($this->tparams->get('hide_html', 0))
+									{
+										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
+									} else {
+										$height = $this->tparams->get('height', 400);
+										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
+									}
+								}
+						?>
+						<tr>
+							<td class="key">
+								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
+									<?php echo $field->label; ?>
+								</label>
+							</td>
+							<td>
+								<?php
+								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+								if(isset($field->html)){
+									echo $field->html;
+								} else {
+									echo $noplugin;
+								}
+								?>
+							</td>
+						</tr>
+						<?php
+							}
+						}
+						?>
+					</table>
+				</fieldset>
+				<?php
+				} else if ($this->item->id == 0) {
+				?>
+					<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
+				<?php
+				} else {
+				?>
+					<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
+				<?php
+				}
+				?>
+				
+				
 
 		<?php if ($this->perms['canparams']) : ?>
 		<?php if($this->params->get('usemetadata', 1)) {?>

@@ -1180,20 +1180,45 @@ class FlexicontentModelItems extends JModel
 		$tparams = $this->_db->loadResult();
 		return $tparams;
 	}
+	
+	/**
+	 * Method to get the values of an extrafield
+	 * 
+	 * @return object
+	 * @since 1.5
+	 * @todo move in a specific class and add the parameter $itemid
+	 */
+	function getExtrafieldvalue($fieldid, $version = 0)
+	{
+		$id = (int)$this->_id;
+		if(!$id) return array();
+		$query = 'SELECT value'
+				.(($version<=0)?' FROM #__flexicontent_fields_item_relations AS fv':' FROM #__flexicontent_items_versions AS fv')
+				.' WHERE fv.item_id = ' . (int)$this->_id
+				.' AND fv.field_id = ' . (int)$fieldid
+				.(($version>0)?' AND fv.version='.((int)$version):'')
+				.' ORDER BY valueorder'
+				;
+		$this->_db->setQuery($query);
+		$field_value = $this->_db->loadResultArray();
+		return $field_value;
+	}
+	
 	/**
 	 * Method to get extrafields which belongs to the item type
 	 * 
 	 * @return object
 	 * @since 1.5
 	 */
-	function getExtrafields()
-	{
+	function getExtrafields() {
+		$typeid = JRequest::getVar('typeid', 0, '', 'int');
 		$version = JRequest::getVar( 'version', '', 'request', 'int' );
+		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
 		$query = 'SELECT fi.*'
 				.' FROM #__flexicontent_fields AS fi'
 				.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
 				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				.' WHERE ie.item_id = ' . (int)$this->_id
+				.$where
 				.' AND fi.published = 1'
 				.' GROUP BY fi.id'
 				.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
