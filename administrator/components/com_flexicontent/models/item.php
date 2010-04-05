@@ -1141,12 +1141,14 @@ class FlexicontentModelItem extends JModel {
 	 */
 	function getExtrafields()
 	{
+		$typeid = JRequest::getVar('typeid', 0, '', 'int');
 		$version = JRequest::getVar( 'version', '', 'request', 'int' );
+		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
 		$query = 'SELECT fi.*'
 				.' FROM #__flexicontent_fields AS fi'
 				.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
 				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				.' WHERE ie.item_id = ' . (int)$this->_id
+				.$where
 				.' AND fi.published = 1'
 				.' GROUP BY fi.id'
 				.' ORDER BY ftrel.ordering, fi.ordering, fi.name'

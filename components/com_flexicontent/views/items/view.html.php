@@ -56,7 +56,7 @@ class FlexicontentViewItems extends JView
 		}
 		
 		//Set layout
-        $this->setLayout('item');
+		$this->setLayout('item');
 
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -98,7 +98,7 @@ class FlexicontentViewItems extends JView
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
-        $parents	= $cats->getParentlist();
+		$parents	= $cats->getParentlist();
 		$pathway 	=& $mainframe->getPathWay();
 		$depth		= $params->get('item_depth', 0);
 
@@ -218,7 +218,7 @@ class FlexicontentViewItems extends JView
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
-        $print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component');
+		$print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component');
 
 		$this->assignRef('item' , 				$item);
 		$this->assignRef('user' , 				$user);
@@ -262,6 +262,7 @@ class FlexicontentViewItems extends JView
 		global $mainframe;
 
 		//Initialize variables
+		$dispatcher = & JDispatcher::getInstance();
 		$document	=& JFactory::getDocument();
 		$user		=& JFactory::getUser();
 		$menus		= & JSite::getMenu();
@@ -273,6 +274,12 @@ class FlexicontentViewItems extends JView
 		$params		=& $mainframe->getParams('com_flexicontent');
 		$tparams	=& $this->get( 'Typeparams' );
 		
+		$fields			= & $this->get( 'Extrafields' );
+		// Add html to field object trought plugins
+		foreach ($fields as $field)
+		{
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
+		}
 		// if it's an edit action, redirect it
 		if ($item->id) {
 			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
@@ -361,7 +368,7 @@ class FlexicontentViewItems extends JView
 		$this->assign('action', 	$uri->toString());
 
 		$this->assignRef('item',	$item);
-		$this->assignRef('params',	$params);
+		$this->assignRef('params',$params);
 		$this->assignRef('lists',	$lists);
 		$this->assignRef('editor',	$editor);
 		$this->assignRef('user',	$user);
@@ -370,6 +377,7 @@ class FlexicontentViewItems extends JView
 		$this->assignRef('fields',	$fields);
 		$this->assignRef('tparams', $tparams);
 		$this->assignRef('perms', 	$perms);
+		$this->assignRef('document', $document);
 
 		parent::display($tpl);
 	}
