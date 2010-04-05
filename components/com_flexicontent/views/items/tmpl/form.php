@@ -100,8 +100,25 @@ function submitbutton( pressbutton ) {
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
-
 			<div class="flexi_formblock">
+<?php
+if($cid = $this->params->get("cid")) {
+	$cids = explode(",", $cid);
+	global $globalcats;
+	$cats=array();
+	foreach($cids as $cid) {
+			$cats[] = $globalcats[$cid]->title;
+?>
+			<input type="hidden" name="cid[]" value="<?php echo $cid;?>" />
+<?php
+	}
+?>
+				<label for="cid" class="flexi_label">
+					<?php echo JText::_('FLEXI_CATEGORIES');?>
+				</label>
+<?php
+	echo implode(',', $cats);
+}else{ ?>
 				<label for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 					<?php if ($this->perms['multicat']) : ?>
@@ -111,8 +128,9 @@ function submitbutton( pressbutton ) {
 					<?php endif; ?>
 				</label>
           		<?php echo $this->lists['cid']; ?>
+<?php } ?>
 			</div>
-          
+
 			<?php if ($this->perms['canpublish']) : ?>
 			<div class="flexi_formblock">
           		<label for="state" class="flexi_label">
@@ -153,6 +171,7 @@ function submitbutton( pressbutton ) {
 		</fieldset>
 
 		<?php if ($this->perms['canparams']) : ?>
+		<?php if($this->params->get('usemetadata', 1)) {?>
     	<fieldset class="flexi_meta">
        	<legend><?php echo JText::_( 'FLEXI_METADATA_INFORMATION' ); ?></legend>
 
@@ -166,6 +185,10 @@ function submitbutton( pressbutton ) {
         		<textarea class="inputbox" cols="20" rows="5" name="metakey" id="metakey" style="width:250px;"><?php echo $this->item->metakey; ?></textarea>
             </div>
       	</fieldset>
+		<?php }else{?>
+			<input type="hidden" name="metadesc" value="" />
+			<input type="hidden" name="metakey" value="" />
+		<?php }?>
 		<?php endif; ?>
 
 		<br class="clear" />
