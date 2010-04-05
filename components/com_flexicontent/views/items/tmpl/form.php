@@ -114,7 +114,7 @@ if($cid = $this->params->get("cid")) {
 	}
 ?>
 				<label for="cid" class="flexi_label">
-					<?php echo JText::_('FLEXI_CATEGORIES');?>
+					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 				</label>
 <?php
 	echo implode(',', $cats);
