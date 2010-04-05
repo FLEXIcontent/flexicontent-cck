@@ -17,6 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$cid = $this->params->get("cid");
 ?>
 
 <script language="javascript" type="text/javascript">
@@ -56,14 +57,14 @@ function submitbutton( pressbutton ) {
 		invalid[0].focus();
 			//form.title.focus();
 			return false;
-	} else if ( form.cid.selectedIndex == -1 ) {
+	}<?php if(!$cid) {?> else if ( form.cid.selectedIndex == -1 ) {
 		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
 		validator.handleResponse(false,form.cid);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
 		return false;
-	} else {
+	} <?php } ?>else {
 	<?php echo $this->editor->save( 'text' ); ?>
 	submitform(pressbutton);
 	return true;
@@ -102,7 +103,7 @@ function submitbutton( pressbutton ) {
 			</div>
 			<div class="flexi_formblock">
 <?php
-if($cid = $this->params->get("cid")) {
+if($cid) {
 	$cids = explode(",", $cid);
 	global $globalcats;
 	$cats=array();
@@ -274,6 +275,8 @@ if($cid = $this->params->get("cid")) {
     	<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
     	<?php echo JHTML::_( 'form.token' ); ?>
     	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="views" value="items" />
 
 	</form>
 </div>

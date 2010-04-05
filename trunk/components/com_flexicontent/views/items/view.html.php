@@ -95,6 +95,13 @@ class FlexicontentViewItems extends JView
 			$id	= JRequest::getInt('id', 0);
 			return JError::raiseError( 404, JText::sprintf( 'MANU ITEM #%d NOT FOUND', $id ) );
 		}
+		
+		$fields			= & $this->get( 'Extrafields' );
+		// Add html to field object trought plugins
+		foreach ($fields as $field)
+		{
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, $row ));
+		}
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);

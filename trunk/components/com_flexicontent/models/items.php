@@ -599,7 +599,10 @@ class FlexicontentModelItems extends JModel
 		$user     	=& JFactory::getUser();
 		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-		
+		$typeid = JRequest::getVar('typeid', 0, '', 'int');
+		$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
+		$post['vstate'] = 2;// approve version all time, you can change this if you want
+		$data['type_id'] = $typeid;
 		$mainframe = &JFactory::getApplication();
 		// Bind the form fields to the table
 		if (!$item->bind($data)) {
@@ -609,12 +612,16 @@ class FlexicontentModelItems extends JModel
 
 		// sanitise id field
 		$item->id = (int) $item->id;
+		$version = FLEXIUtilities::getLastVersions($item->id, true);
+		$version = is_array($version)?0:$version;
+		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
+		$nullDate	= $this->_db->getNullDate();
 
 		// auto assign the main category
 		$item->catid 		= $cats[0];
 		// auto assign the main category
 		$item->sectionid 	= FLEXI_SECTION;
-		$item->type_id 		= 1;
+		$item->type_id 		= $typeid;
 		$item->language		= flexicontent_html::getSiteDefaultLang();
 
 		$isNew = ($item->id < 1);
@@ -742,77 +749,48 @@ class FlexicontentModelItems extends JModel
 		// versioning backup procedure
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		// first see if versioning feature is enabled
-		if ($cparams->get('use_versioning', 1)) {
+		$use_versioning = $cparams->get('use_versioning', 1);
+		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id 		= (int)$item->id;
-			if($isNew)
-				$v->version_id		= 1;
-			elseif(@$post['vstate']==2) 
-				$v->version_id		= (int)$lastversion+1;
-			else
-				$v->version_id		= (int)$current_version;
+			$v->version_id		= (int)$version+1;
 			$v->modified		= $item->modified;
 			$v->modified_by		= $item->modified_by;
-			$v->created 	= $item->created;
-			$v->created_by 	= $item->created_by;
-
+			$v->created 		= $item->created;
+			$v->created_by 		= $item->created_by;
+		}
+		if($post['vstate']==2) {
+			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
+		if ($fields) {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$searchindex = '';
-			if(@$post['vstate']==2) {
-				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-				$db->setQuery($query);
-				$db->query();
-			}
-			if ($fields) {
-				$jcorefields = flexicontent_html::getJCoreFields();
-				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
-					// add the new values to the database 
-					if (is_array($post[$field->name])) {
-						$postvalues = $post[$field->name];
-						$i = 1;
-						foreach ($postvalues as $postvalue) {
-							$obj = new stdClass();
-							$obj->field_id 		= $field->id;
-							$obj->item_id 		= $field->item_id;
-							$obj->valueorder	= $i;
-							$obj->version		= $v->version_id;
-							// @TODO : move to the plugin code
-							if (is_array($postvalue)) {
-								$obj->value			= serialize($postvalue);
-							} else {
-								$obj->value			= $postvalue;
-							}
-							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							if(
-								($isnew || (@$post['vstate']==2) )
-								&& !isset($jcorefields[$field->name])
-								&& !in_array($field->field_type, $jcorefields)
-								&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-								&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-							) {
-								unset($obj->version);
-								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-							}
-							$i++;
-						}
-					}else if ($post[$field->name]) {
+			$jcorefields = flexicontent_html::getJCoreFields();
+			foreach($fields as $field) {
+				// process field mambots onBeforeSaveField
+				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
+				// add the new values to the database 
+				if (is_array($post[$field->name])) {
+					$postvalues = $post[$field->name];
+					$i = 1;
+					foreach ($postvalues as $postvalue) {
 						$obj = new stdClass();
 						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $field->item_id;
-						$obj->valueorder	= 1;
-						$obj->version		= $v->version_id;
-						// @TODO : move in the plugin code
-						if (is_array($post[$field->name])) {
-							$obj->value			= serialize($post[$field->name]);
+						$obj->item_id 		= $item->id;
+						$obj->valueorder	= $i;
+						$obj->version		= (int)$version+1;
+						// @TODO : move to the plugin code
+						if (is_array($postvalue)) {
+							$obj->value			= serialize($postvalue);
 						} else {
-							$obj->value			= $post[$field->name];
-						}
-						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+							$obj->value			= $postvalue;
+						}var_dump($obj);
+						if ($use_versioning)
+							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
-							($isnew || ($post['vstate']==2) )
+							($isNew || ($post['vstate']==2) )
 							&& !isset($jcorefields[$field->name])
 							&& !in_array($field->field_type, $jcorefields)
 							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
@@ -821,12 +799,59 @@ class FlexicontentModelItems extends JModel
 							unset($obj->version);
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
+						$i++;
 					}
-					// process field mambots onAfterSaveField
-					$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-					$searchindex 	.= @$field->search;
+				} else if ($post[$field->name]) {
+					$obj = new stdClass();
+					$obj->field_id 		= $field->id;
+					$obj->item_id 		= $item->id;
+					$obj->valueorder	= 1;
+					//$obj->version		= (int)$version+1;
+					$obj->version		= (int)$version+1;
+					// @TODO : move in the plugin code
+					if (is_array($post[$field->name])) {
+						$obj->value			= serialize($post[$field->name]);
+					} else {
+						$obj->value			= $post[$field->name];
+					}
+					if($use_versioning)
+						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					if(
+						($isNew || ($post['vstate']==2) )
+						&& !isset($jcorefields[$field->name])
+						&& !in_array($field->field_type, $jcorefields)
+						&& ( ($field->field_type!='categories') || ($field->name!='categories') )
+						&& ( ($field->field_type!='tags') || ($field->name!='tags') )
+					) {
+						unset($obj->version);
+						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+					}
 				}
+				// process field mambots onAfterSaveField
+				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+				$searchindex 	.= @$field->search;
 			}
+	
+			// store the extended data if the version is approved
+			if( ($isNew = !$item->id) || ($post['vstate']==2) ) {
+				$item->search_index = $searchindex;
+				// Make sure the data is valid
+				if (!$item->check()) {
+					$this->setError($item->getError());
+					return false;
+				}
+				// Store it in the db
+				if (!$item->store()) {
+					$this->setError($this->_db->getErrorMsg());
+					return false;
+				}
+/*
+				dump($searchindex,'search');
+				dump($item,'item');
+*/
+			}
+		}
+		if ($use_versioning) {
 			if ($v->modified != $nullDate) {
 				$v->created 	= $v->modified;
 				$v->created_by 	= $v->modified_by;
@@ -835,7 +860,7 @@ class FlexicontentModelItems extends JModel
 			$v->comment		= isset($post['versioncomment'])?htmlspecialchars($post['versioncomment'], ENT_QUOTES):'';
 			unset($v->modified);
 			unset($v->modified_by);
-			$db->insertObject('#__flexicontent_versions', $v);
+			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
 		// delete old versions
 		$vcount	= FLEXIUtilities::getVersionsCount($this->_id);
