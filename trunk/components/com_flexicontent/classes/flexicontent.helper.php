@@ -994,7 +994,6 @@ class flexicontent_html
 		$db->setQuery($query);
 		$types = $db->loadAssocList('id');
 		
-		dump($types);
 		return $types;
 	}
 }
