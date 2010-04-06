@@ -946,6 +946,7 @@ class flexicontent_html
 		if($ffield===NULL) return $flexifield;
 		return isset($flexifield[$ffield])?$flexifield[$ffield]:NULL;
 	}
+	
 	function getFlexiFieldId($jfield=NULL) {
 		$flexifields = array(
 			'introtext'=>1,
@@ -963,6 +964,7 @@ class flexicontent_html
 		if($jfield===NULL) return $flexifields;
 		return isset($flexifields[$jfield])?$flexifields[$jfield]:0;
 	}
+	
 	function getFlexiField($jfield=NULL) {
 		$flexifields = array(
 			'introtext'=>'text',
@@ -978,6 +980,22 @@ class flexicontent_html
 		);
 		if($jfield===NULL) return $flexifields;
 		return isset($flexifields[$jfield])?$flexifields[$jfield]:0;
+	}
+	
+	function getTypesList()
+	{
+		$db =& JFactory::getDBO();
+		
+		$query = 'SELECT id, name'
+		. ' FROM #__flexicontent_types'
+		. ' WHERE published = 1'
+		;
+		
+		$db->setQuery($query);
+		$types = $db->loadAssocList('id');
+		
+		dump($types);
+		return $types;
 	}
 }
 

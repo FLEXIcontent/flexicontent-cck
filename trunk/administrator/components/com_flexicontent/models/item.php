@@ -471,10 +471,10 @@ class FlexicontentModelItem extends JModel {
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
 		
-		$details	= JRequest::getVar( 'details', array(), 'post', 'array');
-		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
-		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-		$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
+		$details		= JRequest::getVar( 'details', array(), 'post', 'array');
+		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
+		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
+		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
 
 		// bind it to the table

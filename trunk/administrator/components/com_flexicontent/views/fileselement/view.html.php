@@ -69,8 +69,14 @@ class FlexicontentViewFileselement extends JView
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$document->addStyleSheet('templates/system/css/system.css');
+		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'templates/system/css/system.css');
+		// include khepri stylesheet only if we are in frontend
+		if ($mainframe->isSite()) {
+			$document->addStyleSheet('administrator/templates/khepri/css/general.css');
+			$searchcss = '.adminform #search {border:1px solid silver;font-size:10px;margin:0;padding:0;float:none;height:14px;width:250px;}';
+			$document->addStyleDeclaration($searchcss);
+		}
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }';
 		$document->addStyleDeclaration($css);
