@@ -312,8 +312,8 @@ class FlexicontentViewItems extends JView
 			$perms['multicat']		= 1;
 			$perms['cantags'] 		= 1;
 			$perms['canparams'] 	= 1;
-			$perms['cansubmit']		= 1;
-			$perms['canpublish']	= 1;
+			$perms['cansubmit']		= ($user->gid >= 18);
+			$perms['canpublish']	= ($user->gid >= 21);
 		}
 
 		if (!$perms['cansubmit']) {
