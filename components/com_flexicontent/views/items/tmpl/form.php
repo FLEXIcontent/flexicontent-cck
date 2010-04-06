@@ -162,17 +162,8 @@ if($cid) {
 			</div>
 		</fieldset>
 		<?php endif; ?>
-
-		<?php /*<fieldset class="flexi_fields">
-			<legend>
-			<?php echo JText::_( 'FLEXI_ITEM_TYPE_ARTICLE' ); ?>
-			<?php // echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
-			</legend>
-			<?php echo $this->editor->display( 'text', $this->item->text, '100%;', '350', '75', '20', array('pagebreak','image') ); ?>
-		</fieldset>*/?>
 		
-		
-		<?php
+				<?php
 				if ($this->fields) {
 					$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
@@ -187,7 +178,11 @@ if($cid) {
 				
 				<fieldset>
 					<legend>
-						<?php echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+						<?php
+						$types = flexicontent_html::getTypesList();
+						$this->item->typename = $types[$this->item->type_id]['name'];
+						//dump($this->item->type_id);
+						echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
 					
 					<table class="admintable" width="100%">

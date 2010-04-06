@@ -555,3 +555,11 @@ span.fc_alpha_index {
 #flexicontent .hasTip img {
 	margin: 0;
 }
+
+.empty_image {
+	display: block;
+	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
+	border:1px solid silver;
+	margin-bottom:3px;
+}
+
