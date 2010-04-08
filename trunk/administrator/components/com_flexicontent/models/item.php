@@ -141,7 +141,8 @@ class FlexicontentModelItem extends JModel {
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
+			//$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
+			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
 			if($version==0) 
 				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
 			if($use_versioning) {
