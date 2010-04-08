@@ -670,7 +670,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
-		
+
 		foreach($diff_arrays as $row) {
 			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
