@@ -1454,6 +1454,7 @@ class FLEXIUtilities {
 				break;
 			}
 		}
+		unset($rows);
 		return $status;
 	}
 	/**
