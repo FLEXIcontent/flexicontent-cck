@@ -1392,7 +1392,7 @@ class FLEXIUtilities {
 	 * @return int
 	 * @since 1.5
 	 */
-	function getLastVersions($id=NULL, $justvalue=false, $force=false) {
+	function &getLastVersions($id=NULL, $justvalue=false, $force=false) {
 		global $g_lastversions;
 		if( ($g_lastversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
@@ -1404,10 +1404,13 @@ class FLEXIUtilities {
 				$g_lastversions[$row["id"]] = $row;
 			}
 		}
-		if($id) return $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
-		return @$g_lastversions;
+		if($id) {
+			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
+			return $return;
+		}
+		return $g_lastversions;
 	}
-	function getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
+	function &getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
 		global $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
@@ -1419,11 +1422,14 @@ class FLEXIUtilities {
 				$g_currentversions[$row["id"]] = $row;
 			}
 		}
-		if(!$id && $justvalue) return 0;
-		if($id) return $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
-		return @$g_currentversions;
+		if(!$id && $justvalue) return $v=0;
+		if($id) {
+			$return = $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
+			return $return;
+		}
+		return $g_currentversions;
 	}
-	function getLastItemVersion($id) {
+	function &getLastItemVersion($id) {
 		$db =& JFactory::getDBO();
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
@@ -1434,7 +1440,7 @@ class FLEXIUtilities {
 		
 		return (int)$lastversion;
 	}
-	function currentMissing() {
+	function &currentMissing() {
 		$db =& JFactory::getDBO();
 		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
 				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
@@ -1489,7 +1495,7 @@ class FLEXIUtilities {
 	}
 }
 if(!function_exists('diff_version')) {
-	function diff_version($array1, $array2) {
+	function diff_version(&$array1, &$array2) {
 		$difference = $array1;
 		foreach($array1 as $key1 => $value1) {
 			foreach($array2 as $key2=> $value2) {
