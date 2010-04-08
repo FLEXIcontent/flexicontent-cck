@@ -1393,7 +1393,7 @@ class FLEXIUtilities {
 	 * @since 1.5
 	 */
 	function &getLastVersions($id=NULL, $justvalue=false, $force=false) {
-		global $g_lastversions;
+		static $g_lastversions;
 		if( ($g_lastversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
 			$query = "SELECT item_id as id,max(version_id) as version FROM #__flexicontent_versions WHERE 1 GROUP BY item_id;";
@@ -1411,7 +1411,7 @@ class FLEXIUtilities {
 		return $g_lastversions;
 	}
 	function &getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
-		global $g_currentversions;
+		static $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
 			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
@@ -1462,7 +1462,7 @@ class FLEXIUtilities {
 	 * @return int
 	 * @since 1.5
 	 */
-	function getFirstVersion($id, $max, $current_version)
+	function &getFirstVersion($id, $max, $current_version)
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT version_id'
@@ -1481,7 +1481,7 @@ class FLEXIUtilities {
 	 * @return int
 	 * @since 1.5
 	 */
-	function getVersionsCount($id)
+	function &getVersionsCount($id)
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT COUNT(*)'
