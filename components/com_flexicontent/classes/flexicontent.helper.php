@@ -1403,6 +1403,7 @@ class FLEXIUtilities {
 			foreach($rows as $row) {
 				$g_lastversions[$row["id"]] = $row;
 			}
+			unset($rows);
 		}
 		if($id) {
 			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
@@ -1421,6 +1422,7 @@ class FLEXIUtilities {
 			foreach($rows as $row) {
 				$g_currentversions[$row["id"]] = $row;
 			}
+			unset($rows);
 		}
 		if(!$id && $justvalue) return $v=0;
 		if($id) {
