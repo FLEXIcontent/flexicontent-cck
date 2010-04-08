@@ -35,12 +35,12 @@ Trash & Archive - Expired items
 Item (backend)
 + Implement the notification feature
 
-Versioning (enjoyman)
-+ Add a diff engine for versioning
-+ Remove version feature
-+ Paginate version list
-+ Remove core field from versions table and improve the restore procedure
-+ Add the version comments
+Versioning (enjoyman) - done
++ Add a diff engine for versioning - done
++ Remove version feature - done
++ Paginate version list - done
++ Remove core field from versions table and improve the restore procedure - done
++ Add the version comments - done
 ^ the position of the version panel for better ergonomy???
 
 Categories (enjoyman)
