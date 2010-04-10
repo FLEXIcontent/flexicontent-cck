@@ -1396,19 +1396,14 @@ class FLEXIUtilities {
 		static $g_lastversions;
 		if( ($g_lastversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
-			$link_resource = $db->_resource;
 			$query = "SELECT item_id as id,max(version_id) as version FROM #__flexicontent_versions WHERE 1 GROUP BY item_id;";
-			$res = mysql_query($query, $link_resource);
-			while($row = mysql_fetch_object($res)) {
-				$g_lastversions[$row["id"]] = $row;
-			}/*
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_lastversions =  array();
 			foreach($rows as $row) {
 				$g_lastversions[$row["id"]] = $row;
 			}
-			unset($rows);*/
+			unset($rows);
 		}
 		if($id) {
 			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
@@ -1420,19 +1415,14 @@ class FLEXIUtilities {
 		static $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
-			$link_resource = $db->_resource;
 			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
-			$res = mysql_query($query, $link_resource);
-			while($row = mysql_fetch_object($res)) {
-				$g_currentversions[$row["id"]] = $row;
-			}/*
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
 			foreach($rows as $row) {
 				$g_currentversions[$row["id"]] = $row;
 			}
-			unset($rows);*/
+			unset($rows);
 		}
 		if(!$id && $justvalue) return $v=0;
 		if($id) {
@@ -1494,7 +1484,8 @@ class FLEXIUtilities {
 	 * @return int
 	 * @since 1.5
 	 */
-	function &getVersionsCount($id) {
+	function &getVersionsCount($id)
+	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
