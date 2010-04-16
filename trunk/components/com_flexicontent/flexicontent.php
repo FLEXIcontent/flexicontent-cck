@@ -35,12 +35,12 @@ define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 
 if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
 // define section
-if (!defined('FLEXI_SECTION')) 		define('FLEXI_SECTION', $params->get('flexi_section'));
-if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
+if (!defined('FLEXI_SECTION')) 		define('FLEXI_SECTION'		, $params->get('flexi_section'));
+if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
 if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $params->get('purge_gc', 1));
-define('FLEXI_FISH', ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
+if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
@@ -48,11 +48,11 @@ JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
 // Import the field plugins
 JPluginHelper::importPlugin('flexicontent_fields');
 
-// Require the controller
+// Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
 // Require specific controller if requested
-if( $controller = JRequest::getWord('controller') ) {
+if($controller = JRequest::getWord('controller')) {
 	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
 	if (file_exists($path)) {
 		require_once $path;
@@ -61,13 +61,14 @@ if( $controller = JRequest::getWord('controller') ) {
 	}
 }
 
-//Create the controller
-$classname  = 'FlexicontentController'.($controller?ucfirst($controller):'');
+// Create the controller
+$classname	= 'FlexicontentController'.ucfirst($controller);
 $controller = new $classname( );
 
 // Perform the Request task
-$controller->execute( JRequest::getVar('task', null, 'default', 'cmd') );
+$controller->execute(JRequest::getCmd('task'));
 
 // Redirect if set by the controller
 $controller->redirect();
+
 ?>
