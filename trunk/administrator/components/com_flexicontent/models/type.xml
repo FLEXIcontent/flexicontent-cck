@@ -35,9 +35,10 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
+		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
 		</param>
 		<param name="" type="separator" default="FLEXI_SEO_CONF" level="level1" menu="hide" />
 		<param name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">

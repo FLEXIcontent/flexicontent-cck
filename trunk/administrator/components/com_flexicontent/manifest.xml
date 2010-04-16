@@ -84,6 +84,7 @@
 			<param name="show_title" default="1" />
 			<param name="link_titles" default="1" />
 			<param name="show_readmore" default="1" />
+			<param name="show_intro" default="1" />
 			<param name="show_icons" default="1" />
 			<param name="show_pdf_icon" default="1" />
 			<param name="show_print_icon" default="1" />
