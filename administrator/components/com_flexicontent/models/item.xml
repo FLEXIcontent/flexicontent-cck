@@ -38,9 +38,10 @@
 		</param>
 		<param name="language" type="languages" client="site" label="FLEXI_Content_language" description="FLEXI_PARAMCONTENTLANGUAGE" />
 		<param name="keyref" type="text" size="25" default="" label="Key Reference" description="PARAMKEYREF" />
-		<param name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
+		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
 		</param>
 		<param name="readmore" type="text" size="25" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
 		<param name="" type="separator" default="FLEXI_SEO_CONF" level="level1" menu="hide" />

@@ -86,12 +86,10 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
-<!--
-		<param name="show_intro" type="radio" default="1" label="FLEXI_Show_Intro_Text" description="FLEXI_Show/Hide_the_intro_text" menu="hide">
+		<param name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
--->
 
 		<param name="" type="separator" default="FLEXI_PAGE_CONF" level="level1" menu="hide" />
 		
