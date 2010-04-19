@@ -165,6 +165,13 @@ function FLEXIcontentParseRoute($segments)
 		$vars['cid'] 	= $segments[$count-2];
 		$vars['id'] 	= $segments[$count-1];
 		return $vars;
-		}
+	}
+	
+	if($count == 3) {
+		$vars['view'] 	= $segments[0];
+		//$vars['cid'] 	= $segments[$count-2];
+		$vars['id'] 	= $segments[2];
+		return $vars;
+	}
 }
 ?>
