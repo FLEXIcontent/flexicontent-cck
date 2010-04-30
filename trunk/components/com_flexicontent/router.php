@@ -149,10 +149,15 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 	
+	if($segments[0] == 'fileselement') {
+		$vars['view'] 	= 'fileselement';
+		return $vars;
+	}
+	
 	if($count == 0) {
 		$vars['view'] 	= 'flexicontent';
 		return $vars;
-		}
+	}
 
 	if($count == 1) {
 		$vars['view'] 	= 'category';
