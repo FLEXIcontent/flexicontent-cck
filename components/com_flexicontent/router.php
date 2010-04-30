@@ -86,7 +86,9 @@ function FLEXIcontentBuildRoute(&$query)
 		if($query['view'] == 'favourites') {
 			$segments[] = $query['view'];
 		}
-
+		if($query['view'] == 'fileselement') {
+			$segments[] = $query['view'];
+		}
 		unset($query['view']);
 	};
 
