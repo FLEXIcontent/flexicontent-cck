@@ -503,12 +503,14 @@ class FlexicontentModelCategory extends JModel
 		{
 			$category =& $this->_childs[$i];
 			
-			$category->assigneditems 	= $this->_getassigned( $category->id );
+			$category->assigneditems	= $this->_getassigned( $category->id );
 			$category->subcats			= $this->_getsubs( $category->id );
-
+			$this->_id					= $category->id;
+			$category->items			= $this->getData();
+			$this->_data				= null;
 			$k = 1 - $k;
 		}
-
+		$this->_id = $id;
 		return $this->_childs;
 	}
 
