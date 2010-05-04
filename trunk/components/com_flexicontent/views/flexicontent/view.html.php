@@ -61,6 +61,7 @@ class FlexicontentViewFlexicontent extends JView
 		$limit 		= $params->def('catlimit', 0);
 		$total		= $this->get('Total');
 		$categories	= & $this->get('Data');
+		$categories	= !is_array($categories)?array():$categories;
 
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
