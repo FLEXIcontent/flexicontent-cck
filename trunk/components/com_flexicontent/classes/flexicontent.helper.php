@@ -1424,7 +1424,7 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
-		if(!$id && $justvalue) return $v=0;
+		if(!$id && $justvalue) {$v=0;return $v;}
 		if($id) {
 			$return = $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
 			return $return;
