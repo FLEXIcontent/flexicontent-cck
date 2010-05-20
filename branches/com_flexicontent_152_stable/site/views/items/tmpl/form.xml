@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="FLEXICONTENT_ITEM_SUBMISSION">
+		<message>
+			<![CDATA[FLEXICONTENT_ITEM_SUBMISSION_TIP]]>
+		</message>
+	</layout>
+	<state>
+		<name>FLEXICONTENT_ITEM_SUBMISSION</name>
+		<description>FLEXICONTENT_ITEM_SUBMISSION_DESC</description>
+		<url addpath="/administrator/components/com_flexicontent/elements">
+            <param name="typeid" type="list" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC"> 
+                <option value="1">Article</option> 
+            </param> 
+<!--  			<param name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> --> -->
+		</url>
+		<params>
+		</params>
+	</state>
+</metadata>

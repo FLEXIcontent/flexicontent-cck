@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Extended Weblink</name>
+	<author>Stian Didriksen</author>
+	<creationDate>February 2010</creationDate>
+	<copyright>Copyright (C) 2010 ProThemer</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>stian@prothemer.com</authorEmail>
+	<authorUrl>prothemer.com</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_EXTENDED_WEBLINK</description>
+	<files>
+		<filename plugin="extendedweblink">extendedweblink.php</filename>
+	</files>
+	<params group="standard">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+	</params>
+	<params group="group-extendedweblink">
+		<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+		<param name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+		</param>
+		<param type="spacer" default="&lt;style type=&quot;text/css&quot;&gt; select#paramstarget{width: 150px}&lt;/style&gt;" />
+		<param name="default_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_TITLE" description="FLEXI_FIELD_DEFAULT_TITLE_DESC" />
+		<param name="use_title" type="radio" default="0" label="FLEXI_FIELD_USE_TITLE" description="FLEXI_FIELD_USE_TITLE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="default_text" type="text" default="" label="FLEXI_FIELD_DEFAULT_TEXT" description="FLEXI_FIELD_DEFAULT_TEXT_DESC" />
+		<param name="use_text" type="radio" default="0" label="FLEXI_FIELD_USE_TEXT" description="FLEXI_FIELD_USE_TEXT_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="target" type="list" default="" label="FLEXI_FIELD_DEFAULT_TARGET" description="FLEXI_FIELD_DEFAULT_TARGET_DESC" >
+			<option value=""> - No target - </option>
+			<option value="_blank">open in new window</option>
+			<option value="_parent">open in the parent frameset</option>
+			<option value="_self">open in the same frame</option>
+			<option value="_top">open in the full body of the window</option>
+		</param>
+		<param name="default_class" type="text" default="" label="FLEXI_FIELD_DEFAULT_CLASS" description="FLEXI_FIELD_DEFAULT_CLASS_DESC" />
+		<param name="use_class" type="radio" default="0" label="FLEXI_FIELD_USE_CLASS" description="FLEXI_FIELD_USE_CLASS_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="default_id" type="text" default="" label="FLEXI_FIELD_DEFAULT_ID" description="FLEXI_FIELD_DEFAULT_CLASS_ID" />
+		<param name="use_id" type="radio" default="0" label="FLEXI_FIELD_USE_ID" description="FLEXI_FIELD_USE_ID_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+	</params>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_extendedweblink.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_extendedweblink.ini</language>
+	</languages>
+</install>

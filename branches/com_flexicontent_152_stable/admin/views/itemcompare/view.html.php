@@ -1,0 +1,90 @@
+<?php
+/**
+ * @version 1.5 stable $Id: view.html.php 183 2009-11-18 10:30:48Z vistamedia $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
+jimport( 'joomla.application.component.view');
+
+/**
+ * View class for the FLEXIcontent item comparison screen
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since 1.0
+ */
+class FlexicontentViewItemcompare extends JView {
+
+	function display($tpl = null)
+	{
+		global $mainframe, $option;
+
+		//initialise variables
+		$db			= & JFactory::getDBO();
+		$document	= & JFactory::getDocument();
+		$template 	= $mainframe->getTemplate();
+		$dispatcher = & JDispatcher::getInstance();
+		$rev		= JRequest::getInt('version','','request');
+		$codemode 	= JRequest::getInt('codemode',0);
+		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
+		
+		JHTML::_('behavior.tooltip');
+		JHTML::_('behavior.modal');
+
+		//a trick to avoid loosing general style in modal window
+		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';
+		$document->addStyleDeclaration($css);
+
+		//Get data from the model
+		$model			= & $this->getModel();
+		$row     		= & $this->get( 'Item' );
+		$fields			= & $this->get( 'Extrafields' );
+		$versions		= & $this->get( 'VersionList' );
+		$tparams		= & $this->get( 'Typeparams' );
+				
+		// Create the type parameters
+		$tparams = new JParameter($tparams);
+
+		// Add html to field object trought plugins
+		foreach ($fields as $field)
+		{
+			if ($field->value) {
+				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
+			} else {
+				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
+			}
+			if ($field->version) {
+				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+			} else {
+				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
+			}
+		}
+
+		//assign data to template
+		$this->assignRef('document'     , $document);
+		$this->assignRef('row'      	, $row);
+		$this->assignRef('fields'		, $fields);
+		$this->assignRef('versions'		, $versions);
+		$this->assignRef('rev'			, $rev);
+		$this->assignRef('tparams'		, $tparams);
+		$this->assignRef('cparams'		, $cparams);
+		$this->assignRef('codemode'		, $codemode);
+
+		parent::display($tpl);
+	}
+}
+?>
