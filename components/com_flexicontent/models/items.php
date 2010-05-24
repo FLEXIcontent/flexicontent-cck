@@ -604,6 +604,8 @@ class FlexicontentModelItems extends JModel
 		$post['vstate'] = 2;// approve version all time, you can change this if you want
 		$data['type_id'] = $typeid;
 		$mainframe = &JFactory::getApplication();
+		$params 	= & $mainframe->getParams('com_flexicontent');
+
 		// Bind the form fields to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
@@ -626,11 +628,16 @@ class FlexicontentModelItems extends JModel
 
 		$isNew = ($item->id < 1);
 
+		$autopublished = $params->get('autopublished', 0);
+		if($autopublished) {
+			$item->state = 1;
+		}
 		if ($isNew)
 		{
 			$item->created 		= gmdate('Y-m-d H:i:s');
 			$item->publish_up 	= $item->created;
 			$item->created_by 	= $user->get('id');
+			$params 	= & $mainframe->getParams('com_flexicontent');
 		}
 		else
 		{
@@ -651,10 +658,11 @@ class FlexicontentModelItems extends JModel
 			$item->version 		= $result->version;
 			$item->version++;
 
-			if (!$user->authorize('com_flexicontent', 'state'))	{
+			if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))	{
 				$item->state = $result->state;
 			}
 		}
+		
 
 		// Publishing state hardening for Authors
 		if (!$user->authorize('com_flexicontent', 'state'))

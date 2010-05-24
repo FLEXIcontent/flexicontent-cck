@@ -132,14 +132,16 @@ if($cid) {
 <?php } ?>
 			</div>
 
-			<?php if ($this->perms['canpublish']) : ?>
+			<?php if($autopublished = $this->params->get('autopublished', 0)) {?>
+				<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
+			<?php }elseif ($this->perms['canpublish']) { ?>
 			<div class="flexi_formblock">
           		<label for="state" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
 				</label>
           		<?php echo $this->lists['state']; ?>
 			</div>
-			<?php endif; ?>
+			<?php }; ?>
 		</fieldset>
 		
 		<?php if ($this->perms['cantags']) : ?>
