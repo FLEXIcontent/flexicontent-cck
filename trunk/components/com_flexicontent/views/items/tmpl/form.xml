@@ -20,6 +20,10 @@
 				<option value="0">NO</option>
 				<option value="1">YES</option>
 			</param>
+			<param name="autopublished" type="radio" default="0" label="Auto Published" description="">
+				<option value="0">NO</option>
+				<option value="1">YES</option>
+			</param>
 		</params>
 	</state>
 </metadata>
