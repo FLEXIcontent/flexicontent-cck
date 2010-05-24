@@ -80,7 +80,7 @@ function submitbutton( pressbutton ) {
     </h1>
     <?php endif; ?>
 
-	<form action="<?php echo $this->action ?>" method="post" name="adminForm">
+	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
 	
 		<div class="flexi_buttons">
             <button type="submit" class="button" onclick="return submitbutton('save')">

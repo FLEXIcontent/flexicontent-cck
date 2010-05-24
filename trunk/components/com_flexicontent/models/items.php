@@ -658,14 +658,14 @@ class FlexicontentModelItems extends JModel
 			$item->version 		= $result->version;
 			$item->version++;
 
-			if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))	{
-				$item->state = $result->state;
-			}
+			//if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))	{
+			//	$item->state = $result->state;
+			//}
 		}
 		
 
 		// Publishing state hardening for Authors
-		if (!$user->authorize('com_flexicontent', 'state'))
+		if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))
 		{
 			if ($isNew)
 			{
