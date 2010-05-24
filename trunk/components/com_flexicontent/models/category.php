@@ -173,7 +173,8 @@ class FlexicontentModelCategory extends JModel
 		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 		. $joinaccess
 		. $where
@@ -271,7 +272,7 @@ class FlexicontentModelCategory extends JModel
 		$show_noauth = $cparams->get('show_noauth', 0);
 
 		// First thing we need to do is to select only the requested items
-		$where = ' WHERE rel.catid = '.$this->_id;
+		$where = ' WHERE rel.catid IN ('.$this->_id.')';
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
