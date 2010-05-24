@@ -496,7 +496,7 @@ class FlexicontentModelCategory extends JModel
 		$query = $this->_buildChildsquery();
 		$this->_childs = $this->_getList($query);
 //		$this->_childs = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-
+		$id = $this->_id;
 		$k = 0;
 		$count = count($this->_childs);
 		for($i = 0; $i < $count; $i++)
