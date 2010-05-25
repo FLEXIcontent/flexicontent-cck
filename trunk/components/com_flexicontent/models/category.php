@@ -180,7 +180,6 @@ class FlexicontentModelCategory extends JModel
 		. $where
 		. $orderby
 		;
-
 		return $query;
 	}
 
@@ -260,6 +259,21 @@ class FlexicontentModelCategory extends JModel
 		$gid		= (int) $user->get('aid');
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
+		
+		$group_cat = array($this->_id);
+		//Get active menu parameters.
+		$menus		= & JSite::getMenu();
+		$menu    	= $menus->getActive();
+		if (is_object( $menu )) {
+			$menu_params = new JParameter( $menu->params );		
+			if($menu_params->get('display_subcategories_items', 0)) {
+				if(is_array($this->_childs))
+					foreach($this->_childs as $ch)
+						$group_cat[] = $ch->id;
+			}
+		}
+		$group_cat = array_unique($group_cat);
+		$group_cat = "'".implode("','", $group_cat)."'";
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -272,7 +286,7 @@ class FlexicontentModelCategory extends JModel
 		$show_noauth = $cparams->get('show_noauth', 0);
 
 		// First thing we need to do is to select only the requested items
-		$where = ' WHERE rel.catid IN ('.$this->_id.')';
+		$where = ' WHERE rel.catid IN ('.$group_cat.')';
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';

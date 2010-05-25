@@ -20,6 +20,10 @@
                 <option value="4">FLEXI_LEVEL_4</option> 
                 <option value="5">FLEXI_LEVEL_5</option> 
             </param> 
+	     <param name="display_subcategories_items" type="radio" default="0" label="Display subcategories's items" description="Display subcategories's items"> 
+                <option value="0">FLEXI_NO</option> 
+                <option value="1">FLEXI_YES</option> 
+            </param> 
             <param name="add_item_pathway" type="radio" default="1" label="FLEXI_ADD_ITEM_PATHWAY" description="FLEXI_ADD_ITEM_PATHWAY_DESC"> 
                 <option value="0">FLEXI_NO</option> 
                 <option value="1">FLEXI_YES</option> 

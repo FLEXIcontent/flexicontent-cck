@@ -70,6 +70,7 @@ class FlexicontentViewCategory extends JView
 
 		// Get data from the model		
 		$category 	= & $this->get('Category');
+		$categories	= & $this->get('Childs');
 		$items 		= & $this->get('Data');		
 		$filters 	= & $this->get('Filters');
 		$alpha	 	= & $this->get('Alphaindex');
@@ -85,14 +86,13 @@ class FlexicontentViewCategory extends JView
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
-        //Set layout
-        $this->setLayout('category');
+		//Set layout
+		$this->setLayout('category');
 
 		$limit		= $mainframe->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 
 		$cats		= new flexicontent_cats((int)$category->id);
 		$parents	= $cats->getParentlist();
-		$categories	= & $this->get('Childs');
 		
 		// We can probaly optimize this part later
 		if ($params->get('rootcat')) {
