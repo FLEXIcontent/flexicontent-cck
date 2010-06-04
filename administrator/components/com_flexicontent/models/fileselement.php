@@ -160,17 +160,34 @@ class FlexicontentModelFileselement extends JModel
 	 */
 	function _buildQuery()
 	{
+		global $mainframe, $option;
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
 
-		$query = 'SELECT f.*, u.name AS uploader'
-		. ' FROM #__flexicontent_files AS f'
-		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. $where
-		. ' GROUP BY f.id'
-		. $orderby
-		;
+		if($filter_item) {
+			$query = 'SELECT f.*, u.name AS uploader'
+			. ' FROM #__flexicontent_files AS f'
+			. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
+			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. $where
+			. ' AND fi.field_type = ' . $this->_db->Quote('file')
+			. ' AND rel.item_id=' . $filter_item
+			. ' GROUP BY f.id'
+			//. $having
+			. $orderby
+			;
+		}else{
+			$query = 'SELECT f.*, u.name AS uploader'
+			. ' FROM #__flexicontent_files AS f'
+			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
+			. $where
+			. ' GROUP BY f.id'
+			. $orderby
+			;
+		}
 
 		return $query;
 	}
@@ -261,6 +278,20 @@ class FlexicontentModelFileselement extends JModel
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 
 		return $where;
+	}
+	
+	function getItems() {
+		// File field relation sub query
+		$query = 'SELECT i.id,i.title'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. ' JOIN #__content AS i ON i.id = rel.item_id'
+			. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
+			. ' GROUP BY i.id'
+			;
+		$this->_db->setQuery( $query );
+		$lists = $this->_db->loadObjectList();echo mysql_error();
+		return $lists?$lists:array();
 	}
 }
 ?>
