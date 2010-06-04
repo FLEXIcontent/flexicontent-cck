@@ -158,7 +158,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$field->html = '<ul id="sortables_'.$field->id.'">';
 		
 		if($field->value) {
-			
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
@@ -267,10 +266,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	function getFileName( $value )
 	{
 		$db =& JFactory::getDBO();
-
+		$session = & JFactory::getSession();
+		jimport('joomla.database.table.session');
+		$sessiontable =new JTableSession( $db );
+		$sessiontable->load($session->getId());
+		$and = '';
+		if(!$sessiontable->client_id) 
+			$and = ' AND published = 1';
 		$query = 'SELECT filename, altname, ext'
 				. ' FROM #__flexicontent_files'
-				. ' WHERE id = '. (int) $value . ' AND published = 1'
+				. ' WHERE id = '. (int) $value . $and
 				;
 		$db->setQuery($query);
 		$filename = $db->loadObject();
