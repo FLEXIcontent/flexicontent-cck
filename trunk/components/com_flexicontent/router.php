@@ -26,6 +26,7 @@ function FLEXIcontentBuildRoute(&$query)
 	$menu = &JSite::getMenu();
 	if (empty($query['Itemid'])) {
 		$menuItem = &$menu->getActive();
+		$query['Itemid'] = $menuItem->id;
 	} else {
 		$menuItem = &$menu->getItem($query['Itemid']);
 	}
@@ -93,6 +94,7 @@ function FLEXIcontentBuildRoute(&$query)
 	};
 
 	if (isset($query['cid'])) {
+		//$segments = array();
 		// if we are routing an article or category where the category id matches the menu catid, don't include the category segment
 		if (($view == 'category') and ($mView == 'category') and ($mCatid != intval($query['cid']))) {
 			$segments[] = $query['cid'];
