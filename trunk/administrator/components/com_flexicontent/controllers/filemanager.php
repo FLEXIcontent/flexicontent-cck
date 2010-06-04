@@ -487,4 +487,72 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager' );
 	}
+	
+	/**
+	 * Logic to publish filemanager
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function publish()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+
+		if (!is_array( $cid ) || count( $cid ) < 1) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
+		} else {
+
+			$model = $this->getModel('filemanager');
+
+			if(!$model->publish($cid, 1)) {
+				JError::raiseError(500, $model->getError());
+			}
+
+			$msg 	= JText::_( 'Published file' );
+		
+			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache->clean();
+		}
+
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', $msg );
+	}
+	
+	/**
+	 * Logic to unpublish filemanager
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function unpublish()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+
+		if (!is_array( $cid ) || count( $cid ) < 1) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+		} else {
+
+			$model = $this->getModel('filemanager');
+
+			if(!$model->publish($cid, 0)) {
+				JError::raiseError(500, $model->getError());
+			}
+
+			$msg 	= JText::_( 'Unpublished file' );
+		
+			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache->clean();
+		}
+		
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', $msg );
+	}
 }

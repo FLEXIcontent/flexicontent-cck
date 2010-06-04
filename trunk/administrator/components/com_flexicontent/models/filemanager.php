@@ -159,27 +159,43 @@ class FlexicontentModelFilemanager extends JModel
 	function _buildQuery()
 	{
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
+		global $mainframe, $option;
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
 		
-		// File field relation sub query
-		$subf	= 'SELECT COUNT(value)'
+		if($filter_item) {
+			$query = 'SELECT f.*, u.name AS uploader, count(rel.value) AS nrassigned'
+				. ' FROM #__flexicontent_files AS f'
+				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
+				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+				. $where
+				. ' AND fi.field_type = ' . $this->_db->Quote('file')
+				. ($filter_item?' AND rel.item_id=' . $filter_item:'')
+				. ' GROUP BY f.id'
+				//. $having
+				. $orderby
+				;
+		}else{
+			// File field relation sub query
+			$subf	= 'SELECT COUNT(value)'
 				. ' FROM #__flexicontent_fields_item_relations AS rel'
-				. ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
 				. ' AND value = f.id'
 				;
 
-		$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
+			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
-				. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
+				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where
 				. ' GROUP BY f.id'
 				//. $having
 				. $orderby
 				;
-
+		}
 		return $query;
 	}
 
@@ -419,6 +435,48 @@ class FlexicontentModelFilemanager extends JModel
 			$row->iassigned = $this->_db->loadResult();
 		}
 		return $rows;	
+	}
+	
+	/**
+	 * Method to (un)publish a file
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function publish($cid = array(), $publish = 1)
+	{
+		$user 	=& JFactory::getUser();
+
+		if (count( $cid )) {
+			$cids = implode( ',', $cid );
+
+			$query = 'UPDATE #__flexicontent_files'
+				. ' SET published = ' . (int) $publish
+				. ' WHERE id IN ('. $cids .')'
+				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+			;
+			$this->_db->setQuery( $query );
+			if (!$this->_db->query()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
+		}
+		return $cid;
+	}
+	
+	function getItems() {
+		// File field relation sub query
+		$query = 'SELECT i.id,i.title'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. ' JOIN #__content AS i ON i.id = rel.item_id'
+			. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
+			. ' GROUP BY i.id'
+			;
+		$this->_db->setQuery( $query );
+		$lists = $this->_db->loadObjectList();echo mysql_error();
+		return $lists?$lists:array();
 	}
 }
 ?>
