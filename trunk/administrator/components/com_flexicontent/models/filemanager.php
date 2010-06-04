@@ -165,8 +165,16 @@ class FlexicontentModelFilemanager extends JModel
 		$having		= $this->_buildContentHaving();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
 		
+		// File field relation sub query
+		$subf	= 'SELECT COUNT(value)'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
+			. ' AND value = f.id'
+			;
+			
 		if($filter_item) {
-			$query = 'SELECT f.*, u.name AS uploader, count(rel.value) AS nrassigned'
+			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
@@ -179,14 +187,6 @@ class FlexicontentModelFilemanager extends JModel
 				. $orderby
 				;
 		}else{
-			// File field relation sub query
-			$subf	= 'SELECT COUNT(value)'
-				. ' FROM #__flexicontent_fields_item_relations AS rel'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-				. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
-				. ' AND value = f.id'
-				;
-
 			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
