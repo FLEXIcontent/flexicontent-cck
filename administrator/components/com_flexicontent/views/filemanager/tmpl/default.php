@@ -235,6 +235,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
+				<?php echo $this->lists['items']; ?>
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
@@ -250,6 +251,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="15"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="10%"><?php echo JText::_( 'FLEXI_ASSIGNED' ); ?></th>
@@ -313,6 +315,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				}
 				?>
 			</td>
+			<td align="center"><?php
+				$published 	= JHTML::_('grid.published', $row, $i );
+				echo $published;
+				?></td>
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->assigned; ?></td>

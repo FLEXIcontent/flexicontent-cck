@@ -61,6 +61,7 @@ class FlexicontentViewFilemanager extends JView
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -116,6 +117,7 @@ class FlexicontentViewFilemanager extends JView
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
+		$items = & $this->get('Items');
 
 		//search
 		$lists 				= array();
@@ -134,6 +136,15 @@ class FlexicontentViewFilemanager extends JView
 		$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
 		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
+
+		//item lists
+		$items_list = array();
+		$items_list[] = JHTML::_('select.option', '', JText::_( '- Filter by item -' ) );
+		foreach($items as $item) {
+			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
+		}
+		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+
 
 		//build secure/media filterlist
 		$secure 	= array();
