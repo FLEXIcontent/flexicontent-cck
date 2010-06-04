@@ -270,7 +270,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$query = 'SELECT filename, altname, ext'
 				. ' FROM #__flexicontent_files'
-				. ' WHERE id = '. (int) $value
+				. ' WHERE id = '. (int) $value . ' AND published = 1'
 				;
 		$db->setQuery($query);
 		$filename = $db->loadObject();

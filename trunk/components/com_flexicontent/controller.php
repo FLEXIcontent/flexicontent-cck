@@ -690,6 +690,7 @@ class FlexicontentController extends JController
 				.' WHERE rel.item_id = ' . (int)$contentid
 				.' AND rel.field_id = ' . (int)$fieldid
 				.' AND f.id = ' . (int)$id
+				.' AND f.published= 1'
 				. $andaccess
 				. $andaccess2
 				;
