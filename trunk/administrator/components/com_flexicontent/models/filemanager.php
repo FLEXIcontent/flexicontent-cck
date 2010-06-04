@@ -181,7 +181,7 @@ class FlexicontentModelFilemanager extends JModel
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				. $where
 				. ' AND fi.field_type = ' . $this->_db->Quote('file')
-				. ($filter_item?' AND rel.item_id=' . $filter_item:'')
+				. ' AND rel.item_id=' . $filter_item
 				. ' GROUP BY f.id'
 				//. $having
 				. $orderby

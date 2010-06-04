@@ -66,6 +66,7 @@ class FlexicontentViewFileselement extends JView
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 	'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 			'search', 			'', 'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -103,6 +104,7 @@ class FlexicontentViewFileselement extends JView
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
+		$items = & $this->get('Items');
 		
 		//search filter
 		$filters = array();
@@ -121,6 +123,14 @@ class FlexicontentViewFileselement extends JView
 
 		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
+		//item lists
+		$items_list = array();
+		$items_list[] = JHTML::_('select.option', '', JText::_( '- Filter by item -' ) );
+		foreach($items as $item) {
+			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
+		}
+		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		
 		//build secure/media filterlist
 		$secure 	= array();
 		$secure[] 	= JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_DIRECTORIES' ) .' -' );
@@ -138,11 +148,11 @@ class FlexicontentViewFileselement extends JView
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		
+
 		// removed files
 		$filelist = JRequest::getString('files');
 		$file = JRequest::getInt('file');
-		
+
 		$filelist = explode(',', $filelist);
 		$files = array();
 		foreach ($filelist as $fileid) {
@@ -152,15 +162,13 @@ class FlexicontentViewFileselement extends JView
 			}
 			
 		}
-		
+
 		$files = implode(',', $files);
 		if (strlen($files) > 0) {
-			
 			$files .= ',';
-			
 		}
 		$files .= $file;
-		
+
 		//assign data to template
 		$this->assignRef('session'			, JFactory::getSession());
 		$this->assignRef('params'			, $params);
@@ -174,7 +182,6 @@ class FlexicontentViewFileselement extends JView
 		$this->assignRef('CanViewAllFiles' 	, $CanViewAllFiles);
 
 		parent::display($tpl);
-
 	}
 }
 ?>

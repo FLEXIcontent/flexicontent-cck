@@ -125,7 +125,6 @@ echo $this->pane->endPane();
 	</tr>
 </table>
 <form action="index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm">
-
 	<table class="adminform">
 		<tr>
 			<td width="100%">
@@ -136,7 +135,8 @@ echo $this->pane->endPane();
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-			 	<?php echo $this->lists['url']; ?>
+			 	<?php echo $this->lists['items']; ?>
+				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
 			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
@@ -150,6 +150,7 @@ echo $this->pane->endPane();
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="10%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="15"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <!-- 			<th width="15"><?php // echo JHTML::_('grid.sort', 'ASSIGNED TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
@@ -192,11 +193,16 @@ echo $this->pane->endPane();
 				}
 				?>
 			</td>
+			<td align="center"><?php
+				//$published = JHTML::_('grid.published', $row, $i );
+				//echo $published;
+				echo JHTML::image('administrator/images/tick.png', '');
+				?></td>
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 <!-- 			<td align="center"><?php // echo $row->nrassigned; ?></td> -->
 			<td align="center"><?php echo $row->uploader; ?></td>
-			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' ) );; ?></td>
+			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' ) ); ?></td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php 
