@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	function plgFlexicontent_fieldsFile( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
@@ -195,7 +195,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$separatorf			= $field->parameters->get( 'separatorf', 3 ) ;
 		$useicon			= $field->parameters->get( 'useicon', 1 ) ;
 		$usebutton			= $field->parameters->get( 'usebutton', 0 ) ;
-						
+		$display_filename			= $field->parameters->get( 'display_filename', 0 ) ;
+
 		switch($separatorf)
 		{
 			case 0:
@@ -221,30 +222,27 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// initialise property
 		$field->{$prop} = array();
-		
-		if ($usebutton && $values) {
-			$field->{$prop} = '
-			<form id="form-download-'.$field->id.'" method="post" action="'.JRoute::_( 'index.php?id='. $values[0] .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">
-				<input type="submit" name="download-'.$field->id.'" class="button" value="'.JText::_('Download').'"/>
-			</form>';
-		
-		} else {
 
-			$n = 0;
-			foreach ($values as $value) {
-				$icon = '';
-				$filename = $this->getFileName( $value );
-				if ($filename) {
-					if ($useicon) {
-						$filename	= $this->addIcon( $filename );
-						$icon		= JHTML::image($filename->icon, $filename->ext, 'class="icon-mime"') .'&nbsp;';
-					}
+		$n = 0;
+		foreach ($values as $value) {
+			$icon = '';
+			$filename = $this->getFileName( $value );
+			if ($filename) {
+				if ($useicon) {
+					$filename	= $this->addIcon( $filename );
+					$icon		= JHTML::image($filename->icon, $filename->ext, 'class="icon-mime"') .'&nbsp;';
+				}
+				if($usebutton) {
+					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
+						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('Download').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
+					$str .= '</form>';
+					$field->{$prop}[] = $str;
+				}else
 					$field->{$prop}[]	= $icon . '<a href="' . JRoute::_( 'index.php?id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ) . '">' . $filename->altname . '</a>';
-				}
-				$n++;
-				}
-			$field->{$prop} = implode($separatorf, $field->{$prop});
+			}
+			$n++;
 		}
+		$field->{$prop} = implode($separatorf, $field->{$prop});
 	}
 	
 
