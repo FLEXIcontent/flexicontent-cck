@@ -159,11 +159,14 @@ class FlexicontentViewFlexicontent extends JView
 			$CanPlugins		= 1;
 			$CanTemplates	= 1;
 		}
-
+		$dopostinstall = true;
+		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+			$dopostinstall = false;
+		}
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', true);
 		// ensures the PHP version is correct
-		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
+		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items');
 			if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
 			if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
@@ -195,6 +198,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('params'		, $params);
 
 		// install check
+		$this->assignRef('dopostinstall', $dopostinstall);
 		$this->assignRef('existtype'			, $existtype);
 		$this->assignRef('existfields'			, $existfields);
 		$this->assignRef('existfplg'			, $existfplg);
