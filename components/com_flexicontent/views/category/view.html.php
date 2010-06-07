@@ -71,7 +71,7 @@ class FlexicontentViewCategory extends JView
 		// Get data from the model		
 		$category 	= & $this->get('Category');
 		$categories	= & $this->get('Childs');
-		$items 		= & $this->get('Data');		
+		$items 		= & $this->get('Data');
 		$filters 	= & $this->get('Filters');
 		$alpha	 	= & $this->get('Alphaindex');
 		$model		= & $this->getModel();
@@ -164,20 +164,24 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$tmpl = '.category.default';
 		}
-/*
+
+		JPluginHelper::importPlugin('content');
 		// just a try : to implement later
 		foreach ($items as $item) {
 			$item->event = new stdClass();
+			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params,0));
+			$item->event->afterDisplayTitle = trim(implode("\n", $results));
+
 			$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $item, & $item->params,0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
-	
+
 			$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $item->params, 0));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
 	
 			$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $item->params, 0));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 		}
-*/
+
 
 		// remove previous alpha index filter
 		$uri->delVar('letter');
@@ -210,7 +214,7 @@ class FlexicontentViewCategory extends JView
 
 		$this->assign('action', 			$uri->toString());
 
-        $print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
+		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
 		
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , 	$categories);
