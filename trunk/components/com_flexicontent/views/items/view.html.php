@@ -118,6 +118,11 @@ class FlexicontentViewItems extends JView
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 		}
 		
+		JPluginHelper::importPlugin('content');
+		$item->event = new stdClass();
+		$results = $dispatcher->trigger('onPrepareContent', array (&$item, &$params, $limitstart));
+		$item->event->afterDisplayTitle = trim(implode("\n", $results));
+
 		/*
 		 * Handle the metadata
 		 *
@@ -217,12 +222,7 @@ class FlexicontentViewItems extends JView
 		 * Handle display events
 		 * No need for it currently
 		*/
-		JPluginHelper::importPlugin('content');
-		$item->event = new stdClass();
-		$results = $dispatcher->trigger('onPrepareContent', array ($item, &$params, $limitstart));
-		$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
-		$results = $dispatcher->trigger('onAfterDisplayTitle', array ($item, &$params, $limitstart));
+		$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
 		$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
