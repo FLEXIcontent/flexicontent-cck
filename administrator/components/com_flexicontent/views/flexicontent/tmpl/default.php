@@ -36,32 +36,30 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<td>
 						<div id="cpanel">
 						<?php
-						if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata) || ($this->missingversion))
-						{
+						if (!$this->dopostinstall)  {
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
-						}
-						else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_section'))
-						{
+						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_section')) {
 							echo '<div class="fc-error">';
 							if (!$this->params->get('flexi_section') || $this->params->get('flexi_section') == 0)	echo JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ) . '<br />';
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';
 						}
-
 						global $option;
 
-						$link = 'index.php?option='.$option.'&amp;view=items';
-						FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
-						if ($this->CanAdd)
+						if ($this->dopostinstall) {
+							$link = 'index.php?option='.$option.'&amp;view=items';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
+						}
+						if ($this->dopostinstall && $this->CanAdd)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=item';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ) );
 						}
 						
-						if ($this->CanCats || $this->CanAddCats)
+						if ($this->dopostinstall && ($this->CanCats || $this->CanAddCats) )
 						{
 							if ($this->CanCats)
 							{
@@ -72,7 +70,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 						}
 						
-						if ($this->CanTypes)
+						if ($this->dopostinstall && $this->CanTypes)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=types';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-types.png', JText::_( 'FLEXI_TYPES' ) );
@@ -80,7 +78,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-type-add.png', JText::_( 'FLEXI_NEW_TYPE' ) );
 						}
 						
-						if ($this->CanFields)
+						if ($this->dopostinstall && $this->CanFields)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=fields';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-fields.png', JText::_( 'FLEXI_FIELDS' ) );
@@ -88,7 +86,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-field-add.png', JText::_( 'FLEXI_NEW_FIELD' ) );
 						}
 
-						if ($this->CanTags)
+						if ($this->dopostinstall && $this->CanTags)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=tags';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tags.png', JText::_( 'FLEXI_TAGS' ) );
@@ -96,37 +94,37 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
 						}
 
-						if ($this->CanArchives)
+						if ($this->dopostinstall && $this->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
 						}
 
-						if ($this->CanFiles)
+						if ($this->dopostinstall && $this->CanFiles)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-file.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
 						
-						if ($this->CanTemplates)
+						if ($this->dopostinstall && $this->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editcss.png', JText::_( 'FLEXI_TEMPLATES' ) );
 						}
 
-						if ($this->CanStats)
+						if ($this->dopostinstall && $this->CanStats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=stats';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-stats.png', JText::_( 'FLEXI_STATISTICS' ) );
 						}
 
-						if ($this->CanPlugins)
+						if ($this->dopostinstall && $this->CanPlugins)
 						{
 							$link = 'index.php?option=com_plugins&amp;filter_type=flexicontent_fields&amp;tmpl=component';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ), 1 );
 						}
 												
-						if ($this->params->get('comments') == 1)
+						if ( $this->dopostinstall && ($this->params->get('comments') == 1) )
 						{
 							if ($this->CanComments)
 							{
@@ -135,7 +133,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							}
 						}
 						
-						if (FLEXI_ACCESS)
+						if ($this->dopostinstall && FLEXI_ACCESS)
 						{
 							if ($this->CanRights)
 							{
@@ -144,7 +142,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							}
 						}
 						
-						if ($this->params->get('support_url'))
+						if ($this->dopostinstall && $this->params->get('support_url'))
 						{
 							$link = $this->params->get('support_url');
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-support.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
@@ -159,8 +157,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			
-			if ((!$this->existfields) || (!$this->existtype) || (!$this->allplgpublish) || (!$this->existlang) || (!$this->existversions) || (!$this->existversionsdata) || (!$this->oldbetafiles) || (!$this->nooldfieldsdata) || ($this->missingversion))
-			{
+			if (!$this->dopostinstall) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
@@ -169,7 +166,6 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 
 			$title = JText::_( 'FLEXI_UNAPPROVED' );
 			echo $this->pane->startPanel( $title, 'unapproved' );
-
 				?>
 				<table class="adminlist">
 				<?php

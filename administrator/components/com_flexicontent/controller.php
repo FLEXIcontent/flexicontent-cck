@@ -31,7 +31,12 @@ class FlexicontentController extends JController
 	function __construct()
 	{
 		parent::__construct();
-
+		$view = JRequest::getVar('view');
+		if($view && !FLEXI_SECTION) {
+			$msg = JText::_( 'FLEXI_NO_SECTION_CHOOSEN' );
+			$link 	= 'index.php?option=com_flexicontent';
+			$this->setRedirect($link, $msg);
+		}
 		// Register Extra task
 		$this->registerTask( 'apply'					, 'save' );
 		$this->registerTask( 'applyacl'					, 'saveacl' );
