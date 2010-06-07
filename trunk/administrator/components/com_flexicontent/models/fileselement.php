@@ -171,7 +171,7 @@ class FlexicontentModelFileselement extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
-		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.user', 			'user', 			'', 'int' );
+		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.user', 			'user', 			'', 'int' );
 
 		if($filter_item) {
 			$query = 'SELECT f.*, u.name AS uploader'

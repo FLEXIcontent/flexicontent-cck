@@ -66,8 +66,8 @@ class FlexicontentViewFileselement extends JView
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 	'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
-		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.user', 			'user', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.user', 			'user', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
