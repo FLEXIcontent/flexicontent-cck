@@ -163,6 +163,10 @@ class FlexicontentViewFlexicontent extends JView
 		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
 			$dopostinstall = false;
 		}
+		$session  =& JFactory::getSession();
+		$session->set('flexicontent.postinstall', $dopostinstall);
+		
+		
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', true);
 		// ensures the PHP version is correct
