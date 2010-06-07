@@ -37,6 +37,13 @@ class FlexicontentController extends JController
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
 		}
+		$session  =& JFactory::getSession();
+		$dopostinstall =& $session->get('flexicontent.postinstall');
+		if($view && !$dopostinstall) {
+			$msg = JText::_( 'Post installation step do not complete.' );
+			$link 	= 'index.php?option=com_flexicontent';
+			$this->setRedirect($link, $msg);
+		}
 		// Register Extra task
 		$this->registerTask( 'apply'					, 'save' );
 		$this->registerTask( 'applyacl'					, 'saveacl' );
