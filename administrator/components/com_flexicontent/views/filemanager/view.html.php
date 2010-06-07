@@ -35,13 +35,12 @@ class FlexicontentViewFilemanager extends JView
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null )
-	{
+	function display( $tpl = null ) {
 		global $mainframe, $option;
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
-		
+
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
@@ -51,7 +50,7 @@ class FlexicontentViewFilemanager extends JView
 		$pane   	= & JPane::getInstance('Tabs');
 		$db  		= & JFactory::getDBO();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
-		
+
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order', 	'filter_order', 	'f.filename', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
@@ -62,11 +61,12 @@ class FlexicontentViewFilemanager extends JView
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 'string' );
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
+		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.user', 			'user', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-				
+
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();
 			$CanCats 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
@@ -118,6 +118,7 @@ class FlexicontentViewFilemanager extends JView
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
 		$items = & $this->get('Items');
+		$users = &$this->get('Users');
 
 		//search
 		$lists 				= array();
@@ -145,6 +146,13 @@ class FlexicontentViewFilemanager extends JView
 		}
 		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 
+		//users list
+		$users_list = array();
+		$users_list[] = JHTML::_('select.option', '', JText::_('- Filter by user -'));
+		foreach($users as $u) {
+			$users_list[] = JHTML::_('select.option', $u->id, JText::_( $u->name ) );
+		}
+		$lists['users'] = JHTML::_('select.genericlist', $users_list, 'user', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_user );
 
 		//build secure/media filterlist
 		$secure 	= array();
