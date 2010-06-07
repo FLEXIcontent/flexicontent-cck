@@ -33,7 +33,12 @@ function fetchcounter()
 	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
 	var ajax = new Ajax(url, {
 		method: 'get',
-		update: $('count')
+		update: $('count'),
+		onComplete:function(v) {
+			if(v==0)
+				if(confirm("Refresh this page?"))
+					location.href = 'index.php?option=com_flexicontent&view=items';
+		}
 	});
 	ajax.request();
 }
