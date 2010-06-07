@@ -216,8 +216,12 @@ class FlexicontentViewItems extends JView
 		/*
 		 * Handle display events
 		 * No need for it currently
-         */
+		*/
+		JPluginHelper::importPlugin('content');
 		$item->event = new stdClass();
+		$results = $dispatcher->trigger('onPrepareContent', array ($item, &$params, $limitstart));
+		$item->event->afterDisplayTitle = trim(implode("\n", $results));
+
 		$results = $dispatcher->trigger('onAfterDisplayTitle', array ($item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
