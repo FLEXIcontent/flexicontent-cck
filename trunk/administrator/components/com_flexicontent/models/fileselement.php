@@ -64,6 +64,14 @@ class FlexicontentModelFileselement extends JModel
 	 *
 	 * @since 1.0
 	 */
+	 
+	 /**
+	 * file users
+	 *
+	 * @var object
+	 */
+	var $_users = null;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -139,8 +147,7 @@ class FlexicontentModelFileselement extends JModel
 	 * @access public
 	 * @return integer
 	 */
-	function getPagination()
-	{
+	function getPagination() {
 		// Lets load the files if it doesn't already exist
 		if (empty($this->_pagination))
 		{
@@ -158,13 +165,13 @@ class FlexicontentModelFileselement extends JModel
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQuery()
-	{
+	function _buildQuery() {
 		global $mainframe, $option;
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.user', 			'user', 			'', 'int' );
 
 		if($filter_item) {
 			$query = 'SELECT f.*, u.name AS uploader'
@@ -175,6 +182,7 @@ class FlexicontentModelFileselement extends JModel
 			. $where
 			. ' AND fi.field_type = ' . $this->_db->Quote('file')
 			. ' AND rel.item_id=' . $filter_item
+			. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 			. ' GROUP BY f.id'
 			//. $having
 			. $orderby
@@ -184,12 +192,46 @@ class FlexicontentModelFileselement extends JModel
 			. ' FROM #__flexicontent_files AS f'
 			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where
+			. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 			. ' GROUP BY f.id'
 			. $orderby
 			;
 		}
-
 		return $query;
+	}
+
+	function _buildQueryUsers() {
+		global $mainframe, $option;
+		// Get the WHERE and ORDER BY clauses for the query
+		$where		= $this->_buildContentWhere();
+		$orderby	= $this->_buildContentOrderBy();
+
+		$query = 'SELECT u.id,u.name'
+		. ' FROM #__flexicontent_files AS f'
+		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
+		. $where
+		. ' GROUP BY u.id'
+		. $orderby
+		;
+		return $query;
+	}
+
+	/**
+	 * Method to get files users
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getUsers()
+	{
+		// Lets load the files if it doesn't already exist
+		if (empty($this->_users))
+		{
+			$query = $this->_buildQueryUsers();
+			$this->_users = $this->_getList($query);
+		}
+
+		return $this->_users;
 	}
 
 	/**
