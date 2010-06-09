@@ -64,19 +64,19 @@ class FlexicontentController extends JController
 		$user	=& JFactory::getUser();
 
 		// Create the view
-		$view = & $this->getView('Items', 'html');
+		$view = & $this->getView('items', 'html');
 
 		//general access check
 		if (!($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_content', 'edit', 'content', 'own'))) {
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		}
 
 		// Get/Create the model
-		$model = & $this->getModel('Items');
+		$model = & $this->getModel('items');
 
 		//check if we have an id(edit) and check if we have global edit rights or if we are allowed to edit own items.
 		if( $model->get('id') > 1 && !($user->authorize('com_flexicontent', 'edit') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id')) ) ) {
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		}
 
 		//checked out?
