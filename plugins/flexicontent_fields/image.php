@@ -33,6 +33,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$n = 0;
 		$field->html = '';
 		$select = $this->buildSelectList( $field );
+		$app =& JFactory::getApplication();
 		
 		// if an image exists it display the existing image
 		if ($field->value  && $field->value[0] != '')
@@ -42,9 +43,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
 				$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
+				$adminprefix = $app->isAdmin() ? '../' : '';
 				$field->html	.= '
 				<div style="float:left; margin-right: 5px;">
-					<img src="../'.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver;" />
+					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver;" />
 					<br />
 					<input type="checkbox" name="'.$field->name.'[remove]" value="1"'.$remove.'>'.JText::_( 'FLEXI_FIELD_REMOVE' ).'
 					<input type="checkbox" name="'.$field->name.'[delete]" value="1"'.$delete.'>'.JText::_( 'FLEXI_FIELD_DELETE' ).'
@@ -72,7 +74,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		else
 		{
 			// else display the form for adding a new image
-			$onchange = $field->parameters->get('autoupload', 1)?'  onchange="javascript: submitbutton(\'apply\')"':'';
+			$onchange = ($field->parameters->get('autoupload', 1) && $app->isAdmin()) ? ' onchange="javascript: submitbutton(\'apply\')"' : '';
 			$field->html	.= '
 			<div style="float:left; margin-right: 5px;">
 				<div class="empty_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>
@@ -120,12 +122,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
-		$usepopup	= $field->parameters->get( 'usepopup' ) ;
+		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
+		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
 
 		if ($values && $values[0] != '')
 		{				
 			$document	= & JFactory::getDocument();
+			
+			// load the tooltip library if redquired
+			if ($uselegend) JHTML::_('behavior.tooltip');
 			
 			if ($usepopup && $mainframe->isSite() && ($popuptype == 1))
 			{
@@ -163,7 +169,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$i = 0;
 			foreach ($values as $value)
 			{
-				$value = unserialize($value);
+				$value	= unserialize($value);
 				$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . 'l_' . $value['originalname']);
 				$size	= getimagesize($path);
 				$hl 	= $size[1];
@@ -176,6 +182,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$srcb	= $field->parameters->get('dir') . '/l_' . $value['originalname'];
 				$tip	= JText::_( 'FLEXI_FIELD_LEGEND' ) . '::' . $title;
 				$id		= $field->item_id . '_' . $field->id . '_' . $i;
+				$legend = $uselegend ? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
 			
 				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'items'));
@@ -188,7 +195,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					$field->{$prop} = '
 					<a href="'.$srcb.'" id="mb'.$id.'" class="mb">
-						<img class="hasTip" src="'. $src .'" alt ="'.$alt.'" title="'.$tip.'" />
+						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					</a>
 					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
 					';
@@ -199,7 +206,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</a>
 					';
 				} else {
-					$field->{$prop} = '<img class="hasTip" src="'. $src .'" alt ="'.$alt.'" title="'.$tip.'" />';
+					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}
 			}
 
