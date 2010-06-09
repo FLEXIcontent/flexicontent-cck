@@ -31,9 +31,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($field->field_type != 'file') return;
 
 		// some parameter shortcuts
-		$size				= $field->parameters->get( 'size', 30 ) ;
+		$size		= $field->parameters->get( 'size', 30 ) ;
 						
-		$document	= & JFactory::getDocument();
+		$document	=& JFactory::getDocument();
+		$app		=& JFactory::getApplication();
+		$prefix		= $app->isSite() ? 'administrator/' : '';
 
 		$js = "
 		function qfSelectFile".$field->id."(id, file) {
@@ -70,8 +72,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 			
-			img.src = 'components/com_flexicontent/assets/images/move3.png';
-			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
+			img.src = '".$prefix."components/com_flexicontent/assets/images/move3.png';
+			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
 			li.appendChild(txt);
