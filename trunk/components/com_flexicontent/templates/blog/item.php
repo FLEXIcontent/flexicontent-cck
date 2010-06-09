@@ -28,6 +28,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 		<?php echo flexicontent_html::pdfbutton( $this->item, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'items', $this->params, null , $this->item->slug ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
+		<?php echo flexicontent_html::editbutton( $this->item, $this->params ); ?>
 	</p>
 	<!-- EOF buttons -->
 

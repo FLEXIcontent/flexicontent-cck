@@ -106,7 +106,7 @@ function submitbutton( pressbutton ) {
 if($cid) {
 	$cids = explode(",", $cid);
 	global $globalcats;
-	$cats=array();
+	$cats = array();
 	foreach($cids as $cid) {
 			$cats[] = $globalcats[$cid]->title;
 ?>
@@ -140,6 +140,8 @@ if($cid) {
 				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
 				</label>
           		<?php echo $this->lists['state']; ?>
+          		Approve version <?php echo $this->lists['vstate']; ?>
+
 			</div>
 			<?php }; ?>
 		</fieldset>
@@ -183,7 +185,6 @@ if($cid) {
 						<?php
 						$types = flexicontent_html::getTypesList();
 						$this->item->typename = $types[$this->item->type_id]['name'];
-						//dump($this->item->type_id);
 						echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
 					
@@ -261,8 +262,8 @@ if($cid) {
             </div>
       	</fieldset>
 		<?php }else{?>
-			<input type="hidden" name="metadesc" value="" />
-			<input type="hidden" name="metakey" value="" />
+			<input type="hidden" name="metadesc" value="<?php echo @$this->item->metadesc; ?>" />
+			<input type="hidden" name="metakey" value="<?php echo @$this->item->metakey; ?>" />
 		<?php }?>
 		<?php endif; ?>
 
@@ -272,8 +273,8 @@ if($cid) {
     	<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
     	<?php echo JHTML::_( 'form.token' ); ?>
     	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="views" value="items" />
+		<input type="hidden" name="option" value="com_flexicontent" />
+		<input type="hidden" name="views" value="items" />
 
 	</form>
 </div>

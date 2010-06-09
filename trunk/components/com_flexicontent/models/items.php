@@ -166,9 +166,7 @@ class FlexicontentModelItems extends JModel
 						}
 					}
 				}
-/*
-				$canreadcat = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->cataccess <= $aid;
-*/
+
 				if (!@$canreadcat)
 				{
 					if (!$aid) {
@@ -599,9 +597,9 @@ class FlexicontentModelItems extends JModel
 		$user     	=& JFactory::getUser();
 		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-		$typeid = JRequest::getVar('typeid', 0, '', 'int');
+		$typeid 	= JRequest::getVar('typeid', 0, '', 'int');
 		$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$post['vstate'] = 2;// approve version all time, you can change this if you want
+//		$post['vstate'] = 2;// approve version all time, you can change this if you want
 		$data['type_id'] = $typeid;
 		$mainframe = &JFactory::getApplication();
 		$params 	= & $mainframe->getParams('com_flexicontent');
@@ -716,7 +714,7 @@ class FlexicontentModelItems extends JModel
 
 		$item->ordering = $item->getNextOrder();
 
-		if($isNew) {
+		if ($isNew || $post['vstate']==2) {
 			//store tags
 			$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 			$this->_db->setQuery($query);
@@ -741,8 +739,8 @@ class FlexicontentModelItems extends JModel
 				$this->_db->query();
 			}
 		}
-		if($isNew || @$post['vstate'])
-			$lastversion = FLEXIUtilities::getLastVersions($this->_id, true);
+		
+		if($isNew || @$post['vstate']) $lastversion = FLEXIUtilities::getLastVersions($this->_id, true);
 		$fields		= $this->getExtrafields();
 		$dispatcher = & JDispatcher::getInstance();
 		
@@ -794,7 +792,7 @@ class FlexicontentModelItems extends JModel
 							$obj->value			= serialize($postvalue);
 						} else {
 							$obj->value			= $postvalue;
-						}var_dump($obj);
+						} var_dump($obj);
 						if ($use_versioning)
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(

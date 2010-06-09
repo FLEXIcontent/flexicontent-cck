@@ -295,7 +295,7 @@ class FlexicontentViewItems extends JView
 		}
 		// if it's an edit action, redirect it
 		if ($item->id) {
-			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
+//			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
 		}
 		
 		if (!$user->get('id')) {
@@ -304,10 +304,16 @@ class FlexicontentViewItems extends JView
 		
 		$perms = array();
 		if (FLEXI_ACCESS) {
-			$perms['multicat'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
-			$perms['cantags'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-			$perms['canparams'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$perms['cansubmit']	= ($user->gid < 20) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
+			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
+			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
+			$perms['cansubmit']		= ($user->gid < 20) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
+			$perms['canedit']	= ($user->gid < 21) ? (
+										(FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid)) || 
+										(FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) || 
+										(FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || 
+										(FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all'))
+														   ) : 1;
 			$perms['canpublish']	= ($user->gid < 22) ? (
 										(FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid)) || 
 										(FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) || 
@@ -319,6 +325,7 @@ class FlexicontentViewItems extends JView
 			$perms['cantags'] 		= 1;
 			$perms['canparams'] 	= 1;
 			$perms['cansubmit']		= ($user->gid >= 18);
+			$perms['canedit']		= ($user->gid >= 20);
 			$perms['canpublish']	= ($user->gid >= 21);
 		}
 
@@ -425,6 +432,11 @@ class FlexicontentViewItems extends JView
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
 
 		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );
+
+		$vstate = array();
+		$vstate[] = JHTML::_('select.option',  1, JText::_( 'NO' ) );
+		$vstate[] = JHTML::_('select.option',  2, JText::_( 'YES' ) );
+		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
 
 		return $lists;
 	}

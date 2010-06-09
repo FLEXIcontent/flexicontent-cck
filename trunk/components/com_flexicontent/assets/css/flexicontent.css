@@ -563,3 +563,17 @@ span.fc_alpha_index {
 	margin-bottom:3px;
 }
 
+/* Buttons */
+.button-add a {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
+}
+.button-add a,
+.button-add a:visited,
+.button-add a:link,
+.button-add a:hover {
+	color: black;
+	text-decoration: none;
+}

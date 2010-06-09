@@ -198,6 +198,7 @@ class flexicontent_html
 	function editbutton( $item, &$params)
 	{
 		$user	= & JFactory::getUser();
+//		JHTML::_('behavior.modal', 'a.modal_'.$item->id);
 
 		if ($user->authorize('com_flexicontent', 'edit') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) {
 
@@ -209,8 +210,13 @@ class flexicontent_html
 			$overlib = JText::_( 'FLEXI_EDIT_TIP' );
 			$text = JText::_( 'FLEXI_EDIT' );
 
-			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit';
+			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id;
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
+/*
+			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&tmpl=component';
+			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip modal_'.$item->id.'" title="'.$text.'::'.$overlib.'" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">'.$image.'</a>';
+*/
 
 			return $output;
 		}
