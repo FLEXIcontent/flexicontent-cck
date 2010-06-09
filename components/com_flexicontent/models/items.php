@@ -593,169 +593,255 @@ class FlexicontentModelItems extends JModel
 	 */
 	function store($data)
 	{
-		$item  		=& JTable::getInstance('flexicontent_items', '');
-		$user     	=& JFactory::getUser();
-		$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
-		$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-		$typeid 	= JRequest::getVar('typeid', 0, '', 'int');
-		$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-//		$post['vstate'] = 2;// approve version all time, you can change this if you want
-		$data['type_id'] = $typeid;
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
 		$mainframe = &JFactory::getApplication();
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$item  	=& $this->getTable('flexicontent_items', '');
+		$user	=& JFactory::getUser();
+		
+		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
+		$details = array();
+		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
+		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
+		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
+		$post['vstate'] = (int)$post['vstate'];
 
-		// Bind the form fields to the table
+		// bind it to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
+		$item->bind($details);
 
 		// sanitise id field
 		$item->id = (int) $item->id;
+		
+		$nullDate	= $this->_db->getNullDate();
+
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$nullDate	= $this->_db->getNullDate();
-
-		// auto assign the main category
-		$item->catid 		= $cats[0];
-		// auto assign the main category
-		$item->sectionid 	= FLEXI_SECTION;
-		$item->type_id 		= $typeid;
-		$item->language		= flexicontent_html::getSiteDefaultLang();
-
-		$isNew = ($item->id < 1);
-
-		$autopublished = $params->get('autopublished', 0);
-		if($autopublished) {
-			$item->state = 1;
-		}
-		if ($isNew)
-		{
-			$item->created 		= gmdate('Y-m-d H:i:s');
-			$item->publish_up 	= $item->created;
-			$item->created_by 	= $user->get('id');
-			$params 	= & $mainframe->getParams('com_flexicontent');
-		}
-		else
-		{
-			$item->modified 	= gmdate('Y-m-d H:i:s');
-			$item->modified_by 	= $user->get('id');
-
-			$query = 'SELECT i.hits, i.created, i.created_by, i.version, i.state' .
-			' FROM #__content AS i' .
-			' WHERE i.id = '.(int) $item->id;
-
-			$this->_db->setQuery($query);
-			$result = $this->_db->loadObject();
-			
-			$item->hits = $result->hits;
-			
-			$item->created 		= $result->created;
-			$item->created_by 	= $result->created_by;
-			$item->version 		= $result->version;
-			$item->version++;
-
-			//if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))	{
-			//	$item->state = $result->state;
-			//}
-		}
+		$isnew = false;
+		$tags = array_unique($tags);
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$use_versioning = $cparams->get('use_versioning', 1);
 		
+		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
+			$config =& JFactory::getConfig();
+			$tzoffset = $config->getValue('config.offset');
 
-		// Publishing state hardening for Authors
-		if (!$autopublished && !$user->authorize('com_flexicontent', 'state'))
-		{
-			if ($isNew)
+			if ($isnew = !$item->id) {
+				$item->modified 	= $nullDate;
+				$item->modified_by 	= 0;
+			} else {
+				$mdate =& JFactory::getDate();
+				$item->modified 	= $mdate->toMySQL();
+				$item->modified_by 	= (int)$user->id;
+			}
+			// Are we saving from an item edit?
+			// This code comes directly from the com_content
+
+			$item->created_by 	= $item->created_by ? $item->created_by : $user->get('id');
+
+			if ($item->created && strlen(trim( $item->created )) <= 10) {
+				$item->created 	.= ' 00:00:00';
+			}
+
+			$date =& JFactory::getDate($item->created, $tzoffset);
+			$item->created = $date->toMySQL();
+
+			// Append time if not added to publish date
+			if (strlen(trim($item->publish_up)) <= 10) {
+				$item->publish_up .= ' 00:00:00';
+			}
+
+			$date =& JFactory::getDate($item->publish_up, $tzoffset);
+			$item->publish_up = $date->toMySQL();
+
+			// Handle never unpublish date
+			if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
 			{
-				// For new items
-				$item->state = -3;
+				$item->publish_down = $nullDate;
 			}
 			else
 			{
-				$query = 'SELECT state' .
-				' FROM #__content' .
-				' WHERE id = '.(int) $item->id;
-
-				$this->_db->setQuery($query);
-				$result = $this->_db->loadResult();
-
-				$item->state = $result;
+				if (strlen(trim( $item->publish_down )) <= 10) {
+					$item->publish_down .= ' 00:00:00';
+				}
+				$date =& JFactory::getDate($item->publish_down, $tzoffset);
+				$item->publish_down = $date->toMySQL();
 			}
-		}
-		
-		// Search for the {readmore} tag and split the text up accordingly.
-		$text = str_replace('<br>', '<br />', $data['text']);
 
-		$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
-		$tagPos	= preg_match($pattern, $text);
 
-		if ($tagPos == 0)	{
-			$item->introtext	= $text;
-		} else 	{
-			list($item->introtext, $item->fulltext) = preg_split($pattern, $text, 2);
-		}
+			// auto assign the main category if none selected
+			if (!$item->catid) {
+				$item->catid 		= $cats[0];
+			}
+			
+			// auto assign the section
+			$item->sectionid 	= FLEXI_SECTION;
+			
+			// Get a state and parameter variables from the request
+			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
+			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
+			$params		= JRequest::getVar( 'params', null, 'post', 'array' );
 
-		// Make sure the data is valid
-		if (!$item->check()) {
-			$this->setError($item->getError());
-			return false;
-		}
+			// Build parameter INI string
+			if (is_array($params))
+			{
+				$txt = array ();
+				foreach ($params as $k => $v) {
+					if (is_array($v)) {
+						$v = implode('|', $v);
+					}
+					$txt[] = "$k=$v";
+				}
+				$item->attribs = implode("\n", $txt);
+			}
 
-		// Store the article table to the database
-		if (!$item->store()) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
+			// Get metadata string
+			$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
+			if (is_array($params))
+			{
+				$txt = array();
+				foreach ($metadata as $k => $v) {
+					if ($k == 'description') {
+						$item->metadesc = $v;
+					} elseif ($k == 'keywords') {
+						$item->metakey = $v;
+					} else {
+						$txt[] = "$k=$v";
+					}
+				}
+				$item->metadata = implode("\n", $txt);
+			}
+					
+			// Clean text for xhtml transitional compliance
+			$text = str_replace('<br>', '<br />', $data['text']);
+			
+			// Search for the {readmore} tag and split the text up accordingly.
+			$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
+			$tagPos	= preg_match($pattern, $text);
 
-		if ($isNew)
-		{
-			$this->_id = $item->_db->insertId();
-		}
+			if ($tagPos == 0)	{
+				$item->introtext	= $text;
+			} else 	{
+				list($item->introtext, $item->fulltext) = preg_split($pattern, $text, 2);
+			}
+			
+			if (!$item->id) {
+				$item->ordering = $item->getNextOrder();
+			}
+			
+			// Make sure the data is valid
+			if (!$item->check()) {
+				$this->setError($item->getError());
+				return false;
+			}
+			if(!$use_versioning) {
+				$item->version = $isnew?1:($current_version+1);
+			}else{
+				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
+			}
+			// Store it in the db
+			if (!$item->store()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
+			if (FLEXI_ACCESS) {
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
+				if ($canRight) FAccess::saveaccess( $item, 'item' );
+			}
 
-		$item->ordering = $item->getNextOrder();
+			$this->_item	=& $item;
 
-		if ($isNew || $post['vstate']==2) {
-			//store tags
-			$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
+			//if($post['vstate']==2) {
+				//store tag relation
+				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				foreach($tags as $tag)
+				{
+					$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
+					$this->_db->setQuery($query);
+					$this->_db->query();
+				}
+			//}
+
+			// Store categories to item relations
+
+			// Add the primary cat to the array if it's not already in
+			if (!in_array($item->catid, $cats)) {
+				$cats[] = $item->catid;
+			}
+
+			//At least one category needs to be assigned
+			if (!is_array( $cats ) || count( $cats ) < 1) {
+				$this->setError('FLEXI_SELECT_CATEGORY');
+				return false;
+			}
+
+			//if($isnew || $post['vstate']==2) {
+			// delete only relations which are not part of the categories array anymore to avoid loosing ordering
+			$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
+					. ' WHERE itemid = '.$item->id
+					. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
+					;
 			$this->_db->setQuery($query);
 			$this->_db->query();
 
-			foreach($tags as $tag)
-			{
-				$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
-				$this->_db->setQuery($query);
-				$this->_db->query();
+			// draw an array of the used categories
+			$query 	= 'SELECT catid'
+					. ' FROM #__flexicontent_cats_item_relations'
+					. ' WHERE itemid = '.$item->id
+					;
+			$this->_db->setQuery($query);
+			$used = $this->_db->loadResultArray();
+
+			foreach($cats as $cat) {
+				// insert only the new records
+				if (!in_array($cat, $used)) {
+					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
+							.' VALUES(' . $cat . ',' . $item->id . ')'
+							;
+					$this->_db->setQuery($query);
+					$this->_db->query();
+				}
+			}
+			//}
+		} else {
+			$datenow =& JFactory::getDate();
+			$item->modified 		= $datenow->toMySQL();
+			$item->modified_by 		= $user->get('id');
+			// Add the primary cat to the array if it's not already in
+			if (!in_array($item->catid, $cats)) {
+				$cats[] = $item->catid;
 			}
 
-			//store cat relation
-			$query = 'DELETE FROM #__flexicontent_cats_item_relations WHERE itemid = '.$item->id;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-
-			foreach($cats as $cat)
-			{
-				$query = 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES(' . $cat . ',' . $item->id . ')';
-				$this->_db->setQuery($query);
-				$this->_db->query();
+			//At least one category needs to be assigned
+			if (!is_array( $cats ) || count( $cats ) < 1) {
+				$this->setError('FLEXI_SELECT_CATEGORY');
+				return false;
 			}
 		}
+		$post['categories'][0] = $cats;
+		$post['tags'][0] = $tags;
+		///////////////////////////////
+		// store extra fields values //
+		///////////////////////////////
 		
-		if($isNew || @$post['vstate']) $lastversion = FLEXIUtilities::getLastVersions($this->_id, true);
+		// get the field object
+		$this->_id 	= $item->id;	
 		$fields		= $this->getExtrafields();
 		$dispatcher = & JDispatcher::getInstance();
-		
-		$current_version = $item->version;
 		
 		// NOTE: This event isn't used yet but may be useful in a near future
 		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
 		
-		$db =& JFactory::getDBO();
-		$nullDate	= $db->getNullDate();
-
 		// versioning backup procedure
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		// first see if versioning feature is enabled
-		$use_versioning = $cparams->get('use_versioning', 1);
 		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id 		= (int)$item->id;
@@ -776,7 +862,8 @@ class FlexicontentModelItems extends JModel
 			$jcorefields = flexicontent_html::getJCoreFields();
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
-				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
+				$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+
 				// add the new values to the database 
 				if (is_array($post[$field->name])) {
 					$postvalues = $post[$field->name];
@@ -792,11 +879,11 @@ class FlexicontentModelItems extends JModel
 							$obj->value			= serialize($postvalue);
 						} else {
 							$obj->value			= $postvalue;
-						} var_dump($obj);
+						}
 						if ($use_versioning)
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
-							($isNew || ($post['vstate']==2) )
+							($isnew || ($post['vstate']==2) )
 							&& !isset($jcorefields[$field->name])
 							&& !in_array($field->field_type, $jcorefields)
 							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
@@ -812,7 +899,6 @@ class FlexicontentModelItems extends JModel
 					$obj->field_id 		= $field->id;
 					$obj->item_id 		= $item->id;
 					$obj->valueorder	= 1;
-					//$obj->version		= (int)$version+1;
 					$obj->version		= (int)$version+1;
 					// @TODO : move in the plugin code
 					if (is_array($post[$field->name])) {
@@ -823,7 +909,7 @@ class FlexicontentModelItems extends JModel
 					if($use_versioning)
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					if(
-						($isNew || ($post['vstate']==2) )
+						($isnew || ($post['vstate']==2) )
 						&& !isset($jcorefields[$field->name])
 						&& !in_array($field->field_type, $jcorefields)
 						&& ( ($field->field_type!='categories') || ($field->name!='categories') )
@@ -839,7 +925,7 @@ class FlexicontentModelItems extends JModel
 			}
 	
 			// store the extended data if the version is approved
-			if( ($isNew = !$item->id) || ($post['vstate']==2) ) {
+			if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
 				$item->search_index = $searchindex;
 				// Make sure the data is valid
 				if (!$item->check()) {
@@ -851,10 +937,6 @@ class FlexicontentModelItems extends JModel
 					$this->setError($this->_db->getErrorMsg());
 					return false;
 				}
-/*
-				dump($searchindex,'search');
-				dump($item,'item');
-*/
 			}
 		}
 		if ($use_versioning) {
@@ -868,8 +950,9 @@ class FlexicontentModelItems extends JModel
 			unset($v->modified_by);
 			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
+		
 		// delete old versions
-		$vcount	= FLEXIUtilities::getVersionsCount($this->_id);
+		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > ($vmax+1)) {
@@ -881,8 +964,8 @@ class FlexicontentModelItems extends JModel
 					.' AND version <' . $deleted_version
 					.' AND version!=' . (int)$current_version
 					;
-			$db->setQuery($query);
-			$db->query();
+			$this->_db->setQuery($query);
+			$this->_db->query();
 
 			$query = 'DELETE'
 					.' FROM #__flexicontent_versions'
@@ -890,119 +973,10 @@ class FlexicontentModelItems extends JModel
 					.' AND version_id <' . $deleted_version
 					.' AND version_id!=' . (int)$current_version
 					;
-			$db->setQuery($query);
-			$db->query();
+			$this->_db->setQuery($query);
+			$this->_db->query();
 		}
-
-		$this->_item	=& $item;
-/*
-		///////////////////////////////
-		// store extra fields values //
-		///////////////////////////////
-		
-		// get the field object
-		$this->_id 	= $item->id;	
-		$fields		= $this->getExtrafields();
-		$dispatcher = & JDispatcher::getInstance();
-		
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
-		
-		// versioning backup procedure
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-
-		// delete old values
-		$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-
-		// let's do first some cleaning
-		$post 	= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
-		
-		// here we append some specific values to the post array
-		// to handle them as extrafields and store their values
-		$post['created'] 		= $item->created;
-		$post['created_by'] 	= $item->created_by;
-		$post['modified'] 		= $item->modified;
-		$post['modified_by'] 	= $item->modified_by;
-		$post['version'] 		= $item->version++;
-
-		// intialize the searchindex for fulltext search
-		$searchindex = '';
-		
-		// loop through the field object
-		if ($fields)
-		{
-			foreach($fields as $field)
-			{
-				// process field mambots onBeforeSaveField
-				$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-				// add the new values to the database 
-				if (is_array($post[$field->name]))
-				{
-					$postvalues = $post[$field->name];
-					$i = 1;
-
-					foreach ($postvalues as $postvalue)
-					{
-						$obj = new stdClass();
-						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $field->item_id;
-						$obj->valueorder	= $i;
-						// @TODO : move to the plugin code
-						if (is_array($postvalue)) {
-							$obj->value			= serialize($postvalue);
-						} else {
-							$obj->value			= $postvalue;
-						}
-						
-						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-						$i++;
-					}
-				}
-				else
-				{
-					if ($post[$field->name])
-					{
-						$obj = new stdClass();
-						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $field->item_id;
-						$obj->valueorder	= 1;
-						// @TODO : move in the plugin code
-						if (is_array($post[$field->name])) {
-							$obj->value			= serialize($post[$field->name]);
-						} else {
-							$obj->value			= $post[$field->name];
-						}
-						
-						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-					}
-				}
-
-				// process field mambots onAfterSaveField
-				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-				
-				$searchindex 	.= $field->search;
-			}
-			
-			$item->search_index = $searchindex;
-			$item->version--;
-
-			// Make sure the data is valid
-			if (!$item->check()) {
-				$this->setError($item->getError());
-				return false;
-			}
-
-			// Store it in the db
-			if (!$item->store()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-		}
-*/
-
-		return $this->_item->id;
+		return true;
 	}
 
 	/**
