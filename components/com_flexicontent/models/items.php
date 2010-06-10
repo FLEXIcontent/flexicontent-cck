@@ -753,11 +753,12 @@ class FlexicontentModelItems extends JModel
 		$user	=& JFactory::getUser();
 		
 		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
-		$details = array();
+		$details 		= array();
 		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
+		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
 		// bind it to the table
 		if (!$item->bind($data)) {
@@ -833,11 +834,15 @@ class FlexicontentModelItems extends JModel
 			
 			// auto assign the section
 			$item->sectionid 	= FLEXI_SECTION;
+
+			// set type and language
+ 			$item->type_id 		= (int)$typeid;
+ 			$item->language		= flexicontent_html::getSiteDefaultLang();			
 			
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
-			$params		= JRequest::getVar( 'params', null, 'post', 'array' );
+			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 
 			// Build parameter INI string
 			if (is_array($params))
