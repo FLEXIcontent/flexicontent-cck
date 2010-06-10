@@ -74,6 +74,7 @@ class FlexicontentViewItems extends JView
 		}
 		
 		//get item data
+		JRequest::setVar('loadcurrent', true);
 		$item 	= & $this->get('Item');
 				
 		$iparams	=& $item->parameters;
@@ -270,8 +271,7 @@ class FlexicontentViewItems extends JView
 	 *
 	 * @since 1.0
 	 */
-	function _displayForm($tpl)
-	{
+	function _displayForm($tpl) {
 		global $mainframe;
 
 		//Initialize variables
@@ -281,6 +281,7 @@ class FlexicontentViewItems extends JView
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
 		$uri     	=& JFactory::getURI();
+		JRequest::setVar('loadcurrent', false);
 		$item		=& $this->get('Item');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');

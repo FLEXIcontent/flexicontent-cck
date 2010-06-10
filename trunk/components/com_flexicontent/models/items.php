@@ -123,8 +123,7 @@ class FlexicontentModelItems extends JModel
 	 * @return array
 	 * @since 1.0
 	 */
-	function &getItem( )
-	{
+	function &getItem() {
 		global $mainframe, $globalcats;
 		
 		/*
@@ -325,9 +324,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	array
 	 * @since	1.0
 	 */
-	function _loadItem()
-	{
-		$loadcurrent = false;
+	function _loadItem() {
+		$loadcurrent = JRequest::getVar('loadcurrent', false, 'request', 'boolean');
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
 			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
@@ -368,7 +366,7 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery($query);
 			$fields = $this->_db->loadObjectList();
 			$fields = $fields?$fields:array();
-			
+
 			foreach($fields as $f) {
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
@@ -451,22 +449,15 @@ class FlexicontentModelItems extends JModel
 					// @TODO : move in the plugin code
 					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
 						continue;
-						//$obj->value = serialize($item->categories);
-						//$catflag = true;
 					}elseif( ($field->field_type=='tags') && ($field->name=='tags') ) {
 						continue;
-						//$obj->value = serialize($item->tags);
-						//$tagflag = true;
 					}else{
 						$obj->value			= $field->value;
 					}
-					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
 					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-					//echo "insert into __flexicontent_items_versions<br />";
 					if( !$clean_database && !isset($jcorefields[$field->name]) && !in_array($field->field_type, $jcorefields)) {
 						unset($obj->version);
 						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
 					// process field mambots onAfterSaveField
 					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
@@ -480,8 +471,6 @@ class FlexicontentModelItems extends JModel
 					$obj->version		= (int)$current_version;
 					$obj->value		= serialize($item->categories);
 					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-					//unset($obj->version);
-					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 				}
 				if(!$tagflag) {
 					$obj = new stdClass();
@@ -491,8 +480,6 @@ class FlexicontentModelItems extends JModel
 					$obj->version		= (int)$current_version;
 					$obj->value		= serialize($item->tags);
 					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-					//unset($obj->version);
-					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 				}
 				$v = new stdClass();
 				$v->item_id 		= (int)$item->id;
@@ -500,9 +487,7 @@ class FlexicontentModelItems extends JModel
 				$v->created 	= $item->created;
 				$v->created_by 	= $item->created_by;
 				//$v->comment		= 'kept current version to version table.';
-				//echo "insert into __flexicontent_versions<br />";
 				$this->_db->insertObject('#__flexicontent_versions', $v);
-				//$this->_item->version=$current_version;
 			}
 			return (boolean) $this->_item;
 		}
@@ -643,8 +628,7 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function hit()
-	{
+	function hit() {
 		global $mainframe;
 
 		if ($this->_id)
@@ -656,20 +640,20 @@ class FlexicontentModelItems extends JModel
 		return false;
 	}
 
-	function getAlltags()
-	{
+	function getAlltags() {
 		$query = 'SELECT * FROM #__flexicontent_tags ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
 	}
 
-	function getUsedtags()
-	{
-		$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
-		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
-		return $used;
+	function getUsedtags() {
+		if(!@$this->_item->tags && is_array($this->_item->tags)) {
+			$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
+			$this->_db->setQuery($query);
+			$this->_item->tags = $this->_db->loadResultArray();
+		}
+		return $this->_item->tags;
 	}
 
 	/**
@@ -1173,10 +1157,12 @@ class FlexicontentModelItems extends JModel
 	 */
 	function getCatsselected()
 	{
-		$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
-		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
-		return $used;
+		if(!@$this->_item->categories) {
+			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
+			$this->_db->setQuery($query);
+			$this->_item->categories = $this->_db->loadResultArray();
+		}
+		return $this->_item->categories;
 	}
 
 	/**
