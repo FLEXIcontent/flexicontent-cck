@@ -139,8 +139,13 @@ if($cid) {
 				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
 				</label>
           		<?php echo $this->lists['state']; ?>
-          		Approve version <?php echo $this->lists['vstate']; ?>
-
+          		<?php // echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate']; ?>
+			</div>
+			<div class="flexi_formblock">
+          		<label for="vstate" class="flexi_label">
+				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
+				</label>
+          		<?php echo $this->lists['vstate']; ?>
 			</div>
 			<?php }; ?>
 		</fieldset>

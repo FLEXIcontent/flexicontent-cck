@@ -434,9 +434,9 @@ class FlexicontentViewItems extends JView
 		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );
 
 		$vstate = array();
-		$vstate[] = JHTML::_('select.option',  1, JText::_( 'NO' ) );
-		$vstate[] = JHTML::_('select.option',  2, JText::_( 'YES' ) );
-		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
+		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
 
 		return $lists;
 	}
