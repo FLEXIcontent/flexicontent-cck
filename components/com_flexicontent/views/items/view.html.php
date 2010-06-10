@@ -298,7 +298,7 @@ class FlexicontentViewItems extends JView
 		if ($item->id) {
 //			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
 		}
-		
+
 		if (!$user->get('id')) {
 			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
 		}

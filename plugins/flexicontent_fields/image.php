@@ -510,7 +510,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function buildSelectList( $field )
 	{
 		$db =& JFactory::getDBO();
-
+		
 		$query = 'SELECT value'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = '. (int) $field->id
@@ -530,11 +530,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_FIELD_PLEASE_SELECT'));
+		$onchange = ($field->parameters->get('autoupload', 1) && $app->isAdmin()) ? ' onchange="javascript: submitbutton(\'apply\')"' : '';
 		foreach ($values as $value) {
 			$options[] = JHTML::_('select.option', $value, $value); 
-			}
-		
-		$list	= JHTML::_('select.genericlist', $options, $field->name.'[originalname]', 'onchange="javascript: submitbutton(\'apply\')"', 'value', 'text', '');
+		}
+		$list	= JHTML::_('select.genericlist', $options, $field->name.'[originalname]', $onchange, 'value', 'text', '');
 
 		return $list;
 	}

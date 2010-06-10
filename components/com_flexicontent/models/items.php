@@ -129,15 +129,14 @@ class FlexicontentModelItems extends JModel
 		/*
 		* Load the Item data
 		*/
-		if ($this->_loadItem())
-		{
+		if ($this->_loadItem()) {
 			// Get the paramaters of the active menu item
 			$params = & $mainframe->getParams('com_flexicontent');
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
 			$gid	= (int) $user->get('gid');
 			$cid	= JRequest::getInt('cid');
-			
+
 			// Is the category published?
 			if ($cid) {
 				if (!$globalcats[$cid]->published) {
@@ -146,7 +145,7 @@ class FlexicontentModelItems extends JModel
 			}
 
 			// Do we have access to the category?
-			if ($this->_item->catid) {
+			if (@$this->_item->id && @$this->_item->catid) {
 				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
 				foreach ($ancestors as $cat) {
 					if (FLEXI_ACCESS) {
@@ -187,7 +186,7 @@ class FlexicontentModelItems extends JModel
 						}
 					}
 				}
-			} else {
+			} elseif(@$this->_item->id) {
 				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
 				return false;
 			}
@@ -313,7 +312,6 @@ class FlexicontentModelItems extends JModel
 			$item->search_index			= '';
 			$this->_item				= $item;
 		}
-
 		return $this->_item;
 	}
 
@@ -346,9 +344,12 @@ class FlexicontentModelItems extends JModel
 			;
 			$this->_db->setQuery($query);
 			$item = $this->_db->loadObject();
+			if(!$item) {
+				return false;
+			}
 			
 			$isnew = (($this->_id <= 0) || !$this->_id);
-			$current_version = $item->version;
+			$current_version = isset($item->version)?$item->version:0;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			//$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
 			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
@@ -648,7 +649,7 @@ class FlexicontentModelItems extends JModel
 	}
 
 	function getUsedtags() {
-		if(!@$this->_item->tags && is_array($this->_item->tags)) {
+		if(!@$this->_item->tags) {
 			$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
 			$this->_item->tags = $this->_db->loadResultArray();
