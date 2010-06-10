@@ -376,11 +376,11 @@ class FlexicontentViewItems extends JView
 		$pathway->addItem($title, '');
 
 		// Unify the introtext and fulltext fields and separated the fields by the readmore tag
-		if (JString::strlen($item->fulltext) > 1) {
+		/*if (JString::strlen($item->fulltext) > 1) {
 			$item->text = $item->introtext."<hr id=\"system-readmore\" />".$item->fulltext;
 		} else {
 			$item->text = $item->introtext;
-		}
+		}*/
 
 		//Ensure the row data is safe html
 		JFilterOutput::objectHTMLSafe( $item );
