@@ -291,7 +291,7 @@ class FlexicontentModelItems extends JModel
 				$session->set('hit', $stamp, 'flexicontent');
 			}
 			//we show the introtext and fulltext (chr(13) = carriage return)
-			$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
+			//$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
 
 			$this->_loadItemParams();
 		}
@@ -327,15 +327,13 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _loadItem()
 	{
-		if($this->_id == '0') {
-			return false;
-		}
+		$loadcurrent = false;
+		// Lets load the item if it doesn't already exist
+		if (empty($this->_item)) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			$use_versioning = $cparams->get('use_versioning', 1);
 
-		// Get the WHERE clause
-		$where	= $this->_buildItemWhere();
-
-		if (empty($this->_item))
-		{
+			$where	= $this->_buildItemWhere();
 			$query = 'SELECT i.*, ie.*, c.access AS cataccess, c.id AS catid, c.published AS catpublished,'
 			. ' u.name AS author, u.usertype, ty.name AS typename,'
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
@@ -349,8 +347,163 @@ class FlexicontentModelItems extends JModel
 			. $where
 			;
 			$this->_db->setQuery($query);
-			$this->_item = $this->_db->loadObject();
+			$item = $this->_db->loadObject();
 			
+			$isnew = (($this->_id <= 0) || !$this->_id);
+			$current_version = $item->version;
+			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
+			//$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
+			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
+			if($version==0) 
+				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
+			if($use_versioning) {
+				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
+					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
+					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
+			}else{
+				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_fields_item_relations as iv "
+					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
+					." WHERE iv.item_id='".$this->_id."';";
+			}
+			$this->_db->setQuery($query);
+			$fields = $this->_db->loadObjectList();
+			$fields = $fields?$fields:array();
+			
+			foreach($fields as $f) {
+				$fieldname = $f->name;
+				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
+					$item->$fieldname = unserialize($f->value);
+				}else{
+					$item->$fieldname = $f->value;
+				}
+			}
+			
+			if(!isset($item->tags)||!is_array($item->tags)) {
+				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
+				$this->_db->setQuery($query);
+				$item->tags = $this->_db->loadResultArray();
+			}
+			if(!isset($item->categories)||!is_array($item->categories)) {
+				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
+				$this->_db->setQuery($query);
+				$item->categories = $this->_db->loadResultArray();
+			}
+			$item->id = $this->_id;
+
+			$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
+					." FROM #__flexicontent_items_ext as ie "
+					. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
+					." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
+					." WHERE ie.item_id='".$this->_id."';";
+			$this->_db->setQuery($query);
+			$type = $this->_db->loadObject();
+			if($type) {
+				$item->typename = $type->typename;
+				$item->rating_count = $type->rating_count;
+				$item->score = $type->score;
+				$item->version = $current_version;
+			}else{
+				$item->version = 0;
+				$item->score = 0;
+			}
+			if($isnew) {
+				$createdate = & JFactory::getDate();
+				$nullDate	= $this->_db->getNullDate();
+				$item->created 		= $createdate->toUnix();
+				$item->modified 	= $nullDate;
+				$item->publish_up 	= $createdate->toUnix();
+				$item->publish_down = JText::_( 'FLEXI_NEVER' );
+				$item->state 		= -4;
+			}
+
+			if($version == $current_version) {
+				$item->text = $item->introtext;
+			}
+			$this->_item = &$item;
+			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
+				$mainframe = &JFactory::getApplication();
+				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
+						." FROM #__flexicontent_fields_item_relations as fir"
+						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
+						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
+						." WHERE fir.item_id='".$this->_id."';";
+				$this->_db->setQuery($query);
+				$fields = $this->_db->loadObjectList();
+				$jcorefields = flexicontent_html::getJCoreFields();
+				$catflag = false;
+				$tagflag = false;
+				$clean_database = true;
+				if(!$clean_database && $fields) {
+					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$this->_id;
+					$this->_db->setQuery($query);
+					$this->_db->query();
+				}
+				foreach($fields as $field) {
+					// process field mambots onBeforeSaveField
+					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+
+					// add the new values to the database 
+					$obj = new stdClass();
+					$obj->field_id 		= $field->id;
+					$obj->item_id 		= $this->_id;
+					$obj->valueorder	= $field->valueorder;;
+					$obj->version		= (int)$current_version;
+					// @TODO : move in the plugin code
+					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
+						continue;
+						//$obj->value = serialize($item->categories);
+						//$catflag = true;
+					}elseif( ($field->field_type=='tags') && ($field->name=='tags') ) {
+						continue;
+						//$obj->value = serialize($item->tags);
+						//$tagflag = true;
+					}else{
+						$obj->value			= $field->value;
+					}
+					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
+					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					//echo "insert into __flexicontent_items_versions<br />";
+					if( !$clean_database && !isset($jcorefields[$field->name]) && !in_array($field->field_type, $jcorefields)) {
+						unset($obj->version);
+						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						//echo "insert into __flexicontent_fields_item_relations<br />";
+					}
+					// process field mambots onAfterSaveField
+					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+					//$searchindex 	.= @$field->search;
+				}
+				if(!$catflag) {
+					$obj = new stdClass();
+					$obj->field_id 		= 13;
+					$obj->item_id 		= $this->_id;
+					$obj->valueorder	= 1;
+					$obj->version		= (int)$current_version;
+					$obj->value		= serialize($item->categories);
+					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					//unset($obj->version);
+					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+				}
+				if(!$tagflag) {
+					$obj = new stdClass();
+					$obj->field_id 		= 14;
+					$obj->item_id 		= $this->_id;
+					$obj->valueorder	= 1;
+					$obj->version		= (int)$current_version;
+					$obj->value		= serialize($item->tags);
+					$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					//unset($obj->version);
+					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+				}
+				$v = new stdClass();
+				$v->item_id 		= (int)$item->id;
+				$v->version_id		= (int)$current_version;
+				$v->created 	= $item->created;
+				$v->created_by 	= $item->created_by;
+				//$v->comment		= 'kept current version to version table.';
+				//echo "insert into __flexicontent_versions<br />";
+				$this->_db->insertObject('#__flexicontent_versions', $v);
+				//$this->_item->version=$current_version;
+			}
 			return (boolean) $this->_item;
 		}
 		return true;
@@ -591,8 +744,7 @@ class FlexicontentModelItems extends JModel
 	 * @access	public
 	 * @since	1.0
 	 */
-	function store($data)
-	{
+	function store($data) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -606,7 +758,6 @@ class FlexicontentModelItems extends JModel
 		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
-		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
 		// bind it to the table
 		if (!$item->bind($data)) {
@@ -683,14 +834,10 @@ class FlexicontentModelItems extends JModel
 			// auto assign the section
 			$item->sectionid 	= FLEXI_SECTION;
 			
-			// set type and language
-			$item->type_id 		= (int)$typeid;
-			$item->language		= flexicontent_html::getSiteDefaultLang();
-			
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
-			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
+			$params		= JRequest::getVar( 'params', null, 'post', 'array' );
 
 			// Build parameter INI string
 			if (is_array($params))
