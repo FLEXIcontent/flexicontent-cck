@@ -29,12 +29,11 @@ class FlexicontentFields
 	 */
 	function getFields($items, $view = 'items', $params = null, $aid = 0)
 	{
-		if (!$items) return;
-		
 		if (!is_array($items)) {
 			$rows[] = $items;
 			$items	= $rows;
 		}
+		if (!$items) return $items;
 
 		JPluginHelper::importPlugin('flexicontent_fields');
 		$user 		= &JFactory::getUser();

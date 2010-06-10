@@ -39,7 +39,7 @@ class FlexicontentController extends JController
 		}
 		$session  =& JFactory::getSession();
 		$dopostinstall =& $session->get('flexicontent.postinstall');
-		if($view && ($view!='flexicontent') && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
 			$msg = JText::_( 'Post installation step do not complete.' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
