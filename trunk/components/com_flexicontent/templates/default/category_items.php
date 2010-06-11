@@ -73,12 +73,14 @@ endif;
 <?php
 if ($this->items) :
 	// routine to determine all used columns for this table
+	$layout = $this->params->get('ilayout', 'default');
+	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
 	$columns = array();
 	foreach ($this->items as $item) :
 		if (isset($item->positions['table'])) :
-			foreach ($item->positions['table'] as $pos) :
-				if (!in_array($pos->name, $columns)) :
-					$columns[$pos->name] = $item->fields[$pos->name]->label;
+			foreach ($fbypos['table']->fields as $f) :
+				if (!in_array($f, $columns)) :
+					$columns[$f] = $item->fields[$f]->label;
 				endif;
 			endforeach;
 		endif;

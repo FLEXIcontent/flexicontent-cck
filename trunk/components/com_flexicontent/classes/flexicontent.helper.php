@@ -1301,25 +1301,27 @@ class flexicontent_tmpl
 	 * @access public
 	 * @return object
 	 */
-	function getFieldsByPositions($folder, $type)
-	{
-		$db = JFactory::getDBO();
-		
-		$query  = 'SELECT *'
-				. ' FROM #__flexicontent_templates'
-				. ' WHERE template = ' . $db->Quote($folder)
-				. ' AND layout = ' . $db->Quote($type)
-				;				;
-		$db->setQuery($query);
-		$positions = $db->loadObjectList('position');
-		
-		foreach ($positions as $pos) {
-			$pos->fields = explode(',', $pos->fields);
-		}		
-		
-		return $positions;
+	function getFieldsByPositions($folder, $type) {
+		static $templates;
+		if(!isset($templates[$folder])) {
+			$templates[$folder] = array();
+		}
+		if(!isset($templates[$folder][$type])) {
+			$db = JFactory::getDBO();
+			$query  = 'SELECT *'
+					. ' FROM #__flexicontent_templates'
+					. ' WHERE template = ' . $db->Quote($folder)
+					. ' AND layout = ' . $db->Quote($type)
+					;
+			$db->setQuery($query);
+			$positions = $db->loadObjectList('position');
+			foreach ($positions as $pos) {
+				$pos->fields = explode(',', $pos->fields);
+			}
+			$templates[$folder][$type] = & $positions;
+		}
+		return $templates[$folder][$type];
 	}
-
 }
 
 class flexicontent_images
