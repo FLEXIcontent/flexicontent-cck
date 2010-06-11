@@ -67,7 +67,6 @@ class FlexicontentViewFileselement extends JView
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 			'search', 			'', 'string' );
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
-		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.user', 			'user', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -132,16 +131,6 @@ class FlexicontentViewFileselement extends JView
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
 		}
 		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
-		
-		
-		//users list
-		$users_list = array();
-		$users_list[] = JHTML::_('select.option', '', JText::_('- Filter by user -'));
-		foreach($users as $u) {
-			$users_list[] = JHTML::_('select.option', $u->id, JText::_( $u->name ) );
-		}
-		$lists['users'] = JHTML::_('select.genericlist', $users_list, 'user', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_user );
-		
 		
 		//build secure/media filterlist
 		$secure 	= array();

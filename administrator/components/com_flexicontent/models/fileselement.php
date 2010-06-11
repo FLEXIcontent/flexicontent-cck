@@ -171,7 +171,6 @@ class FlexicontentModelFileselement extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
-		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.user', 			'user', 			'', 'int' );
 
 		if($filter_item) {
 			$query = 'SELECT f.*, u.name AS uploader'
@@ -182,7 +181,6 @@ class FlexicontentModelFileselement extends JModel
 			. $where
 			. ' AND fi.field_type = ' . $this->_db->Quote('file')
 			. ' AND rel.item_id=' . $filter_item
-			. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 			. ' GROUP BY f.id'
 			//. $having
 			. $orderby
@@ -192,7 +190,6 @@ class FlexicontentModelFileselement extends JModel
 			. ' FROM #__flexicontent_files AS f'
 			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where
-			. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 			. ' GROUP BY f.id'
 			. $orderby
 			;

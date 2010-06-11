@@ -26,7 +26,7 @@ function FLEXIcontentBuildRoute(&$query)
 	$menu = &JSite::getMenu();
 	if (empty($query['Itemid'])) {
 		$menuItem = &$menu->getActive();
-		$query['Itemid'] = $menuItem->id;
+		$query['Itemid'] = @$menuItem->id;
 	} else {
 		$menuItem = &$menu->getItem($query['Itemid']);
 	}
