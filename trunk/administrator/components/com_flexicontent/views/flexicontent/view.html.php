@@ -158,8 +158,12 @@ class FlexicontentViewFlexicontent extends JView
 			$CanPlugins		= 1;
 			$CanTemplates	= 1;
 		}
+		$dopostinstall = true;
+		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+			$dopostinstall = false;
+		}
 		$session  =& JFactory::getSession();
-		$dopostinstall = $session->get('flexicontent.postinstall');
+		$session->set('flexicontent.postinstall', $dopostinstall);
 		
 		
 		//Create Submenu
