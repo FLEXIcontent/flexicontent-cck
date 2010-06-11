@@ -164,7 +164,6 @@ class FlexicontentModelFilemanager extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
-		$filter_user 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.user', 			'user', 			'', 'int' );
 		
 		// File field relation sub query
 		$subf	= 'SELECT COUNT(value)'
@@ -183,7 +182,6 @@ class FlexicontentModelFilemanager extends JModel
 				. $where
 				. ' AND fi.field_type = ' . $this->_db->Quote('file')
 				. ' AND rel.item_id=' . $filter_item
-				. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 				. ' GROUP BY f.id'
 				//. $having
 				. $orderby
@@ -193,7 +191,6 @@ class FlexicontentModelFilemanager extends JModel
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where
-				. ($filter_user?' AND f.uploaded_by=' . $filter_user:'')
 				. ' GROUP BY f.id'
 				//. $having
 				. $orderby
