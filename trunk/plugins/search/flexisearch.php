@@ -150,10 +150,10 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	// filter by active language
 	$andlang = '';
 	if (FLEXI_FISH && $filter_lang) {
-		$andlang .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 	}
 
-	$query 	= 'SELECT DISTINCT a.title AS title,a.sectionid'
+	$query 	= 'SELECT DISTINCT a.title AS title, a.sectionid,'
 			. ' a.created AS created,'
 			. ' ie.search_index AS text,'
 			. ' "2" AS browsernav,'
