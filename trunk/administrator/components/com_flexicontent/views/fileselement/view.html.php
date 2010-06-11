@@ -87,9 +87,9 @@ class FlexicontentViewFileselement extends JView
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		$js = "
 		function qffileselementadd(id, file) {
-			document.adminForm.file.value=id;	
+			document.adminForm.file.value=id;
 			window.parent.qfSelectFile".$fieldid."(id, file);	
-			document.adminForm.submit();	
+			//document.adminForm.submit();	
 		}
 		";
 		$document->addScriptDeclaration($js);
