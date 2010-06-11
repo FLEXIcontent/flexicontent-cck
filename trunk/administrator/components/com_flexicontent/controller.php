@@ -38,7 +38,11 @@ class FlexicontentController extends JController
 			$this->setRedirect($link, $msg);
 		}
 		$session  =& JFactory::getSession();
+		
 		$dopostinstall =& $session->get('flexicontent.postinstall');
+		if($dopostinstall===NULL) {
+			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
+		}
 		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
 			$msg = JText::_( 'Post installation step do not complete.' );
 			$link 	= 'index.php?option=com_flexicontent';
@@ -59,6 +63,25 @@ class FlexicontentController extends JController
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
 	}
 
+	function getPostinstallState() {
+		$model 				= $this->getModel('flexicontent');
+		$existtype 			= & $model->getExistType();
+		$existfields 		= & $model->getExistFields();
+		$allplgpublish 		= & $model->getAllPluginsPublished();
+		$existlang	 		= & $model->getExistLanguageColumn();
+		$existversions 		= & $model->getExistVersionsTable();
+		$existversionsdata	= & $model->getExistVersionsPopulated();
+		$oldbetafiles		= & $model->getOldBetaFiles();
+		$nooldfieldsdata	= & $model->getNoOldFieldsData();
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$use_versioning = $params->get('use_versioning', 1);
+		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+		$dopostinstall = true;
+		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+			$dopostinstall = false;
+		}
+		return $dopostinstall;
+	}
 	/**
 	 * Display the view
 	 */
