@@ -170,6 +170,16 @@ endif;
 			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
 			<?php 
 			endif; 
+			if (FLEXI_FISH) :
+			?>
+			<div class="flexi_formblock">
+          		<label for="languages" class="flexi_label">
+				<?php echo JText::_( 'FLEXI_LANGUAGE' ).':';?>
+				</label>
+          		<?php echo $this->lists['languages']; ?>
+			</div>
+			<?php 
+			endif; 
 			?>
 		</fieldset>
 		
