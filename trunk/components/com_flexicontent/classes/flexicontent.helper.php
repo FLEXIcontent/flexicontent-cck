@@ -198,28 +198,46 @@ class flexicontent_html
 	function editbutton( $item, &$params)
 	{
 		$user	= & JFactory::getUser();
-//		JHTML::_('behavior.modal', 'a.modal_'.$item->id);
 
-		if ($user->authorize('com_flexicontent', 'edit') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) {
-
-			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+		if (FLEXI_ACCESS)
+		{
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			
+			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)))
+			{
+				if ( $params->get('show_icons') ) {
+					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+				} else {
+					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+				}
+				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
+				$text 		= JText::_( 'FLEXI_EDIT' );
+	
+				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+	
+				return $output;
 			}
-			$overlib = JText::_( 'FLEXI_EDIT_TIP' );
-			$text = JText::_( 'FLEXI_EDIT' );
 
-			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id;
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+		} else {
 
-/*
-			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&tmpl=component';
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip modal_'.$item->id.'" title="'.$text.'::'.$overlib.'" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">'.$image.'</a>';
-*/
-
-			return $output;
+			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
+			{
+				if ( $params->get('show_icons') ) {
+					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+				} else {
+					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+				}
+				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
+				$text 		= JText::_( 'FLEXI_EDIT' );
+	
+				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+	
+				return $output;
+			}
 		}
+
 		return;
 	}
 
