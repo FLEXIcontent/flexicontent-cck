@@ -249,12 +249,21 @@ div.flexi_edit form select.invalid {
 div.flexi_box_left,
 div.flexi_box_right {
 	float: left;
-	width: 45%;
+	width: 48%;
 }
 
 div.flexi_box_right {
 	float: right;
 }
+
+/* Access */
+fieldset.flexiaccess legend {
+	background: url(../../../../administrator/components/com_flexicontent/assets/images/toggle_blue.png) no-repeat 98% 50%;
+	padding-right: 22px;
+	line-height: 18px;
+	cursor: pointer;
+}
+
 
 /** Tags **/
 

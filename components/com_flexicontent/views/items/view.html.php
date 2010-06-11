@@ -294,33 +294,70 @@ class FlexicontentViewItems extends JView
 		{
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
 		}
-		// if it's an edit action, redirect it
-		if ($item->id) {
-//			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
+
+		// first check if the user is logged
+		if (!$user->get('id')) {
+			$mainframe->redirect('index.php', JText::_( 'FLEXI_ALERTNOTAUTH' ));
 		}
 
-		if (!$user->get('id')) {
-			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
+		// check if it's an edit action
+		if ($item->id) {
+			// EDIT action
+			if (FLEXI_ACCESS) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			
+				if ( (!in_array('editown', $rights) && $item->created_by == $user->get('id')) && (!in_array('edit', $rights)) )
+				{
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			} else {
+				$canEdit	= $user->authorize('com_content', 'edit', 'content', 'all');
+				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own');
+				
+				if ( $canEdit || ($canEditOwn && ($item->created_by == $user->get('id'))) )
+				{
+					// continue
+				} else {
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			}
+		} else {
+			// SUBMIT action
+			if (FLEXI_ACCESS) {
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+	
+				if ( @$canAdd['content'] || @$canAdd['category'] )
+				{
+					// continue
+				} else {
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			} else {
+				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+				
+				if (!$canAdd)
+				{
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			}
 		}
+
 		
-		$perms = array();
+		$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+		$perms 	= array();
 		if (FLEXI_ACCESS) {
 			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
 			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
 			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$perms['cansubmit']		= ($user->gid < 20) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
-			$perms['canedit']	= ($user->gid < 21) ? (
-										(FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid)) || 
-										(FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) || 
-										(FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || 
-										(FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all'))
-														   ) : 1;
-			$perms['canpublish']	= ($user->gid < 22) ? (
-										(FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid)) || 
-										(FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) || 
-										(FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all')) || 
-										(FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all'))
-														   ) : 1;
+			$perms['cansubmit']		= ($user->gid < 25) ? ( (in_array('submit', $rights)) || (in_array('add', $rights)) ) : 1;
+			$perms['canedit']		= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
+			$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
+			$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
+			$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 		} else {
 			$perms['multicat']		= 1;
 			$perms['cantags'] 		= 1;
@@ -328,6 +365,8 @@ class FlexicontentViewItems extends JView
 			$perms['cansubmit']		= ($user->gid >= 18);
 			$perms['canedit']		= ($user->gid >= 20);
 			$perms['canpublish']	= ($user->gid >= 21);
+			$perms['candelete']		= ($user->gid >= 21);
+			$perms['canright']		= ($user->gid >= 21);
 		}
 
 		if (!$perms['cansubmit']) {
@@ -348,6 +387,7 @@ class FlexicontentViewItems extends JView
 		
 		//add css file
 		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
 		$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
 		
 		//Get the lists
@@ -438,6 +478,17 @@ class FlexicontentViewItems extends JView
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
 		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
+
+		// build granular access list
+		if (FLEXI_ACCESS) {
+			if (isset($user->level)) {
+				$lists['access'] = FAccess::TabGmaccess( $item, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+			} else {
+				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+			}
+		} else {
+			$lists['access'] = JHTML::_('list.accesslevel', $item);
+		}
 
 		return $lists;
 	}
