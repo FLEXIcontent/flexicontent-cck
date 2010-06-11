@@ -290,8 +290,7 @@ class FlexicontentViewItems extends JView
 		
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
-		foreach ($fields as $field)
-		{
+		foreach ($fields as $field) {
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
 		}
 

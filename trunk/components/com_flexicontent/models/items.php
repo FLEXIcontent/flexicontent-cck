@@ -1360,8 +1360,8 @@ class FlexicontentModelItems extends JModel
 	 * @since 1.5
 	 */
 	function getExtrafields() {
-		$typeid = JRequest::getVar('typeid', 0, '', 'int');
-		$version = JRequest::getVar( 'version', '', 'request', 'int' );
+		$typeid = intval(@$this->_item->type_id);
+		$version = (int)FLEXIUtilities::getLastVersions($this->_id, true);
 		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
 		$query = 'SELECT fi.*'
 				.' FROM #__flexicontent_fields AS fi'
