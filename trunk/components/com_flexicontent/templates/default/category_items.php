@@ -80,7 +80,7 @@ if ($this->items) :
 		if (isset($item->positions['table'])) :
 			foreach ($fbypos['table']->fields as $f) :
 				if (!in_array($f, $columns)) :
-					$columns[$f] = $item->fields[$f]->label;
+					$columns[$f] = @$item->fields[$f]->label;
 				endif;
 			endforeach;
 		endif;
