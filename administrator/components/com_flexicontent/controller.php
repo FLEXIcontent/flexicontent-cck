@@ -40,7 +40,7 @@ class FlexicontentController extends JController
 		$session  =& JFactory::getSession();
 		
 		$dopostinstall =& $session->get('flexicontent.postinstall');
-		if($dopostinstall===NULL) {
+		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
 		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
