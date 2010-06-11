@@ -62,7 +62,6 @@ class FlexicontentViewFlexicontent extends JView
 		// handle joomfish integration
 		if (JPluginHelper::isEnabled('system', 'jfdatabase')) {
 			$files = new stdClass;
-			
 			$files->fields->dest 	= JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_fields.xml';
 			$files->fields->source 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_fields.xml';
 			$files->files->dest 	= JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_files.xml';
@@ -159,12 +158,8 @@ class FlexicontentViewFlexicontent extends JView
 			$CanPlugins		= 1;
 			$CanTemplates	= 1;
 		}
-		$dopostinstall = true;
-		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
-			$dopostinstall = false;
-		}
 		$session  =& JFactory::getSession();
-		$session->set('flexicontent.postinstall', $dopostinstall);
+		$dopostinstall = $session->get('flexicontent.postinstall');
 		
 		
 		//Create Submenu

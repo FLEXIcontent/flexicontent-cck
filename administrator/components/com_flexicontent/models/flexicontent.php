@@ -135,18 +135,20 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistType()
-	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__flexicontent_types'
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-			
-		if ($count > 0) {
-			return true;
+	function getExistType() {
+		static $return;
+		if($return===NULL) {
+			$return = false;
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__flexicontent_types'
+			;
+			$this->_db->setQuery( $query );
+			$count = $this->_db->loadResult();
+			if ($count > 0) {
+				$return = true;
 			}
-	return false;
+		}
+		return $return;
 	}
 
 	/**
@@ -157,16 +159,20 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistFields()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__flexicontent_fields'
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-			
-		if ($count > 13) {
-			return true;
+		static $return;
+		if($return===NULL) {
+			$return = false;
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__flexicontent_fields'
+			;
+			$this->_db->setQuery( $query );
+			$count = $this->_db->loadResult();
+				
+			if ($count > 13) {
+				$return = true;
 			}
-	return false;
+		}
+		return $return;
 	}
 
 	/**
@@ -230,15 +236,19 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getAllPluginsPublished()
 	{
-		$query 	= 'SELECT COUNT( id )'
-				. ' FROM #__plugins'
-				. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
-				. ' OR element = ' . $this->_db->Quote('flexisearch')
-				. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
-				. ' AND published <> 1'
-				;
-		$this->_db->setQuery( $query );
-		return $this->_db->loadResult() ? false : true;
+		static $return;
+		if($return === NULL) {
+			$query 	= 'SELECT COUNT( id )'
+					. ' FROM #__plugins'
+					. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
+					. ' OR element = ' . $this->_db->Quote('flexisearch')
+					. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
+					. ' AND published <> 1'
+					;
+			$this->_db->setQuery( $query );
+			$return = $this->_db->loadResult() ? false : true;
+		}
+		return $return;
 	}
 
 	/**
@@ -249,8 +259,12 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistLanguageColumn()
 	{
-		$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-		return (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+		static $return;
+		if($return === NULL) {
+			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
+			$return = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+		}
+		return $return;
 	}
 
 	/**
@@ -261,9 +275,13 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistVersionsTable()
 	{
-		$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_versions');
-		$this->_db->setQuery($query);
-		return $this->_db->loadResult() ? true : false;
+		static $return;
+		if($return === NULL) {
+			$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_versions');
+			$this->_db->setQuery($query);
+			$return = $this->_db->loadResult() ? true : false;
+		}
+		return $return;
 	}
 
 	/**
@@ -272,21 +290,24 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistVersionsPopulated()
-	{
-		$query 	= 'SELECT COUNT( version )'
-				. ' FROM #__flexicontent_items_versions'
-				;
-		$this->_db->setQuery( $query );
-		if(!$this->_db->loadResult()) {
-			return true;
-		} else {
-			$query 	= 'SELECT COUNT( id )'
-					. ' FROM #__flexicontent_versions'
+	function getExistVersionsPopulated() {
+		static $return;
+		if($return === NULL) {
+			$query 	= 'SELECT COUNT( version )'
+					. ' FROM #__flexicontent_items_versions'
 					;
 			$this->_db->setQuery( $query );
-			return $this->_db->loadResult() ? true : false;
+			if(!$this->_db->loadResult()) {
+				$return = true;
+			} else {
+				$query 	= 'SELECT COUNT( id )'
+						. ' FROM #__flexicontent_versions'
+						;
+				$this->_db->setQuery( $query );
+				$return = $this->_db->loadResult() ? true : false;
+			}
 		}
+		return $return;
 	}
 
 	/**
@@ -308,24 +329,27 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getOldBetaFiles()
-	{
-		$files 	= array (
-			'default.xml',
-			'default.php',
-			'index.html',
-			'form.php',
-			'form.xml'
-			);
-		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-		$cattmpl 	= JFolder::files($catdir);		
-		$ctmpl 		= array_diff($cattmpl,$files);
-		
-		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
-		$itemtmpl 	= JFolder::files($itemdir);		
-		$itmpl 		= array_diff($itemtmpl,$files);
-		
-		return ($ctmpl || $itmpl) ? false : true;
+	function getOldBetaFiles() {
+		static $return;
+		if($return===NULL) {
+			$files 	= array (
+				'default.xml',
+				'default.php',
+				'index.html',
+				'form.php',
+				'form.xml'
+				);
+			$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
+			$cattmpl 	= JFolder::files($catdir);		
+			$ctmpl 		= array_diff($cattmpl,$files);
+			
+			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+			$itemtmpl 	= JFolder::files($itemdir);		
+			$itmpl 		= array_diff($itemtmpl,$files);
+			
+			$return = ($ctmpl || $itmpl) ? false : true;
+		}
+		return $return;
 	}
 
 	/**
@@ -427,12 +451,16 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getNoOldFieldsData()
 	{
-		$query 	= 'SELECT COUNT( item_id )'
-				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id < 13'
-				;
-		$this->_db->setQuery( $query );
-		return $this->_db->loadResult() ? false : true;
+		static $return;
+		if($return===NULL) {
+			$query 	= 'SELECT COUNT( item_id )'
+					. ' FROM #__flexicontent_fields_item_relations'
+					. ' WHERE field_id < 13'
+					;
+			$this->_db->setQuery( $query );
+			$return = $this->_db->loadResult() ? false : true;
+		}
+		return $return;
 	}
 
 	
