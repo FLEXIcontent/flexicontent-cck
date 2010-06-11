@@ -18,7 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
-
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
 	<tr>
 		<td>
@@ -27,13 +26,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
-				
 			<!-- File Upload Form -->
             <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
                 <fieldset>
                     <legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
                     <fieldset class="actions">
-
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 							<tr>
 								<td class="key">
@@ -124,7 +121,7 @@ echo $this->pane->endPane();
 		</td>
 	</tr>
 </table>
-<form action="index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm">
+<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm">
 	<table class="adminform">
 		<tr>
 			<td width="100%">
@@ -136,7 +133,6 @@ echo $this->pane->endPane();
 			</td>
 			<td nowrap="nowrap">
 			 	<?php echo $this->lists['items']; ?>
-				<?php echo $this->lists['users']; ?>
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
