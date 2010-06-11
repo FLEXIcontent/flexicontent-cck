@@ -389,12 +389,63 @@ class FlexicontentModelItems extends JModel
 		$where[] = ' i.state != -2';
 		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
 
-		// if FLEXIaccess only authorize user to see its own items
+		// if FLEXIaccess only authorize users to see their own items
 		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-			if (!@$allitems) {
-				$where[] = 'i.created_by = ' . $user->id;
+				
+			if (!@$allitems) {				
+
+				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
+				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
+
+				if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
+					if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
+						$allown = array();
+						$allown[] = ' i.created_by = ' . $user->id;
+						if (isset($canEdit['category'])) {
+							if (count($canEdit['category']) == 1) {
+								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
+							} else if (count($canEdit['category']) > 1) {
+								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
+							}
+						}
+						if (isset($canEdit['item'])) {
+							if (count($canEdit['item']) == 1) {
+								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
+							} else if (count($canEdit['item']) > 1) {
+								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+							}
+						}
+						$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+					} else { // standard rules for the other users
+						$allown = array();
+						if (isset($canEditOwn['category'])) {
+							if (count($canEditOwn['category']) == 1) {
+								$allown[] = ' (i.catid = ' . $canEditOwn['category'][0]. ' AND i.created_by = ' . $user->id . ')'; 
+							} else if (count($canEditOwn['category']) > 1) {
+								$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
+							}
+						}
+						if (isset($canEdit['category'])) {
+							if (count($canEdit['category']) == 1) {
+								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
+							} else if (count($canEdit['category']) > 1) {
+								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
+							}
+						}
+						if (isset($canEdit['item'])) {
+							if (count($canEdit['item']) == 1) {
+								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
+							} else if (count($canEdit['item']) > 1) {
+								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+							}
+						}
+						if (count($allown) > 0) {
+							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+						}
+					}
+				}
 			}
 		}
 
