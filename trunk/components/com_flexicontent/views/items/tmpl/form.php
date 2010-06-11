@@ -102,23 +102,24 @@ function submitbutton( pressbutton ) {
 			</div>
 			<div class="flexi_formblock">
 <?php
-if($cid) {
+if ($cid) :
 	$cids = explode(",", $cid);
 	global $globalcats;
 	$cats = array();
-	foreach($cids as $cid) {
+	foreach($cids as $cid) :
 			$cats[] = $globalcats[$cid]->title;
 ?>
 			<input type="hidden" name="cid[]" value="<?php echo $cid;?>" />
 <?php
-	}
+	endforeach;
 ?>
 				<label for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 				</label>
 <?php
 	echo implode(',', $cats);
-}else{ ?>
+else :
+?>
 				<label for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 					<?php if ($this->perms['multicat']) : ?>
@@ -128,28 +129,80 @@ if($cid) {
 					<?php endif; ?>
 				</label>
           		<?php echo $this->lists['cid']; ?>
-<?php } ?>
+<?php
+endif;
+?>
 			</div>
 
-			<?php if($autopublished = $this->params->get('autopublished', 0)) {?>
+			<?php
+			if ($autopublished = $this->params->get('autopublished', 0)) : 
+			?>
 				<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
-			<?php }elseif ($this->perms['canpublish']) { ?>
+				<input type="hidden" id="vstate" name="vstate" value="2" />
+			<?php 
+			elseif ($this->perms['canpublish']) :
+			?>
 			<div class="flexi_formblock">
           		<label for="state" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
 				</label>
           		<?php echo $this->lists['state']; ?>
-          		<?php // echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate']; ?>
 			</div>
+				<?php
+				if (!$this->params->get('auto_approve', 1)) :
+				?>
 			<div class="flexi_formblock">
           		<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
 				</label>
           		<?php echo $this->lists['vstate']; ?>
 			</div>
-			<?php }; ?>
+				<?php
+				else :
+				?>
+				<input type="hidden" id="vstate" name="vstate" value="2" />
+				<?php
+				endif;
+				?>
+			<?php 
+			else :
+			?>
+			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
+			<?php 
+			endif; 
+			?>
 		</fieldset>
 		
+		<?php
+		if (FLEXI_ACCESS && $this->perms['canright']) :
+		$this->document->addScriptDeclaration("
+			window.addEvent('domready', function() {
+			var slideaccess = new Fx.Slide('tabacces');
+			var slidenoaccess = new Fx.Slide('notabacces');
+			slideaccess.hide();
+				$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
+					slideaccess.toggle();
+					slidenoaccess.toggle();
+					});
+				});
+			");
+
+		?>
+		<fieldset class="flexiaccess">
+			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+			<table id="tabacces" class="admintable" width="100%">
+            	<tr>
+            		<td>
+                		<div id="access"><?php echo $this->lists['access']; ?></div>
+                	</td>
+            	</tr>
+        	</table>
+			<div id="notabacces">
+			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+        	</div>
+        </fieldset>
+        <?php endif; ?>
+
 		<?php if ($this->perms['cantags']) : ?>
 		<fieldset class="flexi_tags">
 			<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
@@ -257,12 +310,12 @@ if($cid) {
 
             <div class="flexi_box_left">
               	<label for="metadesc"><?php echo JText::_( 'FLEXI_META_DESCRIPTION' ); ?></label>
-          		<textarea class="inputbox" cols="20" rows="5" name="metadesc" id="metadesc" style="width:250px;"><?php echo $this->item->metadesc; ?></textarea>
+          		<textarea class="inputbox" cols="20" rows="5" name="metadesc" id="metadesc" style="width:100%;"><?php echo $this->item->metadesc; ?></textarea>
             </div>
 
             <div class="flexi_box_right">
         		<label for="metakey"><?php echo JText::_( 'FLEXI_META_KEYWORDS' ); ?></label>
-        		<textarea class="inputbox" cols="20" rows="5" name="metakey" id="metakey" style="width:250px;"><?php echo $this->item->metakey; ?></textarea>
+        		<textarea class="inputbox" cols="20" rows="5" name="metakey" id="metakey" style="width:100%;"><?php echo $this->item->metakey; ?></textarea>
             </div>
       	</fieldset>
 		<?php }else{?>

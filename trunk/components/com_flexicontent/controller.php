@@ -61,28 +61,46 @@ class FlexicontentController extends JController
 	*/
 	function edit()
 	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
 		$user	=& JFactory::getUser();
 
 		// Create the view
 		$view = & $this->getView('items', 'html');
 
-		//general access check
-		if (!($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_content', 'edit', 'content', 'own'))) {
-//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-		}
-
 		// Get/Create the model
 		$model = & $this->getModel('items');
 
-		//check if we have an id(edit) and check if we have global edit rights or if we are allowed to edit own items.
-		if( $model->get('id') > 1 && !($user->authorize('com_flexicontent', 'edit') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id')) ) ) {
-//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+		// first verify it's an edit action
+		if ($model->get('id') > 1)
+		{
+			if (FLEXI_ACCESS) {
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+			
+				if ( (!in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) && (!in_array('edit', $rights)))
+				{
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			} else {
+				$canEdit	= $user->authorize('com_content', 'edit', 'content', 'all');
+				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own');
+				
+				if ( $canEdit || ($canEditOwn && ($model->get('created_by') == $user->get('id'))) )
+				{
+					// continue
+				} else {
+					// user isn't authorize to edit
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
+			}
 		}
 
 		//checked out?
 		if ( $model->isCheckedOut($user->get('id')))
 		{
-			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', JText::_( 'FLEXI_THE_ITEM' ), $model->get('title'));
+			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
 			$this->setRedirect(JRoute::_('index.php?view=items&id='.$model->get('id'), false), $msg);
 			return;
 		}
@@ -108,14 +126,35 @@ class FlexicontentController extends JController
 	*/
 	function add()
 	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
 		$user	=& JFactory::getUser();
 
 		// Create the view
-		$view = & $this->getView('Items', 'html');
+		$view = & $this->getView('items', 'html');
 
 		//general access check
-		if (!$user->authorize('com_flexicontent', 'add')) {
-//			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+		if (FLEXI_ACCESS) {
+			$canAdd 	= FAccess::checkUserElementsAccess($user->gmid, 'submit');
+
+			if ( @$canAdd['content'] || @$canAdd['category'] )
+			{
+				// continue
+			} else {
+				// user isn't authorize to edit
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			}
+		} else {
+			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+			
+			if ($canAdd)
+			{
+				// continue
+			} else {
+				// user isn't authorize to edit
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			}
 		}
 
 		// Get/Create the model
@@ -160,11 +199,6 @@ class FlexicontentController extends JController
 		if ($user->get('id') < 1) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
-		}
-
-		//access checks
-		if ( !(($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_content', 'edit', 'content', 'own')) || $user->authorize('com_flexicontent', 'add'))) {
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		}
 
 		if ($model->store($post)) {
