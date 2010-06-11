@@ -236,7 +236,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			</td>
 			<td nowrap="nowrap">
 				<?php echo $this->lists['items']; ?>
-				<?php echo $this->lists['users']; ?>
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
