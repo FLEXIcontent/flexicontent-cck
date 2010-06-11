@@ -63,6 +63,7 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	$show_noauth = $params->get('show_noauth', 0);
 
 	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+	require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 
 	if (is_array( $areas )) {
 		if (!array_intersect( $areas, array_keys( plgSearchFlexisearchAreas() ) )) {
@@ -74,7 +75,11 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	$plugin =& JPluginHelper::getPlugin('search', 'flexisearch');
 	$pluginParams = new JParameter( $plugin->params );
 
-	$limit = $pluginParams->def( 'search_limit', 50 );
+	// shortcode of the site active language (joomfish)
+	$lang 		= JRequest::getWord('lang', '' );
+
+	$limit 			= $pluginParams->def( 'search_limit', 50 );
+	$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
 
 	$text = trim( $text );
 	if ( $text == '' ) {
@@ -128,17 +133,24 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	
 	// Select only items user has access to if he is not allowed to show unauthorized items
+	$joinaccess	= '';
+	$andaccess	= '';
 	if (!$show_noauth) {
 		if (FLEXI_ACCESS) {
-			$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-			$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')';
+			$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')';
 			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $gid . ')';
 		} else {
-			$joinaccess	 = '';
-			$andaccess   = ' AND c.access <= '.$gid;
+			$andaccess  .= ' AND c.access <= '.$gid;
 			$andaccess  .= ' AND a.access <= '.$gid;
 		}
+	}
+
+	// filter by active language
+	$andlang = '';
+	if (FLEXI_FISH && $filter_lang) {
+		$andlang .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 	}
 
 	$query 	= 'SELECT DISTINCT a.title AS title,a.sectionid'
@@ -156,6 +168,7 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 			. ' AND a.state IN (1, -5)'
 			. ' AND c.published = 1'
 			. $andaccess
+			. $andlang
 			. ' ORDER BY '. $order
 			;
 
@@ -166,7 +179,7 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	{
 		foreach($list as $key => $row) {
 			if($row->sectionid==FLEXI_SECTION)
-				$list[$key]->href = FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug);
+				$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
 			else
 				$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->catslug, $row->sectionid));
 		}
