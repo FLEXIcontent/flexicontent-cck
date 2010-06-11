@@ -119,7 +119,8 @@ class FlexicontentController extends JController
 	}
 	
 	/**
-	* adds an item
+	* Logic to add an item
+	* Deprecated in 1.5.3 stable
 	*
 	* @access	public
 	* @since	1.0
@@ -323,12 +324,6 @@ class FlexicontentController extends JController
 		$vote		= JRequest::getInt('vote', 0);
 		$session 	=& JFactory::getSession();
 		$params 	= & $mainframe->getParams('com_flexicontent');
-
-/*
-		if (!$params->get('show_vote')) {
-			return;
-		}
-*/
 
 		$cookieName	= JUtility::getHash( $mainframe->getName() . 'flexicontentvote' . $id );
 		$voted = JRequest::getVar( $cookieName, '0', 'COOKIE', 'INT');

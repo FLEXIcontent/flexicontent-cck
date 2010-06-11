@@ -186,13 +186,14 @@ class FlexicontentModelItems extends JModel
 						}
 					}
 				}
-			} elseif(@$this->_item->id) {
+			} else if (@$this->_item->id) {
 				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
 				return false;
 			}
 			
 			// Do we have access to the content itself
-			if ($this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
+			
+			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
 			{
 				if (!$aid) {
 					// Redirect to login
@@ -212,7 +213,7 @@ class FlexicontentModelItems extends JModel
 						return false;
 					}
 				}
-			} else { // otherwise check for the standard states
+			} else if (@$this->_item->id) { // otherwise check for the standard states
 				$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
 				if (!@$canreaditem)
 				{

@@ -98,13 +98,6 @@ class FlexicontentViewItems extends JView
 		}
 		
 		$fields		=& $item->fields;
-		// Add html to field object trought plugins
-/*
-		foreach ($fields as $field)
-		{
-			$results = $dispatcher->trigger('onDisplayField', array( &$field, $row ));
-		}
-*/
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
@@ -272,6 +265,7 @@ class FlexicontentViewItems extends JView
 	 * @since 1.0
 	 */
 	function _displayForm($tpl) {
+
 		global $mainframe;
 
 		//Initialize variables
@@ -327,11 +321,9 @@ class FlexicontentViewItems extends JView
 			if (FLEXI_ACCESS) {
 				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
 	
-				if ( @$canAdd['content'] || @$canAdd['category'] )
+				if ( !@$canAdd['content'] && !@$canAdd['category'] )
 				{
-					// continue
-				} else {
-					// user isn't authorize to edit
+					// user isn't authorize to submit
 					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 				}
 			} else {
@@ -339,7 +331,7 @@ class FlexicontentViewItems extends JView
 				
 				if (!$canAdd)
 				{
-					// user isn't authorize to edit
+					// user isn't authorize to submit
 					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 				}
 			}
@@ -347,28 +339,30 @@ class FlexicontentViewItems extends JView
 
 		$perms 	= array();
 		if (FLEXI_ACCESS) {
-			$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
 			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
 			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$perms['cansubmit']		= ($user->gid < 25) ? ( (in_array('submit', $rights)) || (in_array('add', $rights)) ) : 1;
-			$perms['canedit']		= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
-			$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
-			$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
-			$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
+
+			if ($item->id) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+				$perms['canedit']		= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
+				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
+				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
+				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
+			} else {
+				$perms['canedit']		= ($user->gid < 25) ? 0 : 1;
+				$perms['canpublish']	= ($user->gid < 25) ? 0 : 1;
+				$perms['candelete']		= ($user->gid < 25) ? 0 : 1;
+				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
+			}
 		} else {
 			$perms['multicat']		= 1;
 			$perms['cantags'] 		= 1;
 			$perms['canparams'] 	= 1;
-			$perms['cansubmit']		= ($user->gid >= 18);
 			$perms['canedit']		= ($user->gid >= 20);
 			$perms['canpublish']	= ($user->gid >= 21);
 			$perms['candelete']		= ($user->gid >= 21);
 			$perms['canright']		= ($user->gid >= 21);
-		}
-
-		if (!$perms['cansubmit']) {
-			$mainframe->redirect('index.php', JText::_( 'ALERTNOTAUTH' ));
 		}
 
 		//Add the js includes to the document <head> section
@@ -390,6 +384,14 @@ class FlexicontentViewItems extends JView
 		
 		//Get the lists
 		$lists = $this->_buildEditLists($perms['multicat']);
+
+		if (FLEXI_FISH) {
+		//build languages list
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item->language, 3);
+		} else {
+			$item->language = flexicontent_html::getSiteDefaultLang();
+		}
+
 
 		//Load the JEditor object
 		$editor =& JFactory::getEditor();
@@ -413,13 +415,6 @@ class FlexicontentViewItems extends JView
 		//get pathway
 		$pathway =& $mainframe->getPathWay();
 		$pathway->addItem($title, '');
-
-		// Unify the introtext and fulltext fields and separated the fields by the readmore tag
-		/*if (JString::strlen($item->fulltext) > 1) {
-			$item->text = $item->introtext."<hr id=\"system-readmore\" />".$item->fulltext;
-		} else {
-			$item->text = $item->introtext;
-		}*/
 
 		//Ensure the row data is safe html
 		JFilterOutput::objectHTMLSafe( $item );
