@@ -510,6 +510,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function buildSelectList( $field )
 	{
 		$db =& JFactory::getDBO();
+		$app =& JFactory::getApplication();
 		
 		$query = 'SELECT value'
 				. ' FROM #__flexicontent_fields_item_relations'
