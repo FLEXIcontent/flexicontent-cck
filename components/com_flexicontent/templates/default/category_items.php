@@ -73,7 +73,7 @@ endif;
 <?php
 if ($this->items) :
 	// routine to determine all used columns for this table
-	$layout = $this->params->get('ilayout', 'default');
+	$layout = $this->params->get('clayout', 'default');
 	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
 	$columns = array();
 	foreach ($this->items as $item) :
