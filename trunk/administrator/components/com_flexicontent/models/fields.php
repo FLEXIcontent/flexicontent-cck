@@ -410,6 +410,18 @@ class FlexicontentModelFields extends JModel
 				return false;
 			}
 			
+			// delete also field in fields versions table
+			$query = 'DELETE FROM #__flexicontent_items_versions'
+					. ' WHERE field_id IN ('. $cids .')'
+					;
+
+			$this->_db->setQuery( $query );
+
+			if(!$this->_db->query()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
+			
 		}
 
 		return true;
