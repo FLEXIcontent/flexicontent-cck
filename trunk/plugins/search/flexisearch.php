@@ -81,6 +81,11 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 	$limit 			= $pluginParams->def( 'search_limit', 50 );
 	$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
 
+	// Dates for publish up & down items
+	$nullDate = $db->getNullDate();
+	$date =& JFactory::getDate();
+	$now = $date->toMySQL();
+
 	$text = trim( $text );
 	if ( $text == '' ) {
 		return array();
@@ -167,6 +172,8 @@ function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 			. ' WHERE ( '.$where.' )'
 			. ' AND a.state IN (1, -5)'
 			. ' AND c.published = 1'
+			. ' AND ( a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).' )'
+			. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
 			. $andaccess
 			. $andlang
 			. ' ORDER BY '. $order
