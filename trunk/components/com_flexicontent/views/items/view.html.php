@@ -290,7 +290,15 @@ class FlexicontentViewItems extends JView
 
 		// first check if the user is logged
 		if (!$user->get('id')) {
-			$mainframe->redirect('index.php', JText::_( 'FLEXI_ALERTNOTAUTH' ));
+			$menu =& JSite::getMenu();
+			$itemid = $params->get('notauthurl');
+			$item = $menu->getItem($itemid);
+			if($item->component) {
+				$url = JRoute::_($item->link.'&Itemid='.$itemid.'&option='.$item->component, false);
+			}else{
+				$url = JRoute::_($item->link, false);
+			}
+			$mainframe->redirect($url, JText::_( 'FLEXI_ALERTNOTAUTH' ));
 		}
 
 		// check if it's an edit action

@@ -24,6 +24,7 @@
 				<option value="0">NO</option>
 				<option value="1">YES</option>
 			</param>
+			<param name="notauthurl" type="menuitem" default="" disable="separator" label="Not Autorizeed Redirection URL" description="PARAMLOGOUTREDIRECTURL" />
 		</params>
 	</state>
 </metadata>
