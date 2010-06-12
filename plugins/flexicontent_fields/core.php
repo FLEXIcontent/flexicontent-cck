@@ -105,7 +105,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 
 			case 'state': // state
-			$field->display = flexicontent_html::stateicon( $item->state, $params );
+			$field->display = flexicontent_html::stateicon( $item->state, $field->parameters );
 			break;
 
 			case 'voting': // voting button

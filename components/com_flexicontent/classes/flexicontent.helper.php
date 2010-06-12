@@ -308,10 +308,10 @@ class flexicontent_html
 
 		$text = JText::_( 'FLEXI_STATE' );
 		
-		if ( $params->get('show_icons') ) {
+		if ( $params->get('show_icons', 1) ) {
 			$image = JHTML::_('image.site', $img, 'components/com_flexicontent/assets/images/', NULL, NULL, $alt, 'class="editlinktip hasTip" title="'.$text.'::'.$alt.'"' );
 		} else {
-			$image = '&nbsp;'. $alt;
+			$image = $alt;
 		}
 		return $image;
 		return;
