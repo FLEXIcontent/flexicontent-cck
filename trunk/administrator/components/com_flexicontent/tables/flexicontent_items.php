@@ -195,29 +195,27 @@ class flexicontent_items extends JTable{
 	 */
 	function store( $updateNulls=false )
 	{
-        $k             = $this->_tbl_key;
-        $frn_key       = $this->_frn_key;
+		$k             = $this->_tbl_key;
+		$frn_key       = $this->_frn_key;
 
-        // Split the object for the two tables #__content and #__flexicontent_items_ext
-        //$type     = new stdClass();
-	$type = JFactory::_createDBO();
-	$type->_tbl = $this->_tbl;
-	$type->_tbl_key = $this->_tbl_key;
-        //$type_ext = new stdClass();
-	$type_ext = JFactory::_createDBO();
-	$type_ext->_tbl = $this->_tbl;
-	$type_ext->_tbl_key = $this->_tbl_key;
-        foreach ($this->getProperties() as $p => $v)
-        {
-        // If the property is in the join properties array we add it to the items_ext object
-            if (in_array($p, $this->_join_prop))
-            {
-                $type_ext->$p = $v;
-		// Else we add it to the type object
-            } else {
-                $type->$p = $v;
-            }
-        }
+		// Split the object for the two tables #__content and #__flexicontent_items_ext
+		//$type     = new stdClass();
+		$type = & JTable::getInstance('content');
+		$type->_tbl = $this->_tbl;
+		$type->_tbl_key = $this->_tbl_key;
+		//$type_ext = new stdClass();
+		$type_ext = & JTable::getInstance('flexicontent_items_ext', '');
+		$type_ext->_tbl = $this->_tbl_join;
+		$type_ext->_tbl_key = $this->_frn_key;
+		foreach ($this->getProperties() as $p => $v) {
+			// If the property is in the join properties array we add it to the items_ext object
+			if (in_array($p, $this->_join_prop)) {
+				$type_ext->$p = $v;
+				// Else we add it to the type object
+			} else {
+				$type->$p = $v;
+			}
+		}
 
 		if( $this->$k )
 		{
@@ -228,7 +226,8 @@ class flexicontent_items extends JTable{
 		{
 			$ret = $this->_db->insertObject( $this->_tbl, $type, $this->_tbl_key );
 			// set the type_id
-			$this->id = $this->_db->insertid();
+			$this->id = $type->id;
+			$this->id = $this->id?$this->id:$this->_db->insertid();
 		}
 
 		if( !$ret )
@@ -238,16 +237,16 @@ class flexicontent_items extends JTable{
 		}
 		else
 		{
-	        // check for foreign key
-	        if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key))
-	        {
-	        	// update #__flexicontent_items_ext table
+			// check for foreign key
+			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key))
+			{
+				// update #__flexicontent_items_ext table
 				$ret = $this->_db->updateObject( $this->_tbl_join, $type_ext, $this->_frn_key, $updateNulls );
-	        } else {
-    	    	// insert into #__flexicontent_items_ext table
-    	        $type_ext->$frn_key = $this->id;
+			} else {
+				// insert into #__flexicontent_items_ext table
+				$type_ext->$frn_key = $this->id;
 				$ret = $this->_db->insertObject( $this->_tbl_join, $type_ext, $this->_frn_key );
-    	    }
+			}
 			return true;
 		}
 	}
