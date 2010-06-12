@@ -199,8 +199,14 @@ class flexicontent_items extends JTable{
         $frn_key       = $this->_frn_key;
 
         // Split the object for the two tables #__content and #__flexicontent_items_ext
-        $type     = new stdClass();
-        $type_ext = new stdClass();
+        //$type     = new stdClass();
+	$type = JFactory::_createDBO();
+	$type->_tbl = $this->_tbl;
+	$type->_tbl_key = $this->_tbl_key;
+        //$type_ext = new stdClass();
+	$type_ext = JFactory::_createDBO();
+	$type_ext->_tbl = $this->_tbl;
+	$type_ext->_tbl_key = $this->_tbl_key;
         foreach ($this->getProperties() as $p => $v)
         {
         // If the property is in the join properties array we add it to the items_ext object
@@ -216,13 +222,13 @@ class flexicontent_items extends JTable{
 		if( $this->$k )
 		{
 			$ret = $this->_db->updateObject( $this->_tbl, $type, $this->_tbl_key, $updateNulls );
-    	    $type_ext->$frn_key = $this->$k;
+			$type_ext->$frn_key = $this->$k;
 		}
 		else
 		{
 			$ret = $this->_db->insertObject( $this->_tbl, $type, $this->_tbl_key );
-            // set the type_id
-            $this->id = $this->_db->insertid();
+			// set the type_id
+			$this->id = $this->_db->insertid();
 		}
 
 		if( !$ret )
