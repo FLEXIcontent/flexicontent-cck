@@ -199,6 +199,10 @@ class FlexicontentViewCategory extends JView
 		// Add html to filter object
 		if ($filters)
 		{
+			// Make the filter compatible with Joomla standard cache
+			$cache = JFactory::getCache('com_flexicontent');
+			$cache->clean();
+
 			foreach ($filters as $filtre)
 			{
 				$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
