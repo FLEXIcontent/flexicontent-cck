@@ -62,10 +62,10 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		}
 		
 		// initialise property
-		if($item->version == 1 && $default_value) {
-			$field->value[0] = $default_value;
-		} elseif (!$field->value[0]) {
-			$field->value[0] = '';
+		if(($item->version < 2) && $default_value) {
+			$field->value[] = $default_value;
+		} else {
+			if (!$field->value) $field->value = array('');
 		}
 
 		$listelements = explode("%% ", $field_elements);
