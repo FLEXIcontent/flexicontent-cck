@@ -650,7 +650,8 @@ class FlexicontentModelItems extends JModel
 	}
 
 	function getUsedtags() {
-		if(!@$this->_item->tags) {
+		if(!@$this->_id) $this->_item->tags = array();
+		if(@$this->_id && !@$this->_item->tags) {
 			$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
 			$this->_item->tags = $this->_db->loadResultArray();
