@@ -263,9 +263,60 @@ class FlexicontentModelTags extends JModel
 				;
 
 		$this->_db->setQuery($query);
-        $this->_tag = $this->_db->loadObject();
+		$this->_tag = $this->_db->loadObject();
         
 		return $this->_tag;
+	}
+	
+	/**
+	 * Method to store the tag
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function storetag($data)
+	{
+		$row  =& $this->getTable('flexicontent_tags', '');
+
+		// bind it to the table
+		if (!$row->bind($data)) {
+			JError::raiseError(500, $this->_db->getErrorMsg() );
+			return false;
+		}
+
+		// Make sure the data is valid
+		if (!$row->check()) {
+			$this->setError($row->getError());
+			return false;
+		}
+
+		// Store it in the db
+		if (!$row->store()) {
+			JError::raiseError(500, $this->_db->getErrorMsg() );
+			return false;
+		}
+		$this->_tag = &$row;
+		return $row->id;
+	}
+	
+	/**
+	 * Method to add a tag
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function addtag($name) {
+		$obj = new stdClass();
+		$obj->name	 	= $name;
+		$obj->published	= 1;
+
+		//$this->storetag($obj);
+		if($this->storetag($obj)) {
+			return true;
+		}
+		return false;
 	}
 }
 ?>

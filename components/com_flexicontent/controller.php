@@ -565,7 +565,7 @@ class FlexicontentController extends JController
 	 * @access public
 	 * @since 1.0
 	 */
-	function addtag()
+	function addtagx()
 	{
 
 		$user = JFactory::getUser();
@@ -577,6 +577,31 @@ class FlexicontentController extends JController
 			$model->addtag($name);
 		}
 		return;
+	}
+	
+	/**
+	 *  Add new Tag from item screen
+	 *
+	 */
+	function addtag() {
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
+		$name 	= JRequest::getString('name', '');
+		$model 	= $this->getModel('tags');
+		$array = JRequest::getVar('cid',  0, '', 'array');
+		$cid = (int)$array[0];
+		$model->setId($cid);
+		if($cid==0) {
+			$result = $model->addtag($name);
+			if($result)
+				echo $model->_tag->id."|".$model->_tag->name;
+		} else {
+			$id = $model->get('id');
+			$name = $model->get('name');
+			echo $id."|".$name;
+		}
+		exit;
 	}
 
 	/**

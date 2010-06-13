@@ -96,7 +96,6 @@ if ($this->CanUseTags) {
 	");
 }
 ?>
-
 <script language="javascript" type="text/javascript">
 window.addEvent( "domready", function() {
     var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gethits'});
@@ -119,11 +118,10 @@ function addtag(id, tagname) {
 	}
 	
 	var tag = new itemscreen();
-    tag.addtag( id, tagname );
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&view=items&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
-function reseter(task, id, div)
-{	
+function reseter(task, id, div){
 	var form = document.adminForm;
 	
 	if (task == 'resethits') {
@@ -132,7 +130,7 @@ function reseter(task, id, div)
 	}
 		
 	var res = new itemscreen();
-    res.reseter( task, id, div );
+	res.reseter( task, id, div );
 }
 function clickRestore(link) {
 	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ); ?>")) {
@@ -162,9 +160,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 ?>
 
 <div class="flexicontent">
-
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm" autocomplete="off">
-
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">

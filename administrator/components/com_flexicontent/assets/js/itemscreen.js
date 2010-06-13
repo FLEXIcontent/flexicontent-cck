@@ -31,9 +31,9 @@ var itemscreen = new Class(
 		ajax.request.delay(300, ajax);
 	},
 
-	addtag: function( cid, tagname )
+	addtag: function( cid, tagname, url )
 	{
-		var url = 'index.php?option=com_flexicontent&controller=tags&task=addtag&format=raw&cid='+cid;
+		var url = url+'&cid='+cid;
 		var tagajax = new Ajax(url, {
 			method: 'get',
 			data : Object.toQueryString({'name' : tagname }),

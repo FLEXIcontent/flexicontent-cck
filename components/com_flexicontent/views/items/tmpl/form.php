@@ -21,6 +21,8 @@ $cid = $this->params->get("cid");
 
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 //$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
@@ -69,6 +71,19 @@ if ($this->perms['cantags']) {
 				jQuery(\"#input-tags\").attr('tagname','');
 				jQuery(\"#input-tags\").attr('value','');
 			}
+			jQuery(\".deletetag\").click(function(e){
+				parent = jQuery(jQuery(this).parent());
+				parent.remove();
+				return false;
+			});
+		});
+	");
+}else{
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function () {
+			jQuery(\".deletetag\").click(function(e){
+				return false;
+			});
 		});
 	");
 }
@@ -93,8 +108,19 @@ function addToList(id, name) {
 	obj = $('ultagbox');
 	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
 }
+function addtag(id, tagname) {
+	if(id==null) {
+		id=0;
+	}
+	if(tagname == '') {
+		alert('<?php echo JText::_( 'FLEXI_ENTER_TAG', true); ?>' );
+		return;
+	}
+	if(id) return;
+	var tag = new itemscreen();
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&view=items&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+}
 function submitbutton( pressbutton ) {
-
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
 		return;
@@ -278,7 +304,7 @@ endif;
 				if(!in_array($tag->id, $this->used)) break;
 				if ($this->perms['cantags']) {
 					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag"  align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 				} else {
 					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
