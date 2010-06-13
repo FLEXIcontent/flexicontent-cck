@@ -583,8 +583,7 @@ class FlexicontentModelItems extends JModel
 	 * @return	object
 	 * @since	1.0
 	 */
-	function getTagsX()
-	{
+	function getTagsX() {
 		$query = 'SELECT DISTINCT t.name,'
 		. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 		. ' FROM #__flexicontent_tags AS t'
@@ -607,8 +606,7 @@ class FlexicontentModelItems extends JModel
 	 * @return object
 	 * @since 1.0
 	 */
-	function gettags($mask="")
-	{
+	function gettags($mask="") {
 		$where = ($mask!="")?" name like '%$mask%' AND":"";
 		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
@@ -1211,7 +1209,7 @@ class FlexicontentModelItems extends JModel
 			JError::raiseError(500, $this->_db->getErrorMsg() );
 			return false;
 		}
-
+		$this->_tag = &$row;
 		return $row->id;
 	}
 
@@ -1222,15 +1220,16 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function addtag($name)
-	{
+	function addtag($name) {
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
 
-		$this->storetag($obj);
-
-		return true;
+		//$this->storetag($obj);
+		if($this->storetag($obj)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
