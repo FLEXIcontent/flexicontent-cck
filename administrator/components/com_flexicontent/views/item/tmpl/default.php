@@ -118,7 +118,7 @@ function addtag(id, tagname) {
 	}
 	
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&view=items&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&controller=tags&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
 function reseter(task, id, div){
