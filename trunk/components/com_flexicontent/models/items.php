@@ -583,7 +583,7 @@ class FlexicontentModelItems extends JModel
 	 * @return	object
 	 * @since	1.0
 	 */
-	function getTags()
+	function getTagsX()
 	{
 		$query = 'SELECT DISTINCT t.name,'
 		. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
@@ -599,6 +599,21 @@ class FlexicontentModelItems extends JModel
 		$this->_tags = $this->_db->loadObjectList();
 
 		return $this->_tags;
+	}
+	
+	/**
+	 * Method to fetch tags
+	 * 
+	 * @return object
+	 * @since 1.0
+	 */
+	function gettags($mask="")
+	{
+		$where = ($mask!="")?" name like '%$mask%' AND":"";
+		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
+		$this->_db->setQuery($query);
+		$tags = $this->_db->loadObjectlist();
+		return $tags;
 	}
 
 	/**
