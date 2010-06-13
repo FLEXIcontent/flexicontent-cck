@@ -19,11 +19,11 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $cid = $this->params->get("cid");
 
+JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
-//$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
@@ -118,7 +118,7 @@ function addtag(id, tagname) {
 	}
 	if(id) return;
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&view=items&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
@@ -151,6 +151,10 @@ function submitbutton( pressbutton ) {
 	submitform(pressbutton);
 	return true;
 	}
+}
+function deleteTag(obj) {
+	parent = $($(obj).getParent());
+	parent.remove();
 }
 </script>
 
@@ -300,14 +304,20 @@ endif;
 		<div class="qf_tagbox" id="qf_tagbox">
 		<ul id="ultagbox">
 		<?php
+/*
+dump($this->tags,'tags');
+dump($this->used,'used');
+dump($this->perms,'perms');
+*/
 			foreach( $this->tags as $tag ) {
-				if(!in_array($tag->id, $this->used)) break;
-				if ($this->perms['cantags']) {
-					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag"  align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-				} else {
-					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+				if(in_array($tag->id, $this->used)) {
+					if ($this->perms['cantags']) {
+						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+					} else {
+						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+					}
 				}
 			}
 			?>

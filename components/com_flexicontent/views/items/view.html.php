@@ -429,17 +429,17 @@ class FlexicontentViewItems extends JView
 
 		$this->assign('action', 	$uri->toString());
 
-		$this->assignRef('item',	$item);
-		$this->assignRef('params',$params);
-		$this->assignRef('lists',	$lists);
-		$this->assignRef('editor',	$editor);
-		$this->assignRef('user',	$user);
-		$this->assignRef('tags',	$tags);
-		$this->assignRef('used',	$used);
-		$this->assignRef('fields',	$fields);
-		$this->assignRef('tparams', $tparams);
-		$this->assignRef('perms', 	$perms);
-		$this->assignRef('document', $document);
+		$this->assignRef('item',		$item);
+		$this->assignRef('params',		$params);
+		$this->assignRef('lists',		$lists);
+		$this->assignRef('editor',		$editor);
+		$this->assignRef('user',		$user);
+		$this->assignRef('tags',		$tags);
+		$this->assignRef('used',		$used);
+		$this->assignRef('fields',		$fields);
+		$this->assignRef('tparams', 	$tparams);
+		$this->assignRef('perms', 		$perms);
+		$this->assignRef('document',	$document);
 
 		parent::display($tpl);
 	}
