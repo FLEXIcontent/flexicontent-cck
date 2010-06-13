@@ -18,8 +18,61 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $cid = $this->params->get("cid");
-?>
 
+$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
+$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+//$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
+if ($this->perms['cantags']) {
+	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery.pager.js');
+	
+	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/Pager.css');
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function () {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+				width: 260,
+				matchContains: false,
+				mustMatch: false,
+				selectFirst: false,
+				dataType: \"json\",
+				parse: function(data) {
+					return jQuery.map(data, function(row) {
+						return {
+							data: row,
+							value: row.name,
+							result: row.name
+						};
+					});
+				},
+				formatItem: function(row) {
+					return row.name;
+				}
+			}).result(function(e, row) {
+				jQuery(\"#input-tags\").attr('tagid',row.id);
+				jQuery(\"#input-tags\").attr('tagname',row.name);
+				addToList(row.id, row.name);
+			}).keydown(function(event) {
+				if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
+					addtag(0, jQuery(\"#input-tags\").attr('value'));
+					resetField();
+					return false;
+				}else if(event.keyCode==13) {
+					resetField();
+					return false;
+				}
+			});
+			function resetField() {
+				jQuery(\"#input-tags\").attr('tagid',0);
+				jQuery(\"#input-tags\").attr('tagname','');
+				jQuery(\"#input-tags\").attr('value','');
+			}
+		});
+	");
+}
+?>
 <script language="javascript" type="text/javascript">
 Window.onDomReady(function(){
 	document.formvalidator.setHandler('cid',
@@ -36,7 +89,10 @@ Window.onDomReady(function(){
 		}
 	);
 });
-	
+function addToList(id, name) {
+	obj = $('ultagbox');
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
+}
 function submitbutton( pressbutton ) {
 
 	if (pressbutton == 'cancel') {
@@ -213,108 +269,125 @@ endif;
         </fieldset>
         <?php endif; ?>
 
-		<?php if ($this->perms['cantags']) : ?>
-		<fieldset class="flexi_tags">
-			<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
-			
-			<div id="tags">
-        	<?php
-    		$n = count($this->tags);
-    		if ($n) {
-        		echo '<div class="flexi_tagbox"><ul>';
-        		for( $i = 0, $n; $i < $n; $i++ )
-        		{
-					$tag = $this->tags[$i];
-					echo '<li><div><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $this->used) ? 'checked="checked"' : '') . ' /></span>'.$this->escape($tag->name).'</div></li>';	
+	<fieldset class="flexi_tags">
+		<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
+		<div class="qf_tagbox" id="qf_tagbox">
+		<ul id="ultagbox">
+		<?php
+			foreach( $this->tags as $tag ) {
+				if(!in_array($tag->id, $this->used)) break;
+				if ($this->perms['cantags']) {
+					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+				} else {
+					echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+					echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
 				}
-				echo '</ul></div>';
 			}
 			?>
-			</div>
-		</fieldset>
+		</ul>
+		<br class="clear" />
+	</div>
+		<?php if ($this->perms['cantags']) : ?>
+		<div id="tags">
+	<?php /*
+	$n = count($this->tags);
+	if ($n) {
+		echo '<div class="flexi_tagbox"><ul>';
+		for( $i = 0, $n; $i < $n; $i++ )
+		{
+				$tag = $this->tags[$i];
+				echo '<li><div><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $this->used) ? 'checked="checked"' : '') . ' /></span>'.$this->escape($tag->name).'</div></li>';	
+			}
+			echo '</ul></div>';
+		}*/
+		?>
+		<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+			<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+		</label>
+		</div>
 		<?php endif; ?>
+	</fieldset>
+
+	<?php
+	if ($this->fields) {
+		$this->document->addScriptDeclaration("
+		window.addEvent('domready', function() {
+			$$('#type_id').addEvent('change', function(ev) {
+				$('fc-change-error').setStyle('display', 'block');
+				});
+			});
+		");
+	?>
+
+	<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+	
+	<fieldset>
+		<legend>
+			<?php
+			$types = flexicontent_html::getTypesList();
+			$this->item->typename = $types[$this->item->type_id]['name'];
+			echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+		</legend>
 		
-				<?php
-				if ($this->fields) {
-					$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						$$('#type_id').addEvent('change', function(ev) {
-							$('fc-change-error').setStyle('display', 'block');
-							});
-						});
-					");
-				?>
-
-				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
-				
-				<fieldset>
-					<legend>
-						<?php
-						$types = flexicontent_html::getTypesList();
-						$this->item->typename = $types[$this->item->type_id]['name'];
-						echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
-					</legend>
-					
-					<table class="admintable" width="100%">
-						<?php
-						foreach ($this->fields as $field) {
-							// used to hide the core fields from this listing
-							if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
-							// set the specific label for the maintext field
-								if ($field->field_type == 'maintext')
-								{
-									$field->label = $this->tparams->get('maintext_label', $field->label);
-									$field->description = $this->tparams->get('maintext_desc', $field->description);
-									//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
-									$maintext = $this->item->text;
-									if ($this->tparams->get('hide_html', 0))
-									{
-										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
-									} else {
-										$height = $this->tparams->get('height', 400);
-										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
-									}
-								}
-						?>
-						<tr>
-							<td class="key">
-								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-									<?php echo $field->label; ?>
-								</label>
-							</td>
-							<td>
-								<?php
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-								if(isset($field->html)){
-									echo $field->html;
-								} else {
-									echo $noplugin;
-								}
-								?>
-							</td>
-						</tr>
-						<?php
-							}
+		<table class="admintable" width="100%">
+			<?php
+			foreach ($this->fields as $field) {
+				// used to hide the core fields from this listing
+				if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
+				// set the specific label for the maintext field
+					if ($field->field_type == 'maintext')
+					{
+						$field->label = $this->tparams->get('maintext_label', $field->label);
+						$field->description = $this->tparams->get('maintext_desc', $field->description);
+						//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
+						$maintext = $this->item->text;
+						if ($this->tparams->get('hide_html', 0))
+						{
+							$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
+						} else {
+							$height = $this->tparams->get('height', 400);
+							$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
 						}
-						?>
-					</table>
-				</fieldset>
-				<?php
-				} else if ($this->item->id == 0) {
-				?>
-					<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
-				<?php
-				} else {
-				?>
-					<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
-				<?php
+					}
+			?>
+			<tr>
+				<td class="key">
+					<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
+						<?php echo $field->label; ?>
+					</label>
+				</td>
+				<td>
+					<?php
+					$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+					if(isset($field->html)){
+						echo $field->html;
+					} else {
+						echo $noplugin;
+					}
+					?>
+				</td>
+			</tr>
+			<?php
 				}
-				?>
-				
-				
+			}
+			?>
+		</table>
+	</fieldset>
+	<?php
+	} else if ($this->item->id == 0) {
+	?>
+		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
+	<?php
+	} else {
+	?>
+		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
+	<?php
+	}
+	?>
 
-		<?php if ($this->perms['canparams']) : ?>
-		<?php if($this->params->get('usemetadata', 1)) {?>
+	<?php if ($this->perms['canparams']) : ?>
+	<?php if($this->params->get('usemetadata', 1)) {?>
     	<fieldset class="flexi_meta">
        	<legend><?php echo JText::_( 'FLEXI_METADATA_INFORMATION' ); ?></legend>
 

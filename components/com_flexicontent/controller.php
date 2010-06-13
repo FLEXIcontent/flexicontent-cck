@@ -898,5 +898,39 @@ class FlexicontentController extends JController
 		$mainframe->close();
 	}
 
+	/**
+	 * Method to fetch the tags form
+	 * 
+	 * @since 1.5
+	 */
+	function viewtags() {
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
+		$user	=& JFactory::getUser();
+		if (FLEXI_ACCESS) {
+			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+		} else {
+			$CanUseTags = 1;
+		}
+		if($CanUseTags) {
+			//header('Content-type: application/json');
+			@ob_end_clean();
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Cache-Control: no-cache");
+			header("Pragma: no-cache");
+			//header("Content-type:text/json");
+			$model 		=  $this->getModel('items');
+			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
+			$array = array();
+			echo "[";
+			foreach($tagobjs as $tag) {
+				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
+			}
+			echo implode(",", $array);
+			echo "]";
+			exit;
+		}
+	}
 }
 ?>
