@@ -71,40 +71,49 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		switch ($field->field_type)
 		{
 			case 'created': // created
+			$field->value[] = $item->created;
 			$dateformat = $dateformat ? $dateformat : $customdate;
 			$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
 			break;
 			
 			case 'createdby': // created by
+			$field->value[] = $item->created_by;
 			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
 			break;
 
 			case 'modified': // modified
+			$field->value[] = $item->modified;
 			$dateformat = $dateformat ? $dateformat : $customdate;
 			$field->display = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
 			break;
 			
 			case 'modifiedby': // modified by
+			$field->value[] = $item->modified_by;
 			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
 			break;
 
 			case 'title': // hits
+			$field->value[] = $item->title;
 			$field->display = $pretext.$item->title.$posttext;
 			break;
 
 			case 'hits': // hits
+			$field->value[] = $item->hits;
 			$field->display = $pretext.$item->hits.$posttext;
 			break;
 
 			case 'type': // document type
+			$field->value[] = $item->type_id;
 			$field->display = $pretext.$item->typename.$posttext;
 			break;
 
 			case 'version': // version
+			$field->value[] = $item->version;
 			$field->display = $pretext.$item->version.$posttext;
 			break;
 
 			case 'state': // state
+			$field->value[] = $item->state;
 			$field->display = flexicontent_html::stateicon( $item->state, $field->parameters );
 			break;
 
