@@ -350,7 +350,9 @@ class FlexicontentModelCategory extends JModel
 		}		
 		
 		$alpha 	= $mainframe->getUserStateFromRequest( $option.'.category.letter', 'letter', '', 'cmd' );
-
+		if($alpha==="") {
+			$alpha = JRequest::getVar('letter', '');
+		}
 		if ($alpha == '0') {
 			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
 		}		
@@ -681,37 +683,35 @@ class FlexicontentModelCategory extends JModel
 	 * @since 1.5
 	 */
  	function getAlphaindex() {
-        $user		= & JFactory::getUser();
-        $gid		= (int) $user->get('aid');
-        $lang 		= JRequest::getWord('lang', '' );
-        // Get the category parameters
-        $cparams 	= $this->_category->parameters;
-        // show unauthorized items
-        $show_noauth = $cparams->get('show_noauth', 0);
-        
-        // Filter the category view with the active active language
-        $and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
-        $and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
-        
-        
-        $query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
-                . ' FROM #__content AS i'
-                . ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
-                . ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-                . ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
-                . ' WHERE rel.catid = '.$this->_id
-                . $and
-                . ' AND i.state IN (1, -5)'
-                . ' AND i.sectionid = '.FLEXI_SECTION
-                . $and2
-                . ' GROUP BY alpha'
-                . ' ORDER BY alpha ASC';
-        ;
-        $this->_db->setQuery($query);
-        $alpha = $this->_db->loadResultArray();
-        
-        return $alpha;
-    }
-
+		$user		= & JFactory::getUser();
+		$gid		= (int) $user->get('aid');
+		$lang 		= JRequest::getWord('lang', '' );
+		// Get the category parameters
+		$cparams 	= $this->_category->parameters;
+		// show unauthorized items
+		$show_noauth = $cparams->get('show_noauth', 0);
+		
+		// Filter the category view with the active active language
+		$and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
+		$and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
+		
+		
+		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+			. ' WHERE rel.catid = '.$this->_id
+			. $and
+			. ' AND i.state IN (1, -5)'
+			. ' AND i.sectionid = '.FLEXI_SECTION
+			. $and2
+			. ' GROUP BY alpha'
+			. ' ORDER BY alpha ASC';
+		;
+		$this->_db->setQuery($query);
+		$alpha = $this->_db->loadResultArray();
+		return $alpha;
+	}
 }
 ?>
