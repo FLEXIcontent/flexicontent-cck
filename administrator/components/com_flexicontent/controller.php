@@ -43,11 +43,13 @@ class FlexicontentController extends JController
 		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
+		
 		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
-			$msg = JText::_( 'Post installation step do not complete.' );
+			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
 		}
+		
 		// Register Extra task
 		$this->registerTask( 'apply'					, 'save' );
 		$this->registerTask( 'applyacl'					, 'saveacl' );
