@@ -205,6 +205,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						<img src="'. $src .'" alt ="'.$alt.'" />
 					</a>
 					';
+				} else if ($usepopup && $popuptype == 3) {
+				$field->{$prop} = '
+					<a href="'.$srcb.'" class="jcepopup" rel="'.$field->item_id.'" title="'.($desc ? $desc : $title).'">
+						<img src="'. $src .'" alt ="'.$alt.'" />
+					</a>
+					';
 				} else {
 					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}

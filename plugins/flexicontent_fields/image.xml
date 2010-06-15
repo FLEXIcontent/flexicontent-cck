@@ -94,6 +94,7 @@
 		<param name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
 			<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>
 			<option value="2">FLEXI_FIELD_IMAGE_ROKBOX</option>
+			<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
 		</param>
 	</params>
 	<languages>
