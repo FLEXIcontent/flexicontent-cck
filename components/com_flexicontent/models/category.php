@@ -63,6 +63,13 @@ class FlexicontentModelCategory extends JModel{
 	 * @var integer
 	 */
 	var $_total = null;
+	
+	/**
+	 * Group Categories
+	 *
+	 * @var integer
+	 */
+	var $_group_cats = array();
 
 	/**
 	 * Constructor
@@ -259,7 +266,7 @@ class FlexicontentModelCategory extends JModel{
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
-		$group_cat = array($this->_id);
+		$_group_cats = array($this->_id);
 		//Get active menu parameters.
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
@@ -268,11 +275,12 @@ class FlexicontentModelCategory extends JModel{
 			if($menu_params->get('display_subcategories_items', 0)) {
 				if(is_array($this->_childs))
 					foreach($this->_childs as $ch)
-						$group_cat[] = $ch->id;
+						$_group_cats[] = $ch->id;
 			}
 		}
-		$group_cat = array_unique($group_cat);
-		$group_cat = "'".implode("','", $group_cat)."'";
+		$_group_cats = array_unique($_group_cats);
+		$this->_group_cats = $_group_cats;
+		$_group_cats = "'".implode("','", $_group_cats)."'";
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -283,9 +291,9 @@ class FlexicontentModelCategory extends JModel{
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
-
+		
 		// First thing we need to do is to select only the requested items
-		$where = ' WHERE rel.catid IN ('.$group_cat.')';
+		$where = ' WHERE rel.catid IN ('.$_group_cats.')';
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
@@ -696,13 +704,13 @@ class FlexicontentModelCategory extends JModel{
 		$and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
 		$and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
 		
-		
+		$_group_cats = implode("','", $this->_group_cats);
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 			. ' FROM #__content AS i'
 			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
-			. ' WHERE rel.catid = '.$this->_id
+			. ' LEFT JOIN #__categories AS c ON c.id IN (\''. $_group_cats .'\')'
+			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
 			. ' AND i.state IN (1, -5)'
 			. ' AND i.sectionid = '.FLEXI_SECTION
