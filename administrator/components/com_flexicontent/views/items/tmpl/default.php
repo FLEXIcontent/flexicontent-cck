@@ -379,10 +379,10 @@ window.addEvent('domready', function(){
 			if (FLEXI_ACCESS) {
 				$rights 			= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
 				
-				$canEdit 			= $canEditAll || in_array('edit', $rights) || ($user->gid >= 24);
-				$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || ($user->gid >= 24);
-				$canPublish 		= $canPublishAll || in_array('publish', $rights) || ($user->gid >= 24);
-				$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+				$canEdit 			= $canEditAll || in_array('edit', $rights) || ($user->gid > 24);
+				$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
+				$canPublish 		= $canPublishAll || in_array('publish', $rights) || ($user->gid > 24);
+				$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
 			} else {
 				$canEdit		= 1;
 				$canEditOwn		= 1;
@@ -638,44 +638,20 @@ window.addEvent('domready', function(){
 	
 	<table cellspacing="0" cellpadding="4" border="0" align="center">
 		<tr>
-			<td>
-			<img src="images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u>
-			</td>
-			<td>
-			<img src="images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?>
-			</td>
-			<td>
-			<img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u>
-			</td>
+			<td><img src="images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><img src="images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+			<td><img src="images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
 		</tr>
 		<tr>
-		<td>
-			<img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_NEED_TO BE APROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u>
-			</td>
-			<td>
-			<img src="images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u>
-			</td>
-			<td>
-			<img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u>
-			</td>
+			<td><img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_NEED_TO BE APROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+			<td><img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
 
