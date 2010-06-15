@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage Flexicontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModel
-{
+class FlexicontentModelCategory extends JModel{
 	/**
 	 * Category id
 	 *
@@ -347,11 +346,13 @@ class FlexicontentModelCategory extends JModel
 					}
 				}
 			}
-		}		
-		
-		$alpha 	= $mainframe->getUserStateFromRequest( $option.'.category.letter', 'letter', '', 'cmd' );
-		if($alpha==="") {
-			$alpha = JRequest::getVar('letter', '');
+		}
+		$session  =& JFactory::getSession();
+		$alpha = JRequest::getVar('letter');
+		if($alpha===NULL) {
+			$alpha =  $session->get($option.'.category.letter');
+		}else{
+			$session->set($option.'.category.letter', $alpha);
 		}
 		if ($alpha == '0') {
 			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
