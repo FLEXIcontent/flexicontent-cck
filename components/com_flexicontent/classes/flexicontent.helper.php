@@ -1208,7 +1208,7 @@ class flexicontent_tmpl
 		jimport('joomla.filesystem.file');
 		$themes = new stdClass();
 		
-		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates'; 
+		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates';
 		$templates = JFolder::folders($tmpldir);
 		
 		foreach ($templates as $tmpl) {
@@ -1302,11 +1302,11 @@ class flexicontent_tmpl
 		return $themes;
 	}
 
-	function getThemes()
+	function getThemes($tmpldir='')
 	{
 		jimport('joomla.filesystem.file');
 
-		$tmpldir = JPATH_COMPONENT_SITE.DS.'templates'; 
+		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates';
 		$themes = JFolder::folders($tmpldir);
 		
 		return $themes;
