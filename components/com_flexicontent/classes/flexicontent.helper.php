@@ -1212,7 +1212,7 @@ class flexicontent_tmpl
 		$templates = JFolder::folders($tmpldir);
 		
 		foreach ($templates as $tmpl) {
-			$tmplxml = JPATH_COMPONENT_SITE.DS.'templates'.DS.$tmpl.DS.'item.xml';
+			$tmplxml = $tmpldir.DS.$tmpl.DS.'item.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->items->{$tmpl}->name 		= $tmpl;
 				$themes->items->{$tmpl}->view 		= 'items';
