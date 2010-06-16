@@ -766,19 +766,21 @@ class FlexicontentModelItem extends JModel {
 						$i++;
 					}
 				} else if ($post[$field->name]) {
-					$obj = new stdClass();
-					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $item->id;
-					$obj->valueorder	= 1;
-					$obj->version		= (int)$version+1;
-					// @TODO : move in the plugin code
-					if (is_array($post[$field->name])) {
-						$obj->value			= serialize($post[$field->name]);
-					} else {
-						$obj->value			= $post[$field->name];
+					//not versionning hits field => Fix this issue 18 http://code.google.com/p/flexicontent/issues/detail?id=18
+					if ($field->id != 7) {
+						$obj = new stdClass();
+						$obj->field_id 		= $field->id;
+						$obj->item_id 		= $item->id;
+						$obj->valueorder	= 1;
+						$obj->version		= (int)$version+1;
+						// @TODO : move in the plugin code
+						if (is_array($post[$field->name])) {
+							$obj->value			= serialize($post[$field->name]);
+						} else {
+							$obj->value			= $post[$field->name];
+						}
+						if($use_versioning) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					}
-					if($use_versioning)
-						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					if(
 						($isnew || ($post['vstate']==2) )
 						&& !isset($jcorefields[$field->name])
