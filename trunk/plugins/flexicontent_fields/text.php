@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 
@@ -46,7 +47,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// initialise property
 		if($item->version == 1 && $default_value) {
-			$field->value[0] = $default_value;
+			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
 			$field->value[0] = '';
 		} else {
@@ -210,6 +211,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 
@@ -260,7 +262,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($values as $value) {
 			$field->{$prop}[]	= $values[$n] ? $pretext.$values[$n].$posttext : '';
 			$n++;
-			}
+		}
 		$field->{$prop}  = implode($separatorf, $field->{$prop});
 		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 	}

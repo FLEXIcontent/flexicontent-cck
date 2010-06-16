@@ -22,11 +22,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 	function plgFlexicontent_fieldsEmail( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'email') return;
 
@@ -190,6 +191,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'email') return;
 

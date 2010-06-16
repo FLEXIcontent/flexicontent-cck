@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function plgFlexicontent_fieldsCore( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
@@ -94,7 +94,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'title': // hits
 			$field->value[] = $item->title;
-			$field->display = $pretext.$item->title.$posttext;
+			$field->display = $pretext.JText::_($item->title).$posttext;
 			break;
 
 			case 'hits': // hits
@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'type': // document type
 			$field->value[] = $item->type_id;
-			$field->display = $pretext.$item->typename.$posttext;
+			$field->display = $pretext.JText::_($item->typename).$posttext;
 			break;
 
 			case 'version': // version
@@ -152,7 +152,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			foreach ($categories as $category) {
 				$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
 				$field->value[] = $category->title; 
-				}
+			}
 			$field->display = implode($separatorf, $field->display);
 			else :
 			$field->value[] = '';

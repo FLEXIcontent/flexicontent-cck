@@ -22,11 +22,12 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	function plgFlexicontent_fieldsRadio( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_radio', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_radio', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radio') return;
 
@@ -81,7 +82,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			if ($field->value[0] && $field->value[0] == $listarray[0]) {
 				$checked = ' checked="checked"';
 				} 
-			$options .= '<label><input type="radio" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$listarray[1].'</label>'.$separator;			 
+			$options .= '<label><input type="radio" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
 			}			
 			
@@ -121,6 +122,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radio') return;
 		
@@ -142,7 +144,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ($values) {
 			foreach ($listarrays as $listarray) {
 				if ($values[0] == $listarray[0]) {
-					$display = $listarray[1];
+					$display = JText::_($listarray[1]);
 					} 
 				$i++;
 				}

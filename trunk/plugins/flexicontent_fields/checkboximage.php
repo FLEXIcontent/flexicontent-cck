@@ -22,11 +22,12 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 	function plgFlexicontent_fieldsCheckboximage( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_checkboximage', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_checkboximage', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkboximage') return;
 
@@ -88,10 +89,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			for($n=0, $c=count($field->value); $n<$c; $n++) {
 				if ($field->value[$n] == $listarray[0]) {
 					$checked = ' checked="checked"';
-					}
-				} 
+				}
+			}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 			$i++;
 			}			
 			
@@ -136,6 +137,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkboximage') return;
 

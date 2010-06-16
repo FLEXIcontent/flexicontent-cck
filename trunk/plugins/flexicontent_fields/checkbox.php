@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkbox') return;
 
@@ -80,7 +81,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 						$checked = ' checked="checked"';
 					}
 				} 
-			$options .= '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$listarray[1].'</label>'.$separator;			 
+			$options .= '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
 			}			
 			
@@ -125,6 +126,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkbox') return;
 
@@ -168,11 +170,11 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		foreach ($listarrays as $listarray) {
 			for($n=0, $c=count($values); $n<$c; $n++) {
 				if ($values[$n] == $listarray[0]) {
-					$display[] = $listarray[1];
-					}
-				} 
+					$display[] = JText::_($listarray[1]);
+				}
+			} 
 			$i++;
-			}			
+		}			
 			
 		$field->{$prop} = implode($separatorf, $display);
 	}

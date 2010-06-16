@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
 
@@ -206,6 +207,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
 
