@@ -28,7 +28,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'select') return;
-
+		$field->label = JText::_($field->label);
 		// some parameter shortcuts
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
@@ -59,7 +59,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				$options = array();
 				if ($empty_option) $options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 				foreach($results as $result) {
-					$options[] = JHTML::_('select.option', $result->value, $result->text);
+					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}
 				$field->html	= JHTML::_('select.genericlist', $options, $field->name, $required, 'value', 'text', $field->value);
 			}
@@ -70,20 +70,19 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
-			}
+		}
 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 		$i = 1;
 		$display = "";
 		foreach ($listarrays as $listarray) {
-			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
+			$options[] = JHTML::_('select.option', $listarray[0], JText::_($listarray[1])); 
 			if ($field->value[0] == $listarray[0]) {
-				$display = $listarray[1];
-				}
+				$display = JText::_($listarray[1]);
+			}
 			$i++;
-			}			
-			
+		}
 		$field->html	= JHTML::_('select.genericlist', $options, $field->name, $required, 'value', 'text', $field->value);
 		$field->display	= $display ? $display:JText::_( 'FLEXI_NO_VALUE' );
 		}
@@ -123,7 +122,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 
 				foreach($results as $result) {
 					if ($result->value == $post) {
-						$searchindex	= $pretext . $result->text . $posttext;
+						$searchindex	= $pretext . JText::_($result->text) . $posttext;
 					}
 				}
 				
@@ -157,6 +156,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'select') return;
 		
@@ -188,7 +188,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				if ($values) {
 					foreach($results as $result) {
 						if ($result->value == $values[0]) {
-							$field->{$prop}	= $pretext . $result->text . $posttext;
+							$field->{$prop}	= $pretext . JText::_($result->text) . $posttext;
 						}
 					}
 				}
@@ -209,7 +209,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			if ($values) {
 				foreach ($listarrays as $listarray) {
 					if ($values[0] == $listarray[0]) {
-						$display = $pretext . $listarray[1] . $posttext;
+						$display = $pretext . JText::_($listarray[1]) . $posttext;
 					}
 				$i++;
 				}			
@@ -244,7 +244,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				$options = array();
 				$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
 				foreach($results as $result) {
-					$options[] = JHTML::_('select.option', $result->value, $result->text);
+					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}
 				$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			}

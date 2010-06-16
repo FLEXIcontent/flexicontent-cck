@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
 
@@ -44,7 +45,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// initialise property
 		if($item->version == 1 && $default_value) {
-			$field->value[0] = $default_value;
+			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
 			$field->value[0] = '';
 		}
@@ -72,6 +73,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
 		

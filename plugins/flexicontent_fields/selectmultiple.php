@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;
 
@@ -75,7 +76,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 				for($n=0, $c=count($field->value); $n<$c; $n++) {
 					if ($field->value[$n] == $listarray[0]) {
-						$display[] = $listarray[1];
+						$display[] = JText::_($listarray[1]);
 					}
 				}
 			}			
@@ -155,6 +156,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;
 		
@@ -217,12 +219,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				foreach($results as $result) {
 					for($n=0, $c=count($values); $n<$c; $n++) {
 						if ($result->value == $values[$n]) {
-							$display[] = $pretext . $result->text . $posttext;
+							$display[] = $pretext . JText::_($result->text) . $posttext;
 						}
 					}
 				}
-			$field->{$prop} = implode($separatorf, $display);
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				$field->{$prop} = implode($separatorf, $display);
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			}
 
 		} else { // Elements mode
@@ -238,12 +240,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			foreach ($listarrays as $listarray) {
 				for($n=0, $c=count($values); $n<$c; $n++) {
 					if ($values[$n] == $listarray[0]) {
-						$display[] = $listarray[1];
+						$display[] = JText::_($listarray[1]);
 					}
 				}
 			}			
-		$field->{$prop} = implode($separatorf, $display);
-		$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = implode($separatorf, $display);
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		}
 	}
 

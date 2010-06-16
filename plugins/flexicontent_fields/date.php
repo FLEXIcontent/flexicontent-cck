@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
 
@@ -168,7 +169,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			foreach ($field->value as $value) {
 				$field->html .= '<li>' . JHTML::_('calendar', $value, $field->name.'[]', $field->name.'_'.$n) . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
 				$n++;
-				}
+			}
 			$field->html 	.=	'</ul>';
 			$field->html 	.= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {
@@ -199,6 +200,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
 		
