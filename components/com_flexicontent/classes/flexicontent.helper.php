@@ -1204,12 +1204,11 @@ class flexicontent_tmpl
 	 * @return 	object	object of templates
 	 * @since 1.5
 	 */
-	function getTemplates()
-	{
+	function getTemplates($tmpldir='') {
 		jimport('joomla.filesystem.file');
 		$themes = new stdClass();
 		
-		$tmpldir = JPATH_COMPONENT_SITE.DS.'templates'; 
+		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates'; 
 		$templates = JFolder::folders($tmpldir);
 		
 		foreach ($templates as $tmpl) {
