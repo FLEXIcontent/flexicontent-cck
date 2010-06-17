@@ -85,8 +85,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 
-		$field->{$prop}	 = $opentag;
-		$field->{$prop}	.= $values ? ($use_html ? $values[0] : nl2br($values[0])) : '';
-		$field->{$prop}	.= $closetag;
+		if ($values) {
+			$field->{$prop}	 = $opentag;
+			$field->{$prop}	.= $values ? ($use_html ? $values[0] : nl2br($values[0])) : '';
+			$field->{$prop}	.= $closetag;
+		} else {
+			$field->{$prop}	 = '';
+		}
 	}
 }

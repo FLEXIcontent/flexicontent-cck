@@ -223,8 +223,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 						}
 					}
 				}
-				$field->{$prop} = implode($separatorf, $display);
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				if ($values) {
+					$field->{$prop} = implode($separatorf, $display);
+					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				} else {
+					$field->{$prop} = '';
+				}
 			}
 
 		} else { // Elements mode
@@ -244,8 +248,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					}
 				}
 			}			
-			$field->{$prop} = implode($separatorf, $display);
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			if ($values) {
+				$field->{$prop} = implode($separatorf, $display);
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
 		}
 	}
 
