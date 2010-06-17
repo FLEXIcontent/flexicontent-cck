@@ -263,7 +263,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->{$prop}[]	= $values[$n] ? $pretext.$values[$n].$posttext : '';
 			$n++;
 		}
-		$field->{$prop}  = implode($separatorf, $field->{$prop});
-		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		if($field->{$prop}) {
+			$field->{$prop}  = implode($separatorf, $field->{$prop});
+			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		} else {
+			$field->{$prop} = '';
+		}
 	}
 }
