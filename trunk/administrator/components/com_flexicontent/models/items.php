@@ -612,6 +612,19 @@ class FlexicontentModelItems extends JModel
 					$this->_db->setQuery($query);
 					$this->_db->query();
 				}
+				
+				// fix issue 39 => http://code.google.com/p/flexicontent/issues/detail?id=39
+				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+				$use_versioning = $cparams->get('use_versioning', 1);
+				if($use_versioning) {
+					$v = new stdClass();
+					$v->item_id 		= (int)$item->id;
+					$v->version_id		= 1;
+					$v->created 	= $item->created;
+					$v->created_by 	= $item->created_by;
+					//$v->comment		= 'copy version.';
+					$this->_db->insertObject('#__flexicontent_versions', $v);
+				}
 
 				// get the item categories
 				$query 	= 'SELECT catid'
