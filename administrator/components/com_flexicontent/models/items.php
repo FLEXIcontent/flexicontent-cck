@@ -559,7 +559,8 @@ class FlexicontentModelItems extends JModel
 				$item =& JTable::getInstance('flexicontent_items', '');
 				$item->load($itemid);
 				
-				$sourceid = (int)$item->id;
+				$sourceid 	= (int)$item->id;
+				$curversion = (int)$item->version;
 				
 				//Save target item
       			$row  				=& JTable::getInstance('flexicontent_items', '');
@@ -624,6 +625,24 @@ class FlexicontentModelItems extends JModel
 					$v->created_by 	= $item->created_by;
 					//$v->comment		= 'copy version.';
 					$this->_db->insertObject('#__flexicontent_versions', $v);
+				}
+
+				// get the items versions
+				$query 	= 'SELECT *'
+						. ' FROM #__flexicontent_items_versions'
+						. ' WHERE item_id = '. $sourceid
+						. ' AND version = ' . $curversion
+						;
+				$this->_db->setQuery($query);
+				$curversions = $this->_db->loadObjectList();
+
+				foreach ($curversions as $cv) {
+					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `value`)'
+							. ' VALUES(1 ,'  . $cv->field_id . ', ' . $copyid . ', ' . $cv->valueorder . ', ' . $this->_db->Quote($cv->value) . ')'
+							;
+					$this->_db->setQuery($query);
+					$this->_db->query();
+//dump($this->_db,'DB');				
 				}
 
 				// get the item categories
@@ -725,6 +744,19 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
+		
+		// update version table
+		if ($seccats) {
+			$query 	= 'UPDATE #__flexicontent_items_versions SET value = ' . $this->_db->Quote(serialize($seccats))
+					. ' WHERE version = 1'
+					. ' AND item_id = ' . (int)$itemid
+					. ' AND field_id = 13'
+					. ' AND valueorder = 1'
+					;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
+		
 		return true;
 	}
 
