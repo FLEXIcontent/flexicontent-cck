@@ -37,6 +37,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
 		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/media');
+		$app			= & JFactory::getApplication();
+		$client			= $app->isAdmin() ? '../' : '';
+		$clientpref		= $app->isAdmin() ? '' : 'administrator/';
 				
 
 		$js = "
@@ -75,7 +78,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
-			thumb.src = '../components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../components/com_flexicontent/medias/'+file+'&w=100&h=100&zc=1';
+			thumb.src = '".$client."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../components/com_flexicontent/medias/'+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
@@ -83,7 +86,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 			
-			img.src = 'components/com_flexicontent/assets/images/move3.png';
+			img.src = '".$clientpref."components/com_flexicontent/assets/images/move3.png';
 			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
@@ -182,7 +185,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$field->html .= '<li>';
 				
 				$filename = $this->getFileName( $file );
-				$src = '../components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../' . $mediapath . DS . $filename->filename . '&w=100&h=100&zc=1';
+				$src = $client . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../' . $mediapath . DS . $filename->filename . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
@@ -247,16 +250,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		if ($values)
 		{
-			$document->addStyleSheet('plugins/flexicontent_fields/minigallery/galleriffic.css');
+//			JHTML::_('behavior.mootools');
+			$document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
 			// this allows you to override the default css files
 			$document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
 			JHTML::_('behavior.mootools');
-			$document->addScript('plugins/flexicontent_fields/minigallery/jquery.opacityrollover.js');
-			$document->addScript('plugins/flexicontent_fields/minigallery/jquery.galleriffic.js');
+			$document->addScript('plugins/flexicontent_fields/minigallery/backgroundslider.js');
+			$document->addScript('plugins/flexicontent_fields/minigallery/slideshow.js');
 
 		  	$js = "
-		  	(function($){
-		  		$(document).ready(function(){
+		  	window.addEvent('domready',function(){
 					var obj = {
 						wait: ".$field->parameters->get( 'wait', 4000 ).", 
 						effect: '".$field->parameters->get( 'effect', 'fade' )."',
@@ -266,64 +269,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 						thumbnails: true,
 						backgroundSlider: true
 					}
-					//$('#slideshowContainer').slideshow($('#slideshowThumbnail'),obj);
-					//show = new SlideShow('slideshowContainer','slideshowThumbnail',obj);
-					//show.play();
-					
-					// We only want these styles applied when javascript is enabled
-					$('div.navigation').css({'width' : '300px', 'float' : 'left'});
-					$('div.content').css('display', 'block');
-	
-					// Initially set opacity on thumbnails and add
-					// additional styling for hover effect on thumbnails
-					var onMouseOutOpacity = 0.67;
-					$('#thumbnails ul.thumbs li').opacityrollover({
-						mouseOutOpacity:   onMouseOutOpacity,
-						mouseOverOpacity:  1.0,
-						fadeSpeed:         'fast',
-						exemptionSelector: '.selected'
-					});
-					
-					// Initialize Advanced Galleriffic Gallery
-					var gallery = $('#thumbnails').galleriffic({
-						delay:                     2500,
-						numThumbs:                 ".count($values).",
-						rel:					   'slideshow',
-						preloadAhead:              10,
-						enableTopPager:            true,
-						enableBottomPager:         true,
-						maxPagesToShow:            7,
-						imageContainerSel:         '#slideshow',
-						controlsContainerSel:      '#controls',
-						captionContainerSel:       '#caption',
-						loadingContainerSel:       '#loading',
-						renderSSControls:          false,
-						renderNavControls:         false,
-						playLinkText:              'Play Slideshow',
-						pauseLinkText:             'Pause Slideshow',
-						prevLinkText:              '&lsaquo; Previous Photo',
-						nextLinkText:              'Next Photo &rsaquo;',
-						nextPageLinkText:          'Next &rsaquo;',
-						prevPageLinkText:          '&lsaquo; Prev',
-						enableHistory:             false,
-						autoStart:                 false,
-						syncTransitions:           true,
-						defaultTransitionDuration: 900,
-						onBeforeSlideChange:             function(prevIndex, nextIndex) {
-							// 'this' refers to the gallery, which is an extension of $('#thumbnails')
-							this.find('ul.thumbs').children()
-								.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
-								.eq(nextIndex).fadeTo('fast', 1.0);
-						},
-						onPageTransitionOut:       function(callback) {
-							this.fadeTo('fast', 0.0, callback);
-						},
-						onPageTransitionIn:        function() {
-							this.fadeTo('fast', 1.0);
-						}
-					});					
+				show = new SlideShow('slideshowContainer','slideshowThumbnail',obj);
+				show.play();
 				});
-			})(jQuery);	
 			";
 			$document->addScriptDeclaration($js);
 			
@@ -339,21 +287,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$css .= "#thumbnails { width: ".$w_l."px; }";
 			}
 			if ($thumbposition == 2 || $thumbposition == 4) {
-				$css .= ".slideshowContainer { float: none; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
+				$css .= ".slideshowContainer { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
 			}
 
 			$document->addStyleDeclaration($css);
 			
 			$display = array();
-			$field->{$prop} .= ($thumbposition > 2) ? '<div id="slideshowContainer" class="slideshowContainer">
-				<div id="controls" class="controls"></div>
-				<div class="slideshow-container">
-					<div id="loading" class="loader"></div>
-					<div id="slideshow" class="slideshow"></div>
-				</div>
-				<div id="caption" class="caption-container"></div>
-			</div>' : '';
-			$field->{$prop} .= '<div id="thumbnails" class="navigation"><ul class="thumbs noscript">';
+			
+			$field->{$prop}  = '';
+			$field->{$prop} .= ($thumbposition > 2) ? '<div id="slideshowContainer" class="slideshowContainer"></div>' : '';
+			$field->{$prop} .= '<div id="thumbnails">';
 			$n = 0;
 			foreach ($values as $value) {
 				$filename = $this->getFileName( $value );
@@ -361,13 +304,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
-					$display[]	= '<li><a name="'.$filename->filename.'" title="' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '" href="'.$srcb.'" rel="slideshow" class="slideshowThumbnail thumb"><img src="'.$srcs.'" border="0" alt="' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '" /></a><div class="caption">
-					</div></li>';
+					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 				}
 				$n++;
 				}
 			$field->{$prop} .= implode(' ', $display);
-			$field->{$prop} .= '</ul></div><div style="clear:both"></div>';
+			$field->{$prop} .= '</div>';
 			$field->{$prop} .= ($thumbposition < 3) ? '<div id="slideshowContainer" class="slideshowContainer"></div>' : '';
 		}
 	}
