@@ -44,11 +44,14 @@ class FlexicontentViewFileselement extends JView
 
 		//initialise variables
 		$document	= & JFactory::getDocument();
+		$app		= & JFactory::getApplication();
 		$pane   	= & JPane::getInstance('Tabs');
 		$db  		= & JFactory::getDBO();
 		$user  		= & JFactory::getUser();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
+		
+		$client		= $app->isAdmin() ? '../' : '';
 		
 		
 		//global $fieldid;
@@ -173,6 +176,7 @@ class FlexicontentViewFileselement extends JView
 		//assign data to template
 		$this->assignRef('session'			, JFactory::getSession());
 		$this->assignRef('params'			, $params);
+		$this->assignRef('client'			, $client);
 		$this->assignRef('pane'				, $pane);
 		$this->assignRef('lists'    	  	, $lists);
 		$this->assignRef('rows'     	 	, $rows);
