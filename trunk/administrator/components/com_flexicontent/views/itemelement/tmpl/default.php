@@ -30,6 +30,7 @@ defined('_JEXEC') or die('Restricted access');
 			<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 		</td>
 		<td nowrap="nowrap">
+			<?php echo $this->lists['filter_type'];	?>
 			<?php echo $this->lists['filter_cats'];	?>
 			<?php echo $this->lists['state'];	?>
 		</td>

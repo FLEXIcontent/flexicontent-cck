@@ -270,20 +270,21 @@ class FlexicontentModelCategory extends JModel{
 		//Get active menu parameters.
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		if (is_object( $menu )) {
-			$menu_params = new JParameter( $menu->params );		
-			if($menu_params->get('display_subcategories_items', 0)) {
-				if(is_array($this->_childs))
-					foreach($this->_childs as $ch)
-						$_group_cats[] = $ch->id;
-			}
+
+		// Get the category parameters
+		$cparams 	= $this->_category->parameters;
+
+		// display sub-categories
+		$display_subcats = $cparams->get('display_subcategories_items', 0);
+		if($display_subcats) {
+			if(is_array($this->_childs))
+				foreach($this->_childs as $ch)
+					$_group_cats[] = $ch->id;
 		}
 		$_group_cats = array_unique($_group_cats);
 		$this->_group_cats = $_group_cats;
 		$_group_cats = "'".implode("','", $_group_cats)."'";
-
-		// Get the category parameters
-		$cparams 	= $this->_category->parameters;
+		
 		// shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		// content language parameter UNUSED

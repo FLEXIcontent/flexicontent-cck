@@ -62,6 +62,10 @@
 			<option value="0">Hide</option>
 			<option value="1">Show</option>
 		</param>
+    	<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
+            <option value="0">FLEXI_NO</option> 
+            <option value="1">FLEXI_YES</option> 
+        </param> 
 		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 			<option value="">Default</option>
 			<option value="date">Oldest first</option>

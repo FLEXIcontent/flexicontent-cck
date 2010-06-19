@@ -42,10 +42,11 @@ class FlexicontentViewItemelement extends JView {
 		JHTML::_('behavior.modal');
 
 		//get var
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 		'filter_state', 	'*', 'word' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order', 	'filter_order', 	'i.ordering'	, 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',	'filter_order_Dir',	''				, 'word' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 	'filter_state', 	'*'				, 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 		'filter_cats', 		0, 				'int' );
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 		'filter_type', 		0, 				'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -57,6 +58,7 @@ class FlexicontentViewItemelement extends JView {
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
+		$types		= & $this->get( 'Typeslist' );
 		$pageNav 	= & $this->get( 'Pagination' );
 
 		$categories = $globalcats;
@@ -69,6 +71,9 @@ class FlexicontentViewItemelement extends JView {
 		$lists['order'] = $filter_order;
 		
 		$ordering = ($lists['order'] == 'i.ordering');
+
+		//build type select list
+		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"');
 
 		// search filter
 		$lists['search']= $search;
