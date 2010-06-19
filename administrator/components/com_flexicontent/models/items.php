@@ -69,7 +69,7 @@ class FlexicontentModelItems extends JModel
 
 		global $mainframe, $option;
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
+		$limit		= $mainframe->getUserStateFromRequest( $option.'.items.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly

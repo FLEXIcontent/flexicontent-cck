@@ -65,7 +65,7 @@ class JElementItem extends JElement
 		JHTML::_('behavior.modal', 'a.modal');
 
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"$item->title\" disabled=\"disabled\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 850, y: 575}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
+		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
 		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
 
 		return $html;

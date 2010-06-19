@@ -1096,6 +1096,7 @@ class FlexicontentModelItem extends JModel {
 		$query = 'SELECT id, name'
 				. ' FROM #__flexicontent_types'
 				. ' WHERE published = 1'
+				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();

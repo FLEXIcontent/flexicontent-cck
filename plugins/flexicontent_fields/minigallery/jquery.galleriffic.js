@@ -7,13 +7,13 @@
  *
  * Much thanks to primary contributer Ponticlaro (http://www.ponticlaro.com)
  */
-;(function($) {
+;(function(jQuery) {
 	// Globally keep track of all images by their unique hash.  Each item is an image data object.
 	var allImages = {};
 	var imageCounter = 0;
 
 	// Galleriffic static class
-	$.galleriffic = {
+	jQuery.galleriffic = {
 		version: '2.0.1',
 
 		// Strips invalid characters and any leading # characters
@@ -25,7 +25,7 @@
 			if (!hash)
 				return undefined;
 
-			hash = $.galleriffic.normalizeHash(hash);
+			hash = jQuery.galleriffic.normalizeHash(hash);
 			return allImages[hash];
 		},
 
@@ -33,7 +33,7 @@
 		// Returns false when an image is not found for the specified hash.
 		// @param {String} hash This is the unique hash value assigned to an image.
 		gotoImage: function(hash) {
-			var imageData = $.galleriffic.getImage(hash);
+			var imageData = jQuery.galleriffic.getImage(hash);
 			if (!imageData)
 				return false;
 
@@ -51,7 +51,7 @@
 		// gallery is verified to be the same as the specified owning gallery before
 		// performing the remove operation.
 		removeImageByHash: function(hash, ownerGallery) {
-			var imageData = $.galleriffic.getImage(hash);
+			var imageData = jQuery.galleriffic.getImage(hash);
 			if (!imageData)
 				return false;
 
@@ -98,11 +98,11 @@
 	};
 
 	// Primary Galleriffic initialization function that should be called on the thumbnail container.
-	$.fn.galleriffic = function(settings) {
+	jQuery.fn.galleriffic = function(settings) {
 		//  Extend Gallery Object
-		$.extend(this, {
+		jQuery.extend(this, {
 			// Returns the version of the script
-			version: $.galleriffic.version,
+			version: jQuery.galleriffic.version,
 
 			// Current state of the slideshow
 			isSlideshowRunning: false,
@@ -114,8 +114,8 @@
 
 				if (!this.enableHistory) {
 					// The href attribute holds the unique hash for an image
-					var hash = $.galleriffic.normalizeHash($(link).attr('href'));
-					$.galleriffic.gotoImage(hash);
+					var hash = jQuery.galleriffic.normalizeHash(jQuery(link).attr('href'));
+					jQuery.galleriffic.gotoImage(hash);
 					e.preventDefault();
 				}
 			},
@@ -141,7 +141,7 @@
 			// @param {Boolean} insert Specifies whether the the image is appended to the end or inserted into the gallery.
 			// @param {Integer} position The index within the gallery where the item shouold be added.
 			addImage: function(listItem, thumbExists, insert, position) {
-				var $li = ( typeof listItem === "string" ) ? $(listItem) : listItem;				
+				var $li = ( typeof listItem === "string" ) ? jQuery(listItem) : listItem;				
 				var $aThumb = $li.find('a.thumb');
 				var slideUrl = $aThumb.attr('href');
 				var title = $aThumb.attr('title');
@@ -228,7 +228,7 @@
 
 			// Convenience method that simply calls the global removeImageByHash method.
 			removeImageByHash: function(hash) {
-				return $.galleriffic.removeImageByHash(hash, this);
+				return jQuery.galleriffic.removeImageByHash(hash, this);
 			},
 
 			// Removes an image from the gallery.
@@ -272,7 +272,7 @@
 				var gallery = this;
 
 				this.find('ul.thumbs > li').each(function(i) {
-					gallery.addImage($(this), true, false);
+					gallery.addImage(jQuery(this), true, false);
 				});
 
 				return this;
@@ -493,7 +493,7 @@
 				var imageData = this.data[index];
 				
 				if (!bypassHistory && this.enableHistory)
-					$.historyLoad(String(imageData.hash));  // At the moment, historyLoad only accepts string arguments
+					jQuery.historyLoad(String(imageData.hash));  // At the moment, historyLoad only accepts string arguments
 				else
 					this.gotoImage(imageData);
 
@@ -637,11 +637,11 @@
 				newSlide.find('a')
 					.append(imageData.image);
 					
-				if(typeof $().colorbox == 'function')
+				if(typeof jQuery().colorbox == 'function')
 				{
 					var link 	= newSlide.find('a'),
-						related = $('a[rel='+imageData.gallery.rel+']');
-					link.colorbox({href: $(imageData.image).attr('alt'), photo: true, slideshow: false, title: false});
+						related = jQuery('a[rel='+imageData.gallery.rel+']');
+					link.colorbox({href: jQuery(imageData.image).attr('alt'), photo: true, slideshow: false, title: false});
 				}
 				//console.warn(imageData.gallery.rel, test)
 				var newCaption = 0;
@@ -765,7 +765,7 @@
 				// Show/Hide thumbs
 				var $thumbsUl = this.find('ul.thumbs');
 				$thumbsUl.find('li').each(function(i) {
-					var $li = $(this);
+					var $li = jQuery(this);
 					if (i >= startIndex && i <= stopIndex) {
 						$li.show();
 					} else {
@@ -870,16 +870,16 @@
 		});
 
 		// Now initialize the gallery
-		$.extend(this, defaults, settings);
+		jQuery.extend(this, defaults, settings);
 		
 		// Verify the history plugin is available
-		if (this.enableHistory && !$.historyInit)
+		if (this.enableHistory && !jQuery.historyInit)
 			this.enableHistory = false;
 		
 		// Select containers
-		if (this.imageContainerSel) this.$imageContainer = $(this.imageContainerSel);
-		if (this.captionContainerSel) this.$captionContainer = $(this.captionContainerSel);
-		if (this.loadingContainerSel) this.$loadingContainer = $(this.loadingContainerSel);
+		if (this.imageContainerSel) this.$imageContainer = jQuery(this.imageContainerSel);
+		if (this.captionContainerSel) this.$captionContainer = jQuery(this.captionContainerSel);
+		if (this.loadingContainerSel) this.$loadingContainer = jQuery(this.loadingContainerSel);
 
 		// Initialize the thumbails
 		this.initializeThumbs();
@@ -897,7 +897,7 @@
 
 		// Setup controls
 		if (this.controlsContainerSel) {
-			this.$controlsContainer = $(this.controlsContainerSel).empty();
+			this.$controlsContainer = jQuery(this.controlsContainerSel).empty();
 			
 			if (this.renderSSControls) {
 				if (this.autoStart) {
@@ -928,7 +928,7 @@
 
 		var initFirstImage = !this.enableHistory || !location.hash;
 		if (this.enableHistory && location.hash) {
-			var hash = $.galleriffic.normalizeHash(location.hash);
+			var hash = jQuery.galleriffic.normalizeHash(location.hash);
 			var imageData = allImages[hash];
 			if (!imageData)
 				initFirstImage = true;
@@ -940,7 +940,7 @@
 
 		// Setup Keyboard Navigation
 		if (this.enableKeyboardNavigation) {
-			$(document).keydown(function(e) {
+			jQuery(document).keydown(function(e) {
 				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 				switch(key) {
 					case 32: // space

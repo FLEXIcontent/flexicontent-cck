@@ -5,7 +5,7 @@
  * Licensed under the MIT License:
  *   http://www.opensource.org/licenses/mit-license.php
  */
-;(function($) {
+;(function(jQuery) {
 	var defaults = {
 		mouseOutOpacity:   0.67,
 		mouseOverOpacity:  1.0,
@@ -13,14 +13,14 @@
 		exemptionSelector: '.selected'
 	};
 
-	$.fn.opacityrollover = function(settings) {
+	jQuery.fn.opacityrollover = function(settings) {
 		// Initialize the effect
-		$.extend(this, defaults, settings);
+		jQuery.extend(this, defaults, settings);
 
 		var config = this;
 
 		function fadeTo(element, opacity) {
-			var $target = $(element);
+			var $target = jQuery(element);
 			
 			if (config.exemptionSelector)
 				$target = $target.not(config.exemptionSelector);	

@@ -129,6 +129,7 @@ class FlexicontentModelItemelement extends JModel
 
 		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
 					. ' FROM #__content AS i'
+					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 					. $where
@@ -168,6 +169,7 @@ class FlexicontentModelItemelement extends JModel
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -194,6 +196,10 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
 
+		if ( $filter_type ) {
+			$where[] = 'ie.type_id = ' . $filter_type;
+		}
+
 		if ( $search ) {
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 		}
@@ -202,5 +208,25 @@ class FlexicontentModelItemelement extends JModel
 
 		return $where;
 	}
+
+	/**
+	 * Method to get types list
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getTypeslist ()
+	{
+		$query = 'SELECT id, name'
+				. ' FROM #__flexicontent_types'
+				. ' WHERE published = 1'
+				. ' ORDER BY name ASC'
+				;
+		$this->_db->setQuery($query);
+		$types = $this->_db->loadObjectList();
+		
+		return $types;
+	}
+
 }
 ?>
