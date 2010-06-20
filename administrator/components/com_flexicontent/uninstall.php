@@ -34,7 +34,7 @@ $error = false;
 $extensions = array();
 $db =& JFactory::getDBO();
 
-//if you have new flexi plugins add here
+//if you have new flexi plugins add here: name => folder
 $flexiplugins = array(
 	"checkbox"			=>	"flexicontent_fields",
 	"checkboximage"		=>	"flexicontent_fields",
