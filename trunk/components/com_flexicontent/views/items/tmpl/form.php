@@ -22,6 +22,10 @@ $cid = $this->params->get("cid");
 JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+// add extra css for the edit form
+if ($this->params->get('form_extra_css')) {
+	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
+}
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 if ($this->perms['cantags']) {
@@ -78,7 +82,7 @@ if ($this->perms['cantags']) {
 			});
 		});
 	");
-}else{
+} else {
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\".deletetag\").click(function(e){

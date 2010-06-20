@@ -2,13 +2,13 @@
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <install type="component" version="1.5.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>19 June 2010</creationDate>
+	<creationDate>20 June 2010</creationDate>
 	<author>Emmanuel Danan</author>
 	<copyright>(C) 2009-2010 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.3 Stable (r316)</version>
+	<version>1.5.3 Stable (r318)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
@@ -85,6 +85,7 @@
 			<param name="link_titles" default="1" />
 			<param name="show_readmore" default="1" />
 			<param name="show_intro" default="1" />
+			<param name="form_extra_css" default="" />
 			<param name="show_icons" default="1" />
 			<param name="show_pdf_icon" default="1" />
 			<param name="show_print_icon" default="1" />
