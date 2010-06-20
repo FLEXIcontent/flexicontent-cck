@@ -157,6 +157,6 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `template` varchar(50) NOT NULL default '',
   `layout` varchar(20) NOT NULL default '',
   `position` varchar(100) NOT NULL default '',
-  `fields` varchar(255) NOT NULL default '',
+  `fields` text NOT NULL,
   PRIMARY KEY  (`template`,`layout`,`position`)
 ) TYPE=MyISAM;
