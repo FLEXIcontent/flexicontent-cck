@@ -14,7 +14,84 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
- 
+
+
+FLEXIcontent 1.5.3 stable - Build 318 - Changelog
+
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
++ New features
+--------------------------------------------------------------------------------------------------
++ Full frontend submission with custom fields
++ Full frontend edition with custom fields & FLEXIaccess permissions
++ Display subcategory items in a parent category page
++ New minigallery plugin
++ Add show_intro parameter overriding: global -> type -> item
++ Add autopublishing feature for frontend submission form.
++ Add events to the content plugins
++ Add parameter to the state field to allow displaying icon instead of text (issue 12) http://code.google.com/p/flexicontent/issues/detail?id=12
++ Add metadata.xml file to allow hidding filemanager and fileselement views from menu manager
++ Append values to the core fields to allow more flexibility in display
++ Add compatibility of the Alphabetical Index with UTF8
++ Add JCE MediaBox for popup type in field image
++ Add a type filter list for the itemelement view and auto adjust the modal window (menu manager)
++ Add a configuration parameter to define extra css properties on the submit/edit form
+
+
+^ Modifications
+--------------------------------------------------------------------------------------------------
+^ Manage the FLEXI constants globaly through the system plugin to be sure they are defined everywhere.
+^ Improvements on the file plugin (when a file is unpublished)
+^ Improve fileselement and filemanager to add an items filters
+^ Improve the router
+^ Improve post installation process in terms of ergonomy and performances
+^ Modification on the image field to allow frontend submit/edit and to disable the tooltip
+^ Improved items view for FLEXIaccess users to allow users to display all items they can edit only and the category filter accordingly
+^ Improve code from the getAlphaindex() method (issue 33) http://code.google.com/p/flexicontent/issues/detail?id=33
+^ Use the autocomplete for the tags on frontend instead of the checkboxes
+^ Move the inculde subcategories items parameter from the menus to the categories
+^ Set a specific limit parameter scope for the items view in backend
+
+
+# Bug fixes
+--------------------------------------------------------------------------------------------------
+# fix bug on category menu filter and add the state filter (http://www.flexicontent.org/forum/index.php?f=21&amp;t=1196&amp;rb_v=viewtopic)
+# fix bug extended data not saved (issue 13)
+# fix bug with double quotes striped from the text fields (http://www.flexicontent.org/forum/index.php?f=29&amp;t=1113&amp;start=0&amp;rb_v=viewtopic)
+# fix bug about create link if the article are not in flexisection, use joomla article url format.
+# fix bug Hits default field suffix text
+# fix bug about category layout(field ordering was not correct).
+# fix bug on the search plugin and improve compatibility with joomfish allowing users to display only the results in the active language
+# fix bug missing coma in the $query of the search plugin
+# Fix a bug when deleting and trying to edit an item (issue 26) http://code.google.com/p/flexicontent/issues/detail?id=26
+# Bug on category filters when cache is activated issue29 (http://code.google.com/p/flexicontent/issues/detail?id=29)
+# Bug on the search plugin with publish up and down (issue 31) http://code.google.com/p/flexicontent/issues/detail?id=31
+# Bug on the radio button field when no value is set in the configuration
+# Bug the fields where not loaded properly when the versioning was disabled
+# Bug administrator group edit permissions where not properly filtered by FLEXIaccess
+# Bug avoid versioning the hits field, fix issue 18
+# Bug with opentag and closetag displayed even if there's no value
+# The types list was not alphabebitically ordered in the item view in backend
+# Fix a bug on the copy/move feature (issue 39) http://code.google.com/p/flexicontent/issues/detail?id=39
+
+
+$ Language
+--------------------------------------------------------------------------------------------------
+$ Add underline to language string See: http://www.flexicontent.org/forum/index.php?f=39&amp;t=1321&amp;rb_v=viewtopic#p6212
+$ EN spelling and grammar fixes. See: http://www.flexicontent.org/forum/index.php?f=39&amp;t=427&amp;rb_v=viewtopic
+$ EN grammar fix. See: http://www.flexicontent.org/forum/index.php?f=39&amp;t=509&amp;rb_v=viewtopic
+$ Added 3 missing language strings to en-GB. 
+$ Removed some duplicate strings from FR and EN admin language files.
+$ added 2 missing language strings to fr-FR. See r216.
+
+
 ################################################################################################
 
 FLEXIcontent beta 5 changelog 
