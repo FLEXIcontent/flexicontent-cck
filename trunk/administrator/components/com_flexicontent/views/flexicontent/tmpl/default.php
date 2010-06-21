@@ -300,7 +300,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="vistamedia::Professionnal Joomla! developpement and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official french support portal">www.joomla.fr</a>
 					<br />
 					Marvelic Engine<br />
-					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is base in Bangkok,Thailand. We are Joomla specialist and supports companies and organizations with consultancy, Joomla implementation, Training and custom extension development">www.marvelic.co.th</a>
+					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is based in Bangkok,Thailand. We are Joomla specialist and supports companies and organizations with consultancy, Joomla implementation, Training and custom extensions development">www.marvelic.co.th</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professionnal Joomla! Integration">www.artefact-design.com</a></p>
