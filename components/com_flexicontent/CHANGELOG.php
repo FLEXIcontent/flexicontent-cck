@@ -43,6 +43,7 @@ $ -> Language fix or change
 + Add JCE MediaBox for popup type in field image
 + Add a type filter list for the itemelement view and auto adjust the modal window (menu manager)
 + Add a configuration parameter to define extra css properties on the submit/edit form
++ Add a refresh confirmation message when all items are bound to their extended data
 
 
 ^ Modifications

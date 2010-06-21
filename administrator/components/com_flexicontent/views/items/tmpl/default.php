@@ -36,7 +36,7 @@ function fetchcounter()
 		update: $('count'),
 		onComplete:function(v) {
 			if(v==0)
-				if(confirm("Refresh this page?"))
+				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
 					location.href = 'index.php?option=com_flexicontent&view=items';
 		}
 	});
