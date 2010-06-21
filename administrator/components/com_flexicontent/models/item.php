@@ -200,7 +200,7 @@ class FlexicontentModelItem extends JModel {
 				$item->modified 	= $nullDate;
 				$item->publish_up 	= $createdate->toUnix();
 				$item->publish_down = JText::_( 'FLEXI_NEVER' );
-				$item->state 		= -4;
+				$item->state 		= $cparams->get('new_item_state', -4);
 			}
 
 			if($version == $current_version) {
@@ -336,7 +336,7 @@ class FlexicontentModelItem extends JModel {
 			$item->attribs				= null;
 			$item->access				= 0;
 			$item->metadata				= null;
-			$item->state				= -4;
+			$item->state				= $cparams->get('new_item_state', -4);
 			$item->mask					= null;
 			$item->images				= null;
 			$item->urls					= null;
