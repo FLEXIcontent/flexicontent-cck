@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 						</ul>
 						<div class=\"button-add\">
 							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x: 850, y: 575}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 							</div>
 						</div>
 						";
