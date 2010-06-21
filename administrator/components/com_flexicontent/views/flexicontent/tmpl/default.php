@@ -294,8 +294,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
-					<p>Copyright &copy; 2009-2010 / Emmanuel Danan<br />
-					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="vistamedia::Professionnal Joomla! developpement and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official french support portal">www.joomla.fr</a></p>
+					<p>Copyright &copy; 2009-2010
+					<br />
+					Emmanuel Danan<br />
+					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="vistamedia::Professionnal Joomla! developpement and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official french support portal">www.joomla.fr</a>
+					<br />
+					Marvelic Engine<br />
+					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is base in Bangkok,Thailand. We are Joomla specialist and supports companies and organizations with consultancy, Joomla implementation, Training and custom extension development">www.marvelic.co.th</a>
+					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professionnal Joomla! Integration">www.artefact-design.com</a></p>
 				</div>
