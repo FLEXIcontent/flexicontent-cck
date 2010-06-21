@@ -16,7 +16,7 @@
  */
 
 
-FLEXIcontent 1.5.3 stable - Build 318 - Changelog
+FLEXIcontent 1.5.3 stable - Build 323 - Changelog
 
 Legend:
 * -> Security Fix
@@ -81,6 +81,7 @@ $ -> Language fix or change
 # Bug with opentag and closetag displayed even if there's no value
 # The types list was not alphabebitically ordered in the item view in backend
 # Fix a bug on the copy/move feature (issue 39) http://code.google.com/p/flexicontent/issues/detail?id=39
+# Fix a bug missing controllers folder in the manifest.xml
 
 
 $ Language
