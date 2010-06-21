@@ -18,6 +18,14 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="new_item_state" type="list" default="-4" label="FLEXI_NEW_ITEM_STATE" description="FLEXI_NEW_ITEM_STATE_DESC" menu="hide">
+			<option value="1">FLEXI_PUBLISHED</option>
+			<option value="0">FLEXI_UNPUBLISHED</option>
+			<option value="-1">FLEXI_ARCHIVED</option>
+			<option value="-3">FLEXI_PENDING</option>
+			<option value="-4">FLEXI_TO_WRITE</option>
+			<option value="-5">FLEXI_UNAPPROVED</option>
+		</param>
 		
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" level="level1" menu="hide" />
 		
