@@ -1208,7 +1208,7 @@ class flexicontent_tmpl
 		jimport('joomla.filesystem.file');
 		$themes = new stdClass();
 		
-		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates';
+		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$templates = JFolder::folders($tmpldir);
 		
 		foreach ($templates as $tmpl) {
@@ -1255,7 +1255,7 @@ class flexicontent_tmpl
 					}
 				}
 			}
-			$tmplxml = JPATH_COMPONENT_SITE.DS.'templates'.DS.$tmpl.DS.'category.xml';
+			$tmplxml = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$tmpl.DS.'category.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->category->{$tmpl}->name 		= $tmpl;
 				$themes->category->{$tmpl}->view 		= 'category';
@@ -1306,7 +1306,7 @@ class flexicontent_tmpl
 	{
 		jimport('joomla.filesystem.file');
 
-		$tmpldir = $tmpldir?$tmpldir:JPATH_COMPONENT_SITE.DS.'templates';
+		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$themes = JFolder::folders($tmpldir);
 		
 		return $themes;
