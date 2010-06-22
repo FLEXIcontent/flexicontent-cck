@@ -297,13 +297,13 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<p>Copyright &copy; 2009-2010
 					<br />
 					Emmanuel Danan<br />
-					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="vistamedia::Professionnal Joomla! developpement and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official french support portal">www.joomla.fr</a>
+					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="Vistamedia.fr::Professional Joomla! Development and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official French support portal">www.joomla.fr</a>
 					<br />
 					Marvelic Engine<br />
-					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is based in Bangkok,Thailand. We are Joomla specialist and supports companies and organizations with consultancy, Joomla implementation, Training and custom extensions development">www.marvelic.co.th</a>
+					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.">www.marvelic.co.th</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
-					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professionnal Joomla! Integration">www.artefact-design.com</a></p>
+					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a></p>
 				</div>
 			</td>
 		</tr>
