@@ -263,7 +263,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="11">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
