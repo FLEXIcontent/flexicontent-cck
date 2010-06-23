@@ -130,7 +130,7 @@ function reseter(task, id, div){
 	}
 		
 	var res = new itemscreen();
-	res.reseter( task, id, div );
+	res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
 }
 function clickRestore(link) {
 	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ); ?>")) {
