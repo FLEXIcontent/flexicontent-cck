@@ -1,13 +1,12 @@
 var itemscreen = new Class(
-{  
+{
 	options:  {
 		id: "",
 		script_url: "index.php?option=com_flexicontent&controller=items&format=raw",
 		task: ""
 	},
 
-	initialize: function( name, options )  
-	{  
+	initialize: function( name, options ) {
 		this.setOptions( options );
 		this.name = name;
 	},  
@@ -48,9 +47,9 @@ var itemscreen = new Class(
 		tagajax.request();
 	},
 
-	reseter: function( task, id, div )
-	{
-		var url = 'index.php?option=com_flexicontent&controller=items&task=' + task + '&id=' + id + '&format=raw';
+	reseter: function( task, id, div, url ) {
+	  var url = url+'&format=raw&task='+task+'&id='+id;
+		//var url = 'index.php?option=com_flexicontent&controller=items&task=' + task + '&id=' + id + '&format=raw';
 
 		var resetajax = new Ajax(url, {
 			method: 'get',
@@ -59,7 +58,6 @@ var itemscreen = new Class(
 			});
 		resetajax.request();
 	}
-
 });
 
 itemscreen.implement( new Options, new Events );
