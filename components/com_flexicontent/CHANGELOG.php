@@ -16,7 +16,7 @@
  */
 
 
-FLEXIcontent 1.5.3 stable - Build 323 - Changelog
+FLEXIcontent 1.5.3 stable - build 333 - Changelog
 
 Legend:
 * -> Security Fix
