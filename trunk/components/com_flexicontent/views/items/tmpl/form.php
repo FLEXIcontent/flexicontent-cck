@@ -449,6 +449,7 @@ dump($this->perms,'perms');
 
 		<br class="clear" />
         
+		<input type="hidden" name="created" value="<?php echo $this->item->created; ?>" />
 		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
     	<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
     	<?php echo JHTML::_( 'form.token' ); ?>
