@@ -417,7 +417,8 @@ class FlexicontentModelItems extends JModel
 			}
 
 			if($version == $current_version) {
-				$item->text = $item->introtext;
+				//$item->text = $item->introtext;
+				$item->text = $item->introtext . '<hr id="system-readmore" />' . $item->fulltext;
 			}
 			$this->_item = &$item;
 			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
