@@ -158,6 +158,9 @@ class FlexicontentModelTags extends JModel
 				$andaccess   = ' AND mc.access <= '.$gid;
 				$andaccess  .= ' AND i.access <= '.$gid;
 			}
+		} else {
+			$joinaccess	 = '';
+			$andaccess   = '';
 		}
 
 		$where		= $this->_buildItemWhere();
