@@ -8,7 +8,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.3a stable (r337)</version>
+	<version>1.5.3a stable (r338)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
@@ -31,6 +31,7 @@
 		<folder>helpers</folder>
 		<folder>librairies</folder>
 		<folder>models</folder>
+		<folder>sef_ext</folder>
 		<folder>templates</folder>
 		<folder>views</folder>
 	</files>
