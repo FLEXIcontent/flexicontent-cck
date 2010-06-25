@@ -16,6 +16,24 @@
  */
 
 
+
+FLEXIcontent 1.5.3a stable - build 335 - Changelog
+
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+# Bug fix: The created date was set to the time the content was edited [issue 42]
+# Bug fix: The fulltext bloc disapeared when editing the current version of an article in frontend [issue 46]
+
+
+
+
 FLEXIcontent 1.5.3 stable - build 333 - Changelog
 
 Legend:
