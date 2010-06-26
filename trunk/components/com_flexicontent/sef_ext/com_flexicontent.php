@@ -1,22 +1,19 @@
 <?php
 /**
- * @version 1.0 $Id: com_flexicontent.php 137 2008-08-04 20:57:18Z vistamedia $
+ * @version 1.5 stable $Id$
  * @package Joomla
- * @subpackage QuickFAQ sh404sef plugin
- * @copyright (C) 2005 - 2008 Christoph Lukes
- * @license GNU/GPL, see LICENSE.php
- * QuickFAQ is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License 2
- * as published by the Free Software Foundation.
-
- * QuickFAQ is distributed in the hope that it will be useful,
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with QuickFAQ; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 // no direct access
@@ -25,7 +22,9 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
 
-global $sh_LANG, $sefConfig;
+global $sh_LANG, $sefConfig, $globalcats;
+
+//dump($globalcats,'$globalcats');
 
 $shLangName 	= '';
 $shLangIso 		= '';
@@ -33,7 +32,8 @@ $title 			= array ( );
 $shItemidString = '';
 $dosef	 		= shInitializePlugin ( $lang, $shLangName, $shLangIso, $option );
 $layout 		= JRequest::getString('layout', '');
-$type 			= JRequest::getString('type', '');
+$typeid 		= JRequest::getString('typeid', '');
+$task 			= JRequest::getString('task', '');
 
 if ($dosef == false) {
 	return;
@@ -48,31 +48,38 @@ $shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_F
 
 // ------------------  /load language file - adjust as needed ----------------------------------------
 
+$view 			= isset ( $view ) ? @$view : null;
+$Itemid 		= isset ( $Itemid ) ? @$Itemid : null;
 
-$view = isset ( $view ) ? @$view : null;
-$Itemid = isset ( $Itemid ) ? @$Itemid : null;
-$shFAQName = shGetComponentPrefix ( $option );
-$shFAQName = empty ( $shFAQName ) ? 
-
-getMenuTitle ( $option, $view, $Itemid, null, $shLangName ) : $shFAQName;
-
-$shFAQName = (empty ( $shFAQName ) || $shFAQName == '/') ? 'FAQ' : $shFAQName;
-
-if (! empty ( $shFAQName )) {
-	$title [] = $shFAQName;
-}
 
 switch ( $view) {
 	
 	case 'items' :
 		
+if ($typeid || $task == 'download' || $task == 'weblink') {
+	$dosef = false;
+	return;
+} else {
+/*
+	shRemoveFromGETVarsList ( 'id' );
+	shRemoveFromGETVarsList ( 'cid' );
+	shRemoveFromGETVarsList ( 'task' );
+	shRemoveFromGETVarsList ( 'option' );
+	shRemoveFromGETVarsList ( 'lang' );
+	shRemoveFromGETVarsList ( 'view' );
+	shRemoveFromGETVarsList ( 'layout' );
+	shRemoveFromGETVarsList ( 'typeid' );
+*/
+}
+
 		isset ( $task ) ? $task : $task = '';
 		
-		if (! empty ( $id ) && ! empty ( $cid )) {
+		if (!empty($id) && !empty($cid) && empty($task) ) {
 			
-			$query	= 'SELECT i.id, i.title, c.title AS cattitle'
+			$query	= 'SELECT i.id, i.title, c.title AS cattitle, ty.alias AS typealias'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+					. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 					. ' WHERE i.id = ' . ( int ) $id;
@@ -88,49 +95,47 @@ switch ( $view) {
 				die ( $database->stderr () );
 			} elseif ($row) {
 				if ($row->title) {
-					$title [] = $row->cattitle;
-					$title [] = $row->title;
-					if ($task == 'edit') {
-						$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT_EDIT'];
+					if ($globalcats[$cid]->ancestorsarray) {
+						$ancestors = $globalcats[$cid]->ancestorsarray;
+						foreach ($ancestors as $ancestor) {
+							$title[] = $globalcats[$ancestor]->title . '/';
+						}		
 					}
+					
+					$title [] = $row->title;
 				}
 			}
-		} else {
-			if ($task == 'add' || $layout == 'form') {
-				$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT_ADD'];
+
+		shRemoveFromGETVarsList ( 'id' );
+		shRemoveFromGETVarsList ( 'cid' );
+//		shRemoveFromGETVarsList ( 'task' );
+		shRemoveFromGETVarsList ( 'option' );
+		shRemoveFromGETVarsList ( 'lang' );
+		shRemoveFromGETVarsList ( 'view' );
+		shRemoveFromGETVarsList ( 'layout' );
+//		shRemoveFromGETVarsList ( 'typeid' );
+
+		}
+		
+	break;
+	
+	case 'category' :
+
+		if (!empty($cid) && empty($id)) {
+
+			if ($globalcats[$cid]->ancestorsarray) {
+				$ancestors = $globalcats[$cid]->ancestorsarray;
+				foreach ($ancestors as $ancestor) {
+					$title[] = $globalcats[$ancestor]->title . '/';
+				}		
 			} else {
 				$title [] = '/';
 			}
 		}
-		shRemoveFromGETVarsList ( 'id' );
-		shRemoveFromGETVarsList ( 'cid' );
-		shRemoveFromGETVarsList ( 'task' );
-		shRemoveFromGETVarsList ( 'layout' );
-		shRemoveFromGETVarsList ( 'type' );
-	break;
-	
-	case 'category' :
-		if (! empty ( $cid )) {
-			$query 	= 'SELECT id, title FROM #__categories'
-					.' WHERE id = ' . ( int ) $cid;
-			$database->setQuery ( $query );
-			
-			if (shTranslateURL ( $option, $shLangName )) {
-				$row = $database->loadObject ();
-			} else {
-				$row = $database->loadObject ( null, false );
-			}
-			
-			if ($database->getErrorNum ()) {
-				die ( $database->stderr () );
-			} elseif ($row) {
-				if ($row->title) {
-					$title [] = $row->title;
-				}
-			}
-		} else {
-			$title [] = '/';
-		}
+
+		shRemoveFromGETVarsList ( 'option' );
+		shRemoveFromGETVarsList ( 'lang' );
+		shRemoveFromGETVarsList ( 'view' );
 		shRemoveFromGETVarsList ( 'cid' );
 	break;
 	
@@ -160,22 +165,26 @@ switch ( $view) {
 	break;
 	
 	case 'favourites' :
-		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT_FAVOURITES'] . $sefConfig->suffix;
+		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_FAVOURITES'] .  '/';
+shRemoveFromGETVarsList ( 'option' );
+shRemoveFromGETVarsList ( 'lang' );
+shRemoveFromGETVarsList ( 'view' );
 	break;
-/*
+
 	
 	case 'flexicontent' :
-//		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . $sefConfig->suffix;
+		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . '/';
+shRemoveFromGETVarsList ( 'option' );
+shRemoveFromGETVarsList ( 'lang' );
+shRemoveFromGETVarsList ( 'view' );
 	break;
-*/
+
 	
 	default :
-		$title [] = '/';
+//		$title [] = '/';
 	break;
 }
 
-shRemoveFromGETVarsList ( 'option' );
-shRemoveFromGETVarsList ( 'lang' );
 
 if (! empty ( $Itemid ))
 	shRemoveFromGETVarsList ( 'Itemid' );
@@ -185,10 +194,6 @@ if (! empty ( $limit ))
 
 if (isset ( $limitstart ))
 	shRemoveFromGETVarsList ( 'limitstart' ); // limitstart can be zero
-
-
-if (! empty ( $view ))
-	shRemoveFromGETVarsList ( 'view' );
 	
 // ------------------  standard plugin finalize function - don't change ---------------------------  
 
