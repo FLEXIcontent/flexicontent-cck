@@ -44,9 +44,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$required 	= $required ? ' class="required"' : '';
 		
 		// initialise property
-		if($item->version == 1 && $default_value) {
+		if($item->version < 2 && $default_value) {
+			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
+			$field->value = array();
 			$field->value[0] = '';
 		}
 

@@ -17,7 +17,7 @@
 
 
 
-FLEXIcontent 1.5.3a stable - build 337 - Changelog
+FLEXIcontent 1.5.3a stable - build 341 - Changelog
 
 Legend:
 * -> Security Fix
@@ -30,8 +30,12 @@ $ -> Language fix or change
 
 # Bug fix: The created date was set to the time the content was edited [issue 42]
 # Bug fix: The fulltext bloc disapeared when editing the current version of an article in frontend [issue 46]
+# Bug fix: Handle the default values properly for every field type [issue 48]
 
 + Add the sh404sef plugin to the trunk
+
+$ Add missing string for the weblink field
+
 
 
 FLEXIcontent 1.5.3 stable - build 333 - Changelog

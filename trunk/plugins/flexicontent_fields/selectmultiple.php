@@ -42,8 +42,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 		
 		// initialise property
-		if($item->version == 1 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
+		} else if (!$field->value) {
+			$field->value = array();
+			$field->value[0] = '';
 		}
 
 		if ($sql_mode) { // SQL mode
