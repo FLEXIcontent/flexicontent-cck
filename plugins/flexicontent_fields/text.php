@@ -46,9 +46,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$required 	= $required ? ' class="required"' : '';
 		
 		// initialise property
-		if($item->version == 1 && $default_value) {
+		if($item->version < 2 && $default_value) {
+			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
+			$field->value = array();
 			$field->value[0] = '';
 		} else {
 			for ($n=0; $n<count($field->value); $n++) {
@@ -164,7 +166,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
-				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.($value ? $value : $default_value).'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
+				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
 				$n++;
 				}
 			$field->html .=	'</ul>';

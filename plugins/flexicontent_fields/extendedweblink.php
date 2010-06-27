@@ -41,10 +41,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$required 	= $required ? ' class="required"' : '';
 		
 		// initialise property
-		if(!$field->value || $field->value[0] == '') {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
-			$field->value[] = $default_value ? $default_value : '';
-			}
+			$field->value[0] = JText::_($default_value);
+		} elseif (!$field->value) {
+			$field->value = array();
+			$field->value[0] = '';
+		}
 			
 		if ($multiple) {
 			$document	= & JFactory::getDocument();

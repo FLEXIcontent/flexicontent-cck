@@ -38,8 +38,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
 								
 		$required 	= $required ? ' class="required"' : '';
-		//dump($field->value);
-		if (!$field->value) $field->value[0] = '';
+
+		// initialise property
+		if (!$field->value) {
+			$field->value = array();
+			$field->value[0] = '';
+		}
+		
 		if ($multiple) {
 			$document	= & JFactory::getDocument();
 

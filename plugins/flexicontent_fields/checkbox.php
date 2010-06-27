@@ -63,9 +63,13 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		}
 
 		// initialise property
-		if($item->version == 1 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
-			}
+		} else if (!$field->value) {
+			$field->value = array();
+			$field->value[0] = '';
+		}
+
 		$listelements = explode("%% ", $field_elements);
 		$listarrays = array();
 		foreach ($listelements as $listelement) {

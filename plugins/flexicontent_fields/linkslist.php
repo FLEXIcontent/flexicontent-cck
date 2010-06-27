@@ -71,9 +71,12 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		}
 
 		// initialise property
-		if($item->version == 1 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
-			}
+		} elseif (!$field->value) {
+			$field->value = array();
+			$field->value[0] = '';
+		}
 
 		if(strlen($field_elements) === 0) return $field->html = '<div id="fc-change-error" class="fc-error">Please enter at least one item. Example: <pre style="display:inline-block; margin:0">{"item1":{"name":"Item1"},"item2":{"name":"Item2"}}</pre></div>';
 		

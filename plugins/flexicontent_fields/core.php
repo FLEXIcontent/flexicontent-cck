@@ -71,6 +71,16 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		switch ($field->field_type)
 		{
 			case 'created': // created
+/*
+			$config =& JFactory::getConfig();
+			$tzoffset = $config->getValue('config.offset');
+			if ($item->created && strlen(trim( $item->created )) <= 10) {
+				$item->created 	.= ' 00:00:00';
+			}
+			$date =& JFactory::getDate($item->created, $tzoffset);
+			$item->created = $date->toMySQL();
+*/
+
 			$field->value[] = $item->created;
 			$dateformat = $dateformat ? $dateformat : $customdate;
 			$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
