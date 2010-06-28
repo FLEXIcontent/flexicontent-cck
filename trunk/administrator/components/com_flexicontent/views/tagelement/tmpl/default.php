@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=qftagelement&amp;tmpl=component" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=tagelement&amp;tmpl=component" method="post" name="adminForm">
 
 <table class="adminform">
 		<tr>
