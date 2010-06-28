@@ -24,13 +24,8 @@ Fields (vistamedia)
 + Copy fields
 + Allow to filter by core fields (author, reviser, category, tag)
 
-Frontend publishing
-+ The frontend publication system for non article types
-+ The frontend editing
-
 Trash & Archive - Expired items
 ^ transform archive view to add a trash system for the items
-
 
 Item (backend)
 + Implement the notification feature

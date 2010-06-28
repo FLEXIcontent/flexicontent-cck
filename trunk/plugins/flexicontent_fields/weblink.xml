@@ -19,7 +19,8 @@
 		</param>
 	</params>
 	<params group="group-weblink">
-		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+		<param name="default_value_link" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE_LINK" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+		<param name="default_value_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 		<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>

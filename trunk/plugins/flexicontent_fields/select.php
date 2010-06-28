@@ -39,7 +39,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$required 	= $required ? 'class="required"' : null;
 
 		// initialise property
-		if($item->version < 2 && $default_values) {
+		if($item->version < 2 && $default_value) {
+			$field->value = array();
 			$field->value[0] = $default_value;
 		} else if (!$field->value) {
 			$field->value = array();

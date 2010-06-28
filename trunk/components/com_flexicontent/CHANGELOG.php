@@ -17,7 +17,7 @@
 
 
 
-FLEXIcontent 1.5.3a stable - build 341 - Changelog
+FLEXIcontent 1.5.3a stable - build 343 - Changelog
 
 Legend:
 * -> Security Fix
