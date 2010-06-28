@@ -21,14 +21,16 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $sefConfig, $globalcats;
+global $sh_LANG, $globalcats;
 
+$sefConfig 		= & shRouter::shGetConfig();
 $shLangName 	= '';
 $shLangIso 		= '';
 $title 			= array ( );
 $shItemidString = '';
 $dosef	 		= shInitializePlugin ( $lang, $shLangName, $shLangIso, $option );
-$layout 		= JRequest::getVar('layout', '');
+$layout 		= JRequest::getVar('layout', null);
+$typeid	 		= JRequest::getInt('typeid', null);
 
 if ($dosef == false) {
 	return;
@@ -42,6 +44,26 @@ if ($dosef == false) {
 $shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
 
 // ------------------  /load language file - adjust as needed ----------------------------------------
+
+// do something about that Itemid thing
+if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
+  //global $Itemid;
+  if ($sefConfig->shInsertGlobalItemidIfNone && !empty($shCurrentItemid)) {
+    $string .= '&Itemid='.$shCurrentItemid;  // append current Itemid 
+    $Itemid = $shCurrentItemid;
+    shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
+  }  
+  if ($sefConfig->shInsertTitleIfNoItemid)
+  	$title[] = $sefConfig->shDefaultMenuItemName ? 
+      $sefConfig->shDefaultMenuItemName : getMenuTitle($option, null, $shCurrentItemid );
+  $shItemidString = $sefConfig->shAlwaysInsertItemid ? 
+    _COM_SEF_SH_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$shCurrentItemid
+    : '';
+} else {  // if Itemid in non-sef URL
+  $shItemidString = $sefConfig->shAlwaysInsertItemid ? 
+    _COM_SEF_SH_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$Itemid
+    : '';
+}
 
 $view 		= isset ($view) ? @$view : null;
 $Itemid		= isset ($Itemid) ? @$Itemid : null;
@@ -108,12 +130,15 @@ switch ($view) {
 			}
 			
 		} else {
-			$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_ADD'];
-		}
-
-		// Remove the vars from the url
-		if (!empty($layout))
+			$shName = shGetComponentPrefix($option);
+			$shName = empty($shName) ? getMenuTitle($option, (isset($view) ? @$view : null), $Itemid ) : $shName;
+			if (!empty($shName) && $shName != '/') $title[] = $shName;  // V x
+			//$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_ADD'];
+	
+			// Remove the vars from the url
 			shRemoveFromGETVarsList ( 'layout' );
+			shRemoveFromGETVarsList ( 'typeid' );
+		}
 
 	break;
 	
