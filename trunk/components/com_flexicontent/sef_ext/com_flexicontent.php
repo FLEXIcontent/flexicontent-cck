@@ -97,6 +97,12 @@ switch ($view) {
 					}
 				}	
 			
+				// Remove the vars from the url
+				if (!empty($id))
+					shRemoveFromGETVarsList ( 'id' );
+				if (!empty($cid))
+					shRemoveFromGETVarsList ( 'cid' );
+
 			} elseif ($task == 'edit') {
 				$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_EDIT'];
 			}
@@ -106,10 +112,6 @@ switch ($view) {
 		}
 
 		// Remove the vars from the url
-		if (!empty($id))
-			shRemoveFromGETVarsList ( 'id' );
-		if (!empty($cid))
-			shRemoveFromGETVarsList ( 'cid' );
 		if (!empty($layout))
 			shRemoveFromGETVarsList ( 'layout' );
 
