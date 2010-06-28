@@ -1337,15 +1337,22 @@ class FlexicontentModelItems extends JModel
 	 */
 	function getTypeparams ()
 	{
-		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id
-				;
+		$query	= 'SELECT t.attribs'
+				. ' FROM #__flexicontent_types AS t';
+
+		if ($this->_id == null) {
+			$type_id = JRequest::getInt('typeid', 0);
+			$query .= ' WHERE t.id = ' . (int)$type_id;
+		} else {
+			$query .= ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+					. ' WHERE ie.item_id = ' . (int)$this->_id
+					;
+		}
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		return $tparams;
 	}
+
 	
 	/**
 	 * Method to get the values of an extrafield
