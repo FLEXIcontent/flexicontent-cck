@@ -35,15 +35,19 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
+		$default_link		= $field->parameters->get( 'default_value_link', '' ) ;
+		$default_title		= $field->parameters->get( 'default_value_title', '' ) ;
 		$size				= $field->parameters->get( 'size', 30 ) ;
 								
 		$required 	= $required ? ' class="required"' : '';
 		
 		// initialise property
-		if($item->version < 2 && $default_value) {
+		if($item->version < 2 && $default_link) {
 			$field->value = array();
-			$field->value[0] = JText::_($default_value);
+			$field->value[0]['link'] = $default_link;
+			$field->value[0]['title'] = $default_title;
+			$field->value[0]['hits'] = 0;
+			$field->value[0] = serialize($field->value[0]);
 		} elseif (!$field->value) {
 			$field->value = array();
 			$field->value[0] = '';
@@ -172,10 +176,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$field->html	.= '
 				<li>
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URL' ).':</span>
-					<input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" />
+					<input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</span>
-					<input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" />
-					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
+					<input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
+					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.$value['hits'].'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span>
 				</li>';

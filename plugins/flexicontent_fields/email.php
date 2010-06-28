@@ -161,7 +161,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 			
 			foreach ($field->value as $value) {
-				$field->html .= '<li><input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.($value ? $value : $default_value).'" /><input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
+				$field->html .= '<li><input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'" /><input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
 				$n++;
 				}
 			$field->html .=	'</ul>';
