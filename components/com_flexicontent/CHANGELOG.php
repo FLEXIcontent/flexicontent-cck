@@ -16,9 +16,28 @@
  */
 
 
+FLEXIcontent 1.5.3b stable - build 350 - Changelog
+--------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+ 	
+# Bug fix: JS error when submitting an item which didn't use the maintext field [issue 50]
+# Bug fix: There was a problem with submitting new contents with sh404sef activated
+# Bug fix: The tagelement view was not working properly http://www.flexicontent.org/forum/index.php?f=29&t=1733&start=0&rb_v=viewtopic
+
++ Add an update check in control panel / see => http://code.google.com/p/flexicontent/issues/detail?id=45
+
+
 
 FLEXIcontent 1.5.3a stable - build 345 - Changelog
-
+--------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
@@ -40,7 +59,7 @@ $ Add missing string for the weblink field
 
 
 FLEXIcontent 1.5.3 stable - build 333 - Changelog
-
+-------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
