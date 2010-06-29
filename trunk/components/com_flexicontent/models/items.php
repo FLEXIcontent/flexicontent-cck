@@ -782,6 +782,7 @@ class FlexicontentModelItems extends JModel
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
+
 			$config =& JFactory::getConfig();
 			$tzoffset = $config->getValue('config.offset');
 
@@ -802,8 +803,10 @@ class FlexicontentModelItems extends JModel
 				$item->created 	.= ' 00:00:00';
 			}
 
-			$date =& JFactory::getDate($item->created, $tzoffset);
-			$item->created = $date->toMySQL();
+			if ($isnew) {
+				$date =& JFactory::getDate($item->created, $tzoffset);
+				$item->created = $date->toMySQL();
+			}
 
 			// Append time if not added to publish date
 			if (strlen(trim($item->publish_up)) <= 10) {
