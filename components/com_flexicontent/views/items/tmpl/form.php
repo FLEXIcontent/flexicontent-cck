@@ -124,6 +124,7 @@ function addtag(id, tagname) {
 	var tag = new itemscreen();
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
+
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
@@ -151,11 +152,12 @@ function submitbutton( pressbutton ) {
 		invalid[0].focus();
 		return false;
 	} <?php } ?>else {
-	<?php echo $this->editor->save( 'text' ); ?>
+	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) echo $this->editor->save( 'text' ); ?>
 	submitform(pressbutton);
 	return true;
 	}
 }
+
 function deleteTag(obj) {
 	parent = $($(obj).getParent());
 	parent.remove();
