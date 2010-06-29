@@ -216,7 +216,7 @@ class FlexicontentModelItem extends JModel {
 						." WHERE fir.item_id='".$this->_id."';";
 				$this->_db->setQuery($query);
 				$fields = $this->_db->loadObjectList();
-				$jcorefields = flexicontent_html::getJCoreFields();
+				$jcorefields = flexicontent_html::getJCoreFields(NULL, true);
 				$catflag = false;
 				$tagflag = false;
 				$clean_database = true;

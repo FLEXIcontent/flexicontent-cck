@@ -74,6 +74,7 @@
 			<param name="support_url" default="" />
 			<param name="add_tooltips" default="1" />
 			<param name="disablecss" default="0" />
+			<param name="show_updatecheck" default="1" />
 			<param name="new_item_state" default="-4" />
 			<param name="flexi_fish" default="0" />
 			<param name="filtercat" default="0" />

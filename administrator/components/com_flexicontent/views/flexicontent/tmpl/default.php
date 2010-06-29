@@ -17,7 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
+$template	= $mainframe->getTemplate();
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
 {
@@ -288,8 +288,116 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<?php $k = 1 - $k; } ?>
 				</table>
 				<?php
-				echo $this->pane->endPanel();
-				echo $this->pane->endPane();
+				echo $this->pane->endPanel(); ?>
+                
+                  <?php
+			if($this->params->get('show_updatecheck') == 1) {	 
+			if ($this->check['current'] == 0 ) {	 
+				$title = JText::_( 'FLEXI_VERSION_OK' );
+				} else {
+				$title = JText::_( 'FLEXI_NEW_VERSION' );
+				}
+			echo $this->pane->startPane( 'stat-pane' );
+			echo $this->pane->startPanel( $title, 'updatecomponent' );
+			
+			?>
+            
+            <?php
+				if($this->check['connect'] == 0) {
+				?>
+					<table class="adminlist">
+						<thead>
+								<tr>
+									<th colspan="2">
+									<?php echo JText::_( 'FLEXI_VERSION' ); ?>
+									</th>
+								</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td colspan="2">
+								<?php
+									echo '<b><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></b>';
+								?>
+							</td>
+							</tr>
+						</tbody>
+					</table>
+				<?php
+				} elseif ($this->check['enabled'] == 1) {
+				?>
+			
+			<table class="adminlist">
+		<thead>
+				<tr>
+					<th colspan="2">
+					<?php echo JText::_( 'FLEXI_UPDATE_CHECK' ); ?>
+					</th>
+				</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td width="33%">
+				<?php
+		  			if ($this->check['current'] == 0 ) {		  				
+						echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-checkin.png', NULL, 'width=32');
+		  			} elseif( $this->check['current'] == -1 ) {
+		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+		  			} else {
+		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+		  			}
+		  		?>
+			</td>
+			<td>
+				<?php
+		  			if ($this->check['current'] == 0) {
+		  				echo '<strong><font color="green">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</font></strong>';
+		  			} elseif( $this->check['current'] == -1 ) {
+		  				echo '<b><font color="red">'.JText::_( 'FLEXI_OLD_VERSION_INSTALLED' ).'</font></b>';
+		  			} else {
+		  				echo '<b><font color="orange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</font></b>';
+		  			}
+		  		?>
+			</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['version']; ?>
+				</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['current_version']; ?>
+				</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['released']; ?>
+				</td>
+			</tr>
+            
+           
+	</tbody>
+</table>
+			<?php 
+			} 
+			?>
+			<?php
+			echo $this->pane->endPanel();
+			}
+			
+			?>
+                
+				<?php echo $this->pane->endPane();
 				?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>

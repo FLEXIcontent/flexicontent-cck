@@ -51,6 +51,10 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 $error = false;
 $extensions = array();
 
+//clear a cache
+$cache = & JFactory::getCache();
+$cache->clean( null, 'com_flexicontent' );
+
 // fix joomla 1.5 bug
 $this->parent->getDBO =& $this->parent->getDBO();
 
