@@ -18,7 +18,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		
+		<param name="show_updatecheck" type="radio" default="1" label="FLEXI_CHECK_UPDATE" description="FLEXI_CHECK_UPDATE_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+	
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" level="level1" menu="hide" />
 		
 		<param name="flexi_fish" type="radio" default="0" label="FLEXI_JOOMFISH_SUPPORT" description="FLEXI_JOOMFISH_SUPPORT_DESC"  menu="hide">
