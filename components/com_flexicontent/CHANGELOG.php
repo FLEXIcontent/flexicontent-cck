@@ -16,6 +16,24 @@
  */
 
 
+FLEXIcontent 1.5.3c stable - build 354 - Changelog
+--------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+ 	
+# Bug fix: the created_by was reset to the current editor (http://www.flexicontent.org/developers-blog/flexicontent-153-stable-release-frontend-editing-inside.html#comment-438)
+# Bug fix: the created date was modified by the time offset each time the item was edited and the versioning was disabled [issue 47]
+
++ Add compatibility with the PrintMe component from dioscouri http://bit.ly/dcDacR
+
+
 FLEXIcontent 1.5.3b stable - build 350 - Changelog
 --------------------------------------------------
 Legend:
