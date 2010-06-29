@@ -173,7 +173,7 @@ class FlexicontentModelFilemanager extends JModel
 			. ' AND value = f.id'
 			;
 			
-		if($filter_item) {
+		if ($filter_item) {
 			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
@@ -186,7 +186,7 @@ class FlexicontentModelFilemanager extends JModel
 				//. $having
 				. $orderby
 				;
-		}else{
+		} else {
 			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
