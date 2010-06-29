@@ -225,7 +225,7 @@ class FlexicontentViewItems extends JView
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
-		$print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component');
+		$print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 
 		$this->assignRef('item' , 				$item);
 		$this->assignRef('user' , 				$user);
