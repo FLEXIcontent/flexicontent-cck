@@ -189,6 +189,8 @@ class FlexicontentFields
 	{
 		$dispatcher = &JDispatcher::getInstance();
 
+		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
+
 		// we append some values to the field object
 		$field->item_id 	= (int)$item->id;
 		$field->value 		= $values;
@@ -202,6 +204,7 @@ class FlexicontentFields
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
+				$field->title = $item->title;
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
@@ -212,7 +215,7 @@ class FlexicontentFields
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, 0));
+				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 				$field->display = $field->text;
 			}
 		}
@@ -222,6 +225,7 @@ class FlexicontentFields
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
+				$field->title = $item->title;
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
@@ -232,7 +236,7 @@ class FlexicontentFields
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, 0));
+				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 				$field->display = $field->text;
 			}
 		}
