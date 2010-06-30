@@ -35,7 +35,7 @@ class FlexicontentHelperRoute
 	/**
 	 * @param	int	The route of the item
 	 */
-	function getItemRoute($id, $catid = 0)
+	function getItemRoute($id, $catid = 0, $Itemid=0)
 	{
 		$needles = array(
 			'items'  => (int) $id,
@@ -51,9 +51,11 @@ class FlexicontentHelperRoute
 
 		$link .= '&id='. $id;
 
-		if($item = FlexicontentHelperRoute::_findItem($needles)) {
+		if($Itemid) {
+			$link .= '&Itemid='.$Itemid;
+		}elseif($item = FlexicontentHelperRoute::_findItem($needles)) {
 			$link .= '&Itemid='.$item->id;
-		};
+		}
 
 		return $link;
 	}
