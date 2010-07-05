@@ -308,7 +308,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
-					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail'.$item->id.'"><img src="'.$srcs.'" border="0" /></a>';
+					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail'.$item->id.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 				}
 				$n++;
 				}
