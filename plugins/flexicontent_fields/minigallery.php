@@ -17,12 +17,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsMinigallery extends JPlugin
-{
-	function plgFlexicontent_fieldsMinigallery( &$subject, $params )
-	{
+class plgFlexicontent_fieldsMinigallery extends JPlugin {
+	function plgFlexicontent_fieldsMinigallery( &$subject, $params ) {
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
@@ -40,7 +38,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$app			= & JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
 		$clientpref		= $app->isAdmin() ? '' : 'administrator/';
-				
 
 		$js = "
 		function randomString() {
@@ -272,14 +269,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 						thumbnails: true,
 						backgroundSlider: true
 					}
-				show = new SlideShow('slideshowContainer','slideshowThumbnail',obj);
+				show = new SlideShow('slideshowContainer".$item->id."','slideshowThumbnail".$item->id."',obj);
 				show.play();
 				});
 			";
 			$document->addScriptDeclaration($js);
 			
 			$css = "
-			.slideshowContainer {
+			.slideshowContainer".$item->id." {
 				width: ".$w_l."px;
 				height: ".$h_l."px;
 				margin-".$marginpos.": 5px;
@@ -290,7 +287,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$css .= "#thumbnails { width: ".$w_l."px; }";
 			}
 			if ($thumbposition == 2 || $thumbposition == 4) {
-				$css .= ".slideshowContainer { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
+				$css .= ".slideshowContainer".$item->id." { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
 			}
 
 			$document->addStyleDeclaration($css);
@@ -298,7 +295,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$display = array();
 			
 			$field->{$prop}  = '';
-			$field->{$prop} .= ($thumbposition > 2) ? '<div id="slideshowContainer" class="slideshowContainer"></div>' : '';
+			$field->{$prop} .= ($thumbposition > 2) ? '<div id="slideshowContainer'.$item->id.'" class="slideshowContainer'.$item->id.'"></div>' : '';
 			$field->{$prop} .= '<div id="thumbnails">';
 			$n = 0;
 			foreach ($values as $value) {
@@ -311,13 +308,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
-					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
+					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail'.$item->id.'"><img src="'.$srcs.'" border="0" /></a>';
 				}
 				$n++;
 				}
 			$field->{$prop} .= implode(' ', $display);
 			$field->{$prop} .= '</div>';
-			$field->{$prop} .= ($thumbposition < 3) ? '<div id="slideshowContainer" class="slideshowContainer"></div>' : '';
+			$field->{$prop} .= ($thumbposition < 3) ? '<div id="slideshowContainer'.$item->id.'" class="slideshowContainer'.$item->id.'"></div>' : '';
 		}
 	}
 	
