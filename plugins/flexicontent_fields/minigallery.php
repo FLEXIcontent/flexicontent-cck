@@ -65,7 +65,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			var img		= document.createElement('img');
 			
 			var filelist = document.getElementById('sortables_".$field->id."');
-			
+			if(file.substring(0,7)!='http://')
+				file = '".JPATH_ROOT."/components/com_flexicontent/medias/'+file;
 			$(li).addClass('minigallery');
 			$(thumb).addClass('thumbs');
 			$(span).addClass('drag');
@@ -78,7 +79,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
-			thumb.src = '".JURI::root()."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=".JPATH_ROOT."/components/com_flexicontent/medias/'+file+'&w=100&h=100&zc=1';
+			thumb.src = '".JURI::root()."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
@@ -183,9 +184,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
-				
 				$filename = $this->getFileName( $file );
-				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JPATH_ROOT . DS . $mediapath . DS . $filename->filename . '&w=100&h=100&zc=1';
+				$img_path = $filename->filename;
+				if(substr($filename->filename, 0, 7)!='http://')
+					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
+				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
@@ -301,8 +304,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			foreach ($values as $value) {
 				$filename = $this->getFileName( $value );
 				if ($filename) {
-					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JURI::base(true) . '/' . $mediapath . '/' . $filename->filename . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+					$img_path = $filename->filename;
+					if(substr($filename->filename,0,7)!='http://') {
+						$img_path = JURI::base(true) . '/' . $mediapath . '/' . $filename->filename;
+					}
+					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
 					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 				}
