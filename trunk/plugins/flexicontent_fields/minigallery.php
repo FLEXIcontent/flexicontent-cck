@@ -33,7 +33,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		// some parameter shortcuts
 		$size				= $field->parameters->get( 'size', 30 ) ;
-						
+
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
 		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/media');
@@ -78,7 +78,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
-			thumb.src = '".$client."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../components/com_flexicontent/medias/'+file+'&w=100&h=100&zc=1';
+			thumb.src = '".JURI::root()."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=".JPATH_ROOT."/components/com_flexicontent/medias/'+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 			
-			img.src = '".$clientpref."components/com_flexicontent/assets/images/move3.png';
+			img.src = '".JURI::root()."/administrator/components/com_flexicontent/assets/images/move3.png';
 			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
@@ -185,7 +185,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$field->html .= '<li>';
 				
 				$filename = $this->getFileName( $file );
-				$src = $client . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../' . $mediapath . DS . $filename->filename . '&w=100&h=100&zc=1';
+				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . JPATH_ROOT . DS . $mediapath . DS . $filename->filename . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
