@@ -178,7 +178,7 @@ class FlexicontentViewFlexicontent extends JView
 		}
 		
 		//updatecheck
-		if($params->get('show_updatecheck') == 1) {
+		if($params->get('show_updatecheck', 1) == 1) {
 		$cache = & JFactory::getCache('com_flexicontent');
 		$cache->setCaching( 1 );
 		$cache->setLifeTime( 100 );

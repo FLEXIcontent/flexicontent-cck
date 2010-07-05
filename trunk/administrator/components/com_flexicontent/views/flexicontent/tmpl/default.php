@@ -291,7 +291,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				echo $this->pane->endPanel(); ?>
                 
                   <?php
-			if($this->params->get('show_updatecheck') == 1) {	 
+			if($this->params->get('show_updatecheck', 1) == 1) {	 
 			if ($this->check['current'] == 0 ) {	 
 				$title = JText::_( 'FLEXI_VERSION_OK' );
 				} else {
