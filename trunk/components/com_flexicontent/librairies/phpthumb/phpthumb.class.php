@@ -1157,7 +1157,7 @@ class phpthumb {
 					$versionstring[0] = false;
 					$this->DebugMessage('ImageMagick did not return recognized version string ('.$versionstring[1].')', __FILE__, __LINE__);
 				}
-				$this->DebugMessage('ImageMagick convert --version says "'.$matches[0].'"', __FILE__, __LINE__);
+				$this->DebugMessage('ImageMagick convert --version says "'.@$matches[0].'"', __FILE__, __LINE__);
 			}
 		}
 		return @$versionstring[intval($returnRAW)];
