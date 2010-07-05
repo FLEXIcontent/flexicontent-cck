@@ -116,8 +116,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		$n = count($this->rows);
 		foreach ($this->rows as $row) {
 			if (in_array($row->ext, $imageexts)) {
-		$src = $this->client . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../' . $mediapath . DS . $row->filename . '&w=60&h=60';
-		$srcb = $this->client . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=../../../../' . $mediapath . DS . $row->filename . '&w=200&h=200';
+			$img_path = $row->filename;
+			if(substr($row->filename, 0, 7)!='http://') {
+				$img_path = JPATH_ROOT . DS . $mediapath . DS . $row->filename;
+			}
+			$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=60&h=60';
+			$srcb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=200&h=200';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
