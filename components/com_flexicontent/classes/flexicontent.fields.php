@@ -155,7 +155,7 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 
-		$item->parameters	= new JParameter( $item->attribs );
+//		$item->parameters	= new JParameter( $item->attribs );
 		$item->params		= $item->parameters;
 		$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
 		$item->modified		= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;
