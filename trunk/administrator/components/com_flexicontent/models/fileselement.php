@@ -175,6 +175,7 @@ class FlexicontentModelFileselement extends JModel
 		if($filter_item) {
 			$session = JFactory::getSession();
 			$files = $session->get('fileselement.'.$filter_item, null);
+			$files = $files?$files:array();
 			$files2 = $this->getItemFiles();
 			$files = array_merge($files, $files2);
 			$files = array_unique($files);
@@ -219,7 +220,9 @@ class FlexicontentModelFileselement extends JModel
 			. ' GROUP BY f.id'
 			;
 			$db->setQuery($query);
-			return $db->loadResultArray();
+			$items = $db->loadResultArray();
+			$items = $items?$items:array();
+			return $items;
 		}
 	}
 
