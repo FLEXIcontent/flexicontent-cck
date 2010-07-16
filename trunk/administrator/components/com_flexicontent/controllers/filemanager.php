@@ -135,6 +135,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 					$db->insertObject('#__flexicontent_files', $obj);
 					
+					$option = JRequest::getVar('option');
+					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+					$session = JFactory::getSession();
+					$files = $session->get('fileselement.'.$filter_item, null);
+
+					if(!$files) {
+						$files = array();
+					}
+					$files[] = $db->insertid();
+					$session->set('fileselement.'.$filter_item, $files);
+
 					jexit('Upload complete');
 				} else {
 
@@ -158,6 +169,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$db->insertObject('#__flexicontent_files', $obj);
 
 					$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
+					
+					$option = JRequest::getVar('option');
+					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+					$session = JFactory::getSession();
+					$files = $session->get('fileselement.'.$filter_item, null);
+
+					if(!$files) {
+						$files = array();
+					}
+					$files[] = $db->insertid();
+					$session->set('fileselement.'.$filter_item, $files);
 					
 					// REDIRECT
 					if ($return) {
@@ -229,7 +251,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$db->insertObject('#__flexicontent_files', $obj);
 
 		$mainframe->enqueueMessage(JText::_( 'FLEXI_FILE_ADD_SUCCESS' ));
-					
+
+		$option = JRequest::getVar('option');
+		$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+		$session = JFactory::getSession();
+		$files = $session->get('fileselement.'.$filter_item, null);
+
+		if(!$files) {
+			$files = array();
+		}
+		$files[] = $db->insertid();
+		$session->set('fileselement.'.$filter_item, $files);
+
 		// REDIRECT
 		if ($return) {
 			$mainframe->redirect(base64_decode($return));
