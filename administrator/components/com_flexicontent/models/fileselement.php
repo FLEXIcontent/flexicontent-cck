@@ -86,7 +86,6 @@ class FlexicontentModelFileselement extends JModel
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
 		$this->setId((int)$array[0]);
-
 	}
 
 	/**
@@ -113,7 +112,7 @@ class FlexicontentModelFileselement extends JModel
 		// Lets load the files if it doesn't already exist
 		if (empty($this->_data))
 		{
-			$query = $this->_buildQuery();
+			$query = $this->_buildQuery();//echo "query : $query<br />";
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
@@ -166,21 +165,26 @@ class FlexicontentModelFileselement extends JModel
 	 * @since 1.0
 	 */
 	function _buildQuery() {
-		global $mainframe, $option;
+		$mainframe = JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
 
 		if($filter_item) {
+			$session = JFactory::getSession();
+			$files = $session->get('fileselement.'.$filter_item, null);
+			$files2 = $this->getItemFiles();
+			$files = array_merge($files, $files2);
+			$files = array_unique($files);
+			$session->set('fileselement.'.$filter_item, $files);
+			$files = "'".implode("','", $files)."'";
 			$query = 'SELECT f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
-			. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
 			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
-			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 			. $where
-			. ' AND fi.field_type = ' . $this->_db->Quote('file')
-			. ' AND rel.item_id=' . $filter_item
+			. ' AND f.id IN (' . $files . ')'
 			. ' GROUP BY f.id'
 			//. $having
 			. $orderby
@@ -195,6 +199,28 @@ class FlexicontentModelFileselement extends JModel
 			;
 		}
 		return $query;
+	}
+	
+	function getItemFiles() {
+		$mainframe = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		if($filter_item) {
+			$where		= $this->_buildContentWhere();
+			$db = JFactory::getDBO();
+			$query = 'SELECT f.id'
+			. ' FROM #__flexicontent_files AS f'
+			. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
+			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. $where
+			. ' AND fi.field_type = ' . $this->_db->Quote('file')
+			. ' AND rel.item_id=' . $filter_item
+			. ' GROUP BY f.id'
+			;
+			$db->setQuery($query);
+			return $db->loadResultArray();
+		}
 	}
 
 	function _buildQueryUsers() {
