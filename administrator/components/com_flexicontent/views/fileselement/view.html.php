@@ -35,8 +35,7 @@ class FlexicontentViewFileselement extends JView
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null )
-	{
+	function display( $tpl = null ) {
 		global $mainframe, $option;
 		
 		//Load pane behavior
@@ -50,12 +49,9 @@ class FlexicontentViewFileselement extends JView
 		$user  		= & JFactory::getUser();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
-		
+
 		$client		= $app->isAdmin() ? '../' : '';
-		
-		
-		//global $fieldid;
-		
+
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
@@ -84,7 +80,7 @@ class FlexicontentViewFileselement extends JView
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }';
 		$document->addStyleDeclaration($css);
-		
+
 		//add js to document
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		$js = "
@@ -95,7 +91,7 @@ class FlexicontentViewFileselement extends JView
 		}
 		";
 		$document->addScriptDeclaration($js);
-		
+
 		if (FLEXI_ACCESS) {
 			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
 			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
@@ -133,7 +129,7 @@ class FlexicontentViewFileselement extends JView
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
 		}
-		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 		
 		//build secure/media filterlist
 		$secure 	= array();

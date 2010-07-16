@@ -322,14 +322,11 @@ class FlexicontentModelFileselement extends JModel
 	function getItems() {
 		// File field relation sub query
 		$query = 'SELECT i.id,i.title'
-			. ' FROM #__flexicontent_fields_item_relations AS rel'
-			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-			. ' JOIN #__content AS i ON i.id = rel.item_id'
-			. ' WHERE fi.field_type = ' . $this->_db->Quote('file')
-			. ' GROUP BY i.id'
+			. ' FROM #__content AS i '
+			. ' WHERE i.sectionid = ' . FLEXI_SECTION
 			;
 		$this->_db->setQuery( $query );
-		$lists = $this->_db->loadObjectList();echo mysql_error();
+		$lists = $this->_db->loadObjectList();
 		return $lists?$lists:array();
 	}
 }
