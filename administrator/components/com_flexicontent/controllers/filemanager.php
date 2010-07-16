@@ -137,14 +137,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					
 					$option = JRequest::getVar('option');
 					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
-					$session = JFactory::getSession();
-					$files = $session->get('fileselement.'.$filter_item, null);
+					if($filter_item) {
+						$session = JFactory::getSession();
+						$files = $session->get('fileselement.'.$filter_item, null);
 
-					if(!$files) {
-						$files = array();
+						if(!$files) {
+							$files = array();
+						}
+						$files[] = $db->insertid();
+						$session->set('fileselement.'.$filter_item, $files);
 					}
-					$files[] = $db->insertid();
-					$session->set('fileselement.'.$filter_item, $files);
 
 					jexit('Upload complete');
 				} else {
@@ -172,14 +174,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					
 					$option = JRequest::getVar('option');
 					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
-					$session = JFactory::getSession();
-					$files = $session->get('fileselement.'.$filter_item, null);
+					if($filter_item) {
+						$session = JFactory::getSession();
+						$files = $session->get('fileselement.'.$filter_item, null);
 
-					if(!$files) {
-						$files = array();
+						if(!$files) {
+							$files = array();
+						}
+						$files[] = $db->insertid();
+						$session->set('fileselement.'.$filter_item, $files);
 					}
-					$files[] = $db->insertid();
-					$session->set('fileselement.'.$filter_item, $files);
 					
 					// REDIRECT
 					if ($return) {
@@ -254,14 +258,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$option = JRequest::getVar('option');
 		$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
-		$session = JFactory::getSession();
-		$files = $session->get('fileselement.'.$filter_item, null);
+		if($filter_item) {
+			$session = JFactory::getSession();
+			$files = $session->get('fileselement.'.$filter_item, null);
 
-		if(!$files) {
-			$files = array();
+			if(!$files) {
+				$files = array();
+			}
+			$files[] = $db->insertid();
+			$session->set('fileselement.'.$filter_item, $files);
 		}
-		$files[] = $db->insertid();
-		$session->set('fileselement.'.$filter_item, $files);
 
 		// REDIRECT
 		if ($return) {
