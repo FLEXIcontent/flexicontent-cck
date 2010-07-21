@@ -169,6 +169,7 @@ class FlexicontentViewCategory extends JView
 		// just a try : to implement later
 		foreach ($items as $item) {
 			$item->event = new stdClass();
+			$item->params = new JParameter($item->attribs);
 			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params,0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
