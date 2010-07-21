@@ -60,8 +60,7 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 
-	function getCategoryRoute($catid)
-	{
+	function getCategoryRoute($catid, $Itemid=0) {
 		$needles = array(
 			'category' => (int) $catid
 		);
@@ -69,7 +68,9 @@ class FlexicontentHelperRoute
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=category&cid='.$catid;
 
-		if($item = FlexicontentHelperRoute::_findCategory($needles)) {
+		if($Itemid) {
+			$link .= '&Itemid='.$Itemid;
+		}elseif($item = FlexicontentHelperRoute::_findCategory($needles)) {
 			$link .= '&Itemid='.$item->id;
 		};
 
