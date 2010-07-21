@@ -182,7 +182,7 @@ class FlexicontentViewFlexicontent extends JView
 		$cache = & JFactory::getCache('com_flexicontent');
 		$cache->setCaching( 1 );
 		$cache->setLifeTime( 100 );
-		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), 'component');
+		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
 		$this->assignRef('check'		, $check);
 		}
 				
