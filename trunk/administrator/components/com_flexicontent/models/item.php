@@ -155,7 +155,7 @@ class FlexicontentModelItem extends JModel {
 					." WHERE iv.item_id='".$this->_id."';";
 			}
 			$this->_db->setQuery($query);
-			$fields = $this->_db->loadObjectList();echo mysql_error();
+			$fields = $this->_db->loadObjectList();
 			$fields = $fields?$fields:array();
 			foreach($fields as $f) {
 				$fieldname = $f->name;
@@ -207,7 +207,7 @@ class FlexicontentModelItem extends JModel {
 				$item->text = $item->introtext;
 			}
 			$this->_item = &$item;
-			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
+			if(!$isnew && ( ($use_versioning && ($current_version>$lastversion))  || (($current_version==0) && ($lastversion==0)) ) ) {//add current version.
 				$mainframe = &JFactory::getApplication();
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
 						." FROM #__flexicontent_fields_item_relations as fir"
