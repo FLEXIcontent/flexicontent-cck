@@ -107,8 +107,8 @@ switch ($view) {
 								if (shTranslateURL ( $option, $shLangName )) {
 									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 									$database->setQuery ( $query );
-									$row = $database->loadObject ();
-									$title[] = $row->title . '/';
+									$row_cat = $database->loadObject ();
+									$title[] = $row_cat->title . '/';
 								} else {
 									$title[] = $globalcats[$ancestor]->title . '/';
 								}
