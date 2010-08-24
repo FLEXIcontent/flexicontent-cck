@@ -58,12 +58,22 @@ class FlexicontentViewFile extends JView {
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=filemanager' );
 			}
 		}
+		
+		//build access level list
+		if (FLEXI_ACCESS) {
+			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
+		} else {
+			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
+		}
+		$document	= & JFactory::getDocument();
 
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		$this->assignRef('row'      	, $row);
+		$this->assignRef('row'    	, $row);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('document'      , $document);
 
 		parent::display($tpl);
 	}
