@@ -284,7 +284,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 						</td>
 					</tr>
 				</table>
-									
+
 				<?php
 				if (FLEXI_ACCESS && $this->canRight && $this->row->id) :
 				$this->document->addScriptDeclaration("
