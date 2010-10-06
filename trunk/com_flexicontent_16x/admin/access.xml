@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<access component="com_flexicontent">
+	<section name="component">
+		<action name="com_flexicontent.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
+		<action name="com_flexicontent.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+		<action name="com_flexicontent.create" title="JAction_Create" description="JAction_Create_Component_Desc" />
+		<action name="com_flexicontent.delete" title="JAction_Delete" description="JAction_Delete_Component_Desc" />
+		<action name="com_flexicontent.edit" title="JAction_Edit" description="JAction_Edit_Component_Desc" />
+		<action name="com_flexicontent.edit.state" title="JAction_Edit_State" description="JAction_Edit_State_Component_Desc" />
+	</section>
+	<section name="item">
+		<action name="com_content.create" title="CONTENT_ACCESS_CREATE" description="CONTENT_ACCESS_CREATE_DESC" />
+		<action name="com_flexicontent.delete" title="CONTENT_ACCESS_DELETE" description="CONTENT_ACCESS_DELETE_DESC" />
+		<action name="com_flexicontent.edit" title="CONTENT_ACCESS_EDIT" description="CONTENT_ACCESS_EDIT_DESC" />
+		<action name="com_flexicontent.edit.state" title="CONTENT_ACCESS_EDITSTATE" description="CONTENT_ACCESS_EDITSTATE_DESC" />
+	</section>
+	<section name="type">
+		<action name="com_flexicontent.create" title="TYPE_ACCESS_CREATE" description="TYPE_ACCESS_CREATE_DESC" />
+		<action name="com_flexicontent.delete" title="TYPE_ACCESS_DELETE" description="TYPE_ACCESS_DELETE_DESC" />
+		<action name="com_flexicontent.edit" title="TYPE_ACCESS_EDIT" description="TYPE_ACCESS_EDIT_DESC" />
+		<action name="com_flexicontent.edit.state" title="TYPE_ACCESS_EDITSTATE" description="TYPE_ACCESS_EDITSTATE_DESC" />
+	</section>
+	<section name="category">
+		<action name="com_flexicontent.create" title="CATEGORY_ACCESS_CREATE" description="CATEGORY_ACCESS_CREATE_DESC" />
+		<action name="com_flexicontent.delete" title="CATEGORY_ACCESS_DELETE" description="CATEGORY_ACCESS_DELETE_DESC" />
+		<action name="com_flexicontent.edit" title="CATEGORY_ACCESS_EDIT" description="CATEGORY_ACCESS_EDIT_DESC" />
+		<action name="com_flexicontent.edit.state" title="CATEGORY_ACCESS_EDITSTATE" description="CATEGORY_ACCESS_EDITSTATE_DESC" />
+	</section>
+</access>

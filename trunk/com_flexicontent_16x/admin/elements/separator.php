@@ -18,7 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-
+jimport('joomla.form.field');
 /**
  * Renders a fields element
  *
@@ -26,7 +26,8 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementSeparator extends JElement
+ 
+class JFormFieldSeparator extends JFormField
 {
 	/**
 	 * Element name
@@ -34,11 +35,8 @@ class JElementSeparator extends JElement
 	 * @var		string
 	 */
 	var	$_name = 'separator';
-	
-
-	function fetchElement($name, $value, &$node, $control_name)
-	{
-		$level = $node->attributes('level');
+	protected function getInput() {
+		$level = $this->element->getAttribute('level');
 		if ($level == 'level2') {
 			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
 		} else if ($level == 'level3') {
@@ -46,8 +44,6 @@ class JElementSeparator extends JElement
 		} else {
 			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
 		}
-		
-		return '<span style="'.$style.'">'.JText::_($value).'</div>';
+		return '<span style="'.$style.'">'.JText::_($this->value).'</div>';
 	}
-
 }

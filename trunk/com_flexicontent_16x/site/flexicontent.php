@@ -35,7 +35,21 @@ define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 
 if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
 // define section
-if (!defined('FLEXI_SECTION')) 		define('FLEXI_SECTION'		, $params->get('flexi_section'));
+if($flexi_category = $params->get('flexi_category')) {
+	if (!defined('FLEXI_CATEGORY')) {
+		define('FLEXI_CATEGORY', $params->get('flexi_category'));
+		$db = &JFactory::getDBO();
+		$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
+		$db->setQuery($query);
+		$obj = $db->loadObject();
+		if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', $obj->lft);
+		if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', $obj->rgt);
+	}
+}else{
+	if (!defined('FLEXI_CATEGORY'))	define('FLEXI_CATEGORY', $params->get('flexi_category'));
+	if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', 0);
+	if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', 0);
+}
 if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));

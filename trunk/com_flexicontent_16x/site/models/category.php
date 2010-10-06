@@ -310,7 +310,7 @@ class FlexicontentModelCategory extends JModel{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
-		$where .= ' AND i.sectionid = ' . FLEXI_SECTION;
+		$where .= ' AND i.sectionid = ' . FLEXI_CATEGORY;
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
@@ -714,7 +714,7 @@ class FlexicontentModelCategory extends JModel{
 			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
 			. ' AND i.state IN (1, -5)'
-			. ' AND i.sectionid = '.FLEXI_SECTION
+			. ' AND i.sectionid = '.FLEXI_CATEGORY
 			. $and2
 			. ' GROUP BY alpha'
 			. ' ORDER BY alpha ASC';

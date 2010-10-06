@@ -1440,7 +1440,7 @@ class FLEXIUtilities {
 		static $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
-			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_CATEGORY."';";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
@@ -1471,7 +1471,7 @@ class FLEXIUtilities {
 		$db =& JFactory::getDBO();
 		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
 				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-				" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1';";
+				" WHERE sectionid='".FLEXI_CATEGORY."' AND c.version > '1';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList("id");
 		$status = false;

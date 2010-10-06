@@ -129,7 +129,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
 					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
-					. ' AND c.section = ' . FLEXI_SECTION
+					. ' AND c.section = ' . FLEXI_CATEGORY
 					. $where
 					;
 			$this->_db->setQuery( $query );
@@ -142,7 +142,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 					. ' LEFT JOIN #__groups AS g ON g.id = c.access'
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
 					. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' WHERE c.section = ' . FLEXI_SECTION
+					. ' WHERE c.section = ' . FLEXI_CATEGORY
 					. ' AND sec.scope = ' . $this->_db->Quote('content')
 					. $where
 					. ' GROUP BY c.id'

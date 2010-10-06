@@ -225,7 +225,7 @@ class FlexicontentModelArchive extends JModel
 		$where = array();
 		
 		$where[] = ' i.state = -1';
-		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
+		$where[] = ' i.sectionid = ' . FLEXI_CATEGORY;
 		
 		if ($search) {
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );

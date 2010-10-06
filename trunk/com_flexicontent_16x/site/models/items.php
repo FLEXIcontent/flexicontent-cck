@@ -837,7 +837,7 @@ class FlexicontentModelItems extends JModel
 			}
 			
 			// auto assign the section
-			$item->sectionid 	= FLEXI_SECTION;
+			$item->sectionid 	= FLEXI_CATEGORY;
 
 			// set type and language
  			$item->type_id 		= (int)$typeid;

@@ -143,7 +143,7 @@ class FlexicontentModelCategory extends JModel
 			$category->name					= null;
 			$category->alias				= null;
 			$category->image				= JText::_( 'FLEXI_CHOOSE_IMAGE' );
-			$category->section				= FLEXI_SECTION;
+			$category->section				= FLEXI_CATEGORY;
 			$category->image_position		= 'left';
 			$category->description			= null;
 			$category->published			= 1;

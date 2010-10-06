@@ -58,7 +58,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -3'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				;
@@ -87,7 +87,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -4'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				;
@@ -116,7 +116,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = 'SELECT id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -5'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
 				. ($allitems ? '' : ' AND created_by = '.$user->id)
 				. ' ORDER BY created DESC'
 				;
@@ -474,7 +474,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION
+				. ' WHERE section = ' . FLEXI_CATEGORY
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -486,39 +486,39 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if FLEXI_SECTION still exists
+	 * Method to check if FLEXI_CATEGORY still exists
 	 *
 	 * @access public
 	 * @return	boolean	True on success
 	 */
 	function getExistsec()
 	{
-		if (FLEXI_SECTION) {
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__sections'
-		. ' WHERE id = ' . FLEXI_SECTION
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-			
-		if ($count > 0) {
-			return true;
-		} else {
-			// Save the created section as flexi_section for the component
-			$component =& JComponentHelper::getParams('com_flexicontent');
-			$component->set('flexi_section', '');
-			$cparams = $component->toString();
+		if (FLEXI_CATEGORY) {
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__sections'
+			. ' WHERE id = ' . FLEXI_CATEGORY
+			;
+			$this->_db->setQuery( $query );
+			$count = $this->_db->loadResult();
+				
+			if ($count > 0) {
+				return true;
+			} else {
+				// Save the created category as flexi_category for the component
+				$component =& JComponentHelper::getParams('com_flexicontent');
+				$component->set('flexi_category', '');
+				$cparams = $component->toString();
 
-			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+				$flexi =& JComponentHelper::getComponent('com_flexicontent');
 
-			$query 	= 'UPDATE #__components'
-					. ' SET params = ' . $this->_db->Quote($cparams)
-					. ' WHERE id = ' . $flexi->id;
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-			return true;
-		}
+				$query 	= 'UPDATE #__components'
+						. ' SET params = ' . $this->_db->Quote($cparams)
+						. ' WHERE id = ' . $flexi->id;
+						;
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				return true;
+			}
 		}
 	return false;
 	}
@@ -661,7 +661,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getDiffVersions($current_versions=array(), $last_versions=array())
 	{
 		// check if the section was chosen to avoid adding data on static contents
-		if (!FLEXI_SECTION) return array();
+		if (!FLEXI_CATEGORY) return array();
 		
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
@@ -676,13 +676,13 @@ class FlexicontentModelFlexicontent extends JModel
 		//$and = "";
 
 		// check if the section was chosen to avoid adding data on static contents
-		if (!FLEXI_SECTION) return false;
+		if (!FLEXI_CATEGORY) return false;
 		return FLEXIUtilities::currentMissing();
 	}
 	function addCurrentVersionData()
 	{
 		// check if the section was chosen to avoid adding data on static contents
-		if (!FLEXI_SECTION) return true;
+		if (!FLEXI_CATEGORY) return true;
 
 		// @TODO: move somewhere else
 		$this->formatFlexiPlugins();
@@ -693,7 +693,7 @@ class FlexicontentModelFlexicontent extends JModel
 		// add the current version data
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
-		$query = "SELECT id,catid,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$query = "SELECT id,catid,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_CATEGORY."';";
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
