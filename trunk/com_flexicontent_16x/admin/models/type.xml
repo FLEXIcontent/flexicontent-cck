@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<name>Type Edit Form</name>
+	<params addpath="/administrator/components/com_flexicontent/elements">
+		<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" />
+		<param name="hide_maintext" type="radio" default="0" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="hide_html" type="radio" default="0" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
+		<param name="maintext_label" type="text" default="" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
+		<param name="maintext_desc" type="textarea" default="" rows="5" cols="25" label="FLEXI_MAINTEXT_DESC" description="FLEXI_MAINTEXT_DESC_DESC" />
+		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_JCOMMENTS</option>
+			<option value="2">FLEXI_JOMCOMMENTS</option>
+		</param>
+		<param name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="" type="separator" default="FLEXI_SEO_CONF" level="level1" menu="hide" />
+		<param name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+<!--
+		<param name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE">
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
+		</param>
+-->
+	</params>
+</form>

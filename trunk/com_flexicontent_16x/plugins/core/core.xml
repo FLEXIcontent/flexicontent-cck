@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Core Fields</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>March 2009</creationDate>
+	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.vistamedia.fr</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_CORE</description>
+	<files>
+		<filename plugin="core">core.php</filename>
+	</files>
+	<params group="standard">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+	</params>
+	<params group="group-title"><!-- title -->
+	</params>
+	<params group="group-created"><!-- created date -->
+		<param name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
+			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+			<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+		</param>
+		<param name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+	</params>
+	<params group="group-createdby"><!-- created by (author) -->
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+			<option value="1">FLEXI_DISPLAY_NAME</option>
+			<option value="2">FLEXI_DISPLAY_USERNAME</option>
+		</param>
+	</params>
+	<params group="group-modified"><!-- modified date -->
+		<param name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
+			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+			<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+		</param>
+		<param name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+	</params>
+	<params group="group-modifiedby"><!-- modified by (modifier) -->
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+			<option value="1">FLEXI_DISPLAY_NAME</option>
+			<option value="2">FLEXI_DISPLAY_USERNAME</option>
+		</param>
+	</params>
+	<params group="group-state"><!-- state -->
+		<param name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC">
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+	</params>
+	<params group="group-hits"><!-- hits -->
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+	</params>
+	<params group="group-type"><!-- document type -->
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+	</params>
+	<params group="group-version"><!-- version -->
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+	</params>
+	<params group="group-voting"><!-- voting -->
+		<param name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
+		<param name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+	</params>
+	<params group="group-categories"><!-- categories -->
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+		</param>
+	</params>
+	<params group="group-tags"><!-- tags -->
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+		</param>
+	</params>
+	<params group="group-files"><!-- files -->
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+		</param>
+	</params>
+	<params group="group-maintext" addpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
+		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+	</params>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_core.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_core.ini</language>
+	</languages>
+</install>

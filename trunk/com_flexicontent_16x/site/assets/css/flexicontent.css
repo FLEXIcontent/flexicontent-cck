@@ -1,0 +1,588 @@
+/* FLEXIcontent base CSS */
+
+div#flexicontent {
+}
+
+div#flexicontent .clear {
+	border: 0;
+	clear: both;
+	float: none;
+	font-size: 1px;
+	height: 0;
+	line-height: 1px;
+	margin: 0;
+	padding: 0;
+	visibility: hidden;
+}
+
+div#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
+	clear: both;
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden;
+}
+
+div#flexicontent .floattext {
+	display: block;
+	margin: 0 0 0.5em; /* safari */
+}
+
+/**
+ * @section buttons
+ *
+ * print, pdf, ...
+ */
+div#flexicontent .buttons {
+	float: right;
+}
+
+div#flexicontent .buttons img {
+	border: none;
+}
+
+div#flexicontent .buttons a {
+	height: 16px;
+	line-height: 16px;
+	padding: 0 0 0 5px;
+}
+
+/**
+ * @section headlines
+ *
+ */
+div#flexicontent h2 {
+}
+
+div#flexicontent h2 img {
+	border: none;
+}
+
+h2.flexicontent {
+	margin: 0 0 0.5em;
+}
+
+/** 
+ * @pagination css trick to center the div without having a fixed width
+ * see http://www.cssplay.co.uk/menus/centered.html
+ */
+div.pagination {
+	float: left;
+	left: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+div.pagination div.tab,
+div.pagination div.page-block {
+	position: relative;
+	right: 50%;
+}
+
+div.pageslinks {
+	clear: both;
+	float: left;
+	overflow: hidden;
+	width: 100%;
+}
+
+div#flexicontent .pagescounter {
+	text-align: center;
+}
+
+/**
+ * @section Categoryview
+ *
+ */
+div#flexicontent .catimg {
+	float: left;
+	margin: 0 0.5em 0.5em 0;
+	position: relative;
+}
+
+div#flexicontent .catimg p {
+	font-size: 0.9em;
+	line-height: 180%;
+	margin: 0 0 0.5em 0;
+}
+
+div#flexicontent .catdescription {
+	margin: 0 0 0.5em 0;
+}
+
+div#flexicontent .subcategories {
+	border-bottom: 2px solid #dddddd;
+	/* font-size: 1.2em; font-weight: bold; */
+	margin: 0.8em 0;
+	padding: 0.5em 0.3em;
+}
+
+/**
+ * @section FLEXIcontent Item
+ *
+ */
+div#flexicontent .taglist {
+	margin: 5px 0 10px;
+	padding: 0 5px;
+}
+
+/**
+ * @section FLEXIcontent Table
+ *
+ */
+div#flexicontent table.flexitable {
+	border: 1px solid #e5e5e5;
+	border-collapse: collapse;
+	clear: both;
+	font-size: 1em;
+	margin: 1em 1px;
+	width: 99%;
+}
+
+div#flexicontent table.flexitable th {
+	background-color: #efefef;
+	border-bottom: 1px solid #e5e5e5;
+	border-right: 1px solid #e5e5e5;
+	color: #000000;
+	font-weight: bold;
+	padding: 0.4em;
+	text-align: left;
+}
+
+div#flexicontent table.flexitable th.table-titles {
+	background-color: inherit;
+	font-weight: normal;
+}
+
+div#flexicontent table.flexitable th img {
+	border: none;
+	margin: 0 0 5px 5px;
+	vertical-align: middle;
+}
+
+div#flexicontent table.flexitable td {
+	border-bottom: 1px solid #e5e5e5;
+	border-right: 1px solid #e5e5e5;
+	padding: 0.4em;
+	vertical-align: top;
+}
+
+div#flexicontent table.flexitable tr.sectiontableentry2 td {
+	background: #f4f4f4;
+}
+
+div#flexicontent table.flexitable tr:hover td, 
+div#flexicontent table.flexitable tr:hover th {
+	background: #f8f8f8;
+}
+
+/**
+ * @section flexicontent Table Filter Form
+ *
+ */
+div.subcategorieslist {
+	margin: 0 0 1em 0;
+}
+
+div#fc_alpha {
+	margin: 0 0 1em 0;
+}
+
+div#flexicontent #fc_filter {
+	border: solid 1px #dddddd;
+	margin: 0 0 1em 0;
+	padding: 0.5em;
+}
+
+div#flexicontent .fc_fleft {
+	float: left;
+}
+
+div#flexicontent .fc_fright {
+	float: right;
+}
+
+div#flexicontent .fc_fright .filter {
+	margin-left: 10px;
+}
+
+/** Item submission Form **/
+ 
+div.flexi_edit .flexi_buttons {
+	float: right;
+}
+div.flexi_edit .flexi_label {
+	width: 9em;
+	display: block;
+	float: left;
+	vertical-align: middle;
+}
+div.flexi_edit .flexi_label.invalid {
+	font-weight: bold;
+}
+div.flexi_edit .flexi_formblock {
+	clear: both;
+}
+
+div.flexi_edit fieldset {
+	border: 1px solid #dddddd;
+	margin-bottom: 1em;
+}
+
+div.flexi_edit form input,
+div.flexi_edit form button,
+div.flexi_edit form select,
+div.flexi_edit form textarea {
+	background-color: #ffffff;
+	border: 1px solid #dddddd;
+	cursor: pointer;
+	margin: 0 0 0.5em 0;
+	padding: 0.2em;
+}
+
+div.flexi_edit form input.invalid,
+div.flexi_edit form select.invalid {
+	border: 1px dotted #ff0000;
+}
+
+div.flexi_box_left,
+div.flexi_box_right {
+	float: left;
+	width: 48%;
+}
+
+div.flexi_box_right {
+	float: right;
+}
+
+/* Access */
+fieldset.flexiaccess legend {
+	background: url(../../../../administrator/components/com_flexicontent/assets/images/toggle_blue.png) no-repeat 98% 50%;
+	padding-right: 22px;
+	line-height: 18px;
+	cursor: pointer;
+}
+
+
+/** Tags **/
+
+div#tags {
+	margin: 3px;
+}
+
+.flexi_tagbox {
+	display: block;
+	max-height: 170px;
+  	overflow: auto;
+/*   	border: 1px dashed silver; */
+  	background: #fff;	
+}
+
+.flexi_tagbox ul {
+	margin: 3px;
+	padding: 0px;
+}
+.flexi_tagbox ul li {
+	width: 130px;
+	min-height: 20px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px;
+	zoom: 1;
+	*display: inline;
+	_height: 20px;
+}
+
+.flexi_tagbox ul li div {
+	padding-top: 3px;
+}
+.flexi_tagbox input {
+	width: 20px;
+	display: block;
+	float: left;
+	margin-top: -4px;
+}
+
+
+/** rating bar **/
+div#flexicontent .qf_ratingbarcontainer {
+	border: 1px solid #999999;
+	display: block;
+	height: 10px;
+	margin: 2px 2px;
+	width: 60px;
+}
+
+div#flexicontent .qf_ratingbar {
+	background-color: #c0c0c0;
+	display: block;
+	height: 10px;
+}
+
+/* state toggler */
+.qf_statetoggler{
+	list-style: none;
+	padding: 0;
+	width: 10px;
+}
+
+.options {
+	position: absolute;
+}
+
+.statetoggler li ul li {
+	background-color: #ffffff;
+	border: #dddddd 1px solid;
+	color: #000000;
+	list-style: none;
+	padding: 2px;
+}
+
+
+/* DIRECTORY VIEW */
+div#flexicontent.directory .floattext h2 {
+	background-color: #dddddd;
+	border-bottom: 0 none;
+	border-left: 1px solid #ffffff;
+	border-right: 1px solid #ffffff;
+	color: #ffffff;
+	margin: -3px 0 0;
+	padding: 1px 0;
+	width: auto;
+}
+
+div#flexicontent.directory .floattext h2 a {
+	border: 2px solid #dddddd;
+	display: block;
+	margin: 0 -1px;
+	padding: 2px 0 1px 4px;
+	position: relative;
+}
+
+div#flexicontent.directory .floattext ul {
+	list-style: none;
+	margin: 3px 0 7px;
+	padding: 0 7px;
+}
+
+div#flexicontent.directory .column {
+	float: left;
+	margin-right: 5px;
+}
+
+/* Favourites */
+.fav-block {
+	clear: both;
+}
+
+.fav-block img {
+	vertical-align: middle;
+}
+
+.favlink {
+	outline: none;
+}
+
+.fcfav img {
+}
+
+/**
+ * Comments for JComments only ;-)
+ */
+div.comments {
+	margin-top: 15px;
+}
+
+.comments #jc h4 {
+	color: inherit;
+	font-weight: normal;
+	margin-top: 0px;
+}
+
+.comments #comments a {
+	color: inherit;
+}
+
+.comments #comments a:hover {
+	color: #578e13;
+}
+
+.comments #comments div.comments-list {
+	margin-left: 0;
+}
+
+.comments .rbox_tr,
+.comments .rbox_tl,
+.comments .rbox_t,
+.comments .rbox_br,
+.comments .rbox_bl,
+.comments .rbox_b,
+.comments .rbox_m {
+	background: none;
+	border: none;
+}
+
+.comments .rbox {
+	border: 1px #cccccc solid;
+}
+
+.comments .even .rbox {
+	background: #ffffff;
+}
+
+.comments .odd .rbox {
+	background: #f0f0f0;
+}
+
+.comments #comments-list-footer {
+	margin: 0 0 10px 0;
+}
+
+#comments-form p, 
+#comments-form #comments-form-buttons, 
+#comments-form #comments-form-error {
+	margin-left: 0px !important;
+}
+
+#comments-form #comments-form-message, 
+#comments-inline-edit #comments-form-message {
+	display: block;
+	padding: 5px 5px 5px 25px;
+}
+
+.comments-form-message-error {
+	background: url(../images/error.png) #ffd86f no-repeat 4px 50%;
+}
+
+.comments-form-message-info {
+	background: url(../images/information.png) #dfeeff no-repeat 4px 50%;
+}
+
+/* Tab comments */
+.comments .votes {
+	margin-left: -4px;
+}
+
+.comments .favs {
+	margin: 5px 0 15px;
+}
+
+/**
+ * Tabs CSS
+ * taken from the general.css in the backend
+ */
+dl.tabs {
+	float: left;
+	margin: 10px 0 -1px 0;
+	z-index: 50;
+}
+
+dl.tabs dt {
+	background: #f0f0f0;
+	border-left: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
+	border-top: 1px solid #cccccc;
+	color: #666666;
+	float: left;
+	margin-left: 3px;
+	padding: 4px 10px;
+}
+
+dl.tabs dt.open {
+	background: #f9f9f9;
+	border-bottom: 1px solid #f9f9f9;
+	color: #000000;
+	z-index: 100;
+}
+
+div.current {
+	border: 1px solid #cccccc;
+	clear: both;
+	padding: 10px 10px;
+}
+
+div.current dd {
+	margin: 0;
+	padding: 0;
+}
+
+#bottom-block {
+	margin: 0 auto;
+	width: 373px;
+}
+
+/* Alpha Index */
+#fc_alpha {
+	clear: both;
+	float: left;
+	overflow: hidden;
+	width: 100%;
+}
+
+#fc_alpha .letters {
+	float: left;
+	left: 50%;
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+#fc_alpha .numbers {
+	clear: both;
+	float: left;
+	left: 50%;
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+.fc_alpha_index {
+	background: #efefef;
+	border: 1px solid #c0c0c0;
+	float: left;
+	margin-right: 2px;
+	padding: 1px 2px;
+	position: relative;
+	right: 50%;
+	text-decoration: none;
+}
+
+span.fc_alpha_index {
+	color: #c0c0c0;
+}
+
+/* File Field Plugin */
+.icon-mime {
+	vertical-align: middle;
+}
+
+/* strange property in japurity /-) */
+#flexicontent .hasTip img {
+	margin: 0;
+}
+
+.empty_image {
+	display: block;
+	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
+	border:1px solid silver;
+	margin-bottom:3px;
+}
+
+/* Buttons */
+.button-add a {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
+}
+.button-add a,
+.button-add a:visited,
+.button-add a:link,
+.button-add a:hover {
+	color: black;
+	text-decoration: none;
+}

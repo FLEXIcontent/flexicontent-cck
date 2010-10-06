@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<author>Emmanuel Danan</author>
+	<website>www.flexicontent.org</website>
+	<email>emmanuel@vistamedia.fr</email>
+	<license>GPLv2</license>
+	<version>1.1</version>
+	<release>25 november 2009</release>
+	<description>This layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
+	<params addpath="/administrator/components/com_flexicontent/elements">
+	</params>
+	<fieldgroups>
+		<group>table</group>
+	</fieldgroups>	
+	<csscategory>
+		<file>css/category.css</file>
+	</csscategory>
+	<jscategory>
+	</jscategory>	
+</metadata>
