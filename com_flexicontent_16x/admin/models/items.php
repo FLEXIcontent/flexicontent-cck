@@ -153,7 +153,7 @@ class FlexicontentModelItems extends JModel
 		$status = array();
 		
 		$query 	= 'SELECT id FROM #__content'
-				. ' WHERE sectionid = ' . FLEXI_SECTION
+				. ' WHERE sectionid = ' . FLEXI_CATEGORY
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -203,7 +203,7 @@ class FlexicontentModelItems extends JModel
 		if ($status['no']) {
 			$and = ' AND id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT id, title, introtext, `fulltext`, catid, created, created_by, modified, modified_by, version, state FROM #__content'
-					. ' WHERE sectionid = ' . FLEXI_SECTION
+					. ' WHERE sectionid = ' . FLEXI_CATEGORY
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -386,7 +386,7 @@ class FlexicontentModelItems extends JModel
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
+		$where[] = ' i.sectionid = ' . FLEXI_CATEGORY;
 
 		// if FLEXIaccess only authorize users to see their own items
 		if (FLEXI_ACCESS) {
@@ -1085,7 +1085,7 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 			
-			$where = $this->_db->nameQuote('sectionid').' = '.FLEXI_SECTION; 
+			$where = $this->_db->nameQuote('sectionid').' = '.FLEXI_CATEGORY; 
 			$row->reorder($where);
 			return true;
 
@@ -1454,34 +1454,35 @@ class FlexicontentModelItems extends JModel
 	 * @since 1.5
 	 */
 	 
-	function import()
-	{
+	function import() {
+		jimport('joomla.utilities.simplexml');
 		// Get the site default language
 		$languages =& JComponentHelper::getParams('com_languages');
 		$lang = $languages->get('site', 'en-GB');
-
-		// Get all Joomla sections
-	    $query = 'SELECT * FROM #__sections';
-    	$this->_db->setQuery($query);
-		$sections = $this->_db->loadObjectList();
 		
 		$logs = new stdClass();
-		$logs->sec = 0;
+		//$logs->sec = 0;
 		$logs->cat = 0;
 		$logs->art = 0;
-//		$logs->err = new stdClass();
 		
-		// Create the new section for flexicontent items
-		$flexisection =& JTable::getInstance('section');
-		$flexisection->title		= 'FLEXIcontent';
-		$flexisection->alias		= 'flexicontent';
-		$flexisection->published	= 1;
-		$flexisection->ordering		= $flexisection->getNextOrder();
-		$flexisection->access		= 0;
-		$flexisection->scope		= 'content';
-	   	$flexisection->check();
-		$flexisection->store();
-
+		$topcat = &JTable::getInstance('flexicontent_categories','');
+		$topcat->parent_id			= 1;
+		$topcat->level				= 0;
+		$topcat->extension = "com_content";
+		$topcat->title				= 'FLEXIcontent';
+		$topcat->alias				= 'flexicontent';
+		$topcat->lft				= null;
+		$topcat->rgt				= null;
+		$topcat->level				= 0;
+		$topcat->published			= 1;
+		$topcat->access			= 1;
+		$topcat->language			= "*";
+		$topcat->setLocation(0, 'last-child');
+	   	$topcat->check();
+		$topcat->store();
+		$topcat->rebuildPath($topcat->id);
+		$topcat_id = $topcat->id;
+		
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
@@ -1492,99 +1493,71 @@ class FlexicontentModelItems extends JModel
 				$catparams->set($param->attributes('name'), $param->attributes('default'));
 			}
 		}
-    	$catparams = $catparams->toString();		
-		
+		$catparams_str = $catparams->toString();
 		// Loop throught the section object and create cat -> subcat -> items -> fields
-		$k = 0;
-		foreach ($sections as $section)
-		{
-			$cat = &JTable::getInstance('flexicontent_categories','');
-			$cat->parent_id			= 0;
-			$cat->title				= $section->title;
-			$cat->name				= $section->name;
-      		$cat->alias 			= $section->alias;
-      		$cat->image 			= $section->image;
-      		$cat->section 			= $flexisection->id;
-			$cat->image_position	= $section->image_position;
-			$cat->description		= $section->description;
-			$cat->published			= $section->published;
-			$cat->ordering			= $section->ordering;
-			$cat->access			= $section->access;
-			$cat->params			= $catparams;
-	   		$k++;
-	   		$cat->check();
-			if ($cat->store()) {
-				$logs->sec++;
-			} else {
-				$logs->err->$k->type 	= JText::_( 'FLEXI_IMPORT_SECTION' ) . ' id';
-				$logs->err->$k->id 		= $section->id;
-				$logs->err->$k->title 	= $section->title;
-			}
-			
-			// Get the categories of the created section
-		    $query = 'SELECT * FROM #__categories WHERE section = ' . $section->id;
-    		$this->_db->setQuery($query);
-			$categories = $this->_db->loadObjectList();
-			
-			// Loop throught the categories of the created section
-			foreach ($categories as $category)
-			{
-				$subcat = &JTable::getInstance('flexicontent_categories','');
-				$subcat->load($category->id);
-				$subcat->id			= 0;
-				$subcat->parent_id	= $cat->id;
-      			$subcat->section 	= $flexisection->id;
-				$subcat->params		= $catparams;
-		   		$k++;
-				$subcat->check();
-				if ($subcat->store()) {
-					$logs->cat++;
-				} else {
-					$logs->err->$k->type 	= JText::_( 'FLEXI_IMPORT_CATEGORY' ) . ' id';
-					$logs->err->$k->id 		= $category->id;
-					$logs->err->$k->title 	= $category->title;
-				}
-			
-				// Get the articles of the created category
-		    	$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
-    			$this->_db->setQuery($query);
-				$articles = $this->_db->loadObjectList();
-
-				// Loop throught the articles of the created category
-				foreach ($articles as $article)
-				{
-					$item = &JTable::getInstance('content');
-					$item->load($article->id);
-					$item->id				= 0;
-					$item->sectionid		= $flexisection->id;
-					$item->catid			= $subcat->id;
-			   		$k++;
-			   		$item->check();
-					if ($item->store()) {
-						$logs->art++;
-					} else {
-						$logs->err->$k->type 	= JText::_( 'FLEXI_IMPORT_ARTICLE' ) . ' id';
-						$logs->err->$k->id 		= $article->id;
-						$logs->err->$k->title 	= $article->title;
-					}
-				} // end articles loop
-			} // end categories loop
-		} // end sections loop
 		
-		// Save the created section as flexi_section for the component
+		// Get the categories of the created section
+		$query = "SELECT * FROM #__categories WHERE id!='".$topcat->id."' AND parent_id!='0'  AND level>'0';";
+		$this->_db->setQuery($query);
+		$categories = $this->_db->loadObjectList();
+		$k = 0;
+		// Loop throught the categories of the created section
+		foreach ($categories as $category) {
+			$subcat = &JTable::getInstance('flexicontent_categories','');
+			$subcat->load($category->id);
+			$subcat->id			= 0;
+			$subcat->lft			= null;
+			$subcat->rgt			= null;
+			$subcat->level			= null;
+			$subcat->parent_id		= $topcat->id;
+			$subcat->params		= $category->params;
+			$subcat->setLocation($topcat->id, 'last-child');
+	   		$k++;
+			$subcat->check();
+			if ($subcat->store()) {
+				$logs->cat++;
+			} else {
+				$logs->err->$k->type 	= JText::_( 'FLEXI_IMPORT_CATEGORY' ) . ' id';
+				$logs->err->$k->id 		= $category->id;
+				$logs->err->$k->title 	= $category->title;
+			}
+			$subcat->rebuildPath($subcat->id);
+
+			// Get the articles of the created category
+			$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
+			$this->_db->setQuery($query);
+			$articles = $this->_db->loadObjectList();
+
+			// Loop throught the articles of the created category
+			foreach ($articles as $article) {
+				$item = &JTable::getInstance('content');
+				$item->load($article->id);
+				$item->id				= 0;
+				$item->catid			= $subcat->id;
+		   		$k++;
+		   		$item->check();
+				if ($item->store()) {
+					$logs->art++;
+				} else {
+					$logs->err->$k->type 	= JText::_( 'FLEXI_IMPORT_ARTICLE' ) . ' id';
+					$logs->err->$k->id 		= $article->id;
+					$logs->err->$k->title 	= $article->title;
+				}
+			} // end articles loop
+		} // end categories loop
+
+		// Save the created category as flexi_category for the component
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		$fparams->set('flexi_section', $flexisection->id);
-    	$fparams = $fparams->toString();		
+		$fparams->set('flexi_category', $topcat_id);
+		$fparams = $fparams->toString();
 
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-	    
-	    $query 	= 'UPDATE #__components'
+		$query = 'UPDATE #__components'
 	    		. ' SET params = ' . $this->_db->Quote($fparams)
 	    		. ' WHERE id = ' . $flexi->id;
 	    		;
-    	$this->_db->setQuery($query);
-    	$this->_db->query();
-
+		$this->_db->setQuery($query);
+		$this->_db->query();
 		return $logs;
 	}
 }

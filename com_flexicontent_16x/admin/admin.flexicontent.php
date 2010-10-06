@@ -30,17 +30,7 @@ JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
 JPluginHelper::importPlugin('flexicontent_fields');
 JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
-// Set filepath
-$params =& JComponentHelper::getParams('com_flexicontent');
-define('COM_FLEXICONTENT_FILEPATH',    JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
-define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
-
-// Define some constants
-if (!defined('FLEXI_SECTION'))	define('FLEXI_SECTION', $params->get('flexi_section'));
-if (!defined('FLEXI_ACCESS')) 	define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-define('FLEXI_VERSION',	'1.5.3c');
-define('FLEXI_RELEASE',	'stable (r354)');
+require_once(dirname(__FILE__).DS.'defineconstants.php');
 
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');

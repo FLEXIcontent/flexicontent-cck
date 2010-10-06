@@ -18,8 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-class flexicontent_cats
-{
+class flexicontent_cats {
 	/**
 	 * Parent Categories
 	 *
@@ -61,7 +60,7 @@ class flexicontent_cats
 					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
 					.' FROM #__categories'
 					.' WHERE id ='. (int)$cid 
-					.' AND section = ' . FLEXI_SECTION
+					.' AND section = ' . FLEXI_CATEGORY
 					.' AND published = 1'
 					;
 			$db->setQuery($query);
@@ -73,7 +72,7 @@ class flexicontent_cats
 	{
 		$db 		=& JFactory::getDBO();
 		
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND section = ' . FLEXI_SECTION;
+		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND section = ' . FLEXI_CATEGORY;
 		$db->setQuery( $query );
 
 		if($cid != 0) {
@@ -92,19 +91,21 @@ class flexicontent_cats
 	}
 	
 	/**
-    * Get the categorie tree
-    *
-    * @return array
-    */
-	function getCategoriesTree( $published=null )
-	{
+	    * Get the categorie tree
+	    *
+	    * @return array
+	    */
+	function getCategoriesTree( $published=null ) {
 		$db			=& JFactory::getDBO();
-		
-		if ($published) {
-			$where[] = 'published = 1';
-			$where[] = 'section = ' . FLEXI_SECTION;
-		} else {
-			$where[] = 'section = ' . FLEXI_SECTION;
+		$where		= array();
+		//$where[] = "parent_id != '0'";
+		if ($published) $where[] = 'published = 1';
+		if(defined('FLEXI_CATEGORY')) {
+			if ($published) {
+				$where[] = 'section = ' . FLEXI_CATEGORY;
+			} else {
+				$where[] = 'section = ' . FLEXI_CATEGORY;
+			}
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
@@ -112,27 +113,28 @@ class flexicontent_cats
 		$query = 'SELECT *, id AS value, title AS text'
 				.' FROM #__categories'
 				.$where
-				.' ORDER BY parent_id, ordering'
+				.' ORDER BY parent_id, lft'
 				;
 
 		$db->setQuery($query);
 
 		$rows = $db->loadObjectList();
+		$rows = is_array($rows)?$rows:array();
 		
 		//set depth limit
 		$levellimit = 10;
 		
 		//get children
-    	$children = array();  	
-    	foreach ($rows as $child) {
-        	$parent = $child->parent_id;
-       		$list = @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
+		$children = array();
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list = @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
 
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
+		//get list of the items
+		$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
 
 		return $list;
 	}

@@ -194,7 +194,7 @@ class FlexicontentModelFavourites extends JModel
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 
-		$where .= ' AND i.sectionid = '.FLEXI_SECTION;
+		$where .= ' AND i.sectionid = '.FLEXI_CATEGORY;
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

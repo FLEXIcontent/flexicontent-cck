@@ -21,8 +21,8 @@ defined('_JEXEC') or die('Restricted access');
  * @package 	Joomla.Framework
  * @subpackage	Table
  * @since		1.0
- */
-class flexicontent_categories extends JTable
+ */jimport('joomla.database.tablenested');
+class flexicontent_categories extends JTableNested
 {
 	/** @var int Primary key */
 	var $id					= null;
@@ -30,16 +30,8 @@ class flexicontent_categories extends JTable
 	var $parent_id			= null;
 	/** @var string The menu title for the category (a short name)*/
 	var $title				= null;
-	/** @var string The full name for the category*/
-	var $name				= null;
 	/** @var string The the alias for the category*/
 	var $alias				= null;
-	/** @var string */
-	var $image				= null;
-	/** @var string */
-	var $section			= null;
-	/** @var int */
-	var $image_position		= null;
 	/** @var string */
 	var $description		= null;
 	/** @var boolean */
@@ -54,6 +46,13 @@ class flexicontent_categories extends JTable
 	var $access				= null;
 	/** @var string */
 	var $params				= null;
+	
+	var $asset_id=null;
+	var $lft=null;
+	var $rgt=null;
+	var $level=null;
+	var $path=null;
+	var $extension=null;
 
 	/**
 	* @param database A database connector object
@@ -100,7 +99,6 @@ class flexicontent_categories extends JTable
 			$datenow =& JFactory::getDate();
 			$this->alias = $datenow->toFormat("%Y-%m-%d-%H-%M-%S");
 		}
-
 		return true;
 	}
 }

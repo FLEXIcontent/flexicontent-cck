@@ -318,7 +318,7 @@ class FlexicontentModelItem extends JModel {
 			$item->alias				= null;
 			$item->title_alias			= null;
 			$item->text					= null;
-			$item->sectionid			= FLEXI_SECTION;
+			//$item->sectionid			= FLEXI_CATEGORY;
 			$item->catid				= null;
 			$item->score				= 0;
 			$item->votecount			= 0;
@@ -551,7 +551,7 @@ class FlexicontentModelItem extends JModel {
 			}
 			
 			// auto assign the section
-			$item->sectionid 	= FLEXI_SECTION;
+			$item->sectionid 	= FLEXI_CATEGORY;
 			
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );

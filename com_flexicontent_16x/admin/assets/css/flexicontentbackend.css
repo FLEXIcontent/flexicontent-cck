@@ -26,10 +26,10 @@
 .icon-32-person2			{ background-image: url(../images/person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/savenew.png); }
 .icon-32-go					{ background-image: url(../../../../images/go_f2.png); }
-.icon-32-download			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-export.png); }
-.icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
-.icon-32-import				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-upload.png); }
-.icon-32-duplicate			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
+.icon-32-download			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-export.png); }
+.icon-32-params				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
+.icon-32-import				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-upload.png); }
+.icon-32-duplicate			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
 
 /* Buttons */
 .button-add a {
@@ -78,7 +78,7 @@
 	line-height: 130%;
 }
 .alert-modalbox {
-	background: url(../../../../templates/khepri/images/notice-alert.png) 0% 50% no-repeat transparent;
+	background: url(../../../../templates/bluestork/images/notice-alert.png) 0% 50% no-repeat transparent;
 	padding-left: 45px;
 	margin-bottom: 15px;
 }

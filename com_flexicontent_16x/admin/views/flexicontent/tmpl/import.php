@@ -21,16 +21,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('import').addEvent('click', function(e) {
-			$('import-log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&controller=items&task=import&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('import-log')
-			});
-			ajax.request.delay(300, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('import-log').set('html','<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('import-log')
+				}).send();
+			}else{
+				$('import-log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('import-log')
+				});
+				ajax.request.delay(300, ajax);
+			}
 		});
 	}); 
 

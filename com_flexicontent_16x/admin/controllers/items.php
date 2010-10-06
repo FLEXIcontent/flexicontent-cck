@@ -27,8 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends FlexicontentController
-{
+class FlexicontentControllerItems extends FlexicontentController {
 	/**
 	 * Constructor
 	 *
@@ -253,15 +252,14 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function import()
-	{		
+	function import() {
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$user	=& JFactory::getUser();
 		$model 	= $this->getModel('items');
 		
-		if ($user->gid < 25) {
+		if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
 			echo JText::_( 'ALERTNOTAUTH' );
 			return;
 		}
@@ -271,7 +269,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$catscache->clean();
 		$msg  = JText::_( 'FLEXI_IMPORT_SUCCESSULL' );
 		$msg .= '<ul class="import-ok">';
-		$msg .= '<li>' . $logs->sec . ' ' . JText::_( 'FLEXI_IMPORT_SECTIONS' ) . '</li>';
+		//$msg .= '<li>' . $logs->sec . ' ' . JText::_( 'FLEXI_IMPORT_SECTIONS' ) . '</li>';
 		$msg .= '<li>' . $logs->cat . ' ' . JText::_( 'FLEXI_IMPORT_CATEGORIES' ) . '</li>';
 		$msg .= '<li>' . $logs->art . ' ' . JText::_( 'FLEXI_IMPORT_ARTICLES' ) . '</li>';
 		$msg .= '</ul>';

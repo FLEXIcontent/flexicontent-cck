@@ -32,7 +32,7 @@ class FlexicontentController extends JController
 	{
 		parent::__construct();
 		$view = JRequest::getVar('view');
-		if($view && !FLEXI_SECTION) {
+		if($view && !FLEXI_CATEGORY) {
 			$msg = JText::_( 'FLEXI_NO_SECTION_CHOOSEN' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -536,7 +536,7 @@ VALUES
 			$db->setQuery($query);
 			$db->query();
 		}
-		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_CATEGORY."';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 

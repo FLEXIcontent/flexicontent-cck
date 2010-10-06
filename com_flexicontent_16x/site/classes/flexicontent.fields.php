@@ -125,7 +125,7 @@ class FlexicontentFields
 
 		global $mainframe;
 		if (!$item) return;
-		if ($item->sectionid != FLEXI_SECTION) return;
+		if ($item->sectionid != FLEXI_CATEGORY) return;
 
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
