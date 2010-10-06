@@ -53,7 +53,7 @@
 			<option value="10">FLEXI_10</option>
 			<option value="20">FLEXI_20</option>
 			<option value="50">FLEXI_50</option>
-			<option value="100">FLEXI_100_(not_recommended)</option>
+			<option value="100">FLEXI_100_not_recommended</option>
 		</param>
 		<param name="versionsperpage" type="radio" default="5" label="FLEXI_VERSION_PER_PAGE" description="FLEXI_VERSION_PER_PAGE_DESC" menu="hide">
 			<option value="5">FLEXI_5</option>
