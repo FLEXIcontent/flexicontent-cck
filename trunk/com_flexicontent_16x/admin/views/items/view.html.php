@@ -31,7 +31,8 @@ class FlexicontentViewItems extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -303,9 +304,9 @@ class FlexicontentViewItems extends JView {
 		parent::display($tpl);
 	}
 
-	function _displayCopyMove($tpl = null, $cid)
-	{
-		global $mainframe, $globalcats;
+	function _displayCopyMove($tpl = null, $cid) {
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$user 		= & JFactory::getUser();

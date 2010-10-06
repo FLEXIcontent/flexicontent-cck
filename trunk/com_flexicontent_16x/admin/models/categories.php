@@ -79,7 +79,7 @@ class FlexicontentModelCategories extends JModel
 	 */
 	function getData()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		static $items;
 

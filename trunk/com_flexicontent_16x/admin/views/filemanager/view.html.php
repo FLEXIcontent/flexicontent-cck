@@ -36,8 +36,8 @@ class FlexicontentViewFilemanager extends JView
 	 * @since 1.0
 	 */
 	function display( $tpl = null ) {
-		global $mainframe, $option;
-
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		//Load pane behavior
 		jimport('joomla.html.pane');
 

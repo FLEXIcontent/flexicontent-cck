@@ -63,11 +63,10 @@ class FlexicontentModelItems extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
-
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.items.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
@@ -333,9 +332,9 @@ class FlexicontentModelItems extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy()
-	{
-		global $mainframe, $option;
+	function _buildContentOrderBy() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
@@ -358,9 +357,9 @@ class FlexicontentModelItems extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
-	{
-		global $mainframe, $option;
+	function _buildContentWhere() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$nullDate = $this->_db->getNullDate();
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
@@ -946,9 +945,9 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function move($direction)
-	{
-		global $mainframe, $option;
+	function move($direction) {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 
@@ -1060,9 +1059,9 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveorder($cid = array(), $order)
-	{
-		global $mainframe, $option;
+	function saveorder($cid = array(), $order) {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 
@@ -1320,9 +1319,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access)
-	{
-		global $mainframe;
+	function access($id, $access) {
+		$mainframe = &JFactory::getApplication();
 		$row =& JTable::getInstance('flexicontent_items', '');
 
 		$row->load( $this->_id );

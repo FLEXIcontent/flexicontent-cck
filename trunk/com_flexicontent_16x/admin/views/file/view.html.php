@@ -29,9 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewFile extends JView {
 
-	function display($tpl = null)
-	{
-		global $mainframe;
+	function display($tpl = null) {
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$document	= & JFactory::getDocument();

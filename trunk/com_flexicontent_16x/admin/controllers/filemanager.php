@@ -27,15 +27,13 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerFilemanager extends FlexicontentController
-{
+class FlexicontentControllerFilemanager extends FlexicontentController{
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 	}
 	
@@ -44,9 +42,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function upload()
-	{
-		global $mainframe;
+	function upload() {
+		$mainframe = &JFactory::getApplication();
 
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
@@ -208,12 +205,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function addurl()
-	{
-		global $mainframe;
-
+	function addurl() {
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		$mainframe = &JFactory::getApplication();
 
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
@@ -280,9 +275,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function addlocal()
-	{
-		global $mainframe;
+	function addlocal() {
+		$mainframe = &JFactory::getApplication();
 
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );

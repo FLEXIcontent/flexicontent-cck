@@ -534,7 +534,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
 		$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('componentid', $component->id);
+		$items	= $menus->getItems('component_id', $component->id);
 			
 		if (count($items) > 0) {
 			return true;

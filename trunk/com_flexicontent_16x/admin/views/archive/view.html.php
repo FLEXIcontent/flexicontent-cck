@@ -29,9 +29,9 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewArchive extends JView {
 
-	function display($tpl = null)
-	{
-		global $mainframe, $option;
+	function display($tpl = null) {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$user 		= & JFactory::getUser();

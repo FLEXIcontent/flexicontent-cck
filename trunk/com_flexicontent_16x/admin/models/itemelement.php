@@ -49,11 +49,10 @@ class FlexicontentModelItemelement extends JModel
 	 *
 	 * @since 0.9
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
-
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.itemelement.limitstart', 'limitstart', 0, 'int' );
@@ -145,9 +144,9 @@ class FlexicontentModelItemelement extends JModel
 	 * @access private
 	 * @return string
 	 */
-	function _buildContentOrderBy()
-	{
-		global $mainframe, $option;
+	function _buildContentOrderBy() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',		'filter_order_Dir',	'', 			'word' );
@@ -163,9 +162,9 @@ class FlexicontentModelItemelement extends JModel
 	 * @access private
 	 * @return string
 	 */
-	function _buildContentWhere()
-	{
-		global $mainframe, $option;
+	function _buildContentWhere() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );

@@ -72,11 +72,10 @@ class FlexicontentModelFileselement extends JModel
 	 */
 	var $_users = null;
 
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
-
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
@@ -227,7 +226,8 @@ class FlexicontentModelFileselement extends JModel
 	}
 
 	function _buildQueryUsers() {
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
@@ -267,9 +267,9 @@ class FlexicontentModelFileselement extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy()
-	{
-		global $mainframe, $option;
+	function _buildContentOrderBy() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
@@ -286,9 +286,9 @@ class FlexicontentModelFileselement extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
-	{
-		global $mainframe, $option;
+	function _buildContentWhere() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
 		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );

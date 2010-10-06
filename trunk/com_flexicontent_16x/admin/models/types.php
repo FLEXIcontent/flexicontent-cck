@@ -63,11 +63,11 @@ class FlexicontentModelTypes extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
@@ -188,9 +188,9 @@ class FlexicontentModelTypes extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy()
-	{
-		global $mainframe, $option;
+	function _buildContentOrderBy() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
@@ -207,9 +207,9 @@ class FlexicontentModelTypes extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
-	{
-		global $mainframe, $option;
+	function _buildContentWhere() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
@@ -241,9 +241,9 @@ class FlexicontentModelTypes extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentHaving()
-	{
-		global $mainframe, $option;
+	function _buildContentHaving() {
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -403,9 +403,9 @@ class FlexicontentModelTypes extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access)
-	{
-		global $mainframe;
+	function access($id, $access) {
+		$mainframe = &JFactory::getApplication();
+
 		$row =& JTable::getInstance('flexicontent_types', '');
 
 		$row->load( $this->_id );

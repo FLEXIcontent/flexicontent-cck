@@ -93,7 +93,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 	 */
 	function getData()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		static $items;
 

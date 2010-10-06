@@ -29,9 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewType extends JView {
 
-	function display($tpl = null)
-	{
-		global $mainframe;
+	function display($tpl = null) {
+		$mainframe = &JFactory::getApplication();
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
