@@ -29,7 +29,7 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewField extends JView {
 
 	function display($tpl = null) {
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		$user 		= & JFactory::getUser();
 
 		JHTML::_('behavior.tooltip');

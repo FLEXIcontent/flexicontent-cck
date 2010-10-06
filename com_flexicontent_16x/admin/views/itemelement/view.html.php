@@ -29,9 +29,10 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewItemelement extends JView {
 
-	function display($tpl = null)
-	{
-		global $mainframe, $option, $globalcats;
+	function display($tpl = null) {
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db			= & JFactory::getDBO();

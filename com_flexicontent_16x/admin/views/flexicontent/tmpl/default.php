@@ -17,6 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$mainframe = &JFactory::getApplication();
 $template	= $mainframe->getTemplate();
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))

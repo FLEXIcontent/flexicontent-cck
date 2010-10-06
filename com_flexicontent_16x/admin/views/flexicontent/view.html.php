@@ -35,9 +35,8 @@ class FlexicontentViewFlexicontent extends JView
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null )
-	{
-		global $mainframe;
+	function display( $tpl = null ) {
+		$mainframe = &JFactory::getApplication();
 		
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -122,7 +121,8 @@ class FlexicontentViewFlexicontent extends JView
 		$document->addStyleDeclaration($css);
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			if ($user->gid > 24) {
+			//if ($user->gid > 24) {
+			if(JAccess::check($user->id, 'core.admin', 'root.1')) {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 			}

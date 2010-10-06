@@ -30,8 +30,7 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewEditacl extends JView {
 
 	function display($tpl = null) {
-
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$document	= & JFactory::getDocument();

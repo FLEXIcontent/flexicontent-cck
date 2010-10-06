@@ -67,7 +67,8 @@ class FlexicontentModelFields extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
@@ -187,7 +188,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
@@ -212,7 +214,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -262,7 +265,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentHaving()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -438,7 +442,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function access($id, $access)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$row =& JTable::getInstance('flexicontent_fields', '');
 
 		$row->load( $this->_id );
@@ -551,7 +556,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function move($direction)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
@@ -664,7 +670,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 

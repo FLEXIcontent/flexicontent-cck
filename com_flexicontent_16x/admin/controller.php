@@ -97,11 +97,10 @@ class FlexicontentController extends JController
 	 * Saves the acl file
 	 *
 	 */
-	function saveacl()
-	{
-		global $mainframe, $option;
-
+	function saveacl() {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		$option = JRequest::getVar('option');
+		$mainframe = &JFactory::getApplication();
 
 		// Initialize some variables
 		$option			= JRequest::getVar('option');
@@ -522,6 +521,7 @@ VALUES
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$db =& JFactory::getDBO();
+		$mainframe = &JFactory::getApplication();
 
 		$queries 	= array();
 		// alter some table field types
@@ -539,7 +539,7 @@ VALUES
 		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
-		global $mainframe;
+
 		foreach($rows as $row) {
 			$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 			if($row->version > $lastversion) {

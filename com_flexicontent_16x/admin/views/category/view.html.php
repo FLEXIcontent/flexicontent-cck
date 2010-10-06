@@ -29,9 +29,9 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewCategory extends JView {
 
-	function display($tpl = null)
-	{
-		global $mainframe, $globalcats;
+	function display($tpl = null) {
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();
