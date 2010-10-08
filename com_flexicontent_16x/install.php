@@ -59,14 +59,16 @@ $cache->clean( null, 'com_flexicontent' );
 $this->parent->getDBO =& $this->parent->getDBO();
 
 // additional extensions
-$add =& $this->manifest->xpath('additional');
-if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
+$add_array =& $this->manifest->xpath('additional');
+$add = NULL;
+if(count($add_array)) $add = $add_array[0];
+if (is_a($add, 'JXMLElement') && count($add->children())) {
     $exts =& $add->children();
     foreach ($exts as $ext) {
 		$extensions[] = array(
 			'name' => $ext->data(),
 			'type' => $ext->name(),
-			'folder' => $this->parent->getPath('source').'/'.$ext->attributes('folder'),
+			'folder' => $this->parent->getPath('source').'/'.$ext->getAttribute('folder'),
 			'installer' => new JInstaller(),
 			'status' => false);
     }
@@ -75,7 +77,6 @@ if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
-	
 	if ($extension['installer']->install($extension['folder'])) {
 		$extension['status'] = true;
 	} else {

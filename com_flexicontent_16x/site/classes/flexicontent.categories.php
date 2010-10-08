@@ -202,8 +202,7 @@ class flexicontent_cats {
 	 * @param string $class
 	 * @return void
 	 */
-	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true)
-	{
+	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true) {
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
 
@@ -234,6 +233,7 @@ class flexicontent_cats {
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					} else {
+						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
 						// FLEXIaccess rule $viewtree enables tree view
 						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}

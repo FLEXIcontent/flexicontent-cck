@@ -100,7 +100,7 @@ dump($this->row);
 				</table>
 									
 				<?php
-				if (FLEXI_ACCESS && $this->CanCats) :
+				if ($this->permission->CanCats) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 					var slideaccess = new Fx.Slide('tabacces');
@@ -116,17 +116,17 @@ dump($this->row);
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
-                    	<tr>
-                    		<td>
-                        		<div id="access"><?php echo $this->Lists['access']; ?></div>
-                        	</td>
-                    	</tr>
-                	</table>
+					<tr>
+					<td>
+						<div id="access"><?php echo $this->Lists['access']; ?></div>
+					</td>
+					</tr>
+					</table>
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-                	</div>
-                </fieldset>
-                <?php endif; ?>
+					</div>
+				</fieldset>
+				<?php endif; ?>
 
 				<table class="adminform">
 					<tr>

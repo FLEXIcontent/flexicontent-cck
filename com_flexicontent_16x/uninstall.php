@@ -58,16 +58,18 @@ $flexiplugins = array(
 );
 // additional extensions
 $add =& $this->manifest->xpath('additional');
-if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
+$add = NULL;
+if(count($add_array)) $add = $add_array[0];
+if (is_a($add, 'JXMLElement') && count($add->children())) {
     $exts =& $add->children();
     foreach ($exts as $ext) {
 
 		// set query
 		switch ($ext->name()) {
 			case 'plugin':
-				$attribute_name = $ext->attributes('name');
+				$attribute_name = $ext->getAttribute('name');
 				if(array_key_exists($attribute_name, $flexiplugins)) {
-					$query = 'SELECT * FROM #__plugins WHERE element='.$db->Quote($ext->attributes('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
+					$query = 'SELECT * FROM #__plugins WHERE element='.$db->Quote($ext->getAttribute('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
 					// query extension id and client id
 					$db->setQuery($query);
 					$res = $db->loadObject();
@@ -82,7 +84,7 @@ if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
 				}
 				break;
 			case 'module':
-				$query = 'SELECT * FROM #__modules WHERE module='.$db->Quote($ext->attributes('name'));
+				$query = 'SELECT * FROM #__modules WHERE module='.$db->Quote($ext->getAttribute('name'));
 		// query extension id and client id
 		$db->setQuery($query);
 		$res = $db->loadObject();

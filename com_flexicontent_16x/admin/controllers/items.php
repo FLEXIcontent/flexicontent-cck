@@ -297,8 +297,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function bindextdata()
-	{
+	function bindextdata() {
 		$extdata 	= JRequest::getInt('extdata', '');		
 		$model 		= $this->getModel('items');
 		$rows 		= $model->getUnassociatedItems($extdata);

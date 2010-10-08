@@ -55,6 +55,7 @@
 			<filename>index.html</filename>
 			<filename>admin.flexicontent.php</filename>
 			<filename>controller.php</filename>
+			<filename>defineconstants.php</filename>
 			<filename>config.xml</filename>
 			<filename>access.xml</filename>
 			<folder>installation</folder>

@@ -32,17 +32,9 @@ class FlexicontentViewCategory extends JView {
 	function display($tpl = null) {
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
+		$permission = FlexicontentHelperPerm::getPerm();
 
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanAddCats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'addcats', 'users', $user->gmid) : 1;
-		} else {
-			$CanCats 		= 1;
-			$CanAddCats 	= 1;
-		}
-
-		if (!$CanCats && !$CanAddCats) {
+		if (!$permission->CanCats && !$permission->CanAddCats) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 
@@ -81,7 +73,7 @@ class FlexicontentViewCategory extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Category' );
+		$row     		= & $this->get( 'Category' );
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
 		
@@ -133,12 +125,12 @@ class FlexicontentViewCategory extends JView {
 		if (FLEXI_ACCESS) {
 			$Lists['access'] = FAccess::TabGmaccess( $row, 'category', 1, 1, 1, 1, 1, 1, 1, 1, 1 );
 		}
-					
+
 		//assign vars to view
 		$this->assignRef('document'     , $document);
 		$this->assignRef('Lists'      	, $Lists);
 		$this->assignRef('row'      	, $row);
-		$this->assignRef('CanCats'      , $CanCats);
+		$this->assignRef('permission'      , $permission);
 		$this->assignRef('editor'		, $editor);
 		$this->assignRef('form'			, $form);
 		$this->assignRef('pane'			, $pane);

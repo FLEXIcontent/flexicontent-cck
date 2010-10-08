@@ -148,12 +148,11 @@ class FlexicontentModelItems extends JModel
 	 * @return array
 	 * @since 1.5
 	 */
-	function getExtdataStatus()
-	{
+	function getExtdataStatus() {
 		$status = array();
 		
-		$query 	= 'SELECT id FROM #__content'
-				. ' WHERE sectionid = ' . FLEXI_CATEGORY
+		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
+				. ' WHERE (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')'
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -196,14 +195,13 @@ class FlexicontentModelItems extends JModel
 	 * @return object
 	 * @since 1.5
 	 */
-	function getUnassociatedItems($limit = 1000000)
-	{
+	function getUnassociatedItems($limit = 1000000) {
 		$status = $this->getExtdataStatus();
-
 		if ($status['no']) {
-			$and = ' AND id IN ( ' . implode(',', $status['no']) . ' )';
-			$query 	= 'SELECT id, title, introtext, `fulltext`, catid, created, created_by, modified, modified_by, version, state FROM #__content'
-					. ' WHERE sectionid = ' . FLEXI_CATEGORY
+			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
+			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
+					. ' JOIN #__categories as cat ON c.catid=cat.id' 
+					. ' WHERE (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')'
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -311,13 +309,14 @@ class FlexicontentModelItems extends JModel
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
+		$query 		= 'SELECT i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-					. ' LEFT JOIN #__groups AS g ON g.id = i.access'
+					. ' LEFT JOIN #__usergroups AS g ON g.id = i.access'
 					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+					. ' JOIN #__categories AS cat ON i.catid=cat.id'
 					. $where
 					. ' GROUP BY i.id'
 					. $orderby
@@ -386,15 +385,14 @@ class FlexicontentModelItems extends JModel
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' i.sectionid = ' . FLEXI_CATEGORY;
+		$where[] = ' (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')';
 
 		// if FLEXIaccess only authorize users to see their own items
 		if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-				
-			if (!@$allitems) {				
 
+			if (!@$allitems) {				
 				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
 				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
 
@@ -1429,8 +1427,7 @@ class FlexicontentModelItems extends JModel
 	 * @return object
 	 * @since 1.5
 	 */
-	function getLanguages()
-	{
+	function getLanguages() {
 		$query = 'SELECT *'
 				.' FROM #__languages'
 				.' ORDER BY ordering ASC'
