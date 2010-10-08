@@ -28,9 +28,7 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewItems extends JView {
-
-	function display($tpl = null)
-	{
+	function display($tpl = null) {
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 
@@ -199,7 +197,7 @@ class FlexicontentViewItems extends JView {
 			$langs	= & $this->get( 'Languages' );
 		}
 		$categories = $globalcats?$globalcats:array();
-		
+
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
@@ -208,7 +206,7 @@ class FlexicontentViewItems extends JView {
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-		
+
 		// build the categories select list for filter
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', true);
 

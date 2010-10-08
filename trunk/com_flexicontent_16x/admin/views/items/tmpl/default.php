@@ -20,27 +20,43 @@ defined('_JEXEC') or die('Restricted access');
 $limit = $this->pageNav->limit;
 ?>
 <script language="javascript" type="text/javascript">
-window.onDomReady(stateselector.init.bind(stateselector));
+if(MooTools.version>="1.2.4") {
+	window.addEvent('domready', function() {stateselector.init()});
+}else{
+	window.onDomReady(stateselector.init.bind(stateselector));
+}
 
 function dostate(state, id)
 {	
 	var change = new processstate();
-    change.dostate( state, id );
+	change.dostate( state, id );
 }
 
-function fetchcounter()
-{
+function fetchcounter() {
 	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
-	var ajax = new Ajax(url, {
-		method: 'get',
-		update: $('count'),
-		onComplete:function(v) {
-			if(v==0)
-				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
-					location.href = 'index.php?option=com_flexicontent&view=items';
-		}
-	});
-	ajax.request();
+	if(MooTools.version>="1.2.4") {
+		new Request.HTML({
+			url: url,
+			method: 'get',
+			update: $('count'),
+			onComplete:function(v) {
+				if(v==0)
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+						location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		}).send();
+	}else{
+		var ajax = new Ajax(url, {
+			method: 'get',
+			update: $('count'),
+			onComplete:function(v) {
+				if(v==0)
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+						location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		});
+		ajax.request();
+	}
 }
 
 // the function overloads joomla standard event
@@ -91,29 +107,36 @@ function delFilter(name)
 window.addEvent('domready', function(){
 	var startdate	= $('startdate');
 	var enddate 	= $('enddate');
-	if (startdate.getValue() == '') {
+	if(MooTools.version>="1.2.4") {
+		var sdate = startdate.value;
+		var edate = enddate.value;
+	}else{
+		var sdate = startdate.getValue();
+		var edate = enddate.getValue();
+	}
+	if (sdate == '') {
 		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
 	}
-	if (enddate.getValue() == '') {
+	if (edate == '') {
 		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
 	}
 	$('startdate').addEvent('focus', function() {
-		if (startdate.getValue() == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
+		if (sdate == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
 			startdate.setProperty('value', '');
 		}		
 	});
 	$('enddate').addEvent('focus', function() {
-		if (enddate.getValue() == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
+		if (edate == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
 			enddate.setProperty('value', '');
-		}		
+		}
 	});
 	$('startdate').addEvent('blur', function() {
-		if (startdate.getValue() == '') {
+		if (sdate == '') {
 			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
 		}		
 	});
 	$('enddate').addEvent('blur', function() {
-		if (enddate.getValue() == '') {
+		if (edate == '') {
 			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
 		}		
 	});
@@ -138,15 +161,30 @@ window.addEvent('domready', function(){
 window.addEvent('domready', function(){
 	var count = fetchcounter();
 	$('bindForm').addEvent('submit', function(e) {
-		$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
-		e = new Event(e).stop();
-		
-		this.send({
-			update: 	$('log-bind'),
-			onComplete:	function() {
-				fetchcounter();
-			}
-		});
+		if(MooTools.version>="1.2.4") {
+			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			e = e.stop();
+		}else{
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			e = new Event(e).stop();
+		}
+		if(MooTools.version>="1.2.4") {
+			new Request.HTML({
+				url: this.action,
+				method: 'post',
+				update: $('log-bind'),
+				onComplete: function() {
+					fetchcounter();
+				}
+			}).send();
+		}else{
+			this.send({
+				update: $('log-bind'),
+				onComplete: function() {
+					fetchcounter();
+				}
+			});
+		}
 	});
 }); 
 </script>
@@ -408,7 +446,7 @@ window.addEvent('domready', function(){
 			}
 
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
-
+				$alt = "";
 				if ( $row->state == 1 ) {
 					$img = 'tick.png';
 					$alt = JText::_( 'FLEXI_PUBLISHED' );

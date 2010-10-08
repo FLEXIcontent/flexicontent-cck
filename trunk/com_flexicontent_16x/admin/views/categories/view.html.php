@@ -74,18 +74,18 @@ class FlexicontentViewCategories extends JView {
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
-		$categories 	= $globalcats;
+		/*$categories 	= $globalcats;
 		if($permission->CanCats || $permission->CanAdd || $permission->CanEdit) {
 			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
 			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, false);
 		}else{
 			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
 			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
-		}
+		}*/
 
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );
-		
+
 		// search filter
 		$lists['search']= $search;
 

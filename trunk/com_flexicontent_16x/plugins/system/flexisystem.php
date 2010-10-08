@@ -35,7 +35,15 @@ class plgSystemFlexisystem extends JPlugin
 		parent::__construct( $subject, $config );
 
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		if (!defined('FLEXI_SECTION'))		define('FLEXI_SECTION'		, $fparams->get('flexi_section'));
+		if (!defined('FLEXI_CATEGORY')) {
+			define('FLEXI_CATEGORY', $fparams->get('flexi_category'));
+			$db = &JFactory::getDBO();
+			$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
+			$db->setQuery($query);
+			$obj = $db->loadObject();
+			if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', $obj->lft);
+			if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', $obj->rgt);
+		}
 		if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 		if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $fparams->get('advcache', 1));
 		if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $fparams->get('advcache_time', 3600));
@@ -43,13 +51,7 @@ class plgSystemFlexisystem extends JPlugin
 		if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $fparams->get('purge_gc', 1));
 		if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($fparams->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 
-        JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
-        
-/*
-        echo "<xmp>";
-        var_export($_REQUEST);
-        echo "</xmp>";
-*/
+		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
 	
 	/**
@@ -61,14 +63,14 @@ class plgSystemFlexisystem extends JPlugin
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 
 		$this->trackSaveConf();
-		if (FLEXI_SECTION) {
+		if (FLEXI_CATEGORY) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
 			// add the category tree to categories cache
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->setCaching(1); 		//force cache
 			$catscache->setLifeTime(84600); //set expiry to one day
-		    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+			$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}
@@ -169,8 +171,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 	}
 	
-	function getCategoriesTree()
-	{
+	function getCategoriesTree() {
 		global $globalcats;
 
 		$db		=& JFactory::getDBO();
@@ -179,8 +180,8 @@ class plgSystemFlexisystem extends JPlugin
 		$query	= 'SELECT id, parent_id, published, access, title,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION
-				. ' ORDER BY parent_id, ordering'
+				. ' WHERE lft > ' . FLEXI_CATEGORY_LFT . ' AND rgt < ' . FLEXI_CATEGORY_RGT
+				. ' ORDER BY parent_id, lft'
 				;
 		$db->setQuery($query);
 		$cats = $db->loadObjectList();
@@ -189,41 +190,38 @@ class plgSystemFlexisystem extends JPlugin
 		$children = array();
 		$parents = array();
 		
-    	//set depth limit
+		//set depth limit
    		$levellimit = 10;
-		
-    	foreach ($cats as $child) {
-        	$parent = $child->parent_id;
-        	if ($parent) $parents[] = $parent;
-       		$list 	= @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
-    	
-    	$parents = array_unique($parents);
+		foreach ($cats as $child) {
+			$parent = $child->parent_id;
+			if ($parent) $parents[] = $parent;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		$parents = array_unique($parents);
 
-    	//get list of the items
-    	$globalcats = plgSystemFlexisystem::_getCatAncestors(0, '', array(), $children, true, max(0, $levellimit-1));
+		//get list of the items
+		$globalcats = plgSystemFlexisystem::_getCatAncestors(FLEXI_CATEGORY, '', array(), $children, true, max(0, $levellimit-1));
 
-    	foreach ($globalcats as $cat) {
-    		$cat->ancestorsonlyarray	= $cat->ancestors;
-    		$cat->ancestorsonly			= implode(',', $cat->ancestors);
-    		$cat->ancestors[] 			= $cat->id;
-    		$cat->ancestorsarray		= $cat->ancestors;
-    		$cat->ancestors				= implode(',', $cat->ancestors);
-    		$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
-    		$cat->descendants			= implode(',', $cat->descendantsarray);
-    	}
-
-    	return $globalcats;
+		foreach ($globalcats as $cat) {
+			$cat->ancestorsonlyarray	= $cat->ancestors;
+			$cat->ancestorsonly			= implode(',', $cat->ancestors);
+			$cat->ancestors[] 			= $cat->id;
+			$cat->ancestorsarray		= $cat->ancestors;
+			$cat->ancestors				= implode(',', $cat->ancestors);
+			$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
+			$cat->descendants			= implode(',', $cat->descendantsarray);
+		}
+		return $globalcats;
 	}
 
 	/**
-    * Get the ancestors of each category node
-    *
-    * @access private
-    * @return array
-    */
+	    * Get the ancestors of each category node
+	    *
+	    * @access private
+	    * @return array
+	    */
 	function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		if (!$ancestors) $ancestors = array();

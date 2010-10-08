@@ -104,8 +104,9 @@ class FlexicontentModelCategories extends JModel
 				$where[] = 'c.published = 0';
 			}
 		}
+		$where[] = ' (c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT . ')';
 		
-		$where 		= ( count( $where ) ? ' AND ' . implode( ' AND ', $where ) : '' );
+		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		
 		//select the records
 		//note, since this is a tree we have to do the limits code-side
@@ -121,17 +122,14 @@ class FlexicontentModelCategories extends JModel
 		}
 		
 		$query = 'SELECT c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
-					. ' FROM #__categories AS c'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
-					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-					//. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' AND c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT
-					//. ' AND sec.scope = ' . $this->_db->Quote('content')
-					. $where
-					. ' GROUP BY c.id'
-					. $orderby
-					;
+				. ' FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
+				. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
+				. $where
+				. ' GROUP BY c.id'
+				. $orderby
+				;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
 		//establish the hierarchy of the categories
