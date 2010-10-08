@@ -118,70 +118,35 @@ class FlexicontentViewItems extends JView {
 		}
 		$js .= "});";
 		$document->addScriptDeclaration($js);
-		
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
-			$CanEdit 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) : 1;
-			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
-			$CanDelete 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-			$CanCopy	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid) : 1;
-		} else {
-			$CanAdd 		= 1;
-			$CanEdit		= 1;
-			$CanPublish		= 1;
-			$CanDelete		= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanTemplates	= 1;
-			$CanRights		= 1;
-			$CanOrder		= 1;
-			$CanCopy		= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent');
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', true);
-		if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
-		if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
-		if ($CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
-		if ($CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
-		if ($CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
-		if ($CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
-		if ($CanTemplates) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates');
-		if ($CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
+		if ($permission->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
+		if ($permission->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
+		if ($permission->CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
+		if ($permission->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
+		if ($permission->CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
+		if ($permission->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
+		if ($permission->CanTemplates) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates');
+		if ($permission->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
-		if ($CanAdd) {
+		if ($permission->CanAdd) {
 			JToolBarHelper::addNew();
-			if ($CanCopy) {
+			if ($permission->CanCopy) {
 				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
 			}
 		}
-		if ($CanEdit) {
+		if ($permission->CanEdit) {
 			JToolBarHelper::editList();
 		}
-		if ($CanDelete) {
+		if ($permission->CanDelete) {
 			JToolBarHelper::deleteList();
 		}
-		if (FLEXI_ACCESS && !$CanPublish) {
+		if (!$permission->CanPublish) {
 			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 
@@ -266,8 +231,8 @@ class FlexicontentViewItems extends JView {
 		}
 
 		if (FLEXI_FISH) {
-		//build languages filter
-		$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
+			//build languages filter
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
 		}
 		
 		//assign data to template
@@ -281,9 +246,7 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('user'			, $user);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
+		$this->assignRef('permission'		, $permission);
 		$this->assignRef('unassociated'	, $unassociated);
 		// filters
 		$this->assignRef('filter_id'		, $filter_id);
@@ -322,48 +285,18 @@ class FlexicontentViewItems extends JView {
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
-			$CanEdit 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) : 1;
-			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
-			$CanDelete 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-		} else {
-			$CanAdd 		= 1;
-			$CanEdit		= 1;
-			$CanPublish		= 1;
-			$CanDelete		= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanOrder		= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent');
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', true);
-		if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
-		if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
-		if ($CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
-		if ($CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
-		if ($CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
-		if ($CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
-		if ($CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
+		if ($permission->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
+		if ($permission->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
+		if ($permission->CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
+		if ($permission->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
+		if ($permission->CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
+		if ($permission->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
+		if ($permission->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );
@@ -393,9 +326,7 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('user'			, $user);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
+		$this->assignRef('permission'		, $permission);
 
 		parent::display($tpl);
 	}

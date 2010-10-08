@@ -260,16 +260,16 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="<?php echo $this->CanOrder ? '90' : '60'; ?>" class="center">
+			<th width="<?php echo $this->permission->CanOrder ? '90' : '60'; ?>" class="center">
 				<?php
 				if ($this->filter_cats == '' || $this->filter_cats == 0) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
-					if ($this->CanOrder) :
+					if ($this->permission->CanOrder) :
 						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
 					endif;
 				else :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
-					if ($this->CanOrder) :
+					if ($this->permission->CanOrder) :
 						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
 					endif;
 				endif;
@@ -436,7 +436,7 @@ window.addEvent('domready', function(){
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 
 			if (FLEXI_ACCESS) {
-				if ($this->CanRights) {
+				if ($this->permission->CanRights) {
 					$access 	= FAccess::accessswitch('item', $row, $i);
 				} else {
 					$access 	= FAccess::accessswitch('item', $row, $i, 'content', 1);
@@ -587,7 +587,7 @@ window.addEvent('domready', function(){
 			</div>
 			<?php endif ; ?>
 			</td>
-			<?php if ($this->CanOrder) : ?>
+			<?php if ($this->permission->CanOrder) : ?>
 			<td class="order">
 				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
 
@@ -623,7 +623,7 @@ window.addEvent('domready', function(){
 					$typeofcats = ((int)$category->id == (int)$row->maincat) ? ' maincat' : ' secondarycat';
 					$catlink	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
-					if ($this->CanCats) :
+					if ($this->permission->CanCats) :
 				?>
 					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">
 					<a href="<?php echo $catlink; ?>">
