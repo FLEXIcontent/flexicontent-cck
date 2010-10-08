@@ -157,8 +157,7 @@ class FlexicontentController extends JController
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function createDefaultType()
-	{
+	function createDefaultType() {
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 

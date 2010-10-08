@@ -77,8 +77,7 @@ class FlexicontentModelCategories extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getData()
-	{
+	function getData() {
 		$mainframe = &JFactory::getApplication();
 		
 		static $items;
@@ -89,13 +88,13 @@ class FlexicontentModelCategories extends JModel
 		
 		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
+		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_state', 'filter_state', '', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );		
 		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.ordering';
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.lft';
 		
 		$where = array();
 		if ( $filter_state ) {
@@ -114,21 +113,21 @@ class FlexicontentModelCategories extends JModel
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
 					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
-					. ' AND c.section = ' . FLEXI_CATEGORY
+					. ' AND c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT
 					. $where
 					;
 			$this->_db->setQuery( $query );
 			$search_rows = $this->_db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned'
+		$query = 'SELECT c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
 					. ' FROM #__categories AS c'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' LEFT JOIN #__groups AS g ON g.id = c.access'
+					. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-					. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' WHERE c.section = ' . FLEXI_CATEGORY
-					. ' AND sec.scope = ' . $this->_db->Quote('content')
+					//. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
+					. ' AND c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT
+					//. ' AND sec.scope = ' . $this->_db->Quote('content')
 					. $where
 					. ' GROUP BY c.id'
 					. $orderby
@@ -136,20 +135,20 @@ class FlexicontentModelCategories extends JModel
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
 		//establish the hierarchy of the categories
-		$children = array();
+		$children = array();echo mysql_error();
 		
-    	//set depth limit
+		//set depth limit
    		$levellimit = 10;
 		
-    	foreach ($rows as $child) {
-        	$parent = $child->parent_id;
-       		$list 	= @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
-    	
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		
+		//get list of the items
+		$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
 
     	    	//eventually only pick out the searched items.
 		if ($search) {
@@ -168,7 +167,7 @@ class FlexicontentModelCategories extends JModel
 			$list = $list1;
 		}
 		
-    	$total = count( $list );
+		$total = count( $list );
 
 		jimport('joomla.html.pagination');
 		$this->_pagination = new JPagination( $total, $limitstart, $limit );

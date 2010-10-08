@@ -10,7 +10,7 @@ define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 
 // Define some constants
 if($flexi_category = $params->get('flexi_category')) {
 	if (!defined('FLEXI_CATEGORY')) {
-		define('FLEXI_CATEGORY', $params->get('flexi_category'));
+		define('FLEXI_CATEGORY', $flexi_category);
 		$db = &JFactory::getDBO();
 		$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
 		$db->setQuery($query);

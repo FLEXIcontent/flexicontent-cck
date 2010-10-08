@@ -470,19 +470,18 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistcat()
-	{
+	function getExistcat() {
 		$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_CATEGORY
+				. ' WHERE lft> ' . FLEXI_CATEGORY_LFT . ' AND rgt<' . FLEXI_CATEGORY_RGT
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
 			
 		if ($count > 0) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 	/**
@@ -491,8 +490,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistsec()
-	{
+	function getExistsec() {
 		if (FLEXI_CATEGORY) {
 			$query = 'SELECT COUNT( id )'
 			. ' FROM #__sections'
@@ -535,11 +533,10 @@ class FlexicontentModelFlexicontent extends JModel
 
 		$menus	= &JApplication::getMenu('site', array());
 		$items	= $menus->getItems('component_id', $component->id);
-			
 		if (count($items) > 0) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 

@@ -21,11 +21,14 @@ defined('_JEXEC') or die('Restricted access');
 <script type="text/javascript">
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
-		$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
-		
+		if(MooTools.version>="1.2.4") {
+			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		}else{
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		}
 		this.send({
-			update: 	$('log-bind')
+			update: $('log-bind')
 		});
 	});
 }); 
