@@ -17,22 +17,27 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-?>
-
-<?php if (!$this->existfields) : //@TODO must write a class for that!!! I'm a dirty lazy pig :-) ?>
+if (!$this->existfields) : //@TODO must write a class for that!!! I'm a dirty lazy pig :-) ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existfields').addEvent('click', function(e) {
-			$('existfields-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
-			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=createdefaultfields&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existfields-log')
-			});
-			ajax.request.delay(500, ajax);
+			e = new Event(e).stop();
+			if(MooTools.version>="1.2.4") {
+				$('existfields-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existfields-log')
+				}).send();
+			}else{
+				$('existfields-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existfields-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -41,16 +46,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existtype').addEvent('click', function(e) {
-			$('existtype-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=createdefaultype&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existtype-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('existtype-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existtype-log')
+				}).send();
+			}else{
+				$('existtype-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existtype-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -59,16 +71,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('publishplugins').addEvent('click', function(e) {
-			$('publishplugins-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=publishplugins&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('publishplugins-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('publishplugins-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('publishplugins-log')
+				}).send();
+			}else{
+				$('publishplugins-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('publishplugins-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -77,16 +96,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existlang').addEvent('click', function(e) {
-			$('existlang-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=createlangcolumn&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existlang-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('existlang-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existlang-log')
+				}).send();
+			}else{
+				$('existlang-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existlang-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -95,16 +121,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existversions').addEvent('click', function(e) {
-			$('existversions-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=createversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existversions-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('existversions-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existversions-log')
+				}).send();
+			}else{
+				$('existversions-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existversions-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -113,16 +146,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existversionsdata').addEvent('click', function(e) {
-			$('existversionsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=populateversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('existversionsdata-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('existversionsdata-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existversionsdata-log')
+				}).send();
+			}else{
+				$('existversionsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existversionsdata-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -131,16 +171,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('cachethumb').addEvent('click', function(e) {
-			$('cachethumb-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('cachethumb-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('cachethumb-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('cachethumb-log')
+				}).send();
+			}else{
+				$('cachethumb-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('cachethumb-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -149,16 +196,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('oldbetafiles').addEvent('click', function(e) {
-			$('oldbetafiles-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('oldbetafiles-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('oldbetafiles-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('oldbetafiles-log')
+				}).send();
+			}else{
+				$('oldbetafiles-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('oldbetafiles-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -167,16 +221,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('oldfieldsdata').addEvent('click', function(e) {
-			$('oldfieldsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('oldfieldsdata-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('oldfieldsdata-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('oldfieldsdata-log')
+				}).send();
+			}else{
+				$('oldfieldsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('oldfieldsdata-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>
@@ -185,16 +246,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('missingversion').addEvent('click', function(e) {
-			$('missingversion-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
-
 			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo JUtility::getToken();?>=1&format=raw";
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('missingversion-log')
-			});
-			ajax.request.delay(500, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('missingversion-log').set('html', '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('missingversion-log')
+				}).send();
+			}else{
+				$('missingversion-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('missingversion-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
 		});
 	});
 </script>

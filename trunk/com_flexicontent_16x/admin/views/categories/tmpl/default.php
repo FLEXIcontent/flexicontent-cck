@@ -17,9 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access'); ?>
-
 <form action="index.php" method="post" name="adminForm">
-
 	<table class="adminform">
 		<tr>
 			<td width="100%">
@@ -69,15 +67,15 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
-			if (FLEXI_ACCESS) {
-				if ($this->CanRights) {
+			/*if (FLEXI_ACCESS) {
+				if ($this->permission->CanRights) {
 					$access 	= FAccess::accessswitch('category', $row, $i);
 				} else {
 					$access 	= FAccess::accessswitch('category', $row, $i, 'content', 1);
 				}
-			} else {
+			} else {*/
 				$access 	= JHTML::_('grid.access', $row, $i );
-			}
+			//}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
    		?>

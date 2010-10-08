@@ -21,6 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
 //require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
 
 // Set the table directory

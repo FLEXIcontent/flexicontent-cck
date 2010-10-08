@@ -28,8 +28,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFlexicontent extends JView
-{
+class FlexicontentViewFlexicontent extends JView{
 	/**
 	 * Creates the Entrypage
 	 *
@@ -89,7 +88,7 @@ class FlexicontentViewFlexicontent extends JView
 		
 		// required setup check
 		$existcat 	= & $this->get( 'Existcat' );
-		$existsec 	= & $this->get( 'Existsec' );
+		//$existsec 	= & $this->get( 'Existsec' );
 		$existmenu 	= & $this->get( 'Existmenu' );
 
 		// install check
@@ -161,7 +160,6 @@ class FlexicontentViewFlexicontent extends JView
 		$session  =& JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		
-		
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', true);
 		// ensures the PHP version is correct
@@ -185,13 +183,13 @@ class FlexicontentViewFlexicontent extends JView
 		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
 		$this->assignRef('check'		, $check);
 		}
-				
+
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('unapproved'	, $unapproved);
 		$this->assignRef('openquest'	, $openquest);
 		$this->assignRef('inprogress'	, $inprogress);
 		$this->assignRef('existcat'		, $existcat);
-		$this->assignRef('existsec'		, $existsec);
+		//$this->assignRef('existsec'		, $existsec);
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);
