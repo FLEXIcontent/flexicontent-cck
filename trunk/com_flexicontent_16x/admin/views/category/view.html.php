@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewCategory extends JView {
-
 	function display($tpl = null) {
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
@@ -86,7 +85,7 @@ class FlexicontentViewCategory extends JView {
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
 			}
 		} else {
-			if (!$CanAddCats) {
+			if (!$permission->CanAddCats) {
 				$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 			}
 		}
@@ -109,7 +108,7 @@ class FlexicontentViewCategory extends JView {
 
 
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
-			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) || $CanCats) {
+			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) || $permission->CanCats) {
 				$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"', false, false);
 				$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
 			} else {

@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewType extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 
@@ -61,7 +60,6 @@ class FlexicontentViewType extends JView {
 		JToolBarHelper::save();
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
-
 
 		//Get data from the model
 		$model		= & $this->getModel();

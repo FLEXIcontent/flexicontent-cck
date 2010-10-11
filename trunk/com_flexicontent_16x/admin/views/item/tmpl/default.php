@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 $this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
-if ($this->CanUseTags) {
+if ($this->permission->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -262,7 +262,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									$nused = count($this->usedtags);
 									for( $i = 0, $nused; $i < $nused; $i++ ) {
 										$tag = $this->usedtags[$i];
-										if ($this->CanUseTags) {
+										if ($this->permission->CanUseTags) {
 											echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 										} else {
@@ -274,7 +274,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								</ul>
 								<br class="clear" />
 							</div>
-							<?php if ($this->CanUseTags) : ?>
+							<?php if ($this->permission->CanUseTags) : ?>
 							<div id="tags">
 								<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
@@ -298,7 +298,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							});
 						});
 					");
-
 				?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
@@ -325,9 +324,8 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 						});
 					");
 				?>
-
 				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
-				
+
 				<fieldset>
 					<legend>
 						<?php echo $this->row->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->row->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
@@ -514,7 +512,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
 			</tr>
 		</table>
-		<?php if ($this->CanVersion) : ?>
+		<?php if ($this->permission->CanVersion) : ?>
 		<div id="result" >
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">
 			<tr>

@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewTag extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 

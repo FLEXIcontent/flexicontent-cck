@@ -149,6 +149,7 @@ class FlexicontentViewItems extends JView {
 		if (!$permission->CanPublish) {
 			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
+		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
 		$rows      		= & $this->get( 'Data');

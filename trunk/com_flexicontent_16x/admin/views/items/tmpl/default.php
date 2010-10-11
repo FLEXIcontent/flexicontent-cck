@@ -527,7 +527,7 @@ window.addEvent('domready', function(){
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<div id="row<?php echo $row->id; ?>">
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
-							<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+							<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 						</span>
 					</div>
 					</a>
@@ -536,42 +536,42 @@ window.addEvent('domready', function(){
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_PUBLISH_THIS_ITEM' ); ?>">
-									<img src="images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('0', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_UNPUBLISH_THIS_ITEM' ); ?>">
-									<img src="images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
 								</a>	
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_ARCHIVE_THIS_ITEM' ); ?>">
-									<img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-3', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_PENDING' ); ?>">
-									<img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-4', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_TO_WRITE' ); ?>">
-									<img src="images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
 								</a>	
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-5', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_IN_PROGRESS' ); ?>">
-									<img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
+									<img src="<?php echo JURI::root();?>components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
 								</a>	
 								</div>
 							</li>

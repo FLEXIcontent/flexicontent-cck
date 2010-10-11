@@ -18,13 +18,12 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
-
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
 	<tr>
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->CanUpload) :
+			if ($this->permission->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 		    <?php if ($this->require_ftp): ?>
@@ -144,7 +143,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			</form>
 			<?php
 			echo $this->pane->endPanel();
-			if ($this->CanUpload) :
+			if ($this->permission->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' );
 			?>
 			<!-- File from server Form -->
@@ -239,7 +238,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
