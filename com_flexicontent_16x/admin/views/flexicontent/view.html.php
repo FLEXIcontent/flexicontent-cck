@@ -47,14 +47,11 @@ class FlexicontentViewFlexicontent extends JView{
 
 		// handle jcomments integration
 		if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
-			$CanComments 	= 1;
 			$dest 			= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins'.DS.'com_flexicontent.plugin.php';
 			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
 			if (!JFile::exists($dest)) {
 				JFile::copy($source, $dest);
 			}
-		} else {
-			$CanComments 	= 0;
 		}
 
 		// handle joomfish integration
@@ -119,44 +116,17 @@ class FlexicontentViewFlexicontent extends JView{
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
 
+		$permission = FlexicontentHelperPerm::getPerm();
+
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			//if ($user->gid > 24) {
 			if(JAccess::check($user->id, 'core.admin', 'root.1')) {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 			}
-			JToolBarHelper::preferences('com_flexicontent', '550', '650', 'Configuration');
-		}		
-		
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
-			$CanAddCats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'addcats', 'users', $user->gmid) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanPlugins	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_plugins', 'manage', 'users', $user->gmid) : 1;
-			$CanComments 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_jcomments', 'manage', 'users', $user->gmid) : $CanComments;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-		} else {
-			$CanAdd			= 1;
-			$CanAddCats 	= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanPlugins		= 1;
-			$CanTemplates	= 1;
+			if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
+
 		$session  =& JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		
@@ -165,14 +135,14 @@ class FlexicontentViewFlexicontent extends JView{
 		// ensures the PHP version is correct
 		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items');
-			if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
-			if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
-			if ($CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
-			if ($CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
-			if ($CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
-			if ($CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
-			if ($CanTemplates) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates');
-			if ($CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
+			if ($permission->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
+			if ($permission->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
+			if ($permission->CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
+			if ($permission->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
+			if ($permission->CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
+			if ($permission->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
+			if ($permission->CanTemplates) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates');
+			if ($permission->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
 		}
 		
 		//updatecheck
@@ -211,19 +181,7 @@ class FlexicontentViewFlexicontent extends JView{
 		$this->assignRef('missingversion'		, $missingversion);
 
 		// assign Rights to the template
-		$this->assignRef('CanAdd'		, $CanAdd);
-		$this->assignRef('CanAddCats'	, $CanAddCats);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanTypes'		, $CanTypes);
-		$this->assignRef('CanFields'	, $CanFields);
-		$this->assignRef('CanTags'		, $CanTags);
-		$this->assignRef('CanArchives'	, $CanArchives);
-		$this->assignRef('CanFiles'		, $CanFiles);
-		$this->assignRef('CanTemplates'	, $CanTemplates);
-		$this->assignRef('CanStats'		, $CanStats);
-		$this->assignRef('CanRights'	, $CanRights);
-		$this->assignRef('CanPlugins'	, $CanPlugins);
-		$this->assignRef('CanComments'	, $CanComments);
+		$this->assignRef('permission'		, $permission);
 
 		parent::display($tpl);
 

@@ -118,16 +118,8 @@ class FlexicontentViewItem extends JView {
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, $row ));
 		}
 		
-		if (FLEXI_ACCESS) {
-			$CanParams	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$CanVersion	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'versioning', 'users', $user->gmid) : 1;
-			$CanUseTags	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanParams	= 1;
-			$CanVersion	= 1;
-			$CanUseTags = 1;
-		}
-		if (!$CanParams) 	$document->addStyleDeclaration('#det-pane {display:none;}');
+		$permission = FlexicontentHelperPerm::getPerm();
+		if (!$permission->CanParams) 	$document->addStyleDeclaration('#det-pane {display:none;}');
 
 		// set default values
 		$canPublish 	= 1;
@@ -140,7 +132,7 @@ class FlexicontentViewItem extends JView {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
 			}
-			if (FLEXI_ACCESS && ($user->gid < 25)) {
+			if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
 				$canEdit 		= in_array('edit', $rights);
 				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
@@ -291,8 +283,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
 		$this->assignRef('usedtags'			, $usedtags);
-		$this->assignRef('CanVersion'		, $CanVersion);
-		$this->assignRef('CanUseTags'		, $CanUseTags);
+		$this->assignRef('permission'		, $permission);
 		$this->assignRef('current_page'		, $current_page);
 
 		parent::display($tpl);

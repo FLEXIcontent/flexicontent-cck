@@ -18,13 +18,12 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
-
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
 	<tr>
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->CanUpload) :
+			if ($this->permission->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 				
@@ -78,7 +77,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<td nowrap="nowrap">
 			 	<?php echo $this->lists['items']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>

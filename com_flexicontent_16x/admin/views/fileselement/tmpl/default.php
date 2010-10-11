@@ -23,7 +23,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->CanUpload) :
+			if ($this->permission->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 			<!-- File Upload Form -->
@@ -136,7 +136,7 @@ echo $this->pane->endPane();
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>

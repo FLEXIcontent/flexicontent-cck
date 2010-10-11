@@ -41,7 +41,7 @@ class FlexicontentViewField extends JView {
 		//Get data from the model
 		$model			= & $this->getModel();
 		$row     			= & $this->get( 'Field' );
-		//var_dump($model);
+
 		//Import File system
 		jimport('joomla.filesystem.file');
 		

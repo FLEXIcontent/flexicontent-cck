@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 	<fields addfieldpath="/administrator/components/com_flexicontent/elements">
-		<fieldset name="basic">
-			<field name="separator" label="" type="separator" default="FLEXI_GENERAL_CONF" level="level1" menu="hide" />
+		<fieldset name="component" label="Options" description="FLEXI_GENERAL_CONF">
+			<field name="separator" label="" type="separator" default="" level="level1" menu="hide" />
 
 			<field name="flexi_category" type="categoryparent" size="1" default="" label="FLEXI_SELECT_A_SECTION" description="FLEXI_SELECT_A_SECTION_DESC"  menu="hide" />
 			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
@@ -171,6 +171,56 @@
 			<field name="purge_gc" type="radio" default="1" label="FLEXI_GC" description="FLEXI_GC_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+		</fieldset>
+		<fieldset name="permissions1" label="Permissions-flexicontent" description="JCONFIG_PERMISSIONS_DESC">
+			<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component">
+				<action name="com_flexicontent.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
+				<action name="com_flexicontent.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+				<action name="com_flexicontent.fields" title="Fields" description="CanFields" />
+				<action name="com_flexicontent.tags" title="Tags" description="CanTags" />
+				<action name="com_flexicontent.archives" title="Archives" description="CanArchives" />
+				<action name="com_flexicontent.stats" title="Stats" description="CanStats" />
+				<action name="com_flexicontent.templates" title="Templates" description="CanTemplates" />
+				<action name="com_flexicontent.versioning" title="Version" description="CanVersion" />
+				<action name="com_flexicontent.usetags" title="Tags" description="CanUseTags" />
+			</field>
+		</fieldset>
+		<fieldset name="permissions2" label="Permissions-item" description="JCONFIG_PERMISSIONS_DESC">
+			<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component">
+				<action name="com_flexicontent.manageitem" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+				<action name="com_flexicontent.create" title="JAction_Create" description="JAction_Create_Component_Desc" />
+				<action name="com_flexicontent.delete" title="JAction_Delete" description="JAction_Delete_Component_Desc" />
+				<action name="com_flexicontent.edit" title="JAction_Edit" description="JAction_Edit_Component_Desc" />
+				<action name="com_flexicontent.edit.state" title="JAction_Edit_State" description="JAction_Edit_State_Component_Desc" />
+				<action name="com_flexicontent.copyitems" title="Copy items" description="Copy items" />
+				<action name="com_flexicontent.order" title="CanOrder" description="CanOrder" />
+				<action name="com_flexicontent.paramsitem" title="CanParams" description="CanParams" />
+			</field>
+		</fieldset>
+		<fieldset name="permissions3" label="Permissions-type" description="JCONFIG_PERMISSIONS_DESC">
+			<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component">
+				<action name="com_flexicontent.managetype" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+				<action name="com_flexicontent.createtype" title="Create" description="Create type" />
+				<action name="com_flexicontent.deletetype" title="Delete" description="Create type" />
+				<action name="com_flexicontent.edittype" title="Edit" description="Edit type" />
+				<action name="com_flexicontent.edittype.state" title="Edit state" description="Edit state of type" />
+			</field>
+		</fieldset>
+		<fieldset name="permissions4" label="Permissions-categories" description="JCONFIG_PERMISSIONS_DESC">
+			<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component">
+				<action name="com_flexicontent.managecat" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+				<action name="com_flexicontent.createcat" title="Create" description="Create category" />
+				<action name="com_flexicontent.deletecat" title="Delete" description="Delete category" />
+				<action name="com_flexicontent.editcat" title="Edit" description="Edit category" />
+				<action name="com_flexicontent.editcat.state" title="Edit state" description="Edit state of category" />
+			</field>
+		</fieldset>
+		<fieldset name="permissions5" label="Permissions-files" description="JCONFIG_PERMISSIONS_DESC">
+			<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component">
+				<action name="com_flexicontent.managefile" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+				<action name="com_flexicontent.uploadfiles" title="Upload" description="Upload files" />
+				<action name="com_flexicontent.viewallfiles" title="View All files" description="View All files" />
 			</field>
 		</fieldset>
 	</fields>
