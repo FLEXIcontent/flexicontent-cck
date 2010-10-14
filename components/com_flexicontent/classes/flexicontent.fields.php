@@ -215,7 +215,14 @@ class FlexicontentFields
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
+				$field->slug = $item->slug;
+				$field->sectionid = $item->sectionid;
+				$field->catid = $item->catid;
+				$field->catslug = $item->categoryslug;
+				$field->fieldid = $field->id;
+				$field->id = $item->id;
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
 		}
@@ -236,7 +243,14 @@ class FlexicontentFields
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
+				$field->slug = $item->slug;
+				$field->sectionid = $item->sectionid;
+				$field->catid = $item->catid;
+				$field->catslug = $item->categoryslug;
+				$field->fieldid = $field->id;
+				$field->id = $item->id;
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
 		}
