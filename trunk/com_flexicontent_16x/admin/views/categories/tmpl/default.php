@@ -16,8 +16,12 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
-<form action="index.php" method="post" name="adminForm">
+defined('_JEXEC') or die('Restricted access');
+$listOrder	= $this->state->get('list.ordering');
+$listDirn	= $this->state->get('list.direction');
+$saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
+?>
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table class="adminform">
 		<tr>
 			<td width="100%">
@@ -43,7 +47,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="90">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
 			</th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -64,7 +68,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		$i = 0;
 		$n = count($this->rows);
 		foreach ($this->rows as $row) {
-
+			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
 			/*if (FLEXI_ACCESS) {
@@ -119,23 +123,30 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				<?php echo $access; ?>
 			</td>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
+				<?php /*<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
 
 				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 
 				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				*/?>
+				<?php if ($saveOrder) : ?>
+					<span><?php echo $this->pageNav->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
+					<span><?php echo $this->pageNav->orderDownIcon($i, $this->pageNav->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
+				<?php endif; ?>
+				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
+				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" />
+				<?php $originalOrders[] = $orderkey + 1; ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php 
-		$k = 1 - $k;
-        $i++;
+			$k = 1 - $k;
+			$i++;
 		} 
 		?>
 	</tbody>
-
 	</table>
 
 	<input type="hidden" name="boxchecked" value="0" />

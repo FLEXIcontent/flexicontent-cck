@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modeladmin');
 
 /**
  * FLEXIcontent Component Category Model
@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModel
+class FlexicontentModelCategory extends JModelAdmin
 {
 	/**
 	 * Category data
@@ -142,7 +142,7 @@ class FlexicontentModelCategory extends JModel
 			$category->title				= null;
 			$category->name					= null;
 			$category->alias				= null;
-			$category->image				= JText::_( 'FLEXI_CHOOSE_IMAGE' );
+			//$category->image				= JText::_( 'FLEXI_CHOOSE_IMAGE' );
 			$category->section				= FLEXI_CATEGORY;
 			$category->image_position		= 'left';
 			$category->description			= null;
@@ -333,6 +333,44 @@ class FlexicontentModelCategory extends JModel
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true)
+	{
+		// Initialise variables.
+		$extension	= $this->getState('category.extension');
+
+		// Get the form.
+		$form = $this->loadForm('com_flexicontent.category'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) {
+			return false;
+		}
+
+		// Modify the form based on Edit State access controls.
+		if (empty($data['extension'])) {
+			$data['extension'] = $extension;
+		}
+
+		if (!$this->canEditState((object) $data)) {
+			// Disable fields for display.
+			$form->setFieldAttribute('ordering', 'disabled', 'true');
+			$form->setFieldAttribute('published', 'disabled', 'true');
+
+			// Disable fields while saving.
+			// The controller has already verified this is a record you can edit.
+			$form->setFieldAttribute('ordering', 'filter', 'unset');
+			$form->setFieldAttribute('published', 'filter', 'unset');
+		}
+
+		return $form;
 	}
 }
 ?>

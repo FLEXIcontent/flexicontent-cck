@@ -19,7 +19,8 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+//jimport('joomla.application.component.model');
+jimport('joomla.application.component.modellist');
 
 /**
  * FLEXIcontent Component Categories Model
@@ -28,7 +29,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategories extends JModel
+class FlexicontentModelCategories extends JModelList
 {
 	/**
 	 * Pagination object
@@ -49,8 +50,7 @@ class FlexicontentModelCategories extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -64,116 +64,53 @@ class FlexicontentModelCategories extends JModel
 	 * @access	public
 	 * @param	int Category identifier
 	 */
-	function setId($id)
-	{
+	function setId($id) {
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
 
 	/**
-	 * Method to get categories item data
-	 *
-	 * @access public
-	 * @return array
+	 * @return	string
+	 * @since	1.6
 	 */
-	function getData() {
-		$mainframe = &JFactory::getApplication();
-		
-		static $items;
-
-		if (isset($items)) {
-			return $items;
-		}
-		
-		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );		
-		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.lft';
-		
-		$where = array();
+	function getListQuery() {
+		// Create a new query object.
+		$db = $this->getDbo();
+		$filter_state= $this->getState('com_flexicontent.categories.filter_state');
+		$query = $db->getQuery(true);
+		// Select the required fields from the table.
+		$query->select(
+			$this->getState(
+				'list.select',
+				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
+			)
+		);
+		$query->from('#__categories AS c');
+		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
+		$query->join('LEFT', '#__usergroups AS g ON g.id = c.access');
+		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
+		//$query->where("c.extension = 'com_content'");
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
-				$where[] = 'c.published = 1';
+				$query->where("c.published = 1");
 			} else if ($filter_state == 'U' ) {
-				$where[] = 'c.published = 0';
+				$query->where("c.published = 0");
 			}
 		}
-		$where[] = ' (c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT . ')';
-		
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-		
-		//select the records
-		//note, since this is a tree we have to do the limits code-side
-		if ($search) {			
-			$query = 'SELECT c.id'
-					. ' FROM #__categories AS c'
-					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
-					. ' AND c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT
-					. $where
-					;
-			$this->_db->setQuery( $query );
-			$search_rows = $this->_db->loadResultArray();					
+		$query->where(' (c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT . ')');
+		// Filter by search in title
+		$search = $this->getState('com_flexicontent.categories.search');
+		if (!empty($search)) {			
+			$search = $db->Quote('%'.$db->getEscaped($search, true).'%');
+			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
 		}
-		
-		$query = 'SELECT c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
-				. ' FROM #__categories AS c'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
-				. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-				. $where
-				. ' GROUP BY c.id'
-				. $orderby
-				;
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
-		//establish the hierarchy of the categories
-		$children = array();echo mysql_error();
-		
-		//set depth limit
-   		$levellimit = 10;
-		
-		foreach ($rows as $child) {
-			$parent = $child->parent_id;
-			$list 	= @$children[$parent] ? $children[$parent] : array();
-			array_push($list, $child);
-			$children[$parent] = $list;
-		}
-		
-		//get list of the items
-		$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
-
-    	    	//eventually only pick out the searched items.
-		if ($search) {
-			$list1 = array();
-
-			foreach ($search_rows as $sid )
-			{
-				foreach ($list as $item)
-				{
-					if ($item->id == $sid) {
-						$list1[] = $item;
-					}
-				}
-			}
-			// replace full list with found items
-			$list = $list1;
-		}
-		
-		$total = count( $list );
-
-		jimport('joomla.html.pagination');
-		$this->_pagination = new JPagination( $total, $limitstart, $limit );
-
-		// slice out elements based on limits
-		$list = array_slice( $list, $this->_pagination->limitstart, $this->_pagination->limit );
-		
-		return $list;
+		$query->group('c.id');
+		// Add the list ordering clause.
+		$query->order($db->getEscaped($this->getState('com_flexicontent.categories.filter_order', 'c.lft')).' '.$db->getEscaped($this->getState('com_flexicontent.categories.filter_order_Dir', 'ASC')));
+		//echo nl2br(str_replace('#__','jos_',$query));
+		//echo $query->__toString();
+		return $query;
 	}
 
 	/**
@@ -182,7 +119,7 @@ class FlexicontentModelCategories extends JModel
 	 * @access public
 	 * @return integer
 	 */
-	function &getPagination()
+	function &getPaginationx()
 	{
 		if ($this->_pagination == null) {
 			$this->getData();

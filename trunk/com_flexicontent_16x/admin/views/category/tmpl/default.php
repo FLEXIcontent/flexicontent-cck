@@ -103,22 +103,22 @@ dump($this->row);
 				if ($this->permission->CanCats) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
-					var slideaccess = new Fx.Slide('tabacces');
-					var slidenoaccess = new Fx.Slide('notabacces');
-					slideaccess.hide();
+						var slideaccess = new Fx.Slide('tabacces');
+						var slidenoaccess = new Fx.Slide('notabacces');
+						slideaccess.hide();
 						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
 							slideaccess.toggle();
 							slidenoaccess.toggle();
-							});
 						});
-					");
+					});
+				");
 				?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
 					<tr>
 					<td>
-						<div id="access"><?php echo $this->Lists['access']; ?></div>
+						<div id="access"><?php echo $this->iform->getInput('rules'); ?></div>
 					</td>
 					</tr>
 					</table>
@@ -144,76 +144,43 @@ dump($this->row);
 				<?php
 				$title = JText::_( 'FLEXI_ACCESS' );
 				echo $this->pane->startPane( 'det-pane' );
-				if (!FLEXI_ACCESS) :
 				echo $this->pane->startPanel( $title, 'access' );
 				?>
 				<table>
 					<tr>
 						<td>
 							<label for="access">
-								<?php echo JText::_( 'FLEXI_ACCESS' ).':'; ?>
+								<?php echo $this->iform->getLabel('access'); ?>
 							</label>
 						</td>
 						<td>
-							<?php echo $this->Lists['access']; ?>
+							<?php echo $this->iform->getInput('access'); ?>
 						</td>
 					</tr>
 				</table>
+<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 				<?php
 				echo $this->pane->endPanel();
-				endif;
-				$title = JText::_( 'FLEXI_IMAGE' );
-				echo $this->pane->startPanel( $title, 'image' );
-				?>
-				<table>
-					<tr>
-						<td>
-							<label for="image">
-								<?php echo JText::_( 'FLEXI_CHOOSE_IMAGE' ).':'; ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->Lists['imagelist']; ?>
-						</td>
-					</tr>
-					<tr>
-						<td></td>
-						<td>
-							<script language="javascript" type="text/javascript">
-								if (document.forms[0].image.options.value!=''){
-									jsimg='../images/stories/' + getSelectedValue( 'adminForm', 'image' );
-								} else {
-									jsimg='../images/M_images/blank.png';
-								}
-								document.write('<img src=' + jsimg + ' name="imagelib" width="80" height="80" border="2" alt="Preview" />');
-							</script>
-							<br /><br />
-						</td>
-					</tr>
-				</table>
-				<?php
-				echo $this->pane->endPanel();
+				$fieldSets = $this->iform->getFieldsets('params');
 
-				$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-				echo $this->pane->startPanel( $title, "params-std" );
-				echo $this->form->render('params');
-				echo $this->pane->endPanel();
-
-				$title = JText::_( 'FLEXI_PARAMETERS_COMMON' );
-				echo $this->pane->startPanel( $title, "params-common" );
-				echo $this->form->render('params', 'common');
-				echo $this->pane->endPanel();
-				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-
-				foreach ($this->tmpls as $tmpl) {
-					$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-					echo $tmpl->params->render();
-					echo $this->pane->endPanel();
-				}
-
-				echo $this->pane->endPane();
+foreach ($fieldSets as $name => $fieldSet) :
+	$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+	echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+	if (isset($fieldSet->description) && trim($fieldSet->description)) :
+		echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+	endif;
+	?>
+	<fieldset class="panelform">
+		<?php foreach ($this->iform->getFieldset($name) as $field) : ?>
+			<?php echo $field->label; ?>
+			<?php echo $field->input; ?>
+		<?php endforeach; ?>
+		<?php echo $this->iform->getLabel('note'); ?>
+		<?php echo $this->iform->getInput('note'); ?>
+	</fieldset>
+<?php endforeach; ?>
+<?php echo JHtml::_('sliders.end'); ?>
+				<?php echo $this->pane->endPane();
 				?>
 			</td>
 		</tr>
