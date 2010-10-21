@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields>
+		<field
+			id="access"
+			name="access"
+			type="accesslevel"
+			label="JField_Access_Label"
+			description="JField_Access_Desc"
+			class="inputbox"
+			size="1"
+			default="" />
+
+		<field
+			id="rules"
+			name="rules"
+			type="rules"
+			label="Content_Rules_Label"
+			description="Content_Rules_Desc"
+			class="inputbox"
+			filter="rules"
+			component="com_content"
+			section="article"
+			default="" />
+	</fields>
+</form>

@@ -36,6 +36,8 @@ class FlexicontentViewCategory extends JView {
 		if (!$permission->CanCats && !$permission->CanAddCats) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
+		
+		$iform		= $this->get('Form');
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -75,6 +77,8 @@ class FlexicontentViewCategory extends JView {
 		$row     		= & $this->get( 'Category' );
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
+
+		$iform->bind($row);
 		
 		$categories = $globalcats;
 
@@ -103,8 +107,8 @@ class FlexicontentViewCategory extends JView {
 		//build selectlists
 		$Lists = array();
 		$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
-		$Lists['imagelist'] 		= JHTML::_('list.images', 'image', $row->image, $javascript, '/images/stories/' );
-		$Lists['access'] 			= JHTML::_('list.accesslevel', $row );
+		//$Lists['imagelist'] 		= JHTML::_('list.images', 'image', $row->image, $javascript, '/images/' );
+		//$Lists['access'] 			= JHTML::_('list.accesslevel', $row );
 
 
 		if (FLEXI_ACCESS && ($user->gid < 25)) {
@@ -134,6 +138,7 @@ class FlexicontentViewCategory extends JView {
 		$this->assignRef('form'			, $form);
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('tmpls'		, $tmpls);
+		$this->assignRef('iform'			, $iform);
 
 		parent::display($tpl);
 	}

@@ -73,7 +73,24 @@ class FlexicontentViewCategories extends JView {
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
+		$rows      	= & $this->get( 'Items');
+		$this->state		= $this->get('State');
+		$rows			= $this->get('Items');
+		$this->pagination	= $this->get('Pagination');
+		$children = array();
+		
+		//set depth limit
+   		$levellimit = 10;
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		
+		//get list of the items
+		$rows = flexicontent_cats::treerecurse(FLEXI_CATEGORY, '', array(), $children, false, max(0, $levellimit-1));
+		
 		$pageNav 	= & $this->get( 'Pagination' );
 		/*$categories 	= $globalcats;
 		if($permission->CanCats || $permission->CanAdd || $permission->CanEdit) {
@@ -83,6 +100,11 @@ class FlexicontentViewCategories extends JView {
 			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
 			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
 		}*/
+		
+		// Preprocess the list of items to find ordering divisions.
+		foreach ($rows as &$item) {
+			$this->ordering[$item->parent_id][] = $item->id;
+		}
 
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );
@@ -101,7 +123,7 @@ class FlexicontentViewCategories extends JView {
 		$this->assignRef('rows'      		, $rows);
 		$this->assignRef('permission'      	, $permission);
 		$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('ordering'		, $ordering);
+		$this->assignRef('orderingx'		, $ordering);
 		$this->assignRef('user'			, $user);
 
 		parent::display($tpl);
