@@ -1497,6 +1497,8 @@ class FlexicontentModelItems extends JModel
 		$query = "SELECT * FROM #__categories WHERE id!='".$topcat->id."' AND parent_id!='0'  AND level>'0';";
 		$this->_db->setQuery($query);
 		$categories = $this->_db->loadObjectList();
+		$map_old_new = array();
+		$map_old_new[1] = $topcat->id;
 		$k = 0;
 		// Loop throught the categories of the created section
 		foreach ($categories as $category) {
@@ -1506,7 +1508,7 @@ class FlexicontentModelItems extends JModel
 			$subcat->lft			= null;
 			$subcat->rgt			= null;
 			$subcat->level			= null;
-			$subcat->parent_id		= $topcat->id;
+			$subcat->parent_id		= isset($map_old_new[$category->parent_id])?$map_old_new[$category->parent_id]:$topcat->id;
 			$subcat->params		= $category->params;
 			$subcat->setLocation($topcat->id, 'last-child');
 	   		$k++;
@@ -1519,6 +1521,7 @@ class FlexicontentModelItems extends JModel
 				$logs->err->$k->title 	= $category->title;
 			}
 			$subcat->rebuildPath($subcat->id);
+			$map_old_new[$category->id] = $subcat->id;
 
 			// Get the articles of the created category
 			$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
@@ -1542,6 +1545,7 @@ class FlexicontentModelItems extends JModel
 				}
 			} // end articles loop
 		} // end categories loop
+		unset($map_old_new);
 
 		// Save the created category as flexi_category for the component
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
