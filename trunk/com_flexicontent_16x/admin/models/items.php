@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItems extends JModel
-{
+class FlexicontentModelItems extends JModel{
 	/**
 	 * Items data
 	 *
@@ -88,8 +87,7 @@ class FlexicontentModelItems extends JModel
 	 * @access	public
 	 * @param	int Category identifier
 	 */
-	function setId($id)
-	{
+	function setId($id) {
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
@@ -1497,6 +1495,17 @@ class FlexicontentModelItems extends JModel
 		$query = "SELECT * FROM #__categories WHERE id!='".$topcat->id."' AND parent_id!='0'  AND level>'0';";
 		$this->_db->setQuery($query);
 		$categories = $this->_db->loadObjectList();
+		/*//get children
+		$children = array();
+		foreach ($categories as $child) {
+			$parent = $child->parent_id;
+			$list = @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		$categories = $children;
+		//unset($children);
+		*/
 		$map_old_new = array();
 		$map_old_new[1] = $topcat->id;
 		$k = 0;
@@ -1509,8 +1518,8 @@ class FlexicontentModelItems extends JModel
 			$subcat->rgt			= null;
 			$subcat->level			= null;
 			$subcat->parent_id		= isset($map_old_new[$category->parent_id])?$map_old_new[$category->parent_id]:$topcat->id;
-			$subcat->params		= $category->params;
-			$subcat->setLocation($topcat->id, 'last-child');
+			$subcat->params			= $category->params;
+			$subcat->setLocation($subcat->parent_id, 'last-child');
 	   		$k++;
 			$subcat->check();
 			if ($subcat->store()) {
@@ -1545,6 +1554,17 @@ class FlexicontentModelItems extends JModel
 				}
 			} // end articles loop
 		} // end categories loop
+		foreach ($categories as $category) {
+			$subcat = &JTable::getInstance('flexicontent_categories','');
+			$subcat->load($map_old_new[$category->id]);
+			$subcat->lft			= null;
+			$subcat->rgt			= null;
+			$subcat->level			= null;
+			$subcat->parent_id		= isset($map_old_new[$category->parent_id])?$map_old_new[$category->parent_id]:$topcat->id;
+			$subcat->setLocation($subcat->parent_id, 'last-child');
+			$subcat->check();
+			$subcat->store();
+		}
 		unset($map_old_new);
 
 		// Save the created category as flexi_category for the component
@@ -1553,9 +1573,9 @@ class FlexicontentModelItems extends JModel
 		$fparams = $fparams->toString();
 
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-		$query = 'UPDATE #__components'
+		$query = 'UPDATE #__extensions'
 	    		. ' SET params = ' . $this->_db->Quote($fparams)
-	    		. ' WHERE id = ' . $flexi->id;
+	    		. ' WHERE `type`='.$this->_db->Quote("component").' AND extension_id = ' . $this->_db->Quote($flexi->id);
 	    		;
 		$this->_db->setQuery($query);
 		$this->_db->query();
