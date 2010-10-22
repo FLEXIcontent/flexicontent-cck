@@ -38,11 +38,16 @@ class plgSystemFlexisystem extends JPlugin
 		if (!defined('FLEXI_CATEGORY')) {
 			define('FLEXI_CATEGORY', $fparams->get('flexi_category'));
 			$db = &JFactory::getDBO();
-			$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
-			$db->setQuery($query);
-			$obj = $db->loadObject();
-			if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', $obj->lft);
-			if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', $obj->rgt);
+			if(FLEXI_CATEGORY) {
+				$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
+				$db->setQuery($query);
+				$obj = $db->loadObject();
+				if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', $obj->lft);
+				if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', $obj->rgt);
+			}else{
+				if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', NULL);
+				if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', NULL);
+			}
 		}
 		if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 		if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $fparams->get('advcache', 1));
