@@ -182,7 +182,7 @@ class plgSystemFlexisystem extends JPlugin
 		$db		=& JFactory::getDBO();
 
 		// get the category tree and append the ancestors to each node		
-		$query	= 'SELECT id, parent_id, published, access, title,'
+		$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories'
 				. ' WHERE lft > ' . FLEXI_CATEGORY_LFT . ' AND rgt < ' . FLEXI_CATEGORY_RGT
