@@ -34,6 +34,8 @@ class FlexicontentHelperPerm{
 			$permission->CanParams	 	= JAccess::check($user->id, 'com_flexicontent.paramsitem', 		'com_flexicontent');
 			//categories
 			$permission->CanCats 		= JAccess::check($user->id, 'com_flexicontent.managecat',		'com_flexicontent');
+			$permission->CanUserCats 	= JAccess::check($user->id, 'com_flexicontent.usercats',			'com_flexicontent');
+			$permission->CanViewTree 	= JAccess::check($user->id, 'com_flexicontent.viewtree',			'com_flexicontent');
 			$permission->CanAddCats 	= JAccess::check($user->id, 'com_flexicontent.createcat', 		'com_flexicontent');
 			//files
 			$permission->CanFiles	 	= JAccess::check($user->id, 'com_flexicontent.managefile', 		'com_flexicontent');
