@@ -167,9 +167,8 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function checkin()
 	{
-		if ($this->_id)
-		{
-			$category = & JTable::getInstance('flexicontent_categories','');
+		if ($this->_id) {
+			$category = $this->getTable();
 			return $category->checkin($this->_id);
 		}
 		return false;
@@ -193,7 +192,7 @@ class FlexicontentModelCategory extends JModelAdmin
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$category = & JTable::getInstance('flexicontent_categories','');
+			$category = $this->getTable();
 			if(!$category->checkout($uid, $this->_id)) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
@@ -238,27 +237,56 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function store($data)
 	{
-		$category = & JTable::getInstance('flexicontent_categories','');
+		$pk		= (!empty($data['id'])) ? $data['id'] : (int)$this->getState($this->getName().'.id');
+		$isNew	= true;
+		
+		$category = $this->getTable();
+		
+		// Load the row if saving an existing category.
+		if ($pk > 0) {
+			$category->load($pk);
+			$isNew = false;
+		}
+
+		// Set the new parent id if parent id not matched OR while New/Save as Copy .
+		if ($category->parent_id != $data['jform']['parent_id'] || $data['id'] == 0) {
+			$category->setLocation($data['jform']['parent_id'], 'last-child');
+		}
+
+		// Alter the title for save as copy
+		if (!$isNew && $data['id'] == 0 && $category->parent_id == $data['parent_id']) {
+			$m = null;
+			$data['alias'] = '';
+			if (preg_match('#\((\d+)\)$#', $table->title, $m)) {
+				$data['title'] = preg_replace('#\(\d+\)$#', '('.($m[1] + 1).')', $category->title);
+			} else {
+				$data['title'] .= ' (2)';
+			}
+		}
 		
 		// bind it to the table
-		if (!$category->bind($data)) {
+		if (!$category->bind($data['jform'])) {
 			$this->setError(500, $this->_db->getErrorMsg() );
 			return false;
+		}
+		
+		// Bind the rules.
+		if (isset($data['rules'])) {
+			$rules = new JRules($data['rules']);
+			$category->setRules($rules);
 		}
 
 		if (!$category->id) {
 			$category->ordering = $category->getNextOrder();
 		}
 		
-		$params			= JRequest::getVar( 'params', null, 'post', 'array' );
+		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
+		$params			= $data["jform"]["params"];
 		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
 		
-		if ($copyparams)
-		{
+		if ($copyparams) {
 			$category->params = $this->getParams($copyparams);
-		}
-		else
-		{
+		} else{
 			// Build parameter INI string
 			if (is_array($params))
 			{
@@ -285,12 +313,17 @@ class FlexicontentModelCategory extends JModelAdmin
 			return false;
 		}
 		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $category, 'category' );
+		// Rebuild the tree path.
+		if (!$category->rebuildPath($category->id)) {
+			$this->setError($category->getError());
+			return false;
 		}
+		
+		/*if (FLEXI_ACCESS) {
+			FAccess::saveaccess( $category, 'category' );
+		}*/
 
 		$this->_category	=& $category;
-		
 		return true;
 	}
 	
@@ -302,8 +335,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	string		ini string of params
 	 * @since	1.5
 	 */
-	function getParams($id)
-	{
+	function getParams($id) {
 		$query 	= 'SELECT params FROM #__categories'
 				. ' WHERE id = ' . (int)$id
 				;
@@ -311,7 +343,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		$copyparams = $this->_db->loadResult();
 		
 		return $copyparams;
-	}	
+	}
 	
 	/**
 	 * Method to copy category parameters
@@ -343,13 +375,12 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	mixed	A JForm object on success, false on failure
 	 * @since	1.6
 	 */
-	public function getForm($data = array(), $loadData = true)
-	{
+	public function getForm($data = array(), $loadData = true) {
 		// Initialise variables.
-		$extension	= $this->getState('category.extension');
+		$extension	= $this->getState('flexicontent_categories.extension');
 
 		// Get the form.
-		$form = $this->loadForm('com_flexicontent.category'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
+		$form = $this->loadForm('com_flexicontent.flexicontent_categories'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form)) {
 			return false;
 		}
@@ -371,6 +402,117 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 
 		return $form;
+	}
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData()
+	{
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+
+		if (empty($data)) {
+			$data = $this->getItem();
+		}
+
+		return $data;
+	}
+	
+	/**
+	 * Method to get a category.
+	 *
+	 * @param	integer	An optional id of the object to get, otherwise the id from the model state is used.
+	 * @return	mixed	Category data object on success, false on failure.
+	 * @since	1.6
+	 */
+	public function getItem($pk = null) {
+		if ($result = parent::getItem($pk)) {
+			// Prime required properties.
+			if (empty($result->id)) {
+				$result->parent_id	= $this->getState('flexicontent_categories.parent_id');
+				$result->extension	= $this->getState('flexicontent_categories.extension');
+			}
+
+			// Convert the metadata field to an array.
+			$registry = new JRegistry();
+			$registry->loadJSON($result->metadata);
+			$result->metadata = $registry->toArray();
+
+			// Convert the created and modified dates to local user time for display in the form.
+			jimport('joomla.utilities.date');
+			$tz	= new DateTimeZone(JFactory::getApplication()->getCfg('offset'));
+
+			if (intval($result->created_time)) {
+				$date = new JDate($result->created_time);
+				$date->setTimezone($tz);
+				$result->created_time = $date->toMySQL(true);
+			} else {
+				$result->created_time = null;
+			}
+
+			if (intval($result->modified_time)) {
+				$date = new JDate($result->modified_time);
+				$date->setTimezone($tz);
+				$result->modified_time = $date->toMySQL(true);
+			} else {
+				$result->modified_time = null;
+			}
+		}
+
+		return $result;
+	}
+	/**
+	 * Returns a Table object, always creating it
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	*/
+	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
+		return JTable::getInstance($type, $prefix, $config);
+	}
+	/**
+	 * Auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @since	1.6
+	 */
+	protected function populateState()
+	{
+		$app = JFactory::getApplication('administrator');
+
+		if (!($parentId = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.parent_id'))) {
+			$parentId = JRequest::getInt('parent_id');
+		}
+		$this->setState('flexicontent_categories.parent_id', $parentId);
+
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
+			$extension = JRequest::getCmd('extension', 'com_content');
+		}
+		// Load the User state.
+		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
+			$cid = JRequest::getVar('cid', array(0));
+			$pk = (int)$cid[0];
+		}
+		$this->setState($this->getName().'.id', $pk);
+
+
+		$this->setState('flexicontent_categories.extension', $extension);
+		$parts = explode('.',$extension);
+		// extract the component name
+		$this->setState('flexicontent_categories.component', $parts[0]);
+		// extract the optional section name
+		$this->setState('flexicontent_categories.section', (count($parts)>1)?$parts[1]:null);
+
+		// Load the parameters.
+		$params	= JComponentHelper::getParams('com_flexicontent');
+		$this->setState('params', $params);
 	}
 }
 ?>

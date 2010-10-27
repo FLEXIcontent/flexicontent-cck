@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <access component="com_content">
-	<section name="component">
-		<action name="core.admin" title="JACTION_ADMIN" description="JACTION_ADMIN_COMPONENT_DESC" />
-		<action name="core.manage" title="JACTION_MANAGE" description="JACTION_MANAGE_COMPONENT_DESC" />
-		<action name="core.create" title="JACTION_CREATE" description="JACTION_CREATE_COMPONENT_DESC" />
-		<action name="core.delete" title="JACTION_DELETE" description="JACTION_DELETE_COMPONENT_DESC" />
-		<action name="core.edit" title="JACTION_EDIT" description="JACTION_EDIT_COMPONENT_DESC" />
-		<action name="core.edit.state" title="JACTION_EDIT_STATE" description="JACTION_EDIT_STATE_COMPONENT_DESC" />
-	</section>
 	<section name="category">
 		<action name="com_flexicontent.createcat" title="Create" description="Create category" />
 		<action name="com_flexicontent.deletecat" title="Delete" description="Delete category" />
