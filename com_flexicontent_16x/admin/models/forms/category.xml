@@ -18,9 +18,17 @@
 	<field
 		name="parent_id"
 		type="categoryparent"
-		label="COM_CATEGORIES_FIELD_PARENT_LABEL"
+		top="1"
+		label="FLEXI_PARENT"
 		description="COM_CATEGORIES_FIELD_PARENT_DESC"
-		class="inputbox"/>
+		class="inputbox" />
+	<field
+		name="copycid"
+		type="categoryparent"
+		top="2"
+		label="FLEXI_COPY_PARAMETERS"
+		description="FLEXI_COPY_PARAMETERS"
+		class="inputbox" />
 
 	<field
 		name="lft"
@@ -67,7 +75,7 @@
 	<field
 		name="alias"
 		type="text"
-		label="JFIELD_ALIAS_LABEL"
+		label="FLEXI_ALIAS"
 		description="JFIELD_ALIAS_DESC"
 		class="inputbox"
 		size="40"/>
@@ -96,7 +104,7 @@
 		class="inputbox"
 		default="1"
 		size="1"
-		label="JGLOBAL_STATE"
+		label="FLEXI_PUBLISHED"
 		description="JFIELD_PUBLISHED_DESC">
 		<option
 			value="1">
@@ -104,12 +112,6 @@
 		<option
 			value="0">
 			JUNPUBLISHED</option>
-		<option
-			value="2">
-			JARCHIVED</option>
-		<option
-			value="-2">
-			JTRASHED</option>
 	</field>
 
 	<field
