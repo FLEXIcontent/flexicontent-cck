@@ -17,14 +17,14 @@
 
 	<field
 		name="parent_id"
-		type="categoryparent"
+		type="categorytree"
 		top="1"
 		label="FLEXI_PARENT"
 		description="COM_CATEGORIES_FIELD_PARENT_DESC"
 		class="inputbox" />
 	<field
 		name="copycid"
-		type="categoryparent"
+		type="categorytree"
 		top="2"
 		label="FLEXI_COPY_PARAMETERS"
 		description="FLEXI_COPY_PARAMETERS"
