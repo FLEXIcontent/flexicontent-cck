@@ -93,7 +93,7 @@ var JFormValidator = new Class({
 	{
 		// If the field is required make sure it has a value
 		if ($(el).hasClass('required')) {
-			if (($(el).getValue() == false)) {
+			if (($(el).get('value') == false)) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -107,9 +107,9 @@ var JFormValidator = new Class({
 		}
 
 		// Check the additional validation types
-		if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).getValue()) {
+		if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).get('value')) {
 			// Execute the validation handler and return result
-			if (this.handlers[handler].exec($(el).getValue()) != true) {
+			if (this.handlers[handler].exec($(el).get('value')) != true) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -169,6 +169,6 @@ var JFormValidator = new Class({
 });
 
 document.formvalidator = null;
-Window.onDomReady(function(){
+window.addEvent('domready', function(){
 	document.formvalidator = new JFormValidator();
 });
