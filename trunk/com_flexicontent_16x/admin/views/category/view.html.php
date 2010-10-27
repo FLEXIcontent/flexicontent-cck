@@ -74,18 +74,14 @@ class FlexicontentViewCategory extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		$row     		= & $this->get( 'Category' );
+		//$row     		= & $this->get( 'Category' );
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
-
-		$iform->bind($row);
-		
 		$categories = $globalcats;
-
 		//fail if checked out not by 'me'
-		if ($row->id) {
+		if($iform->getValue("id")) {
 			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED BY ANOTHER ADMIN' ));
+				JError::raiseWarning( 'SOME_ERROR_CODE', $iform->getValue("title").' '.JText::_( 'FLEXI_EDITED BY ANOTHER ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
 			}
 		} else {
@@ -95,14 +91,14 @@ class FlexicontentViewCategory extends JView {
 		}
 
 		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, 'description' );
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, 'description' );
 	    	
 		// Create the form
-		$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');
+		/*$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');
 //		$form->loadINI($row->params);
 		foreach ($tmpls as $tmpl) {
 			$tmpl->params->loadINI($row->params);
-		}
+		}*/
 		
 		//build selectlists
 		$Lists = array();
@@ -111,7 +107,7 @@ class FlexicontentViewCategory extends JView {
 		//$Lists['access'] 			= JHTML::_('list.accesslevel', $row );
 
 
-		if (FLEXI_ACCESS && ($user->gid < 25)) {
+		/*if (FLEXI_ACCESS && ($user->gid < 25)) {
 			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) || $permission->CanCats) {
 				$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"', false, false);
 				$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
@@ -122,23 +118,23 @@ class FlexicontentViewCategory extends JView {
 		} else {
 			$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, true, 'class="inputbox"');
 			$Lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
-		}
+		}*/
 
 		// build granular access list
-		if (FLEXI_ACCESS) {
+		/*if (FLEXI_ACCESS) {
 			$Lists['access'] = FAccess::TabGmaccess( $row, 'category', 1, 1, 1, 1, 1, 1, 1, 1, 1 );
-		}
+		}*/
 
 		//assign vars to view
 		$this->assignRef('document'     , $document);
 		$this->assignRef('Lists'      	, $Lists);
-		$this->assignRef('row'      	, $row);
-		$this->assignRef('permission'      , $permission);
-		$this->assignRef('editor'		, $editor);
-		$this->assignRef('form'			, $form);
-		$this->assignRef('pane'			, $pane);
-		$this->assignRef('tmpls'		, $tmpls);
-		$this->assignRef('iform'			, $iform);
+		//$this->assignRef('row'      	, $row);
+		$this->assignRef('permission'	, $permission);
+		$this->assignRef('editor'	, $editor);
+		//$this->assignRef('form'	, $form);
+		$this->assignRef('pane'		, $pane);
+		$this->assignRef('tmpls'	, $tmpls);
+		$this->assignRef('iform'	, $iform);
 
 		parent::display($tpl);
 	}

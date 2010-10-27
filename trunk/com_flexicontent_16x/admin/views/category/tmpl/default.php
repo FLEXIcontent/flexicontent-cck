@@ -33,7 +33,11 @@ $this->document->addScriptDeclaration("
 dump($this->row);
 */
 ?>
-
+<style>
+.pane-sliders {
+	margin: 8px 0px 0px 0px;
+}
+</style>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -43,54 +47,62 @@ dump($this->row);
 					<tr>
 						<td class="key">
 							<label for="title">
-								<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+								<?php echo $this->iform->getLabel('title'); ?>
 							</label>
 						</td>
 						<td>
-							<input id="title" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />
+							<?php /*<input id="title" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />*/?>
+							<?php echo $this->iform->getInput('title'); ?>
 						</td>
 						<td>
 							<label for="published">
-								<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+								<?php echo $this->iform->getLabel('published'); ?>
 							</label>
 						</td>
 						<td>
 							<?php
-							$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-							echo $html;
+							//$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
+							//echo $html;
 							?>
+							<?php echo $this->iform->getInput('published'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<label for="alias">
-								<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+								<?php echo $this->iform->getLabel('alias'); ?>
 							</label>
 						</td>
 						<td>
-							<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="100" value="<?php echo $this->row->alias; ?>" />
+							<?php /*<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="100" value="<?php echo $this->row->alias; ?>" />*/?>
+							<?php echo $this->iform->getInput('alias'); ?>
 						</td>
 						<td>
 							<label for="parent">
-								<?php echo JText::_( 'FLEXI_PARENT' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_PARENT' ).':'; ?>
+								<?php echo $this->iform->getLabel('parent_id'); ?>
 							</label>
 						</td>
 						<td>
-							<?php				
-								echo $this->Lists['parent_id'];
-							?>
+							<?php //echo $this->Lists['parent_id'];?>
+							<?php echo $this->iform->getInput('parent_id'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<label for="parent">
-								<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
+							<label for="copycid">
+								<?php //echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
+								<?php echo $this->iform->getLabel('copycid'); ?>
 							</label>
 						</td>
 						<td>
 							<?php				
-								echo $this->Lists['copyid'];
+								//echo $this->Lists['copyid'];
 							?>
+							<?php echo $this->iform->getInput('copycid'); ?>
 						</td>
 						<td>
 						</td>
@@ -133,14 +145,14 @@ dump($this->row);
 						<td>
 							<?php
 							// parameters : areaname, content, hidden field, width, height, rows, cols
-							echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
+							//echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
 							?>
+							<?php echo $this->iform->getInput('description'); ?>
 						</td>
 					</tr>
 				</table>
-			
 			</td>
-			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="320px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
 				$title = JText::_( 'FLEXI_ACCESS' );
 				echo $this->pane->startPane( 'det-pane' );
@@ -158,10 +170,10 @@ dump($this->row);
 						</td>
 					</tr>
 				</table>
-<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
+<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1)); ?>
 				<?php
 				echo $this->pane->endPanel();
-				$fieldSets = $this->iform->getFieldsets('params');
+$fieldSets = $this->iform->getFieldsets('params');
 
 foreach ($fieldSets as $name => $fieldSet) :
 	$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
@@ -188,8 +200,7 @@ foreach ($fieldSets as $name => $fieldSet) :
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
-<input type="hidden" name="section" value="<?php echo $this->row->section; ?>" />
+<input type="hidden" name="id" value="<?php echo $this->iform->getValue('id'); ?>" />
 <input type="hidden" name="controller" value="categories" />
 <input type="hidden" name="view" value="category" />
 <input type="hidden" name="task" value="" />
