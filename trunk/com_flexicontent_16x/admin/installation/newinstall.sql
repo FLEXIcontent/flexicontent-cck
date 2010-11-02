@@ -17,7 +17,7 @@ VALUES
 
 INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two');
 
-INSERT INTO `jos_flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
+INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
 VALUES
 	(1,1,1),
 	(2,1,2),
