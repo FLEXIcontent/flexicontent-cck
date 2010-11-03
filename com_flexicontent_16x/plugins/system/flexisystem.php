@@ -25,13 +25,11 @@ jimport( 'joomla.plugin.plugin' );
 /**
  * Example system plugin
  */
-class plgSystemFlexisystem extends JPlugin
-{
+class plgSystemFlexisystem extends JPlugin{
 	/**
 	 * Constructor
 	 */
-	function plgSystemFlexisystem( &$subject, $config )
-	{
+	function plgSystemFlexisystem( &$subject, $config ) {
 		parent::__construct( $subject, $config );
 
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
@@ -85,19 +83,19 @@ class plgSystemFlexisystem extends JPlugin
 		$this->redirectSiteComContent();
 	}
 	
-	function redirectAdminComContent()
-	{
-		$app 				=& JFactory::getApplication();
+	function redirectAdminComContent() {
+		$app 			=& JFactory::getApplication();
 		$option 			= JRequest::getCMD('option');
 		$applicationName 	= $app->getName();
 		$user 				=& JFactory::getUser();
-		$minsecs			= $this->params->get('redirect_sections', 24);
-		$mincats			= $this->params->get('redirect_cats', 24);
-		$minarts			= $this->params->get('redirect_articles', 24);
-		
+
+		$mincats			= $this->params->get('redirect_cats', array());
+		$minarts			= $this->params->get('redirect_articles', array());
+		$usergroups = array_keys($user->get('groups'));
+
 		if (!empty($option)) {
 			// if try to access com_content you get redirected to Flexicontent items
-			if ($option == 'com_content' && $applicationName == 'administrator' && $user->gid <= $minarts) {
+			if ($option == 'com_content' && $applicationName == 'administrator' ) {
 				//get task execution
 				$task = JRequest::getCMD('task');
 				// url to redirect
@@ -109,26 +107,33 @@ class plgSystemFlexisystem extends JPlugin
 				} else {
 					$urlItems .= '&view=items';
 				}
-				
-				$app->redirect($urlItems,'');
-				return false;
-
-			} elseif ($option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
-				// url to redirect
-				$urlItems = 'index.php?option=com_flexicontent&view=categories';
-				
-				$scope = JRequest::getVar('scope');
-				if ($scope == 'content') {
+				$redirect = false;
+				if(in_array('-1', $minarts)) {
+					$redirect = false;
+				}elseif(in_array('-2', $minarts)) {
+					$redirect = true;
+				}
+				if($redirect) {
+					$app->redirect($urlItems,'');
+				}elseif(count(array_intersect($usergroups, $minarts))>0) {
 					$app->redirect($urlItems,'');
 				}
 				return false;
-			
-			} elseif ($option == 'com_categories' && $applicationName == 'administrator' && $user->gid <= $mincats) {
+
+			} elseif ($option == 'com_categories' && $applicationName == 'administrator' ) {
 				// url to redirect
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
-				
-				$section = JRequest::getVar('section');
-				if ($section == 'com_content') {
+
+				$extension = JRequest::getVar('extension');
+				$redirect = false;
+				if(in_array('-1', $mincats)) {
+					$redirect = false;
+				}elseif(in_array('-2', $mincats)) {
+					$redirect = true;
+				}
+				if($redirect  && ($extension == 'com_content')) {
+					$app->redirect($urlItems,'');
+				}elseif((count(array_intersect($usergroups, $mincats))>0) && ($extension == 'com_content')) {
 					$app->redirect($urlItems,'');
 				}
 				return false;
