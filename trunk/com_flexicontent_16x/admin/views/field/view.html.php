@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
+jimport('joomla.form.form');
 
 /**
  * View class for the FLEXIcontent field screen
@@ -64,35 +65,22 @@ class FlexicontentViewField extends JView {
 
 		//Get data from the model
 		$model				= & $this->getModel();
-		$row     			= & $this->get( 'Field' );
+		$form				= $this->get('Form');
 		$types				= & $this->get( 'Typeslist' );
 		$typesselected		= & $this->get( 'Typesselected' );
 		JHTML::_('behavior.tooltip');
-		
+
 		//build selectlists
 		$lists = array();
 		//build type select list
 		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
-
-		// build the html select list for ordering
-		$query = 'SELECT ordering AS value, label AS text'
-		. ' FROM #__flexicontent_fields'
-		. ' WHERE published >= 0'
-		. ' ORDER BY ordering'
-		;
-		$row->ordering = @$row->ordering;
-		if($row->id)
-			$lists['ordering'] 			= JHTML::_('list.specificordering',  $row, $row->id, $query );
-		else
-			$lists['ordering'] 			= JHTML::_('list.specificordering',  $row, '', $query );
-
 		//build field_type list
-		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
+		if ($form->getValue("iscore") == 1) { $class = 'disabled="disabled"'; } else {
 			$class = '';
 			$document->addScriptDeclaration("
 					window.addEvent('domready', function() {
-						$$('#field_type').addEvent('change', function(ev) {
-							$('fieldspecificproperties').setHTML('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+						$$('#jform_field_type').addEvent('change', function(ev) {
+							$('fieldspecificproperties').set('html', '<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							var ajaxoptions ={
 								method:'get',
 								onComplete:function(response) {
@@ -100,35 +88,53 @@ class FlexicontentViewField extends JView {
 								},
 								update:$('fieldspecificproperties')
 							};
-							var ajaxobj = new Ajax(
-								'index.php?option=com_flexicontent&controller=fields&task=getfieldspecificproperties&cid=".$row->id."&field_type='+this.value+'&format=raw',
-								ajaxoptions);
-							ajaxobj.request.delay(300, ajaxobj);
+							new Request.HTML({
+								url: 'index.php?option=com_flexicontent&controller=fields&task=getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&format=raw',
+								method: 'get',
+								update: $('fieldspecificproperties'),
+								evalScripts: false,
+								onComplete:function(response) {
+									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
+								}
+							}).send();
 						});
 					});
 				");
 			
 		}
-		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
+		//$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
-		if (FLEXI_ACCESS) {
+		/*if (FLEXI_ACCESS) {
 			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-		}
+		}*/
 
 		// Create the form
-		$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$row->field_type.'.xml';
+		/*$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$form->getValue("field_type").DS.$form->getValue("field_type").'.xml';
+		
 		if (JFile::exists( $pluginpath )) {
-			$form = new JParameter('', $pluginpath);
-		} else {
-			$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
+			$aform = JForm::getInstance('com_flexicontent.field.'.$form->getValue('field_type'), $pluginpath, array('control' => 'jform', 'load_data' => true), false);
+		}else{
+			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core'.DS.'core.xml';
+			$aform = JForm::getInstance('com_flexicontent.field.'.$global_field_types[0]->value, $pluginpath, array('control' => 'jform', 'load_data' => true), false);
 		}
-		// Special and Core Groups
-		$form->loadINI($row->attribs);
+		echo $pluginpath."<br />";
+		var_dump($aform);*/
+		
+		/*if($attribs = $form->getValue("attribs")) {
+			$arrays = explode("\n", $attribs);
+			$params = new JObject();
+			foreach($arrays as $a) {
+				$a = explode("=", $a);
+				$params->$a[0] = @$a[1];
+			}
+			$form->bind($params);
+			unset($params);
+		}*/
 
 		// fail if checked out not by 'me'
-		if ($row->id) {
+		if ($form->getValue("id")) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
@@ -143,7 +149,8 @@ class FlexicontentViewField extends JView {
 		$this->assignRef('row'      	, $row);
 		$this->assignRef('lists'      	, $lists);
 //		$this->assignRef('tmpls'      	, $tmpls);
-		$this->assignRef('form'			, $form);
+		//$this->assignRef('aform'	, $aform);
+		$this->assignRef('form'		, $form);
 
 		parent::display($tpl);
 	}

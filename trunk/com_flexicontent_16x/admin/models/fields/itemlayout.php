@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 
 /**
  * Renders a author element
@@ -26,20 +30,37 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JElementItemlayout extends JElement
-{
+class JFormFieldItemlayout extends JFormFieldList{
 	/**
-	 * Element name
-	 * @access	protected
+	 * The form field type.
+	 *
 	 * @var		string
+	 * @since	1.6
 	 */
-	var	$_name = 'Itemlayout';
+	protected $type = 'Itemlayout';
+	
+	/**
+	 * Method to get the field input markup.
+	 *
+	 * @return	string	The field input markup.
+	 * @since	1.6
+	 */
+	protected function getInput() {
+		$name = $this->name;
+		$value = $this->value;
+		
+		$control_name = 'attribs';
+		$options = (array) $this->getOptions();
+		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
+		return JHTMLSelect::genericList($options, $name, $class, 'value', 'text', $value, $control_name.$name);
+	}
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
+	protected function getOptions() {
+		//$name, $value, &$node, $control_name
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->items;
-		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
+		$value = $this->value;
+		
 		$view	= JRequest::getVar('view');
 
 		$lays = array();
@@ -47,7 +68,7 @@ class JElementItemlayout extends JElement
 			$lays[] = $tmpl->name;
 		}
 		$lays = implode("','", $lays);
-
+		
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
@@ -94,7 +115,6 @@ window.addEvent('domready', function(){
 });
 ";
 		$doc->addScriptDeclaration($js);
-
 		if ($tmpls !== false) {
 			if ($view != 'type') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
@@ -103,8 +123,7 @@ window.addEvent('domready', function(){
 				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
 			}
 		}
-
-		return JHTMLSelect::genericList($layouts, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
+		return $layouts;
 	}
 }
 ?>

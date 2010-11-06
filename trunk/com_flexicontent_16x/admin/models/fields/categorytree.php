@@ -19,8 +19,7 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	com_categories
  * @since		1.6
  */
-class JFormFieldCategoryTree extends JFormFieldList
-{
+class JFormFieldCategoryTree extends JFormFieldList{
 	/**
 	 * The form field type.
 	 *
@@ -35,8 +34,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 	 * @return	string	The field input markup.
 	 * @since	1.6
 	 */
-	protected function getInput()
-	{
+	protected function getInput() {
 		// Initialize variables.
 		$html = array();
 		$attr = '';
@@ -120,7 +118,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 		$filter = (bool)$this->element->getAttribute('filter');
 		if($top == 1) {
 			$obj = new stdClass;
-			$obj->value = '';
+			$obj->value = FLEXI_CATEGORY;
 			$obj->level = 0;
 			$obj->text = JText::_( 'FLEXI_TOPLEVEL' );
 			$catlist[] 	= $obj;
@@ -135,7 +133,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 		foreach ($globalcats as $item) {
 			if ((!$published) || ($published && $item->published)) {
 				//if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
-				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($item->lft >= $globalcats[$cid[0]]->lft && $item->rgt <= $globalcats[$cid[0]]->rgt)) {
+				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($item->lft >= @$globalcats[$cid[0]]->lft && $item->rgt <= @$globalcats[$cid[0]]->rgt)) {
 					if($top == 2) {
 						if($cid[0] != $item->id) {
 							$obj = new stdClass;
@@ -148,7 +146,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 						}
 					}
 				} else if ($filter) {
-					if (FLEXI_ACCESS && (!in_array($item->id, $usercats)) && ($user->gid < 25)) {
+					if ( !in_array($item->id, $usercats) ) {
 						if ($viewallcats) { // only disable cats in the list else don't show them at all
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}

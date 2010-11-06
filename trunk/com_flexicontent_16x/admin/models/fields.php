@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modellist');
 
 /**
  * FLEXIcontent Component fields Model
@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFields extends JModel
-{
+class FlexicontentModelFields extends JModelList{
 	/**
 	 * Field data
 	 *
@@ -63,8 +62,7 @@ class FlexicontentModelFields extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		$mainframe = &JFactory::getApplication();
@@ -81,7 +79,6 @@ class FlexicontentModelFields extends JModel
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
 		$this->setId((int)$array[0]);
-
 	}
 
 	/**
@@ -95,42 +92,6 @@ class FlexicontentModelFields extends JModel
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
-	}
-
-	/**
-	 * Method to get fields data
-	 *
-	 * @access public
-	 * @return array
-	 */
-	function getData()
-	{
-		// Lets load the fields if it doesn't already exist
-		if (empty($this->_data))
-		{
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-		}
-
-		return $this->_data;
-	}
-
-	/**
-	 * Method to get the total nr of the fields
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getTotal()
-	{
-		// Lets load the fields if it doesn't already exist
-		if (empty($this->_total))
-		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
-		}
-
-		return $this->_total;
 	}
 
 	/**
@@ -158,24 +119,76 @@ class FlexicontentModelFields extends JModel
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQuery()
-	{
+	function getListQuery() {
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where		= $this->_buildContentWhere();
-		$orderby	= $this->_buildContentOrderBy();
-		$having		= $this->_buildContentHaving();
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$db = &JFactory::getDBO();
+		$query = $db->getQuery(true);
 
-		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering'
-					. ' FROM #__flexicontent_fields AS t'
-					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
-					. ' LEFT JOIN #__groups AS g ON g.id = t.access'
-					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-					. $where
-					. ' GROUP BY t.id'
-					. $having
-					. $orderby
-					;
-					
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
+		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
+		if ($filter_type && $filter_order == 't.ordering') {
+			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 'typeordering' );
+		} else if (!$filter_type && $filter_order == 'typeordering') {
+			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 't.ordering' );
+		}
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
+		
+		// Select the required fields from the table.
+		$query->select(
+			$this->getState(
+				'list.select',
+				't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering'
+			)
+		);
+		$query->from('#__flexicontent_fields AS t');
+		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
+		$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
+		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
+		if ( $filter_iscore ) {
+			if ( $filter_iscore == 'C' ) {
+				$query->where('t.iscore = 1');
+			} else if ($filter_iscore == 'NC' ) {
+				$query->where('t.iscore = 0');
+			} else if ($filter_iscore == 'BV' ) {
+				$query->where('(t.iscore = 0 OR t.id = 1)');
+			}
+		}
+
+		if ( $filter_state ) {
+			if ( $filter_state == 'P' ) {
+				$query->where('t.published = 1');
+			} else if ($filter_state == 'U' ) {
+				$query->where('t.published = 0');
+			}
+		}
+
+		if ( $filter_type ) {
+			$query->where('rel.type_id = ' . $filter_type);
+		}
+
+		if ($search) {
+			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
+		}
+		
+		$query->group('t.id');
+		if ( $filter_assigned ) {
+			if ( $filter_assigned == 'O' ) {
+				$query->having('COUNT(rel.type_id) = 0');
+			} else if ($filter_assigned == 'A' ) {
+				$query->having('COUNT(rel.type_id) > 0');
+			}
+		}
+
+		$query->order($filter_order.' '.$filter_order_Dir);
+		//echo str_replace("#__", "jos_", $query->__toString());	
 		return $query;
 	}
 
@@ -212,8 +225,7 @@ class FlexicontentModelFields extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
-	{
+	function _buildContentWhere() {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 

@@ -61,14 +61,10 @@ class FlexicontentControllerCategories extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$task		= JRequest::getVar('task');
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		// define the rights for correct redirecting the save task
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-		} else {
-			$CanCats 	= 1;
-		}
+		$CanCats 	= $permission->CanCats;
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
@@ -77,7 +73,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model = $this->getModel('category');
 
 		if ( $model->store($post) ) {
-
 			switch ($task)
 			{
 				case 'apply' :
@@ -100,9 +95,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 			
 			//Take care of access levels and state
 			$categoriesmodel = & $this->getModel('categories');
-			if (!FLEXI_ACCESS) {
+			/*if (!FLEXI_ACCESS) {
 				$categoriesmodel->access($model->get('id'), $model->get('access'));
-			}
+			}*/
 			
 			$pubid = array();
 			$pubid[] = $model->get('id');
@@ -117,8 +112,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 
-		} else {
-
+		} else {exit;
 			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY' );
 			JError::raiseError( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=category';

@@ -27,7 +27,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewField extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 		$user 		= & JFactory::getUser();
@@ -40,29 +39,35 @@ class FlexicontentViewField extends JView {
 		
 		//Get data from the model
 		$model			= & $this->getModel();
-		$row     			= & $this->get( 'Field' );
+		$form		= $this->get('Form');
 
 		//Import File system
 		jimport('joomla.filesystem.file');
 		
 		// Create the form
-		$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
+		/*$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
 		if (JFile::exists( $pluginpath )) {
 			$form = new JParameter('', $pluginpath);
 		} else {
 			$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
 		}
-		$form->loadINI($row->attribs);
+		$form->loadINI($row->attribs);*/
 		// fail if checked out not by 'me'
-		if ($row->id) {
+		if ($form->getValue("id")) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
-		if ($field_type)
-		{
-			echo $form->render('params', 'group-' . $field_type );
+		if ($field_type) {
+			foreach($form->getFieldset('group-' . $field_type) as $field) :
+				?>
+				<fieldset class="panelform">
+				<?php echo $field->label; ?>
+				<?php echo $field->input; ?>
+				</fieldset>
+				<?php
+			endforeach;
 		} else {
 			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 		}

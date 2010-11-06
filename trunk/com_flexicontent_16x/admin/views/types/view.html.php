@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewTypes extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -78,8 +77,8 @@ class FlexicontentViewTypes extends JView {
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows      	= & $this->get( 'Items');
+		$this->pagination 	= & $this->get( 'Pagination' );
 
 		$lists = array();
 		
@@ -97,7 +96,6 @@ class FlexicontentViewTypes extends JView {
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('user'      	, $user);
-		$this->assignRef('pageNav' 		, $pageNav);
 
 		parent::display($tpl);
 	}

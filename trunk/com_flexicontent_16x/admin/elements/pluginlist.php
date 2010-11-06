@@ -18,7 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 /**
  * Renders the list of the content plugins
  *
@@ -26,8 +29,7 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementPluginlist extends JElement
-{
+class JFormFieldPluginlist extends JFormFieldList{
 	/**
 	 * Element name
 	 * @access	protected
@@ -35,17 +37,19 @@ class JElementPluginlist extends JElement
 	 */
 	var	$_name = 'Pluginlist';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
-
+	function getInput() {
+		//$name, $value, &$node, $control_name
+		$name = $this->name;
+		$value = $this->value;
 		$plugins 	= array();
 //		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
 		$db =& JFactory::getDBO();
 		
 		$query  = 'SELECT element AS name'
-				. ' FROM #__plugins'
+				. ' FROM #__extensions'
 				. ' WHERE folder = ' . $db->Quote('content')
+				. ' AND `type`=' . $db->Quote('plugin')
 				. ' AND element NOT IN ('.$db->Quote('pagebreak').','.$db->Quote('pagenavigation').','.$db->Quote('vote').')'
 				. ' ORDER BY name';
 		
@@ -57,7 +61,6 @@ class JElementPluginlist extends JElement
 		}
 
 		$class = 'class="inputbox" multiple="true" size="5"';
-		
-		return JHTMLSelect::genericList($plugins, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
+		return JHTMLSelect::genericList($plugins, $name, $class, 'value', 'text', $value, $name);
 	}
 }

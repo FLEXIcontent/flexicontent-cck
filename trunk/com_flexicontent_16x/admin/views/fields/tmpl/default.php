@@ -70,7 +70,7 @@ defined('_JEXEC') or die('Restricted access');
 	<tfoot>
 		<tr>
 			<td colspan="14">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -78,25 +78,40 @@ defined('_JEXEC') or die('Restricted access');
 	<tbody>
 		<?php
 		$k = 0;
-		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
-			$row = $this->rows[$i];
-
+		$i = 0;
+		$n = count($this->rows);
+		foreach($this->rows as $row) {
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=fields&amp;task=edit&amp;cid[]='. $row->id;
 			if ($row->id > 6) {
-			$published 	= JHTML::_('grid.published', $row, $i );
+				$published 	= JHTML::_('grid.published', $row, $i );
 			} else {
-			$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );;
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			}
-			if (FLEXI_ACCESS) {
-				$access 	= FAccess::accessswitch('field', $row, $i);
-			} else {
-				$access 	= JHTML::_('grid.access', $row, $i );
+			
+			if( $row->isfilter ) {
+				$isfilter = "tick.png";
+			}else{
+				$isfilter = "publish_x.png";
 			}
+			
+			if( $row->issearch ) {
+				$issearch = "tick.png";
+			}else{
+				$issearch = "publish_x.png";
+			}
+			
+			if( $row->isadvsearch ) {
+				$isadvsearch = "tick.png";
+			}else{
+				$isadvsearch = "publish_x.png";
+			}
+			
+			$access 	= JHTML::_('grid.access', $row, $i );
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
@@ -124,9 +139,9 @@ defined('_JEXEC') or die('Restricted access');
 				}
 				?>
 			</td>
-			<td align="center"><img src="images/<?php echo ( $row->isfilter ) ? 'tick.png' : 'publish_x.png'; ?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-			<td align="center"><img src="images/<?php echo ( $row->issearch ) ? 'tick.png' : 'publish_x.png'; ?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-			<td align="center"><img src="images/<?php echo ( $row->isadvsearch ) ? 'tick.png' : 'publish_x.png'; ?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
 			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
 			<td align="center">
 				<?php echo $access; ?>
@@ -135,9 +150,9 @@ defined('_JEXEC') or die('Restricted access');
 				<?php echo $published; ?>
 			</td>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pagination->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
 
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
@@ -148,7 +163,7 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
-		<?php $k = 1 - $k; } ?>
+		<?php $k = 1 - $k; $i++;} ?>
 	</tbody>
 
 	</table>

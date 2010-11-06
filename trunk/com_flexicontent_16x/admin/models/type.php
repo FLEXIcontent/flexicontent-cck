@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modeladmin');
 
 /**
  * FLEXIcontent Component Type Model
@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelType extends JModel
-{
+class FlexicontentModelType extends JModelAdmin{
 	/**
 	 * Type data
 	 *
@@ -42,8 +41,7 @@ class FlexicontentModelType extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -98,7 +96,81 @@ class FlexicontentModelType extends JModel
 		
 		return $this->_type;
 	}
+	
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true) {
+		// Initialise variables.
+		$app = JFactory::getApplication();
 
+		// Get the form.
+		$form = $this->loadForm('com_flexicontent.type', 'type', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) {
+			return false;
+		}
+
+		return $form;
+	}
+	
+	/**
+	 * Method to get a single record.
+	 *
+	 * @param	integer	$pk	The id of the primary key.
+	 *
+	 * @return	mixed	Object on success, false on failure.
+	 * @since	1.6
+	 */
+	public function getItem($pk = null) {
+		// Initialise variables.
+		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
+		$table	= $this->getTable('flexicontent_types', '');
+
+		if ($pk > 0) {
+			// Attempt to load the row.
+			$return = $table->load($pk);
+
+			// Check for a table object error.
+			if ($return === false && $table->getError()) {
+				$this->setError($table->getError());
+				return false;
+			}
+		}
+
+		// Convert to the JObject before adding other data.
+		$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+
+		if (property_exists($item, 'attribs')) {
+			$registry = new JRegistry;
+			$registry->loadJSON($item->attribs);
+			$item->attribs = $registry->toArray();
+		}
+
+		return $item;
+	}
+	
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData()
+	{
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.type.data', array());
+
+		if (empty($data)) {
+			$data = $this->getItem();
+		}
+
+		return $data;
+	}
 
 	/**
 	 * Method to load type data
@@ -221,22 +293,20 @@ class FlexicontentModelType extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data)
-	{
+	function store($data) {
 		$type  =& $this->getTable('flexicontent_types', '');
 
 		// bind it to the table
-		if (!$type->bind($data)) {
+		if (!$type->bind($data['jform'])) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
 
-		$params		= JRequest::getVar( 'params', null, 'post', 'array' );
+		$attribs		= $data['jform']['attribs'];
 		// Build parameter INI string
-		if (is_array($params))
-		{
+		if (is_array($attribs)) {
 			$txt = array ();
-			foreach ($params as $k => $v) {
+			foreach ($attribs as $k => $v) {
 				if (is_array($v)) {
 					$v = implode('|', $v);
 				}
@@ -267,16 +337,13 @@ class FlexicontentModelType extends JModel
 				$obj = new stdClass();
 				$obj->field_id	 	= (int)$fieldid;
 				$obj->type_id		= $type->id;
-
 				$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
 			}
 		}
-
 		return true;
 	}
 	
-	function addtype($name){
-		
+	function addtype($name) {
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
@@ -299,6 +366,37 @@ class FlexicontentModelType extends JModel
 		
 		return $corefields;
 	}
+	/**
+	 * Auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @since	1.6
+	 */
+	protected function populateState() {
+		$app = JFactory::getApplication('administrator');
 
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
+			$extension = JRequest::getCmd('extension', 'com_flexicontent');
+		}
+		// Load the User state.
+		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
+			$cid = JRequest::getVar('cid', array(0));
+			$pk = (int)$cid[0];
+		}
+		$this->setState($this->getName().'.id', $pk);
+
+
+		$this->setState('com_flexicontent.type.extension', $extension);
+		$parts = explode('.',$extension);
+		// extract the component name
+		$this->setState('com_flexicontent.type.component', $parts[0]);
+		// extract the optional section name
+		$this->setState('com_flexicontent.type.section', (count($parts)>1)?$parts[1]:null);
+
+		// Load the parameters.
+		//$params	= JComponentHelper::getParams('com_flexicontent');
+		//$this->setState('params', $params);
+	}
 }
 ?>

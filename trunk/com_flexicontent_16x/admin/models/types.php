@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modellist');
 
 /**
  * FLEXIcontent Component types Model
@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelTypes extends JModel
-{
+class FlexicontentModelTypes extends JModelList{
 	/**
 	 * Type data
 	 *
@@ -94,144 +93,62 @@ class FlexicontentModelTypes extends JModel
 	}
 
 	/**
-	 * Method to get types data
-	 *
-	 * @access public
-	 * @return array
-	 */
-	function getData()
-	{
-		// Lets load the types if it doesn't already exist
-		if (empty($this->_data))
-		{
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-		}
-		return $this->_data;
-	}
-
-	/**
-	 * Method to get the total nr of the types
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getTotal()
-	{
-		// Lets load the types if it doesn't already exist
-		if (empty($this->_total))
-		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
-		}
-
-		return $this->_total;
-	}
-
-	/**
-	 * Method to get a pagination object for the types
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getPagination()
-	{
-		// Lets load the types if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
-		}
-
-		return $this->_pagination;
-	}
-
-	/**
 	 * Method to build the query for the types
 	 *
 	 * @access private
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQuery()
-	{
+	function getListQuery() {
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where		= $this->_buildContentWhere();
-		$orderby	= $this->_buildContentOrderBy();
-//		$having		= $this->_buildContentHaving();
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$db = &JFactory::getDBO();
+		$query = $db->getQuery(true);
+
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
+		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+
+
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
 		$subquery = 'SELECT COUNT(type_id)'
 					. ' FROM #__flexicontent_items_ext'
 					. ' WHERE type_id = t.id'
 					;
-
-		$query = 'SELECT t.*, u.name AS editor, g.name AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned'
-					. ' FROM #__flexicontent_types AS t'
-					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id'
-					. ' LEFT JOIN #__groups AS g ON g.id = t.access'
-					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-					. $where
-					. ' GROUP BY t.id'
-//					. $having
-					. $orderby
-					;
-					
-
-		return $query;
-
-	}
-
-	/**
-	 * Method to build the orderby clause of the query for the types
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentOrderBy() {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
-
-		return $orderby;
-	}
-
-	/**
-	 * Method to build the where clause of the query for the types
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentWhere() {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		$where = array();
-
+		// Select the required fields from the table.
+		$query->select(
+			$this->getState(
+				'list.select',
+				't.*, u.name AS editor, g.title AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned'
+			)
+		);
+		
+		$query->from('#__flexicontent_types AS t');
+		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id');
+		$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
+		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
+		$query->group('t.id');
+		
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
-				$where[] = 't.published = 1';
+				$query->where('t.published = 1');
 			} else if ($filter_state == 'U' ) {
-				$where[] = 't.published = 0';
+				$query->where('t.published = 0');
 			}
 		}
 
 		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
 		}
+		$query->order($filter_order.' '.$filter_order_Dir);
+		//echo str_replace("#__", "jos_", $query->__toString());
 
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		return $query;
 
-		return $where;
 	}
 	
 	/**

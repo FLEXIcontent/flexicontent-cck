@@ -64,6 +64,7 @@ class FlexicontentViewType extends JView {
 		//Get data from the model
 		$model		= & $this->getModel();
 		$row     	= & $this->get( 'Type' );
+		$this->iform		= $this->get('Form');
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
 
@@ -79,15 +80,15 @@ class FlexicontentViewType extends JView {
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//create the parameter form
-		$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'type.xml');
+		/*$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'type.xml');
 		$form->loadINI($row->attribs);
 		foreach ($tmpls as $tmpl) {
 			$tmpl->params->loadINI($row->attribs);
-		}
+		}*/
 
 		//assign data to template
 		$this->assignRef('row'      	, $row);
-		$this->assignRef('form'			, $form);
+		//$this->assignRef('form'			, $form);
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('tmpls'		, $tmpls);
 

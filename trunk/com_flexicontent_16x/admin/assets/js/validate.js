@@ -79,7 +79,7 @@ var JFormValidator = new Class({
 		// Iterate through the form object and attach the validate method to all input fields.
 		$A(form.elements).each(function(el){
 			el = $(el);
-			if ((el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit') {
+			if ((el.get('tag') == 'input' || el.get('tag') == 'button') && el.getProperty('type') == 'submit') {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}

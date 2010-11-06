@@ -192,8 +192,7 @@ foreach ($fieldSets as $name => $fieldSet) :
 	</fieldset>
 <?php endforeach; ?>
 <?php echo JHtml::_('sliders.end'); ?>
-				<?php echo $this->pane->endPane();
-				?>
+				<?php echo $this->pane->endPane();?>
 			</td>
 		</tr>
 	</table>

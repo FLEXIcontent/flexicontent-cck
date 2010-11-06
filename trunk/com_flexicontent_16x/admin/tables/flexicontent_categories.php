@@ -25,13 +25,21 @@ defined('_JEXEC') or die('Restricted access');
 class flexicontent_categories extends JTableNested
 {
 	/** @var int Primary key */
-	var $id					= null;
+	var $id				= null;
 	/** @var int */
+	var $asset_id			= null;
 	var $parent_id			= null;
+	var $lft			= null;
+	var $rgt			= null;
+	var $level			= null;
+	/** @var string */
+	var $path			= null;
+	var $extension=null;
 	/** @var string The menu title for the category (a short name)*/
-	var $title				= null;
+	var $title			= null;
 	/** @var string The the alias for the category*/
-	var $alias				= null;
+	var $alias			= null;
+	var $note			= null;
 	/** @var string */
 	var $description		= null;
 	/** @var boolean */
@@ -41,18 +49,20 @@ class flexicontent_categories extends JTableNested
 	/** @var time */
 	var $checked_out_time	= 0;
 	/** @var int */
-	var $ordering			= null;
+	//var $ordering			= null;
 	/** @var int */
-	var $access				= null;
+	var $access			= null;
 	/** @var string */
-	var $params				= null;
-	
-	var $asset_id=null;
-	var $lft=null;
-	var $rgt=null;
-	var $level=null;
-	var $path=null;
-	var $extension=null;
+	var $params			= null;
+	var $metadesc			= null;
+	var $metakey			= null;
+	var $metadata			= null;
+	var $created_user_id		= null;
+	var $created_time		= null;
+	var $modified_user_id		= null;
+	var $modified_time		= null;
+	var $hits			= null;
+	var $language			= null;
 
 	/**
 	* @param database A database connector object
