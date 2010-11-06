@@ -60,6 +60,13 @@
 		description =""
 		class="inputbox" />
 	<field
+		name="iscore"
+		type="hidden"
+		default="0"
+		label="iscore"
+		description =""
+		class="inputbox" />
+	<field
 		name="issearch"
 		type="booleanlist"
 		default="1"

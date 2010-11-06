@@ -42,7 +42,7 @@ class JFormFieldFieldtypeslist extends JFormFieldList{
 	protected function getOptions() {
 		global $global_field_types;
 		$db =& JFactory::getDBO();
-		
+
 		$query = 'SELECT element AS value, name AS text'
 		. ' FROM #__extensions'
 		. ' WHERE enabled = 1'
