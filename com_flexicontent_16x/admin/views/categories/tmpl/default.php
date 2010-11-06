@@ -20,6 +20,8 @@ defined('_JEXEC') or die('Restricted access');
 $listOrder	= $this->state->get('list.ordering');
 $listDirn	= $this->state->get('list.direction');
 $saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
+$user		= &JFactory::getUser();
+$userId		= $user->get('id');
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table class="adminform">
@@ -48,7 +50,7 @@ $saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="90">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
+				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
 			</th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
@@ -57,7 +59,7 @@ $saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
 	<tfoot>
 		<tr>
 			<td colspan="10">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -67,40 +69,38 @@ $saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
 		$k = 0;
 		$i = 0;
 		$n = count($this->rows);
+		$canEdit	= $this->permission->CanCats;
 		foreach ($this->rows as $row) {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
-			/*if (FLEXI_ACCESS) {
-				if ($this->permission->CanRights) {
-					$access 	= FAccess::accessswitch('category', $row, $i);
-				} else {
-					$access 	= FAccess::accessswitch('category', $row, $i, 'content', 1);
-				}
-			} else {*/
-				$access 	= JHTML::_('grid.access', $row, $i );
-			//}
+			$access 	= JHTML::_('grid.access', $row, $i );
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
+			$canEditOwn	= $user->authorise('core.edit.own', '#__categories.'.$row->id) && ($row->created_user_id == $userId);
+			$canCheckin	= $user->authorise('core.admin', 'com_checkin') || ($row->checked_out == $userId) || ($row->checked_out == 0);
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
-				<?php
-				if ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) {
-					// echo htmlspecialchars($row->treename.$row->title, ENT_QUOTES, 'UTF-8');
-					echo $row->treename . htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-				} else {
-				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">
-					<?php echo $row->treename.' ';?>
-					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
-				<?php
-				}
-				?>
+				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $row->level-1) ?>
+						<?php if ($row->checked_out) : ?>
+							<?php echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin); ?>
+						<?php endif; ?>
+						<?php if ($canEdit || $canEditOwn) : ?>
+							<a href="<?php echo $link;?>">
+								<?php echo $this->escape($row->title); ?></a>
+						<?php else : ?>
+							<?php echo $this->escape($row->title); ?>
+						<?php endif; ?>
+						<p class="smallsub" title="<?php echo $this->escape($row->path);?>">
+							<?php echo str_repeat('<span class="gtr">|&mdash;</span>', $row->level-1) ?>
+							<?php if (empty($row->note)) : ?>
+								<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($row->alias));?>
+							<?php else : ?>
+								<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS_NOTE', $this->escape($row->alias), $this->escape($row->note));?>
+							<?php endif; ?></p>
 			</td>
 			<td>
 				<?php
@@ -123,17 +123,9 @@ $saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
 				<?php echo $access; ?>
 			</td>
 			<td class="order">
-				<?php /*<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
-
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
-
-				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
-
-				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
-				*/?>
 				<?php if ($saveOrder) : ?>
-					<span><?php echo $this->pageNav->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
-					<span><?php echo $this->pageNav->orderDownIcon($i, $this->pageNav->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
+					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
+					<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
 				<?php endif; ?>
 				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
 				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" />

@@ -18,7 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-jimport('joomla.form.field');
+jimport('joomla.form.formfield');
 /**
  * Renders a fields element
  *
@@ -27,8 +27,7 @@ jimport('joomla.form.field');
  * @since		1.5
  */
  
-class JFormFieldSeparator extends JFormField
-{
+class JFormFieldSeparator extends JFormField{
 	/**
 	 * Element name
 	 * @access	protected

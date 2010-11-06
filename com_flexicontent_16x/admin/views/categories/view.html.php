@@ -36,11 +36,11 @@ class FlexicontentViewCategories extends JView {
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search 			= $db->getEscaped( trim($search) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -79,28 +79,6 @@ class FlexicontentViewCategories extends JView {
 		$this->pagination	= $this->get('Pagination');
 		$children = array();
 		
-		//set depth limit
-   		$levellimit = 10;
-		foreach ($rows as $child) {
-			$parent = $child->parent_id;
-			$list 	= @$children[$parent] ? $children[$parent] : array();
-			array_push($list, $child);
-			$children[$parent] = $list;
-		}
-		
-		//get list of the items
-		$rows = flexicontent_cats::treerecurse(FLEXI_CATEGORY, '', array(), $children, false, max(0, $levellimit-1));
-		
-		$pageNav 	= & $this->get( 'Pagination' );
-		/*$categories 	= $globalcats;
-		if($permission->CanCats || $permission->CanAdd || $permission->CanEdit) {
-			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
-			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, false);
-		}else{
-			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
-			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
-		}*/
-		
 		// Preprocess the list of items to find ordering divisions.
 		foreach ($rows as &$item) {
 			$this->ordering[$item->parent_id][] = $item->id;
@@ -116,13 +94,13 @@ class FlexicontentViewCategories extends JView {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.ordering') ? 'c.ordering' : '';
+		$ordering = ($lists['order'] == 'c.lft') ? 'c.lft' : '';
 
 		//assign data to template
 		$this->assignRef('lists'      		, $lists);
 		$this->assignRef('rows'      		, $rows);
 		$this->assignRef('permission'      	, $permission);
-		$this->assignRef('pageNav' 		, $pageNav);
+		//$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('orderingx'		, $ordering);
 		$this->assignRef('user'			, $user);
 

@@ -25,7 +25,7 @@ var itemscreen = new Class(
 		if(typeof options!="undefined") {
 			dooptions = options;
 		}
-		$(doname).setHTML('<p class="qf_centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		$(doname).set('html', '<p class="qf_centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		var ajax = new Ajax(this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id, dooptions);
 		ajax.request.delay(300, ajax);
 	},

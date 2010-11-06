@@ -12,14 +12,15 @@
 	<files>
 		<filename plugin="linkslist">linkslist.php</filename>
 	</files>
-	<params group="standard">
-		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+	<config>
+	<fieldset name="standard">
+		<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
-		</param>
-	</params>
-	<params group="group-linkslist">
-		<param type="spacer" name="test" default="&lt;script type=&quot;text/javascript&quot;&gt; window.addEvent('domready', function(){
+		</field>
+	</fieldset>
+	<fieldset name="group-linkslist">
+		<field type="spacer" name="test" default="&lt;script type=&quot;text/javascript&quot;&gt; window.addEvent('domready', function(){
 		
 			var label 		= $('paramsfield_elements-lbl'),
 				labelcell   = label.getParent().getParent(),
@@ -34,14 +35,15 @@
 			$('paramsfield_elements').getParent().setProperty('colspan', 2).addClass('paramlist_key'); 
 		
 		}); &lt;/script&gt;" />
-		<param name="field_elements" type="textarea" default="" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
-		<param name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
+		<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
+		<field name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
 			<option value="ul">Unordered list</option>
 			<option value="ol">Ordered list</option>
-		</param>
-		<param name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
-		<param name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
-	</params>
+		</field>
+		<field name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
+		<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
+	</fieldset>
+	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_linkslist.ini</language>
 	</languages>

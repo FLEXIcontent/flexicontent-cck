@@ -235,8 +235,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data)
-	{
+	function store($data) {
 		$pk		= (!empty($data['id'])) ? $data['id'] : (int)$this->getState($this->getName().'.id');
 		$isNew	= true;
 		
@@ -276,9 +275,9 @@ class FlexicontentModelCategory extends JModelAdmin
 			$category->setRules($rules);
 		}
 
-		if (!$category->id) {
+		/*if (!$category->id) {
 			$category->ordering = $category->getNextOrder();
-		}
+		}*/
 		
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		$params			= $data["jform"]["params"];
@@ -318,6 +317,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$this->setError($category->getError());
 			return false;
 		}
+		$category->checkin();
 		
 		/*if (FLEXI_ACCESS) {
 			FAccess::saveaccess( $category, 'category' );
@@ -377,10 +377,10 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true) {
 		// Initialise variables.
-		$extension	= $this->getState('flexicontent_categories.extension');
+		$extension	= $this->getState('com_flexicontent.category.extension');
 
 		// Get the form.
-		$form = $this->loadForm('com_flexicontent.flexicontent_categories'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
+		$form = $this->loadForm('com_flexicontent.category'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form)) {
 			return false;
 		}
@@ -409,8 +409,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	mixed	The data for the form.
 	 * @since	1.6
 	 */
-	protected function loadFormData()
-	{
+	protected function loadFormData() {
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
@@ -432,8 +431,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		if ($result = parent::getItem($pk)) {
 			// Prime required properties.
 			if (empty($result->id)) {
-				$result->parent_id	= $this->getState('flexicontent_categories.parent_id');
-				$result->extension	= $this->getState('flexicontent_categories.extension');
+				$result->parent_id	= $this->getState('com_flexicontent.category.parent_id');
+				$result->extension	= $this->getState('com_flexicontent.category.extension');
 			}
 
 			// Convert the metadata field to an array.
@@ -476,6 +475,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
 		return JTable::getInstance($type, $prefix, $config);
 	}
+
 	/**
 	 * Auto-populate the model state.
 	 *
@@ -483,14 +483,13 @@ class FlexicontentModelCategory extends JModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function populateState()
-	{
+	protected function populateState() {
 		$app = JFactory::getApplication('administrator');
 
 		if (!($parentId = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.parent_id'))) {
 			$parentId = JRequest::getInt('parent_id');
 		}
-		$this->setState('flexicontent_categories.parent_id', $parentId);
+		$this->setState('com_flexicontent.category.parent_id', $parentId);
 
 		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
 			$extension = JRequest::getCmd('extension', 'com_content');
@@ -503,12 +502,12 @@ class FlexicontentModelCategory extends JModelAdmin
 		$this->setState($this->getName().'.id', $pk);
 
 
-		$this->setState('flexicontent_categories.extension', $extension);
+		$this->setState('com_flexicontent.category.extension', $extension);
 		$parts = explode('.',$extension);
 		// extract the component name
-		$this->setState('flexicontent_categories.component', $parts[0]);
+		$this->setState('com_flexicontent.category.component', $parts[0]);
 		// extract the optional section name
-		$this->setState('flexicontent_categories.section', (count($parts)>1)?$parts[1]:null);
+		$this->setState('com_flexicontent.category.section', (count($parts)>1)?$parts[1]:null);
 
 		// Load the parameters.
 		$params	= JComponentHelper::getParams('com_flexicontent');

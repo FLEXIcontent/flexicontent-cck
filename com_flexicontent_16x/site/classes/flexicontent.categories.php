@@ -146,12 +146,12 @@ class flexicontent_cats {
     * @access public
     * @return array
     */
-	function treerecurse( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
 	{
 		if (!$ancestors) $ancestors = array();
 		
-		if (@$children[$id] && $level <= $maxlevel) {
-			foreach ($children[$id] as $v) {
+		if (@$children[$parent_id] && $level <= $maxlevel) {
+			foreach ($children[$parent_id] as $v) {
 				$id = $v->id;
 				
 				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
@@ -167,13 +167,13 @@ class flexicontent_cats {
 				}
 
 				if ($title) {
-					if ( $v->parent_id == 0 ) {
+					if ( $v->parent_id == FLEXI_CATEGORY ) {
 						$txt    = ''.$v->title;
 					} else {
 						$txt    = $pre.$v->title;
 					}
 				} else {
-					if ( $v->parent_id == 0 ) {
+					if ( $v->parent_id == FLEXI_CATEGORY ) {
 						$txt    = '';
 					} else {
 						$txt    = $pre;
@@ -181,7 +181,7 @@ class flexicontent_cats {
 				}
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 		= "$indent$txt";
+				$list[$id]->treename 		= "{$indent}{$txt}";
 				$list[$id]->ancestors 		= $ancestors;
 				$list[$id]->childrenarray 	= @$children[$id];
 				$list[$id]->children 		= count( @$children[$id] );

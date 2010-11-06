@@ -27,15 +27,13 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerFields extends FlexicontentController
-{
+class FlexicontentControllerFields extends FlexicontentController{
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		// Register Extra task

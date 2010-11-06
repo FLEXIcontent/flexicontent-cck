@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modeladmin');
 
 /**
  * FLEXIcontent Component Field Model
@@ -28,8 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelField extends JModel
-{
+class FlexicontentModelField extends JModelAdmin{
 	/**
 	 * Field data
 	 *
@@ -42,8 +41,7 @@ class FlexicontentModelField extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -56,8 +54,7 @@ class FlexicontentModelField extends JModel
 	 * @access	public
 	 * @param	int field identifier
 	 */
-	function setId($id)
-	{
+	function setId($id) {
 		// Set field id and wipe data
 		$this->_id	    = $id;
 		$this->_field	= null;
@@ -72,8 +69,7 @@ class FlexicontentModelField extends JModel
 	 * @return 	mixed 				The value of the property
 	 * @since	1.0
 	 */
-	function get($property, $default=null)
-	{
+	function get($property, $default=null) {
 		if ($this->_loadField()) {
 			if(isset($this->_field->$property)) {
 				return $this->_field->$property;
@@ -125,6 +121,186 @@ class FlexicontentModelField extends JModel
 			return (boolean) $this->_field;
 		}
 		return true;
+	}
+	
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true) {
+		// Initialise variables.
+		$app = JFactory::getApplication();
+
+		// Get the form.
+		$form = $this->loadForm('com_flexicontent.field', 'field', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) {
+			return false;
+		}
+
+		return $form;
+	}
+	
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData()
+	{
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.type.data', array());
+
+		if (empty($data)) {
+			$data = $this->getItem();
+		}
+
+		return $data;
+	}
+	
+	/**
+	 * Method to get a single record.
+	 *
+	 * @param	integer	$pk	The id of the primary key.
+	 *
+	 * @return	mixed	Object on success, false on failure.
+	 * @since	1.6
+	 */
+	public function getItem($pk = null) {
+		// Initialise variables.
+		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
+		$table	= $this->getTable('flexicontent_fields', '');
+
+		if ($pk > 0) {
+			// Attempt to load the row.
+			$return = $table->load($pk);
+
+			// Check for a table object error.
+			if ($return === false && $table->getError()) {
+				$this->setError($table->getError());
+				return false;
+			}
+		}else{
+			/*$table->id					= 0;
+			$table->field_type				= null;*/
+			$table->name					= 'field' . ($this->_getLastId() + 1);
+			/*$table->label					= null;
+			$table->description				= '';
+			$table->isfilter				= 0;
+			$table->iscore					= 0;
+			$table->issearch				= 1;
+			$table->isadvsearch				= 0;
+			$table->positions				= array();
+			$table->published				= 1;
+			$table->attribs					= null;
+			$table->access					= 0;*/
+		}
+
+		// Convert to the JObject before adding other data.
+		$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+
+		if (property_exists($item, 'attribs')) {
+			$registry = new JRegistry;
+			$registry->loadJSON($item->attribs);
+			$item->attribs = $registry->toArray();
+		}
+		$field_type = $pk ? $table->field_type : JRequest::getVar('field_type', '');
+		$this->setState('field.field_type', $field_type);
+		return $item;
+	}
+	
+	/**
+	 * @param	object	A form object.
+	 * @param	mixed	The data expected for the form.
+	 * @return	mixed	True if successful.
+	 * @throws	Exception if there is an error in the form event.
+	 * @since	1.6
+	 */
+	protected function preprocessForm($form, $data) {
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.folder');
+
+		// Initialise variables.
+		$field_type	= $this->getState('field.field_type');
+		$client		= JApplicationHelper::getClientInfo(0);
+
+		// Try 1.6 format: /plugins/folder/element/element.xml
+		$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.DS.$field_type.'.xml';
+		if (!JFile::exists( $pluginpath )) {
+			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core'.DS.'core.xml';
+		}
+		if (!file_exists($pluginpath)) {
+				throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $field_type.'.xml'));
+				return false;
+			}
+
+		// Load the core and/or local language file(s).
+		/*	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, null, false, false)
+		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, null, false, false)
+		||	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, $lang->getDefault(), false, false)
+		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, $lang->getDefault(), false, false);
+		*/
+		if (file_exists($pluginpath)) {
+			// Get the plugin form.
+			if (!$form->loadFile($pluginpath, false, '//config')) {
+				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
+			}
+		}
+
+		// Attempt to load the xml file.
+		if (!$xml = simplexml_load_file($pluginpath)) {
+			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
+		}
+
+		// Get the help data from the XML file if present.
+		$help = $xml->xpath('/extension/help');
+		if (!empty($help)) {
+			$helpKey = trim((string) $help[0]['key']);
+			$helpURL = trim((string) $help[0]['url']);
+
+			$this->helpKey = $helpKey ? $helpKey : $this->helpKey;
+			$this->helpURL = $helpURL ? $helpURL : $this->helpURL;
+		}
+
+		// Trigger the default form events.
+		parent::preprocessForm($form, $data);
+	}
+	
+	/**
+	 * Auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @since	1.6
+	 */
+	protected function populateState() {
+		$app = JFactory::getApplication('administrator');
+
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
+			$extension = JRequest::getCmd('extension', 'com_flexicontent');
+		}
+		// Load the User state.
+		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
+			$cid = JRequest::getVar('cid', array(0));
+			$pk = (int)@$cid[0];
+		}
+		$this->setState($this->getName().'.id', $pk);
+
+
+		$this->setState('com_flexicontent.field.extension', $extension);
+		$parts = explode('.',$extension);
+		// extract the component name
+		$this->setState('com_flexicontent.field.component', $parts[0]);
+		// extract the optional section name
+		$this->setState('com_flexicontent.field.section', (count($parts)>1)?$parts[1]:null);
+
+		// Load the parameters.
+		//$params	= JComponentHelper::getParams('com_flexicontent');
+		//$this->setState('params', $params);
 	}
 
 	/**
@@ -347,8 +523,7 @@ class FlexicontentModelField extends JModel
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		
-		foreach($types as $type)
-		{
+		foreach($types as $type) {
 			// insert only the new records
 			if (!in_array($type, $used)) {
 				//get last position of each field in each type;

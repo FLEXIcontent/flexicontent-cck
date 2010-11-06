@@ -55,22 +55,17 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function save()
-	{
+	function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
 		$task		= JRequest::getVar('task');
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
-
 		$model = $this->getModel('type');
 
 		if ( $model->store($post) ) {
-
-			switch ($task)
-			{
+			switch ($task) {
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->get('id');
 					break;
@@ -87,16 +82,12 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
-
 		} else {
-
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_TYPE' );
 			//JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=type';
 		}
-
 		$model->checkin();
-
 		$this->setRedirect($link, $msg);
 	}
 
@@ -140,8 +131,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 	= $this->getModel('types');
 
+		$msg = '';
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 		} else if (!$model->candelete($cid)) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED' ));

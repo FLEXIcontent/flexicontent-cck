@@ -19,8 +19,6 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
-
-
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
@@ -28,54 +26,64 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="name">
-								<?php echo JText::_( 'FLEXI_TYPE_NAME' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_TYPE_NAME' ).':'; ?>
+								<?php echo $this->iform->getLabel('name'); ?>
 							</label>
 						</td>
 						<td>
-							<input id="name" name="name" class="required" value="<?php echo $this->row->name; ?>" size="50" maxlength="100" />
+							<!-- input id="name" name="name" class="required" value="<?php echo $this->row->name; ?>" size="50" maxlength="100" / -->
+							<?php echo $this->iform->getInput('name'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td class="key">
 							<label for="published">
-								<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+								<?php //echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+								<?php echo $this->iform->getLabel('published'); ?>
 							</label>
 						</td>
 						<td>
 							<?php
-							$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-							echo $html;
+							//$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
+							//echo $html;
 							?>
+							<?php echo $this->iform->getInput('published'); ?>
 						</td>
 					</tr>
 				</table>			
 			</td>
 			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+				<?php echo $this->pane->startPane( 'det-pane' );?>
+				<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1)); ?>
 				<?php
-				$title = JText::_( 'FLEXI_PARAMETERS' );
-				echo $this->pane->startPane( 'det-pane' );
-				echo $this->pane->startPanel( $title, "params-page" );
-				echo $this->form->render('params');
 				echo $this->pane->endPanel();
-
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-
-				foreach ($this->tmpls as $tmpl) {
-					$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-					echo $tmpl->params->render();
-					echo $this->pane->endPanel();
-				}
-
-				echo $this->pane->endPane();
-				?>
+				$fieldSets = $this->iform->getFieldsets('attribs');
+				foreach ($fieldSets as $name => $fieldSet) :
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+					endif;
+					?>
+					<fieldset class="panelform">
+						<table>
+						<?php foreach ($this->iform->getFieldset($name) as $field) : ?>
+						<tr>
+							<td><?php echo $field->label; ?></td>
+							<td><?php echo $field->input; ?></td>
+						</tr>
+						<?php endforeach; ?>
+						</table>
+					</fieldset>
+				<?php endforeach; ?>
+				<?php echo JHtml::_('sliders.end'); ?>
+				<?php echo $this->pane->endPane();?>
 			</td>
 		</tr>
 	</table>
-
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $this->row->id; ?>" />
 <input type="hidden" name="controller" value="types" />
 <input type="hidden" name="view" value="type" />
 <input type="hidden" name="task" value="" />

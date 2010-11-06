@@ -19,7 +19,6 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-//jimport('joomla.application.component.model');
 jimport('joomla.application.component.modellist');
 
 /**
@@ -29,15 +28,7 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategories extends JModelList
-{
-	/**
-	 * Pagination object
-	 *
-	 * @var object
-	 */
-	var $_pagination = null;
-
+class FlexicontentModelCategories extends JModelList{
 	/**
 	 * Categorie id
 	 *
@@ -76,8 +67,16 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function getListQuery() {
 		// Create a new query object.
+		$mainframe = &JFactory::getApplication();
 		$db = $this->getDbo();
-		$filter_state= $this->getState('com_flexicontent.categories.filter_state');
+		$option = JRequest::getVar('option');
+		//$filter_state= $this->getState($option.'.categories.filter_state');
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
+		//$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+
 		$query = $db->getQuery(true);
 		// Select the required fields from the table.
 		$query->select(
@@ -100,31 +99,17 @@ class FlexicontentModelCategories extends JModelList
 		}
 		$query->where(' (c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT . ')');
 		// Filter by search in title
-		$search = $this->getState('com_flexicontent.categories.search');
+		//$search = $this->getState('com_flexicontent.categories.search');
 		if (!empty($search)) {			
-			$search = $db->Quote('%'.$db->getEscaped($search, true).'%');
-			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
+			$search = $db->Quote('%'.$db->getEscaped(trim($search), true).'%');
+			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.JString::strtolower($search).' OR c.note LIKE '.$search.')');
 		}
 		$query->group('c.id');
 		// Add the list ordering clause.
-		$query->order($db->getEscaped($this->getState('com_flexicontent.categories.filter_order', 'c.lft')).' '.$db->getEscaped($this->getState('com_flexicontent.categories.filter_order_Dir', 'ASC')));
+		$query->order($db->getEscaped($filter_order).' '.$db->getEscaped($filter_order_Dir));
 		//echo nl2br(str_replace('#__','jos_',$query));
-		//echo $query->__toString();
+		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
-	}
-
-	/**
-	 * Method to get a pagination object for the categories
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function &getPaginationx()
-	{
-		if ($this->_pagination == null) {
-			$this->getData();
-		}
-		return $this->_pagination;
 	}
 
 	/**
@@ -134,8 +119,7 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function publish($cid = array(), $publish = 1)
-	{
+	function publish($cid = array(), $publish = 1) {
 		$user 	=& JFactory::getUser();
 
 		if (count( $cid ))
@@ -241,22 +225,22 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	string $msg
 	 * @since	1.0
 	 */
-	function delete($cids)
-	{		
+	function delete($cids) {
 		$params = & JComponentHelper::getParams('com_flexicontent');
-		
+		$table  =& $this->getTable('flexicontent_categories', '');
+
 		// Add all children to the list
-		foreach ($cids as $id)
-		{
-			$this->_addCategories($id, $cids);
+		$allcids = $cids;
+		foreach ($allcids as $id) {
+			$this->_addCategories($id, $allcids);
 		}
-				
-		$cids = implode( ',', $cids );
+
+		$allcids = implode( ',', $allcids );
 
 		$query = 'SELECT c.id, c.parent_id, c.title, COUNT( e.catid ) AS numcat'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS e ON e.catid = c.id'
-				. ' WHERE c.id IN ('. $cids .')'
+				. ' WHERE c.id IN ('. $allcids .')'
 				. ' GROUP BY c.id'
 				;
 		$this->_db->setQuery( $query );
@@ -265,10 +249,10 @@ class FlexicontentModelCategories extends JModelList
 			JError::raiseError( 500, $this->_db->stderr() );
 			return false;
 		}
-		
+
 		$err = array();
 		$cid = array();
-		
+
 		//TODO: Categories and its childs without assigned items will not be deleted if another tree has any item entry 
 		foreach ($rows as $row) {
 			if ($row->numcat == 0) {				
@@ -277,33 +261,11 @@ class FlexicontentModelCategories extends JModelList
 				$err[] = $row->title;
 			}
 		}
-		
-		if (count( $cid ) && count($err) == 0)
-		{
-			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__categories'
-					. ' WHERE id IN ('. $cids .')';
 
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// remove also categories acl if applicable
-			if (FLEXI_ACCESS) {
-				$query 	= 'DELETE FROM #__flexiaccess_acl'
-						. ' WHERE acosection = ' . $this->_db->Quote('com_content')
-						. ' AND axosection = ' . $this->_db->Quote('category')
-						. ' AND axo IN ('. $cids .')'
-						;
-				$this->_db->setQuery( $query );
-			}
-			
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
+		if (count( $cid ) && count($err) == 0) {
+			foreach ($cids as $id) {
+				$table-> id = $id;
+				$table->delete($id);
 			}
 		}
 
@@ -314,7 +276,7 @@ class FlexicontentModelCategories extends JModelList
 			} else {
 	    		$msg 	= JText::sprintf( 'FLEXI_ITEMS_ASSIGNED_CATEGORY', $cids );
 			}
-    		return $msg;
+    			return $msg;
 		} else {
 			$total 	= count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_CATEGORIES_DELETED' );
@@ -331,8 +293,7 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function access($id, $access)
-	{				
+	function access($id, $access) {
 		$category  =& $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
@@ -418,7 +379,8 @@ class FlexicontentModelCategories extends JModelList
 		// Get all rows with parent of $id
 		$query = 'SELECT '.$get
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_CATEGORY
+				. ' WHERE lft >= ' . FLEXI_CATEGORY_LFT
+				. ' AND rgt <= ' . FLEXI_CATEGORY_RGT
 				. ' AND '.$source.' = '.(int) $id;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();

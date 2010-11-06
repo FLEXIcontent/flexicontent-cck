@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<fields>
-		<field
-			id="access"
-			name="access"
-			type="accesslevel"
-			label="JField_Access_Label"
-			description="JField_Access_Desc"
-			class="inputbox"
-			size="1"
-			default="" />
-	</fields>
+	<field
+		name="id"
+		type="text"
+		default="0"
+		label="JGLOBAL_FIELD_ID_LABEL"
+		description ="JGLOBAL_FIELD_ID_DESC"
+		class="readonly"
+		readonly="true" />
+	<field
+		name="field_type"
+		type="fieldtypeslist"
+		default="text"
+		label="FLEXI_FIELD_TYPE"
+		description =""
+		class="inputbox" />
+	<field
+		name="name"
+		type="text"
+		default=""
+		label="FLEXI_FIELD_NAME"
+		description =""
+		class="inputbox required" />
+	<field
+		name="label"
+		type="text"
+		default=""
+		label="FLEXI_FIELD_LABEL"
+		description =""
+		class="inputbox required" />
+	<field
+		name="ordering"
+		type="fieldordering"
+		default="999"
+		label="Ordering"
+		description =""
+		class="inputbox" />
+	<field
+		name="description"
+		type="textarea"
+		cols="30"
+		 rows="5"
+		default=""
+		label="FLEXI_FIELD_DESCRIPTION"
+		description =""
+		class="inputbox" />
+	<field
+		name="description"
+		type="editor"
+		default=""
+		label="FLEXI_FIELD_DESCRIPTION"
+		description =""
+		class="inputbox" />
+	<field
+		name="isfilter"
+		type="booleanlist"
+		default="1"
+		label="FLEXI_FIELD_ISFILTER"
+		description =""
+		class="inputbox" />
+	<field
+		name="issearch"
+		type="booleanlist"
+		default="1"
+		label="FLEXI_FIELD_IS_SEARCHABLE"
+		description =""
+		class="inputbox" />
+	<field
+		name="isadvsearch"
+		type="booleanlist"
+		default="1"
+		label="FLEXI_FIELD_IS_ADVANCED_SEARCHABLE"
+		description =""
+		class="inputbox" />
+	<field
+		name="published"
+		type="booleanlist"
+		default="1"
+		label="FLEXI_PUBLISHED"
+		description =""
+		class="inputbox" />
+	<field
+		id="access"
+		name="access"
+		type="accesslevel"
+		label="JField_Access_Label"
+		description="JField_Access_Desc"
+		class="inputbox"
+		size="1"
+		default="" />
 </form>

@@ -8,7 +8,7 @@
 		label="JGLOBAL_FIELD_ID_LABEL"
 		description ="JGLOBAL_FIELD_ID_DESC"
 		class="readonly"
-		readonly="true"/>
+		readonly="true" />
 
 	<field
 		name="asset_id"
@@ -52,7 +52,7 @@
 		description="CATEGORIES_PATH_DESC"
 		class="readonly"
 		size="40"
-		readonly="true"/>
+		readonly="true" />
 
 	<field
 		name="extension"
@@ -61,7 +61,7 @@
 		description="COM_CATEGORIES_FIELD_EXTENSION_DESC"
 		class="readonly"
 		size="40"
-		readonly="true"/>
+		readonly="true" />
 
 	<field
 		name="title"
@@ -70,7 +70,7 @@
 		description="JFIELD_TITLE_DESC"
 		class="inputbox"
 		size="40"
-		required="true"/>
+		required="true" />
 
 	<field
 		name="alias"
@@ -78,7 +78,7 @@
 		label="FLEXI_ALIAS"
 		description="JFIELD_ALIAS_DESC"
 		class="inputbox"
-		size="40"/>
+		size="40" />
 
 	<field
 		name="note"
@@ -199,9 +199,7 @@
 		section="category" />
 
 	<fields name="params">
-		<fieldset
-			name="basic">
-
+		<fieldset name="basic">
 			<field
 				name="target"
 				type="componentlayout"
