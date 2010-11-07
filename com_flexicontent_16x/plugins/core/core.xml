@@ -13,107 +13,109 @@
 		<filename plugin="core">core.php</filename>
 	</files>
 	<config>
-	<fieldset name="standard">
-		<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-title"><!-- title -->
-	</fieldset>
-	<fieldset name="group-created"><!-- created date -->
-		<field name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
-			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
-			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
-			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
-			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-			<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
-		</field>
-		<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-	</fieldset>
-	<fieldset name="group-createdby"><!-- created by (author) -->
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-		<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
-			<option value="1">FLEXI_DISPLAY_NAME</option>
-			<option value="2">FLEXI_DISPLAY_USERNAME</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-modified"><!-- modified date -->
-		<field name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
-			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
-			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
-			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
-			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-			<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
-		</field>
-		<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-	</fieldset>
-	<fieldset name="group-modifiedby"><!-- modified by (modifier) -->
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-		<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
-			<option value="1">FLEXI_DISPLAY_NAME</option>
-			<option value="2">FLEXI_DISPLAY_USERNAME</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-state"><!-- state -->
-		<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC">
-			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-hits"><!-- hits -->
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-	</fieldset>
-	<fieldset name="group-type"><!-- document type -->
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-	</fieldset>
-	<fieldset name="group-version"><!-- version -->
-		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-	</fieldset>
-	<fieldset name="group-voting"><!-- voting -->
-		<field name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
-		<field name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-	</fieldset>
-	<fieldset name="group-categories"><!-- categories -->
-		<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-tags"><!-- tags -->
-		<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-files"><!-- files -->
-		<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-maintext" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
-		<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-	</fieldset>
+	<fields name="attribs">
+		<fieldset name="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-title"><!-- title -->
+		</fieldset>
+		<fieldset name="group-created"><!-- created date -->
+			<field name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
+				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+				<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+			</field>
+			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		</fieldset>
+		<fieldset name="group-createdby"><!-- created by (author) -->
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+				<option value="1">FLEXI_DISPLAY_NAME</option>
+				<option value="2">FLEXI_DISPLAY_USERNAME</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-modified"><!-- modified date -->
+			<field name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
+				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+				<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+			</field>
+			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		</fieldset>
+		<fieldset name="group-modifiedby"><!-- modified by (modifier) -->
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
+				<option value="1">FLEXI_DISPLAY_NAME</option>
+				<option value="2">FLEXI_DISPLAY_USERNAME</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-state"><!-- state -->
+			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-hits"><!-- hits -->
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		</fieldset>
+		<fieldset name="group-type"><!-- document type -->
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		</fieldset>
+		<fieldset name="group-version"><!-- version -->
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		</fieldset>
+		<fieldset name="group-voting"><!-- voting -->
+			<field name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
+			<field name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+		</fieldset>
+		<fieldset name="group-categories"><!-- categories -->
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-tags"><!-- tags -->
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-files"><!-- files -->
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-maintext" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+		</fieldset>
+	</fields>
 	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_core.ini</language>

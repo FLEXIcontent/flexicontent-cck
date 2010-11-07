@@ -13,33 +13,35 @@
 		<filename plugin="file">file.php</filename>
 	</files>
 	<config>
-	<fieldset name="standard">
-		<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</field>
-	</fieldset>
-	<fieldset name="group-file">
-		<field name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-		<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-		</field>
-		<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
-		</field>
-		<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
-		</field>
-		<field name="display_filename" type="radio" default="0" label="Display filename" description="Display filename(if you use download button)">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
-		</field>
-	</fieldset>
+	<fields name="attribs">
+		<fieldset name="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-file">
+			<field name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+			</field>
+			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="display_filename" type="radio" default="0" label="Display filename" description="Display filename(if you use download button)">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+		</fieldset>
+	</fields>
 	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_file.ini</language>

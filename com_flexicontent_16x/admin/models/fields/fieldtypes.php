@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 
 /**
  * Renders a fields element
@@ -26,16 +30,35 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementTypes extends JElement
-{
+class JFormFieldFieldtypes extends JFormFieldList{
 	/**
-	 * Element name
-	 * @access	protected
+	 * The form field type.
+	 *
 	 * @var		string
+	 * @since	1.6
 	 */
-	var	$_name = 'Types';
+	protected $type = 'Fieldtypes';
+	
+	/**
+	 * Method to get the field input markup.
+	 *
+	 * @return	string	The field input markup.
+	 * @since	1.6
+	 */
+	protected function getInput() {
+		$name = $this->name;
+		$value = $this->value;
+		$attr = '';
 
-	function fetchElement($name, $value, &$node, $control_name) {
+		// Initialize some field attributes.
+		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
+		$attr .= $this->element['size'] ? ' size="'.(int) $this->element['size'].'"' : '';
+		$attr .= $this->multiple ? ' multiple="multiple"' : '';
+		$options = (array) $this->getOptions();
+		return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
+	}
+	protected function getOptions() {
 		$db =& JFactory::getDBO();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
@@ -45,7 +68,6 @@ class JElementTypes extends JElement
 		
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
-		$class = '';
-		return JHTML::_('select.genericlist', $types, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
+		return $types;
 	}
 }

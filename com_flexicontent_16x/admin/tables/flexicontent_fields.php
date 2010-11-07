@@ -25,8 +25,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class flexicontent_fields extends JTable
-{
+class flexicontent_fields extends JTable{
 	/**
 	 * Primary Key
 	 * @var int
@@ -68,18 +67,16 @@ class flexicontent_fields extends JTable
 	}
 	
 	// overloaded check function
-	function check()
-	{
+	function check() {
 		// Not typed in a label?
 		if (trim( $this->label ) == '') {
 			$this->_error = JText::_( 'FLEXI_ADD_LABEL' );
 			JError::raiseWarning('SOME_ERROR_CODE', $this->_error );
 			return false;
 		}
-				
-		$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
 
-		if((empty($this->name) || $this->name === $name) && $this->iscore != 1 ) {
+		if((empty($this->name) || trim($this->name) === '') && $this->iscore != 1 ) {
+			$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
 			$this->name = $newname;
 		}
 

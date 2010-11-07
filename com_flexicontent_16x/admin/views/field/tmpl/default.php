@@ -131,15 +131,13 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 				<tr>
 					<td width="40%">
-						<label for="tid">
-						<strong><?php echo JText::_( 'FLEXI_TYPES' ); ?>: *</strong>
+						<strong><?php echo $this->form->getLabel('tid'); ?>: *</strong>
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_TYPES_NOTES' );?>">
 							<?php echo $infoimage; ?>
 						</span>
-						</label>
 					</td>
 					<td>
-						<?php echo $this->lists['tid']; ?>
+						<?php echo $this->form->getInput('tid'); ?>
 					</td>
 				</tr>
 			</table>
@@ -150,7 +148,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 0px; padding-bottom: 0px;">
 					<?php
 					foreach($this->form->getFieldset('standard') as $field) :
-						$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
+						//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
 						?>
 						<fieldset class="panelform">
 						<?php echo $field->label; ?>
@@ -167,7 +165,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php
 					if ($this->form->getValue("field_type")) {
 						foreach($this->form->getFieldset('group-' . $this->form->getValue("field_type")) as $field) :
-							$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
+							//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
 							?>
 							<fieldset class="panelform">
 							<?php echo $field->label; ?>
@@ -180,7 +178,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						if(isset($global_field_types[0])) {
 							// Create the form
 							foreach($this->form->getFieldset('group-' . $global_field_types[0]->value) as $field) :
-								$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
+								//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
 								?>
 								<fieldset class="panelform">
 								<?php echo $field->label; ?>
@@ -204,7 +202,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 <input type="hidden" name="jform[iscore]" value="<?php echo $this->form->getValue("iscore"); ?>" />
 <input type="hidden" name="name" value="<?php echo $this->form->getValue("name"); ?>" />
 <?php endif; ?>
-<input type="hidden" name="id" value="<?php echo $this->form->getValue("id"); ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue("id"); ?>" />
 <input type="hidden" name="controller" value="fields" />
 <input type="hidden" name="view" value="field" />
 <input type="hidden" name="task" value="" />
