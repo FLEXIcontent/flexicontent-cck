@@ -96,4 +96,13 @@
 		class="inputbox"
 		size="1"
 		default="" />
+	<field
+		name="tid"
+		type="fieldtypes"
+		multiple="true"
+		label="FLEXI_TYPES"
+		description=""
+		class="inputbox"
+		size="1"
+		default="" />
 </form>

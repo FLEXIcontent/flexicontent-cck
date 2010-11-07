@@ -66,14 +66,8 @@ class FlexicontentViewField extends JView {
 		//Get data from the model
 		$model				= & $this->getModel();
 		$form				= $this->get('Form');
-		$types				= & $this->get( 'Typeslist' );
-		$typesselected		= & $this->get( 'Typesselected' );
 		JHTML::_('behavior.tooltip');
 
-		//build selectlists
-		$lists = array();
-		//build type select list
-		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
 		//build field_type list
 		if ($form->getValue("iscore") == 1) { $class = 'disabled="disabled"'; } else {
 			$class = '';
@@ -102,36 +96,6 @@ class FlexicontentViewField extends JView {
 				");
 			
 		}
-		//$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
-		//build access level list
-		/*if (FLEXI_ACCESS) {
-			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
-		} else {
-			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-		}*/
-
-		// Create the form
-		/*$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$form->getValue("field_type").DS.$form->getValue("field_type").'.xml';
-		
-		if (JFile::exists( $pluginpath )) {
-			$aform = JForm::getInstance('com_flexicontent.field.'.$form->getValue('field_type'), $pluginpath, array('control' => 'jform', 'load_data' => true), false);
-		}else{
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core'.DS.'core.xml';
-			$aform = JForm::getInstance('com_flexicontent.field.'.$global_field_types[0]->value, $pluginpath, array('control' => 'jform', 'load_data' => true), false);
-		}
-		echo $pluginpath."<br />";
-		var_dump($aform);*/
-		
-		/*if($attribs = $form->getValue("attribs")) {
-			$arrays = explode("\n", $attribs);
-			$params = new JObject();
-			foreach($arrays as $a) {
-				$a = explode("=", $a);
-				$params->$a[0] = @$a[1];
-			}
-			$form->bind($params);
-			unset($params);
-		}*/
 
 		// fail if checked out not by 'me'
 		if ($form->getValue("id")) {

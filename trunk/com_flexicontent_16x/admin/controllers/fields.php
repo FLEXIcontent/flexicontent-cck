@@ -53,8 +53,7 @@ class FlexicontentControllerFields extends FlexicontentController{
 	 * @return void
 	 * @since 1.0
 	 */
-	function save()
-	{
+	function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
@@ -66,7 +65,6 @@ class FlexicontentControllerFields extends FlexicontentController{
 		$model = $this->getModel('field');
 
 		if ( $model->store($post) ) {
-
 			switch ($task)
 			{
 				case 'apply' :

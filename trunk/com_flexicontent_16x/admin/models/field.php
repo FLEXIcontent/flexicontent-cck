@@ -150,8 +150,7 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	mixed	The data for the form.
 	 * @since	1.6
 	 */
-	protected function loadFormData()
-	{
+	protected function loadFormData() {
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.type.data', array());
 
@@ -202,6 +201,9 @@ class FlexicontentModelField extends JModelAdmin{
 
 		// Convert to the JObject before adding other data.
 		$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+		if ($pk > 0) {
+			$item->tid = $this->getTypesselected();
+		}
 
 		if (property_exists($item, 'attribs')) {
 			$registry = new JRegistry;
@@ -234,9 +236,9 @@ class FlexicontentModelField extends JModelAdmin{
 			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core'.DS.'core.xml';
 		}
 		if (!file_exists($pluginpath)) {
-				throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $field_type.'.xml'));
-				return false;
-			}
+			throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $field_type.'.xml'));
+			return false;
+		}
 
 		// Load the core and/or local language file(s).
 		/*	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, null, false, false)
@@ -360,10 +362,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
-	{
-		if ($this->_id)
-		{
+	function checkin() {
+		if ($this->_id) {
 			$field = & JTable::getInstance('flexicontent_fields', '');
 			return $field->checkout($uid, $this->_id);
 		}
@@ -378,10 +378,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
-	{
-		if ($this->_id)
-		{
+	function checkout($uid = null) {
+		if ($this->_id) {
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
 				$user	=& JFactory::getUser();
@@ -402,10 +400,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True if checked out
 	 * @since	1.0
 	 */
-	function isCheckedOut( $uid=0 )
-	{
-		if ($this->_loadField())
-		{
+	function isCheckedOut( $uid=0 ) {
+		if ($this->_loadField()) {
 			if ($uid) {
 				return ($this->_field->checked_out && $this->_field->checked_out != $uid);
 			} else {
@@ -426,28 +422,25 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data)
-	{
+	function store($data) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$field  	=& $this->getTable('flexicontent_fields', '');
-		$types		= JRequest::getVar('tid', array(), 'post', 'array');
-		$standard	= JRequest::getVar('standard', array(), 'post', 'array');
+		$types		= $data['jform']['tid'];
 		
 		// bind it to the table
-		if (!$field->bind($data)) {
+		if (!$field->bind($data['jform'])) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
 		
-		$params		= JRequest::getVar( 'params', null, 'post', 'array' );
+		$attribs		= $data['jform']['attribs'];
 
 		// Build parameter INI string
-		if (is_array($params))
-		{
+		if (is_array($attribs)) {
 			$txt = array ();
-			foreach ($params as $k => $v) {
+			foreach ($attribs as $k => $v) {
 				if (is_array($v)) {
 					$v = implode('|', $v);
 				}
@@ -472,10 +465,6 @@ class FlexicontentModelField extends JModelAdmin{
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $field, 'field' );
-		}
 
 		// Add the id to the name if it's a new field only
 		// I know it's a little tricky but it functions
@@ -497,11 +486,10 @@ class FlexicontentModelField extends JModelAdmin{
 		$this->_field	=& $field;
 		
 		// append all types to the type array if the field belongs to core
-		if ($field->iscore == 1)
-		{
+		if ($field->iscore == 1) {
 			$query 	= 'SELECT id'
-					. ' FROM #__flexicontent_types'
-					;
+				. ' FROM #__flexicontent_types'
+				;
 			$this->_db->setQuery($query);
 			$types = $this->_db->loadResultArray();
 		}
@@ -509,17 +497,17 @@ class FlexicontentModelField extends JModelAdmin{
 		// Store field to types relations
 		// delete relations which type is not part of the types array anymore
 		$query 	= 'DELETE FROM #__flexicontent_fields_type_relations'
-				. ' WHERE field_id = '.$field->id
-				. ($types ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
-				;
+			. ' WHERE field_id = '.$field->id
+			. ($types ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
+			;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
 		// draw an array of the used types
 		$query 	= 'SELECT type_id'
-				. ' FROM #__flexicontent_fields_type_relations'
-				. ' WHERE field_id = '.$field->id
-				;
+			. ' FROM #__flexicontent_fields_type_relations'
+			. ' WHERE field_id = '.$field->id
+			;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		
@@ -528,20 +516,19 @@ class FlexicontentModelField extends JModelAdmin{
 			if (!in_array($type, $used)) {
 				//get last position of each field in each type;
 				$query 	= 'SELECT max(ordering) as ordering'
-						. ' FROM #__flexicontent_fields_type_relations'
-						. ' WHERE type_id = ' . $type
-						;
+					. ' FROM #__flexicontent_fields_type_relations'
+					. ' WHERE type_id = ' . $type
+					;
 				$this->_db->setQuery($query);
 				$ordering = $this->_db->loadResult()+1;
 
 				$query 	= 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`)'
-						.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
-						;
+					.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
+					;
 				$this->_db->setQuery($query);
 				$this->_db->query();
 			}
 		}
-		
 		return true;
 	}
 	
@@ -551,13 +538,12 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ()
-	{
+	function getTypeslist () {
 		$query = 'SELECT id, name'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
+			. ' FROM #__flexicontent_types'
+			. ' WHERE published = 1'
+			. ' ORDER BY name ASC'
+			;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();
 		return $types;	
@@ -569,14 +555,12 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypesselected()
-	{
+	function getTypesselected() {
 		$query = 'SELECT DISTINCT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int)$this->_id;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		return $used;
 	}
-	
 }
 
 ?>

@@ -41,6 +41,7 @@ class JFormFieldPluginlist extends JFormFieldList{
 		//$name, $value, &$node, $control_name
 		$name = $this->name;
 		$value = $this->value;
+		$value = explode("|", $value);
 		$plugins 	= array();
 //		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
@@ -61,6 +62,6 @@ class JFormFieldPluginlist extends JFormFieldList{
 		}
 
 		$class = 'class="inputbox" multiple="true" size="5"';
-		return JHTMLSelect::genericList($plugins, $name, $class, 'value', 'text', $value, $name);
+		return JHTMLSelect::genericList($plugins, $name.'[]', $class, 'value', 'text', $value, $name);
 	}
 }
