@@ -193,8 +193,7 @@ class flexicontent_items extends JTable{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function store( $updateNulls=false )
-	{
+	function store( $updateNulls=false ) {
 		$k             = $this->_tbl_key;
 		$frn_key       = $this->_frn_key;
 

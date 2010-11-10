@@ -157,7 +157,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			
-			if (!$this->dopostinstall) {
+			if ($this->dopostinstall) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');

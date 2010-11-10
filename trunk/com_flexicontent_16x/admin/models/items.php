@@ -125,8 +125,7 @@ class FlexicontentModelItems extends JModel{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function setSiteDefaultLang($id)
-	{
+	function setSiteDefaultLang($id) {
 		$languages =& JComponentHelper::getParams('com_languages');
 		$lang 		= $languages->get('site', 'en-GB');
 
@@ -150,25 +149,29 @@ class FlexicontentModelItems extends JModel{
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-				. ' WHERE (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')'
-				;
+			. ' WHERE (cat.lft >= ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . FLEXI_CATEGORY_RGT . ')'
+			;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
+		$allids = is_array($allids)?$allids:array();
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
 		$this->_db->setQuery($query);
 		$allext = $this->_db->loadResultArray();
+		$allext = is_array($allext)?$allext:array();
 
 		$query 	= 'SELECT DISTINCT itemid FROM #__flexicontent_cats_item_relations';
 		$this->_db->setQuery($query);
 		$allcat = $this->_db->loadResultArray();
+		$allcat = is_array($allcat)?$allcat:array();
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
-				. ' GROUP BY item_id'
-				. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
-				;
+			. ' GROUP BY item_id'
+			. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
+			;
 		$this->_db->setQuery($query);
 		$allfi = $this->_db->loadResultArray();
+		$allfi = is_array($allfi)?$allfi:array();
 		
 		$status['allids'] 		= $allids;
 		$status['allext'] 		= $allext;
@@ -181,7 +184,7 @@ class FlexicontentModelItems extends JModel{
 //		$status['nofi'] 		= array_diff($allids,$allfi);
 //		$status['countnofi'] 	= count($status['nofi']);
 //		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
-		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
+		$status['no'] 			= array_unique(array_merge($status['noext'], $status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
 		return $status;

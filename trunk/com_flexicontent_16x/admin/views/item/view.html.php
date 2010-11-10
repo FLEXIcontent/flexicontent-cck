@@ -27,23 +27,25 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewItem extends JView {
-
 	function display($tpl = null) {
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
 		
 		//initialise variables
-		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
 		$pane 		= & JPane::getInstance('sliders');
-		$dispatcher = & JDispatcher::getInstance();
+		$dispatcher	= & JDispatcher::getInstance();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
+		
+		$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
+		$document->addCustomTag('<script>jQuery.noConflict();</script>');
 
 		JHTML::_('behavior.tooltip');
 
@@ -75,28 +77,30 @@ class FlexicontentViewItem extends JView {
 
 		//Get data from the model
 		$model			= & $this->getModel();
-		$row     		= & $this->get( 'Item' );
+		$form		= $this->get('Form');
 		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
-		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
+		$lastversion = FLEXIUtilities::getLastVersions($form->getValue("id"), true);
 		if($version==0)
-			JRequest::setVar( 'version', $version = $lastversion);
-		if(!$cparams->get('use_versioning', 1))
-			JRequest::setVar( 'version', 0);
+			$currentversion = $lastversion;
+		else
+			$currentversion = $version;
+		//if(!$cparams->get('use_versioning', 1))
+		//	JRequest::setVar( 'version', 0);
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$selectedcats	= & $this->get( 'Catsselected' );
 		$fields			= & $this->get( 'Extrafields' );
-		$types			= & $this->get( 'Typeslist' );
+		//$types			= & $this->get( 'Typeslist' );
 		$typesselected	= & $this->get( 'Typesselected' );
 		$versioncount	= & $this->get( 'VersionCount' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$pagecount	= (int)ceil($versioncount/$versionsperpage);
 		$allversions		= & $model->getVersionList();//get all versions.
 		$current_page = 1;
-		$k=1;
+		$k=1;//echo "<xmp>";var_dump($fields);echo "</xmp>";
 		foreach($allversions as $v) {
 			if( $k && (($k%$versionsperpage)==0) ) 
 				$current_page++;
-			if($v->nr==$version) break;
+			if($v->nr==$currentversion) break;
 			$k++;
 		}
 
@@ -108,14 +112,13 @@ class FlexicontentViewItem extends JView {
 
 		$usedtags = array();
 		if ($cid) {
-			//$usedtags 	= $model->getusedtags($cid);
-			$usedtagsA 	= & $this->get( 'UsedtagsArray' );
+			$usedtagsA 	= & $fields['tags']->value;
 			$usedtags 	= $model->getUsedtags($usedtagsA);
 		}
+
 		// Add html to field object trought plugins
-		foreach ($fields as $field)
-		{
-			$results = $dispatcher->trigger('onDisplayField', array( &$field, $row ));
+		foreach ($fields as $field) {
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, $form ));
 		}
 		
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -126,14 +129,14 @@ class FlexicontentViewItem extends JView {
 		$canPublishOwn	= 1;
 		$canRight 		= 1;
 
-		if ($row->id) {
+		if ($form->getValue("id")) {
 			// fail if checked out not by 'me'	
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
-			}
+			//if ($model->isCheckedOut( $user->get('id') )) {
+			//	JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			//	$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
+			//}
 			if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $form->getValue("catid"));
 				$canEdit 		= in_array('edit', $rights);
 				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
 				$canPublish 	= in_array('publish', $rights);
@@ -153,7 +156,7 @@ class FlexicontentViewItem extends JView {
 
 		//build selectlists
 		$lists = array();
-		if (FLEXI_ACCESS && ($user->gid < 25)) {
+		/*if (FLEXI_ACCESS && ($user->gid < 25)) {
 			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all'))) {
 				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true, false);
 				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true, false);
@@ -162,13 +165,10 @@ class FlexicontentViewItem extends JView {
 				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
 			}
 		} else {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
+			//$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
+			//$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $form->getValue("catid"), 2, 'class="scat"', true);
 		}
-
-		//buid types selectlist
-		$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', true );
-	
+		
 		// build granular access list
 		if (FLEXI_ACCESS) {
 			if (isset($user->level)) {
@@ -176,47 +176,14 @@ class FlexicontentViewItem extends JView {
 			} else {
 				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
 			}
-		}
+		}*/
 		
 		// Create the type parameters
 		$tparams = new JParameter($tparams);
-		// Create the form
-		if (FLEXI_ACCESS) {
-			$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item2.xml');
-		} else {
-			$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item.xml');
-		}
-
-		// Details Group
-		$active = (intval($row->created_by) ? intval($row->created_by) : $user->get('id'));
-		if (!FLEXI_ACCESS) {
-			$form->set('access', $row->access);
-		}
-		$form->set('created_by', $active);
-		$form->set('created_by_alias', $row->created_by_alias);
-		$form->set('created', JHTML::_('date', $row->created, '%Y-%m-%d %H:%M:%S'));
-		$form->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
-		$form->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
-		if (JHTML::_('date', $row->publish_down, '%Y') <= 1969 || $row->publish_down == $db->getNullDate()) {
-			$form->set('publish_down', JText::_( 'FLEXI_NEVER' ));
-		} else {
-			$form->set('publish_down', JHTML::_('date', $row->publish_down, '%Y-%m-%d %H:%M:%S'));
-		}
-
-		// Advanced Group
-		$form->loadINI($row->attribs);
-
-		// Metadata Group
-		$form->set('description', $row->metadesc);
-		$form->set('keywords', $row->metakey);
-		$form->loadINI($row->metadata);
 
 		// Handle item templates parameters
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
-		foreach ($tmpls as $tmpl) {
-			$tmpl->params->loadINI($row->attribs);
-		}
 
 		//build state list
 		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
@@ -225,22 +192,21 @@ class FlexicontentViewItem extends JView {
 		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
-		if(!$canPublish)
-			$row->state = $row->state ? $row->state : -4;
-		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
+		//if(!$canPublish)
+		//	$row->state = $row->state ? $row->state : -4;
+		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $form->getValue("state") );
 		
 		//build version state list
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
 		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
-		if (FLEXI_FISH) {
+		/*if (FLEXI_FISH) {
 		//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
 		} else {
 			$row->language = flexicontent_html::getSiteDefaultLang();
-		}
-		
-		switch ($row->state) {
+		}*/
+		switch ($form->getValue("state")) {
 			case 0:
 			$published = JText::_( 'FLEXI_UNPUBLISHED' );
 			break;
@@ -264,12 +230,10 @@ class FlexicontentViewItem extends JView {
 		//assign data to template
 		$this->assignRef('document'     	, $document);
 		$this->assignRef('lists'      		, $lists);
-		$this->assignRef('row'      		, $row);
 		$this->assignRef('canPublish'   	, $canPublish);
 		$this->assignRef('canPublishOwn'	, $canPublishOwn);
 		$this->assignRef('canRight'			, $canRight);
 		$this->assignRef('published'		, $published);
-		$this->assignRef('editor'			, $editor);
 		$this->assignRef('pane'				, $pane);
 		$this->assignRef('nullDate'			, $nullDate);
 		$this->assignRef('form'				, $form);
@@ -285,6 +249,8 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('usedtags'			, $usedtags);
 		$this->assignRef('permission'		, $permission);
 		$this->assignRef('current_page'		, $current_page);
+		$this->assignRef('permission'		, $permission);
+		$this->assignRef('fieldtype'		, $typesselected);
 
 		parent::display($tpl);
 	}

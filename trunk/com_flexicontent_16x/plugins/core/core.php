@@ -17,16 +17,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsCore extends JPlugin
-{
-	function plgFlexicontent_fieldsCore( &$subject, $params )
-	{
+class plgFlexicontent_fieldsCore extends JPlugin{
+	function plgFlexicontent_fieldsCore( &$subject, $params ) {
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 	}
 
-	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
-	{
+	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' ) {
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
 		$view = JRequest::setVar('view', JRequest::getVar('view', 'items'));

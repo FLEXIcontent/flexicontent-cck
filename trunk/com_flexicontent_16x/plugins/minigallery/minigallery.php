@@ -319,7 +319,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 	}
 	
 
-	function onBeforeSaveField(&$field, &$post, $file)
+	function onBeforeSaveField(&$field, &$post, &$file)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;

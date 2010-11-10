@@ -154,45 +154,30 @@ dump($this->row);
 			</td>
 			<td valign="top" width="320px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
-				$title = JText::_( 'FLEXI_ACCESS' );
-				echo $this->pane->startPane( 'det-pane' );
-				echo $this->pane->startPanel( $title, 'access' );
+				echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
+				echo JHtml::_('sliders.panel',JText::_('FLEXI_ACCESS'), 'access-options');
 				?>
-				<table>
-					<tr>
-						<td>
-							<label for="access">
-								<?php echo $this->iform->getLabel('access'); ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->iform->getInput('access'); ?>
-						</td>
-					</tr>
-				</table>
-<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1)); ?>
+				<fieldset class="panelform">
+					<?php echo $this->iform->getLabel('access'); ?>
+					<?php echo $this->iform->getInput('access'); ?>
+				</fieldset>
 				<?php
-				echo $this->pane->endPanel();
-$fieldSets = $this->iform->getFieldsets('params');
-
-foreach ($fieldSets as $name => $fieldSet) :
-	$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-	echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
-	if (isset($fieldSet->description) && trim($fieldSet->description)) :
-		echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-	endif;
-	?>
-	<fieldset class="panelform">
-		<?php foreach ($this->iform->getFieldset($name) as $field) : ?>
-			<?php echo $field->label; ?>
-			<?php echo $field->input; ?>
-		<?php endforeach; ?>
-		<?php echo $this->iform->getLabel('note'); ?>
-		<?php echo $this->iform->getInput('note'); ?>
-	</fieldset>
-<?php endforeach; ?>
-<?php echo JHtml::_('sliders.end'); ?>
-				<?php echo $this->pane->endPane();?>
+				$fieldSets = $this->iform->getFieldsets('params');
+				foreach ($fieldSets as $name => $fieldSet) :
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+					endif;
+					?>
+					<fieldset class="panelform">
+						<?php foreach ($this->iform->getFieldset($name) as $field) : ?>
+							<?php echo $field->label; ?>
+							<?php echo $field->input; ?>
+						<?php endforeach; ?>
+					</fieldset>
+				<?php endforeach; ?>
+				<?php echo JHtml::_('sliders.end'); ?>
 			</td>
 		</tr>
 	</table>

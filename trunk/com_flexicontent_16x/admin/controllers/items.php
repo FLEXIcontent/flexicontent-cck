@@ -33,8 +33,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		// Register Extra task
@@ -60,8 +59,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function save()
-	{
+	function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
@@ -69,16 +67,14 @@ class FlexicontentControllerItems extends FlexicontentController {
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
-		$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW );
+		//$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW );
 
 		$model = $this->getModel('item');
 
 		if ( $model->store($post) ) {
-
-			switch ($task)
-			{
+			switch ($task) {
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=item&cid='.(int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&view=item&cid='.(int) $model->getId();
 					break;
 
 				case 'saveandnew' :
@@ -100,7 +96,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 			JError::raiseError( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=item';
 		}
-
 		$this->setRedirect($link, $msg);
 	}
 	
@@ -301,7 +296,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 		$extdata 	= JRequest::getInt('extdata', '');		
 		$model 		= $this->getModel('items');
 		$rows 		= $model->getUnassociatedItems($extdata);
-		
 		echo ($model->addFlexiData($rows));
 	}
 
@@ -312,8 +306,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function setitemstate()
-	{
+	function setitemstate() {
 		$id 	= JRequest::getInt( 'id', 0 );
 		$state 	= JRequest::getVar( 'state', 0 );
 
@@ -735,8 +728,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * 
 	 * @since 1.0
 	 */
-	function gethits()
-	{
+	function gethits() {
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
 		$hits 	= $model->gethits($id);
@@ -761,7 +753,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 
 		$model 	= $this->getModel('item');
 		$model->_id = $id;
-		$item = $model->getItem(true);
+		$item = $model->getItem($id);
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 

@@ -81,14 +81,6 @@
 		size="40" />
 
 	<field
-		name="note"
-		type="text"
-		label="JFIELD_NOTE_LABEL"
-		description="JFIELD_NOTE_DESC"
-		class="inputbox"
-		size="40"/>
-
-	<field
 		name="description"
 		type="editor"
 		label="JGLOBAL_DESCRIPTION"
@@ -213,6 +205,13 @@
 				type="media"
 				label="COM_CATEGORIES_FIELD_IMAGE_LABEL"
 				description="COM_CATEGORIES_FIELD_IMAGE_DESC" />
+			<field
+				name="note"
+				type="text"
+				label="JFIELD_NOTE_LABEL"
+				description="JFIELD_NOTE_DESC"
+				class="inputbox"
+				size="40"/>
 		</fieldset>
 		<fieldset
 			name="standard">
@@ -325,7 +324,7 @@
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="filters" type="filters" size="10" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+			<field name="filters" type="filters" size="5" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 		</fieldset>
 	</fields>
 

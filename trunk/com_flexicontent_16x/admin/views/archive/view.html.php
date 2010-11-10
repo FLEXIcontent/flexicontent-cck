@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewArchive extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -73,7 +72,7 @@ class FlexicontentViewArchive extends JView {
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
+		$rows      	= & $this->get( 'Items');
 		$pageNav 	= & $this->get( 'Pagination' );
 		
 		// search filter

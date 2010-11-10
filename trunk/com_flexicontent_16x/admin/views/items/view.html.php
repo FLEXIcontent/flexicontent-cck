@@ -116,6 +116,9 @@ class FlexicontentViewItems extends JView {
 		} else {
 			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
+		
+		$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
+		$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&tmpl=component&format=raw');\n";
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -159,9 +162,8 @@ class FlexicontentViewItems extends JView {
 		$unassociated	= & $this->get( 'UnassociatedItems' );
 		$status      	= & $this->get( 'ExtdataStatus');
 		
-		if (FLEXI_FISH) {
-			$langs	= & $this->get( 'Languages' );
-		}
+		JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
+		
 		$categories = $globalcats?$globalcats:array();
 
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );

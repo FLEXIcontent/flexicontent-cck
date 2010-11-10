@@ -39,6 +39,7 @@ class JFormFieldCategoryTree extends JFormFieldList{
 		$html = array();
 		$attr = '';
 
+		if(!is_array($this->value)) $this->value = array($this->value);
 		// Initialize some field attributes.
 		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 
@@ -57,24 +58,24 @@ class JFormFieldCategoryTree extends JFormFieldList{
 		$options = (array) $this->getOptions();
 
 		// Create a read-only list (no name) with a hidden input to store the value.
-		if ((string) $this->element['readonly'] == 'true') {
-			//$html[] = JHtml::_('select.genericlist', $options, '', trim($attr), 'value', 'text', $this->value, $this->id);
-			
+		if ((string) $this->element['readonly'] == 'true') {			
 			$html[] = '<select name="" '.trim($attr).'>';
 			foreach($options as $opt) {
 				$disabled = '';
 				$selected = '';
 				if( @$opt->disable )
 					$disabled = ' disabled="disabled"';
-				if($opt->value==$this->value)
+				if(in_array($opt->value, $this->value))
 					$selected = ' selected="selected"';
 				$html[] = '<option value="'.$opt->value.'"'.$disabled.$selected.'>'.$opt->text.'</option>';
 			}
 			$html[] = '</select>';
-			$html[] = '<input type="hidden" name="'.$this->name.'" value="'.$this->value.'"/>';
+			foreach($this->value as $v)
+				$html[] = '<input type="hidden" name="'.$this->name.'" value="'.$value.'"/>';
 		}
 		// Create a regular list.
 		else {
+			
 			//$html[] = JHtml::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);
 			$html[] = '<select name="'.$this->name.'" '.trim($attr).'>';
 			foreach($options as $opt) {
@@ -82,7 +83,7 @@ class JFormFieldCategoryTree extends JFormFieldList{
 				$selected = '';
 				if( @$opt->disable )
 					$disabled = ' disabled="disabled"';
-				if($opt->value==$this->value)
+				if(in_array($opt->value, $this->value))
 					$selected = ' selected="selected"';
 				$html[] = '<option value="'.$opt->value.'"'.$disabled.$selected.'>'.$opt->text.'</option>';
 			}

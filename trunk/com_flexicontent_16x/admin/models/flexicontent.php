@@ -55,12 +55,13 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT id, title, catid, created_by'
-				. ' FROM #__content'
+		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+				. ' FROM #__content as c'
+				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE state = -3'
-				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
-				. ($allitems ? '' : ' AND created_by = '.$user->id)
-				. ' ORDER BY created DESC'
+				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . (int)FLEXI_CATEGORY_RGT
+				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. ' ORDER BY c.created DESC'
 				;
 
 		$this->_db->SetQuery($query, 0, 5);
@@ -75,8 +76,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getOpenquestions()
-	{
+	function getOpenquestions() {
 		if (FLEXI_ACCESS) {
 			$user 		=& JFactory::getUser();
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
@@ -84,12 +84,13 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT id, title, catid, created_by'
-				. ' FROM #__content'
-				. ' WHERE state = -4'
-				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
-				. ($allitems ? '' : ' AND created_by = '.$user->id)
-				. ' ORDER BY created DESC'
+		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+				. ' FROM #__content as c'
+				. ' JOIN #__categories as cat ON c.id=cat.id'
+				. ' WHERE c.state = -4'
+				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . (int)FLEXI_CATEGORY_RGT
+				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. ' ORDER BY c.created DESC'
 				;
 
 		$this->_db->SetQuery($query, 0, 5);
@@ -104,8 +105,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getInprogress()
-	{
+	function getInprogress() {
 		if (FLEXI_ACCESS) {
 			$user 		=& JFactory::getUser();
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
@@ -113,12 +113,13 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT id, title, catid, created_by'
-				. ' FROM #__content'
-				. ' WHERE state = -5'
-				. ' AND sectionid = ' . (int)FLEXI_CATEGORY
-				. ($allitems ? '' : ' AND created_by = '.$user->id)
-				. ' ORDER BY created DESC'
+		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+				. ' FROM #__content as c'
+				. ' JOIN #__categories as cat ON c.id=cat.id'
+				. ' WHERE c.state = -5'
+				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= '. (int)FLEXI_CATEGORY_RGT
+				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. ' ORDER BY c.created DESC'
 				;
 
 		$this->_db->SetQuery($query, 0, 5);
@@ -655,11 +656,10 @@ class FlexicontentModelFlexicontent extends JModel
 		return $check;
 	}
 	
-	function getDiffVersions($current_versions=array(), $last_versions=array())
-	{
-		// check if the section was chosen to avoid adding data on static contents
+	function getDiffVersions($current_versions=array(), $last_versions=array()) {
+		// check if the category was chosen to avoid adding data on static contents
 		if (!FLEXI_CATEGORY) return array();
-		
+
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
 		}
@@ -676,8 +676,7 @@ class FlexicontentModelFlexicontent extends JModel
 		if (!FLEXI_CATEGORY) return false;
 		return FLEXIUtilities::currentMissing();
 	}
-	function addCurrentVersionData()
-	{
+	function addCurrentVersionData() {
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_CATEGORY) return true;
 
@@ -690,12 +689,14 @@ class FlexicontentModelFlexicontent extends JModel
 		// add the current version data
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
-		$query = "SELECT id,catid,version,created,modified,created_by,introtext,`fulltext` FROM #__content WHERE sectionid='".FLEXI_CATEGORY."';";
+		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext` FROM #__content as c"
+				. " JOIN #__categories as cat ON c.catid=cat.id "
+				." WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."';";
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
-
+		//echo "<xmp>";var_dump(FLEXIUtilities::currentMissing());echo "</xmp>";
 		foreach($diff_arrays as $row) {
 			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
@@ -806,18 +807,17 @@ class FlexicontentModelFlexicontent extends JModel
 		return true;
 	}
 	
-	function formatFlexiPlugins()
-	{
+	function formatFlexiPlugins() {
 		$db 	= & $this->_db;
-		$query	= 'SELECT id, name FROM #__plugins'
+		$query	= 'SELECT extension_id, name FROM #__extensions'
 				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
+				. ' AND `type`=' . $db->Quote('plugin')
 				;
 		$db->setQuery($query);
 		$flexiplugins = $db->loadObjectList();
-		
 		foreach ($flexiplugins as $fp) {
 			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
-				$query = 'UPDATE #__plugins SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE id = ' . (int)$fp->id;
+				$query = 'UPDATE #__extensions SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE `type`='.$db->Quote('plugin').' AND extension_id = ' . (int)$fp->id;
 				$db->setQuery($query);
 				$db->Query();
 			}

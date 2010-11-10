@@ -17,16 +17,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsText extends JPlugin
-{
-	function plgFlexicontent_fieldsText( &$subject, $params )
-	{
+class plgFlexicontent_fieldsText extends JPlugin{
+	function plgFlexicontent_fieldsText( &$subject, $params ) {
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 
-	function onDisplayField(&$field, $item)
-	{
+	function onDisplayField(&$field, $item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
@@ -46,7 +43,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$required 	= $required ? ' class="required"' : '';
 		
 		// initialise property
-		if($item->version < 2 && $default_value) {
+		if($item->getValue('version') < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
@@ -58,29 +55,30 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 		}
 		
-		if ($multiple) // handle multiple records
-		{
+		if ($multiple) {// handle multiple records
 			$document	= & JFactory::getDocument();
+			if(!isset($document->jquery_ui_core)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
+				$document->jquery_ui_core = true;
+			}
+			if(!isset($document->jquery_ui_widget)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
+				$document->jquery_ui_widget = true;
+			}
+			if(!isset($document->jquery_ui_mouse)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
+				$document->jquery_ui_mouse = true;
+			}
+			if(!isset($document->jquery_ui_sortable)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
+				$document->jquery_ui_sortable = true;
+			}
 
 			//add the drag and drop sorting feature
 			$js = "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
-					});			
-				});
+			jQuery(function() {
+				jQuery( '#sortables_".$field->id."' ).sortable();
+			});
 			";
 			$document->addScriptDeclaration($js);
 
@@ -90,39 +88,22 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 			function addField".$field->id."(el) {
 				if((curRowNum".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					//var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 					thisNewField.getFirst().setProperty('value','');
 
 					thisNewField.injectAfter(thisField);
-		
-					new Sortables($('sortables_".$field->id."'), {
-						'handles': $('sortables_".$field->id."').getElements('span.drag'),
-						'onDragStart': function(element, ghost){
-							ghost.setStyles({
-							   'list-style-type': 'none',
-							   'opacity': 1
-							});
-							element.setStyle('opacity', 0.3);
-						},
-						'onDragComplete': function(element, ghost){
-							element.setStyle('opacity', 1);
-							ghost.remove();
-							this.trash.remove();
-						}
-					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
 						this.setOptions({duration: 600});
 						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
 					curRowNum".$field->id."++;
 					}
 				}
@@ -132,15 +113,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
+				//var fx	= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				fx.start({
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
-				curRowNum".$field->id."--;
+					curRowNum".$field->id."--;
 				}
 			}
 			";
@@ -163,33 +144,30 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 			$move2 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 			$n = 0;
-			$field->html = '<ul id="sortables_'.$field->id.'">';
+			$field->html = '<ul id="sortables_'.$field->id.'" style="float:left;">';
 
 			foreach ($field->value as $value) {
-				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
+				$field->html	.= '<li>'.$pretext.'<input name="jform['.$field->name.'][]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
 				$n++;
 				}
 			$field->html .=	'</ul>';
 			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
-			$field->html	= '<div>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';
+			$field->html	= '<div>'.$pretext.'<input name="jform['.$field->name.'][]" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';
 		}
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
+	function onBeforeSaveField( $field, &$post, &$file ) {
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 		
 		$newpost = array();
 		$new = 0;
 
-		foreach ($post as $n=>$v)
-		{
-			if ($post[$n] != '')
-			{
+		foreach ($post as $n=>$v) {
+			if ($post[$n] != '') {
 				$newpost[$new] = $post[$n];
 			}
 			$new++;
@@ -211,8 +189,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	}
 
 
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
-	{
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
