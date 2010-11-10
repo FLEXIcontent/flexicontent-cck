@@ -51,26 +51,28 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 		if ($multiple) {
 			$document	= & JFactory::getDocument();
+			if(!isset($document->jquery_ui_core)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
+				$document->jquery_ui_core = true;
+			}
+			if(!isset($document->jquery_ui_widget)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
+				$document->jquery_ui_widget = true;
+			}
+			if(!isset($document->jquery_ui_mouse)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
+				$document->jquery_ui_mouse = true;
+			}
+			if(!isset($document->jquery_ui_sortable)){
+				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
+				$document->jquery_ui_sortable = true;
+			}
 
 			//add the drag and drop sorting feature
 			$js = "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
-					});			
-				});
+			jQuery(function() {
+				jQuery( '#sortables_".$field->id."' ).sortable();
+			});
 			";
 			$document->addScriptDeclaration($js);
 
@@ -84,7 +86,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					//var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
 					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
@@ -98,22 +101,6 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					thisNewField.getElements('span span').setHTML('0');
 
 					thisNewField.injectAfter(thisField);
-		
-					new Sortables($('sortables_".$field->id."'), {
-						'handles': $('sortables_".$field->id."').getElements('span.drag'),
-						'onDragStart': function(element, ghost){
-							ghost.setStyles({
-							   'list-style-type': 'none',
-							   'opacity': 1
-							});
-							element.setStyle('opacity', 0.3);
-						},
-						'onDragComplete': function(element, ghost){
-							element.setStyle('opacity', 1);
-							ghost.remove();
-							this.trash.remove();
-						}
-					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
 						this.setOptions({duration: 600});
@@ -134,13 +121,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				//var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
 				curRowNum".$field->id."--;
 				}

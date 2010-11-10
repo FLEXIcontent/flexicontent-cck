@@ -26,8 +26,7 @@ if(MooTools.version>="1.2.4") {
 	window.onDomReady(stateselector.init.bind(stateselector));
 }
 
-function dostate(state, id)
-{	
+function dostate(state, id) {
 	var change = new processstate();
 	change.dostate( state, id );
 }
@@ -60,8 +59,7 @@ function fetchcounter() {
 }
 
 // the function overloads joomla standard event
-function submitform(pressbutton)
-{
+function submitform(pressbutton) {
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
@@ -98,8 +96,7 @@ function submitform(pressbutton)
 }
 
 // delete active filter
-function delFilter(name)
-{
+function delFilter(name) {
 	var myForm = $('adminForm');
 	$(name).setProperty('value', '');
 }

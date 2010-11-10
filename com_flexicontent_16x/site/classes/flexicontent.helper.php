@@ -1218,7 +1218,9 @@ class flexicontent_tmpl
 				$themes->items->{$tmpl}->view 		= 'items';
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
 				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';	
-				$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
+				//$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
+				$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+				$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				foreach ($themes->items as $ilay) {
 					$parser =& JFactory::getXMLParser('Simple');		
 					$parser->loadFile($tmplxml);
@@ -1255,15 +1257,17 @@ class flexicontent_tmpl
 					}
 				}
 			}
-			$tmplxml = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$tmpl.DS.'category.xml';
+			$tmplxml = $tmpldir.DS.$tmpl.DS.'category.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->category->{$tmpl}->name 		= $tmpl;
 				$themes->category->{$tmpl}->view 		= 'category';
 				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
 				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';	
-				$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
+				//$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
+				$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+				$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				foreach ($themes->category as $clay) {
-					$parser =& JFactory::getXMLParser('Simple');		
+					$parser =& JFactory::getXMLParser('Simple');
 					$parser->loadFile($tmplxml);
 					$document 	=& $parser->document;
 
@@ -1433,14 +1437,16 @@ class FLEXIUtilities {
 		if($id) {
 			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
 			return $return;
-		}
+		}elseif($justvalue) {$v=0;return $v;}
 		return $g_lastversions;
 	}
 	function &getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
 		static $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
-			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_CATEGORY."';";
+			$query = "SELECT c.id,c.version FROM #__content as c"
+					. " JOIN #__categories as cat ON c.id=cat.id"
+					. " WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."';";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
@@ -1449,11 +1455,10 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
-		if(!$id && $justvalue) {$v=0;return $v;}
 		if($id) {
 			$return = $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
 			return $return;
-		}
+		}elseif($justvalue) {$v=0;return $v;}
 		return $g_currentversions;
 	}
 	function &getLastItemVersion($id) {
@@ -1468,20 +1473,25 @@ class FLEXIUtilities {
 		return (int)$lastversion;
 	}
 	function &currentMissing() {
-		$db =& JFactory::getDBO();
-		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-				" WHERE sectionid='".FLEXI_CATEGORY."' AND c.version > '1';";
-		$db->setQuery($query);
-		$rows = $db->loadObjectList("id");
-		$status = false;
-		foreach($rows as $r) {
-			if(!$r->iversion) {
-				$status = true;
-				break;
+		static $status;
+		if(!$status) {
+			$status = array();
+			$db =& JFactory::getDBO();
+			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
+					" JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+					" JOIN #__categories as cat ON c.catid=cat.id" .
+					" WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."' AND c.version > '1';";
+			$db->setQuery($query);
+			//echo str_replace("#__", "jos_", $query);
+			$rows = $db->loadObjectList("id");
+			
+			foreach($rows as $r) {
+				if(!$r->iversion) {
+					$status[$r->id] = array('id'=>$r->id, 'version'=>$r->version);
+				}
 			}
+			unset($rows);
 		}
-		unset($rows);
 		return $status;
 	}
 	/**

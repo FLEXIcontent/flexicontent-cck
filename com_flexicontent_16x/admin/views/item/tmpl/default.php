@@ -17,9 +17,6 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-
-$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
-$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->permission->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
@@ -74,7 +71,7 @@ if ($this->permission->CanUseTags) {
 		});
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&active=".$this->version."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
@@ -98,10 +95,10 @@ if ($this->permission->CanUseTags) {
 ?>
 <script language="javascript" type="text/javascript">
 window.addEvent( "domready", function() {
-    var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gethits'});
+    var hits = new itemscreen('hits', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'gethits'});
     hits.fetchscreen();
 
-    var votes = new itemscreen('votes', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'getvotes'});
+    var votes = new itemscreen('votes', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'getvotes'});
     votes.fetchscreen();
 });
 function addToList(id, name) {
@@ -158,7 +155,6 @@ $revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/imag
 $view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
 $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
 ?>
-
 <div class="flexicontent">
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm" autocomplete="off">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -170,32 +166,27 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
-										<label for="title">
-										<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
-										</label>
+										<?php echo $this->form->getLabel('title');?>
 									</td>
 									<td>
-										<input id="title" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="254" />
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<label for="alias">
-										<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
-										</label>
-									</td>
-									<td>
-										<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="254" value="<?php echo $this->row->alias; ?>" />
+										<?php //echo $this->form->getInput('title');?>
+										<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="45" maxlength="254">
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<label for="type_id">
-										<?php echo JText::_( 'FLEXI_TYPE' ).':'; ?>
-										</label>
+										<?php echo $this->form->getLabel('alias');?>
 									</td>
 									<td>
-									<?php echo $this->lists['type']; ?>
+										<?php echo $this->form->getInput('alias');?>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<?php echo $this->form->getLabel('type_id');?>
+									</td>
+									<td>
+										<?php echo $this->form->getInput('type_id');?>
 									</td>
 								</tr>
 								<tr>
@@ -206,7 +197,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									</td>
 									<td>
 									<?php
-									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
+									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
 										echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
@@ -215,7 +206,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 											endif;
 									else :
 										echo $this->published;
-										echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
+										echo '<input type="hidden" name="state" value="'.$this->form->getValue("state").'" />';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												echo '<input type="hidden" name="vstate" value="1" />';
 											else :
@@ -258,7 +249,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 						<td valign="top" width="50%">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
-								<?php
+<?php
 									$nused = count($this->usedtags);
 									for( $i = 0, $nused; $i < $nused; $i++ ) {
 										$tag = $this->usedtags[$i];
@@ -270,7 +261,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" align="right"></a></li>';
 										}
 									}
-									?>
+?>
 								</ul>
 								<br class="clear" />
 							</div>
@@ -302,17 +293,17 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
-                    	<tr>
-                    		<td>
-                        		<div id="access"><?php echo $this->lists['access']; ?></div>
-                        	</td>
-                    	</tr>
-                	</table>
+				    	<tr>
+				    		<td>
+				        		<div id="access"><?php echo $this->lists['access']; ?></div>
+				        	</td>
+				    	</tr>
+					</table>
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-                	</div>
-                </fieldset>
-                <?php endif; ?>
+                			</div>
+               			</fieldset>
+				<?php endif; ?>
 
 				<?php
 				if ($this->fields) {
@@ -328,7 +319,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 
 				<fieldset>
 					<legend>
-						<?php echo $this->row->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->row->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+						<?php echo $this->form->getValue("type_id") ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->fieldtype->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
 					
 					<table class="admintable" width="100%">
@@ -337,17 +328,16 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							// used to hide the core fields from this listing
 							if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
 							// set the specific label for the maintext field
-								if ($field->field_type == 'maintext')
-								{
+								if ($field->field_type == 'maintext') {
 									$field->label = $this->tparams->get('maintext_label', $field->label);
 									$field->description = $this->tparams->get('maintext_desc', $field->description);
-									$maintext = ($this->version!=$this->row->version)?@$field->value[0]:$this->row->text;
-									if ($this->tparams->get('hide_html', 0))
-									{
-										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
+									$maintext = @$field->value[0];
+									if ($this->tparams->get('hide_html', 0)) {
+										$field->html = '<textarea name="jform[text]" id="jform_text" rows="20" cols="75">'.$maintext.'</textarea>';
 									} else {
 										$height = $this->tparams->get('height', 400);
-										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
+										$editor = & JFactory::getEditor();
+										$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array('pagebreak'), 'jform_text' ) ;;
 									}
 								}
 						?>
@@ -375,7 +365,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					</table>
 				</fieldset>
 				<?php
-				} else if ($this->row->id == 0) {
+				} else if ($this->form->getValue("id") == 0) {
 				?>
 					<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 				<?php
@@ -390,13 +380,13 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			
 		<?php
 		// used to hide "Reset Hits" when hits = 0
-		if ( !$this->row->hits ) {
+		if ( !$this->form->getValue("hits") ) {
 			$visibility = 'style="display: none; visibility: hidden;"';
 		} else {
 			$visibility = '';
 		}
 		
-		if ( !$this->row->score ) {
+		if ( !$this->form->getValue("score") ) {
 			$visibility2 = 'style="display: none; visibility: hidden;"';
 		} else {
 			$visibility2 = '';
@@ -405,14 +395,14 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 		<?php
-		if ( $this->row->id ) {
+		if ( $this->form->getValue("id") ) {
 		?>
 		<tr>
 			<td>
 				<strong><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?>:</strong>
 			</td>
 			<td>
-				<?php echo $this->row->id; ?>
+				<?php echo $this->form->getValue("id"); ?>
 			</td>
 		</tr>
 		<?php
@@ -433,7 +423,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<td>
 				<div id="hits"></div>
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->row->id; ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->form->getValue('id'); ?>', 'hits')" />
 				</span>
 				<div id="hits"></div>
 			</td>
@@ -445,7 +435,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<td>
 				<div id="votes"></div>
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resetvotes', '<?php echo $this->form->getValue('id'); ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
@@ -462,7 +452,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<strong><?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?></strong>
 			</td>
 			<td>
-				#<?php echo $this->row->version;?>
+				#<?php echo $this->form->getValue('version');?>
 			</td>
 		</tr>
 		<tr>
@@ -470,7 +460,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<strong><?php echo JText::_( 'FLEXI_WORKING_VERSION' ); ?></strong>
 			</td>
 			<td>
-				#<?php echo $this->version?$this->version:$this->row->version;?>
+				#<?php echo $this->version?$this->version:$this->form->getValue('version');?>
 			</td>
 		</tr>
 		<tr>
@@ -479,10 +469,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</td>
 			<td>
 				<?php
-				if ( $this->row->created == $this->nullDate ) {
+				if ( $this->form->getValue('created') == $this->nullDate ) {
 					echo JText::_( 'FLEXI_NEW_ITEM' );
 				} else {
-					echo JHTML::_('date',  $this->row->created,  JText::_( 'DATE_FORMAT_LC2' ) );
+					echo JHTML::_('date',  $this->form->getValue('created'),  JText::_( 'DATE_FORMAT_LC2' ) );
 				}
 				?>
 			</td>
@@ -493,10 +483,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</td>
 			<td>
 				<?php
-					if ( $this->row->modified == $this->nullDate ) {
+					if ( $this->form->getValue('modified') == $this->nullDate ) {
 						echo JText::_( 'FLEXI_NOT_MODIFIED' );
 					} else {
-						echo JHTML::_('date',  $this->row->modified, JText::_( 'DATE_FORMAT_LC2' ));
+						echo JHTML::_('date',  $this->form->getValue('modified'), JText::_( 'DATE_FORMAT_LC2' ));
 					}
 				?>
 			</td>
@@ -509,7 +499,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>
 			</tr>
 			<tr>
-				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
+				<td><textarea name="jform[versioncomment]" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
 			</tr>
 		</table>
 		<?php if ($this->permission->CanVersion) : ?>
@@ -518,7 +508,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
 			</tr>
-			<?php if ($this->row->id == 0) : ?>
+			<?php if ($this->form->getValue('id') == 0) : ?>
 			<tr>
 				<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
 			</tr>
@@ -531,30 +521,20 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			?>
 			<tr<?php echo $class; ?>>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->form->getValue('created') : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->form->getValue('creator'), 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="#" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
-				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+				if((int)$version->nr==(int)$this->form->getValue('version')) {//is current version? ?>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->form->getValue('id');?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
 				<?php }?></td>
 			</tr>
 			<?php
 				endif;
 			endforeach;
-			/*
-			$currentdate =& JFactory::getDate();
-			$currentdate = $currentdate->toUnix();
-			?>
-			<tr>
-				<td class="versions-first"><?php echo '#' . $this->row->version; ?></td>
-				<td class="versions-first"><?php echo JHTML::_('date', $currentdate, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
-				<td class="versions-first"><?php echo $this->row->modifier; ?></td>
-				<td class="versions-first" align="center"><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a></td>
-			</tr>
-			<?php */ endif; ?>
+			endif; ?>
 		</table>
 		</div>
 		<div id="pager"></div>
@@ -578,7 +558,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
-					<?php echo $this->lists['cid']; ?>
+					<?php //echo $this->lists['cid']; ?>
+					<?php echo $this->form->getInput('cid');?>
+					
 				</td>
 			</tr>
 			<tr>
@@ -588,56 +570,111 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
-					<?php echo $this->lists['catid']; ?>
+					<?php //echo $this->lists['catid']; ?>
+					<?php echo $this->form->getInput('catid');?>
 				</td>
 			</tr>
 		</table>
+			<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
+			<table>
+			<tr>
+			<td>
+			<?php
+			echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
+			/*if (isset($fieldSet->description) && trim($fieldSet->description)) :
+				echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+			endif;*/
+			?>
+			<fieldset class="panelform">
+			<ul class="adminformlist">
+				<li><?php echo $this->form->getLabel('access');?>
+				<?php echo $this->form->getInput('access');?></li>
+				<li><?php echo $this->form->getLabel('created_by');?>
+				<?php echo $this->form->getInput('created_by');?></li>
+				<li><?php echo $this->form->getLabel('created_by_alias');?>
+				<?php echo $this->form->getInput('created_by_alias');?></li>
+				<li><?php echo $this->form->getLabel('created');?>
+				<?php echo $this->form->getInput('created');?></li>
+				<li><?php echo $this->form->getLabel('publish_up');?>
+				<?php echo $this->form->getInput('publish_up');?></li>
+				<li><?php echo $this->form->getLabel('publish_down');?>
+				<?php echo $this->form->getInput('publish_down');?></li>
+			</ul>
+			</fieldset>
 
 			<?php
-			$title = JText::_( 'FLEXI_DETAILS' );
-			echo $this->pane->startPane( 'det-pane' );
-			echo $this->pane->startPanel( $title, 'details' );
-			echo $this->form->render('details');
+			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
+			//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+			?>
+			<fieldset class="panelform">
+				<?php echo $this->form->getLabel('metadesc'); ?>
+				<?php echo $this->form->getInput('metadesc'); ?>
 
-			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
-			echo $this->pane->endPanel();
-			echo $this->pane->startPanel( $title, "metadata-page" );
-			echo $this->form->render('meta', 'metadata');
-			
-			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-			echo $this->pane->endPanel();
-			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->form->render('params', 'advanced');
-			echo $this->pane->endPanel();
-
+				<?php echo $this->form->getLabel('metakey'); ?>
+				<?php echo $this->form->getInput('metakey'); ?>
+				<?php foreach($this->form->getGroup('metadata') as $field): ?>
+					<?php if ($field->hidden): ?>
+						<?php echo $field->input; ?>
+					<?php else: ?>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</fieldset>
+			<?php
+			$fieldSets = $this->form->getFieldsets('attribs');
+			foreach ($fieldSets as $name => $fieldSet) :
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+				echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+				?>
+				<fieldset class="panelform">
+					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php endforeach;
+			?>
+			</td>
+			</tr>
+			<tr>
+			<td>
+			<?php
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-
 			foreach ($this->tmpls as $tmpl) {
 				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-				echo $tmpl->params->render();
-				echo $this->pane->endPanel();
+				echo JHtml::_('sliders.panel',JText::_($title),  "params-".$tmpl->name);
+				?>
+				<fieldset class="panelform">
+					<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					<?php endforeach; ?>
+				</fieldset>
+				<?php
 			}
-
-			echo $this->pane->endPane();
 			?>
+			</td>
+			</tr>
+			</table>
+			<?php echo JHtml::_('sliders.end'); ?>
 		</td>
 	</tr>
 </table>
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue('id'); ?>" />
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
-<input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
-<input type="hidden" name="oldtitle" value="<?php echo $this->row->title; ?>" />
-<input type="hidden" name="oldtext" value="<?php echo $this->row->text; ?>" />
-<input type="hidden" name="oldstate" value="<?php echo $this->row->state; ?>" />
-<input type="hidden" name="oldmodified" value="<?php echo $this->row->modified; ?>" />
-<input type="hidden" name="oldmodified_by" value="<?php echo $this->row->modified_by; ?>" />
+<input type="hidden" name="hits" value="<?php echo $this->form->getValue('hits'); ?>" />
+<input type="hidden" name="oldtitle" value="<?php echo $this->form->getValue('title'); ?>" />
+<input type="hidden" name="oldtext" value="<?php echo $this->form->getValue('text'); ?>" />
+<input type="hidden" name="oldstate" value="<?php echo $this->form->getValue('state'); ?>" />
+<input type="hidden" name="oldmodified" value="<?php echo $this->form->getValue('modified'); ?>" />
+<input type="hidden" name="oldmodified_by" value="<?php echo $this->form->getValue('modified_by'); ?>" />
 <?php if (!FLEXI_FISH) : ?>
-<input type="hidden" name="language" value="<?php echo $this->row->language; ?>" />
+<input type="hidden" name="language" value="<?php echo $this->form->getValue('language'); ?>" />
 <?php endif; ?>
 </form>
 

@@ -70,4 +70,9 @@ class JFormFieldFieldtypes extends JFormFieldList{
 		$types = $db->loadObjectList();
 		return $types;
 	}
+	public function setAttributes($attribs = array()) {
+		$this->name = $attribs['name'];
+		$this->value = $attribs['value'];
+		$this->label = JText::_($attribs['label']);
+	}
 }

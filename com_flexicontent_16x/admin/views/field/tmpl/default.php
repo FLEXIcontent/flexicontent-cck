@@ -200,7 +200,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if ($this->form->getValue('iscore') == 1) : ?>
 <input type="hidden" name="jform[iscore]" value="<?php echo $this->form->getValue("iscore"); ?>" />
-<input type="hidden" name="name" value="<?php echo $this->form->getValue("name"); ?>" />
+<input type="hidden" name="jform[name]" value="<?php echo $this->form->getValue("name"); ?>" />
 <?php endif; ?>
 <input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue("id"); ?>" />
 <input type="hidden" name="controller" value="fields" />
