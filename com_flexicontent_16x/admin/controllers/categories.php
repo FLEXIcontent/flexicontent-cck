@@ -55,8 +55,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 * @return void
 	 * @since 1.0
 	 */
-	function save()
-	{
+	function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -112,14 +111,11 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 
-		} else {exit;
-			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY' );
-			JError::raiseError( 500, $model->getError() );
-			$link 	= 'index.php?option=com_flexicontent&view=category';
+		} else {
+			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY '. $model->getError() );
+			$link 	= 'index.php?option=com_flexicontent&view=category'.(@$_REQUEST['id']?'&cid[]='.(int)$_REQUEST['id']:'');
 		}
-
 		$model->checkin();
-
 		$this->setRedirect($link, $msg);
 	}
 

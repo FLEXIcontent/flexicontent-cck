@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <access component="com_flexicontent">
-	<section name="category">
-		<action name="com_flexicontent.createcat" title="Create" description="Create category" />
-		<action name="com_flexicontent.deletecat" title="Delete" description="Delete category" />
-		<action name="com_flexicontent.editcat" title="Edit" description="Edit category" />
-		<action name="com_flexicontent.editcat.state" title="Edit state" description="Edit state of category" />
-	</section>
 	<section name="component">
-		<action name="com_flexicontent.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
-		<action name="com_flexicontent.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+		<action name="flexicontent.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
+		<action name="flexicontent.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
 
-		<action name="com_flexicontent.fields" title="Can manage fields" description="Can manage fields" />
-		<action name="com_flexicontent.tags" title="Can manage tags" description="Can manage tags" />
-		<action name="com_flexicontent.archives" title="CanArchives" description="CanArchives" />
-		<action name="com_flexicontent.stats" title="Can manage stats" description="Can manage stats" />
-		<action name="com_flexicontent.templates" title="Can manage templates" description="Can manage templates" />
-		<action name="com_flexicontent.versioning" title="Can use version" description="Can use version" />
-		<action name="com_flexicontent.usetags" title="Can use tags" description="Can use tags" />
+		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
+		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />
+		<action name="flexicontent.archives" title="CanArchives" description="CanArchives" />
+		<action name="flexicontent.stats" title="Can manage stats" description="Can manage stats" />
+		<action name="flexicontent.templates" title="Can manage templates" description="Can manage templates" />
+		<action name="flexicontent.versioning" title="Can use version" description="Can use version" />
+		<action name="flexicontent.usetags" title="Can use tags" description="Can use tags" />
 		
-		<action name="com_flexicontent.manageitem" title="Can manage articles" description="Can manage articles" />
-		<action name="com_flexicontent.create" title="Can create article" description="Can create article" />
-		<action name="com_flexicontent.delete" title="Can delete article" description="Can delete article" />
-		<action name="com_flexicontent.edit" title="Can edit article" description="Can edit article" />
-		<action name="com_flexicontent.edit.state" title="Can edit state of article" description="Can edit state of article" />
-		<action name="com_flexicontent.copyitems" title="Can copy articles" description="Can copy articles" />
-		<action name="com_flexicontent.order" title="Can order articles" description="Can order articles" />
-		<action name="com_flexicontent.paramsitem" title="Can set article params" description="Can set article params" />
+		<action name="flexicontent.manageitem" title="Can manage articles" description="Can manage articles" />
+		<action name="flexicontent.create" title="Can create article" description="Can create article" />
+		<action name="flexicontent.deleteall" title="Can delete article" description="Can delete article" />
+		<action name="flexicontent.editall" title="Can edit article" description="Can edit article" />
+		<action name="flexicontent.editall.state" title="Can edit state of article" description="Can edit state of article" />
+		<action name="flexicontent.copyitems" title="Can copy articles" description="Can copy articles" />
+		<action name="flexicontent.order" title="Can order articles" description="Can order articles" />
+		<action name="flexicontent.paramsitem" title="Can set article params" description="Can set article params" />
+		<action name="flexicontent.displayallitems" title="Can display all items" description="Can display all items" />
 		
-		<action name="com_flexicontent.managetype" title="Can manage types" description="Can manage types" />
-		<action name="com_flexicontent.createtype" title="Can create type" description="Can create type" />
-		<action name="com_flexicontent.deletetype" title="Can delete type" description="Can delete type" />
-		<action name="com_flexicontent.edittype" title="Can edit type" description="Can edit type" />
-		<action name="com_flexicontent.edittype.state" title="Can edit state of type" description="Can edit state of type" />
+		<action name="flexicontent.managetype" title="Can manage types" description="Can manage types" />
+		<action name="flexicontent.createtype" title="Can create type" description="Can create type" />
+		<action name="flexicontent.deletetype" title="Can delete type" description="Can delete type" />
+		<action name="flexicontent.edittype" title="Can edit type" description="Can edit type" />
+		<action name="flexicontent.edittype.state" title="Can edit state of type" description="Can edit state of type" />
 		
-		<action name="com_flexicontent.managecat" title="Can manage categories" description="Can manage categories" />
-		<action name="com_flexicontent.usercats" title="View All Categories" description="View All Categories" />
-		<action name="com_flexicontent.viewtree" title="View categories tree" description="View categories tree" />
-		<action name="com_flexicontent.createcat" title="Can create category" description="Can create category" />
-		<action name="com_flexicontent.deletecat" title="Can delete category" description="Can delete category" />
-		<action name="com_flexicontent.editcat" title="Can edit category" description="Can edit category" />
-		<action name="com_flexicontent.editcat.state" title="Can edit state of category" description="Can edit state of category" />
+		<action name="flexicontent.managecat" title="Can manage categories" description="Can manage categories" />
+		<action name="flexicontent.usercats" title="View All Categories" description="View All Categories" />
+		<action name="flexicontent.viewtree" title="View categories tree" description="View categories tree" />
+		<action name="flexicontent.createcat" title="Can create category" description="Can create category" />
+		<action name="flexicontent.deleteallcat" title="Can delete category" description="Can delete category" />
+		<action name="flexicontent.editallcat" title="Can edit category" description="Can edit category" />
+		<action name="flexicontent.editallcat.state" title="Can edit state of category" description="Can edit state of category" />
 		
-		<action name="com_flexicontent.managefile" title="Can manage files" description="Can manage files" />
-		<action name="com_flexicontent.uploadfiles" title="Upload file" description="Upload file" />
-		<action name="com_flexicontent.viewallfiles" title="View All files" description="View All files" />
+		<action name="flexicontent.managefile" title="Can manage files" description="Can manage files" />
+		<action name="flexicontent.uploadfiles" title="Upload file" description="Upload file" />
+		<action name="flexicontent.viewallfiles" title="View All files" description="View All files" />
 	</section>
 
 	<section name="article">
-		<action name="core.delete" title="COM_CONTENT_ACCESS_DELETE" description="COM_CONTENT_ACCESS_DELETE_DESC" />
-		<action name="core.edit" title="COM_CONTENT_ACCESS_EDIT" description="COM_CONTENT_ACCESS_EDIT_DESC" />
-		<action name="core.edit.state" title="COM_CONTENT_ACCESS_EDITSTATE" description="COM_CONTENT_ACCESS_EDITSTATE_DESC" />
+		<action name="flexicontent.delete" title="Delete this item" description="Delete this item" />
+		<action name="flexicontent.deleteown" title="Delete own item" description="Delete own item" />
+		<action name="flexicontent.edit" title="Edit this item" description="Edit this item" />
+		<action name="flexicontent.editown" title="Edit own item" description="Edit own item" />
+		<action name="flexicontent.edit.state" title="Publish this item" description="Publish this item" />
+		<action name="flexicontent.editown.state" title="Publish own item" description="Publish own item" />
+	</section>
+	
+	<section name="category">
+		<action name="flexicontent.deletecat" title="Delete this category" description="Delete this category" />
+		<action name="flexicontent.deleteowncat" title="Delete own category" description="Delete own category" />
+		<action name="flexicontent.editcat" title="Edit this category" description="Edit this category" />
+		<action name="flexicontent.editowncat" title="Edit own category" description="Edit own category" />
+		<action name="flexicontent.editcat.state" title="Publish this category" description="Publish this category" />
+		<action name="flexicontent.editowncat.state" title="Publish own category" description="Publish own category" />
 	</section>
 </access>

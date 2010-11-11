@@ -347,23 +347,13 @@ class FlexicontentModelItem extends JModelAdmin {
 		$mainframe = &JFactory::getApplication();
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
-		
-		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
-		//$tags 		= JRequest::getVar( 'tag', array(), 'post', 'array');
-		$tags			= $data['tag'];
 
-		//$cats 		= JRequest::getVar( 'cid', array(), 'post', 'array');
-
+		$tags			= isset($data['tag'])?$data['tag']:array();
 		$cats			= isset($data['jform']['cid'])?$data['jform']['cid']:array();
 		$id			= (int)$data['jform']['id'];
-		//$post 		= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$data['vstate']		= (int)$data['vstate'];
-
-		//$item->bind($details);
 		$item->id = $id;
-		
 		$nullDate	= $this->_db->getNullDate();
-
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
@@ -371,6 +361,7 @@ class FlexicontentModelItem extends JModelAdmin {
 		$tags = array_unique($tags);
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
+		$item->setRules($data['jform']['rules']);
 		if( ($isnew = !$id) || ($data['vstate']==2) ) {//vstate = 2 is approve version then save item to #__content table.
 			// Add the primary cat to the array if it's not already in
 			if (!in_array($data['jform']['catid'], $cats)) {

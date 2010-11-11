@@ -99,11 +99,9 @@ class FlexicontentModelItems extends JModel{
 	 * @access public
 	 * @return object
 	 */
-	function getData()
-	{
+	function getData() {
 		// Lets load the Items if it doesn't already exist
-		if (empty($this->_data))
-		{
+		if (empty($this->_data)) {
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 
@@ -116,9 +114,8 @@ class FlexicontentModelItems extends JModel{
 				}
 				$k = 1 - $k;
 			}
-		return $this->_data;
-					}			
-			
+			return $this->_data;
+	}
 	/**
 	 * Method to set the default site language to an item with no language
 	 * 
@@ -361,6 +358,7 @@ class FlexicontentModelItems extends JModel{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$nullDate = $this->_db->getNullDate();
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
@@ -389,16 +387,18 @@ class FlexicontentModelItems extends JModel{
 		$where[] = ' (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')';
 
 		// if FLEXIaccess only authorize users to see their own items
-		if (FLEXI_ACCESS) {
+		//if (FLEXI_ACCESS) {
 			$user 	=& JFactory::getUser();
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+			$allitems	= $permission->DisplayAllItems;
 
 			if (!@$allitems) {				
-				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
-				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
+				$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.edit', 'item');
+				$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editcat', 'category');
+				$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editown', 'item');
+				$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editowncat', 'category');
 
-				if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
-					if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
+				if (!$permission->CanEdit) { // first exclude the users allowed to edit all items
+					if (@$canEditOwn['item']) { // custom rules for users allowed to edit all their own items
 						$allown = array();
 						$allown[] = ' i.created_by = ' . $user->id;
 						if (isset($canEdit['category'])) {
@@ -445,7 +445,7 @@ class FlexicontentModelItems extends JModel{
 					}
 				}
 			}
-		}
+		//}//if (FLEXI_ACCESS)
 
 		// get not associated items to remove them from the displayed datas
 		$unassociated = $this->getUnassociatedItems();

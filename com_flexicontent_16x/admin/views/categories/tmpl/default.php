@@ -77,7 +77,7 @@ $userId		= $user->get('id');
 			$access 	= JHTML::_('grid.access', $row, $i );
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
-			$canEditOwn	= $user->authorise('core.edit.own', '#__categories.'.$row->id) && ($row->created_user_id == $userId);
+			$canEditOwn	= $user->authorise('flexicontent.editowncat', 'flexicontent.category.'.$row->id) && ($row->created_user_id == $userId);
 			$canCheckin	= $user->authorise('core.admin', 'com_checkin') || ($row->checked_out == $userId) || ($row->checked_out == 0);
    		?>
 		<tr class="<?php echo "row$k"; ?>">
