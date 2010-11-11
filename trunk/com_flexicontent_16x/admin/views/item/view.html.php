@@ -44,7 +44,9 @@ class FlexicontentViewItem extends JView {
 		$dispatcher	= & JDispatcher::getInstance();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 		
-		$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
+		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
+		}
 		$document->addCustomTag('<script>jQuery.noConflict();</script>');
 
 		JHTML::_('behavior.tooltip');

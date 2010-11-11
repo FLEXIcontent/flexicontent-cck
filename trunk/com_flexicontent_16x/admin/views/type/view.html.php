@@ -63,32 +63,19 @@ class FlexicontentViewType extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Type' );
-		$this->iform		= $this->get('Form');
+		$this->form		= $this->get('Form');
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
 
 		// fail if checked out not by 'me'
-		if ($row->id) {
+		if ($this->form->getValue("id")) {
 			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+				JError::raiseWarning( 'SOME_ERROR_CODE', $this->form->getValue("name").' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
 			}
 		}
 
-		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-
-		//create the parameter form
-		/*$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'type.xml');
-		$form->loadINI($row->attribs);
-		foreach ($tmpls as $tmpl) {
-			$tmpl->params->loadINI($row->attribs);
-		}*/
-
 		//assign data to template
-		$this->assignRef('row'      	, $row);
-		//$this->assignRef('form'			, $form);
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('tmpls'		, $tmpls);
 

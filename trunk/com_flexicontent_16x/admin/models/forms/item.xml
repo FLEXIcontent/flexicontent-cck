@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<fieldset addfilepath="/administrator/components/com_flexicontent/elements">
+	<fieldset>
 		<field name="id"  type="text" class="readonly" label="JGLOBAL_FIELD_ID_LABEL"
 			description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" 
 			readonly="true"  />
@@ -119,7 +119,7 @@
 
 	</fieldset>
 	<fields name="attribs">
-	<fieldset name="params-page" label="FLEXI_PARAMETERS_STANDARD">
+	<fieldset name="params-page" label="FLEXI_PARAMETERS_STANDARD" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" />
 		<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">Use Global</option>

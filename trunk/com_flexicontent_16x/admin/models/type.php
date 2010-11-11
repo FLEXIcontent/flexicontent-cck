@@ -34,7 +34,7 @@ class FlexicontentModelType extends JModelAdmin{
 	 *
 	 * @var object
 	 */
-	var $_type = null;
+	var $_id = null;
 
 	/**
 	 * Constructor
@@ -44,8 +44,14 @@ class FlexicontentModelType extends JModelAdmin{
 	function __construct() {
 		parent::__construct();
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		$array = JRequest::getVar('cid',  array(0), '', 'array');
+		$array = is_array($array)?$array:array($array);
+		$id = $array[0];
+		if(!$id) {
+			$data = JRequest::get( 'post' );
+			$id = $data['jform']['id'];
+		}
+		$this->setId((int)$id);
 	}
 
 	/**
@@ -54,47 +60,13 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @access	public
 	 * @param	int type identifier
 	 */
-	function setId($id)
-	{
+	function setId($id) {
 		// Set type id and wipe data
 		$this->_id	    = $id;
-		$this->_type	= null;
 	}
 	
-	/**
-	 * Overridden get method to get properties from the type
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.0
-	 */
-	function get($property, $default=null)
-	{
-		if ($this->_loadType()) {
-			if(isset($this->_type->$property)) {
-				return $this->_type->$property;
-			}
-		}
-		return $default;
-	}
-
-	/**
-	 * Method to get type data
-	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
-	 */
-	function &getType()
-	{
-		if ($this->_loadType())
-		{
-		}
-		else  $this->_initType();
-		
-		return $this->_type;
+	function getId() {
+		return $this->_id;
 	}
 	
 	/**
@@ -227,12 +199,11 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
-	{
-		if ($this->_id)
-		{
+	function checkin() {
+		if ($this->_id) {
 			$type = & JTable::getInstance('flexicontent_types', '');
-			return $type->checkout($uid, $this->_id);
+			$user = &JFactory::getUser();
+			return $type->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -245,10 +216,8 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
-	{
-		if ($this->_id)
-		{
+	function checkout($uid = null) {
+		if ($this->_id) {
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
 				$user	=& JFactory::getUser();

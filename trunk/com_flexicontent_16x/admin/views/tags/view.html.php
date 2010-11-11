@@ -70,7 +70,7 @@ class FlexicontentViewTags extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
-		if ($user->gid >= 24) {
+		if (JAccess::check($user->get("id"), 'core.admin', 'root.1')) {
 			$toolbar =&JToolBar::getInstance('toolbar');
 			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 400, 400);
 		}
@@ -79,7 +79,7 @@ class FlexicontentViewTags extends JView {
 		JToolBarHelper::addNew();
 		JToolBarHelper::editList();
 		JToolBarHelper::deleteList();
-		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		if(JAccess::check($user->get("id"), 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');

@@ -27,15 +27,13 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerTypes extends FlexicontentController
-{
+class FlexicontentControllerTypes extends FlexicontentController {
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
 
 		// Register Extra task
@@ -67,7 +65,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		if ( $model->store($post) ) {
 			switch ($task) {
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->getId();
 					break;
 
 				case 'saveandnew' :
@@ -98,8 +96,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function publish()
-	{
+	function publish() {
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -126,8 +123,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function unpublish()
-	{
+	function unpublish() {
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 	= $this->getModel('types');
 
