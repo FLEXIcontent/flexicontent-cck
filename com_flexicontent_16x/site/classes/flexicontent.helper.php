@@ -18,8 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-class flexicontent_html
-{
+jimport('joomla.form.form');
+
+class flexicontent_html{
 	/**
 	 * Strip html tags and cut after x characters
 	 *
@@ -28,8 +29,7 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	function striptagsandcut( $text, $chars=null )
-	{
+	function striptagsandcut( $text, $chars=null ) {
 		// first strip html tags
 		$cleantext = strip_tags($text);
 
@@ -1196,8 +1196,7 @@ class flexicontent_upload
 	}
 }
 
-class flexicontent_tmpl
-{
+class flexicontent_tmpl {
 	/**
 	 * Get the template list
 	 *

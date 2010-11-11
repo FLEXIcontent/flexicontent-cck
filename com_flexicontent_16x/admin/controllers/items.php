@@ -106,8 +106,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function orderup()
-	{
+	function orderup() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -124,8 +123,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function orderdown()
-	{
+	function orderdown() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -142,8 +140,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function saveorder()
-	{
+	function saveorder() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		

@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewTemplate extends JView {
-
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -37,6 +36,26 @@ class FlexicontentViewTemplate extends JView {
 		$db  		= & JFactory::getDBO();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
+		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
+		}
+		$document->addCustomTag('<script>jQuery.noConflict();</script>');
+		if(!isset($document->jquery_ui_core)){
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
+			$document->jquery_ui_core = true;
+		}
+		if(!isset($document->jquery_ui_widget)){
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
+			$document->jquery_ui_widget = true;
+		}
+		if(!isset($document->jquery_ui_mouse)){
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
+			$document->jquery_ui_mouse = true;
+		}
+		if(!isset($document->jquery_ui_sortable)){
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
+			$document->jquery_ui_sortable = true;
+		}
 		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
@@ -61,49 +80,41 @@ class FlexicontentViewTemplate extends JView {
 			}
 			foreach ($idsort as $k => $v) {
 				if ($k > 1) {
-					$jssort[] = 'results('.$k.',\''.$v.'\')';
+					$jssort[] = 'storeordering(jQuery("#sortable-'.$v.'"))';
 				}
 			}
+			
 			$positions = implode(',', $idsort);
 			
 			$jssort = implode("; ", $jssort);
-			$moosort = implode("','", $sort);
+			$jqueyrsort = "#".implode(",#", $sort);
+
 			$js = "
-			var my = '';
-			window.addEvent('domready', function(){
-				var mySortables = new Sortables(['".$moosort."'], {
-					constrain: false,
-					clone: false,
-					revert: true,
-					onComplete: storeordering
+			jQuery(function() {
+				my = jQuery( \"$jqueyrsort\" ).sortable({
+					connectWith: \"".$jqueyrsort."\",
+					update: function(event, ui) {
+						if(ui.sender) {
+							storeordering(jQuery(ui.sender));
+						}else{
+							storeordering(jQuery(ui.item).parent());
+						}
+					}
 				});
-				my = mySortables;
-				storeordering();
-
-				var slideaccess = new Fx.Slide('propvisible');
-				var slidenoaccess = new Fx.Slide('propnovisible');
-				var legend = $$('fieldset.tmplprop legend');
-				slidenoaccess.hide();
-				legend.addEvent('click', function(ev) {
-					legend.toggleClass('open');
-					slideaccess.toggle();
-					slidenoaccess.toggle();
-				});
-
-
+				initordering();
 			});
-
-			function results(i, field) {
-				var res = my.serialize(i, function(element, index){
-				return element.getProperty('id').replace('field_','');
-			}).join(',');
-				$(field).value = res;
+			function storeordering(parent_element) {
+				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
+				fields = new Array();
+				i = 0;
+				parent_element.children('li').each(function(){
+					fields[i++] = jQuery(this).attr('id').replace('field_', '');
+				});
+				jQuery(hidden_id).val(fields.join(','))
 			}
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration( $js );
+			$document->addScriptDeclaration($js);
 		}
-
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 

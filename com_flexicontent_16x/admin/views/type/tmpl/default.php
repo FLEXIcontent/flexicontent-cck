@@ -27,37 +27,35 @@ defined('_JEXEC') or die('Restricted access');
 						<td class="key">
 							<label for="name">
 								<?php //echo JText::_( 'FLEXI_TYPE_NAME' ).':'; ?>
-								<?php echo $this->iform->getLabel('name'); ?>
+								<?php echo $this->form->getLabel('name'); ?>
 							</label>
 						</td>
 						<td>
-							<!-- input id="name" name="name" class="required" value="<?php echo $this->row->name; ?>" size="50" maxlength="100" / -->
-							<?php echo $this->iform->getInput('name'); ?>
+							<?php echo $this->form->getInput('name'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td class="key">
-							<label for="published">
-								<?php //echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
-								<?php echo $this->iform->getLabel('published'); ?>
-							</label>
+							<?php echo $this->form->getLabel('published'); ?>
 						</td>
 						<td>
-							<?php
-							//$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-							//echo $html;
-							?>
-							<?php echo $this->iform->getInput('published'); ?>
+							<?php echo $this->form->getInput('published'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<?php echo $this->form->getLabel('access'); ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('access'); ?>
 						</td>
 					</tr>
 				</table>			
 			</td>
 			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
-				<?php echo $this->pane->startPane( 'det-pane' );?>
-				<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1)); ?>
+				<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
 				<?php
-				echo $this->pane->endPanel();
-				$fieldSets = $this->iform->getFieldsets('attribs');
+				$fieldSets = $this->form->getFieldsets('attribs');
 				foreach ($fieldSets as $name => $fieldSet) :
 					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
@@ -67,7 +65,7 @@ defined('_JEXEC') or die('Restricted access');
 					?>
 					<fieldset class="panelform">
 						<table>
-						<?php foreach ($this->iform->getFieldset($name) as $field) : ?>
+						<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 						<tr>
 							<td><?php echo $field->label; ?></td>
 							<td><?php echo $field->input; ?></td>
@@ -77,13 +75,12 @@ defined('_JEXEC') or die('Restricted access');
 					</fieldset>
 				<?php endforeach; ?>
 				<?php echo JHtml::_('sliders.end'); ?>
-				<?php echo $this->pane->endPane();?>
 			</td>
 		</tr>
 	</table>
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="jform[id]" value="<?php echo $this->row->id; ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue('id'); ?>" />
 <input type="hidden" name="controller" value="types" />
 <input type="hidden" name="view" value="type" />
 <input type="hidden" name="task" value="" />

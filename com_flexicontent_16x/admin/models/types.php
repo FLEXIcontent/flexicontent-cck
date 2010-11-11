@@ -214,11 +214,9 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function candelete($cid = array())
-	{
+	function candelete($cid = array()) {
 		$n		= count( $cid );
-		if (count( $cid ))
-		{
+		if (count( $cid )) {
 			for ($i = 0; $i < $n; $i++)
 			{
 			$query = 'SELECT COUNT( type_id )'
@@ -232,7 +230,7 @@ class FlexicontentModelTypes extends JModelList{
 				return false;
 				}
 			}
-		return true;
+			return true;
 		}
 	}
 
