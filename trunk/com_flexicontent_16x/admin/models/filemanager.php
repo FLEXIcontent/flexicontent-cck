@@ -228,10 +228,10 @@ class FlexicontentModelFilemanager extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
-	{
+	function _buildContentWhere() {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
 		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', '', 'int' );
@@ -244,11 +244,7 @@ class FlexicontentModelFilemanager extends JModel
 
 		$where = array();
 		
-		if (FLEXI_ACCESS) {
-			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
-		} else {
-			$CanViewAllFiles	= 1;
-		}
+		$CanViewAllFiles = $permission->CanViewAllFiles;
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;

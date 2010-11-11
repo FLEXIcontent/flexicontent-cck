@@ -131,17 +131,30 @@ class flexicontent_items extends JTable{
      * @access protected
      */
     var $_join_prop    		= array('item_id',
-    								'type_id',
-    								'language',
-    								'sub_items',
-    								'sub_categories',
-    								'related_items',
-    								'search_index');
+					'type_id',
+					'language',
+					'sub_items',
+					'sub_categories',
+					'related_items',
+					'search_index');
 	/**
 	* @param database A database connector object
 	*/
 	function flexicontent_items(& $db) {
 		parent::__construct('#__content', 'id', $db);
+	}
+	
+	/**
+	 * Method to compute the default name of the asset.
+	 * The default name is in the form `table_name.id`
+	 * where id is the value of the primary key of the table.
+	 *
+	 * @return	string
+	 * @since	1.6
+	 */
+	protected function _getAssetName() {
+		$k = $this->_tbl_key;
+		return 'flexicontent.item.'.(int) $this->$k;
 	}
 
 	/**
@@ -151,8 +164,7 @@ class flexicontent_items extends JTable{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function load( $oid=null )
-	{
+	function load( $oid=null ) {
 		$k = $this->_tbl_key;
 
 		if ($oid !== null) {
@@ -237,8 +249,7 @@ class flexicontent_items extends JTable{
 		else
 		{
 			// check for foreign key
-			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key))
-			{
+			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key)) {
 				// update #__flexicontent_items_ext table
 				$ret = $this->_db->updateObject( $this->_tbl_join, $type_ext, $this->_frn_key, $updateNulls );
 			} else {
@@ -246,8 +257,68 @@ class flexicontent_items extends JTable{
 				$type_ext->$frn_key = $this->id;
 				$ret = $this->_db->insertObject( $this->_tbl_join, $type_ext, $this->_frn_key );
 			}
+		}
+		// If the table is not set to track assets return true.
+		if (!$this->_trackAssets) {
 			return true;
 		}
+
+		if ($this->_locked) {
+			$this->_unlock();
+		}
+
+		//
+		// Asset Tracking
+		//
+
+		$parentId	= $this->_getAssetParentId();
+		$name		= $this->_getAssetName();
+		$title		= $this->_getAssetTitle();
+
+		$asset	= JTable::getInstance('Asset');
+		$asset->loadByName($name);
+
+		// Check for an error.
+		if ($error = $asset->getError()) {
+			$this->setError($error);
+			return false;
+		}
+
+		// Specify how a new or moved node asset is inserted into the tree.
+		if (empty($this->asset_id) || $asset->parent_id != $parentId) {
+			$asset->setLocation($parentId, 'last-child');
+		}
+
+		// Prepare the asset to be stored.
+		$asset->parent_id	= $parentId;
+		$asset->name		= $name;
+		$asset->title		= $title;
+		if ($this->_rules instanceof JRules) {
+			$asset->rules = (string) $this->_rules;
+		}
+
+		if (!$asset->check() || !$asset->store($updateNulls)) {
+			$this->setError($asset->getError());
+			return false;
+		}
+
+		if (empty($this->asset_id)) {
+			// Update the asset_id field in this table.
+			$this->asset_id = (int) $asset->id;
+
+			$query = $this->_db->getQuery(true);
+			$query->update($this->_db->nameQuote($this->_tbl));
+			$query->set('asset_id = '.(int) $this->asset_id);
+			$query->where($this->_db->nameQuote($k).' = '.(int) $this->$k);
+			$this->_db->setQuery($query);
+
+			if (!$this->_db->query()) {
+				$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
+				$this->setError($e);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

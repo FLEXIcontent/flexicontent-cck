@@ -289,6 +289,7 @@ class FlexicontentModelFileselement extends JModel
 	function _buildContentWhere() {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
 		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );
@@ -301,11 +302,7 @@ class FlexicontentModelFileselement extends JModel
 
 		$where = array();
 		
-		if (FLEXI_ACCESS) {
-			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
-		} else {
-			$CanViewAllFiles	= 1;
-		}
+		$CanViewAllFiles = $permission->CanViewAllFiles;
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;

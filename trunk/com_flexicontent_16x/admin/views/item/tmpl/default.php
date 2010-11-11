@@ -277,7 +277,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				</table>
 
 				<?php
-				if (FLEXI_ACCESS && $this->canRight && $this->row->id) :
+				//if (FLEXI_ACCESS && $this->canRight && $this->row->id) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 					var slideaccess = new Fx.Slide('tabacces');
@@ -295,7 +295,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<table id="tabacces" class="admintable" width="100%">
 				    	<tr>
 				    		<td>
-				        		<div id="access"><?php echo $this->lists['access']; ?></div>
+				        		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 				        	</td>
 				    	</tr>
 					</table>
@@ -303,7 +303,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
                 			</div>
                			</fieldset>
-				<?php endif; ?>
+				<?php //endif; ?>
 
 				<?php
 				if ($this->fields) {
@@ -669,7 +669,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="task" value="" />
 <input type="hidden" name="hits" value="<?php echo $this->form->getValue('hits'); ?>" />
 <input type="hidden" name="oldtitle" value="<?php echo $this->form->getValue('title'); ?>" />
-<input type="hidden" name="oldtext" value="<?php echo $this->form->getValue('text'); ?>" />
+<input type="hidden" name="oldtext" value="<?php //echo $this->form->getValue('text'); ?>" />
 <input type="hidden" name="oldstate" value="<?php echo $this->form->getValue('state'); ?>" />
 <input type="hidden" name="oldmodified" value="<?php echo $this->form->getValue('modified'); ?>" />
 <input type="hidden" name="oldmodified_by" value="<?php echo $this->form->getValue('modified_by'); ?>" />

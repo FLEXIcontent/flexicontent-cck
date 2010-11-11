@@ -22,8 +22,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	Table
  * @since		1.0
  */jimport('joomla.database.tablenested');
-class flexicontent_categories extends JTableNested
-{
+class flexicontent_categories extends JTableNested{
 	/** @var int Primary key */
 	var $id				= null;
 	/** @var int */
@@ -70,6 +69,19 @@ class flexicontent_categories extends JTableNested
 	function flexicontent_categories(& $db) {
 		parent::__construct('#__categories', 'id', $db);
 	}
+	
+	/**
+	 * Method to compute the default name of the asset.
+	 * The default name is in the form `table_name.id`
+	 * where id is the value of the primary key of the table.
+	 *
+	 * @return	string
+	 * @since	1.6
+	 */
+	protected function _getAssetName() {
+		$k = $this->_tbl_key;
+		return 'flexicontent.category.'.(int) $this->$k;
+	}
 
 	/**
 	 * Overloaded check function
@@ -79,8 +91,7 @@ class flexicontent_categories extends JTableNested
 	 * @see JTable::check
 	 * @since 1.5
 	 */
-	function check()
-	{
+	function check() {
 		// check for valid name
 		if (trim( $this->title ) == '') {
 			$this->setError(JText::sprintf( 'must contain a title', JText::_( 'FLEXI_Category' ) ));
@@ -88,10 +99,10 @@ class flexicontent_categories extends JTableNested
 		}
 
 		// check for existing name
-		/*$query = 'SELECT id'
+		$query = 'SELECT id'
 		. ' FROM #__categories '
 		. ' WHERE title = '.$this->_db->Quote($this->title)
-		. ' AND section = '.$this->_db->Quote($this->section)
+		. ' AND lft>=' . FLEXI_CATEGORY_LFT . ' AND rgt<=' . FLEXI_CATEGORY_RGT
 		;
 		$this->_db->setQuery( $query );
 
@@ -99,7 +110,7 @@ class flexicontent_categories extends JTableNested
 		if ($xid && $xid != intval( $this->id )) {
 			$this->_error = JText::sprintf( 'WARNNAMETRYAGAIN', JText::_( 'FLEXI_Category' ) );
 			return false;
-		}*/
+		}
 
 		if(empty($this->alias)) {
 			$this->alias = $this->title;

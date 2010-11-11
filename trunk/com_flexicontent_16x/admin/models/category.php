@@ -262,7 +262,7 @@ class FlexicontentModelCategory extends JModelAdmin
 				$data['title'] .= ' (2)';
 			}
 		}
-		
+		$category->setRules($data['jform']['rules']);
 		// bind it to the table
 		if (!$category->bind($data['jform'])) {
 			$this->setError(500, $this->_db->getErrorMsg() );
@@ -318,10 +318,6 @@ class FlexicontentModelCategory extends JModelAdmin
 			return false;
 		}
 		$category->checkin();
-		
-		/*if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $category, 'category' );
-		}*/
 
 		$this->_category	=& $category;
 		return true;
