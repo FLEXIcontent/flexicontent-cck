@@ -1444,7 +1444,7 @@ class FLEXIUtilities {
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
 			$query = "SELECT c.id,c.version FROM #__content as c"
-					. " JOIN #__categories as cat ON c.id=cat.id"
+					. " JOIN #__categories as cat ON c.catid=cat.id"
 					. " WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."';";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
