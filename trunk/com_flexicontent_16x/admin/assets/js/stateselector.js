@@ -29,43 +29,31 @@ var stateselector = {
 	}
 };
 
-var processstate = new Class(  
-{  
+var processstate = new Class({  
 	options:  {
 		id: "",
 		script_url: "index.php?option=com_flexicontent&controller=items&format=raw",
 		task: "setitemstate",
 		state: ""
-},
+	},
 
-initialize: function( name, options )  
-{  
-	this.setOptions( options );
-	this.name = name;
-},
+	initialize: function( name, options ) {  
+		this.setOptions( options );
+		this.name = name;
+	},
 
-dostate: function( state, id )
-{
-	var url = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
-	new Request.HTML({
+	dostate: function( state, id ) {
+		var url = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
+		new Request.HTML({
 			url: url,
 			method: 'get',
 			update: $('row' + id),
 			evalScripts: false
 		}).send();
-		
-	/*var setstate = new Ajax(url, {
-		method: 'get',
-		evalScripts: false,
-		update: 'row' + id
-//		onComplete: hider
-		});
-	setstate.request();*/
-	
-//	function hider(response) {
-		//alert(response);
-//	}
-}
+	//	function hider(response) {
+			//alert(response);
+	//	}
+	}
 });
 
 processstate.implement( new Options, new Events );

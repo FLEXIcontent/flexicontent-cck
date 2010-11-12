@@ -701,6 +701,7 @@ class FlexicontentModelItems extends JModel{
 		if (!$maincat) return true;
 		
 
+
 		$item =& JTable::getInstance('flexicontent_items', '');
 		$item->load($itemid);
 		$item->catid = $maincat;
@@ -766,12 +767,10 @@ class FlexicontentModelItems extends JModel{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function setitemstate($id, $state = 1)
-	{
+	function setitemstate($id, $state = 1) {
 		$user 	=& JFactory::getUser();
 
-		if ( $id )
-		{
+		if ( $id ) {
 			$v = FLEXIUtilities::getCurrentVersions((int)$id);
 			
 			$query = 'UPDATE #__content'
