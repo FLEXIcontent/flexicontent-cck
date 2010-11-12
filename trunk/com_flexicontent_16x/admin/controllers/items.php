@@ -335,8 +335,8 @@ class FlexicontentControllerItems extends FlexicontentController {
 		
 		$cache = &JFactory::getCache('com_flexicontent');
 		$cache->clean();
-
-		echo '<img src="images/'.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />';
+		$path = JURI::root().'components/com_flexicontent/assets/images/';
+		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />';
 	}
 
 	/**

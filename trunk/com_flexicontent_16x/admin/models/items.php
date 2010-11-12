@@ -700,6 +700,7 @@ class FlexicontentModelItems extends JModel{
 	{
 		if (!$maincat) return true;
 		
+
 		$item =& JTable::getInstance('flexicontent_items', '');
 		$item->load($itemid);
 		$item->catid = $maincat;
