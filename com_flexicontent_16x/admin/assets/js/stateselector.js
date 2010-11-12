@@ -47,14 +47,20 @@ initialize: function( name, options )
 dostate: function( state, id )
 {
 	var url = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
-
-	var setstate = new Ajax(url, {
+	new Request.HTML({
+			url: url,
+			method: 'get',
+			update: $('row' + id),
+			evalScripts: false
+		}).send();
+		
+	/*var setstate = new Ajax(url, {
 		method: 'get',
 		evalScripts: false,
 		update: 'row' + id
 //		onComplete: hider
 		});
-	setstate.request();
+	setstate.request();*/
 	
 //	function hider(response) {
 		//alert(response);
