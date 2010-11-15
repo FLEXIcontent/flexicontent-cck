@@ -298,8 +298,7 @@ class FlexicontentModelItems extends JModel{
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildQuery()
-	{
+	function _buildQuery() {
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
@@ -307,18 +306,19 @@ class FlexicontentModelItems extends JModel{
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-					. ' LEFT JOIN #__usergroups AS g ON g.id = i.access'
-					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
-					. ' JOIN #__categories AS cat ON i.catid=cat.id'
-					. $where
-					. ' GROUP BY i.id'
-					. $orderby
-					;
+		$query 		= 'SELECT i.*, level.title as access_level, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
+				. ' FROM #__content AS i'
+				. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' LEFT JOIN #__usergroups AS g ON g.id = i.access'
+				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+				. ' JOIN #__categories AS cat ON i.catid=cat.id'
+				. $where
+				. ' GROUP BY i.id'
+				. $orderby
+				;
 		return $query;
 	}
 
@@ -386,66 +386,63 @@ class FlexicontentModelItems extends JModel{
 		$where[] = ' i.state != -2';
 		$where[] = ' (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')';
 
-		// if FLEXIaccess only authorize users to see their own items
-		//if (FLEXI_ACCESS) {
-			$user 	=& JFactory::getUser();
-			$allitems	= $permission->DisplayAllItems;
+		$user 	=& JFactory::getUser();
+		$allitems	= $permission->DisplayAllItems;
 
-			if (!@$allitems) {				
-				$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.edit', 'item');
-				$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editcat', 'category');
-				$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editown', 'item');
-				$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editowncat', 'category');
+		if (!@$allitems) {				
+			$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.edit', 'item');
+			$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editcat', 'category');
+			$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editown', 'item');
+			$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editowncat', 'category');
 
-				if (!$permission->CanEdit) { // first exclude the users allowed to edit all items
-					if (@$canEditOwn['item']) { // custom rules for users allowed to edit all their own items
-						$allown = array();
-						$allown[] = ' i.created_by = ' . $user->id;
-						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']) == 1) {
-								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
-							} else if (count($canEdit['category']) > 1) {
-								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-							}
+			if (!$permission->CanEdit) { // first exclude the users allowed to edit all items
+				if (@$canEditOwn['item']) { // custom rules for users allowed to edit all their own items
+					$allown = array();
+					$allown[] = ' i.created_by = ' . $user->id;
+					if (isset($canEdit['category'])) {
+						if (count($canEdit['category']) == 1) {
+							$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
+						} else if (count($canEdit['category']) > 1) {
+							$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
 						}
-						if (isset($canEdit['item'])) {
-							if (count($canEdit['item']) == 1) {
-								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
-							} else if (count($canEdit['item']) > 1) {
-								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-							}
+					}
+					if (isset($canEdit['item'])) {
+						if (count($canEdit['item']) == 1) {
+							$allown[] = ' i.id = ' . $canEdit['item'][0]; 
+						} else if (count($canEdit['item']) > 1) {
+							$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
 						}
+					}
+					$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+				} else { // standard rules for the other users
+					$allown = array();
+					if (isset($canEditOwn['category'])) {
+						if (count($canEditOwn['category']) == 1) {
+							$allown[] = ' (i.catid = ' . $canEditOwn['category'][0]. ' AND i.created_by = ' . $user->id . ')'; 
+						} else if (count($canEditOwn['category']) > 1) {
+							$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
+						}
+					}
+					if (isset($canEdit['category'])) {
+						if (count($canEdit['category']) == 1) {
+							$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
+						} else if (count($canEdit['category']) > 1) {
+							$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
+						}
+					}
+					if (isset($canEdit['item'])) {
+						if (count($canEdit['item']) == 1) {
+							$allown[] = ' i.id = ' . $canEdit['item'][0]; 
+						} else if (count($canEdit['item']) > 1) {
+							$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+						}
+					}
+					if (count($allown) > 0) {
 						$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-					} else { // standard rules for the other users
-						$allown = array();
-						if (isset($canEditOwn['category'])) {
-							if (count($canEditOwn['category']) == 1) {
-								$allown[] = ' (i.catid = ' . $canEditOwn['category'][0]. ' AND i.created_by = ' . $user->id . ')'; 
-							} else if (count($canEditOwn['category']) > 1) {
-								$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
-							}
-						}
-						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']) == 1) {
-								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
-							} else if (count($canEdit['category']) > 1) {
-								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-							}
-						}
-						if (isset($canEdit['item'])) {
-							if (count($canEdit['item']) == 1) {
-								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
-							} else if (count($canEdit['item']) > 1) {
-								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-							}
-						}
-						if (count($allown) > 0) {
-							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-						}
 					}
 				}
 			}
-		//}//if (FLEXI_ACCESS)
+		}
 
 		// get not associated items to remove them from the displayed datas
 		$unassociated = $this->getUnassociatedItems();
@@ -476,6 +473,7 @@ class FlexicontentModelItems extends JModel{
 
 		if ( $filter_id ) {
 			$where[] = 'i.id = ' . $filter_id;
+
 			}
 
 		if (FLEXI_FISH) {
@@ -1168,34 +1166,29 @@ class FlexicontentModelItems extends JModel{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function candelete($cid = array())
-	{
+	function candelete($cid = array()) {
 		$user = JFactory::getUser();
-		
-		// return true if flexi_access component is not used
-		if (!FLEXI_ACCESS) return true;
 
 		// return true for super administrators
-		if ($user->gid >= 24) return true;
+		if(JAccess::check($user->id, 'core.admin', 'root.1')) return true;
 
 		$n		= count( $cid );
-		if ($n)
-		{
+		if ($n) {
+			$permission = FlexicontentHelperPerm::getPerm();
 			$query = 'SELECT id, catid, created_by FROM #__content'
 			. ' WHERE id IN ( '. implode(',', $cid) . ' )'
 			;
 			$this->_db->setQuery( $query );
 			$items = $this->_db->loadObjectList();
 			
-			foreach ($items as $item)
-			{
-				$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canDelete 		= in_array('delete', $rights) || (FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all'));
-				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id)) || ((FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all')) && ($item->created_by == $user->id));				
+			foreach ($items as $item) {
+				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+				$canDelete 		= in_array('flexicontent.delete', $rights) || ($permission->CanDelete);
+				$canDeleteOwn	= (in_array('flexicontent.deleteown', $rights) && ($item->created_by == $user->id));
 				
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}
-		return true;
+			return true;
 		}
 	}
 
@@ -1206,20 +1199,15 @@ class FlexicontentModelItems extends JModel{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function delete($cid)
-	{
-		if (count( $cid ))
-		{
+	function delete($cid) {
+		if (count( $cid )) {
+			$table =& JTable::getInstance('flexicontent_items', '');
 			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__content'
-					. ' WHERE id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-			
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
+			foreach($cid as $id) {
+				if(!$table->delete($id)) {
+					$this->setError($table->getError());
+					return false;
+				}
 			}
 			
 			// remove items extended
@@ -1287,16 +1275,6 @@ class FlexicontentModelItems extends JModel{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
-			// delete also item ACL
-			if (FLEXI_ACCESS) {
-				$query 	= 'DELETE FROM #__flexiaccess_acl'
-						. ' WHERE acosection = ' . $this->_db->Quote('com_content')
-						. ' AND axosection = ' . $this->_db->Quote('item')
-						. ' AND axo IN ('. $cids .')'
-						;
-				$this->_db->setQuery( $query );
-			}
 			
 			if(!$this->_db->query()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -1310,7 +1288,7 @@ class FlexicontentModelItems extends JModel{
 	}
 	
 	/**
-	 * Method to set the access level of the items
+	 * Method to save the access level of the items
 	 *
 	 * @access	public
 	 * @param 	integer id of the category
@@ -1318,11 +1296,11 @@ class FlexicontentModelItems extends JModel{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access) {
+	function saveaccess($id, $access) {
 		$mainframe = &JFactory::getApplication();
 		$row =& JTable::getInstance('flexicontent_items', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 
@@ -1334,10 +1312,7 @@ class FlexicontentModelItems extends JModel{
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-
-		
 		$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
-
 	}
 
 	/**

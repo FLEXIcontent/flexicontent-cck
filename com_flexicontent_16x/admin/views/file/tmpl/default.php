@@ -71,7 +71,6 @@ function submitbutton(pressbutton) {
 				<input name="ext" value="<?php echo $this->row->ext; ?>" size="5" maxlength="100"<?php echo $disabled; ?> />
 			</td>
 		</tr>
-		<?php if (!FLEXI_ACCESS) : ?>
 		<tr>
 			<td class="key">
 				<label for="access">
@@ -82,12 +81,10 @@ function submitbutton(pressbutton) {
 				<?php echo $this->lists['access']; ?>
 			</td>
 		</tr>
-		<?php endif; ?>
 	</table>
 
 
 <?php
-if (FLEXI_ACCESS) :
 $this->document->addScriptDeclaration("
 	window.addEvent('domready', function() {
 	var slideaccess = new Fx.Slide('tabacces');
@@ -113,7 +110,6 @@ $this->document->addScriptDeclaration("
 	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 </div>
 </fieldset>
-<?php endif; ?>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>

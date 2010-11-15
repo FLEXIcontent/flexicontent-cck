@@ -59,11 +59,7 @@ class FlexicontentViewFile extends JView {
 		}
 		
 		//build access level list
-		if (FLEXI_ACCESS) {
-			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
-		} else {
-			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-		}
+		$lists['access'] 	= JHTML::_('list.accesslevel', $row );
 		$document	= & JFactory::getDocument();
 
 		//clean data

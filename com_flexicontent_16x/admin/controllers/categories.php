@@ -42,9 +42,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
 		$this->registerTask( 'params', 			'params' );
 	}
 
@@ -94,9 +91,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 			
 			//Take care of access levels and state
 			$categoriesmodel = & $this->getModel('categories');
-			/*if (!FLEXI_ACCESS) {
-				$categoriesmodel->access($model->get('id'), $model->get('access'));
-			}*/
 			
 			$pubid = array();
 			$pubid[] = $model->get('id');
@@ -312,13 +306,10 @@ class FlexicontentControllerCategories extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// define the rights for correct redirecting the save task
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-		} else {
-			$CanCats 	= 1;
-		}
-
+		$permission = FlexicontentHelperPerm::getPerm();
+		$check = JAccess::check($user->id, 'core.admin', 'root.1');
+		$user =& JFactory::getUser();
+		$CanCats	= (!$check) ? $permission->CanCats : 1;
 		$category = & JTable::getInstance('flexicontent_categories','');
 		$category->bind(JRequest::get('post'));
 		$category->checkin();
@@ -337,30 +328,18 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 * @return void
 	 * @since 1.0
 	 */
-	function access( )
-	{
+	function access( ) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
-
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
-		} else {
-			if (FLEXI_ACCESS) {
-				$access = 3;
-			} else {
-				$access = 2;
-			}
-		}
+		$id		= (int)$cid[0];
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$id];
 
 		$model = $this->getModel('categories');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache 		=& JFactory::getCache('com_flexicontent');

@@ -400,47 +400,27 @@ window.addEvent('domready', function(){
 		$config		=& JFactory::getConfig();
 		$nullDate 	= $db->getNullDate();
 		$user 		=& $this->user;
-		
-		if (FLEXI_ACCESS) {
-			$canEditAll 		= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-			$canEditOwnAll		= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
-			$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
-			$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-		}
-		
+		$canEditAll 		= $this->permission->CanEdit;
+		$canEditOwnAll	= true;//I(enjoyman) not sure in this line.
+		$canPublishAll 		= $this->permission->CanPublish;
+		$canPublishOwnAll	= true;//I(enjoyman) not sure in this line.
+		$check = JAccess::check($user->id, 'core.admin', 'root.1');
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
-
-			if (FLEXI_ACCESS) {
-				$rights 			= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-				
-				$canEdit 			= $canEditAll || in_array('edit', $rights) || ($user->gid > 24);
-				$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
-				$canPublish 		= $canPublishAll || in_array('publish', $rights) || ($user->gid > 24);
-				$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
-			} else {
-				$canEdit		= 1;
-				$canEditOwn		= 1;
-				$canPublish 	= 1;
-				$canPublishOwn	= 1;
-			}
-
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+			$canEdit 			= $canEditAll || in_array('edit', $rights) || $check;
+			$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || $check;
+			$canPublish 		= $canPublishAll || in_array('publish', $rights) || $check;
+			$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || $check;
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
 			$publish_up->setOffset($config->getValue('config.offset'));
 			$publish_down->setOffset($config->getValue('config.offset'));
 
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
-
-			if (FLEXI_ACCESS) {
-				if ($this->permission->CanRights) {
-					$access 	= FAccess::accessswitch('item', $row, $i);
-				} else {
-					$access 	= FAccess::accessswitch('item', $row, $i, 'content', 1);
-				}
-			} else {
-				$access 	= JHTML::_('grid.access', $row, $i );
-			}
+			if ($this->permission->CanRights) {
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
+			}else $access = $this->escape($row->access_level);
 
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 				$alt = "";

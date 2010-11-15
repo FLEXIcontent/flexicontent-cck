@@ -274,11 +274,12 @@ VALUES
 		$format		= JRequest::getVar('format', '');
 		$db =& JFactory::getDBO();
 		
-		$query	= 'UPDATE #__plugins'
-				. ' SET published = 1'
-				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
+		$query	= 'UPDATE #__extensions'
+				. ' SET enabled = 1'
+				. ' WHERE `type`= ' . $db->Quote('plugin')
+				. ' AND (folder = ' . $db->Quote('flexicontent_fields')
 				. ' OR element = ' . $db->Quote('flexisearch')
-				. ' OR element = ' . $db->Quote('flexisystem')
+				. ' OR element = ' . $db->Quote('flexisystem') . ')'
 				;
 		
 		$db->setQuery($query);

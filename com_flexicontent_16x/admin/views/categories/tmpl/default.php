@@ -74,7 +74,7 @@ $userId		= $user->get('id');
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
-			$access 	= JHTML::_('grid.access', $row, $i );
+			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
 			$canEditOwn	= $user->authorise('flexicontent.editowncat', 'flexicontent.category.'.$row->id) && ($row->created_user_id == $userId);

@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
+jimport('joomla.application.component.controlleradmin');
 
 /**
  * FLEXIcontent Component Item Controller
@@ -27,7 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends FlexicontentController {
+class FlexicontentControllerItems extends JControllerAdmin {
 	/**
 	 * Constructor
 	 *
@@ -35,7 +35,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 */
 	function __construct() {
 		parent::__construct();
-
 		// Register Extra task
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
@@ -46,9 +45,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 		$this->registerTask( 'import', 			'import' );
 		$this->registerTask( 'bindextdata', 	'bindextdata' );
 		$this->registerTask( 'approval', 		'approval' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
 		$this->registerTask( 'getversionlist', 'getversionlist');
 	}
 
@@ -405,8 +401,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function remove()
-	{
+	function remove() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -423,7 +418,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 				$msg = JText::_( 'FLEXI_CANNOT_DELETE_ITEMS' );
 			}
 		} else {
-
 			if (!$model->delete($cid)) {
 				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
 			}
@@ -432,7 +426,6 @@ class FlexicontentControllerItems extends FlexicontentController {
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
-		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 
@@ -443,30 +436,18 @@ class FlexicontentControllerItems extends FlexicontentController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function access( )
-	{
+	function access( ) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
-
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
-		} else {
-			if (FLEXI_ACCESS) {
-				$access = 3;
-			} else {
-				$access = 2;
-			}
-		}
+		$id		= (int)$cid[0];
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$id];
 
 		$model = $this->getModel('items');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');
@@ -617,14 +598,10 @@ class FlexicontentControllerItems extends FlexicontentController {
 		if(!is_array($used)){
 			$used = array();
 		}
-		
-		if (FLEXI_ACCESS) {
-			$CanNewTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'newtags', 'users', $user->gmid) : 1;
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanNewTags = 1;
-			$CanUseTags = 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$check = JAccess::check($user->id, 'core.admin', 'root.1');
+		$CanNewTags = (!$check) ? $permission->CanNewTag : 1;
+		$CanUseTags = (!$check) ? $permission->CanUseTags : 1;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);
@@ -663,11 +640,8 @@ class FlexicontentControllerItems extends FlexicontentController {
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		$user	=& JFactory::getUser();
-		if (FLEXI_ACCESS) {
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanUseTags = 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$CanUseTags = (!$check) ? $permission->CanUseTags : 1;
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();

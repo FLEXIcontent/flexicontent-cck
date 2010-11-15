@@ -23,7 +23,6 @@ if($flexi_category = $params->get('flexi_category')) {
 	if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', 0);
 	if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', 0);
 }
-if (!defined('FLEXI_ACCESS')) 	define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 define('FLEXI_VERSION',	'1.5.3c');
 define('FLEXI_RELEASE',	'stable (r354)');
