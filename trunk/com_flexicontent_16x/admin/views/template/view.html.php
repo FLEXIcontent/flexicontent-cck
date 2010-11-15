@@ -120,7 +120,7 @@ class FlexicontentViewTemplate extends JView {
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$permission = FlexicontentHelperPerm::gerPerm();
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		$user =& JFactory::getUser();
 		$check = JAccess::check($user->id, 'core.admin', 'root.1');
