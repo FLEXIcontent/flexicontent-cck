@@ -47,17 +47,17 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getGeneralstats()
-	{
+	function getGeneralstats() {
 		$_items = array();
 
 		/*
 		* Get total nr of items
 		*/
-		$query = 'SELECT count(id)'
-					. ' FROM #__content'
-					. ' WHERE sectionid = ' . FLEXI_CATEGORY
-					;
+		$query = 'SELECT count(i.id)'
+			. ' FROM #__content as i'
+			. ' JOIN #__categories as c ON i.catid = c.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt <= ' . FLEXI_CATEGORY_RGT
+			;
 
 		$this->_db->SetQuery($query);
   		$_items[] = $this->_db->loadResult();
@@ -66,9 +66,9 @@ class FlexicontentModelStats extends JModel
 		* Get nr of all categories
 		*/
 		$query = 'SELECT count(id)'
-					. ' FROM #__categories'
-					. ' WHERE section = ' . FLEXI_CATEGORY
-					;
+			. ' FROM #__categories'
+			. ' WHERE lft >= ' . FLEXI_CATEGORY_LFT . ' AND rgt <= ' . FLEXI_CATEGORY_RGT
+			;
 
 		$this->_db->SetQuery($query);
   		$_items[] = $this->_db->loadResult();
@@ -77,8 +77,8 @@ class FlexicontentModelStats extends JModel
 		* Get nr of all tags
 		*/
 		$query = 'SELECT count(id)'
-					. ' FROM #__flexicontent_tags'
-					;
+			. ' FROM #__flexicontent_tags'
+			;
 
 		$this->_db->SetQuery($query);
   		$_items[] = $this->_db->loadResult();
@@ -87,8 +87,8 @@ class FlexicontentModelStats extends JModel
 		* Get nr of all files
 		*/
 		$query = 'SELECT count(id)'
-					. ' FROM #__flexicontent_files'
-					;
+			. ' FROM #__flexicontent_files'
+			;
 
 		$this->_db->SetQuery($query);
   		$_items[] = $this->_db->loadResult();
@@ -106,12 +106,13 @@ class FlexicontentModelStats extends JModel
 	function getPopular()
 	{
 		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id, i.hits'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
-				. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
-				. ' ORDER BY i.hits DESC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' ORDER BY i.hits DESC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$hits = $this->_db->loadObjectList();
@@ -125,15 +126,15 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getRating()
-	{
+	function getRating() {
 		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id'
-				. ' FROM #__content AS i'
-				. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
-				. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
-				. ' ORDER BY votes DESC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' ORDER BY votes DESC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$votes = $this->_db->loadObjectList();
@@ -150,12 +151,13 @@ class FlexicontentModelStats extends JModel
 	function getWorstRating()
 	{
 		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id'
-				. ' FROM #__content AS i'
-				. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
-				. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
-				. ' ORDER BY votes ASC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' ORDER BY votes ASC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$worstvotes = $this->_db->loadObjectList();
@@ -172,13 +174,14 @@ class FlexicontentModelStats extends JModel
 	function getCreators()
 	{
 		$query = 'SELECT COUNT(*) AS counter, i.created_by AS id, u.name, u.username'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-				. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
-				. ' GROUP BY u.name'
-				. ' ORDER BY counter DESC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' GROUP BY u.name'
+			. ' ORDER BY counter DESC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$usercreate = $this->_db->loadObjectList();
@@ -195,14 +198,15 @@ class FlexicontentModelStats extends JModel
 	function getEditors()
 	{
 		$query = 'SELECT COUNT(*) AS counter, i.modified_by AS id, u.name, u.username'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
-				. ' WHERE i.modified_by > 0'
-				. ' AND i.sectionid = ' . FLEXI_CATEGORY
-				. ' GROUP BY u.name'
-				. ' ORDER BY counter DESC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
+			. ' WHERE i.modified_by > 0'
+			. ' AND c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' GROUP BY u.name'
+			. ' ORDER BY counter DESC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$usereditor = $this->_db->loadObjectList();
@@ -219,13 +223,14 @@ class FlexicontentModelStats extends JModel
 	function getFavoured()
 	{
 		$query = 'SELECT i.title, i.id, COUNT(f.itemid) AS favnr'
-				. ' FROM #__content AS i'
-				. ' INNER JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
-				. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
-				. ' GROUP BY f.itemid'
-				. ' ORDER BY favnr DESC'
-				. ' LIMIT 5'
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' INNER JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' GROUP BY f.itemid'
+			. ' ORDER BY favnr DESC'
+			. ' LIMIT 5'
+			;
 
 		$this->_db->SetQuery($query);
   		$favnr = $this->_db->loadObjectList();
@@ -240,13 +245,13 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getStatestats()
-	{  		
+	function getStatestats() {  		
   		//get states
 		$query = 'SELECT state'
-				. ' FROM #__content AS i'
-				. ' WHERE sectionid = ' . FLEXI_CATEGORY
-				;
+			. ' FROM #__content AS i'
+			. ' JOIN #__categories as c ON i.catid=c.id'
+			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			;
 
 		$this->_db->SetQuery($query);
   		$states = $this->_db->loadObjectList();
@@ -325,10 +330,11 @@ class FlexicontentModelStats extends JModel
 		* Get all votes
 		*
 		*/
-  		$query = 'SELECT cr.rating_sum, cr.rating_count, c.id'
-				. ' FROM #__content AS c'
-				. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = c.id'
-				. ' WHERE c.sectionid = ' . FLEXI_CATEGORY
+  		$query = 'SELECT cr.rating_sum, cr.rating_count, i.id'
+				. ' FROM #__content AS i'
+				. ' JOIN #__categories as c ON i.catid=c.id'
+				. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
+				. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
 				;
 
 		$this->_db->SetQuery($query);
