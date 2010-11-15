@@ -49,7 +49,7 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
 		</fieldset>
-	<fields>
+	</fields>
 	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_selectmultiple.ini</language>
