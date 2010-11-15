@@ -18,12 +18,13 @@ class FlexicontentHelperPerm{
 			$permission->CanRights	 	= JAccess::check($user->id, 'flexicontent.manage', 			'com_flexicontent');
 			$permission->CanTypes 		= JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent');
 			$permission->CanFields 		= JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent');
-			$permission->CanTags 		= JAccess::check($user->id, 'flexicontent.tags', 			'com_flexicontent');
 			$permission->CanArchives 	= JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent');
 			$permission->CanStats	 	= JAccess::check($user->id, 'flexicontent.stats', 			'com_flexicontent');
 			$permission->CanTemplates	= JAccess::check($user->id, 'flexicontent.templates', 		'com_flexicontent');
 			$permission->CanVersion	 	= JAccess::check($user->id, 'flexicontent.versioning', 		'com_flexicontent');
+			$permission->CanTags 		= JAccess::check($user->id, 'flexicontent.tags', 			'com_flexicontent');
 			$permission->CanUseTags	= JAccess::check($user->id, 'flexicontent.usetags', 			'com_flexicontent');
+			$permission->CanNewTag		= JAccess::check($user->id, 'flexicontent.newtag',			'com_flexicontent');
 			//items
 			$permission->CanAdd 		= JAccess::check($user->id, 'flexicontent.create', 			'com_flexicontent');
 			$permission->CanEdit 		= JAccess::check($user->id, 'flexicontent.editall', 			'com_flexicontent');
@@ -68,6 +69,22 @@ class FlexicontentHelperPerm{
 			}
 		}
 		return $permissions[$section.$action];
+	}
+	function checkAllItemAccess($uid, $section, $id, $force=false) {
+		static $actions;
+		if(!isset($actions[$id]) || $force) {
+			$db = &JFactory::getDBO();
+			$user = &JFactory::getUser($uid);
+			$query = "SELECT rules FROM #__assets WHERE name='flexicontent.{$section}.{$id}';";
+			$db->setQuery($query);
+			$rule_string = $db->loadResult();
+			$rule = new JRules($rule_string);
+			$actions[$id] = array();
+			foreach($rule->getData() as $action=>$data) {
+				$actions[$id][] = $action;
+			}
+		}
+		return $actions[$id];
 	}
 }
 ?>

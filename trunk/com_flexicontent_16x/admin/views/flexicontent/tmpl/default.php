@@ -133,17 +133,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 							}
 						}
 						
-						if ($this->dopostinstall && FLEXI_ACCESS)
-						{
-							if ($this->permission->CanRights)
-							{
-								$link = 'index.php?option=com_flexiaccess';
-								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editacl.png', JText::_( 'FLEXI_EDIT_ACL' ) );
-							}
-						}
-						
-						if ($this->dopostinstall && $this->params->get('support_url'))
-						{
+						if ($this->dopostinstall && $this->params->get('support_url')) {
 							$link = $this->params->get('support_url');
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-support.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 						}
@@ -171,18 +161,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 				<?php
 					$k = 0;
 					$n = count($this->unapproved);
+					$user =& JFactory::getUser();
+					$check = JAccess::check($user->id, 'core.admin', 'root.1');
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->unapproved[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->unapproved[$i];
+						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -213,18 +199,13 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 				<?php
 					$k = 0;
 					$n = count($this->openquest);
+					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->openquest[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->openquest[$i];
+						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -255,18 +236,13 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 				<?php
 					$k = 0;
 					$n = count($this->inprogress);
+					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->inprogress[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->inprogress[$i];
+						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>

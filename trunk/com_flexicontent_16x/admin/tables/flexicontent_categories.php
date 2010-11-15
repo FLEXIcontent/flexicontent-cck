@@ -98,19 +98,18 @@ class flexicontent_categories extends JTableNested{
 			return false;
 		}
 
-		// check for existing name
+		/*// check for existing name
 		$query = 'SELECT id'
-		. ' FROM #__categories '
-		. ' WHERE title = '.$this->_db->Quote($this->title)
-		. ' AND lft>=' . FLEXI_CATEGORY_LFT . ' AND rgt<=' . FLEXI_CATEGORY_RGT
-		;
+			. ' FROM #__categories '
+			. ' WHERE title = '.$this->_db->Quote($this->title)
+			. ' AND lft>=' . FLEXI_CATEGORY_LFT . ' AND rgt<=' . FLEXI_CATEGORY_RGT
+			;
 		$this->_db->setQuery( $query );
-
 		$xid = intval( $this->_db->loadResult() );
-		if ($xid && $xid != intval( $this->id )) {
+		if ($xid && ($xid != intval( $this->id )) ) {
 			$this->_error = JText::sprintf( 'WARNNAMETRYAGAIN', JText::_( 'FLEXI_Category' ) );
 			return false;
-		}
+		}*/
 
 		if(empty($this->alias)) {
 			$this->alias = $this->title;

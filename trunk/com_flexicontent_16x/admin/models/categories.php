@@ -293,18 +293,15 @@ class FlexicontentModelCategories extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function access($id, $access) {
+	function saveaccess($id, $access) {
 		$category  =& $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
 		$cids = array();
 		$cids[] = $id;
 		$this->_addCategories($id, $cids);
-		
 		foreach ($cids as $cid) {
-			
 			$category->load( (int)$cid );
-			
 			if ($category->access < $access) {				
 				$category->access = $access;
 			} else {
@@ -363,8 +360,7 @@ class FlexicontentModelCategories extends JModelList{
 	 * 
 	 * @since 1.0
 	 */
-	function _addCategories($id, &$list, $type = 'children')
-	{
+	function _addCategories($id, &$list, $type = 'children') {
 		// Initialize variables
 		$return = true;
 		

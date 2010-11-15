@@ -318,12 +318,12 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access) {
+	function saveaccess($id, $access) {
 		$mainframe = &JFactory::getApplication();
 
 		$row =& JTable::getInstance('flexicontent_types', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 

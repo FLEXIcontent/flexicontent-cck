@@ -158,27 +158,6 @@ class FlexicontentViewItem extends JView {
 
 		//build selectlists
 		$lists = array();
-		/*if (FLEXI_ACCESS && ($user->gid < 25)) {
-			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all'))) {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true, false);
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true, false);
-			} else {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
-				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
-			}
-		} else {
-			//$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
-			//$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $form->getValue("catid"), 2, 'class="scat"', true);
-		}
-		
-		// build granular access list
-		if (FLEXI_ACCESS) {
-			if (isset($user->level)) {
-			$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
-			} else {
-				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
-			}
-		}*/
 		
 		// Create the type parameters
 		$tparams = new JParameter($tparams);

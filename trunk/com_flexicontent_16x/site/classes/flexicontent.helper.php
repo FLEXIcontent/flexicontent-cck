@@ -62,21 +62,20 @@ class flexicontent_html{
 	 * @return 	string
 	 * @since 1.5
 	 */
-	function extractimagesrc( $row )
-	{
+	function extractimagesrc( $row ) {
 		jimport('joomla.filesystem.file');
 
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
-			
+
 		preg_match ($regex, $row->introtext, $matches);
-		
+
 		if(!count($matches)) preg_match ($regex, $row->fulltext, $matches);
-		
+
 		$images = (count($matches)) ? $matches : array();
-		
+
 		$image = '';
 		if (count($images)) $image = $images[2];
-		
+
 		$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
 
 		return $image;
@@ -405,9 +404,8 @@ class flexicontent_html{
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
-	{
-        $live_path = JURI::base();
+ 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid ) {
+		$live_path = JURI::base();
 
 		$document =& JFactory::getDocument();
 		
@@ -415,16 +413,15 @@ class flexicontent_html{
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim		= $field->parameters->get( 'dimension', 25 );    	
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
-     	$class 		= $field->name;
+		$class 		= $field->name;
 		$img_path	= $live_path . $image;
 	
 		$percent = 0;
 		$stars = '';
 		
-     	global $VoteAddScript;
+		global $VoteAddScript;
 		
-	 	if (!$VoteAddScript)
-	 	{ 
+	 	if (!$VoteAddScript) { 
 			$css 	= $live_path.'components/com_flexicontent/assets/css/fcvote.css';
 			$js		= $live_path.'components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
@@ -507,9 +504,8 @@ class flexicontent_html{
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function favicon($field, $favoured)
-	{
-        $live_path 	= JURI::base();
+	function favicon($field, $favoured) {
+        	$live_path 	= JURI::base();
 		$user		= & JFactory::getUser();
 		$document 	= & JFactory::getDocument();
 		$js			= $live_path.'components/com_flexicontent/assets/js/fcfav.js';
@@ -570,8 +566,7 @@ class flexicontent_html{
 	 * @return array
 	 * @since 1.5
 	 */
-	function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"')
-	{
+	function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"') {
 		$typelist 	= array();
 		
 		if($top) {
@@ -591,8 +586,7 @@ class flexicontent_html{
 	 * @return array
 	 * @since 1.5
 	 */
-	function buildauthorsselect($list, $name, $selected, $top, $class = 'class="inputbox"')
-	{
+	function buildauthorsselect($list, $name, $selected, $top, $class = 'class="inputbox"') {
 		$typelist 	= array();
 		
 		if($top) {
@@ -1019,6 +1013,56 @@ class flexicontent_html{
 		$types = $db->loadAssocList('id');
 		
 		return $types;
+	}
+	/**
+	 * Displays a list of the available access view levels
+	 *
+	 * @param	string	The form field name.
+	 * @param	string	The name of the selected section.
+	 * @param	string	Additional attributes to add to the select field.
+	 * @param	mixed	True to add "All Sections" option or and array of option
+	 * @param	string	The form field id
+	 *
+	 * @return	string	The required HTML for the SELECT tag.
+	 */
+	public static function userlevel($name, $selected, $attribs = '', $params = true, $id = false) {
+		static $options;
+		if(!$options) {
+			$db		= JFactory::getDbo();
+			$query	= $db->getQuery(true);
+			$query->select('a.id AS value, a.title AS text');
+			$query->from('#__viewlevels AS a');
+			$query->group('a.id');
+			$query->order('a.ordering ASC');
+			$query->order('`title` ASC');
+
+			// Get the options.
+			$db->setQuery($query);
+			$options = $db->loadObjectList();
+
+			// Check for a database error.
+			if ($db->getErrorNum()) {
+				JError::raiseWarning(500, $db->getErrorMsg());
+				return null;
+			}
+
+			// If params is an array, push these options to the array
+			if (is_array($params)) {
+				$options = array_merge($params,$options);
+			}
+			// If all levels is allowed, push it into the array.
+			elseif ($params) {
+				array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_LEVELS')));
+			}
+		}
+
+		return JHtml::_('select.genericlist', $options, $name,
+			array(
+				'list.attr' => $attribs,
+				'list.select' => $selected,
+				'id' => $id
+			)
+		);
 	}
 }
 

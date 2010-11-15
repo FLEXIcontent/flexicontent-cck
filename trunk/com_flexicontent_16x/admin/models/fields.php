@@ -452,13 +452,12 @@ class FlexicontentModelFields extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function access($id, $access)
-	{
+	function saveaccess($id, $access) {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$row =& JTable::getInstance('flexicontent_fields', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 

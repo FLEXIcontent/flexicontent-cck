@@ -46,14 +46,10 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getPending()
-	{
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+	function getPending() {
+		$permission = FlexicontentHelperPerm::getPerm();
+		$user = &JFactory::getUser();
+		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 		
 		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -77,12 +73,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @return array
 	 */
 	function getOpenquestions() {
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$user	= &JFactory::getUser();
+		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 
 		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -106,12 +99,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @return array
 	 */
 	function getInprogress() {
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$user = &JFactory::getUser();
+		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 
 		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -184,9 +174,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistFieldsPlugins()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE folder = ' . $this->_db->Quote('flexicontent_fields')
+		$query = 'SELECT COUNT( extension_id )'
+		. ' FROM #__extensions'
+		. ' WHERE `type`= '.$this->_db->Quote('plugin').' AND folder = ' . $this->_db->Quote('flexicontent_fields')
 		;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -205,9 +195,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistSearchPlugin()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE element = ' . $this->_db->Quote('flexisearch')
+		$query = 'SELECT COUNT( extension_id )'
+		. ' FROM #__extensions'
+		. ' WHERE `type`='.$this->_db->Quote('plugin').' AND element = ' . $this->_db->Quote('flexisearch')
 		;
 		$this->_db->setQuery( $query );
 		return $this->_db->loadResult() ? true : false;
@@ -221,9 +211,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistSystemPlugin()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE element = ' . $this->_db->Quote('flexisystem')
+		$query = 'SELECT COUNT( extension_id )'
+		. ' FROM #__extensions'
+		. ' WHERE `type`='.$this->_db->Quote('plugin').' AND element = ' . $this->_db->Quote('flexisystem')
 		;
 		$this->_db->setQuery( $query );
 		return $this->_db->loadResult() ? true : false;
@@ -239,12 +229,12 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		static $return;
 		if($return === NULL) {
-			$query 	= 'SELECT COUNT( id )'
-					. ' FROM #__plugins'
-					. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
+			$query 	= 'SELECT COUNT( extension_id )'
+					. ' FROM #__extensions'
+					. ' WHERE `type`='.$this->_db->Quote('plugin').' AND ( folder = ' . $this->_db->Quote('flexicontent_fields')
 					. ' OR element = ' . $this->_db->Quote('flexisearch')
 					. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
-					. ' AND published <> 1'
+					. ' AND enabled <> 1'
 					;
 			$this->_db->setQuery( $query );
 			$return = $this->_db->loadResult() ? false : true;

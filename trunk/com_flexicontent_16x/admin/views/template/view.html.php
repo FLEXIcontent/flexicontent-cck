@@ -120,31 +120,19 @@ class FlexicontentViewTemplate extends JView {
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$permission = FlexicontentHelperPerm::gerPerm();
 
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? 0 : 1;
-		} else {
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanTemplates	= 1;
-		}
-
+		$user =& JFactory::getUser();
+		$check = JAccess::check($user->id, 'core.admin', 'root.1');
+		$CanCats 		= (!$check) ? $permission->CanCats : 1;
+		$CanTypes 		= (!$check) ? $permission->Types : 1;
+		$CanFields 		= (!$check) ? $permission->CanFields : 1;
+		$CanTags 		= (!$check) ? $permission->CanTags : 1;
+		$CanArchives 	= (!$check) ? $permission->CanArchives : 1;
+		$CanFiles	 	= (!$check) ? $permission->CanFiles : 1;
+		$CanStats	 	= (!$check) ? $permission->CanStats : 1;
+		$CanRights	 	= (!$check) ? $permission->CanRights : 1;
+		$CanTemplates	= (!$check) ? 0 : 1;
 		if (!$CanTemplates) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}

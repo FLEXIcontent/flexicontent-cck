@@ -40,9 +40,6 @@ class FlexicontentControllerTypes extends FlexicontentController {
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
 		$this->registerTask( 'copy', 			'copy' );
 	}
 
@@ -234,20 +231,13 @@ class FlexicontentControllerTypes extends FlexicontentController {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
-
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
-		} else {
-			$access = 2;
-		}
+		$id		= (int)$cid[0];
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$id];
 
 		$model = $this->getModel('types');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');

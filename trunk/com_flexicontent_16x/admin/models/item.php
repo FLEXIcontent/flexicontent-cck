@@ -300,10 +300,8 @@ class FlexicontentModelItem extends JModelAdmin {
 	 */
 	function canAdd() {
 		$user	=& JFactory::getUser();
-
-		if (FLEXI_ACCESS && ($user->gid < 25)) {
-			if 	((!FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) && (!FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) return false;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		if(!$permission->CanAdd) return false;
 		return true;
 	}
 
@@ -314,18 +312,16 @@ class FlexicontentModelItem extends JModelAdmin {
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function canEdit()
-	{
+	function canEdit() {
 		$user	=& JFactory::getUser();
 
-		if (FLEXI_ACCESS && $this->_loadItem() && ($user->gid < 25))
-		{
-				if ($this->_item->id && $this->_item->catid)
-				{
-					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid);
-					$canEdit 	= in_array('edit', $rights) || FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-					$canEditOwn	= ((in_array('editown', $rights) || FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) && ($this->_item->created_by == $user->id));
-				
+		if (!JAccess::check($user->id, 'core.admin', 'root.1')) {
+				$permission = FlexicontentHelperPerm::getPerm();
+				$id = $this->getState($this->getName().'.id');
+				if ($id) {
+					$rights 	= $permission->checkAllItemAccess($uid, 'item', $id);
+					$canEdit 	= in_array('flexicontent.editall', $rights) || $permission->CanEdit;
+					$canEditOwn	= (in_array('flexicontent.editown', $rights) && ($item->created_by == $user->id));
 					if ($canEdit || $canEditOwn) return true;
 					return false;
 				}

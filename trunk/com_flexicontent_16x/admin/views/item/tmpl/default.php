@@ -277,8 +277,8 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				</table>
 
 				<?php
-				//if (FLEXI_ACCESS && $this->canRight && $this->row->id) :
-				$this->document->addScriptDeclaration("
+				if ($this->canRight && $this->form->getValue("id")) :
+					$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 					var slideaccess = new Fx.Slide('tabacces');
 					var slidenoaccess = new Fx.Slide('notabacces');
@@ -303,7 +303,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
                 			</div>
                			</fieldset>
-				<?php //endif; ?>
+				<?php endif; ?>
 
 				<?php
 				if ($this->fields) {
