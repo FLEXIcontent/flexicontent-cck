@@ -304,6 +304,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		$user = &JFactory::getUser();
 		
 		// define the rights for correct redirecting the save task
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -375,7 +376,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 		}
 
 		$model->checkout( $user->get('id') );
-		
 		parent::display();
 	}
 
