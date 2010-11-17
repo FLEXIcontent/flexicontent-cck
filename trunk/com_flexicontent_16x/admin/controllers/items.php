@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controlleradmin');
+jimport('joomla.application.component.controller');
 
 /**
  * FLEXIcontent Component Item Controller
@@ -27,7 +27,7 @@ jimport('joomla.application.component.controlleradmin');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends JControllerAdmin {
+class FlexicontentControllerItems extends JController {
 	/**
 	 * Constructor
 	 *
@@ -512,8 +512,7 @@ class FlexicontentControllerItems extends JControllerAdmin {
 	 * @return void
 	 * @since 1.0
 	 */
-	function edit()
-	{		
+	function edit() {		
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
@@ -538,7 +537,6 @@ class FlexicontentControllerItems extends JControllerAdmin {
 		}
 
 		$model->checkout( $user->get('id') );
-
 		parent::display();
 	}
 
@@ -547,8 +545,7 @@ class FlexicontentControllerItems extends JControllerAdmin {
 	 * 
 	 * @since 1.0
 	 */
-	function resethits()
-	{
+	function resethits() {
 		$id		= JRequest::getInt( 'id', 0 );
 		$model = $this->getModel('item');
 
