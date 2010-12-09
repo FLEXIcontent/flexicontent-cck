@@ -133,6 +133,7 @@ class FlexicontentModelItem extends JModel {
 	 */
 	function _loadItem($loadcurrent=false) {
 		// Lets load the item if it doesn't already exist
+		if(!$this->_id) return false;
 		if (empty($this->_item)) {
 			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 			$use_versioning = $cparams->get('use_versioning', 1);
@@ -310,6 +311,7 @@ class FlexicontentModelItem extends JModel {
 		{
 			$createdate = & JFactory::getDate();
 			$nullDate	= $this->_db->getNullDate();
+			$cparams =& JComponentHelper::getParams('com_flexicontent');
 			
 			$item = new stdClass();
 			$item->id					= 0;
