@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'title': // hits
 			$field->value[] = $item->title;
-			$field->display = $pretext.JText::_($item->title).$posttext;
+			$field->display = $pretext.$item->title.$posttext;
 			break;
 
 			case 'hits': // hits
