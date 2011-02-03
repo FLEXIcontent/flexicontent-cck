@@ -450,7 +450,7 @@ window.addEvent('domready', function(){
 						$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
 					}
 				}
-
+			$row->lang = $row->lang ? $row->lang : 'en-GB';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
