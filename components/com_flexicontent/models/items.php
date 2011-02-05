@@ -137,6 +137,13 @@ class FlexicontentModelItems extends JModel
 			$gid	= (int) $user->get('gid');
 			$cid	= JRequest::getInt('cid');
 
+			// Create the return parameter
+			$return = array (
+				'id' 	=> @$this->_item->id,
+				'cid'	=> $cid
+			);
+			$return = serialize($return); 
+
 			// Is the category published?
 			if ($cid) {
 				if (!$globalcats[$cid]->published) {
@@ -144,62 +151,11 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 
-			// Do we have access to the category?
-			if (@$this->_item->id && @$this->_item->catid) {
-				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
-				foreach ($ancestors as $cat) {
-					if (FLEXI_ACCESS) {
-						if (FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $cat)) {
-							$canreadcat = true;
-						} else {
-							$canreadcat = false;
-							break;
-						}
-					} else {
-						if ($globalcats[$cat]->access <= $aid) {
-							$canreadcat = true;
-						} else {
-							$canreadcat = false;
-							break;
-						}
-					}
-				}
-
-				if (!@$canreadcat)
-				{
-					if (!$aid) {
-						// Redirect to login
-						$uri		= JFactory::getURI();
-						$return		= $uri->toString();
-		
-						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
-						$url .= '&return='.base64_encode($return);
-		
-						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
-					} else {
-						// Redirect to unauthorized page or 403
-						if ($params->get('unauthorized_page', '')) {
-							$mainframe->redirect($params->get('unauthorized_page'));				
-						} else {
-							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-							return false;
-						}
-					}
-				}
-			} else if (@$this->_item->id) {
-				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
-				return false;
-			}
-			
 			// Do we have access to the content itself
-			
 			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
 			{
 				if (!$aid) {
 					// Redirect to login
-					$uri		= JFactory::getURI();
-					$return		= $uri->toString();
-	
 					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
 					$url .= '&return='.base64_encode($return);
 	
@@ -219,9 +175,6 @@ class FlexicontentModelItems extends JModel
 				{
 					if (!$aid) {
 						// Redirect to login
-						$uri		= JFactory::getURI();
-						$return		= $uri->toString();
-		
 						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
 						$url .= '&return='.base64_encode($return);
 		
@@ -229,7 +182,10 @@ class FlexicontentModelItems extends JModel
 					} else {
 						// Redirect to unauthorized page or 403
 						if ($params->get('unauthorized_page', '')) {
-							$mainframe->redirect($params->get('unauthorized_page'));				
+							$url  = $params->get('unauthorized_page');
+							$url .= '&return='.base64_encode($return);
+		
+							$mainframe->redirect($url);				
 						} else {
 							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
 							return false;
