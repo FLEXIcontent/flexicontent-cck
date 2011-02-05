@@ -439,7 +439,8 @@ class phpthumb_functions {
 		return isset($DisabledFunctions[strtolower($function)]);
 	}
 
-
+  //Patched using code from Everett to fix Vulnerability see (http://modxcms.com/forums/index.php?PHPSESSID=02afcf1a7125caa8c6126ae527a99f65&topic=54874.msg316279#msg316279)
+  //JWicks
 	function SafeExec($command) {
 		static $AllowedExecFunctions = array();
 		if (empty($AllowedExecFunctions)) {
@@ -448,6 +449,19 @@ class phpthumb_functions {
 				$AllowedExecFunctions[$key] = !phpthumb_functions::FunctionIsDisabled($key);
 			}
 		}
+    
+    // Strip off any commands after the first semi-colon
+    // and prepare the data to be sent to the command line.
+    // EVERETT @ www.fireproofsocks.com 9/26/2010
+    if (strtoupper(substr(PHP_OS, 0, 3)) == "WIN") { //Windows
+      $command = preg_replace('/&&.*$/','',$command);
+    }
+    else {
+      $command = preg_replace('/;.*$/','',$command); // <-- *NIX only
+    }
+    $command = escapeshellcmd($command);
+
+
 		$command .= ' 2>&1'; // force redirect stderr to stdout
 		foreach ($AllowedExecFunctions as $execfunction => $is_allowed) {
 			if (!$is_allowed) {
