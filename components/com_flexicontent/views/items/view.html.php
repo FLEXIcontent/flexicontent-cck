@@ -36,7 +36,7 @@ class FlexicontentViewItems extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		global $mainframe, $globaltypes;
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();
@@ -94,7 +94,7 @@ class FlexicontentViewItems extends JView
 		if ($item->id == 0)
 		{	
 			$id	= JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf( 'MANU ITEM #%d NOT FOUND', $id ) );
+			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND (items/view.html)', $id ) );
 		}
 		
 		$fields		=& $item->fields;
@@ -105,11 +105,16 @@ class FlexicontentViewItems extends JView
 		$pathway 	=& $mainframe->getPathWay();
 		$depth		= $params->get('item_depth', 0);
 
+		if (isset($globaltypes) && @$globaltypes) {
+			if (!in_array($item->id, $globaltypes))
+				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+		} else {
 		for($p = $depth; $p<count($parents); $p++) {
 			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
 		}
 		if ($params->get('add_item_pathway', 1)) {
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+		}
 		}
 		
 		JPluginHelper::importPlugin('content');
