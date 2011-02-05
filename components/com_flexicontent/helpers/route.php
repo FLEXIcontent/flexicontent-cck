@@ -95,6 +95,8 @@ class FlexicontentHelperRoute
 
 	function _findItem($needles)
 	{
+		global $globalitems;
+		
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
 		$menus	= &JApplication::getMenu('site', array());
@@ -112,8 +114,11 @@ class FlexicontentHelperRoute
 					$match = $item; // priority 2: item id
 					//break;
 				}
+			} else if ( @$globalitems && (@$item->query['view'] == 'items') && (@$globalitems[$needles['category']]->id == @$item->query['id']) ) {
+				$match = $item; // priority 3 advanced items routing (requires the system plugin)
+				//break;
 			} else if ((@$item->query['view'] == 'category') && (@$item->query['cid'] == $needles['category'])) {
-				$match = $item; // priority 3 category cid
+				$match = $item; // priority 4 category cid
 				//break;
 			}
 		}
@@ -154,6 +159,7 @@ class FlexicontentHelperRoute
 
 		$menus	= &JApplication::getMenu('site', array());
 		$items	= $menus->getItems('componentid', $component->id);
+		$items 	= $items ? $items : array();
 
 		$match = null;
 
@@ -177,6 +183,5 @@ class FlexicontentHelperRoute
 
 		return $match;
 	}
-
 }
 ?>
