@@ -21,7 +21,7 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $globalcats;
+global $sh_LANG, $globalcats, $globaltypes, $globalitems;
 
 $sefConfig 		= & shRouter::shGetConfig();
 $shLangName 	= '';
@@ -45,6 +45,7 @@ $shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_F
 
 // ------------------  /load language file - adjust as needed ----------------------------------------
 
+
 // do something about that Itemid thing
 if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
   //global $Itemid;
@@ -65,9 +66,52 @@ if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
     : '';
 }
 
+/*
+  // do something about that Itemid thing
+  if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
+    // V 1.2.4.t moved back here
+    if ($sefConfig->shInsertGlobalItemidIfNone && !empty($shCurrentItemid)) {
+      $string .= '&Itemid='.$shCurrentItemid; ;  // append current Itemid
+      $Itemid = $shCurrentItemid;
+      shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
+    }
+
+    if ($sefConfig->shInsertTitleIfNoItemid)
+    $title[] = $sefConfig->shDefaultMenuItemName ?
+  		$sefConfig->shDefaultMenuItemName : getMenuTitle($option, (isset($view) ? @$view : null), $shCurrentItemid, null, $shLangName );  // V 1.2.4.q added forced language
+  		$shItemidString = '';
+  		if ($sefConfig->shAlwaysInsertItemid && (!empty($Itemid) || !empty($shCurrentItemid)))
+    $shItemidString = COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement
+    .(empty($Itemid)? $shCurrentItemid :$Itemid);
+  } else {  // if Itemid in non-sef URL
+    $shItemidString = $sefConfig->shAlwaysInsertItemid ?
+    COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$Itemid
+    : '';
+    if ($sefConfig->shAlwaysInsertMenuTitle){
+      //global $Itemid; V 1.2.4.g we want the string option, not current page !
+      if ($sefConfig->shDefaultMenuItemName)
+      $title[] = $sefConfig->shDefaultMenuItemName;// V 1.2.4.q added force language
+      elseif ($menuTitle = getMenuTitle($option, (isset($view) ? @$view : null), $Itemid, '',$shLangName )) {
+        if ($menuTitle != '/') $title[] = $menuTitle;
+      }
+    }
+  }
+*/
+
 $view 		= isset ($view) ? @$view : null;
 $Itemid		= isset ($Itemid) ? @$Itemid : null;
 $task 		= isset($task) ? @$task : null;
+$return 	= isset ($return) ? @$return : null;
+
+// V 1.2.4.m
+shRemoveFromGETVarsList('option');
+shRemoveFromGETVarsList('lang');
+if (!empty($Itemid))
+shRemoveFromGETVarsList('Itemid');
+if (!empty($limit))
+shRemoveFromGETVarsList('limit');
+if (isset($limitstart))
+shRemoveFromGETVarsList('limitstart');
 
 switch ($view) {
 	
@@ -77,7 +121,7 @@ switch ($view) {
 		
 			if (!$task) {
 			
-				$query	= 'SELECT i.id, i.title, c.title AS cattitle, ty.alias AS typealias'
+				$query	= 'SELECT i.id, i.title, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
@@ -107,15 +151,33 @@ switch ($view) {
 								if (shTranslateURL ( $option, $shLangName )) {
 									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 									$database->setQuery ( $query );
-									$row_cat = $database->loadObject ();
-									$title[] = $row_cat->title . '/';
+									$row = $database->loadObject ();
+									$title[] = $row->title . '/';
 								} else {
 									$title[] = $globalcats[$ancestor]->title . '/';
 								}
 							}		
 						}
-						
+						if ($globaltypes && !in_array($row->id, $globaltypes)) {
 						$title [] = $row->title;
+					}
+						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
+						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->id, $globaltypes)) {					
+							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
+							$database->setQuery($q);
+							if (shTranslateUrl($option, $shLangName)) // V 1.2.4.m
+								$contentElement = $database->loadObject( );
+							else 
+								$contentElement = $database->loadObject(false);
+							if ($contentElement) {
+								$foundCat = array_search($contentElement->catid, $sefConfig->shInsertNumericalIdCatList);
+								if (($foundCat !== null && $foundCat !== false) || ($sefConfig->shInsertNumericalIdCatList[0] == ''))  { // test both in case PHP < 4.2.0
+									$shTemp = explode(' ', $contentElement->created);
+									$title[] = str_replace('-','', $shTemp[0]).$contentElement->id;
+								}
+							}
+						}
+          				shMustCreatePageId( 'set', true);
 					}
 				}	
 			
@@ -161,6 +223,7 @@ switch ($view) {
 			} else {
 				$title [] = '/';
 			}
+          	shMustCreatePageId( 'set', true);
 		}
 
 		// Remove the vars from the url
@@ -242,6 +305,11 @@ if (!empty($limit))
 
 if (isset($limitstart))
 	shRemoveFromGETVarsList ( 'limitstart' ); // limitstart can be zero
+	
+//if (!empty($return))
+//	shRemoveFromGETVarsList ( 'return' );
+
+
 	
 // ------------------  standard plugin finalize function - don't change ---------------------------  
 
