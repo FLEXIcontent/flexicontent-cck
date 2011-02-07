@@ -133,7 +133,7 @@ class FlexicontentViewFlexicontent extends JView{
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', true);
 		// ensures the PHP version is correct
-		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
+		if (!$dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items');
 			if ($permission->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
 			if ($permission->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');

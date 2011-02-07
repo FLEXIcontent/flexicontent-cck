@@ -39,12 +39,12 @@ class FlexicontentController extends JController
 		}
 		$session  =& JFactory::getSession();
 		
-		$dopostinstall =& $session->get('flexicontent.postinstall');
-		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
+		$dopostinstall =& $session->get('flexicontent.postinstall', true);
+		if($dopostinstall===true) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
 		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && $dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -78,9 +78,9 @@ class FlexicontentController extends JController
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
-		$dopostinstall = true;
+		$dopostinstall = false;
 		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
-			$dopostinstall = false;
+			$dopostinstall = true;
 		}
 		return $dopostinstall;
 	}
