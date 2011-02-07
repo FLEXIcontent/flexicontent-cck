@@ -66,22 +66,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
 					});			
 				});
 			";
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -99,19 +90,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 					thisNewField.injectAfter(thisField);
 		
 					new Sortables($('sortables_".$field->id."'), {
-						'handles': $('sortables_".$field->id."').getElements('span.drag'),
-						'onDragStart': function(element, ghost){
-							ghost.setStyles({
-							   'list-style-type': 'none',
-							   'opacity': 1
-							});
-							element.setStyle('opacity', 0.3);
-						},
-						'onDragComplete': function(element, ghost){
-							element.setStyle('opacity', 1);
-							ghost.remove();
-							this.trash.remove();
-						}
+						'constrain': true,
+						'clone': true,
+						'handle': '.drag".$field->id."'
 					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
@@ -154,7 +135,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -166,7 +147,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
-				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
+				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
 				}
 			$field->html .=	'</ul>';

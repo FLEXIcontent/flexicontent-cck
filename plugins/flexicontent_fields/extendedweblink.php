@@ -56,22 +56,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
 					});			
 				});
 			";
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -100,19 +91,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					thisNewField.injectAfter(thisField);
 		
 					new Sortables($('sortables_".$field->id."'), {
-						'handles': $('sortables_".$field->id."').getElements('span.drag'),
-						'onDragStart': function(element, ghost){
-							ghost.setStyles({
-							   'list-style-type': 'none',
-							   'opacity': 1
-							});
-							element.setStyle('opacity', 0.3);
-						},
-						'onDragComplete': function(element, ghost){
-							element.setStyle('opacity', 1);
-							ghost.remove();
-							this.trash.remove();
-						}
+						'constrain': true,
+						'clone': true,
+						'handle': '.drag".$field->id."'
 					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
@@ -157,7 +138,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -202,7 +183,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 						'.$class.'
 						'.$id.'
 					</tbody></table>
-					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span>
+					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
 					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					

@@ -52,7 +52,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			var filelist = document.getElementById('sortables_".$field->id."');
 			
 			$(li).addClass('sortabledisabled');
-			$(span).addClass('drag');
+			$(span).addClass('drag".$field->id."');
 			
 			var button = document.createElement('input');
 			button.type = 'button';
@@ -84,20 +84,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			span.appendChild(img);
 			
 			new Sortables($('sortables_".$field->id."'), {
-				'handles': $('sortables_".$field->id."').getElements('span.drag'),
-				'onDragStart': function(element, ghost){
-					ghost.setStyles({
-					'list-style-type': 'none',
-					'opacity': 1
-					});
-					element.setStyle('opacity', 0.3);
-				},
-				'onDragComplete': function(element, ghost){
-					element.setStyle('opacity', 1);
-					ghost.remove();
-					this.trash.remove();
-				}
+				'constrain': true,
+				'clone': true,
+				'handle': '.drag".$field->id."'
 			});			
+		
 		}
 		
 			function deleteField".$field->id."(el) {
@@ -115,28 +106,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		";
 		$document->addScriptDeclaration($js);
 
-			//add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
 					});			
 				});
 			";
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
-
 
 			$css = '
 			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -146,7 +127,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -167,7 +148,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$field->html .= "<input size=\"".$size."\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
 				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"".$field->name."[]\" value=\"".$file."\" />";
 				$field->html .= "<input class=\"inputbox fcbutton\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
-				$field->html .= "<span class=\"drag\">".$move."</span>";
+				$field->html .= "<span class=\"drag".$field->id."\">".$move."</span>";
 				$field->html .= '</li>';
 				$i++;
 			}
