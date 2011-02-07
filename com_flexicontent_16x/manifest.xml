@@ -57,6 +57,7 @@
 			<filename>controller.php</filename>
 			<filename>defineconstants.php</filename>
 			<filename>config.xml</filename>
+			<filename>access.xml</filename>
 			<folder>installation</folder>
 			<folder>assets</folder>
 			<folder>views</folder>
