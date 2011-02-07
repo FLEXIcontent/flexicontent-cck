@@ -71,7 +71,7 @@ class FlexicontentViewTemplate extends JView {
 			$js = "
 			var my = '';
 			window.addEvent('domready', function(){
-				var mySortables = new Sortables(['".$moosort."'], {
+				var mySortables = new Sortables('.positions', {
 					constrain: false,
 					clone: false,
 					revert: true,
