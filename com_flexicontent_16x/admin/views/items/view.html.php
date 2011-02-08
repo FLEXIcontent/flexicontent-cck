@@ -122,6 +122,7 @@ class FlexicontentViewItems extends JView {
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		
+		$permission = FlexicontentHelperPerm::getPerm();
 		FLEXIcontentSubmenu();
 
 		//create the toolbar
