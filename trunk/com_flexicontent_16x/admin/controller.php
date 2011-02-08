@@ -652,13 +652,24 @@ VALUES
 		}
 	}
 	
-	function addCurrentVersionData()
-	{
+	function addCurrentVersionData() {
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$model = $this->getModel('flexicontent');
 		if ($model->addCurrentVersionData()) {
+			echo '<span class="install-ok"></span>';
+		} else {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		}
+	}
+	
+	function initialPermission() {
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$model = $this->getModel('flexicontent');
+		if ($model->initialPermission()) {
 			echo '<span class="install-ok"></span>';
 		} else {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
