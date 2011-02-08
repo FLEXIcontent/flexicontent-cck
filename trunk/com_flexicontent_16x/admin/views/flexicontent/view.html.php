@@ -116,6 +116,8 @@ class FlexicontentViewFlexicontent extends JView{
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
 
+		$session  =& JFactory::getSession();
+		$dopostinstall = $session->get('flexicontent.postinstall');
 		$permission = FlexicontentHelperPerm::getPerm();
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
