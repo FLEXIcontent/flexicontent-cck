@@ -12,43 +12,45 @@ class FlexicontentHelperPerm{
 			} else {
 				$CanComments 	= 0;
 			}
+			$user =& JFactory::getUser();
+			$check = JAccess::check($user->id, 'core.admin', 'root.1');
 			$permission = new stdClass;
 			//component
-			$permission->CanConfig 		= JAccess::check($user->id, 'flexicontent.admin', 			'com_flexicontent');
-			$permission->CanRights	 	= JAccess::check($user->id, 'flexicontent.manage', 			'com_flexicontent');
-			$permission->CanTypes 		= JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent');
-			$permission->CanFields 		= JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent');
-			$permission->CanArchives 	= JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent');
-			$permission->CanStats	 	= JAccess::check($user->id, 'flexicontent.stats', 			'com_flexicontent');
-			$permission->CanTemplates	= JAccess::check($user->id, 'flexicontent.templates', 		'com_flexicontent');
-			$permission->CanVersion	 	= JAccess::check($user->id, 'flexicontent.versioning', 		'com_flexicontent');
-			$permission->CanTags 		= JAccess::check($user->id, 'flexicontent.tags', 			'com_flexicontent');
-			$permission->CanUseTags	= JAccess::check($user->id, 'flexicontent.usetags', 			'com_flexicontent');
-			$permission->CanNewTag		= JAccess::check($user->id, 'flexicontent.newtag',			'com_flexicontent');
+			$permission->CanConfig 		= ($check || JAccess::check($user->id, 'flexicontent.admin', 			'com_flexicontent'));
+			$permission->CanRights	 	= ($check || JAccess::check($user->id, 'flexicontent.manage', 			'com_flexicontent'));
+			$permission->CanTypes 		= ($check || JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent'));
+			$permission->CanFields 		= ($check || JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent'));
+			$permission->CanArchives 	= ($check || JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent'));
+			$permission->CanStats	 	= ($check || JAccess::check($user->id, 'flexicontent.stats', 			'com_flexicontent'));
+			$permission->CanTemplates	= ($check || JAccess::check($user->id, 'flexicontent.templates', 		'com_flexicontent'));
+			$permission->CanVersion	 	= ($check || JAccess::check($user->id, 'flexicontent.versioning', 		'com_flexicontent'));
+			$permission->CanTags 		= ($check || JAccess::check($user->id, 'flexicontent.tags', 			'com_flexicontent'));
+			$permission->CanUseTags	= ($check || JAccess::check($user->id, 'flexicontent.usetags', 			'com_flexicontent'));
+			$permission->CanNewTag		= ($check || JAccess::check($user->id, 'flexicontent.newtag',			'com_flexicontent'));
 			//items
-			$permission->CanAdd 		= JAccess::check($user->id, 'flexicontent.create', 			'com_flexicontent');
-			$permission->CanEdit 		= JAccess::check($user->id, 'flexicontent.editall', 			'com_flexicontent');
-			$permission->CanPublish 		= JAccess::check($user->id, 'flexicontent.editall.state', 		'com_flexicontent');
-			$permission->CanDelete 		= JAccess::check($user->id, 'flexicontent.deleteall', 			'com_flexicontent');
-			$permission->CanOrder	 	= JAccess::check($user->id, 'flexicontent.order', 			'com_flexicontent');
-			$permission->CanCopy	 	= JAccess::check($user->id, 'flexicontent.copyitems', 		'com_flexicontent');
-			$permission->CanParams	 	= JAccess::check($user->id, 'flexicontent.paramsitem', 		'com_flexicontent');
-			$permission->DisplayAllItems	 = JAccess::check($user->id, 'flexicontent.displayallitems',	'com_flexicontent');
+			$permission->CanAdd 		= ($check || JAccess::check($user->id, 'flexicontent.create', 			'com_flexicontent'));
+			$permission->CanEdit 		= ($check || JAccess::check($user->id, 'flexicontent.editall', 			'com_flexicontent'));
+			$permission->CanPublish 		= ($check || JAccess::check($user->id, 'flexicontent.editall.state', 		'com_flexicontent'));
+			$permission->CanDelete 		= ($check || JAccess::check($user->id, 'flexicontent.deleteall', 			'com_flexicontent'));
+			$permission->CanOrder	 	= ($check || JAccess::check($user->id, 'flexicontent.order', 			'com_flexicontent'));
+			$permission->CanCopy	 	= ($check || JAccess::check($user->id, 'flexicontent.copyitems', 		'com_flexicontent'));
+			$permission->CanParams	 	= ($check || JAccess::check($user->id, 'flexicontent.paramsitem', 		'com_flexicontent'));
+			$permission->DisplayAllItems	 = ($check || JAccess::check($user->id, 'flexicontent.displayallitems',	'com_flexicontent'));
 			//categories
-			$permission->CanCats 		= JAccess::check($user->id, 'flexicontent.managecat',		'com_flexicontent');
-			$permission->CanUserCats 	= JAccess::check($user->id, 'flexicontent.usercats',			'com_flexicontent');
-			$permission->CanViewTree 	= JAccess::check($user->id, 'flexicontent.viewtree',			'com_flexicontent');
-			$permission->CanAddCats 	= JAccess::check($user->id, 'flexicontent.createcat', 		'com_flexicontent');
-			$permission->CanEditAllCats 	= JAccess::check($user->id, 'flexicontent.editallcat',			'com_flexicontent');
-			$permission->CanDeleteAllCats = JAccess::check($user->id, 'flexicontent.deleteallcat', 		'com_flexicontent');
-			$permission->CanPublishAllCats = JAccess::check($user->id, 'flexicontent.editallcat.state', 	'com_flexicontent');
+			$permission->CanCats 		= ($check || JAccess::check($user->id, 'flexicontent.managecat',		'com_flexicontent'));
+			$permission->CanUserCats 	= ($check || JAccess::check($user->id, 'flexicontent.usercats',			'com_flexicontent'));
+			$permission->CanViewTree 	= ($check || JAccess::check($user->id, 'flexicontent.viewtree',			'com_flexicontent'));
+			$permission->CanAddCats 	= ($check || JAccess::check($user->id, 'flexicontent.createcat', 		'com_flexicontent'));
+			$permission->CanEditAllCats 	= ($check || JAccess::check($user->id, 'flexicontent.editallcat',			'com_flexicontent'));
+			$permission->CanDeleteAllCats = ($check || JAccess::check($user->id, 'flexicontent.deleteallcat', 		'com_flexicontent'));
+			$permission->CanPublishAllCats = ($check || JAccess::check($user->id, 'flexicontent.editallcat.state', 	'com_flexicontent'));
 			//files
-			$permission->CanFiles	 	= JAccess::check($user->id, 'flexicontent.managefile', 		'com_flexicontent');
-			$permission->CanUpload	 	= JAccess::check($user->id, 'flexicontent.uploadfiles', 		'com_flexicontent');
-			$permission->CanViewAllFiles	 = JAccess::check($user->id, 'flexicontent.viewallfiles', 		'com_flexicontent');
+			$permission->CanFiles	 	= ($check || JAccess::check($user->id, 'flexicontent.managefile', 		'com_flexicontent'));
+			$permission->CanUpload	 	= ($check || JAccess::check($user->id, 'flexicontent.uploadfiles', 		'com_flexicontent'));
+			$permission->CanViewAllFiles	 = ($check || JAccess::check($user->id, 'flexicontent.viewallfiles', 		'com_flexicontent'));
 			//others
-			$permission->CanPlugins	 	= JAccess::check($user->id, 'core.manage', 				'com_plugins');
-			$permission->CanComments 	= JAccess::check($user->id, 'core.admin', 'root.1')?$CanComments:JAccess::check($user->id, 'core.manage', 'com_jcomments');
+			$permission->CanPlugins	 	= ($check || JAccess::check($user->id, 'core.manage', 				'com_plugins'));
+			$permission->CanComments 	= ($check || JAccess::check($user->id, 'core.admin', 'root.1')?$CanComments:JAccess::check($user->id, 'core.manage', 'com_jcomments'));
 		}
 		return $permission;
 	}

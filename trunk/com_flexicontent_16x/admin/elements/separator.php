@@ -43,6 +43,6 @@ class JFormFieldSeparator extends JFormField{
 		} else {
 			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
 		}
-		return '<span style="'.$style.'">'.JText::_($this->value).'</div>';
+		return '<fieldset style="float:left;width:100%;"><div style="'.$style.'">'.JText::_($this->value).'</div></fieldset>';
 	}
 }
