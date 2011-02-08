@@ -57,19 +57,18 @@ $flexiplugins = array(
 	"flexisystem"		=>	"system"
 );
 // additional extensions
-$add =& $this->manifest->xpath('additional');
+$add_array =& $this->manifest->xpath('additional');
 $add = NULL;
 if(count($add_array)) $add = $add_array[0];
 if (is_a($add, 'JXMLElement') && count($add->children())) {
     $exts =& $add->children();
     foreach ($exts as $ext) {
-
 		// set query
 		switch ($ext->name()) {
 			case 'plugin':
 				$attribute_name = $ext->getAttribute('name');
 				if(array_key_exists($attribute_name, $flexiplugins)) {
-					$query = 'SELECT * FROM #__plugins WHERE element='.$db->Quote($ext->getAttribute('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
+					$query = 'SELECT * FROM #__extensions WHERE type='.$db->Quote($ext->name()).' AND element='.$db->Quote($ext->getAttribute('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
 					// query extension id and client id
 					$db->setQuery($query);
 					$res = $db->loadObject();
@@ -77,24 +76,24 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 					$extensions[] = array(
 						'name' => $ext->data(),
 						'type' => $ext->name(),
-						'id' => isset($res->id) ? $res->id : 0,
+						'id' => isset($res->extension_id) ? $res->extension_id : 0,
 						'client_id' => isset($res->client_id) ? $res->client_id : 0,
 						'installer' => new JInstaller(),
 						'status' => false);
 				}
 				break;
 			case 'module':
-				$query = 'SELECT * FROM #__modules WHERE module='.$db->Quote($ext->getAttribute('name'));
-		// query extension id and client id
-		$db->setQuery($query);
-		$res = $db->loadObject();
-		$extensions[] = array(
-			'name' => $ext->data(),
-			'type' => $ext->name(),
-			'id' => isset($res->id) ? $res->id : 0,
-			'client_id' => isset($res->client_id) ? $res->client_id : 0,
-			'installer' => new JInstaller(),
-			'status' => false);
+				$query = 'SELECT * FROM #__extensions WHERE type='.$db->Quote($ext->name()).' AND element='.$db->Quote($ext->getAttribute('name'));
+				// query extension id and client id
+				$db->setQuery($query);
+				$res = $db->loadObject();
+				$extensions[] = array(
+					'name' => $ext->data(),
+					'type' => $ext->name(),
+					'id' => isset($res->extension_id) ? $res->extension_id : 0,
+					'client_id' => isset($res->client_id) ? $res->client_id : 0,
+					'installer' => new JInstaller(),
+					'status' => false);
 				break;
 		}
     }
@@ -103,12 +102,12 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 // uninstall additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
-	
 	if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 		$extension['status'] = true;
 	}
 }
-
+$session  =& JFactory::getSession();
+$session->set('flexicontent.postinstall', null);
 ?>
 <h3><?php echo JText::_('Additional Extensions'); ?></h3>
 <table class="adminlist">
@@ -132,6 +131,7 @@ for ($i = 0; $i < count($extensions); $i++) {
 					<span style="<?php echo $style; ?>"><?php echo $ext['status'] ? JText::_('Uninstalled successfully') : JText::_('Uninstall FAILED'); ?></span>
 				</td>
 			</tr>
+			<?php unset($extensions[$i]);?>
 		<?php endforeach; ?>
 	</tbody>
 </table>
