@@ -105,12 +105,19 @@ class FlexicontentViewFlexicontent extends JView{
 		$model 				= $this->getModel('flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+		$initialpermission	= $model->checkInitialPermission();
 
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
+		$document->addStyleDeclaration('
+.pane-sliders {
+	margin: 0px 0 0 0 !important;
+	position: relative;
+}');
 		
 		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
@@ -166,6 +173,7 @@ class FlexicontentViewFlexicontent extends JView{
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
+		$this->assignRef('initialpermission'		, $initialpermission);
 
 		// assign Rights to the template
 		$this->assignRef('permission'		, $permission);

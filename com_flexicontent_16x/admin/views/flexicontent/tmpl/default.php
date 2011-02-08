@@ -143,7 +143,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 				</tr>
 			</table>
 			</td>
-			<td valign="top" width="400px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="400px" style="padding: 0px 0 0 5px">
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			
