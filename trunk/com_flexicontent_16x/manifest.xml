@@ -68,6 +68,7 @@
 		</files>
 		<languages folder="admin/language">
 			<language tag="en-GB">en-GB.com_flexicontent.ini</language>
+			<language tag="en-GB">en-GB.com_flexicontent.sys.ini</language>
 			<language tag="fr-FR">fr-FR.com_flexicontent.ini</language>
 		</languages>
 		<params>
