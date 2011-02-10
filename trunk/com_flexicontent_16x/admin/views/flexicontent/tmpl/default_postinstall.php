@@ -148,7 +148,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		});
 <?php endif; ?>
 <?php if(!$this->cachethumb) : ?>
-		addEvent('domready', function(){
 		$('cachethumb').addEvent('click', function(e) {
 			e = new Event(e).stop();
 			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo JUtility::getToken();?>=1&format=raw";
