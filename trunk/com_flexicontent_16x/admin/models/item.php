@@ -184,7 +184,7 @@ class FlexicontentModelItem extends JModelAdmin {
 			if($pk <= 0) {
 				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 				$item->state				= $cparams->get('new_item_state', -4);
-				$item->language			= flexicontent_html::getSiteDefaultLang();
+				//$item->language			= flexicontent_html::getSiteDefaultLang();
 			}
 			$used = $this->getTypesselected();
 			$item->type_id = $used->id;

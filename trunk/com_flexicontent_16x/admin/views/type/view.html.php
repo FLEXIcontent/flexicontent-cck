@@ -37,7 +37,6 @@ class FlexicontentViewType extends JView {
 		//initialise variables
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
-		$pane 		= & JPane::getInstance('sliders');
 
 		JHTML::_('behavior.tooltip');
 
@@ -63,7 +62,8 @@ class FlexicontentViewType extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		$this->form		= $this->get('Form');
+		$this->form	= $this->get('Form');
+		$attribs	= $this->get('Attribs');
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
 
@@ -76,8 +76,8 @@ class FlexicontentViewType extends JView {
 		}
 
 		//assign data to template
-		$this->assignRef('pane'			, $pane);
 		$this->assignRef('tmpls'		, $tmpls);
+		$this->assignRef('attribs'		, $attribs);
 
 		parent::display($tpl);
 	}

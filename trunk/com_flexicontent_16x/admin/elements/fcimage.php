@@ -18,7 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-
+jimport('joomla.form.formfield');
 /**
  * Renders an image element
  *
@@ -26,29 +26,27 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementFcimage extends JElement
-{
+ class JFormFieldFcimage extends JFormFieldList{
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'Fcimage';
+	protected $type = 'Fcimage';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
+	public function getOptions() {
 
 		$images 	= array();
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
 		$db =& JFactory::getDBO();
-		
+
 		$query = 'SELECT name AS value, label AS text'
-		. ' FROM #__flexicontent_fields'
-		. ' WHERE published = 1'
-		. ' AND field_type = ' . $db->Quote('image')
-		. ' ORDER BY label ASC, id ASC'
-		;
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE published = 1'
+			. ' AND field_type = ' . $db->Quote('image')
+			. ' ORDER BY label ASC, id ASC'
+			;
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
@@ -57,9 +55,7 @@ class JElementFcimage extends JElement
 			$images[] = JHTMLSelect::option($field->value, $field->text); 
 		}
 
-		$class = '';
-		
-		return JHTMLSelect::genericList($images, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
+		return $images;
 	}
 }
 ?>

@@ -149,8 +149,8 @@ class FlexicontentViewItems extends JView {
 		$pageNav 		= & $this->get( 'Pagination' );
 		$types			= & $this->get( 'Typeslist' );
 		$authors		= & $this->get( 'Authorslist' );
-		$unassociated	= & $this->get( 'UnassociatedItems' );
-		$status      	= & $this->get( 'ExtdataStatus');
+		$unassociated		= & $this->get( 'UnassociatedItems' );
+		$status      		= & $this->get( 'ExtdataStatus');
 		
 		JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 		

@@ -38,22 +38,6 @@ class JFormFieldItemlayout extends JFormFieldList{
 	 * @since	1.6
 	 */
 	protected $type = 'Itemlayout';
-	
-	/**
-	 * Method to get the field input markup.
-	 *
-	 * @return	string	The field input markup.
-	 * @since	1.6
-	 */
-	protected function getInput() {
-		$name = $this->name;
-		$value = $this->value;
-		
-		$control_name = 'attribs';
-		$options = (array) $this->getOptions();
-		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
-		return JHTMLSelect::genericList($options, $name, $class, 'value', 'text', $value, $control_name.$name);
-	}
 
 	protected function getOptions() {
 		//$name, $value, &$node, $control_name
@@ -74,7 +58,7 @@ class JFormFieldItemlayout extends JFormFieldList{
 var tmpl = ['".$lays."'];	
 
 function disablePanel(element) {
-	var panel 	= $('params-'+element).getNext();
+	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
 	panel.getParent().addClass('pane-disabled');
@@ -87,7 +71,7 @@ function disablePanel(element) {
 }
 
 function enablePanel(element) {
-	var panel 	= $('params-'+element).getNext();
+	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
 	panel.getParent().removeClass('pane-disabled');

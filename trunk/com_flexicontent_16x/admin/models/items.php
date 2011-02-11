@@ -150,17 +150,17 @@ class FlexicontentModelItems extends JModel{
 			;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
-		$allids = is_array($allids)?$allids:array();
+		$allids = is_array($allids)?$allids:array();// !important
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
 		$this->_db->setQuery($query);
 		$allext = $this->_db->loadResultArray();
-		$allext = is_array($allext)?$allext:array();
+		$allext = is_array($allext)?$allext:array();// !important
 
 		$query 	= 'SELECT DISTINCT itemid FROM #__flexicontent_cats_item_relations';
 		$this->_db->setQuery($query);
 		$allcat = $this->_db->loadResultArray();
-		$allcat = is_array($allcat)?$allcat:array();
+		$allcat = is_array($allcat)?$allcat:array();// !important
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
 			. ' GROUP BY item_id'

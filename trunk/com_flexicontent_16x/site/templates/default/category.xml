@@ -8,8 +8,8 @@
 	<release>25 november 2009</release>
 	<description>This layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
 	<fields name="attribs">
-	<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
-	</fieldset>
+		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
+		</fieldset>
 	</fields>
 	<fieldgroups>
 		<group>table</group>

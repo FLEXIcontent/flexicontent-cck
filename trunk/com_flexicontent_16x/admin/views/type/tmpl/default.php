@@ -52,12 +52,12 @@ defined('_JEXEC') or die('Restricted access');
 					</tr>
 				</table>			
 			</td>
-			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
-				<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
+			<td valign="top" width="350px" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php
+				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$fieldSets = $this->form->getFieldsets('attribs');
 				foreach ($fieldSets as $name => $fieldSet) :
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($name).'_FIELDSET_LABEL';
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
@@ -73,8 +73,39 @@ defined('_JEXEC') or die('Restricted access');
 						<?php endforeach; ?>
 						</table>
 					</fieldset>
-				<?php endforeach; ?>
-				<?php echo JHtml::_('sliders.end'); ?>
+				<?php endforeach;
+				echo JHtml::_('sliders.end');
+				
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				foreach ($this->tmpls as $tmplname=>$tmpl) :
+					$fieldSets = $tmpl->params->getFieldsets('attribs');
+					foreach ($fieldSets as $name => $fieldSet) :
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+						endif;
+				?>
+						<fieldset class="panelform">
+							<table>
+							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
+								$fieldname =  $field->__get('fieldname');
+								//$value = isset($this->attribs[$fieldname])?$this->attribs[$fieldname]:$tmpl->params->getValue($fieldname, $name);
+								$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
+							?>
+							<tr>
+								<td><?php echo $tmpl->params->getLabel($fieldname, $name); ?></td>
+								<td><?php echo $tmpl->params->getInput($fieldname, $name, $value); ?></td>
+							</tr>
+							<?php endforeach; ?>
+							</table>
+						</fieldset>
+				<?php
+					endforeach;//fieldSets
+				endforeach;//tmpls
+				echo JHtml::_('sliders.end');
+				?>
 			</td>
 		</tr>
 	</table>
