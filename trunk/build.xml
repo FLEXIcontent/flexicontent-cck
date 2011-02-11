@@ -105,7 +105,7 @@
 		<copy file="plugins/flexicontent_fields/linkslist.php" tofile="flexipack/plugins/linkslist/linkslist.php" />
 		<copy file="plugins/flexicontent_fields/linkslist.xml" tofile="flexipack/plugins/linkslist/linkslist.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/en-GB.plg_flexicontent_fields_linkslist.ini" />
-		<!--<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/fr-FR.plg_flexicontent_fields_linkslist.ini" />-->
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_linkslist.ini" tofile="flexipack/plugins/linkslist/fr-FR.plg_flexicontent_fields_linkslist.ini" />
 		
 		<copy file="plugins/flexicontent_fields/minigallery.php" tofile="flexipack/plugins/minigallery/minigallery.php" />
 		<copy file="plugins/flexicontent_fields/minigallery.xml" tofile="flexipack/plugins/minigallery/minigallery.xml" />
@@ -126,6 +126,11 @@
 		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
 		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/fr-FR.plg_system_flexisystem.ini" />
+
+		<copy file="plugins/system/flexiadvroute.php" tofile="flexipack/plugins/system/flexiadvroute.php" />
+		<copy file="plugins/system/flexiadvroute.xml" tofile="flexipack/plugins/system/flexiadvroute.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexiadvroute.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/system/fr-FR.plg_system_flexiadvroute.ini" />
 		
 		<move file="flexipack/admin/install.php" tofile="flexipack/install.php" />
 		<move file="flexipack/admin/manifest.xml" tofile="flexipack/manifest.xml" />
