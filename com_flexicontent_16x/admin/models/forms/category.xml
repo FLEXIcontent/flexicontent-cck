@@ -215,7 +215,7 @@
 		</fieldset>
 		<fieldset
 			name="standard">
-			<field name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
+			<field name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" onchange="activatePanel(this.value);" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">Use Global</option>

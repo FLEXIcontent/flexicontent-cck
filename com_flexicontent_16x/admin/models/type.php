@@ -35,6 +35,8 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @var object
 	 */
 	var $_id = null;
+	
+	var $_item = null;
 
 	/**
 	 * Constructor
@@ -122,7 +124,7 @@ class FlexicontentModelType extends JModelAdmin{
 			$registry->loadJSON($item->attribs);
 			$item->attribs = $registry->toArray();
 		}
-
+		$this->_item = &$item;
 		return $item;
 	}
 	
@@ -132,10 +134,9 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	mixed	The data for the form.
 	 * @since	1.6
 	 */
-	protected function loadFormData()
-	{
+	public function loadFormData() {
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.type.data', array());
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.type.data', NULL);
 
 		if (empty($data)) {
 			$data = $this->getItem();
@@ -283,7 +284,6 @@ class FlexicontentModelType extends JModelAdmin{
 			}
 			$type->attribs = implode("\n", $txt);
 		}
-
 		// Make sure the data is valid
 		if (!$type->check()) {
 			$this->setError($type->getError() );
@@ -366,6 +366,12 @@ class FlexicontentModelType extends JModelAdmin{
 		// Load the parameters.
 		//$params	= JComponentHelper::getParams('com_flexicontent');
 		//$this->setState('params', $params);
+	}
+	public function getAttribs() {
+		if($this->_item) {
+			return $this->_item->attribs;
+		}
+		return array();
 	}
 }
 ?>

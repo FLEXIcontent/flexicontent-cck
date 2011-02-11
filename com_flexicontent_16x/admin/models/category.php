@@ -455,6 +455,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			} else {
 				$result->modified_time = null;
 			}
+			$this->_category	=& $result;
 		}
 
 		return $result;
@@ -508,6 +509,12 @@ class FlexicontentModelCategory extends JModelAdmin
 		// Load the parameters.
 		$params	= JComponentHelper::getParams('com_flexicontent');
 		$this->setState('params', $params);
+	}
+	public function getAttribs() {
+		if($this->_category) {
+			return $this->_category->params;
+		}
+		return array();
 	}
 }
 ?>

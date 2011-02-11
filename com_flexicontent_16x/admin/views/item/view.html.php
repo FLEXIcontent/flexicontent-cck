@@ -28,7 +28,6 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewItem extends JView {
 	function display($tpl = null) {
-		
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -41,7 +40,6 @@ class FlexicontentViewItem extends JView {
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
-		$pane 		= & JPane::getInstance('sliders');
 		$dispatcher	= & JDispatcher::getInstance();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 		
@@ -109,7 +107,7 @@ class FlexicontentViewItem extends JView {
 
 		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
-		$languages		= & $this->get( 'Languages' );
+		//$languages		= & $this->get( 'Languages' );
 		//$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
 		$categories 	= $globalcats;
 
@@ -216,7 +214,6 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('canPublishOwn'	, $canPublishOwn);
 		$this->assignRef('canRight'			, $canRight);
 		$this->assignRef('published'		, $published);
-		$this->assignRef('pane'				, $pane);
 		$this->assignRef('nullDate'			, $nullDate);
 		$this->assignRef('form'				, $form);
 		$this->assignRef('subscribers'		, $subscribers);

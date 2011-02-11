@@ -40,6 +40,60 @@ class JFormFieldCategorylayout extends JFormFieldList{
 	function getOptions() {
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
+			$lays = array();
+		foreach ($tmpls as $tmpl) {
+			$lays[] = $tmpl->name;
+		}
+		$lays = implode("','", $lays);
+		
+		$doc 	= & JFactory::getDocument();
+		$js 	= "
+var tmpl = ['".$lays."'];	
+
+function disablePanel(element) {
+	var panel 	= $(element+'-attribs-options').getNext();
+	var selects = panel.getElements('select');
+	var inputs 	= panel.getElements('input');
+	panel.getParent().addClass('pane-disabled');
+	selects.each(function(el){
+		el.setProperty('disabled', 'disabled');
+	});
+	inputs.each(function(el){
+		el.setProperty('disabled', 'disabled');
+	});
+}
+
+function enablePanel(element) {
+	var panel 	= $(element+'-attribs-options').getNext();
+	var selects = panel.getElements('select');
+	var inputs 	= panel.getElements('input');
+	panel.getParent().removeClass('pane-disabled');
+	selects.each(function(el){
+    	el.setProperty('disabled', '');
+	});
+	inputs.each(function(el){
+    	el.setProperty('disabled', '');
+	});
+}
+
+function activatePanel(active) {
+	var inactives = tmpl.filter(function(item, index){
+		return item != active;
+		});
+			
+	inactives.each(function(el){
+		disablePanel(el);
+		});
+		
+	if (active) enablePanel(active);
+}
+
+window.addEvent('domready', function(){
+	activatePanel('".$this->value."');			
+});
+";
+		$doc->addScriptDeclaration($js);
+		$tmpls	= $themes->category;
 		$view	= JRequest::getVar('view');
 		if ($tmpls !== false) {
 			if ($view != 'category') {

@@ -154,7 +154,7 @@ dump($this->row);
 			</td>
 			<td valign="top" width="320px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
-				echo JHtml::_('sliders.start','plugin-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
+				echo JHtml::_('sliders.start','basic-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
 				echo JHtml::_('sliders.panel',JText::_('FLEXI_ACCESS'), 'access-options');
 				?>
 				<fieldset class="panelform">
@@ -176,8 +176,40 @@ dump($this->row);
 							<?php echo $field->input; ?>
 						<?php endforeach; ?>
 					</fieldset>
-				<?php endforeach; ?>
-				<?php echo JHtml::_('sliders.end'); ?>
+				<?php endforeach;
+				echo JHtml::_('sliders.end');
+				
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+				echo JHtml::_('sliders.start','theme-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
+				foreach ($this->tmpls as $tmpl) {
+					$fieldSets = $tmpl->params->getFieldsets('attribs');
+					foreach ($fieldSets as $name => $fieldSet) :
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+						endif;
+				?>
+						<fieldset class="panelform">
+							<table>
+							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
+								$fieldname =  $field->__get('fieldname');
+								//$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
+								$value = NULL;
+							?>
+							<tr>
+								<td><?php echo $tmpl->params->getLabel($fieldname, $name); ?></td>
+								<td><?php echo $tmpl->params->getInput($fieldname, $name, $value); ?></td>
+							</tr>
+							<?php endforeach; ?>
+							</table>
+						</fieldset>
+				<?php
+					endforeach;
+				}
+				echo JHtml::_('sliders.end');
+				?>
+				<?php  ?>
 			</td>
 		</tr>
 	</table>

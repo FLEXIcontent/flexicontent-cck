@@ -216,23 +216,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									?>
 									</td>
 								</tr>
-								<?php if (FLEXI_FISH) : ?>
-								<tr>
-									<td>
-										<label for="language">
-										<?php echo JText::_( 'FLEXI_LANGUAGE' ).':'; ?>
-										</label>
-									</td>
-									<td>
-									<?php echo $this->lists['languages']; ?>
-									</td>
-								</tr>
-								<?php endif; ?>
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
 										<label for="notify">
-										<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
+										<?php echo JText::_( 'FLEXI_NOTIFY' ); ?>
 										</label>
 									</td>
 									<td>
@@ -247,6 +235,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							</table>
 						</td>
 						<td valign="top" width="50%">
+							<table cellspacing="0" cellpadding="0" border="0" width="100%">
+							<tr>
+							<td colspan="2">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
 <?php
@@ -272,6 +263,15 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								</label>
 							</div>
 							<?php endif; ?>
+							</td>
+							</tr>
+							<tr>
+								<td><label for="notify">
+								<?php echo $this->form->getLabel('language'); ?>
+								</label></td>
+								<td><?php echo $this->form->getInput('language');?></td>
+							</tr>
+							</table>
 						</td>
 					</tr>
 				</table>
@@ -643,7 +643,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
 			foreach ($this->tmpls as $tmpl) {
 				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-				echo JHtml::_('sliders.panel',JText::_($title),  "params-".$tmpl->name);
+				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
 				?>
 				<fieldset class="panelform">
 					<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>

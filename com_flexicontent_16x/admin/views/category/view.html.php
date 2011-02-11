@@ -46,7 +46,6 @@ class FlexicontentViewCategory extends JView {
 		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
-		$pane 		= & JPane::getInstance('sliders');
 
 		JHTML::_('behavior.tooltip');
 
@@ -74,9 +73,9 @@ class FlexicontentViewCategory extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		//$row     		= & $this->get( 'Category' );
+		$attribs	= $this->get('Attribs');
 		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->category;
+		$tmpls		= $themes->category;//echo "<xmp>";var_dump($tmpls);echo "</xmp>";
 		$categories = $globalcats;
 		//fail if checked out not by 'me'
 		if($iform->getValue("id")) {
@@ -99,9 +98,9 @@ class FlexicontentViewCategory extends JView {
 		$this->assignRef('Lists'      	, $Lists);
 		$this->assignRef('permission'	, $permission);
 		$this->assignRef('editor'	, $editor);
-		$this->assignRef('pane'		, $pane);
 		$this->assignRef('tmpls'	, $tmpls);
 		$this->assignRef('iform'	, $iform);
+		$this->assignRef('attribs'	, $attribs);
 
 		parent::display($tpl);
 	}

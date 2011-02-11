@@ -138,7 +138,7 @@ window.addEvent('domready', function(){
 		}		
 	});
 
-/*
+<?php /*
 	$('show_filters').setStyle('display', 'none');
 	$('hide_filters').addEvent('click', function() {
 		$('filterline').setStyle('display', 'none');
@@ -150,7 +150,7 @@ window.addEvent('domready', function(){
 		$('show_filters').setStyle('display', 'none');
 		$('hide_filters').setStyle('display', '');
 	});
-*/
+*/ ?>
 });
 </script>
 <?php if ($this->unassociated) : ?>
