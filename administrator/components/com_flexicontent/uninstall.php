@@ -54,7 +54,8 @@ $flexiplugins = array(
 	"linkslist"			=>	"flexicontent_fields",
 	"minigallery"		=>	"flexicontent_fields",
 	"flexisearch"		=>	"search",
-	"flexisystem"		=>	"system"
+	"flexisystem"		=>	"system",
+	"flexiadvroute"		=>	"system"
 );
 // additional extensions
 $add =& $this->manifest->getElementByPath('additional');

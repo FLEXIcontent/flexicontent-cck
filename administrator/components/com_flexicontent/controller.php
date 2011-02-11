@@ -281,6 +281,7 @@ VALUES
 				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
 				. ' OR element = ' . $db->Quote('flexisearch')
 				. ' OR element = ' . $db->Quote('flexisystem')
+				. ' OR element = ' . $db->Quote('flexiadvroute')
 				;
 		
 		$db->setQuery($query);
