@@ -36,6 +36,11 @@
 		</param>
 		<param name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_select.ini</language>
