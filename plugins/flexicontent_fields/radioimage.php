@@ -186,7 +186,10 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
-						
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
 		$listelements = explode("%% ", $field_elements);
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
@@ -194,11 +197,11 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			}
 
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 		foreach ($listarrays as $listarray) {
 			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}			
-			
-		$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';		
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 	}
 }
