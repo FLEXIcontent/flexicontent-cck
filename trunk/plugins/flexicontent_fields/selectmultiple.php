@@ -269,7 +269,10 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
-						
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
@@ -279,16 +282,17 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$results = $db->loadObjectList();
 			
 			if (!$results) {
-				$field->html = '';
+				$field->html .= '';
 			
 			} else {
 			
 				$options = array();
-				$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, $result->text);
 				}
-				$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			}
 
 		} else { // Elements mode
@@ -300,12 +304,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			}
 
 			$options = array(); 
-			$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 			foreach ($listarrays as $listarray) {
 				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}			
-			
-			$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 		}
 	}
 }
