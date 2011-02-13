@@ -214,6 +214,10 @@ class FlexicontentModelCategory extends JModel{
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'DESC';
 				break;
+				case 'modified' :
+				$filter_order		= 'i.modified';
+				$filter_order_dir	= 'DESC';
+				break;
 				case 'alpha' :
 				$filter_order		= 'i.title';
 				$filter_order_dir	= 'ASC';

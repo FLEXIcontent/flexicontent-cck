@@ -70,6 +70,7 @@
 			<option value="">Default</option>
 			<option value="date">Oldest first</option>
 			<option value="rdate">Most recent first</option>
+			<option value="modified">Last modified first</option>
 			<option value="alpha">Title Alphabetical</option>
 			<option value="ralpha">Title Reverse-Alphabetical</option>
 			<option value="author">Author Alphabetical</option>
