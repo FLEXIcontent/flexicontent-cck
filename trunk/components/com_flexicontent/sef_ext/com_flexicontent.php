@@ -66,38 +66,6 @@ if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
     : '';
 }
 
-/*
-  // do something about that Itemid thing
-  if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
-    // V 1.2.4.t moved back here
-    if ($sefConfig->shInsertGlobalItemidIfNone && !empty($shCurrentItemid)) {
-      $string .= '&Itemid='.$shCurrentItemid; ;  // append current Itemid
-      $Itemid = $shCurrentItemid;
-      shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
-    }
-
-    if ($sefConfig->shInsertTitleIfNoItemid)
-    $title[] = $sefConfig->shDefaultMenuItemName ?
-  		$sefConfig->shDefaultMenuItemName : getMenuTitle($option, (isset($view) ? @$view : null), $shCurrentItemid, null, $shLangName );  // V 1.2.4.q added forced language
-  		$shItemidString = '';
-  		if ($sefConfig->shAlwaysInsertItemid && (!empty($Itemid) || !empty($shCurrentItemid)))
-    $shItemidString = COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement
-    .(empty($Itemid)? $shCurrentItemid :$Itemid);
-  } else {  // if Itemid in non-sef URL
-    $shItemidString = $sefConfig->shAlwaysInsertItemid ?
-    COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$Itemid
-    : '';
-    if ($sefConfig->shAlwaysInsertMenuTitle){
-      //global $Itemid; V 1.2.4.g we want the string option, not current page !
-      if ($sefConfig->shDefaultMenuItemName)
-      $title[] = $sefConfig->shDefaultMenuItemName;// V 1.2.4.q added force language
-      elseif ($menuTitle = getMenuTitle($option, (isset($view) ? @$view : null), $Itemid, '',$shLangName )) {
-        if ($menuTitle != '/') $title[] = $menuTitle;
-      }
-    }
-  }
-*/
-
 $view 		= isset ($view) ? @$view : null;
 $Itemid		= isset ($Itemid) ? @$Itemid : null;
 $task 		= isset($task) ? @$task : null;
@@ -151,8 +119,8 @@ switch ($view) {
 								if (shTranslateURL ( $option, $shLangName )) {
 									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 									$database->setQuery ( $query );
-									$row = $database->loadObject ();
-									$title[] = $row->title . '/';
+									$row_cat = $database->loadObject ();
+									$title[] = $row_cat->title . '/';
 								} else {
 									$title[] = $globalcats[$ancestor]->title . '/';
 								}
