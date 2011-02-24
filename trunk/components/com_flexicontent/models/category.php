@@ -363,9 +363,9 @@ class FlexicontentModelCategory extends JModel{
 		$session  =& JFactory::getSession();
 		$alpha = JRequest::getVar('letter');
 		if($alpha===NULL) {
-			$alpha =  $session->get($option.'.category.letter');
-		}else{
-			$session->set($option.'.category.letter', $alpha);
+			$alpha =  $session->get($option.'.category'.$this->_id.'letter'); 
+		} else {
+			$session->set($option.'.category'.$this->_id.'letter', $alpha);
 		}
 		if ($alpha == '0') {
 			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
