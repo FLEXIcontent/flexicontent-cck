@@ -170,7 +170,7 @@ class FlexicontentModelFileselement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
 
 		if($filter_item) {
 			$session = JFactory::getSession();
@@ -205,7 +205,7 @@ class FlexicontentModelFileselement extends JModel
 	function getItemFiles() {
 		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
 		if($filter_item) {
 			$where		= $this->_buildContentWhere();
 			$db = JFactory::getDBO();
@@ -291,9 +291,9 @@ class FlexicontentModelFileselement extends JModel
 		global $mainframe, $option;
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', 1, 'int' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', '', 'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', 0, 'int' );
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 'filter_url', '', 'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 'filter_secure', '', 'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 'filter_ext', '', 'alnum' );

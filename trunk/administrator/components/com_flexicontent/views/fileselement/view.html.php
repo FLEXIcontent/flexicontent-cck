@@ -57,15 +57,15 @@ class FlexicontentViewFileselement extends JView
 		JHTML::_('behavior.formvalidation');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 	'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 	'filter_uploader', '', 				'int' );
-		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 		'filter_url', 		'',				'word' );
-		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 	'filter_secure', 	'', 			'word' );
-		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 		'filter_ext', 		'', 			'alnum' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 		'filter_order', 	'f.filename', 	'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 				'filter', 			1, 				'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 	'filter_uploader', 	0, 				'int' );
+		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 			'filter_url', 		'',				'word' );
+		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 		'filter_secure', 	'', 			'word' );
+		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 			'filter_ext', 		'', 			'alnum' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 				'search', 			'', 			'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 				'items', 			0,	 			'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document

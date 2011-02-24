@@ -54,13 +54,13 @@ class FlexicontentViewFilemanager extends JView
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order', 	'filter_order', 	'f.filename', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 			'filter', 			'', 			'int' );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 	'filter_uploader', '', 				'int' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 			'filter', 			1, 				'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 	'filter_uploader', 	0, 				'int' );
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',				'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 			'alnum' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 			'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			0,	 			'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document

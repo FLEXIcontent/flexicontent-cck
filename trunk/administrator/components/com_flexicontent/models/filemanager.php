@@ -163,7 +163,7 @@ class FlexicontentModelFilemanager extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			0, 'int' );
 		
 		// File field relation sub query
 		$subf	= 'SELECT COUNT(value)'
@@ -230,9 +230,9 @@ class FlexicontentModelFilemanager extends JModel
 		global $mainframe, $option;
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', '', 'int' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', '', 'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 'filter_ext', '', 'alnum' );
