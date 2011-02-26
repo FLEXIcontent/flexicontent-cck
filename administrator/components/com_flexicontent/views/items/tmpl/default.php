@@ -471,7 +471,7 @@ window.addEvent('domready', function(){
 				
 			</td>
 			<?php if (FLEXI_FISH) :
-				if($row->lang) :
+				if( isset($row->lang) && @$row->lang ) :
 				?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if ($this->langs->{$row->lang}->image) : ?>
