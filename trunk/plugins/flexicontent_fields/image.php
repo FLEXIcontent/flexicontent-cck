@@ -184,7 +184,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$srcb	= $field->parameters->get('dir') . '/l_' . $value['originalname'];
 				$tip	= JText::_( 'FLEXI_FIELD_LEGEND' ) . '::' . $title;
 				$id		= $field->item_id . '_' . $field->id . '_' . $i;
-				$legend = $uselegend ? ' class="hasTip" title="'.$tip.'"' : '' ;
+				$legend = ($uselegend && !empty($title))? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
 			
 				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'items'));
