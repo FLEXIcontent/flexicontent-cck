@@ -115,7 +115,7 @@
 .fcvote ul, 
 .fcvote ul li a:hover, 
 .fcvote ul li.current-rating {
-	background-image: url(star.gif)!important;
+	background-image: url(../images/star.gif)!important;
 }
 
 .fcvote ul li a, 
