@@ -764,13 +764,15 @@ class FlexicontentModelItems extends JModel
 				$item->created = $date->toMySQL();
 			}
 
-			// Append time if not added to publish date
-			if (strlen(trim($item->publish_up)) <= 10) {
-				$item->publish_up .= ' 00:00:00';
+			if ($item->publish_up) {
+				// Append time if not added to publish date
+				if (strlen(trim($item->publish_up)) <= 10) {
+					$item->publish_up .= ' 00:00:00';
+				}
+			} else {
+				$date =& JFactory::getDate($item->created, $tzoffset);
+				$item->publish_up = $date->toMySQL();
 			}
-
-			$date =& JFactory::getDate($item->publish_up, $tzoffset);
-			$item->publish_up = $date->toMySQL();
 
 			// Handle never unpublish date
 			if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
