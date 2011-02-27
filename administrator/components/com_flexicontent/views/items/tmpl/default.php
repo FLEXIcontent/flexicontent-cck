@@ -317,8 +317,8 @@ window.addEvent('domready', function(){
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left col_cats">
-			<?php $checked = @$this->filter_subcats ? ' checked="checked"' : ''; ?>
-				<span class="radio"><label for="filter_subcats"><input type="checkbox" name="filter_subcats" value="1" id="filter_subcats" class="inputbox"<?php echo $checked; ?> /><?php echo ' '.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label></span>
+				<label for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<?php echo $this->lists['filter_cats']; ?>
 			</td>
 			<td class="left col_authors">
