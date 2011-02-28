@@ -139,8 +139,14 @@ function clickRestore(link) {
 	return false;
 }
 function deleteTag(obj) {
-	parent = $($(obj).getParent());
-	parent.remove();
+	if (navigator.appVersion.indexOf("MSIE") == -1) {
+		var parent = $($(obj).getParent());
+		parent.remove();
+	} else {
+		var parent = obj.parentNode;
+		parent.innerHTML = "";
+		parent.removeNode(true);
+	}
 }
 jQuery(document).ready(function($){
 //autogrow
