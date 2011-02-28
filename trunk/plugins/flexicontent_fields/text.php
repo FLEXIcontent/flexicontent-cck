@@ -187,7 +187,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 
 		$searchindex .= ' | ';
-		$field->search = $searchindex;
+		
+		$field->search = $field->issearch ? $searchindex : '';
 		
 	}
 

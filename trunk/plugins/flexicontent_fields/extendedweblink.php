@@ -261,17 +261,21 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$post = $newpost;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		foreach ($post as $v)
-		{
-			$searchindex .= $v['link'];
-			$searchindex .= ' ';
-			$searchindex .= $v['title'];
-			$searchindex .= ' ';
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			foreach ($post as $v)
+			{
+				$searchindex .= $v['link'];
+				$searchindex .= ' ';
+				$searchindex .= $v['title'];
+				$searchindex .= ' ';
+			}
+			$searchindex .= ' | ';
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
 		}
-		$searchindex .= ' | ';
-		$field->search = $searchindex;
 	}
 
 

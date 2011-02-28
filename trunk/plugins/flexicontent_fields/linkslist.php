@@ -130,30 +130,34 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		if(!$post) return;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-		$listelements = explode("%% ", $field_elements);
-		$listarrays = array();
-		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
-			}
-
-		$i = 0;
-		$display = array();
-		foreach ($listarrays as $listarray) {
-			for($n=0, $c=count($post); $n<$c; $n++) {
-				if ($post[$n] == $listarray[0]) {
-					$display[] = $listarray[1];
-					}
-				} 
-			$i++;
-			}			
+		if ($field->issearch) {
+			$searchindex = '';
 			
-		$searchindex  = implode(' ', $display);
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+			$listelements = explode("%% ", $field_elements);
+			$listarrays = array();
+			foreach ($listelements as $listelement) {
+				$listarrays[] = explode("::", $listelement);
+				}
+	
+			$i = 0;
+			$display = array();
+			foreach ($listarrays as $listarray) {
+				for($n=0, $c=count($post); $n<$c; $n++) {
+					if ($post[$n] == $listarray[0]) {
+						$display[] = $listarray[1];
+						}
+					} 
+				$i++;
+				}			
+				
+			$searchindex  = implode(' ', $display);
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')

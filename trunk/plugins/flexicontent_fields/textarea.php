@@ -70,7 +70,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if(!$post) return;
 		
 		// create the fulltext search index
-		$field->search = flexicontent_html::striptagsandcut($post) . ' | ';		
+		$searchindex = flexicontent_html::striptagsandcut($post) . ' | ';		
+		$field->search = $field->issearch ? $searchindex : '';
 	}
 
 

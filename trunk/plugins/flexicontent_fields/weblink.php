@@ -215,7 +215,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$searchindex .= ' ';
 		}
 		$searchindex .= ' | ';
-		$field->search = $searchindex;
+
+		$field->search = $field->issearch ? $searchindex : '';
 	}
 
 

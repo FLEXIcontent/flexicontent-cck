@@ -111,26 +111,30 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if(!$post) return;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-
-		$listelements = explode("%% ", $field_elements);
-		$listarrays = array();
-		
-		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
-			}
-
-		foreach ($listarrays as $listarray) {
-			if ($post == $listarray[0]) {
-				$searchindex = $listarray[1];
-			} 
-		}
+		if ($field->issearch) {
+			$searchindex = '';
 			
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+	
+			$listelements = explode("%% ", $field_elements);
+			$listarrays = array();
+			
+			foreach ($listelements as $listelement) {
+				$listarrays[] = explode("::", $listelement);
+				}
+	
+			foreach ($listarrays as $listarray) {
+				if ($post == $listarray[0]) {
+					$searchindex = $listarray[1];
+				} 
+			}
+				
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 	}
 
 
