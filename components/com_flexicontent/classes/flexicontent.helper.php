@@ -445,17 +445,18 @@ class flexicontent_html
 				);
 			-->
 			</script>";
+
+			$css = '
+			.'.$class.' .fcvote {line-height:'.$dim.'px;}
+			.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
+			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
+			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
+			';
+			$document->addStyleDeclaration($css);
+
      		$VoteAddScript = 1;
 	 	}
 		
-		$css = '
-		.'.$class.' .fcvote {line-height:'.$dim.'px;}
-		.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
-		.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
-		.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
-		';
-		$document->addStyleDeclaration($css);
-
 		if ($rating_count != 0) {
 			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*20,2);
 		} elseif ($unrated == 0) {
