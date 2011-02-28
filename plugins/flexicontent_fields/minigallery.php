@@ -232,7 +232,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		if ($values)
 		{
-//			JHTML::_('behavior.mootools');
 			$document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
 			// this allows you to override the default css files
 			$document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
@@ -307,15 +306,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if($field->field_type != 'minigallery') return;
 
 		global $mainframe;
-		
-/*
-		$newpost = array();
-		
-		for ($n=0, $c=count($post); $n<$c; $n++)
-		{
-			if ($post[$n] != '') $newpost[] = $post[$n];
-		}
-*/
 		
 		$post = array_unique($post);
 	}

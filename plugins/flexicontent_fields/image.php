@@ -232,16 +232,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		global $mainframe;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$searchindex .= $post['alt'];
-		$searchindex .= ' ';
-		$searchindex .= $post['title'];
-		$searchindex .= ' ';
-		$searchindex .= $post['desc'];
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			$searchindex .= $post['alt'];
+			$searchindex .= ' ';
+			$searchindex .= $post['title'];
+			$searchindex .= ' ';
+			$searchindex .= $post['desc'];
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 
 		// Upload the original file
 		$this->uploadOriginalFile($field, $post, $file);

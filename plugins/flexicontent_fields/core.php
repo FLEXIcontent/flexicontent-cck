@@ -221,11 +221,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		switch ($field->field_type)
 		{
 			case 'title': // title
-			$field->search = $post . ' | ';
+				if ($field->issearch) {
+					$field->search = $post . ' | ';
+				} else {
+					$field->search = '';
+				}
 			break;
 
 			case 'maintext': // maintext
-			$field->search = flexicontent_html::striptagsandcut($post) . ' | ';
+				if ($field->issearch) {
+					$field->search = flexicontent_html::striptagsandcut($post) . ' | ';
+				} else {
+					$field->search = '';
+				}
 			break;
 		}
 
