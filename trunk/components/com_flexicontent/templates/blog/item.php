@@ -138,7 +138,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- EOF item informations -->
 
 	<!-- BOF comments -->
-	<?php if ($this->params->get('comments')) : ?>
+	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
 	<div class="comments">
 	<?php
 		if ($this->params->get('comments') == 1) :

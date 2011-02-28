@@ -164,7 +164,7 @@ $tmpl = $this->tmpl;
 <!-- EOF bottom block -->
 	<?php endif; ?>
 
-	<?php if ($this->params->get('comments')) : ?>
+	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
 <!-- BOF comments -->
 	<div class="comments">
 		<?php
