@@ -193,13 +193,13 @@ if ($this->limitstart == 0) :
 				<p>
 				<?php
 				if ($this->params->get('lead_strip_html', 1)) :
-				echo flexicontent_html::striptagsandcut( $items[$i]->introtext, $this->params->get('lead_cut_text', 400) );
+				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
 				else :
-				echo $items[$i]->introtext;
+				echo $items[$i]->fields['text']->display;
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1)) : ?>
+    			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
     			<span class="readmore">
     				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="readon">
     				<?php
@@ -392,13 +392,13 @@ if ($this->limitstart == 0) :
 				<p>
 				<?php
 				if ($this->params->get('intro_strip_html', 1)) :
-				echo flexicontent_html::striptagsandcut( $items[$i]->introtext, $this->params->get('intro_cut_text', 200) );
+				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
 				else :
-				echo $items[$i]->introtext;
+				echo $items[$i]->fields['text']->display;
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1)) : ?>
+    			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
     			<span class="readmore">
     				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="readon">
     				<?php
