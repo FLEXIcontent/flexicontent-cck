@@ -83,7 +83,7 @@ if ($this->limitstart == 0) :
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
    				<?php if ($this->params->get('link_titles', 0)) : ?>
-    			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
+    			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
     			<?php
     			else :
    				echo $this->escape($items[$i]->title);
@@ -123,7 +123,7 @@ if ($this->limitstart == 0) :
     			?>
 				<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
     				<?php if ($this->params->get('lead_link_image', 1)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
 					</a>
 					<?php else : ?>
@@ -201,7 +201,7 @@ if ($this->limitstart == 0) :
 				</p>
     			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
     			<span class="readmore">
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="readon">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
     				<?php
     				if ($items[$i]->params->get('readmore')) :
     					echo ' ' . $items[$i]->params->get('readmore');
@@ -282,7 +282,7 @@ if ($this->limitstart == 0) :
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
     				<?php if ($this->params->get('link_titles', 0)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
     				<?php
     				else :
     				echo $this->escape($items[$i]->title);
@@ -322,7 +322,7 @@ if ($this->limitstart == 0) :
     			?>
 				<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
     				<?php if ($this->params->get('intro_link_image', 1)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
 					</a>
 					<?php else : ?>
@@ -400,7 +400,7 @@ if ($this->limitstart == 0) :
 				</p>
     			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
     			<span class="readmore">
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $this->category->slug)); ?>" class="readon">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
     				<?php
     				if ($items[$i]->params->get('readmore')) :
     					echo ' ' . $items[$i]->params->get('readmore');
