@@ -106,7 +106,7 @@ if ($this->items) :
 				<!-- BOF item title -->
     			<th scope="row" class="table-titles">
     				<?php if ($this->params->get('link_titles', 0)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $this->category->slug)); ?>"><?php echo $this->escape($item->title); ?></a>
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $items[$i]->categoryslug)); ?>"><?php echo $this->escape($item->title); ?></a>
     				<?php
     				else :
     				echo $this->escape($item->title);

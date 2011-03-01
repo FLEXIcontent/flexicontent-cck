@@ -37,7 +37,7 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe, $option;
+		global $mainframe, $option, $globalnoroute, $globalcats;
 
 		JHTML::_('behavior.tooltip');
 
@@ -165,6 +165,17 @@ class FlexicontentViewCategory extends JView
 			$tmpl = '.category.default';
 		}
 
+		// Callback function for the array filter
+		function filterCats($var)
+		{
+			global $globalnoroute;
+			
+			if (!in_array($var, $globalnoroute)) {
+				return ($var);
+			}
+			return;
+		}
+		
 		JPluginHelper::importPlugin('content');
 		// just a try : to implement later
 		foreach ($items as $item) {
@@ -181,6 +192,27 @@ class FlexicontentViewCategory extends JView
 	
 			$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $item->params, 0));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
+
+			// reappend the category slug according to the advanced routing parameters
+			if (!$globalnoroute) $globalnoroute = array();
+			
+			if (!in_array($category->id, $globalnoroute)) {
+				$item->categoryslug = $category->slug;
+			} else {
+				if (in_array($item->catid, $globalnoroute)) {
+					$allcats = array();
+					foreach ($item->cats as $cat) {
+						array_push($allcats, $cat->id);
+					}
+					$allowed = array_filter($allcats, "filterCats");
+
+					if (count($allowed) > 0)
+					{
+						$rcat = $allowed[0];
+						$item->categoryslug = $globalcats[$rcat]->slug;
+					}
+				}
+			}
 		}
 
 
