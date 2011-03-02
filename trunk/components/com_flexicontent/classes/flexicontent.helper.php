@@ -91,7 +91,7 @@ class flexicontent_html
 	 */
 	function printbutton( $print_link, &$params )
 	{
-		if ($params->get( 'show_print_icon' )) {
+		if ( $params->get('show_print_icon') || JRequest::getCmd('print') ) {
 
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 
@@ -127,7 +127,7 @@ class flexicontent_html
 	 */
 	function mailbutton($view, &$params, $slug = null, $itemslug = null )
 	{
-		if ($params->get('show_email_icon')) {
+		if ( $params->get('show_email_icon') && !JRequest::getCmd('print') ) {
 
 			$uri    =& JURI::getInstance();
 			$base  	= $uri->toString( array('scheme', 'host', 'port'));
@@ -170,7 +170,7 @@ class flexicontent_html
 	 */
 	function pdfbutton( $item, &$params)
 	{
-		if ($params->get('show_pdf_icon')) {
+		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'pdf_button.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
