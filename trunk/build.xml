@@ -116,6 +116,16 @@
 				<exclude name=".**" />
 			</fileset>
 		</copy>
+
+		<copy file="plugins/flexicontent_fields/toolbar.php" tofile="flexipack/plugins/toolbar/toolbar.php" />
+		<copy file="plugins/flexicontent_fields/toolbar.xml" tofile="flexipack/plugins/toolbar/toolbar.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_toolbar.ini" tofile="flexipack/plugins/toolbar/en-GB.plg_flexicontent_fields_toolbar.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_toolbar.ini" tofile="flexipack/plugins/toolbar/fr-FR.plg_flexicontent_fields_toolbar.ini" />
+		<copy todir="flexipack/plugins/toolbar/toolbar" >
+			<fileset dir="plugins/flexicontent_fields/toolbar">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
 		
 		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
 		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />

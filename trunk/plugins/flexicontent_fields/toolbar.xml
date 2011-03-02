@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Article toolbar</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>March 2011</creationDate>
+	<copyright>Copyright (C) 2009-2011 Emmanuel Danan</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.vistamedia.fr</authorUrl>
+	<version>1.2</version>
+	<description>Article toolbar for FLEXIcontent</description>
+	<files>
+		<filename plugin="toolbar">toolbar.php</filename>
+		<folder plugin="toolbar">toolbar</folder>
+	</files>
+	<params group="standard">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="backend_hidden" type="hidden" default="1" />
+	</params>
+	<params group="group-toolbar" addpath="/administrator/components/com_flexicontent/elements">
+		<param name="display-comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="display-print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="display-email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="display-voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
+		<param name="display-pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="display-social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="addthis-user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USER" description="FLEXI_FIELD_TOOLBAR_USER_DESC" />
+		<param name="default-size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
+		<param name="default-line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
+		<param name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
+		<param name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" menu="hide" />
+		<param name="load-css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="spacer-size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
+<!-- 		<param name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" /> -->
+	</params>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_toolbar.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_toolbar.ini</language>
+	</languages>
+</install>
