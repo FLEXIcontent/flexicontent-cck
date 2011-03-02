@@ -54,13 +54,13 @@ class FlexicontentViewItems extends JView {
 
 		//get vars
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_cats', 		'filter_cats', 		0, 				'int' );
-		$filter_subcats		= JRequest::getInt('filter_subcats', 0, 'post');
+		$filter_subcats 	= $mainframe->getUserStateFromRequest( $context.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
 		if ($filter_cats && $filter_order == 'i.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'catsordering' );
+			$filter_order	= $mainframe->setUserState( $context.'.items.filter_order', 'catsordering' );
 		} else if (!$filter_cats && $filter_order == 'catsordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'i.ordering' );
+			$filter_order	= $mainframe->setUserState( $context.'.items.filter_order', 'i.ordering' );
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'ASC', 			'word' );
 
@@ -73,9 +73,9 @@ class FlexicontentViewItems extends JView {
 		$scope	 			= $mainframe->getUserStateFromRequest( $context.'.items.scope', 			'scope', 			1, 				'int' );
 		$date	 			= $mainframe->getUserStateFromRequest( $context.'.items.date', 				'date', 			1, 				'int' );
 		$startdate	 		= $mainframe->getUserStateFromRequest( $context.'.items.startdate', 		'startdate', 		'', 			'cmd' );
-		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $option.'.items.startdate', '' ); }
+		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $context.'.items.startdate', '' ); }
 		$enddate	 		= $mainframe->getUserStateFromRequest( $context.'.items.enddate', 			'enddate', 			'', 			'cmd' );
-		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $option.'.items.enddate', '' ); }
+		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $context.'.items.enddate', '' ); }
 		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.$filter_id', 		'filter_id', 		'', 			'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $context.'.items.search', 			'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );

@@ -181,10 +181,6 @@ class FlexicontentModelItems extends JModel
 		$status['allcat'] 		= $allcat;
 		$status['nocat'] 		= array_diff($allids,$allcat);
 		$status['countnocat'] 	= count($status['nocat']);
-//		$status['allfi'] 		= $allfi;
-//		$status['nofi'] 		= array_diff($allids,$allfi);
-//		$status['countnofi'] 	= count($status['nofi']);
-//		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
 		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
@@ -365,7 +361,7 @@ class FlexicontentModelItems extends JModel
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
-		$filter_subcats		= JRequest::getInt('filter_subcats', 0, 'post');
+		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
 		if (FLEXI_FISH) {
@@ -590,21 +586,6 @@ class FlexicontentModelItems extends JModel
 				
 				foreach($fields as $field)
 				{
-/*
-					if ($field->field_id == 2 || $field->field_id == 4) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->created) . ')'
-								;
-					} else if ($field->field_id == 6) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->title) . ')'
-								;
-					} else {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
-								;
-					}
-*/
 					if ($field->iscore != 1) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
@@ -642,7 +623,6 @@ class FlexicontentModelItems extends JModel
 							;
 					$this->_db->setQuery($query);
 					$this->_db->query();
-//dump($this->_db,'DB');				
 				}
 
 				// get the item categories
