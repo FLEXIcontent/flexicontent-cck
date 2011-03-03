@@ -17,7 +17,41 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+// Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
+$postcats = $this->params->get("postcats", 0);
+if ($cid) :
+	global $globalcats;
+	$cids 		= explode(",", $cid);
+	$cids_kv 	= array();
+	$options 	= array();
+	foreach ($cids as $cat) {
+		$cids_kv[$cat] = $globalcats[$cat]->title;
+	}
+	
+	switch($postcats) {
+		case 0:
+		default:
+			$fixedcats = implode(', ', $cids_kv);
+			foreach ($cids_kv as $k => $v) {
+				$fixedcats .= '<input type="hidden" name="cid[]" value="'.$k.'" />';
+			}
+			break;
+		case 1:
+			foreach ($cids_kv as $k => $v) {
+				$options[] = JHTML::_('select.option', $k, $v );
+			}
+			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', '', 'value', 'text', '' );
+			break;
+		case 2:
+			foreach ($cids_kv as $k => $v) {
+				$options[] = JHTML::_('select.option', $k, $v );
+			}
+			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', 'multiple="multiple" size="6"', 'value', 'text', '' );
+			break;
+	}
+endif;
 
 JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
@@ -199,25 +233,12 @@ function deleteTag(obj) {
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
 			<div class="flexi_formblock">
-<?php
-if ($cid) :
-	$cids = explode(",", $cid);
-	global $globalcats;
-	$cats = array();
-	foreach($cids as $cid) :
-			$cats[] = $globalcats[$cid]->title;
-?>
-			<input type="hidden" name="cid[]" value="<?php echo $cid;?>" />
-<?php
-	endforeach;
-?>
+<?php if ($cid) : ?>
 				<label for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 				</label>
-<?php
-	echo implode(',', $cats);
-else :
-?>
+				<?php echo $fixedcats; ?>
+<?php else : ?>
 				<label for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 					<?php if ($this->perms['multicat']) : ?>
@@ -227,9 +248,7 @@ else :
 					<?php endif; ?>
 				</label>
           		<?php echo $this->lists['cid']; ?>
-<?php
-endif;
-?>
+<?php endif; ?>
 			</div>
 
 			<?php
@@ -316,11 +335,6 @@ endif;
 		<div class="qf_tagbox" id="qf_tagbox">
 		<ul id="ultagbox">
 		<?php
-/*
-dump($this->tags,'tags');
-dump($this->used,'used');
-dump($this->perms,'perms');
-*/
 			foreach( $this->tags as $tag ) {
 				if(in_array($tag->id, $this->used)) {
 					if ($this->perms['cantags']) {
@@ -338,18 +352,6 @@ dump($this->perms,'perms');
 	</div>
 		<?php if ($this->perms['cantags']) : ?>
 		<div id="tags">
-	<?php /*
-	$n = count($this->tags);
-	if ($n) {
-		echo '<div class="flexi_tagbox"><ul>';
-		for( $i = 0, $n; $i < $n; $i++ )
-		{
-				$tag = $this->tags[$i];
-				echo '<li><div><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $this->used) ? 'checked="checked"' : '') . ' /></span>'.$this->escape($tag->name).'</div></li>';	
-			}
-			echo '</ul></div>';
-		}*/
-		?>
 		<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 			<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
 		</label>
