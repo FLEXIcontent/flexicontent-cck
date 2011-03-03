@@ -238,7 +238,7 @@ class FlexicontentViewItems extends JView
 		$this->assignRef('params' , 			$params);
 		$this->assignRef('iparams' , 			$iparams);
 		$this->assignRef('menu_params' , 		$menu_params);
-		$this->assignRef('print_link' , 			$print_link);
+		$this->assignRef('print_link' , 		$print_link);
 		$this->assignRef('parentcat',			$parentcat);
 		$this->assignRef('fields',				$item->fields);
 		$this->assignRef('tmpl' ,				$tmpl);
