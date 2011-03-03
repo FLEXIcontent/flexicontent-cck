@@ -1319,7 +1319,7 @@ class flexicontent_tmpl
 			$tmpls = flexicontent_tmpl::parseTemplates();
 		}
 	    
-	    return $tmpls
+	    return $tmpls;
 	}
 
 	function getThemes($tmpldir='')
