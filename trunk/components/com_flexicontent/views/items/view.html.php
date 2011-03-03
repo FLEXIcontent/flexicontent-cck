@@ -106,15 +106,16 @@ class FlexicontentViewItems extends JView
 		$depth		= $params->get('item_depth', 0);
 
 		if (isset($globaltypes) && @$globaltypes) {
-			if (!in_array($item->id, $globaltypes))
+			if (!in_array($item->id, $globaltypes)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+			}
 		} else {
-		for($p = $depth; $p<count($parents); $p++) {
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-		}
-		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
-		}
+			for($p = $depth; $p<count($parents); $p++) {
+				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			}
+			if ($params->get('add_item_pathway', 1)) {
+				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+			}
 		}
 		
 		JPluginHelper::importPlugin('content');
