@@ -1200,12 +1200,13 @@ class flexicontent_upload
 class flexicontent_tmpl
 {
 	/**
-	 * Get the template list
+	 * Parse all FLEXIcontent templates files
 	 *
 	 * @return 	object	object of templates
 	 * @since 1.5
 	 */
-	function getTemplates($tmpldir='') {
+	function parseTemplates($tmpldir='')
+	{
 		jimport('joomla.filesystem.file');
 		$themes = new stdClass();
 		
@@ -1301,6 +1302,24 @@ class flexicontent_tmpl
 			}
 		}
 		return $themes;
+	}
+
+	function getTemplates()
+	{
+		if (FLEXI_CACHE)
+		{
+			// add the templates to templates cache
+			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache->setCaching(1); 		//force cache
+			$tmplcache->setLifeTime(84600); //set expiry to one day
+		    $tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
+		}
+		else 
+		{
+			$tmpls = flexicontent_tmpl::parseTemplates();
+		}
+	    
+	    return $tmpls
 	}
 
 	function getThemes($tmpldir='')
