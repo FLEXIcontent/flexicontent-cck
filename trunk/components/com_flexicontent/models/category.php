@@ -130,7 +130,6 @@ class FlexicontentModelCategory extends JModel{
 			$query = $this->_buildQuery();
 
 			$this->_total = $this->_getListCount($query);
-
 			if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
 			} else {
@@ -530,14 +529,13 @@ class FlexicontentModelCategory extends JModel{
 		$id = $this->_id;
 		$k = 0;
 		$count = count($this->_childs);
-		for($i = 0; $i < $count; $i++)
-		{
+		for($i = 0; $i < $count; $i++) {
 			$category =& $this->_childs[$i];
 			
 			$category->assigneditems	= $this->_getassigned( $category->id );
 			$category->subcats			= $this->_getsubs( $category->id );
 			$this->_id					= $category->id;
-			$category->items			= $this->getData();
+			//$category->items			= $this->getData();
 			$this->_data				= null;
 			$k = 1 - $k;
 		}
