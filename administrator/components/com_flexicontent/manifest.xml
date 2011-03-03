@@ -138,7 +138,7 @@
 
 	<plugin name="flexisearch" folder="plugins/search">Search plugin for FLEXIcontent</plugin>
 	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
-	<plugin name="flexiadvroute" folder="plugins/system">System plugin for advanced FLEXIcontent routing (new!!!)</plugin>
+	<plugin name="flexiadvroute" folder="plugins/advroute">System plugin for advanced FLEXIcontent routing (new!!!)</plugin>
 </additional>
 
 <installfile>install.php</installfile>

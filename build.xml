@@ -137,10 +137,10 @@
 		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
 		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/fr-FR.plg_system_flexisystem.ini" />
 
-		<copy file="plugins/system/flexiadvroute.php" tofile="flexipack/plugins/system/flexiadvroute.php" />
-		<copy file="plugins/system/flexiadvroute.xml" tofile="flexipack/plugins/system/flexiadvroute.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexiadvroute.ini" />
-		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/system/fr-FR.plg_system_flexiadvroute.ini" />
+		<copy file="plugins/system/flexiadvroute.php" tofile="flexipack/plugins/advroute/flexiadvroute.php" />
+		<copy file="plugins/system/flexiadvroute.xml" tofile="flexipack/plugins/advroute/flexiadvroute.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/advroute/en-GB.plg_system_flexiadvroute.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/advroute/fr-FR.plg_system_flexiadvroute.ini" />
 		
 		<move file="flexipack/admin/install.php" tofile="flexipack/install.php" />
 		<move file="flexipack/admin/manifest.xml" tofile="flexipack/manifest.xml" />
