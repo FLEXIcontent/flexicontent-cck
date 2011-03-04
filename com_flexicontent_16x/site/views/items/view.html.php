@@ -102,9 +102,9 @@ class FlexicontentViewItems extends JView
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
 		$parents	= $cats->getParentlist();
-		$pathway 	=& $mainframe->getPathWay();
 		$depth		= $params->get('item_depth', 0);
 
+		$pathway 	=& $mainframe->getPathWay();
 		for($p = $depth; $p<count($parents); $p++) {
 			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
 		}
@@ -224,6 +224,14 @@ class FlexicontentViewItems extends JView
 
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
+		
+		$pathway 	=& $mainframe->getPathWay();
+		for($p = $depth; $p<count($parents); $p++) {
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+		}
+		if ($params->get('add_item_pathway', 1)) {
+			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+		}
 
 		$print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 
