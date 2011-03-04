@@ -98,7 +98,7 @@ class FlexicontentHelperRoute
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
 		$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('componentid', $component->id);
+		$items	= $menus->getItems('component_id', $component->id);
 		$items = $items?$items:array();
 		$match = null;
 
@@ -126,7 +126,7 @@ class FlexicontentHelperRoute
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
 		$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('componentid', $component->id);
+		$items	= $menus->getItems('component_id', $component->id);
 		$items = $items?$items:array();
 		$match = null;
 

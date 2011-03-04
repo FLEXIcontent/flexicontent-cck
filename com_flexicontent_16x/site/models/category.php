@@ -80,7 +80,7 @@ class FlexicontentModelCategory extends JModel{
 	{
 		parent::__construct();
 
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		$cid			= JRequest::getInt('cid', 0);
 		
@@ -259,7 +259,8 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
@@ -533,7 +534,7 @@ class FlexicontentModelCategory extends JModel{
 			$category->assigneditems	= $this->_getassigned( $category->id );
 			$category->subcats			= $this->_getsubs( $category->id );
 			$this->_id					= $category->id;
-			$category->items			= $this->getData();
+			//$category->items			= $this->getData();
 			$this->_data				= null;
 			$k = 1 - $k;
 		}
@@ -549,7 +550,7 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function getCategory()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		//initialize some vars
 		$user		= & JFactory::getUser();
@@ -577,7 +578,8 @@ class FlexicontentModelCategory extends JModel{
 		$cparams = $this->_category->parameters;
 
 		//check whether category access level allows access
-		$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
+		//$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
+		$canread 	= true;//---> wait for change.
 		if (!$canread)
 		{
 			if (!$aid) {
@@ -611,7 +613,8 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _loadCategoryParams($cid)
 	{
-		global $mainframe;
+		jimport("joomla.html.parameter");
+		$mainframe = &JFactory::getApplication();
 
 		$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
 		$this->_db->setQuery($query);
@@ -636,7 +639,7 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function getFilters()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');

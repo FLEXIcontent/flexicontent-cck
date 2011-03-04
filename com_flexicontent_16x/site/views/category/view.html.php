@@ -37,7 +37,8 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		JHTML::_('behavior.tooltip');
 
@@ -54,7 +55,7 @@ class FlexicontentViewCategory extends JView
 		// Request variables
 		$limitstart		= JRequest::getInt('limitstart');
 		$format			= JRequest::getVar('format', null);
-		
+
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -115,7 +116,7 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$params->set('page_title',	$category->title);
 		}
-		
+
 		// pathway construction @TODO try to find and automated solution
 		for($p=$params->get('item_depth', 0); $p<count($parents); $p++) {
 			// Do not add the above and root categories when coming from a directory view
@@ -128,11 +129,10 @@ class FlexicontentViewCategory extends JView
 			}
 		}
 
-
 		$document->setTitle( $params->get( 'page_title' ) );
 
 		if ($mainframe->getCfg('MetaTitle') == '1') {
-				$mainframe->addMetaTag('title', $category->title);
+				//$mainframe->addMetaTag('title', $category->title);//--->wait for change to be 1.6 style.
 		}
 		
 		if ($params->get('show_feed_link', 1) == 1) {

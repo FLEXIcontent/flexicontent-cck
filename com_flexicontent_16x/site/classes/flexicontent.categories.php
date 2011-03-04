@@ -57,12 +57,12 @@ class flexicontent_cats {
 		foreach($this->parentcats as $cid) {
 			
 			$query = 'SELECT id, title,'
-					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
-					.' FROM #__categories'
-					.' WHERE id ='. (int)$cid 
-					.' AND section = ' . FLEXI_CATEGORY
-					.' AND published = 1'
-					;
+			.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
+			.' FROM #__categories'
+			.' WHERE id ='. (int)$cid 
+			.' AND lft >= ' . FLEXI_CATEGORY_LFT . ' AND rgt <= ' . FLEXI_CATEGORY_RGT
+			.' AND published = 1'
+			;
 			$db->setQuery($query);
 			$this->category[] 	= $db->loadObject();
 		}

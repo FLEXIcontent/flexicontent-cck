@@ -124,7 +124,8 @@ class FlexicontentModelItems extends JModel
 	 * @since 1.0
 	 */
 	function &getItem() {
-		global $mainframe, $globalcats;
+		$mainframe = &JFactory::getApplication();
+		global $globalcats;
 		
 		/*
 		* Load the Item data
