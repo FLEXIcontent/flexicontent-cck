@@ -36,7 +36,7 @@ class FlexicontentViewItems extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();
@@ -274,7 +274,7 @@ class FlexicontentViewItems extends JView
 	 */
 	function _displayForm($tpl) {
 
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		//Initialize variables
 		$dispatcher = & JDispatcher::getInstance();
@@ -300,11 +300,15 @@ class FlexicontentViewItems extends JView
 		if (!$user->get('id')) {
 			$menu =& JSite::getMenu();
 			$itemid = $params->get('notauthurl');
-			$item = $menu->getItem($itemid);
-			if($item->component) {
-				$url = JRoute::_($item->link.'&Itemid='.$itemid.'&option='.$item->component, false);
+			if($itemid) {
+				$item = $menu->getItem($itemid);
+				if(@$item->component) {
+					$url = JRoute::_($item->link.'&Itemid='.$itemid.'&option='.$item->component, false);
+				}else{
+					$url = JRoute::_($item->link, false);
+				}
 			}else{
-				$url = JRoute::_($item->link, false);
+				$url = "index.php";
 			}
 			$mainframe->redirect($url, JText::_( 'FLEXI_ALERTNOTAUTH' ));
 		}
