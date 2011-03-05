@@ -71,16 +71,6 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		switch ($field->field_type)
 		{
 			case 'created': // created
-/*
-			$config =& JFactory::getConfig();
-			$tzoffset = $config->getValue('config.offset');
-			if ($item->created && strlen(trim( $item->created )) <= 10) {
-				$item->created 	.= ' 00:00:00';
-			}
-			$date =& JFactory::getDate($item->created, $tzoffset);
-			$item->created = $date->toMySQL();
-*/
-
 			$field->value[] = $item->created;
 			$dateformat = $dateformat ? $dateformat : $customdate;
 			$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
@@ -128,13 +118,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 
 			case 'voting': // voting button
-// remove dummy value in next version for legacy purposes
 			$field->value[] = 'button'; // dummy value to force display
 			$field->display = flexicontent_html::ItemVote( $field, 'main', $vote );
 			break;
 
 			case 'favourites': // favourites button
-// remove dummy value in next version for legacy purposes
 			$field->value[] = 'button'; // dummy value to force display
 			$favs = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS').')' : '';
 			$field->display = '
@@ -147,26 +135,20 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				';
 			break;
 
-
-			case 'score': // voting score
-			if ($view == 'category') break;
-// remove dummy value in next version for legacy purposes
-			$field->value[] = 'button'; // dummy value to force display
-			$field->display = '<span id="fcfav">'.flexicontent_html::favicon( $field, $favoured ).'</span><span id="fcfav-reponse"><small>('.JText::_('Favoured').' '.$favourites.')</small></span>';
-			break;
-
-			
 			case 'categories': // assigned categories
+			global $globalnoroute;
 			$display = '';
 			if ($categories) :
-			foreach ($categories as $category) {
-				$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
-				$field->value[] = $category->title; 
-			}
-			$field->display = implode($separatorf, $field->display);
+				foreach ($categories as $category) {
+					if (!in_array($category->id, $globalnoroute)) :
+						$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
+						$field->value[] = $category->title;
+					endif;
+				}
+				$field->display = implode($separatorf, $field->display);
 			else :
-			$field->value[] = '';
-			$field->display = '';
+				$field->value[] = '';
+				$field->display = '';
 			endif;
 			break;
 
