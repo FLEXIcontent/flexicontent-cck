@@ -318,9 +318,12 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getCacheThumbChmod()
 	{
+		return true;
+/*
 		// Open phpThumb cache directory
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 		return (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+*/
 	}
 
 	/**
