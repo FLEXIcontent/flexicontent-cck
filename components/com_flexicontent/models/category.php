@@ -289,8 +289,11 @@ class FlexicontentModelCategory extends JModel{
 		$this->_group_cats = $_group_cats;
 		$_group_cats = "'".implode("','", $_group_cats)."'";
 		
+		// Get the site default language in case no language is set in the url
+		$languages =& JComponentHelper::getParams('com_languages');
+		$lang 		= $languages->get('site', 'en-GB');
 		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
+		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
@@ -435,8 +438,11 @@ class FlexicontentModelCategory extends JModel{
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
+		// Get the site default language in case no language is set in the url
+		$languages =& JComponentHelper::getParams('com_languages');
+		$lang 		= $languages->get('site', 'en-GB');
 		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
+		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
@@ -699,39 +705,44 @@ class FlexicontentModelCategory extends JModel{
 		return $filters;
 	}
 
-   /**
-    * Method to build the alphabetical index
-    *
-    * @access public
-    * @return string
-    * @since 1.5
-    */
-   function getAlphaindex() {
-      
-      global $mainframe;
+	/**
+	* Method to build the alphabetical index
+	*
+	* @access public
+	* @return string
+	* @since 1.5
+	*/
+	function getAlphaindex()
+	{
+		global $mainframe;
+		
+		$user      = & JFactory::getUser();
+		$gid      = (int) $user->get('aid');
 
-      $user      = & JFactory::getUser();
-      $gid      = (int) $user->get('aid');
-      $lang       = JRequest::getWord('lang', '' );
-
-      $now = $mainframe->get('requestTime');
-      $nullDate = $this->_db->getNullDate();
-      
-      // Get the category parameters
-      $cparams    = $this->_category->parameters;
-      // show unauthorized items
-      $show_noauth = $cparams->get('show_noauth', 0);
-      
-      // Filter the category view with the active active language
-      $and 	= FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
-      $and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
-      
-      //Is the content current
-      $and3 = ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
-      $and3.= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
-      
-      $_group_cats = implode("','", $this->_group_cats);
-      $query   	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
+		// Get the site default language in case no language is set in the url
+		$languages =& JComponentHelper::getParams('com_languages');
+		$lang 		= $languages->get('site', 'en-GB');
+		// shortcode of the site active language (joomfish)
+		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
+		
+		$now = $mainframe->get('requestTime');
+		$nullDate = $this->_db->getNullDate();
+		
+		// Get the category parameters
+		$cparams    = $this->_category->parameters;
+		// show unauthorized items
+		$show_noauth = $cparams->get('show_noauth', 0);
+		
+		// Filter the category view with the active active language
+		$and 	= FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
+		$and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
+		
+		//Is the content current
+		$and3 = ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
+		$and3.= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
+		
+		$_group_cats = implode("','", $this->_group_cats);
+		$query   	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 				. ' FROM #__content AS i'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -745,9 +756,9 @@ class FlexicontentModelCategory extends JModel{
 				. ' GROUP BY alpha'
 				. ' ORDER BY alpha ASC'
 				;
-      $this->_db->setQuery($query);
-      $alpha = $this->_db->loadResultArray();
-      return $alpha;
+		$this->_db->setQuery($query);
+		$alpha = $this->_db->loadResultArray();
+		return $alpha;
    }
 }
 ?>
