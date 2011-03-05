@@ -185,6 +185,7 @@ class FlexicontentModelCategory extends JModel{
 		. $where
 		. $orderby
 		;
+		
 		return $query;
 	}
 
@@ -337,7 +338,18 @@ class FlexicontentModelCategory extends JModel{
 				// clean filter variables
 				$filter			= $this->_db->getEscaped( trim(JString::strtolower( $filter ) ) );
 
-				$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $filter, true ).'%', false );
+				$where .= ' AND (';
+				$filters = explode(' ', $filter);
+				$i = 0;
+				foreach ($filters as $pattern) {
+					if ($i == 0) {
+						$where .= 'LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $pattern, true ).'%', false);
+						$i = 1;
+					} else {
+						$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $pattern, true ).'%', false);
+					}
+				}
+				$where .= ') ';
 			}
 		}
 		
