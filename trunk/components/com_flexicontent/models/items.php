@@ -799,7 +799,7 @@ class FlexicontentModelItems extends JModel
 
 			// set type and language
  			$item->type_id 		= (int)$typeid;
- 			$item->language		= flexicontent_html::getSiteDefaultLang();			
+ 			$item->language		= $item->language ? $item->language : flexicontent_html::getSiteDefaultLang();			
 			
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
