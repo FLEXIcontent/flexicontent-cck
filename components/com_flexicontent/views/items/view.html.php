@@ -173,6 +173,12 @@ class FlexicontentViewItems extends JView
 			}
 		}
 		
+		// @TODO chack that as it seems to be dirty :(
+		$uri  			=& JFactory::getURI();
+		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		
 		// increment the hit counter
