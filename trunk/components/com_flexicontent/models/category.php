@@ -464,7 +464,7 @@ class FlexicontentModelCategory extends JModel{
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 
-		$where .= ' AND rel.catid IN ('. $globalcats[$id]->descendants. ')';
+		$where .= ' AND rel.catid IN ('. (@$globalcats[$id]->descendants?$globalcats[$id]->descendants:"''"). ')';
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
