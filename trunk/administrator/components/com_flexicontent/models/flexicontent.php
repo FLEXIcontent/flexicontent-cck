@@ -477,7 +477,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION
+				. ' WHERE section = ' .$this->_db->Quote(FLEXI_SECTION)
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();

@@ -154,7 +154,7 @@ class FlexicontentModelItems extends JModel
 		$status = array();
 		
 		$query 	= 'SELECT id FROM #__content'
-				. ' WHERE sectionid = ' . FLEXI_SECTION
+				. ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION)
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -200,7 +200,7 @@ class FlexicontentModelItems extends JModel
 		if ($status['no']) {
 			$and = ' AND id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT id, title, introtext, `fulltext`, catid, created, created_by, modified, modified_by, version, state FROM #__content'
-					. ' WHERE sectionid = ' . FLEXI_SECTION
+					. ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION)
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -383,7 +383,7 @@ class FlexicontentModelItems extends JModel
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
+		$where[] = ' i.sectionid = ' . $this->_db->Quote(FLEXI_SECTION);
 
 		// if FLEXIaccess only authorize users to see their own items
 		if (FLEXI_ACCESS) {
@@ -1066,7 +1066,7 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 			
-			$where = $this->_db->nameQuote('sectionid').' = '.FLEXI_SECTION; 
+			$where = $this->_db->nameQuote('sectionid').' = '.$this->_db->Quote(FLEXI_SECTION);
 			$row->reorder($where);
 			return true;
 
