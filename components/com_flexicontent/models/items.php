@@ -863,6 +863,8 @@ class FlexicontentModelItems extends JModel
 			}else{
 				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
 			}
+			// process field mambots onBeforeSaveItem
+			$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
 			// Store it in the db
 			if (!$item->store()) {
 				$this->setError($this->_db->getErrorMsg());
