@@ -714,7 +714,7 @@ class FlexicontentModelItems extends JModel
 		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$post['vstate'] = (int)$post['vstate'];
+		$post['vstate'] = @(int)$post['vstate'];
 		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
 		// bind it to the table
@@ -999,6 +999,7 @@ class FlexicontentModelItems extends JModel
 						} else {
 							$obj->value			= $postvalue;
 						}
+						$fields[$key]->value[] = $obj->value;
 						if ($use_versioning)
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
@@ -1025,6 +1026,7 @@ class FlexicontentModelItems extends JModel
 					} else {
 						$obj->value			= $post[$field->name];
 					}
+					$fields[$key]->value[] = $obj->value;
 					if($use_versioning)
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					if(
@@ -1095,6 +1097,8 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
+		// process field mambots onCompleteSaveItem
+		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		return true;
 	}
 

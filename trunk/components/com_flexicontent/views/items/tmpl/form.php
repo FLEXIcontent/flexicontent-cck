@@ -62,7 +62,7 @@ if ($this->params->get('form_extra_css')) {
 }
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
-if ($this->perms['cantags']) {
+if (@$this->fields['tags'] && $this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -329,7 +329,7 @@ function deleteTag(obj) {
         	</div>
         </fieldset>
         <?php endif; ?>
-
+<?php if(@$this->fields['tags']) {?>
 	<fieldset class="flexi_tags">
 		<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
 		<div class="qf_tagbox" id="qf_tagbox">
@@ -359,7 +359,7 @@ function deleteTag(obj) {
 		<?php endif; ?>
 	</fieldset>
 
-	<?php
+<?php }
 	if ($this->fields) {
 		$this->document->addScriptDeclaration("
 		window.addEvent('domready', function() {

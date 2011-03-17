@@ -20,6 +20,10 @@
 				<option value="1">ONE_CAT</option>
 				<option value="2">MULTIPLE_CATS</option>
 			</param>
+			<param name="allowunauthorize" type="radio" default="0" label="Allow unauthorized users" description="Allow unauthorized users to add article.">
+				<option value="0">NO</option>
+				<option value="1">YES</option>
+			</param>
 			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
 				<option value="0">NO</option>
 				<option value="1">YES</option>
