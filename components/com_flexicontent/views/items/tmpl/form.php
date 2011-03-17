@@ -228,7 +228,7 @@ function deleteTag(obj) {
 			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
 			<div class="flexi_formblock">
 				<label for="title" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+				<?php echo JText::_( $this->fields['title']->label ).':';?>
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>

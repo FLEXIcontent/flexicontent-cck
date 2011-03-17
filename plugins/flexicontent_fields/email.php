@@ -38,7 +38,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$default_value		= $field->parameters->get( 'default_value', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_value) {
@@ -142,14 +142,14 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 			
 			foreach ($field->value as $value) {
-				$field->html .= '<li><input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$value.'" /><input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
+				$field->html .= '<li><input name="'.$field->name.'[]" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'" /><input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
-				}
+			}
 			$field->html .=	'</ul>';
 			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
-			$field->html = '<div><input name="'.$field->name.'[]" type="text" size="'.$size.'" value="'.$field->value[0].'" /></div>';
+			$field->html = '<div><input name="'.$field->name.'[]" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'" /></div>';
 		}
 	}
 
