@@ -299,9 +299,11 @@ class FlexicontentViewItems extends JView
 		foreach ($fields as $field) {
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
 		}
+		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
+		$allowunauthorize = $params->get('allowunauthorize', 0);
 
 		// first check if the user is logged
-		if (!$user->get('id')) {
+		if (!$allowunauthorize && !$user->get('id')) {
 			$menu =& JSite::getMenu();
 			$itemid = $params->get('notauthurl');
 			$item = $menu->getItem($itemid);
@@ -347,12 +349,12 @@ class FlexicontentViewItems extends JView
 					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 				}
 			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-				
-				if (!$canAdd)
-				{
-					// user isn't authorize to submit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				if(!$allowunauthorize) {
+					$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+					if (!$canAdd) {
+						// user isn't authorize to submit
+						JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+					}
 				}
 			}
 		}
