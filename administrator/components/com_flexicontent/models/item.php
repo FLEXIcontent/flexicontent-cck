@@ -471,6 +471,7 @@ class FlexicontentModelItem extends JModel {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$mainframe = &JFactory::getApplication();
+		$dispatcher = & JDispatcher::getInstance();
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
 		
@@ -619,6 +620,7 @@ class FlexicontentModelItem extends JModel {
 			}
 			// process field mambots onBeforeSaveItem
 			$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
+			if((count($result)>0) && in_array(false, $result)) return false;
 			// Store it in the db
 			if (!$item->store()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -710,7 +712,6 @@ class FlexicontentModelItem extends JModel {
 		// get the field object
 		$this->_id 	= $item->id;	
 		$fields		= $this->getExtrafields();
-		$dispatcher = & JDispatcher::getInstance();
 		
 		// NOTE: This event isn't used yet but may be useful in a near future
 		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
