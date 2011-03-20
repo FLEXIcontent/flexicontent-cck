@@ -15,9 +15,98 @@
  * GNU General Public License for more details.
  */
 
+-----------------------------------------------------
+- FLEXIcontent 1.5.4 stable - build 514 - Changelog -
+-----------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
 
-FLEXIcontent 1.5.3c stable - build 354 - Changelog
---------------------------------------------------
+
+* Security fix
+--------------------------------------------------------------------------------------------------
+* Disable the phpThumb cache directory check and avoid forcing chmod 777 on phpThumb cache directory
+* Security Fix for the phpThumb library
+
++ New features
+--------------------------------------------------------------------------------------------------
++ Add a canonical tag to avoid duplicate contents with multi-mapping
++ Add the option to allow the user to choose some of the pre-selected categories when submiting items from frontend (issue99)
++ Add the new article toolbar plugin to the trunk
++ Add the ability to sort category by the last modified items (for Mihàly)
++ Add display label with filter option in category views
++ Add the feature to route categories to a specific item type (requires the advanced route system plugin)
++ Add the advanced routing features to the category view. You can now exclude some categories from routing ;)
++ Add the pageid creation feature to sh404 plugin
++ Add the feature to handle the page break (with overpagebreak by Joomlaworks)
++ Add an argument($Itemid) to function FlexicontentHelperRoute::getItemRoute()
++ Add the advanced routing plugin to the 1.5 trunk
++ Add some parameters (id+cid) to the return string (very usefull for websites selling content)
+
+- Removed features
+--------------------------------------------------------------------------------------------------
+- Advanced search column in the fields view because feature is not implemented yet (issue67)
+- Remove the category FLEXIaccess check for the item view (more logical) 
+
+- Bug fixes
+--------------------------------------------------------------------------------------------------
+# Joomfish bug when no lang variable was found in query string, the category view was not filtering the items. (eg Homepage)
+# Joomfish bug when editing an item in frontend. The language saved was always the site default language (see http://www.flexicontent.org/phpbb/viewtopic.php?f=7&t=2945)
+# Fix a the category field to avoid displaying categories that are excluded from routing + some cleanup
+# Comment duplicate select category items query.
+# Fix a small parameter bug in menu items
+# Clean the template cache when duplicating or deleting template
+# Fix upgrade bug in the installer
+# Fix bug on default template related to advanced routing feature
+# Fix some bugs on the filters for the items view (backend)
+# Fix bug about voting css loaded multiple times on category views
+# Fix bug about fields values appended to search_index even if they shouldn't be searchable (issue67)
+# Fix bug about content plugins not triggered in blog template (issue76) # Fix bug about the readmore button that was loaded even there was no content in fulltext
+# Fix bug about deleting tags in IE (issue21 & issue90)
+# Fix bug about AlphaIndex with publish_up date (issue80)
+# Fix bug about comments form displayed in the print item view (issue89)
+# Fix bug about the start publishing date when editing an item in frontend (issue74)
+# Fix bug in voting plugin CSS (issue84)
+# Fix empty legends in image fields (issue91)
+# Fix joomfish bug (issue68)
+# Fix html tags issue (issue86)
+# Fix the IE double posting (issue77)
+# Fix default value as int for the getUserStateFromRequest method in the filemanager views (issue66)
+# Fix Alpha index was filtering all categories (issue64)
+# Fix a small notice that appears when disabling joomfish
+# Fix bug in the frontend edit: quotes were replace by htmlentities when editing
+# Fix bug in the frontend edit: a readmore tag was inserted even there was nothing in the fulltext DB field
+# Fix the bugs about extra parameber setting about template in type,category,and item edit layout. + add language field to item edit layout.
+# Fix javascript error, cannot click to do postinstall
+# Fix the drag and drop feature (for mootools 1.2)
+# Fix bug in parameter inheritance
+# Fixed hard-coded database prefix. Thanks to tembargo for bug report here: http://www.flexicontent.org/forum/index.php?f=29&t=2467&rb_v=viewtopic
+# Fix bug in sh404 plugin (issue 51)
+# Fix bug param show_intro doesn't function globaly
+# Fix bug in minigallery for multiple item used this field.
+# Fix bug about minigallery and fileselement
+# Fix bug about path to file of minigallery plugin.
+# Fix bug about phpThumb(cannot display images)
+
+^ Modified features
+--------------------------------------------------------------------------------------------------
+^ Improvement on the title fulltext filter for the frontend category view (issue 75)
+^ Move the add to pathway after plugin events.
+^ Put the getTemplates method in cache for performance
+^ Small modifications to the buttons to build a better printing view
+^ Modification of the Include Subcategories filter from checkbox to radio options. Avoid loosing the choice when changing from view (issue72)
+^ The update version check is visible by default
+
+
+
+------------------------------------------------------
+- FLEXIcontent 1.5.3c stable - build 354 - Changelog -
+------------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
@@ -34,8 +123,9 @@ $ -> Language fix or change
 + Add compatibility with the PrintMe component from dioscouri http://bit.ly/dcDacR
 
 
-FLEXIcontent 1.5.3b stable - build 350 - Changelog
---------------------------------------------------
+------------------------------------------------------
+- FLEXIcontent 1.5.3b stable - build 350 - Changelog -
+------------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
@@ -53,9 +143,9 @@ $ -> Language fix or change
 + Add an update check in control panel / see => http://code.google.com/p/flexicontent/issues/detail?id=45
 
 
-
-FLEXIcontent 1.5.3a stable - build 345 - Changelog
---------------------------------------------------
+------------------------------------------------------
+- FLEXIcontent 1.5.3a stable - build 345 - Changelog -
+------------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
@@ -75,9 +165,9 @@ $ -> Language fix or change
 $ Add missing string for the weblink field
 
 
-
-FLEXIcontent 1.5.3 stable - build 333 - Changelog
--------------------------------------------------
+-----------------------------------------------------
+- FLEXIcontent 1.5.3 stable - build 333 - Changelog -
+-----------------------------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
@@ -154,9 +244,9 @@ $ Removed some duplicate strings from FR and EN admin language files.
 $ added 2 missing language strings to fr-FR. See r216.
 
 
-################################################################################################
-
-FLEXIcontent beta 5 changelog 
+---------------------------------
+- FLEXIcontent beta 5 changelog -
+---------------------------------
 
 Legend:
 * -> Security Fix
@@ -193,10 +283,9 @@ $ Add languages missing strings
 # Fix the one col/two cols bug in default item template
 
 
-################################################################################################
-
-FLEXIcontent beta 4 changelog 
-
+---------------------------------
+- FLEXIcontent beta 4 changelog -
+---------------------------------
 Legend:
 * -> Security Fix
 # -> Bug Fix
