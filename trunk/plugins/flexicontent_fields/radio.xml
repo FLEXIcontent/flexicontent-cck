@@ -19,7 +19,7 @@
 		</param>
 	</params>
 	<params group="group-radio">
-		<param name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+		<param name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 		<param name="separator" type="list" default="0" label="FLEXI_FIELD_SEPARATOR_BACKEND" description="FLEXI_FIELD_SEPARATOR_BACKEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
