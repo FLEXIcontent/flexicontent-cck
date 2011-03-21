@@ -35,6 +35,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->html = '';
 		$select = $this->buildSelectList( $field );
 		$app =& JFactory::getApplication();
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		
 		// if an image exists it display the existing image
 		if ($field->value  && $field->value[0] != '')

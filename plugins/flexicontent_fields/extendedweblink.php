@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	function plgFlexicontent_fieldsExtendedWeblink( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
@@ -32,13 +32,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if($field->field_type != 'extendedweblink') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$default_value		= $field->parameters->get( 'default_value', '' ) ;
 		$size				= $field->parameters->get( 'size', 30 ) ;
 								
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_value) {
@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -173,11 +173,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					<table class="admintable"><tbody>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-						<td><input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+						<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 						</tr>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-						<td><input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+						<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 						</tr>
 						'.$linktext.'
 						'.$class.'
@@ -210,11 +210,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				<table class="admintable"><tbody>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-					<td><input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+					<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 					</tr>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-					<td><input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+					<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 					</tr>
 					'.$linktext.'
 					'.$class.'

@@ -25,19 +25,18 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
         JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
 
-	function onDisplayField(&$field, $item)
-	{
+	function onDisplayField(&$field, $item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkbox') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		switch($separator)
 		{
@@ -85,9 +84,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 						$checked = ' checked="checked"';
 					}
 				} 
-			$options .= '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+			$options .= '<label><input type="checkbox" class="" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
-			}			
+		}
 			
 		$field->html	= $options;
 	}

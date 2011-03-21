@@ -32,13 +32,13 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if($field->field_type != 'selectmultiple') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$size				= $field->parameters->get( 'size', 6 ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 		
 		// initialise property
@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			
 			} else {
 			
-				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple"'.$required.$size, 'value', 'text', $field->value);
+				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 			}
 
 		} else { // Elements mode
@@ -83,9 +83,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					}
 				}
 			}			
-			
-		$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple"'.$required.$size, 'value', 'text', $field->value);
-		
+			$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 		}
 	}
 

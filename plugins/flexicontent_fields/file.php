@@ -37,6 +37,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$document	=& JFactory::getDocument();
 		$app		=& JFactory::getApplication();
 		$prefix		= $app->isSite() ? 'administrator/' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		$js = "
 		function qfSelectFile".$field->id."(id, file) {
@@ -116,7 +118,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -145,7 +147,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
-				$field->html .= "<input size=\"".$size."\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
+				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
 				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"".$field->name."[]\" value=\"".$file."\" />";
 				$field->html .= "<input class=\"inputbox fcbutton\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
 				$field->html .= "<span class=\"drag".$field->id."\">".$move."</span>";
@@ -156,13 +158,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$user = & JFactory::getUser();
 		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
 		$field->html .= "
-						</ul>
-						<div class=\"button-add\">
-							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-							</div>
-						</div>
-						";
+		</ul>
+		<div class=\"button-add\">
+			<div class=\"blank\">
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+			</div>
+		</div>
+		";
 	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')

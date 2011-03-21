@@ -32,12 +32,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if($field->field_type != 'date') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
-								
-		$required 	= $required ? ' class="required"' : '';
+		$dateformat			= $field->parameters->get( 'date_format', '%Y-%m-%d' ) ;
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		// initialise property
 		if (!$field->value) {
@@ -58,7 +57,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -153,13 +152,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
-				$field->html .= '<li>' . JHTML::_('calendar', $value, $field->name.'[]', $field->name.'_'.$n) . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
+				$field->html .= '<li>' . JHTML::_('calendar', $value, $field->name.'[]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"') . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
 			}
 			$field->html 	.=	'</ul>';
 			$field->html 	.= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {
-			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], $field->name.'[]', $field->name) .'</div>';
+			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], $field->name.'[]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
 		}
 	}
 
@@ -193,7 +192,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
-		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
+		$dateformat			= $field->parameters->get( 'date_format', '%Y-%m-%d' ) ;
 		$customdate			= $field->parameters->get( 'custom_date', '' ) ; 
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
 

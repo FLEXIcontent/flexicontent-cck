@@ -40,6 +40,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$app			= & JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
 		$clientpref		= $app->isAdmin() ? '' : 'administrator/';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		$js = "
 		function randomString() {
@@ -128,7 +130,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '

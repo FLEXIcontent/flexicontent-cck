@@ -34,14 +34,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$editor 	= & JFactory::getEditor();
 		
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$cols				= $field->parameters->get( 'cols', 75 ) ;
 		$rows				= $field->parameters->get( 'rows', 20 ) ;
 		$height				= $field->parameters->get( 'height', 400 ) ;
-		$default_value		= $field->parameters->get( 'default_value' ) ;
+		$default_value			= $field->parameters->get( 'default_value' ) ;
 		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
-						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_value) {
@@ -56,15 +55,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->value[0] = htmlspecialchars( $field->value[0], ENT_NOQUOTES, 'UTF-8' );
 			$field->html	 = $editor->display( $field->name, $field->value[0], '100%', $height, $cols, $rows, array('pagebreak', 'readmore') );
 		} else {
-			$field->html	 = '<textarea name="' . $field->name . '" cols="'.$cols.'" rows="'.$rows.'"'.$required.'>';
+			$field->html	 = '<textarea name="' . $field->name . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">';
 			$field->html	.= $field->value[0];
 			$field->html	.= '</textarea>';
 		}
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
+	function onBeforeSaveField( $field, &$post, &$file ) {
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
 		if(!$post) return;
@@ -75,8 +73,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	}
 
 
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
-	{
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;

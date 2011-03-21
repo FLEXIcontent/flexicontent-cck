@@ -96,6 +96,12 @@
 			<option value="2">FLEXI_FIELD_IMAGE_ROKBOX</option>
 			<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
 		</param>
+<!--
+		<param name="required" type="radio" default="0" label="Required" description="Required">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+-->
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_image.ini</language>
