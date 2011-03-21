@@ -32,12 +32,12 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if($field->field_type != 'radio') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_value		= $field->parameters->get( 'default_value', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		switch($separator)
 		{
@@ -83,8 +83,8 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			$checked  = "";
 			if ($field->value[0] && $field->value[0] == $listarray[0]) {
 				$checked = ' checked="checked"';
-				} 
-			$options .= '<label><input type="radio" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+			}
+			$options .= '<label><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
 			}			
 			

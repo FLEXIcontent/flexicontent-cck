@@ -40,12 +40,12 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		if($field->field_type != 'linkslist') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		switch($separator)
 		{
@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		foreach ($items as $id => $item)
 		{
 			$checked  = in_array($id, $field->value) ? ' checked="checked"' : null;
-			$options[] = '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$id.'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$id.'</label>';			 
+			$options[] = '<label><input type="checkbox" class="'.$required.'" name="'.$field->name.'[]" value="'.$id.'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$id.'</label>';			 
 		}			
 			
 		$field->html = implode($separator, $options);

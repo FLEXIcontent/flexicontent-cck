@@ -32,14 +32,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if($field->field_type != 'weblink') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$default_link		= $field->parameters->get( 'default_value_link', '' ) ;
 		$default_title		= $field->parameters->get( 'default_value_title', '' ) ;
 		$size				= $field->parameters->get( 'size', 30 ) ;
 								
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_link) {
@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -157,21 +157,21 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$field->html	.= '
 				<li>
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URL' ).':</span>
-					<input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
+					<input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</span>
-					<input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
+					<input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
 					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.$value['hits'].'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
 				</li>';
 				$n++;
-				}
+			}
 			$field->html .=	'</ul>';
 			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else {
 			$field->value[0] = unserialize($field->value[0]);
-			$field->html	= '<div>Url: <input name="'.$field->name.'[0][link]" type="text" size="'.$size.'" value="'.$field->value[0]['link'].'" /> Title: <input name="'.$field->name.'[0][title]" type="text" size="'.$size.'" value="'.$field->value[0]['title'].'" /><input name="'.$field->name.'[0][hits]" type="hidden" value="'.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).'" /> '.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).' '.JText::_( 'FLEXI_FIELD_HITS' ).' </div>';
+			$field->html	= '<div>Url: <input name="'.$field->name.'[0][link]" class="urllink'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['link'].'" /> Title: <input name="'.$field->name.'[0][title]" class="urltitle'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['title'].'" /><input name="'.$field->name.'[0][hits]" type="hidden" value="'.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).'" /> '.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).' '.JText::_( 'FLEXI_FIELD_HITS' ).' </div>';
 		}
 	}
 
@@ -221,6 +221,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

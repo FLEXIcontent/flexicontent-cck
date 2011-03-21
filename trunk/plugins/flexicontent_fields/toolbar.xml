@@ -57,6 +57,11 @@
 		</param>
 		<param name="spacer-size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
 <!-- 		<param name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" /> -->
+<!--		<param name="required" type="radio" default="0" label="Required" description="Required">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+-->
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_toolbar.ini</language>
