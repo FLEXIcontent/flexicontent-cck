@@ -34,7 +34,7 @@
 			$('paramsfield_elements').getParent().setProperty('colspan', 2).addClass('paramlist_key'); 
 		
 		}); &lt;/script&gt;" />
-		<param name="field_elements" type="textarea" default="" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
+		<param name="field_elements" type="textarea" default="Title[link=&quot;#&quot; class=&quot;list link&quot;] :: Title2[id=&quot;myID&quot;]" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
 		<param name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
 			<option value="ul">Unordered list</option>
 			<option value="ol">Ordered list</option>
