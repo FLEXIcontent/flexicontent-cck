@@ -8,7 +8,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.4 dev (r518)</version>
+	<version>1.5.4 dev (r519)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
