@@ -127,6 +127,26 @@
 			</fileset>
 		</copy>
 		
+		<copy file="plugins/flexicontent_fields/fcpagenav.php" tofile="flexipack/plugins/fcpagenav/fcpagenav.php" />
+		<copy file="plugins/flexicontent_fields/fcpagenav.xml" tofile="flexipack/plugins/fcpagenav/fcpagenav.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_fcpagenav.ini" tofile="flexipack/plugins/fcpagenav/en-GB.plg_flexicontent_fields_fcpagenav.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_fcpagenav.ini" tofile="flexipack/plugins/fcpagenav/fr-FR.plg_flexicontent_fields_fcpagenav.ini" />
+		<copy todir="flexipack/plugins/fcpagenav/fcpagenav" >
+			<fileset dir="plugins/flexicontent_fields/fcpagenav">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
+		<copy file="plugins/flexicontent_fields/fcloadmodule.php" tofile="flexipack/plugins/fcloadmodule/fcloadmodule.php" />
+		<copy file="plugins/flexicontent_fields/fcloadmodule.xml" tofile="flexipack/plugins/fcloadmodule/fcloadmodule.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_fcloadmodule.ini" tofile="flexipack/plugins/fcloadmodule/en-GB.plg_flexicontent_fields_fcloadmodule.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_fcloadmodule.ini" tofile="flexipack/plugins/fcloadmodule/fr-FR.plg_flexicontent_fields_fcloadmodule.ini" />
+		<copy todir="flexipack/plugins/fcloadmodule/fcloadmodule" >
+			<fileset dir="plugins/flexicontent_fields/fcloadmodule">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
 		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
 		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexisearch.ini" />
