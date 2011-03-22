@@ -35,6 +35,7 @@ $ -> Language fix or change
 
 + New features
 --------------------------------------------------------------------------------------------------
++ Add a default value to the field elements radio, select and select multiple
 + Add the page navigation field plugin
 + Add the load module field plugin
 + Add a javascript validation for required fields
