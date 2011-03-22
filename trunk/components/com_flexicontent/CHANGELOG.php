@@ -35,6 +35,9 @@ $ -> Language fix or change
 
 + New features
 --------------------------------------------------------------------------------------------------
++ Add the page navigation field plugin
++ Add the load module field plugin
++ Add a javascript validation for required fields
 + Add a canonical tag to avoid duplicate contents with multi-mapping
 + Add the option to allow the user to choose some of the pre-selected categories when submiting items from frontend (issue99)
 + Add the new article toolbar plugin to the trunk
