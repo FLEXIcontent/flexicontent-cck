@@ -157,7 +157,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		$user = & JFactory::getUser();
 		//$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items=0&amp;filter_uploader='.$user->id;
+		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;items=0&amp;filter_uploader='.$user->id;
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">

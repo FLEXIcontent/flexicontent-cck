@@ -175,8 +175,9 @@ class FlexicontentModelFileselement extends JModel
 		if($filter_item) {
 			$session = JFactory::getSession();
 			$files = $session->get('fileselement.'.$filter_item, null);
+			var_dump($files);
 			$files = $files?$files:array();
-			$files2 = $this->getItemFiles();
+			$files2 = $this->getItemFiles($filter_item);
 			$files = array_merge($files, $files2);
 			$files = array_unique($files);
 			$session->set('fileselement.'.$filter_item, $files);
@@ -202,10 +203,10 @@ class FlexicontentModelFileselement extends JModel
 		return $query;
 	}
 	
-	function getItemFiles() {
+	function getItemFiles($filter_item=0) {
 		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
+		//$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
 		if($filter_item) {
 			$where		= $this->_buildContentWhere();
 			$db = JFactory::getDBO();
