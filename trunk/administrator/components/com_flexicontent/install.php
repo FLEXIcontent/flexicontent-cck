@@ -112,14 +112,14 @@ if ($error) {
 <!--
 	<tr>
 		<td valign="top" style="font-weight: bold;">
-    		<?php echo JText::_('Choose an option to finish the install :'); ?>
+    		<?php // echo JText::_('Choose an option to finish the install :'); ?>
 		</td>
 		<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
 			<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
-    		<?php echo JText::_('New install'); ?>
+    		<?php // echo JText::_('New install'); ?>
     		</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
 			<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
-    		<?php echo JText::_('Update an existing install'); ?>
+    		<?php // echo JText::_('Update an existing install'); ?>
     		</a>
 		</td>
 	</tr>

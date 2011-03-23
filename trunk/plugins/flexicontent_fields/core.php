@@ -137,17 +137,21 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'categories': // assigned categories
 			global $globalnoroute;
-			// Insure that the global vars are array
-			if (!is_array($globalnoroute))	$globalnoroute	= array();
+			if ( !is_array($globalnoroute) ) $globalnoroute = array();
 			$display = '';
 			if ($categories) :
 				foreach ($categories as $category) {
-					if (!in_array($category->id, $globalnoroute)) :
+					if (!in_array($category->id, @$globalnoroute)) :
 						$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
 						$field->value[] = $category->title;
 					endif;
 				}
-				$field->display = implode($separatorf, $field->display);
+				if (isset($field->display)) :
+					$field->display = implode($separatorf, $field->display);
+				else :
+					$field->value[] = '';
+					$field->display = '';
+				endif;
 			else :
 				$field->value[] = '';
 				$field->display = '';
