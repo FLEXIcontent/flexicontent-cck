@@ -178,9 +178,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$size	= getimagesize($path);
 				$hl 	= $size[1];
 				$wl 	= $size[0];
-				$title	= isset($value['title']) ? $value['title'] : '';
-				$alt	= isset($value['alt']) ? $value['alt'] : '';
-				$desc	= isset($value['desc']) ? $value['desc'] : '';
+				$title	= @$value['title'] ? $value['title'] : '';
+				$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
+				$desc	= @$value['desc'] ? $value['desc'] : '';
 				$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];
 				$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];
 				$srcb	= $field->parameters->get('dir') . '/l_' . $value['originalname'];
