@@ -21,7 +21,12 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $globalcats, $globaltypes, $globalitems;
+global $sh_LANG, $globalcats, $globaltypes, $globalitems, $globalnoroute;
+
+// Insure that the global vars are array
+if (!is_array($globaltypes))	$globaltypes	= array();
+if (!is_array($globalitems))	$globalitems	= array();
+if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 $sefConfig 		= & shRouter::shGetConfig();
 $shLangName 	= '';
@@ -116,17 +121,19 @@ switch ($view) {
 						if ($globalcats[$cid]->ancestorsarray) {
 							$ancestors = $globalcats[$cid]->ancestorsarray;
 							foreach ($ancestors as $ancestor) {
-								if (shTranslateURL ( $option, $shLangName )) {
-									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
-									$database->setQuery ( $query );
-									$row_cat = $database->loadObject ();
-									$title[] = $row_cat->title . '/';
-								} else {
-									$title[] = $globalcats[$ancestor]->title . '/';
+								if (!in_array($ancestor, $globalnoroute)) {
+									if (shTranslateURL ( $option, $shLangName )) {
+										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
+										$database->setQuery ( $query );
+										$row_cat = $database->loadObject ();
+										$title[] = $row_cat->title . '/';
+									} else {
+										$title[] = $globalcats[$ancestor]->title . '/';
+									}
 								}
 							}		
 						}
-						if ($globaltypes && !in_array($row->id, $globaltypes)) {
+						if (!in_array($row->id, $globaltypes)) {
 						$title [] = $row->title;
 					}
 						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only

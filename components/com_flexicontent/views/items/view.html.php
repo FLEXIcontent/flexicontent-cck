@@ -37,6 +37,8 @@ class FlexicontentViewItems extends JView
 	function display( $tpl = null )
 	{
 		global $mainframe, $globaltypes;
+		// Insure that the global vars are array
+		if (!is_array($globaltypes))	$globaltypes	= array();
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();
@@ -224,7 +226,7 @@ class FlexicontentViewItems extends JView
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
 		$pathway 	=& $mainframe->getPathWay();
-		if (isset($globaltypes) && @$globaltypes) {
+		if (count($globaltypes) > 0) {
 			if (!in_array($item->id, $globaltypes)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
