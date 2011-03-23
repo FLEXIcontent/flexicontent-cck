@@ -146,7 +146,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 -->
-<?php endif; ?>
+<?php // endif; ?>
 <?php if (!$this->oldbetafiles) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
