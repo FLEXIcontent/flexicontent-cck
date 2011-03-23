@@ -177,14 +177,10 @@ echo $this->pane->endPane();
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<a style="cursor:pointer" class="<?php echo in_array($row->id, $this->files_selected)?"striketext":""?>" onclick="javascript:qffileselementadd(this, '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<?php
 				echo JHTML::image($row->icon, '');
-				if(in_array($row->id, $this->files_selected)) {
-					echo '<s style="color:red;">'.htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8').'</s>';
-				}else{
-					echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
-				}
+				echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
 				?>
 				</a></span>
 			</td>

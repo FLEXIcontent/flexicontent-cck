@@ -80,13 +80,19 @@ class FlexicontentViewFileselement extends JView
 			$document->addStyleDeclaration($searchcss);
 		}
 		//a trick to avoid loosing general style in modal window
-		$css = 'body, td, th { font-size: 11px; }';
+		$css = 'body, td, th { font-size: 11px; }
+		a.striketext{
+			text-decoration: line-through;
+			color:red;
+		}
+		';
 		$document->addStyleDeclaration($css);
 
 		//add js to document
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		$js = "
-		function qffileselementadd(id, file) {
+		function qffileselementadd(obj, id, file) {
+			obj.className = 'striketext';//work
 			document.adminForm.file.value=id;
 			window.parent.qfSelectFile".$fieldid."(id, file);	
 			//document.adminForm.submit();	
