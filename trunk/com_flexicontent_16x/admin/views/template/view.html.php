@@ -37,6 +37,7 @@ class FlexicontentViewTemplate extends JView {
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			JHTML::_('behavior.mootools');
 			$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 		}
 		$document->addCustomTag('<script>jQuery.noConflict();</script>');

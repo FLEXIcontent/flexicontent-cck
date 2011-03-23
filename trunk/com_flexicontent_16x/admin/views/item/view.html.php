@@ -44,6 +44,7 @@ class FlexicontentViewItem extends JView {
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 		
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			JHTML::_('behavior.mootools');
 			$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
 		}
 		$document->addCustomTag('<script>jQuery.noConflict();</script>');
