@@ -67,6 +67,8 @@ class FlexicontentViewFileselement extends JView
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 				'search', 			'', 			'string' );
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 				'items', 			0,	 			'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		$itemid 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.itemid', 'itemid', 0, 'int' );
 
 		//add css and submenu to document
 		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -101,10 +103,13 @@ class FlexicontentViewFileselement extends JView
 		}
 
 		//Get data from the model
+		$model = $this->getModel();
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
 		$items = & $this->get('Items');
 		$users = &$this->get('Users');
+		
+		$files_selected = $model->getItemFiles($itemid);
 
 		//search filter
 		$filters = array();
@@ -181,6 +186,7 @@ class FlexicontentViewFileselement extends JView
 		$this->assignRef('fieldid' 			, $fieldid);
 		$this->assignRef('CanUpload' 		, $CanUpload);
 		$this->assignRef('CanViewAllFiles' 	, $CanViewAllFiles);
+		$this->assignRef('files_selected', $files_selected);
 
 		parent::display($tpl);
 	}
