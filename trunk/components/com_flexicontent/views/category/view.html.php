@@ -38,6 +38,8 @@ class FlexicontentViewCategory extends JView
 	function display( $tpl = null )
 	{
 		global $mainframe, $option, $globalnoroute, $globalcats;
+		// Insure that the global vars are array
+		if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 		JHTML::_('behavior.tooltip');
 
@@ -169,6 +171,7 @@ class FlexicontentViewCategory extends JView
 		function filterCats($var)
 		{
 			global $globalnoroute;
+			if (!is_array($globalnoroute)) $globalnoroute = array();
 			
 			if (!in_array($var, $globalnoroute)) {
 				return ($var);
@@ -194,8 +197,6 @@ class FlexicontentViewCategory extends JView
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 			// reappend the category slug according to the advanced routing parameters
-			if (!$globalnoroute) $globalnoroute = array();
-			
 			if (!in_array($category->id, $globalnoroute)) {
 				$item->categoryslug = $category->slug;
 			} else {

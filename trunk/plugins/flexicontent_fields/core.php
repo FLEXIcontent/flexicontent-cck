@@ -137,6 +137,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'categories': // assigned categories
 			global $globalnoroute;
+			// Insure that the global vars are array
+			if (!is_array($globalnoroute))	$globalnoroute	= array();
 			$display = '';
 			if ($categories) :
 				foreach ($categories as $category) {
