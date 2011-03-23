@@ -127,7 +127,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
-<?php if (!$this->cachethumb) : ?>
+<?php // if (!$this->cachethumb) : ?>
+<!--
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('cachethumb').addEvent('click', function(e) {
@@ -144,6 +145,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		});
 	});
 </script>
+-->
 <?php endif; ?>
 <?php if (!$this->oldbetafiles) : ?>
 <script type="text/javascript">
@@ -249,14 +251,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</td>
 			</tr>
+<!--
 			<tr>
 				<td class="key">
-					<?php echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
+					<?php // echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
 				</td>
 				<td id="cachethumb-log">
-					<?php echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php // echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</td>
 			</tr>
+-->
 			<tr>
 				<td class="key">
 					<?php echo JText::_( 'FLEXI_CLEANUP_TEMPLATE_FILES' ); ?>

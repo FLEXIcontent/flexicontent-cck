@@ -81,9 +81,10 @@ class FlexicontentViewFileselement extends JView
 		}
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }
-		a.striketext{
+		a.striketext {
 			text-decoration: line-through;
 			color:red;
+			font-style:italic;
 		}
 		';
 		$document->addStyleDeclaration($css);

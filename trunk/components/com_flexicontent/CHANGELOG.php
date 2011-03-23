@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 523 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 527 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -105,8 +105,8 @@ $ -> Language fix or change
 ^ Small modifications to the buttons to build a better printing view
 ^ Modification of the Include Subcategories filter from checkbox to radio options. Avoid loosing the choice when changing from view (issue72)
 ^ The update version check is visible by default
-
-
+^ Add a default value to the alt attribute of the image image field plugin (60 first characters of the item title)
+^ Modify the file field and the fieldelement view to disable the filter on current item by default and allow to strike the already added files.
 
 ------------------------------------------------------
 - FLEXIcontent 1.5.3c stable - build 354 - Changelog -
