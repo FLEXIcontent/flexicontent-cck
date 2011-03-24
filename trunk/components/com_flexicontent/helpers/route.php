@@ -114,7 +114,7 @@ class FlexicontentHelperRoute
 					$match = $item; // priority 2: item id
 					//break;
 				}
-			} else if ( @$globalitems && (@$item->query['view'] == 'items') && (@$globalitems[$needles['category']]->id == @$item->query['id']) ) {
+			} else if ( @$globalitems && @$item->query['id'] && (@$item->query['view'] == 'items') && (@$globalitems[$needles['category']]->id == @$item->query['id']) ) {
 				$match = $item; // priority 3 advanced items routing (requires the system plugin)
 				//break;
 			} else if ((@$item->query['view'] == 'category') && (@$item->query['cid'] == $needles['category'])) {
