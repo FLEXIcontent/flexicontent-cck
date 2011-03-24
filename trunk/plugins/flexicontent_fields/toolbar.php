@@ -43,9 +43,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		if ($view != 'items') return;
 		$document	= & JFactory::getDocument();
 		$lang       = $document->getLanguage();
+
 		$lang   	= substr($lang, 0, 2);
 		
-		$lang		= in_array($lang, array('en','es','it')) ? $lang : 'en';
+		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
 		$display_comments	= $field->parameters->get('display-comments', 1);
@@ -87,27 +88,25 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// text resizer
 		if ($display_resizer)
 		{
+			$document->addScriptDeclaration('var textsize = '.$default_size.';
+			var lineheight = '.$default_line.';
+			function fsize(size,line,unit,id){
+				var vfontsize = document.getElementById(id);
+				if(vfontsize){
+					vfontsize.style.fontSize = size + unit;
+					vfontsize.style.lineHeight = line + unit;
+				}
+			}
+			function changetextsize(up){
+				if(up){
+					textsize 	= parseFloat(textsize)+2;
+					lineheight 	= parseFloat(lineheight)+2;
+				}else{
+					textsize 	= parseFloat(textsize)-2;
+					lineheight 	= parseFloat(lineheight)-2;
+				}
+			}');
 			$display	 .= '
-			<script type="text/javascript">
-				var textsize = '.$default_size.';
-				var lineheight = '.$default_line.';
-				function fsize(size,line,unit,id){
-					var vfontsize = document.getElementById(id);
-					if(vfontsize){
-						vfontsize.style.fontSize = size + unit;
-						vfontsize.style.lineHeight = line + unit;
-					}
-				}
-				function changetextsize(up){
-					if(up){
-						textsize 	= parseFloat(textsize)+2;
-						lineheight 	= parseFloat(lineheight)+2;
-					}else{
-						textsize 	= parseFloat(textsize)-2;
-						lineheight 	= parseFloat(lineheight)-2;
-					}
-				}
-			</script>
 			<div class="flexi-resizer toolbar-element">
 				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</a>
 				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</a>
@@ -150,9 +149,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		if ($display_voice)
 		{
 			$display .= "
-			<div class=\"flexi-voice toolbar-element\">
-				<script type=\"text/javascript\" src=\"http://vozme.com/get_text.js\"></script>
+			<div class=\"flexi-voice toolbar-element\">";
+			if($lang=='th') {//may be la=laos,and Bhutan languages in the future(NECTEC support these languges).
+			$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar/th.js');
+			$display .="
+				<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
+			";
+			}else{
+			$document->addScript('http://vozme.com/get_text.js');
+			$display .="
 				<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
+			";
+			}
+			$display .="
 			</div>
 			<div class=\"toolbar-spacer\"".$spacer."></div>
 			";
@@ -182,17 +191,17 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				<a class="addthis_button_myspace" title="'.JText::_('FLEXI_FIELD_TOOLBAR_GOOGLE').'"></a>
 				<a class="addthis_button_google" title="'.JText::_('FLEXI_FIELD_TOOLBAR_MYSPACE').'"></a>
 				<a class="addthis_button_twitter" title="'.JText::_('FLEXI_FIELD_TOOLBAR_TWITTER').'"></a>
-				</div>
+			</div>
 			';
 			if (!$addthis) {
-				$display	.= '	
+				$document->addCustomTag('	
 					<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username='.$addthis_user.'"></script>
 					<script type="text/javascript">
 					var addthis_config = {
 					     services_exclude: "print,email"
 					}
 					</script>
-				';
+				');
 				$addthis = 1;
 			}
 			$display	.= '</div>';
