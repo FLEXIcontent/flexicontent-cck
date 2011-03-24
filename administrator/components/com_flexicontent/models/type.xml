@@ -49,6 +49,10 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 <!--
 		<param name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE">
 			<option value="0">Hide</option>
