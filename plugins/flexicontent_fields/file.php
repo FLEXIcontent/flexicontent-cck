@@ -92,19 +92,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			});			
 		
 		}
-		
-			function deleteField".$field->id."(el) {
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-				}).chain(function(){
-					row.remove();
-				});
-			}
+		function deleteField".$field->id."(el) {
+			var field	= $(el);
+			var row		= field.getParent();
+			var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+			
+			fx.start({
+				'height': 0,
+				'opacity': 0			
+			}).chain(function(){
+				row.remove();
+			});
+		}
 		";
 		$document->addScriptDeclaration($js);
 
@@ -142,7 +141,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$i = 0;
 		$field->html = '<ul id="sortables_'.$field->id.'">';
-		
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
@@ -155,6 +153,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$i++;
 			}
 		}
+		$files = implode(":", $field->value);
 		$user = & JFactory::getUser();
 		//$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
 		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;items=0&amp;filter_uploader='.$user->id;

@@ -95,9 +95,17 @@ class FlexicontentViewFileselement extends JView
 		function qffileselementadd(obj, id, file) {
 			obj.className = 'striketext';//work
 			document.adminForm.file.value=id;
-			window.parent.qfSelectFile".$fieldid."(id, file);	
-			//document.adminForm.submit();	
+			window.parent.qfSelectFile".$fieldid."(id, file);
 		}
+		window.addEvent('domready', function() {
+			fileobjs = window.parent.document.getElementsByName('file[]');
+			for(i=0,n=fileobjs.length;i<n;i++) {
+				row = document.getElementById('file'+fileobjs[i].value);
+				if((typeof row) !='undefined') {
+					row.className = 'striketext';
+				}
+			}
+		});
 		";
 		$document->addScriptDeclaration($js);
 
