@@ -2,7 +2,7 @@
 /**
  * @version 1.0 $Id$
  * @package Joomla
- * @subpackage FLEXIcontent
+ * @subpackage FLEXIcontent 
  * @subpackage plugin.file
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
