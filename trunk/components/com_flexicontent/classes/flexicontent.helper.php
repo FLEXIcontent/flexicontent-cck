@@ -1488,20 +1488,21 @@ class FLEXIUtilities {
 		return (int)$lastversion;
 	}
 	function &currentMissing() {
-		$db =& JFactory::getDBO();
-		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-				" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iversion IS NULL LIMIT 0,1;";
-		$db->setQuery($query);
-		$rows = $db->loadObjectList("id");
-		$status = false;
-		foreach($rows as $r) {
-			if(!$r->iversion) {
+		static $status;
+		if(!$status) {
+			$db =& JFactory::getDBO();
+			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
+					" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+					" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iversion IS NULL LIMIT 0,1;";
+			$db->setQuery($query);
+			$rows = $db->loadObjectList("id");
+			$rows = is_array($rows)?$rows:array();
+			$status = false;
+			if(count($rows)>0) {
 				$status = true;
-				break;
 			}
+			unset($rows);
 		}
-		unset($rows);
 		return $status;
 	}
 	/**
