@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 534 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 541 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
