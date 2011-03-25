@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 40 2010-02-09 00:08:23Z emmanuel.danan $
+ * @version 1.0 $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
