@@ -168,12 +168,8 @@ class FlexicontentModelQfcategoryelement extends JModel
     	$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
 
     	//eventually only pick out the searched items.
-		if ($search) {
-
-echo '<xmp>';
-var_export($search);
-echo '</xmp>';
-
+		if ($search)
+		{
 			$list1 = array();
 
 			foreach ($search_rows as $sid )

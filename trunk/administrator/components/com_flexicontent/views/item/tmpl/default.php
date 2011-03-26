@@ -342,8 +342,13 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<table class="admintable" width="100%">
 						<?php
 						foreach ($this->fields as $field) {
-							// used to hide the core fields from this listing
-							if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
+							// used to hide the core fields and the hidden fields from this listing
+							if 	(
+									(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
+									&& 
+									(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
+								) 
+							{
 							// set the specific label for the maintext field
 								if ($field->field_type == 'maintext')
 								{
