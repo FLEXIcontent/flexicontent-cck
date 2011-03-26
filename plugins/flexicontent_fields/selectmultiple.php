@@ -172,6 +172,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$separatorf			= $field->parameters->get( 'separatorf' ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		$text_or_value		= $field->parameters->get( 'text_or_value', 1 ) ;
 						
 		switch($separatorf)
 		{
@@ -220,7 +221,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				foreach($results as $result) {
 					for($n=0, $c=count($values); $n<$c; $n++) {
 						if ($result->value == $values[$n]) {
-							$display[] = $pretext . JText::_($result->text) . $posttext;
+							$display[] = $pretext . JText::_($text_or_value ? $result->text : $result->value) . $posttext;
 						}
 					}
 				}
@@ -245,7 +246,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			foreach ($listarrays as $listarray) {
 				for($n=0, $c=count($values); $n<$c; $n++) {
 					if ($values[$n] == $listarray[0]) {
-						$display[] = JText::_($listarray[1]);
+						$display[] = JText::_($text_or_value ? $listarray[1] : $listarray[0]);
 					}
 				}
 			}			

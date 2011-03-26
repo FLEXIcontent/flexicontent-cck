@@ -170,6 +170,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
+		$text_or_value		= $field->parameters->get( 'text_or_value', 1 ) ;
 						
 		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) 	{ $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
@@ -190,7 +191,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				if ($values) {
 					foreach($results as $result) {
 						if ($result->value == $values[0]) {
-							$field->{$prop}	= $pretext . JText::_($result->text) . $posttext;
+							$field->{$prop}	= $pretext . JText::_($text_or_value ? $result->text : $result->value) . $posttext;
 						}
 					}
 				}
@@ -211,7 +212,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			if ($values) {
 				foreach ($listarrays as $listarray) {
 					if ($values[0] == $listarray[0]) {
-						$display = $pretext . JText::_($listarray[1]) . $posttext;
+						$display = $pretext . JText::_($text_or_value ? $listarray[1] : $listarray[0]) . $posttext;
 					}
 				$i++;
 				}			
