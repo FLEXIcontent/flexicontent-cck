@@ -172,14 +172,14 @@ class FlexicontentModelFileselement extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
 
-		if($filter_item) {
-			$session = JFactory::getSession();
-			$files = $session->get('fileselement.'.$filter_item, null);
-			var_dump($files);
-			$files = $files?$files:array();
-			$files2 = $this->getItemFiles($filter_item);
-			$files = array_merge($files, $files2);
-			$files = array_unique($files);
+		if($filter_item) 
+		{
+			$session	= JFactory::getSession();
+			$files 		= $session->get('fileselement.'.$filter_item, null);
+			$files 		= $files?$files:array();
+			$files2 	= $this->getItemFiles($filter_item);
+			$files 		= array_merge($files, $files2);
+			$files 		= array_unique($files);
 			$session->set('fileselement.'.$filter_item, $files);
 			$files = "'".implode("','", $files)."'";
 			$query = 'SELECT f.*, u.name AS uploader'
@@ -191,7 +191,7 @@ class FlexicontentModelFileselement extends JModel
 			//. $having
 			. $orderby
 			;
-		}else{
+		} else {
 			$query = 'SELECT f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
 			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
