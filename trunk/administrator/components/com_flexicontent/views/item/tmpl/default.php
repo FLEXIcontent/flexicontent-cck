@@ -341,6 +341,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					
 					<table class="admintable" width="100%">
 						<?php
+						$hidden = array(
+							'fcloadmodule',
+							'fcpagenav',
+							'toolbar'
+						);
 						foreach ($this->fields as $field) {
 							// used to hide the core fields and the hidden fields from this listing
 							if 	(
