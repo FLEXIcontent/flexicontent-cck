@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 544 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 545 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -51,6 +51,7 @@ $ -> Language fix or change
 + Add an argument($Itemid) to function FlexicontentHelperRoute::getItemRoute()
 + Add the advanced routing plugin to the 1.5 trunk
 + Add some parameters (id+cid) to the return string (very usefull for websites selling content)
++ Add the ability to display label or value in frontend for select or select multiple fields
 
 - Removed features
 --------------------------------------------------------------------------------------------------
