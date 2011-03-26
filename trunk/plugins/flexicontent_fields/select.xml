@@ -36,6 +36,10 @@
 		</param>
 		<param name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+		<param name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE" description="FLEXI_LABEL_OR_VALUE_DESC">
+			<option value="0">FLEXI_VALUE</option>
+			<option value="1">FLEXI_LABEL</option>
+		</param>
 		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_BEFORE_SELECT</option>
