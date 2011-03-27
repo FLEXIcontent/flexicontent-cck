@@ -1,7 +1,7 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexiadvroute.php emmanuel.danan $
- * @plugin 1.0
+ * @version 1.5 stable $Id$
+ * @plugin 1.0.2
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
