@@ -89,26 +89,6 @@ class FlexicontentViewFileselement extends JView
 		';
 		$document->addStyleDeclaration($css);
 
-		//add js to document
-		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
-		$js = "
-		function qffileselementadd(obj, id, file) {
-			obj.className = 'striketext';//work
-			document.adminForm.file.value=id;
-			window.parent.qfSelectFile".$fieldid."(id, file);
-		}
-		window.addEvent('domready', function() {
-			fileobjs = window.parent.document.getElementsByName('file[]');
-			for(i=0,n=fileobjs.length;i<n;i++) {
-				row = document.getElementById('file'+fileobjs[i].value);
-				if((typeof row) !='undefined') {
-					row.className = 'striketext';
-				}
-			}
-		});
-		";
-		$document->addScriptDeclaration($js);
-
 		if (FLEXI_ACCESS) {
 			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
 			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
@@ -123,6 +103,27 @@ class FlexicontentViewFileselement extends JView
 		$pageNav 	= & $this->get( 'Pagination' );
 		$items = & $this->get('Items');
 		$users = &$this->get('Users');
+		
+		$fname = $model->getFieldName($fieldid);
+		//add js to document
+		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
+		$js = "
+		function qffileselementadd(obj, id, file) {
+			obj.className = 'striketext';//work
+			document.adminForm.file.value=id;
+			window.parent.qfSelectFile".$fieldid."(id, file);
+		}
+		window.addEvent('domready', function() {
+			fileobjs = window.parent.document.getElementsByName('{$fname}[]');
+			for(i=0,n=fileobjs.length;i<n;i++) {
+				row = document.getElementById('file'+fileobjs[i].value);
+				if((typeof row) !='undefined') {
+					row.className = 'striketext';
+				}
+			}
+		});
+		";
+		$document->addScriptDeclaration($js);
 		
 		$files_selected = $model->getItemFiles($itemid);
 
