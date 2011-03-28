@@ -94,7 +94,7 @@ switch ($view) {
 		
 			if (!$task) {
 			
-				$query	= 'SELECT i.id, i.title, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
+				$query	= 'SELECT i.id, i.title, i.catid, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
