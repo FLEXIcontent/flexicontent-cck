@@ -292,10 +292,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
                 
                   <?php
 			if($this->params->get('show_updatecheck', 1) == 1) {	 
-			if ($this->check['current'] == 0 ) {	 
-				$title = JText::_( 'FLEXI_VERSION_OK' );
+				if($this->check['connect'] == 0) {
+					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
 				} else {
-				$title = JText::_( 'FLEXI_NEW_VERSION' );
+					if ($this->check['current'] == 0 ) {	 
+						$title = JText::_( 'FLEXI_VERSION_OK' );
+					} else {
+						$title = JText::_( 'FLEXI_NEW_VERSION' );
+					}
 				}
 			echo $this->pane->startPane( 'stat-pane' );
 			echo $this->pane->startPanel( $title, 'updatecomponent' );
