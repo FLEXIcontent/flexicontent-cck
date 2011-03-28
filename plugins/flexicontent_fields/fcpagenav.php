@@ -213,7 +213,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$html .= '
 					<span class="pagenav_prev' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_prev.'::'.$field->prevtitle.'"' : '') . '>
-						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : $prev_label ) . '</a>
+						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>
 					</span>'
 					;
 				}
@@ -222,7 +222,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$html .= '
 					<span class="pagenav_next' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_next.'::'.$field->nexttitle.':: "' : '') . '>
-						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : $next_label ) .'</a>
+						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>
 					</span>'
 					;
 				}
