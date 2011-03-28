@@ -117,9 +117,12 @@ switch ($view) {
 					die ( $database->stderr () );
 				} elseif ($row) {
 					
-					if ($row->title && !empty($cid)) {
-						if ($globalcats[$cid]->ancestorsarray) {
-							$ancestors = $globalcats[$cid]->ancestorsarray;
+					if ($row->title) {
+						// force using the default category if none is specified in the query string
+						$catid = @$cid ? $cid : $row->catid;
+						
+						if ($globalcats[$catid]->ancestorsarray) {
+							$ancestors = $globalcats[$catid]->ancestorsarray;
 							foreach ($ancestors as $ancestor) {
 								if (!in_array($ancestor, $globalnoroute)) {
 									if (shTranslateURL ( $option, $shLangName )) {
