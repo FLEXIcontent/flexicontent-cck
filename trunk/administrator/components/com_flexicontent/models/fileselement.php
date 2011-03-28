@@ -351,10 +351,11 @@ class FlexicontentModelFileselement extends JModel
 	
 	function getItems() {
 		// File field relation sub query
-		$query = 'SELECT i.id,i.title'
-			. ' FROM #__content AS i '
-			. ' WHERE i.sectionid = ' . FLEXI_SECTION
-			;
+		$query	= 'SELECT i.id, i.title'
+				. ' FROM #__content AS i '
+				. ' WHERE i.sectionid = ' . FLEXI_SECTION
+				. ' ORDER BY i.title ASC'
+				;
 		$this->_db->setQuery( $query );
 		$lists = $this->_db->loadObjectList();
 		return $lists?$lists:array();

@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 548 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 553 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -57,6 +57,7 @@ $ -> Language fix or change
 --------------------------------------------------------------------------------------------------
 - Advanced search column in the fields view because feature is not implemented yet (issue67)
 - Remove the category FLEXIaccess check for the item view (more logical) 
+- Remove the empty tooltip from the item edit form if no description exists for the field
 
 - Bug fixes
 --------------------------------------------------------------------------------------------------
@@ -108,6 +109,7 @@ $ -> Language fix or change
 ^ The update version check is visible by default
 ^ Add a default value to the alt attribute of the image image field plugin (60 first characters of the item title)
 ^ Modify the file field and the fieldelement view to disable the filter on current item by default and allow to strike the already added files.
+^ Sort the item filter by title ASC on the fileselement view
 
 ------------------------------------------------------
 - FLEXIcontent 1.5.3c stable - build 354 - Changelog -

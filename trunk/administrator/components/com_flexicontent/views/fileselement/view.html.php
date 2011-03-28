@@ -148,7 +148,7 @@ class FlexicontentViewFileselement extends JView
 		$items_list = array();
 		$items_list[] = JHTML::_('select.option', '', JText::_( '- Filter by item -' ) );
 		foreach($items as $item) {
-			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
+			$items_list[] = JHTML::_('select.option', $item->id, $item->title . ' (#' . $item->id . ')' );
 		}
 		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 		
