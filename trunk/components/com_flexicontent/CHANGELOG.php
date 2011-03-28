@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 553 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 555 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -52,6 +52,7 @@ $ -> Language fix or change
 + Add the advanced routing plugin to the 1.5 trunk
 + Add some parameters (id+cid) to the return string (very usefull for websites selling content)
 + Add the ability to display label or value in frontend for select or select multiple fields
++ Add some missing string in the fr-FR frontend language file (thanks to Annick)
 
 - Removed features
 --------------------------------------------------------------------------------------------------
