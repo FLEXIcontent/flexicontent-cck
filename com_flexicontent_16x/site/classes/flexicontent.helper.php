@@ -96,7 +96,7 @@ class flexicontent_html{
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
-				$image = JHTML::_('image.site', 'printButton.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_PRINT' ));
+				$image = JHTML::_('image.site', 'printButton.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_PRINT' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -145,7 +145,7 @@ class flexicontent_html{
 			$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'emailButton.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+				$image = JHTML::_('image.site', 'emailButton.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
 			}
