@@ -311,7 +311,7 @@ class FlexicontentModelCategory extends JModel{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
-		$where .= ' AND i.sectionid = ' . FLEXI_CATEGORY;
+		$where .= ' AND c.lft >= ' . FLEXI_CATEGORY_LFT .' AND c.rgt<= ' . FLEXI_CATEGORY_RGT;
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
