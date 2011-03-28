@@ -442,9 +442,15 @@ function deleteTag(obj) {
 			?>
 			<tr>
 				<td class="key">
+				<?php if ($field->description) : ?>
 					<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
 						<?php echo $field->label; ?>
 					</label>
+				<?php else : ?>
+					<label for="<?php echo $field->name; ?>">
+						<?php echo $field->label; ?>
+					</label>
+				<?php endif; ?>
 				</td>
 				<td>
 					<?php
