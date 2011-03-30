@@ -109,6 +109,12 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php echo $this->item->event->beforeDisplayContent; ?>
 	<!-- EOF event beforeDisplayContent -->
 
+	<?php if (isset($this->item->toc)) : ?>
+	<!-- BOF TOC -->
+	<?php echo $this->item->toc; ?>
+	<!-- EOF TOC -->
+	<?php endif; ?>
+
 	<div class="description">
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>

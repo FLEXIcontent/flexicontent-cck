@@ -365,7 +365,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
 									} else {
 										$height = $this->tparams->get('height', 400);
-										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
+										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', '' ) ;
 									}
 								}
 						?>

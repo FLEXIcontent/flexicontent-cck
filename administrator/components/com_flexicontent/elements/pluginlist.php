@@ -46,7 +46,7 @@ class JElementPluginlist extends JElement
 		$query  = 'SELECT element AS name'
 				. ' FROM #__plugins'
 				. ' WHERE folder = ' . $db->Quote('content')
-				. ' AND element NOT IN ('.$db->Quote('pagebreak').','.$db->Quote('pagenavigation').','.$db->Quote('vote').')'
+				. ' AND element NOT IN ('.$db->Quote('pagenavigation').','.$db->Quote('vote').')'
 				. ' ORDER BY name';
 		
 		$db->setQuery($query);

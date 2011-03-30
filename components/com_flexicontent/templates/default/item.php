@@ -130,6 +130,12 @@ $tmpl = $this->tmpl;
 
 	<div class="clear"></div>
 
+	<?php if (isset($this->item->toc)) : ?>
+	<!-- BOF TOC -->
+	<?php echo $this->item->toc; ?>
+	<!-- EOF TOC -->
+	<?php endif; ?>
+
 	<?php if (isset($this->item->positions['description'])) : ?>
 <!-- BOF description -->
 	<div class="description">
