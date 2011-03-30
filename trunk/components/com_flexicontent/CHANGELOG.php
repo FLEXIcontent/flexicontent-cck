@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.4 stable - build 555 - Changelog -
+- FLEXIcontent 1.5.4 stable - build 558 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -35,6 +35,7 @@ $ -> Language fix or change
 
 + New features
 --------------------------------------------------------------------------------------------------
++ Add the pagebreak feature in the default and blog templates
 + Add a default value to the field elements radio, select and select multiple
 + Add the page navigation field plugin
 + Add the load module field plugin
