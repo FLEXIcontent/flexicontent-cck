@@ -82,6 +82,8 @@ class FlexicontentController extends JController
 		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
 			$dopostinstall = true;
 		}
+		if(!$model->checkInitialPermission())
+			$dopostinstall = true;
 		return $dopostinstall;
 	}
 	/**

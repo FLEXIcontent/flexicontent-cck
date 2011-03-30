@@ -8,6 +8,7 @@
 		description ="JGLOBAL_FIELD_ID_DESC"
 		class="readonly"
 		readonly="true" />
+	<field name="asset_id" type="hidden" filter="unset" />
 	<field
 		name="field_type"
 		type="fieldtypeslist"
@@ -105,4 +106,7 @@
 		class="inputbox"
 		size="1"
 		default="" />
+	<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_LABEL"
+		description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules"
+		component="com_flexicontent" section="fields" />
 </form>

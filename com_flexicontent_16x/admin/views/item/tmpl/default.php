@@ -277,18 +277,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				</table>
 
 				<?php
-				if ($this->canRight && $this->form->getValue("id")) :
-					$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-					var slideaccess = new Fx.Slide('tabacces');
-					var slidenoaccess = new Fx.Slide('notabacces');
-					slideaccess.hide();
-						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-							slideaccess.toggle();
-							slidenoaccess.toggle();
-							});
-						});
-					");
+				if ($this->canRight) :
 				?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>

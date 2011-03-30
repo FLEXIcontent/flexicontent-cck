@@ -73,7 +73,6 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 			'status' => false);
     }
 }
-
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
@@ -95,7 +94,6 @@ if ($error) {
 		}
 	}
 }
-
 ?>
 <table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">
 	<tr>

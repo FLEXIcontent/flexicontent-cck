@@ -49,6 +49,9 @@
 		<action name="flexicontent.edit.state" title="Publish this item" description="Publish this item" />
 		<action name="flexicontent.editown.state" title="Publish own item" description="Publish own item" />
 	</section>
+	<section name="fields">
+		<action name="flexicontent.readfield" title="Can read fields" description="Can read fields" />
+	</section>
 	
 	<section name="category">
 		<action name="flexicontent.deletecat" title="Delete this category" description="Delete this category" />

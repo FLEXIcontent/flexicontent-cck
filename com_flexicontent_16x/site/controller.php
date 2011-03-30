@@ -716,7 +716,7 @@ class FlexicontentController extends JController
 	 */
 	function download()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		jimport('joomla.filesystem.file');
 
@@ -735,19 +735,19 @@ class FlexicontentController extends JController
 		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"' : '' ;
 
 		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
-				.' FROM #__flexicontent_fields_item_relations AS rel'
-				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
-				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
-				. $joinaccess
-				. $joinaccess2
-				.' WHERE rel.item_id = ' . (int)$contentid
-				.' AND rel.field_id = ' . (int)$fieldid
-				.' AND f.id = ' . (int)$id
-				.' AND f.published= 1'
-				. $andaccess
-				. $andaccess2
-				;
+		.' FROM #__flexicontent_fields_item_relations AS rel'
+		.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
+		.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+		.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+		. $joinaccess
+		. $joinaccess2
+		.' WHERE rel.item_id = ' . (int)$contentid
+		.' AND rel.field_id = ' . (int)$fieldid
+		.' AND f.id = ' . (int)$id
+		.' AND f.published= 1'
+		. $andaccess
+		. $andaccess2
+		;
 		$db->setQuery($query);
 		$file = $db->loadObject();
 
