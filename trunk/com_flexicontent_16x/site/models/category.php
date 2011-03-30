@@ -717,7 +717,7 @@ class FlexicontentModelCategory extends JModel{
 			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
 			. ' AND i.state IN (1, -5)'
-			. ' AND i.sectionid = '.FLEXI_CATEGORY
+			. ' AND c.lft >= '.FLEXI_CATEGORY_LFT.' AND c.rgt<='.FLEXI_CATEGORY_RGT
 			. $and2
 			. ' GROUP BY alpha'
 			. ' ORDER BY alpha ASC';

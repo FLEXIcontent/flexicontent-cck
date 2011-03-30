@@ -814,96 +814,149 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 	}
 	function checkInitialPermission() {
+		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
 		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
 		$db->setQuery($query);
 		$rules = $db->loadResult();
-		$rule = new JRules($rules);//echo "<xmp>";var_dump($rule->getData());echo "</xmp>";
-		return (count($rule->getData())>0);
+		$rule = new JRules($rules);
+		
+		$query = "SELECT count(asset_id) FROM #__flexicontent_fields WHERE asset_id='0';";
+		$db->setQuery($query);
+		$num = (int)$db->loadResult();
+		return ((count($rule->getData())>0) && ($num===0));
 	}
 	function initialPermission() {
+		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
+
+		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
+		$db->setQuery($query);
+		$rules = $db->loadResult();
+		$rule = new JRules($rules);
 		$query = "SELECT * FROM #__usergroups";
 		$db->setQuery($query);
 		$groups = $db->loadObjectList();
-		$rules = array();
-		$rule = array();
-		foreach($groups as $g) {
-			//{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":{"3":1},"core.delete":[],"core.edit":{"4":1},"core.edit.state":{"5":1},"core.edit.own":[]}
-			if(JAccess::checkGroup($g->id, 'core.admin')) {//super user
-				$rule['flexicontent.admin'][$g->id] = 1;//can config
+		if(count($rule->getData())<=0) {
+			
+			$rules = array();
+			$rule = array();
+			foreach($groups as $g) {
+				//{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":{"3":1},"core.delete":[],"core.edit":{"4":1},"core.edit.state":{"5":1},"core.edit.own":[]}
+				if(JAccess::checkGroup($g->id, 'core.admin')) {//super user
+					$rule['flexicontent.admin'][$g->id] = 1;//can config
+				}
+				if(JAccess::checkGroup($g->id, 'core.manage')) {
+					$rule['flexicontent.manage'][$g->id] = 1;//CanRights
+					$rule['flexicontent.manageitem'][$g->id] = 1;
+					$rule['flexicontent.managetype'][$g->id] = 1;//CanTypes
+					$rule['flexicontent.createtype'][$g->id] = 1;
+					$rule['flexicontent.deletetype'][$g->id] = 1;
+					$rule['flexicontent.edittype'][$g->id] = 1;
+					$rule['flexicontent.edittype.state'][$g->id] = 1;
+					$rule['flexicontent.fields'][$g->id] = 1;//CanFields
+					$rule['flexicontent.archives'][$g->id] = 1;//CanArchives
+					$rule['flexicontent.stats'][$g->id] = 1;//CanStats
+					$rule['flexicontent.templates'][$g->id] = 1;//CanTemplates
+					$rule['flexicontent.versioning'][$g->id] = 1;//CanVersion
+					$rule['flexicontent.tags'][$g->id] = 1;//CanTags
+					$rule['flexicontent.usetags'][$g->id] = 1;//CanUseTags
+					$rule['flexicontent.newtag'][$g->id] = 1;//CanNewTag
+					$rule['flexicontent.order'][$g->id] = 1;//CanOrder
+					$rule['flexicontent.copyitems'][$g->id] = 1;//CanCopy
+					$rule['flexicontent.paramsitem'][$g->id] = 1;//CanParams
+					$rule['flexicontent.displayallitems'][$g->id] = 1;//DisplayAllItems
+					$rule['flexicontent.managecat'][$g->id] = 1;//CanCats
+					$rule['flexicontent.usercats'][$g->id] = 1;//CanUserCats
+					$rule['flexicontent.viewtree'][$g->id] = 1;//CanViewTree
+					$rule['flexicontent.createcat'][$g->id] = 1;//CanAddCats
+					$rule['flexicontent.editallcat'][$g->id] = 1;//CanEditAllCats
+					$rule['flexicontent.deleteallcat'][$g->id] = 1;
+					$rule['flexicontent.deleteown'][$g->id] = 1;
+					$rule['flexicontent.editallcat.state'][$g->id] = 1;//CanPublishAllCats
+					$rule['flexicontent.editown'][$g->id] = 1;
+					$rule['flexicontent.edit.state'][$g->id] = 1;
+					$rule['flexicontent.editown.state'][$g->id] = 1;
+					$rule['flexicontent.deletecat'][$g->id] = 1;
+					$rule['flexicontent.deleteowncat'][$g->id] = 1;
+					$rule['flexicontent.editcat'][$g->id] = 1;
+					$rule['flexicontent.editcat.state'][$g->id] = 1;
+					$rule['flexicontent.editowncat.state'][$g->id] = 1;
+					$rule['flexicontent.editowncat'][$g->id] = 1;
+					$rule['flexicontent.managefile'][$g->id] = 1;//CanFiles
+					$rule['flexicontent.uploadfiles'][$g->id] = 1;//CanUpload
+					$rule['flexicontent.viewallfiles'][$g->id] = 1;//CanViewAllFiles
+				}
+				if(JAccess::checkGroup($g->id, 'core.create')) {
+					$rule['flexicontent.create'][$g->id] = 1;//CanAdd
+				}
+				if(JAccess::checkGroup($g->id, 'core.delete')) {
+					$rule['flexicontent.deleteall'][$g->id] = 1;//CanDelete
+				}
+				if(JAccess::checkGroup($g->id, 'core.edit')) {
+					$rule['flexicontent.editall'][$g->id] = 1;//CanEdit
+				}
+				if(JAccess::checkGroup($g->id, 'core.edit.state')) {
+					$rule['flexicontent.editall.state'][$g->id] = 1;//CanPublish
+				}
+				if(JAccess::checkGroup($g->id, 'core.edit.own')) {
+					$rule['flexicontent.editown'][$g->id] = 1;
+				}
 			}
-			if(JAccess::checkGroup($g->id, 'core.manage')) {
-				$rule['flexicontent.manage'][$g->id] = 1;//CanRights
-				$rule['flexicontent.manageitem'][$g->id] = 1;
-				$rule['flexicontent.managetype'][$g->id] = 1;//CanTypes
-				$rule['flexicontent.createtype'][$g->id] = 1;
-				$rule['flexicontent.deletetype'][$g->id] = 1;
-				$rule['flexicontent.edittype'][$g->id] = 1;
-				$rule['flexicontent.edittype.state'][$g->id] = 1;
-				$rule['flexicontent.fields'][$g->id] = 1;//CanFields
-				$rule['flexicontent.archives'][$g->id] = 1;//CanArchives
-				$rule['flexicontent.stats'][$g->id] = 1;//CanStats
-				$rule['flexicontent.templates'][$g->id] = 1;//CanTemplates
-				$rule['flexicontent.versioning'][$g->id] = 1;//CanVersion
-				$rule['flexicontent.tags'][$g->id] = 1;//CanTags
-				$rule['flexicontent.usetags'][$g->id] = 1;//CanUseTags
-				$rule['flexicontent.newtag'][$g->id] = 1;//CanNewTag
-				$rule['flexicontent.order'][$g->id] = 1;//CanOrder
-				$rule['flexicontent.copyitems'][$g->id] = 1;//CanCopy
-				$rule['flexicontent.paramsitem'][$g->id] = 1;//CanParams
-				$rule['flexicontent.displayallitems'][$g->id] = 1;//DisplayAllItems
-				$rule['flexicontent.managecat'][$g->id] = 1;//CanCats
-				$rule['flexicontent.usercats'][$g->id] = 1;//CanUserCats
-				$rule['flexicontent.viewtree'][$g->id] = 1;//CanViewTree
-				$rule['flexicontent.createcat'][$g->id] = 1;//CanAddCats
-				$rule['flexicontent.editallcat'][$g->id] = 1;//CanEditAllCats
-				$rule['flexicontent.deleteallcat'][$g->id] = 1;
-				$rule['flexicontent.deleteown'][$g->id] = 1;
-				$rule['flexicontent.editallcat.state'][$g->id] = 1;//CanPublishAllCats
-				$rule['flexicontent.editown'][$g->id] = 1;
-				$rule['flexicontent.edit.state'][$g->id] = 1;
-				$rule['flexicontent.editown.state'][$g->id] = 1;
-				$rule['flexicontent.deletecat'][$g->id] = 1;
-				$rule['flexicontent.deleteowncat'][$g->id] = 1;
-				$rule['flexicontent.editcat'][$g->id] = 1;
-				$rule['flexicontent.editcat.state'][$g->id] = 1;
-				$rule['flexicontent.editowncat.state'][$g->id] = 1;
-				$rule['flexicontent.editowncat'][$g->id] = 1;
-				$rule['flexicontent.managefile'][$g->id] = 1;//CanFiles
-				$rule['flexicontent.uploadfiles'][$g->id] = 1;//CanUpload
-				$rule['flexicontent.viewallfiles'][$g->id] = 1;//CanViewAllFiles
+			foreach($rule as $key=>$ar) {
+				$rules[$key] = new JRule($ar);
 			}
-			if(JAccess::checkGroup($g->id, 'core.create')) {
-				$rule['flexicontent.create'][$g->id] = 1;//CanAdd
-			}
-			if(JAccess::checkGroup($g->id, 'core.delete')) {
-				$rule['flexicontent.deleteall'][$g->id] = 1;//CanDelete
-			}
-			if(JAccess::checkGroup($g->id, 'core.edit')) {
-				$rule['flexicontent.editall'][$g->id] = 1;//CanEdit
-			}
-			if(JAccess::checkGroup($g->id, 'core.edit.state')) {
-				$rule['flexicontent.editall.state'][$g->id] = 1;//CanPublish
-			}
-			if(JAccess::checkGroup($g->id, 'core.edit.own')) {
-				$rule['flexicontent.editown'][$g->id] = 1;
-			}
-		}
-		foreach($rule as $key=>$ar) {
-			$rules[$key] = new JRule($ar);
-		}
-		$jrules = new JRules($rules);
+			$jrules = new JRules($rules);
 		
-		$query = "SELECT id FROM #__assets WHERE name='com_flexicontent';";
-		$db->setQuery($query);
-		$id = $db->loadResult();
-		if($id) {
-			$query = "UPDATE #__assets SET rules='".$jrules->__toString()."' WHERE id='{$id}';";
+			$query = "SELECT id FROM #__assets WHERE name='com_flexicontent';";
 			$db->setQuery($query);
-			if($db->query()) return true;
+			$id = $db->loadResult();
+			if($id) {
+				$query = "UPDATE #__assets SET rules='".$jrules->__toString()."' WHERE id='{$id}';";
+				$db->setQuery($query);
+				if(!$db->query()) return false;
+			}
 		}
-		return false;
+		$query = "SELECT id FROM #__flexicontent_fields WHERE asset_id='0';";
+		$db->setQuery($query);
+		$rows = $db->loadResultArray();
+		if(count($rows)>0) {
+			$asset	= JTable::getInstance('Asset');
+			$parentId = 1;
+			foreach($rows as $id) {
+				$name = "flexicontent.field.{$id}";
+				$query = "SELECT id FROM #__assets WHERE name='{$name}';";
+				$db->setQuery($query);
+				$asset_id = $db->loadResult();
+				if(!$asset_id) {
+					$asset->loadByName($name);
+					$asset->id = null;
+					if ($asset->parent_id != $parentId) {
+						$asset->setLocation($parentId, 'last-child');
+					}
+					// Prepare the asset to be stored.
+					$asset->parent_id	= $parentId;
+					$asset->name		= $name;
+					$asset->title		= $name;
+					$rules = array();
+					$rule = array();
+					foreach($groups as $g) {
+						$rule['flexicontent.readfield'][$g->id] = 1;
+					}
+					$rules['flexicontent.readfield'] = new JRule($rule['flexicontent.readfield']);
+					$jrules = new JRules($rules);
+					$asset->rules = $jrules->__toString();
+					if (!$asset->check() || !$asset->store(false)) {
+						return false;
+					}
+					$asset_id = $asset->id;
+				}
+				$query = "UPDATE #__flexicontent_fields SET asset_id='{$asset_id}' WHERE id='{$id}';";
+				$db->setQuery($query);
+				$db->query();
+			}
+		}
+		return true;
 	}
 }
 ?>

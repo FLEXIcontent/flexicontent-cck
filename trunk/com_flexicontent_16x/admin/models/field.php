@@ -170,48 +170,39 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @since	1.6
 	 */
 	public function getItem($pk = null) {
-		// Initialise variables.
-		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-		$table	= $this->getTable('flexicontent_fields', '');
+		static $item;
+		if(!$item) {
+			// Initialise variables.
+			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
+			$table	= $this->getTable('flexicontent_fields', '');
 
-		if ($pk > 0) {
-			// Attempt to load the row.
-			$return = $table->load($pk);
+			if ($pk > 0) {
+				// Attempt to load the row.
+				$return = $table->load($pk);
 
-			// Check for a table object error.
-			if ($return === false && $table->getError()) {
-				$this->setError($table->getError());
-				return false;
+				// Check for a table object error.
+				if ($return === false && $table->getError()) {
+					$this->setError($table->getError());
+					return false;
+				}
+			}else{
+				$table->name					= 'field' . ($this->_getLastId() + 1);
 			}
-		}else{
-			/*$table->id					= 0;
-			$table->field_type				= null;*/
-			$table->name					= 'field' . ($this->_getLastId() + 1);
-			/*$table->label					= null;
-			$table->description				= '';
-			$table->isfilter				= 0;
-			$table->iscore					= 0;
-			$table->issearch				= 1;
-			$table->isadvsearch				= 0;
-			$table->positions				= array();
-			$table->published				= 1;
-			$table->attribs					= null;
-			$table->access					= 0;*/
-		}
 
-		// Convert to the JObject before adding other data.
-		$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
-		if ($pk > 0) {
-			$item->tid = $this->getTypesselected();
-		}
+			// Convert to the JObject before adding other data.
+			$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+			if ($pk > 0) {
+				$item->tid = $this->getTypesselected();
+			}
 
-		if (property_exists($item, 'attribs')) {
-			$registry = new JRegistry;
-			$registry->loadJSON($item->attribs);
-			$item->attribs = $registry->toArray();
+			if (property_exists($item, 'attribs')) {
+				$registry = new JRegistry;
+				$registry->loadJSON($item->attribs);
+				$item->attribs = $registry->toArray();
+			}
+			$field_type = $pk ? $table->field_type : JRequest::getVar('field_type', '');
+			$this->setState('field.field_type', $field_type);
 		}
-		$field_type = $pk ? $table->field_type : JRequest::getVar('field_type', '');
-		$this->setState('field.field_type', $field_type);
 		return $item;
 	}
 	
@@ -428,13 +419,11 @@ class FlexicontentModelField extends JModelAdmin{
 
 		$field  	=& $this->getTable('flexicontent_fields', '');
 		$types		= $data['jform']['tid'];
-		
 		// bind it to the table
 		if (!$field->bind($data['jform'])) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		
 		$attribs		= $data['jform']['attribs'];
 
 		// Build parameter INI string
@@ -459,13 +448,25 @@ class FlexicontentModelField extends JModelAdmin{
 			$this->setError($field->getError() );
 			return false;
 		}
-
+		$field->setRules($data['jform']['rules']);
+		$field->_trackAssets = true;
 		// Store it in the db
 		if (!$field->store()) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-
+		//work
+		$query = "SELECT asset_id FROM #__flexicontent_fields WHERE id='{$field->id}';";
+		$this->_db->setQuery($query);
+		$asset_id = $this->_db->loadResult();
+		if($field->asset_id && !$asset_id) {
+			$query = $this->_db->getQuery(true);
+			$query->update($this->_db->nameQuote('#__flexicontent_fields'));
+			$query->set('asset_id = '.(int) $field->asset_id);
+			$query->where($this->_db->nameQuote('id').' = '.(int) $field->id);
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
 		// Add the id to the name if it's a new field only
 		// I know it's a little tricky but it functions
 /*

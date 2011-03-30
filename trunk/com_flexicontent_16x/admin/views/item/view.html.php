@@ -76,7 +76,6 @@ class FlexicontentViewItem extends JView {
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
 
-
 		//Get data from the model
 		$model			= & $this->getModel();
 		$form		= $this->get('Form');
@@ -98,7 +97,7 @@ class FlexicontentViewItem extends JView {
 		$pagecount	= (int)ceil($versioncount/$versionsperpage);
 		$allversions		= & $model->getVersionList();//get all versions.
 		$current_page = 1;
-		$k=1;//echo "<xmp>";var_dump($fields);echo "</xmp>";
+		$k=1;
 		foreach($allversions as $v) {
 			if( $k && (($k%$versionsperpage)==0) ) 
 				$current_page++;

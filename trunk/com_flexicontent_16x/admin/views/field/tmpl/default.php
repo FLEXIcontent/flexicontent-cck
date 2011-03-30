@@ -125,6 +125,20 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 				</table>
 			</fieldset>
+			<?php
+				if ($this->permission->CanRights) :
+			?>
+				<fieldset class="flexiaccess">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+					<table id="tabacces" class="admintable" width="100%">
+				    	<tr>
+				    		<td>
+				        		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+				        	</td>
+				    	</tr>
+					</table>
+               			</fieldset>
+			<?php endif; ?>
 		</td>
 
 		<td valign="top" width="40%" style="padding: 7px 0 0 5px">

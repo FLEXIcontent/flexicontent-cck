@@ -17,7 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-
+jimport('joomla.database.tableasset');
+jimport('joomla.access.rules');
 /**
  * FLEXIcontent table class
  *
@@ -61,6 +62,7 @@ class flexicontent_fields extends JTable{
 	var $access 			= 0;
 	/** @var int */
 	var $ordering 			= null;
+	var $_trackAssets 		= true;
 
 	function flexicontent_fields(& $db) {
 		parent::__construct('#__flexicontent_fields', 'id', $db);
@@ -82,9 +84,9 @@ class flexicontent_fields extends JTable{
 
 		/** check for existing name */
 		$query = 'SELECT id'
-				.' FROM #__flexicontent_fields'
-				.' WHERE name = '.$this->_db->Quote($this->name)
-				;
+			.' FROM #__flexicontent_fields'
+			.' WHERE name = '.$this->_db->Quote($this->name)
+			;
 		$this->_db->setQuery($query);
 
 		$xid = intval($this->_db->loadResult());
@@ -92,8 +94,126 @@ class flexicontent_fields extends JTable{
 			JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('FLEXI_THIS_FIELD_NAME_ALREADY_EXIST', $this->name));
 			return false;
 		}
-	
 		return true;
 	}
+	
+	/**
+	 * Method to compute the default name of the asset.
+	 * The default name is in the form `table_name.id`
+	 * where id is the value of the primary key of the table.
+	 *
+	 * @return	string
+	 * @since	1.6
+	 */
+	protected function _getAssetName() {
+		$k = $this->_tbl_key;
+		return 'flexicontent.field.'.(int) $this->$k;
+	}
+	
+	/**
+	 * Method to store a row in the database from the JTable instance properties.
+	 * If a primary key value is set the row with that primary key value will be
+	 * updated with the instance property values.  If no primary key value is set
+	 * a new row will be inserted into the database with the properties from the
+	 * JTable instance.
+	 *
+	 * @param	boolean True to update fields even if they are null.
+	 * @return	boolean	True on success.
+	 * @since	1.0
+	 * @link	http://docs.joomla.org/JTable/store
+	 */
+	/*public function store($updateNulls = false) {
+		// Initialise variables.
+		$k = $this->_tbl_key;
+
+		// The asset id field is managed privately by this class.
+		if ($this->_trackAssets) {
+			unset($this->asset_id);
+		}
+
+		// If a primary key exists update the object, otherwise insert it.
+		if ($this->$k) {
+			$stored = $this->_db->updateObject($this->_tbl, $this, $this->_tbl_key, $updateNulls);
+		}
+		else {
+			$stored = $this->_db->insertObject($this->_tbl, $this, $this->_tbl_key);
+		}
+
+		// If the store failed return false.
+		if (!$stored) {
+			$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $this->_db->getErrorMsg()));
+			$this->setError($e);
+			return false;
+		}
+		$this->load($this->id);
+
+		// If the table is not set to track assets return true.
+		if (!$this->_trackAssets) {
+			return true;
+		}
+
+		if ($this->_locked) {
+			$this->_unlock();
+		}
+
+		//
+		// Asset Tracking
+		//
+
+		$parentId	= $this->_getAssetParentId();
+		$name		= $this->_getAssetName();
+		$title		= $this->_getAssetTitle();
+
+		$asset	= JTable::getInstance('Asset');
+		$asset->loadByName($name);
+
+		// Re-inject the asset id.
+		//$this->asset_id = $asset->id;
+		$asset_id = $asset->id;
+
+		// Check for an error.
+		if ($error = $asset->getError()) {
+			$this->setError($error);
+			return false;
+		}
+
+		// Specify how a new or moved node asset is inserted into the tree.
+		if (empty($asset_id) || $asset->parent_id != $parentId) {
+			$asset->setLocation($parentId, 'last-child');
+		}
+
+		// Prepare the asset to be stored.
+		$asset->parent_id	= $parentId;
+		$asset->name		= $name;
+		$asset->title		= $title;
+
+		if ($this->_rules instanceof JRules) {
+			$asset->rules = (string) $this->_rules;
+		}
+
+		if (!$asset->check() || !$asset->store($updateNulls)) {
+			$this->setError($asset->getError());
+			return false;
+		}
+
+		if ($asset->id && empty($this->asset_id)) {
+			// Update the asset_id field in this table.
+			$this->asset_id = (int) $asset->id;
+
+			$query = $this->_db->getQuery(true);
+			$query->update($this->_db->nameQuote($this->_tbl));
+			$query->set('asset_id = '.(int) $this->asset_id);
+			$query->where($this->_db->nameQuote($k).' = '.(int) $this->$k);
+			$this->_db->setQuery($query);
+
+			if (!$this->_db->query()) {
+				$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
+				$this->setError($e);
+				return false;
+			}
+		}
+
+		return true;
+	}*/
 }
 ?>

@@ -104,13 +104,14 @@ class FlexicontentViewField extends JView {
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
-
+		$permission = &FlexicontentHelperPerm::getPerm();
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		$this->assignRef('document'      , $document);
+		$this->assignRef('document'     , $document);
 		$this->assignRef('row'      	, $row);
+		$this->assignRef('permission'   , $permission);
 		$this->assignRef('lists'      	, $lists);
 //		$this->assignRef('tmpls'      	, $tmpls);
 		//$this->assignRef('aform'	, $aform);
