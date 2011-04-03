@@ -480,9 +480,9 @@ class FlexicontentViewItems extends JView
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
-		if ($params->get('ilayout')) {
-			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$params->get('ilayout'));
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$params->get('ilayout'));
+		if ($tparams->get('ilayout')) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$tparams->get('ilayout'));
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$tparams->get('ilayout'));
 		}
 
 		parent::display($tpl);
