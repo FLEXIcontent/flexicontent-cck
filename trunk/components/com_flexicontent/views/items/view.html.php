@@ -466,6 +466,24 @@ class FlexicontentViewItems extends JView
 		$this->assignRef('tparams', 	$tparams);
 		$this->assignRef('perms', 		$perms);
 		$this->assignRef('document',	$document);
+		
+		/*
+		 * Set template paths : this procedure is issued from K2 component
+		 *
+		 * "K2" Component by JoomlaWorks for Joomla! 1.5.x - Version 2.1
+		 * Copyright (c) 2006 - 2009 JoomlaWorks Ltd. All rights reserved.
+		 * Released under the GNU/GPL license: http://www.gnu.org/copyleft/gpl.html
+		 * More info at http://www.joomlaworks.gr and http://k2.joomlaworks.gr
+		 * Designed and developed by the JoomlaWorks team
+		 */
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
+		if ($params->get('ilayout')) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$params->get('ilayout'));
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$params->get('ilayout'));
+		}
 
 		parent::display($tpl);
 	}
