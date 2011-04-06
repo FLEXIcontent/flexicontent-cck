@@ -16,6 +16,23 @@
  */
 
 -----------------------------------------------------
+- FLEXIcontent 1.5.5 stable - build xxx - Changelog -
+-----------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+- Bug fixes
+--------------------------------------------------------------------------------------------------
+# Fix issue : Editor buttons were not active anymore
+
+
+-----------------------------------------------------
 - FLEXIcontent 1.5.4 stable - build 558 - Changelog -
 -----------------------------------------------------
 Legend:
