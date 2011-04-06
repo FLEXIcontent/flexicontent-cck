@@ -193,8 +193,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				<a href="http://www.addthis.com/bookmark.php?v=250&username='.$addthis_user.'" class="addthis_button_compact">'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'</a>
 				<span class="addthis_separator">|</span>
 				<a class="addthis_button_facebook" title="'.JText::_('FLEXI_FIELD_TOOLBAR_FACEBOOK').'"></a>
-				<a class="addthis_button_myspace" title="'.JText::_('FLEXI_FIELD_TOOLBAR_GOOGLE').'"></a>
-				<a class="addthis_button_google" title="'.JText::_('FLEXI_FIELD_TOOLBAR_MYSPACE').'"></a>
+				<a class="addthis_button_myspace" title="'.JText::_('FLEXI_FIELD_TOOLBAR_MYSPACE').'"></a>
+				<a class="addthis_button_google" title="'.JText::_('FLEXI_FIELD_TOOLBAR_GOOGLE').'"></a>
 				<a class="addthis_button_twitter" title="'.JText::_('FLEXI_FIELD_TOOLBAR_TWITTER').'"></a>
 			</div>
 			';
