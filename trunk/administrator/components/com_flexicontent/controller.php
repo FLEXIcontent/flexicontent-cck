@@ -55,7 +55,6 @@ class FlexicontentController extends JController
 		$this->registerTask( 'applyacl'					, 'saveacl' );
 		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
 		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
-		$this->registerTask( 'cachethumbchmod'			, 'setCacheThumbChmod' );
 		$this->registerTask( 'publishplugins'			, 'publishplugins' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
@@ -230,34 +229,6 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
 			echo '<span class="install-ok"></span>';
-		}
-	}
-
-	/**
-	 * Method to check if the permissions of Phpthumb cache folder
-	 *
-	 * @access public
-	 * @return	boolean	True on success
-	 */
-	function setCacheThumbChmod()
-	{
-		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-
-		jimport('joomla.client.helper');
-		JClientHelper::setCredentialsFromRequest('ftp');
-		jimport('joomla.filesystem.file');
-
-		// Open phpThumb cache directory
-		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-		if (JPath::canChmod($phpthumbcache)) { 
-    		if (!JPath::setPermissions($phpthumbcache, '0666', '0777')) {
-				echo JText::_('Cannot set permissions, please do it manualy');
-    		} else {
-				echo '<span class="install-ok"></span>';
-    		}
-		} else {
-			echo JText::_('Cannot set permissions, please do it manualy');
 		}
 	}
 
