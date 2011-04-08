@@ -1492,8 +1492,8 @@ class FLEXIUtilities {
 		if(!$status) {
 			$db =& JFactory::getDBO();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-					" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-					" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iversion IS NULL LIMIT 0,1;";
+				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+				" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL LIMIT 0,1;";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
 			$rows = is_array($rows)?$rows:array();
