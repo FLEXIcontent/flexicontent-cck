@@ -290,10 +290,14 @@ class FlexicontentModelCategory extends JModel{
 		$_group_cats = "'".implode("','", $_group_cats)."'";
 		
 		// Get the site default language in case no language is set in the url
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang 		= $languages->get('site', 'en-GB');
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
+		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
@@ -439,18 +443,18 @@ class FlexicontentModelCategory extends JModel{
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
 		// Get the site default language in case no language is set in the url
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang 		= $languages->get('site', 'en-GB');
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
+		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
-
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
 
 		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
 		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
@@ -720,10 +724,13 @@ class FlexicontentModelCategory extends JModel{
 		$gid      = (int) $user->get('aid');
 
 		// Get the site default language in case no language is set in the url
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang 		= $languages->get('site', 'en-GB');
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', substr($lang, 0, 2) );
+		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		
 		$now = $mainframe->get('requestTime');
 		$nullDate = $this->_db->getNullDate();
