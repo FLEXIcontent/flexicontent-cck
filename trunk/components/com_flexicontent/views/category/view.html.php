@@ -202,6 +202,7 @@ class FlexicontentViewCategory extends JView
 			} else {
 				if (in_array($item->catid, $globalnoroute)) {
 					$allcats = array();
+					$item->cats = $item->cats?$item->cats:array();
 					foreach ($item->cats as $cat) {
 						array_push($allcats, $cat->id);
 					}

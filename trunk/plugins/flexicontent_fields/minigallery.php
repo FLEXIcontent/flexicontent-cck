@@ -56,7 +56,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		}
 
 		function qfSelectFile".$field->id."(id, file) {
-		
 			var name 	= 'a_name'+id;
 			var ixid 	= randomString();			
 			var li 		= document.createElement('li');
@@ -84,7 +83,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
-			hid.name = '".$field->name."['+ixid+']';
+			//hid.name = '".$field->name."['+ixid+']';
+			hid.name = '".$field->name."[]';
 			hid.value = id;
 			hid.id = ixid;
 			
@@ -182,13 +182,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id;
 		$field->html .= "
-						</ul>
-						<div class=\"button-add\">
-							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-							</div>
-						</div>
-						";
+		</ul>
+		<div class=\"button-add\">
+			<div class=\"blank\">
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+			</div>
+		</div>
+		";
 	}
 
 

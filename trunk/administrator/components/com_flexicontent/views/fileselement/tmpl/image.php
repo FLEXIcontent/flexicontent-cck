@@ -127,14 +127,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="center">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<img src='<?php echo $srcb; ?>' alt='<?php echo $row->filename; ?>' />
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<a style="cursor:pointer" onclick="qffileselementadd(document.getElementById('file<?php echo $row->id;?>'), '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<img src="<?php echo $src; ?>" alt="<?php echo $row->filename; ?>" />
 				</a>
 				</span>
 			</td>
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<a style="cursor:pointer" id="file<?php echo $row->id;?>" onclick="qffileselementadd(this, '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 				</span>
