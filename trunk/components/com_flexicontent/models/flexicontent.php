@@ -116,6 +116,13 @@ class FlexicontentModelFlexicontent extends JModel
 		$rootcat	= $params->get('rootcat');
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 		// show unauthorized items
@@ -258,6 +265,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$params 	=& $mainframe->getParams('com_flexicontent');
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 		// show unauthorized items
@@ -346,6 +359,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$params 	=& $mainframe->getParams('com_flexicontent');
 		// shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 

@@ -213,8 +213,14 @@ class FlexicontentModelTags extends JModel
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 		$params 	= & $mainframe->getParams('com_flexicontent');
-		// shortcode of the site active language (joomfish)
+		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		$filtertag  = $params->get('filtertag', 0);
 
 		// First thing we need to do is to select only the requested items
