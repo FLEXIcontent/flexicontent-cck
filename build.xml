@@ -20,7 +20,29 @@
 				<exclude name="uploads/**" />
 			</fileset>
 		</copy>
-		
+
+		<!-- modules -->		
+		<copy file="modules/mod_flexicontent/helper.php" tofile="flexipack/modules/mod_flexicontent/helper.php" />
+		<copy file="modules/mod_flexicontent/index.html" tofile="flexipack/modules/mod_flexicontent/index.html" />
+		<copy file="modules/mod_flexicontent/mod_flexicontent.php" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.php" />
+		<copy file="modules/mod_flexicontent/mod_flexicontent.xml" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.xml" />
+		<copy file="language/en-GB/en-GB.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/en-GB.mod_flexicontent.ini" />
+		<copy todir="flexipack/modules/mod_flexicontent/classes" >
+			<fileset dir="modules/mod_flexicontent/classes">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexicontent/elements" >
+			<fileset dir="modules/mod_flexicontent/elements">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexicontent/tmpl" >
+			<fileset dir="modules/mod_flexicontent/tmpl">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
 		<!-- plugins -->
 		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="flexipack/plugins/checkbox/checkbox.php" />
 		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="flexipack/plugins/checkbox/checkbox.xml" />
