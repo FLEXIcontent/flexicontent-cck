@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build xxx - Changelog -
+- FLEXIcontent 1.5.5 stable - build 567 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -27,9 +27,25 @@ $ -> Language fix or change
 - -> Removed
 ! -> Note
 
-- Bug fixes
+# Bug fixes
 --------------------------------------------------------------------------------------------------
+# Fix issue : Bug plugin minigalerie with fileselement.
+# Fix issue : Bug query error about i.version , change to be iv.version no c.version
+# Fix issue : Bug in components/com_flexicontent/views/category/view.html.php on line 205 around foreach ($item->cats as $cat)
+# Fix issue : Bug when displaying a view on frontend and no lang var is set in the query string (issue 121) Thanks to Adrien (Acymailing) for the fix ;)))
+# Fix issue : Bad alt text in toolbar plugin for social bookmarking (issue115)
 # Fix issue : Editor buttons were not active anymore
+# Fix issue : Bug about including the template.(change $params to be $tparams)
+
++ New features
+--------------------------------------------------------------------------------------------------
++ Allow forms to use template.
++ Add the flexicontent module
+
+- Removed features
+--------------------------------------------------------------------------------------------------
+- Cleanup : Remove the deprecated method setCacheThumbChmod() - thanks to Brian Teeman for reporting ;-)))
+
 
 
 -----------------------------------------------------
