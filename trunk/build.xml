@@ -26,7 +26,7 @@
 		<copy file="modules/mod_flexicontent/index.html" tofile="flexipack/modules/mod_flexicontent/index.html" />
 		<copy file="modules/mod_flexicontent/mod_flexicontent.php" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.php" />
 		<copy file="modules/mod_flexicontent/mod_flexicontent.xml" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.xml" />
-		<copy file="language/en-GB/en-GB.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/en-GB.mod_flexicontent.ini" />
+		<copy file="language/en-GB/en-GB.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/languages/en-GB.mod_flexicontent.ini" />
 		<copy todir="flexipack/modules/mod_flexicontent/classes" >
 			<fileset dir="modules/mod_flexicontent/classes">
 				<exclude name=".**" />
