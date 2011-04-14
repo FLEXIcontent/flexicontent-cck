@@ -89,7 +89,7 @@ if ($add_ccs && $caching && !${$layout}) {
 					<?php endif; ?>
 				</div>
 				<?php endif; ?>
-				<?php if ($display_title_feat || $display_text_feat || $mod_readmore_feat) : ?>
+				<?php if ($display_title_feat || $display_text_feat || $mod_readmore_feat || ($use_fields && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured">
 					<?php if ($display_title_feat) : ?>
 					<div class="news_title">
@@ -145,7 +145,7 @@ if ($add_ccs && $caching && !${$layout}) {
 					<?php endif; ?>
 				</div>
 				<?php endif; ?>
-				<?php if ($display_title || $display_text || $mod_readmore) : ?>
+				<?php if ($display_title || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard">
 					<?php if ($display_title) : ?>
 					<div class="news_title">
