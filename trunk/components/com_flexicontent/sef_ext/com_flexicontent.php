@@ -248,7 +248,10 @@ switch ($view) {
 		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . '/';
 	break;
 
-	
+	case 'fileselement' :
+		$dosef = false;
+	break;
+		
 	default :
 		$title [] = '/';
 	break;
