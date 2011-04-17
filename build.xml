@@ -43,6 +43,22 @@
 			</fileset>
 		</copy>
 
+		<copy file="modules/mod_flexitagcloud/helper.php" tofile="flexipack/modules/mod_flexitagcloud/helper.php" />
+		<copy file="modules/mod_flexitagcloud/index.html" tofile="flexipack/modules/mod_flexitagcloud/index.html" />
+		<copy file="modules/mod_flexitagcloud/mod_flexitagcloud.php" tofile="flexipack/modules/mod_flexitagcloud/mod_flexitagcloud.php" />
+		<copy file="modules/mod_flexitagcloud/mod_flexitagcloud.xml" tofile="flexipack/modules/mod_flexitagcloud/mod_flexitagcloud.xml" />
+		<copy file="language/en-GB/en-GB.mod_flexitagcloud.ini" tofile="flexipack/modules/mod_flexitagcloud/languages/en-GB.mod_flexitagcloud.ini" />
+		<copy todir="flexipack/modules/mod_flexitagcloud/elements" >
+			<fileset dir="modules/mod_flexitagcloud/elements">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexitagcloud/tmpl" >
+			<fileset dir="modules/mod_flexitagcloud/tmpl">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
 		<!-- plugins -->
 		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="flexipack/plugins/checkbox/checkbox.php" />
 		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="flexipack/plugins/checkbox/checkbox.xml" />
