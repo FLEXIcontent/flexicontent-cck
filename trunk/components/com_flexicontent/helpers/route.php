@@ -35,7 +35,7 @@ class FlexicontentHelperRoute
 	/**
 	 * @param	int	The route of the item
 	 */
-	function getItemRoute($id, $catid = 0, $Itemid=0)
+	function getItemRoute($id, $catid = 0, $Itemid = 0)
 	{
 		$needles = array(
 			'items'  => (int) $id,
@@ -60,7 +60,7 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 
-	function getCategoryRoute($catid, $Itemid=0) {
+	function getCategoryRoute($catid, $Itemid = 0) {
 		$needles = array(
 			'category' => (int) $catid
 		);
@@ -70,14 +70,14 @@ class FlexicontentHelperRoute
 
 		if($Itemid) {
 			$link .= '&Itemid='.$Itemid;
-		}elseif($item = FlexicontentHelperRoute::_findCategory($needles)) {
+		} elseif($item = FlexicontentHelperRoute::_findCategory($needles)) {
 			$link .= '&Itemid='.$item->id;
-		};
+		}
 
 		return $link;
 	}
 	
-	function getTagRoute($id)
+	function getTagRoute($id, $Itemid = 0)
 	{
 		$needles = array(
 			'tags' => (int) $id
@@ -86,9 +86,11 @@ class FlexicontentHelperRoute
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=tags&id='.$id;
 
-		if($item = FlexicontentHelperRoute::_findTag($needles)) {
+		if($Itemid) {
+			$link .= '&Itemid='.$Itemid;
+		} elseif($item = FlexicontentHelperRoute::_findTag($needles)) {
 			$link .= '&Itemid='.$item->id;
-		};
+		}
 
 		return $link;
 	}
@@ -172,7 +174,7 @@ class FlexicontentHelperRoute
 					break;
 				} else if (@$item->query['view'] == $needle) {
 					$match = $item;
-					break;
+//					break;
 				}
 			}
 
