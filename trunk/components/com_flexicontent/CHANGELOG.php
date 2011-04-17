@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 567 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 572 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -36,11 +36,14 @@ $ -> Language fix or change
 # Fix issue : Bad alt text in toolbar plugin for social bookmarking (issue115)
 # Fix issue : Editor buttons were not active anymore
 # Fix issue : Bug about including the template.(change $params to be $tparams)
+# Fix issue : bug when adding a file in frontend with sh404 (issue 125)
 
 + New features
 --------------------------------------------------------------------------------------------------
 + Allow forms to use template.
 + Add the flexicontent module
++ Add : force a specific Itemid when routing a tag
++ Add the flexicontent tagcloud module
 
 - Removed features
 --------------------------------------------------------------------------------------------------

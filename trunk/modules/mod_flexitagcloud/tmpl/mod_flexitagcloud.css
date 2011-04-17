@@ -1,0 +1,16 @@
+#flexicloud { padding: 2px; line-height: 2.2em; text-align: center; }
+#flexicloud a { padding: 0px; }
+#flexicloud a.tag1 { font-size: 0.7em; font-weight: 100; }
+#flexicloud a.tag2 { font-size: 0.8em; font-weight: 200; }
+#flexicloud a.tag3 { font-size: 0.9em; font-weight: 300; }
+#flexicloud a.tag4 { font-size: 1.0em; font-weight: 400; }
+#flexicloud a.tag5 { font-size: 1.2em; font-weight: 500; }
+#flexicloud a.tag6 { font-size: 1.4em; font-weight: 600; }
+#flexicloud a.tag7 { font-size: 1.6em; font-weight: 700; }
+#flexicloud a.tag8 { font-size: 1.8em; font-weight: 800; }
+#flexicloud a.tag9 { font-size: 2.2em; font-weight: 900; }
+#flexicloud a.tag10 { font-size: 2.5em; font-weight: 900; }
+#flexicloud { margin: 0; }
+#flexicloud li { display: inline; }
+/* hide the extra context from CSS-enabled browsers, but not screenreaders */
+#flexicloud span { position: absolute; left: -9999px; width: 990px; }
