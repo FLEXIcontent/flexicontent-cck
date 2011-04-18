@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 	function plgFlexicontent_fieldsCheckbox( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
+        	JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item) {
@@ -73,21 +73,19 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
-			}
-
+		}
 		$i = 0;
 		$options  = "";
 		foreach ($listarrays as $listarray) {
 			$checked  = "";
 			for($n=0, $c=count($field->value); $n<$c; $n++) {
 				if ($field->value[$n] == $listarray[0]) {
-						$checked = ' checked="checked"';
-					}
-				} 
-			$options .= '<label><input type="checkbox" class="" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+					$checked = ' checked="checked"';
+				}
+			} 
+			$options .= '<label><input type="checkbox" class="'.$required.'" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
 		}
-			
 		$field->html	= $options;
 	}
 
