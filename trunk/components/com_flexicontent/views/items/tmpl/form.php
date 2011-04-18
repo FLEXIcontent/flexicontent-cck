@@ -186,6 +186,18 @@ function checkRequired() {
 			if(!flag) {
 				element = focusElement(element, el);
 			}
+		}else if( (ftype=='checkbox') && (element==null) ) {
+			eles = document.getElementsByName(el.name);
+			flag = false;
+			for(i=0;i<eles.length;i++) {
+				if(eles[i].checked) {
+					flag = true;
+					break;
+				}
+			}
+			if(!flag) {
+				element = focusElement(element, el);
+			}
 		}else {
 			if ( text.length==0 ) {
 				element = focusElement(element, el);
