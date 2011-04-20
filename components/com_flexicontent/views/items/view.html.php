@@ -295,7 +295,16 @@ class FlexicontentViewItems extends JView
 		$item		=& $this->get('Item');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');
-		$params		=& $mainframe->getParams('com_flexicontent');
+		//$params		=& $mainframe->getParams('com_flexicontent');
+		//$params		=& JComponentHelper::getParams('com_flexicontent');
+		$Itemid		=&JRequest::getVar('Itemid', 0);
+		if($Itemid) {
+			$db = &JFactory::getDBO();
+			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
+			$db->setQuery($query);
+			$paramsstring = $db->loadResult();
+			$params = new JParameter($paramsstring);
+		}
 		$tparams	=& $this->get( 'Typeparams' );
 		
 		$fields			= & $this->get( 'Extrafields' );
