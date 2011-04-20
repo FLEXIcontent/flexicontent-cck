@@ -168,7 +168,7 @@ function submitbutton( pressbutton ) {
 	var validator = document.formvalidator;
 	var title = $(form.title).getValue();
 	title.replace(/\s/g,'');
-	if(!validator.checkRequired()) return false;
+//	if(!validator.checkRequired()) return false;
 	if ( title.length==0 ) {
 		//alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");
 		validator.handleResponse(false,form.title);

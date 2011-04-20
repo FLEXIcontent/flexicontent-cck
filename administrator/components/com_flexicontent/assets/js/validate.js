@@ -62,6 +62,90 @@ var JFormValidator = new Class({
 			}
 		);
 
+		this.setHandler('radio',
+			function (par) {
+				var nl, i;
+				if(par.parentNode == null){
+				   return true;
+				}else{
+				   var options = par.parentNode.getElementsByTagName('input');
+
+				   for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked)
+				 		return true;
+				   }
+				
+				return false;
+				}
+			}
+		);
+		
+		this.setHandler('checkbox',
+			function (par) {
+				var nl, i;
+				if(par.parentNode == null){
+				   return true;
+				}else{
+				   var options = par.parentNode.getElementsByTagName('input');
+
+				   for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked)
+						return true;
+				   }
+					
+				   return false;
+				}
+			}
+		);
+		
+		this.setHandler('checkbox2',
+			function (par) {
+				var nl, i;
+				if(par.parentNode == null){
+				   return true;
+				}else{
+				   var options = par.parentNode.getElementsByTagName('input');
+
+				   var count = 0;
+				   for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked)
+						count++;
+				   }
+				   
+				   //exactly 2 options
+				   if(count == 2){
+				   	return true;
+				   }
+					
+				   return false;
+				}
+			}
+		);
+		
+		this.setHandler('checkbox3',
+			function (par) {
+				var nl, i;
+				if(par.parentNode == null){
+				   return true;
+				}else{
+				   var options = par.parentNode.getElementsByTagName('input');
+
+				   var count = 0;
+				   for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked)
+						count++;
+				   }
+				   
+				   //exactly 3 options
+				   if(count == 3){
+				   	return true;
+				   }
+					
+				   return false;
+				}
+			}
+		);
+
 
 		// Attach to forms with class 'form-validate'
 		var forms = $$('form.form-validate');
@@ -91,49 +175,53 @@ var JFormValidator = new Class({
 
 	validate: function(el)
 	{
-		// If the field is required make sure it has a value
-		if ($(el).hasClass('required')) {
-			ftype = $(el).type;
-			if( (ftype=='radio')||(ftype=='checkbox') ) {
-				eles = document.getElementsByName(el.name);
-				flag = false;
-				for(i=0;i<eles.length;i++) {
-					if(eles[i].checked) {
-						flag = true;
-						break;
-					}
-				}
-				if(!flag) {
-					document.formvalidator.focusElement(el);
-					return false;
-				}
-			}else if (($(el).getValue() == false)) {
-				this.handleResponse(false, el);
-				return false;
-			}
-		}
-
-		// Only validate the field if the validate class is set
-		var handler = (el.className && el.className.search(/validate-([a-zA-Z0-9\_\-]+)/) != -1) ? el.className.match(/validate-([a-zA-Z0-9\_\-]+)/)[1] : "";
-		if (handler == '') {
-			this.handleResponse(true, el);
-			return true;
-		}
-
-		// Check the additional validation types
-		if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).getValue()) {
-			// Execute the validation handler and return result
-			if (this.handlers[handler].exec($(el).getValue()) != true) {
-				this.handleResponse(false, el);
-				return false;
-			}
-		}
-
-		// Return validation state
-		this.handleResponse(true, el);
-		return true;
+	  // If the field is required make sure it has a value
+	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
+	      if ($(el).hasClass('required')) {
+	         if (!($(el).getValue()) || ($(el).getValue() == false)) {
+	            this.handleResponse(false, el);
+	            return false;
+	         }
+	      }
+	  }
+	
+	  
+	  // Only validate the field if the validate class is set
+	  var handler = (el.className && el.className.search(/validate-([a-zA-Z0-9\_\-]+)/) != -1) ? el.className.match(/validate-([a-zA-Z0-9\_\-]+)/)[1] : "";      
+	  if (handler == '') {
+	     this.handleResponse(true, el);
+	     return true;
+	  }
+	
+	  // Check the additional validation types
+	  // Individual radio & checkbox can have blank value, providing one element in group is set
+	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
+	     if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).getValue()) {
+	        // Execute the validation handler and return result
+	        if (this.handlers[handler].exec($(el).getValue()) != true) {
+	           this.handleResponse(false, el);
+	           return false;
+	        }
+	     }
+	  } else {
+	     if ((handler) && (handler != 'none') && (this.handlers[handler])) {
+	        if(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox"){
+	          if ($(el).hasClass('required')) {
+	               if (this.handlers[handler].exec(el.parentNode) != true) {
+		               this.handleResponse(false, el);
+		               return false;
+	               }
+	           }
+	        }
+	     }
+	  }
+	
+	  // Return validation state
+	  this.handleResponse(true, el);
+	  return true;
 	},
-
+   
+   
 	isValid: function(form)
 	{
 		var valid = true;
@@ -161,7 +249,7 @@ var JFormValidator = new Class({
 		if (!(el.labelref)) {
 			var labels = $$('label');
 			labels.each(function(label){
-				if (label.getProperty('for') == el.getProperty('id')) {
+				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for')+'[]' == el.getProperty('name')) {
 					el.labelref = label;
 				}
 			});
@@ -179,40 +267,6 @@ var JFormValidator = new Class({
 				$(el.labelref).removeClass('invalid');
 			}
 		}
-	},
-	focusElement: function (el) {
-		this.handleResponse(false, el);
-		var invalid = $$('.invalid');
-		new Fx.Scroll(window).toElement(invalid[0]);
-		invalid[0].focus();
-		el.focus();
-	},
-	checkRequired: function() {
-		var element = null;
-		$$('.required').each(function(el){
-			text = el.getValue();
-			ftype = el.type;
-			if( ((ftype=='radio')||(ftype=='checkbox')) && (element===null) ) {
-				eles = document.getElementsByName(el.name);
-				flag = false;
-				for(i=0;i<eles.length;i++) {
-					if(eles[i].checked) {
-						flag = true;
-						break;
-					}
-				}
-				if(!flag) {
-					document.formvalidator.focusElement(element, el);
-					return false;
-				}
-			}else {
-				if ( text.length==0 ) {
-					document.formvalidator.focusElement(el);
-					return false;
-				}
-			}
-		});
-		return true;
 	}
 });
 
