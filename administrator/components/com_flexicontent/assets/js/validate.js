@@ -93,7 +93,21 @@ var JFormValidator = new Class({
 	{
 		// If the field is required make sure it has a value
 		if ($(el).hasClass('required')) {
-			if (($(el).getValue() == false)) {
+			ftype = $(el).type;
+			if( (ftype=='radio')||(ftype=='checkbox') ) {
+				eles = document.getElementsByName(el.name);
+				flag = false;
+				for(i=0;i<eles.length;i++) {
+					if(eles[i].checked) {
+						flag = true;
+						break;
+					}
+				}
+				if(!flag) {
+					document.formvalidator.focusElement(el);
+					return false;
+				}
+			}else if (($(el).getValue() == false)) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -165,6 +179,40 @@ var JFormValidator = new Class({
 				$(el.labelref).removeClass('invalid');
 			}
 		}
+	},
+	focusElement: function (el) {
+		this.handleResponse(false, el);
+		var invalid = $$('.invalid');
+		new Fx.Scroll(window).toElement(invalid[0]);
+		invalid[0].focus();
+		el.focus();
+	},
+	checkRequired: function() {
+		var element = null;
+		$$('.required').each(function(el){
+			text = el.getValue();
+			ftype = el.type;
+			if( ((ftype=='radio')||(ftype=='checkbox')) && (element===null) ) {
+				eles = document.getElementsByName(el.name);
+				flag = false;
+				for(i=0;i<eles.length;i++) {
+					if(eles[i].checked) {
+						flag = true;
+						break;
+					}
+				}
+				if(!flag) {
+					document.formvalidator.focusElement(element, el);
+					return false;
+				}
+			}else {
+				if ( text.length==0 ) {
+					document.formvalidator.focusElement(el);
+					return false;
+				}
+			}
+		});
+		return true;
 	}
 });
 

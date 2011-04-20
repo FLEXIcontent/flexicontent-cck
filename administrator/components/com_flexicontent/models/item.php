@@ -770,7 +770,7 @@ class FlexicontentModelItem extends JModel {
 						}
 						$i++;
 					}
-				} else if ($post[$field->name]) {
+				} else if (isset($post[$field->name])) {
 					//not versionning hits field => Fix this issue 18 http://code.google.com/p/flexicontent/issues/detail?id=18
 					if ($field->id != 7) {
 						$obj = new stdClass();
