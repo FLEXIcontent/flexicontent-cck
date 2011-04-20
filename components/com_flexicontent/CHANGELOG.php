@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 572 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 576 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -37,6 +37,7 @@ $ -> Language fix or change
 # Fix issue : Editor buttons were not active anymore
 # Fix issue : Bug about including the template.(change $params to be $tparams)
 # Fix issue : bug when adding a file in frontend with sh404 (issue 125)
+# Fix issue : Could not save when a checkbox field was required (issue 124)
 
 + New features
 --------------------------------------------------------------------------------------------------
