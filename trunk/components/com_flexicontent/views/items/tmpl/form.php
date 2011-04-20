@@ -158,58 +158,6 @@ function addtag(id, tagname) {
 	var tag = new itemscreen();
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
-function focusElement(element, el) {
-	var validator = document.formvalidator;
-	validator.handleResponse(false, el);
-	var invalid = $$('.invalid');
-	new Fx.Scroll(window).toElement(invalid[0]);
-	invalid[0].focus();
-	if(!element) {
-		element = el;
-	}
-	return element;
-}
-function checkRequired() {
-	var element = null;
-	$$('.required').each(function(el){
-		text = el.getValue();
-		ftype = el.type;
-		if( (ftype=='radio') && (element==null) ) {
-			values = $$('input[name='+el.name+']').getValue();
-			flag = false;
-			for(i=0;i<values.length;i++) {
-				if(values[i]!==false) {
-					flag = true;
-					break;
-				}
-			}
-			if(!flag) {
-				element = focusElement(element, el);
-			}
-		}else if( (ftype=='checkbox') && (element==null) ) {
-			eles = document.getElementsByName(el.name);
-			flag = false;
-			for(i=0;i<eles.length;i++) {
-				if(eles[i].checked) {
-					flag = true;
-					break;
-				}
-			}
-			if(!flag) {
-				element = focusElement(element, el);
-			}
-		}else {
-			if ( text.length==0 ) {
-				element = focusElement(element, el);
-			}
-		}
-	});
-	if(element!=null) {
-		element.focus();
-		return false;
-	}
-	return true;
-}
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
@@ -220,7 +168,7 @@ function submitbutton( pressbutton ) {
 	var validator = document.formvalidator;
 	var title = $(form.title).getValue();
 	title.replace(/\s/g,'');
-	if(!checkRequired()) return false;
+	if(!validator.checkRequired()) return false;
 	if ( title.length==0 ) {
 		//alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");
 		validator.handleResponse(false,form.title);

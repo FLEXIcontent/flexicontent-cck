@@ -1017,7 +1017,7 @@ class FlexicontentModelItems extends JModel
 						}
 						$i++;
 					}
-				} else if ($post[$field->name]) {
+				} else if (isset($post[$field->name])) {
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
 					$obj->item_id 		= $item->id;

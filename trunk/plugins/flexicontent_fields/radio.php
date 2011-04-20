@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[] = $default_value;
-		} else if (!$field->value) {
+		} else if (!isset($field->value)) {
 			 $field->value = array();
 			 $field->value[0] = '';
 		}
@@ -81,7 +81,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$options  = "";
 		foreach ($listarrays as $listarray) {
 			$checked  = "";
-			if ($field->value[0] && $field->value[0] == $listarray[0]) {
+			if (isset($field->value[0]) && $field->value[0] == $listarray[0]) {
 				$checked = ' checked="checked"';
 			}
 			$options .= '<label><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
