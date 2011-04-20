@@ -121,7 +121,7 @@ switch ($view) {
 						// force using the default category if none is specified in the query string
 						$catid = @$cid ? $cid : $row->catid;
 						
-						if ($globalcats[$catid]->ancestorsarray) {
+						if (@$globalcats[$catid]->ancestorsarray) {
 							$ancestors = $globalcats[$catid]->ancestorsarray;
 							foreach ($ancestors as $ancestor) {
 								if (!in_array($ancestor, $globalnoroute)) {
