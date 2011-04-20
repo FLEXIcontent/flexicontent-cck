@@ -36,7 +36,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
 		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$required 	= $required ? ' required validate-checkbox' : '';
 
 		switch($separator)
 		{

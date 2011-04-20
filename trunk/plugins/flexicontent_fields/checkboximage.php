@@ -43,7 +43,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$required 	= $required ? ' required validate-checkbox' : '';
 
 		switch($separator)
 		{

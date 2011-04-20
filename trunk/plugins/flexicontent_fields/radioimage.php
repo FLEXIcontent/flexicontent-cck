@@ -44,7 +44,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		$default_value		= $field->parameters->get( 'default_value' ) ;
 								
 		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$required 	= $required ? ' required validate-radio' : '';
 
 		switch($separator)
 		{
