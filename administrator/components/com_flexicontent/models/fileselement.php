@@ -112,7 +112,7 @@ class FlexicontentModelFileselement extends JModel
 		// Lets load the files if it doesn't already exist
 		if (empty($this->_data))
 		{
-			$query = $this->_buildQuery();//echo "query : $query<br />";
+			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
@@ -170,7 +170,7 @@ class FlexicontentModelFileselement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', 0, 'int' );
 
 		if($filter_item) 
 		{

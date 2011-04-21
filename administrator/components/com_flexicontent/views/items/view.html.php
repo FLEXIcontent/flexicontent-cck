@@ -76,7 +76,7 @@ class FlexicontentViewItems extends JView {
 		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $context.'.items.startdate', '' ); }
 		$enddate	 		= $mainframe->getUserStateFromRequest( $context.'.items.enddate', 			'enddate', 			'', 			'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $context.'.items.enddate', '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.$filter_id', 		'filter_id', 		'', 			'int' );
+		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.filter_id', 		'filter_id', 		'', 			'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $context.'.items.search', 			'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 

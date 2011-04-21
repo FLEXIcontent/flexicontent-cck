@@ -163,7 +163,7 @@ class FlexicontentModelFilemanager extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			0, 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 			'item_id', 			0, 'int' );
 		
 		// File field relation sub query
 		$subf	= 'SELECT COUNT(value)'
