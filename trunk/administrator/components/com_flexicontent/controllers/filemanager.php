@@ -74,8 +74,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			//sanitize filename further and make unique
 			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
 			$filepath 	= JPath::clean($path.strtolower($filename));
-			
-			if (!flexicontent_upload::check( $file, $err )) {
+			$params = null;
+			if (!flexicontent_upload::check( $file, $err, $params )) {
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance('com_flexicontent.error.php');
@@ -173,7 +173,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
 					
 					$option = JRequest::getVar('option');
-					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
 					if($filter_item) {
 						$session = JFactory::getSession();
 						$files = $session->get('fileselement.'.$filter_item, null);
