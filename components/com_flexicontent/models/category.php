@@ -170,7 +170,15 @@ class FlexicontentModelCategory extends JModel{
 		$orderby		= $this->_buildItemOrderBy();
 
 		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-
+		
+		$field_item = '';
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		$params = $this->_category->parameters;
+		if ($params->get('orderbycustomfieldid', 0) != 0)
+			{
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+			}
+		
 		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
 		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -179,6 +187,7 @@ class FlexicontentModelCategory extends JModel{
 		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+		. $field_item
 		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 		. $joinaccess
@@ -249,6 +258,12 @@ class FlexicontentModelCategory extends JModel{
 			}
 			
 		}
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		if ($params->get('orderbycustomfieldid', 0) != 0)
+			{
+			$filter_order		= 'f.value';
+			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+			}
 		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 
@@ -314,8 +329,13 @@ class FlexicontentModelCategory extends JModel{
 		// is the content current?
 		$where .= ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
-
-
+		
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		if ($cparams->get('orderbycustomfieldid', 0) != 0)
+			{
+			$where .= ' AND f.field_id = '.$cparams->get('orderbycustomfieldid');
+			}
+		
 		// Filter the category view with the active active language
 		if (FLEXI_FISH && $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
