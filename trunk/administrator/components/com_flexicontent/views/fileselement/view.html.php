@@ -38,6 +38,9 @@ class FlexicontentViewFileselement extends JView
 	function display( $tpl = null ) {
 		global $mainframe, $option;
 		
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
 		//Load pane behavior
 		jimport('joomla.html.pane');
 
