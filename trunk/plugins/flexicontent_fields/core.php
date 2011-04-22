@@ -227,4 +227,140 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		}
 
 	}
+
+	function onDisplayFilter(&$filter, $value='')
+	{
+		if($filter->iscore != 1) return; // performance check
+		
+		$db =& JFactory::getDBO();
+
+		switch ($filter->field_type)
+		{
+			case 'createdby': // Created by
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT DISTINCT i.created_by AS value, u.name AS text'
+						. ' FROM #__content AS i'
+						. ' LEFT JOIN #__users AS u'
+						. ' ON i.created_by = u.id'
+						. ' WHERE i.created_by <> 0'
+						. ' ORDER BY u.name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'modifiedby': // Modified by
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
+						. ' FROM #__content AS i'
+						. ' LEFT JOIN #__users AS u'
+						. ' ON i.modified_by = u.id'
+						. ' WHERE i.modified_by <> 0'
+						. ' ORDER BY u.name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'type': // Type
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT id AS value, name AS text'
+						. ' FROM #__flexicontent_types'
+						. ' ORDER BY name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'state': // State
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				$options[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+				$options[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+				$options[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
+				$options[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
+				$options[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'tags': // Tags
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT id AS value, name AS text'
+						. ' FROM #__flexicontent_tags'
+						. ' ORDER BY name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+		}
+	}
 }
