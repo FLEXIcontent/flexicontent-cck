@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 578 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 586 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -45,6 +45,8 @@ $ -> Language fix or change
 + Add the flexicontent module
 + Add : force a specific Itemid when routing a tag
 + Add the flexicontent tagcloud module
++ Add new filter types : created_by, modified_by, document type, state, tags
++ Add : can now order a category view on a custom field value
 
 - Removed features
 --------------------------------------------------------------------------------------------------
