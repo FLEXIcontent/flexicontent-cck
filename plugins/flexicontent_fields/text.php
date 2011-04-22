@@ -163,6 +163,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
+		if(!$post) return;
 		
 		$newpost = array();
 		$new = 0;

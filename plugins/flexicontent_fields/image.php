@@ -230,6 +230,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
+		if(!$post) return;
 
 		global $mainframe;
 		

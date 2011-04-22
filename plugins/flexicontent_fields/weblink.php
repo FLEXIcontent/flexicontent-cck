@@ -180,6 +180,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'weblink') return;
+		if(!$post) return;
 		
 		// reformat the post
 		$newpost = array();
