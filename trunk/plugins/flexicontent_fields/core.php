@@ -205,7 +205,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		if($field->iscore != 1) return;
-
+		if(!$post) return;
+		
 		switch ($field->field_type)
 		{
 			case 'title': // title

@@ -306,6 +306,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
+		if(!$post) return;
 
 		global $mainframe;
 		
