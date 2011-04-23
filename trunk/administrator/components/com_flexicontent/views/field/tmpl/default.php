@@ -102,7 +102,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
-					<tr>
+					<tr style="display:none;">
 						<td class="key">
 							<label for="published">
 								<?php echo JText::_( 'FLEXI_FIELD_ISFILTER' ).':'; ?>

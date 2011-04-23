@@ -38,7 +38,7 @@
 			<option value="1">FLEXI_BEFORE_SELECT</option>
 			<option value="2">FLEXI_IN_SELECT</option>
 		</param>
-		<param name="required" type="radio" default="0" label="Required" description="Required">
+		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>

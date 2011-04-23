@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 586 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 588 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -29,7 +29,7 @@ $ -> Language fix or change
 
 # Bug fixes
 --------------------------------------------------------------------------------------------------
-# Fix issue : Bug plugin minigalerie with fileselement.
+# Fix issue : Bug plugin minigallery with fileselement.
 # Fix issue : Bug query error about i.version , change to be iv.version no c.version
 # Fix issue : Bug in components/com_flexicontent/views/category/view.html.php on line 205 around foreach ($item->cats as $cat)
 # Fix issue : Bug when displaying a view on frontend and no lang var is set in the query string (issue 121) Thanks to Adrien (Acymailing) for the fix ;)))

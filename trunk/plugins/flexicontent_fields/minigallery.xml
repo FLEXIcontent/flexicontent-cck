@@ -53,18 +53,6 @@
 			<option value="right">FLEXI_FIELD_GALLERY_RIGHT</option>
 			<option value="random">FLEXI_FIELD_GALLERY_RANDOM</option>
 		</param>
-<!--
-		<param name="required" type="radio" default="0" label="Required" description="Required">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
--->
-<!--
-		<param name="loop" type="list" default="true" label="FLEXI_FIELD_GALLERY_LOOP" description="FLEXI_FIELD_GALLERY_LOOP_DESC">
-			<option value="true">FLEXI_YES</option>
-			<option value="false">FLEXI_NO</option>
-		</param>
--->
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_minigallery.ini</language>
