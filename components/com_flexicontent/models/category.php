@@ -386,15 +386,9 @@ class FlexicontentModelCategory extends JModel{
 		{
 			foreach ($filters as $filtre)
 			{
-				$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
-				if ($setfilter) {
-					$ids 	= $this->_getFiltered($filtre->id, $setfilter);
-					if ($ids)
-					{
-		 				$where .= ' AND i.id IN (' . $ids . ')';
-					} else {
-		 				$where .= ' AND i.id = 0';
-					}
+				$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
+				if ($filtervalue) {
+					$where .= $this->_getFiltered($filtre->id, $filtervalue, $filtre->field_type);
 				}
 			}
 		}
@@ -567,7 +561,6 @@ class FlexicontentModelCategory extends JModel{
 	{
 		$query = $this->_buildChildsquery();
 		$this->_childs = $this->_getList($query);
-//		$this->_childs = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 		$id = $this->_id;
 		$k = 0;
 		$count = count($this->_childs);
@@ -688,19 +681,28 @@ class FlexicontentModelCategory extends JModel{
 		$scope		= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
 		$filters	= null;
 		
+		if (FLEXI_ACCESS) {
+			$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+			if (isset($readperms['field'])) {
+				$where = ' AND ( fi.access <= '.$gid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
+			} else {
+				$where = ' AND fi.access <= '.$gid;
+			}
+		} else {
+			$where = ' AND fi.access <= '.$gid;
+		}
+		
 		$query  = 'SELECT fi.*'
 				. ' FROM #__flexicontent_fields AS fi'
-				. ' WHERE fi.access <= '.$gid
+				. ' WHERE fi.published = 1'
+				. $where
 				. $scope
-				. ' AND fi.published = 1'
-				. ' AND fi.isfilter = 1'
 				. ' ORDER BY fi.ordering, fi.name'
 				;
 			$this->_db->setQuery($query);
 			$filters = $this->_db->loadObjectList('name');
 
-		foreach ($filters as $filter)
-		{
+		foreach ($filters as $filter) {
 			$filter->parameters = new JParameter($filter->attribs);
 		}
 		
@@ -714,8 +716,47 @@ class FlexicontentModelCategory extends JModel{
 	 * @return string
 	 * @since 1.5
 	 */
-	function _getFiltered($field_id, $value)
+	function _getFiltered($field_id, $value, $field_type = '')
 	{
+		switch($field_type) 
+		{
+			case 'createdby':
+				$filter_query = ' AND i.created_by = ' . $this->_db->Quote($value);
+			break;
+
+			case 'modifiedby':
+				$filter_query = ' AND i.modified_by = ' . $this->_db->Quote($value);
+			break;
+			
+			case 'type':
+				$filter_query = ' AND ie.type_id = ' . $this->_db->Quote($value);
+			break;
+			
+			case 'state':
+				if ( $value == 'P' ) {
+					$filter_query = ' AND i.state = 1';
+				} else if ($value == 'U' ) {
+					$filter_query = ' AND i.state = 0';
+				} else if ($value == 'PE' ) {
+					$filter_query = ' AND i.state = -3';
+				} else if ($value == 'OQ' ) {
+					$filter_query = ' AND i.state = -4';
+				} else if ($value == 'IP' ) {
+					$filter_query = ' AND i.state = -5';
+				}
+			break;
+			
+			case 'tags':
+				$query  = 'SELECT itemid'
+						. ' FROM #__flexicontent_tags_item_relations'
+						. ' WHERE tid = ' . $this->_db->Quote($value)
+						;
+				$this->_db->setQuery($query);
+				$filtered = $this->_db->loadResultArray();
+				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+			break;
+			
+			default:
 		$query  = 'SELECT item_id'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = ' . $field_id
@@ -723,10 +764,12 @@ class FlexicontentModelCategory extends JModel{
 				. ' GROUP BY item_id'
 				;
 		$this->_db->setQuery($query);
-		$filters = $this->_db->loadResultArray();
-		$filters = implode(',', $filters);
+				$filtered = $this->_db->loadResultArray();
+				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+			break; 
+		}
 		
-		return $filters;
+		return $filter_query;
 	}
 
 	/**

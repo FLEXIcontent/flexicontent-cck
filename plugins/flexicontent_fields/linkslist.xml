@@ -41,7 +41,7 @@
 		</param>
 		<param name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
 		<param name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
-		<param name="required" type="radio" default="0" label="Required" description="Required">
+		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>

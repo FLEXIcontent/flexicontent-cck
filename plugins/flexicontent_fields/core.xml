@@ -39,6 +39,11 @@
 			<option value="1">FLEXI_DISPLAY_NAME</option>
 			<option value="2">FLEXI_DISPLAY_USERNAME</option>
 		</param>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
 	</params>
 	<params group="group-modified"><!-- modified date -->
 		<param name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
@@ -59,11 +64,21 @@
 			<option value="1">FLEXI_DISPLAY_NAME</option>
 			<option value="2">FLEXI_DISPLAY_USERNAME</option>
 		</param>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
 	</params>
 	<params group="group-state"><!-- state -->
 		<param name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC">
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
 		</param>
 	</params>
 	<params group="group-hits"><!-- hits -->
@@ -73,6 +88,16 @@
 	<params group="group-type"><!-- document type -->
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
 	</params>
 	<params group="group-version"><!-- version -->
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
@@ -81,10 +106,6 @@
 	<params group="group-voting"><!-- voting -->
 		<param name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 		<param name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-		<param name="required" type="radio" default="0" label="Required" description="Required">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
 	</params>
 	<params group="group-categories"><!-- categories -->
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
@@ -92,10 +113,6 @@
 			<option value="1">FLEXI_LINE_BREAK</option>
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
-		</param>
-		<param name="required" type="radio" default="0" label="Required" description="Required">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
 		</param>
 	</params>
 	<params group="group-tags"><!-- tags -->
@@ -105,9 +122,10 @@
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
 		</param>
-		<param name="required" type="radio" default="0" label="Required" description="Required">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
 		</param>
 	</params>
 	<params group="group-files"><!-- files -->
@@ -117,10 +135,6 @@
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
 		</param>
-		<param name="required" type="radio" default="0" label="Required" description="Required">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
 	</params>
 	<params group="group-maintext" addpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
 		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
@@ -128,7 +142,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-		<param name="required" type="radio" default="0" label="Required" description="Required">
+		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>

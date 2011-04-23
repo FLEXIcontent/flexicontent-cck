@@ -8,7 +8,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.5 stable (r586)</version>
+	<version>1.5.5 stable (r588)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
@@ -98,6 +98,7 @@
 			<param name="catlimit" default="100" />
 			<param name="limit" default="10" />
 			<param name="feed_summary" default="0" />
+			<param name="filter_types" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" />
 
 			<param name="upload_extensions" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP" />
 			<param name="upload_maxsize" default="10000000" />
