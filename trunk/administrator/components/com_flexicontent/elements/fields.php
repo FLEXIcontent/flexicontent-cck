@@ -40,18 +40,25 @@ class JElementFields extends JElement
 
 		$db =& JFactory::getDBO();
 		
+		$and = ($node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
+		
 		$query = 'SELECT id AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
-//		. ' ORDER BY iscore DESC, label ASC, id ASC'
+		. $and
 		. ' ORDER BY label ASC, id ASC'
 		;
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		$class = 'multiple="true" size="10"';
-		
+		if ($node->attributes('multiple')) {
+			$class = 'multiple="true" size="10"';
+		} else {
+			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			$class = 'class="inputbox"';
+		}
+
 		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
 	}
 }
