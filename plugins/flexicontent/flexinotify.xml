@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="flexicontent">
+<install version="1.5" type="plugin" group="flexicontent" method="upgrade">
 	<name>FLEXIcontent - Notifications</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>April 2011</creationDate>
