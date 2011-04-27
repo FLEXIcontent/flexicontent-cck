@@ -2,13 +2,13 @@
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <install type="component" version="1.5.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>25 March 2011</creationDate>
+	<creationDate>27 April 2011</creationDate>
 	<author>Emmanuel Danan</author>
 	<copyright>(C) 2009-2011 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.5.5 stable (r590)</version>
+	<version>1.5.5 stable (r592)</version>
 	<description>A flexible content management system for Joomla! 1.5</description>
 
 	<languages folder="site/language">
@@ -139,6 +139,8 @@
 	<plugin name="toolbar" folder="plugins/toolbar">Article toolbar field</plugin>
 	<plugin name="fcpagenav" folder="plugins/fcpagenav">Page navigation field</plugin>
 	<plugin name="fcloadmodule" folder="plugins/fcloadmodule">Load module field</plugin>
+
+	<plugin name="flexinotify" folder="plugins/flexinotify">Notifications plugin for FLEXIcontent</plugin>
 
 	<plugin name="flexisearch" folder="plugins/search">Search plugin for FLEXIcontent</plugin>
 	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
