@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 590 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 592 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -47,6 +47,8 @@ $ -> Language fix or change
 + Add the flexicontent tagcloud module
 + Add new filter types : created_by, modified_by, document type, state, tags
 + Add : can now order a category view on a custom field value
++ Add : Preview feature with auto-login option
++ Add : Notification plugin
 
 - Removed features
 --------------------------------------------------------------------------------------------------

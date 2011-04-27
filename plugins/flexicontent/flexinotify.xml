@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent">
+	<name>FLEXIcontent - Notifications</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>April 2011</creationDate>
+	<copyright>Copyright (C) 2009 - 2011 Emmanuel Danan. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Notifications plugin for FLEXIcontent</description>
+	<files>
+		<filename plugin="flexinotify">flexinotify.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_flexinotify.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_flexinotify.ini</language>
+	</languages>
+	<params>
+		<param name="mailsubject" type="text" size="40" default="" label="FLEXI_SUBJECT" description="FLEXI_SUBJECT_DESC" />
+		<param name="sendername" type="text" size="40" default="" label="FLEXI_FROM_NAME" description="FLEXI_FROM_NAME_DESC" />
+		<param name="senderemail" type="text" size="40" default="" label="FLEXI_FROM_EMAIL" description="FLEXI_FROM_EMAIL_DESC" />
+		<param name="autologin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+	</params>
+</install>

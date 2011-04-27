@@ -185,6 +185,11 @@
 			</fileset>
 		</copy>
 
+		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
+		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexinotify/en-GB.plg_flexicontent_flexinotify.ini" />
+		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexinotify/fr-FR.plg_flexicontent_flexinotify.ini" />
+
 		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
 		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexisearch.ini" />
