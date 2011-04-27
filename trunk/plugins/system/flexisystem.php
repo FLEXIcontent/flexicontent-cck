@@ -50,8 +50,9 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
+		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
 		
-		if (!empty($username) && !empty($password)) {
+		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
 		return;	
@@ -334,7 +335,9 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			JPluginHelper::importPlugin('user');		
 			$response->username = $username;
-			$result = $mainframe->triggerEvent('onLoginUser', array((array)$response));
+			$response->password = $password;
+			$options = isset($options) ? $options : array();
+			$result = $mainframe->triggerEvent('onLoginUser', array((array)$response,$options));
 		}
 
 		return;
