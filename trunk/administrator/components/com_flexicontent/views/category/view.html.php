@@ -48,12 +48,16 @@ class FlexicontentViewCategory extends JView {
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
+		//Get the route helper for the preview function
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 		//initialise variables
 		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		$pane 		= & JPane::getInstance('sliders');
+		$bar 		= & JToolBar::getInstance('toolbar');
+		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 
 		JHTML::_('behavior.tooltip');
 
@@ -66,19 +70,6 @@ class FlexicontentViewCategory extends JView {
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
-		//create the toolbar
-		if ( $cid ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
-
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );
-		}
-
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
-
 		//Get data from the model
 		$model		= & $this->getModel();
 		$row     	= & $this->get( 'Category' );
@@ -86,6 +77,22 @@ class FlexicontentViewCategory extends JView {
 		$tmpls		= $themes->category;
 		
 		$categories = $globalcats;
+
+		//create the toolbar
+		if ( $cid ) {
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
+			$base 			= str_replace('administrator/', '', JURI::base());
+			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$previewlink 	= $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categories[$row->id]->slug)) . $autologin;
+			// Add a preview button
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+		} else {
+			JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );
+		}
+		JToolBarHelper::apply();
+		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel();
 
 		//fail if checked out not by 'me'
 		if ($row->id) {

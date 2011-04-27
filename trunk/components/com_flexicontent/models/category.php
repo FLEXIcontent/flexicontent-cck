@@ -169,13 +169,10 @@ class FlexicontentModelCategory extends JModel{
 		$where			= $this->_buildItemWhere();
 		$orderby		= $this->_buildItemOrderBy();
 
-		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-		
 		$field_item = '';
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		$params = $this->_category->parameters;
-		if ($params->get('orderbycustomfieldid', 0) != 0)
-			{
+		if ($params->get('orderbycustomfieldid', 0) != 0) {
 			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
 			}
 		
@@ -186,11 +183,9 @@ class FlexicontentModelCategory extends JModel{
 		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
 		. $field_item
 		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		. $joinaccess
 		. $where
 		. $orderby
 		;
@@ -324,11 +319,11 @@ class FlexicontentModelCategory extends JModel{
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
+		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
 		
 		// is the content current?
-		$where .= ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
-		$where .= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
+		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
 		
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		if ($cparams->get('orderbycustomfieldid', 0) != 0)
@@ -343,12 +338,17 @@ class FlexicontentModelCategory extends JModel{
 		
 		$where .= ' AND i.sectionid = ' . FLEXI_SECTION;
 
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// filter by permissions
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
-				$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+				if (isset($readperms['item'])) {
+					$where .= ' AND ( ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' ) )';
 			} else {
-				$where .= ' AND i.access <= '.$gid;
+					$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+				}
+			} else {
+				$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
 			}
 		}
 
@@ -425,14 +425,25 @@ class FlexicontentModelCategory extends JModel{
 		$cparams 	= $this->_category->parameters;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
+		$andaccess = '';
 		
-		$andaccess 		= $show_noauth ? '' : (FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')' : ' AND c.access <= '.$gid) ;
-		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON c.id = gi.axo AND gi.aco = "read" AND gi.axosection = "category"' : '' ;
+		// filter by permissions
+		if (!$show_noauth) {
+			if (FLEXI_ACCESS) {
+				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+				if (isset($readperms['category'])) {
+					$andaccess = ' AND ( c.access <= '.$gid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
+				} else {
+					$andaccess = ' AND c.access <= '.$gid;
+				}
+			} else {
+				$andaccess = ' AND c.access <= '.$gid;
+			}
+		}
 
 		$query = 'SELECT c.*,'
 				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
 				. ' FROM #__categories AS c'
-				. $joinaccess
 				. ' WHERE c.published = 1'
 				. ' AND c.parent_id = '. $this->_id
 				. $andaccess

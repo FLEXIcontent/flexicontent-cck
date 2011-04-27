@@ -278,7 +278,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									}
 									?>
 								</ul>
-								<br class="clear" />
+<!-- 								<br class="clear" /> -->
 							</div>
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">

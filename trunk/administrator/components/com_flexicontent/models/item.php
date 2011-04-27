@@ -142,15 +142,17 @@ class FlexicontentModelItem extends JModel {
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = $item->version;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			//$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true, true):$current_version;
 			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
 			if($version==0) 
 				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
-			if($use_versioning) {
+			if($use_versioning) 
+			{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
-			}else{
+			}
+			else
+			{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_fields_item_relations as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.item_id='".$this->_id."';";
@@ -227,9 +229,6 @@ class FlexicontentModelItem extends JModel {
 					$this->_db->query();
 				}
 				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -634,7 +633,6 @@ class FlexicontentModelItem extends JModel {
 
 			$this->_item	=& $item;
 
-			//if($post['vstate']==2) {
 				//store tag relation
 				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 				$this->_db->setQuery($query);
@@ -645,7 +643,6 @@ class FlexicontentModelItem extends JModel {
 					$this->_db->setQuery($query);
 					$this->_db->query();
 				}
-			//}
 
 			// Store categories to item relations
 
@@ -660,7 +657,6 @@ class FlexicontentModelItem extends JModel {
 				return false;
 			}
 
-			//if($isnew || $post['vstate']==2) {
 			// delete only relations which are not part of the categories array anymore to avoid loosing ordering
 			$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
 					. ' WHERE itemid = '.$item->id
@@ -687,8 +683,9 @@ class FlexicontentModelItem extends JModel {
 					$this->_db->query();
 				}
 			}
-			//}
-		} else {
+		} 
+		else 
+		{
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
 			$item->modified_by 		= $user->get('id');
@@ -703,6 +700,7 @@ class FlexicontentModelItem extends JModel {
 				return false;
 			}
 		}
+
 		$post['categories'][0] = $cats;
 		$post['tags'][0] = $tags;
 		///////////////////////////////
@@ -714,7 +712,7 @@ class FlexicontentModelItem extends JModel {
 		$fields		= $this->getExtrafields();
 		
 		// NOTE: This event isn't used yet but may be useful in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
+		$results = $dispatcher->trigger('onAfterSaveItem', array( $item, &$post ));
 		
 		// versioning backup procedure
 		// first see if versioning feature is enabled
@@ -815,10 +813,6 @@ class FlexicontentModelItem extends JModel {
 					$this->setError($this->_db->getErrorMsg());
 					return false;
 				}
-/*
-				dump($searchindex,'search');
-				dump($item,'item');
-*/
 			}
 		}
 		if ($use_versioning) {

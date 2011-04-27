@@ -90,6 +90,7 @@
 			<param name="show_readmore" default="1" />
 			<param name="show_intro" default="1" />
 			<param name="form_extra_css" default="" />
+			<param name="autoflogin" default="1" />
 			<param name="show_icons" default="1" />
 			<param name="show_pdf_icon" default="1" />
 			<param name="show_print_icon" default="1" />
