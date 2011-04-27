@@ -30,12 +30,15 @@ class FlexicontentViewItem extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
+		//Get the route helper for the preview function
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		
 		//initialise variables
+		$mainframe	= & JFactory::getApplication();
 		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
@@ -43,6 +46,7 @@ class FlexicontentViewItem extends JView {
 		$pane 		= & JPane::getInstance('sliders');
 		$dispatcher = & JDispatcher::getInstance();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
+		$bar 		= & JToolBar::getInstance('toolbar');
 
 		JHTML::_('behavior.tooltip');
 
@@ -58,19 +62,6 @@ class FlexicontentViewItem extends JView {
 		//add js function to overload the joomla submitform
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-
-		//create the toolbar
-		if ( $cid ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );
-
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
-		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
-
 
 		//Get data from the model
 		$model			= & $this->getModel();
@@ -102,8 +93,26 @@ class FlexicontentViewItem extends JView {
 		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams		= & $this->get( 'Typeparams' );
 		$languages		= & $this->get( 'Languages' );
-		//$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
 		$categories 	= $globalcats;
+
+		//create the toolbar
+		if ( $cid ) 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );
+			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$base 			= str_replace('administrator/', '', JURI::base());
+			$previewlink 	= $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) . $autologin;
+			// Add a preview button
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+		} 
+		else 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
+		}
+		JToolBarHelper::apply();
+		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel();
 
 		$usedtags = array();
 		if ($cid) {

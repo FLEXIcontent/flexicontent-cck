@@ -33,9 +33,14 @@ class FlexicontentViewTag extends JView {
 	{
 		global $mainframe;
 
+		//Get the route helper for the preview function
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+
 		//initialise variables
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
+		$bar 		= & JToolBar::getInstance('toolbar');
+		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
@@ -46,10 +51,18 @@ class FlexicontentViewTag extends JView {
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
+		//Get data from the model
+		$model		= & $this->getModel();
+		$row     	= & $this->get( 'Tag' );
+
 		//create the toolbar
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TAG' ), 'tagedit' );
-
+			$base 			= str_replace('administrator/', '', JURI::base());
+			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$previewlink 	= $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($row->id)) . $autologin;
+			// Add a preview button
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tagadd' );
 		}
@@ -57,11 +70,6 @@ class FlexicontentViewTag extends JView {
 		JToolBarHelper::save();
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
-
-
-		//Get data from the model
-		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Tag' );
 
 		// fail if checked out not by 'me'
 		if ($row->id) {

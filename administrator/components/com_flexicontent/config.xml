@@ -103,6 +103,10 @@
 			<option value="-5">FLEXI_UNAPPROVED</option>
 		</param>
 		<param name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" menu="hide" />
+		<param name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
 
 		<param name="" type="separator" default="FLEXI_PAGE_CONF" level="level1" menu="hide" />
 		

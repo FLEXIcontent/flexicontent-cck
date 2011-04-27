@@ -44,17 +44,19 @@ class plgSystemFlexisystem extends JPlugin
 		if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($fparams->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 
         JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
+	}
         
-/*
-        echo "<xmp>";
-        var_export($_REQUEST);
-        echo "</xmp>";
-*/
+	function onAfterInitialise()
+	{
+		$username	= JRequest::getVar('fcu', null);
+		$password	= JRequest::getVar('fcp', null);
+		
+		if (!empty($username) && !empty($password)) {
+			$result = $this->loginUser();
+		}
+		return;	
 	}
 	
-	/**
-	 * Do load rules and start checking function
-	 */
 	function onAfterRoute()
 	{
 		// ensure the PHP version is correct
@@ -299,7 +301,8 @@ class plgSystemFlexisystem extends JPlugin
     * @access public
     * @return void
     */
-	function trackSaveConf() {
+	function trackSaveConf() 
+	{
 		$option 	= JRequest::getVar('option');
 		$component 	= JRequest::getVar('component');
 		$task 		= JRequest::getVar('task');
@@ -309,4 +312,32 @@ class plgSystemFlexisystem extends JPlugin
 			$catscache->clean();
 		}
 	}
+	
+	function loginUser() 
+	{
+		$mainframe =& JFactory::getApplication();
+		$username	= JRequest::getVar('fcu', null);
+		$password	= JRequest::getVar('fcp', null);
+
+		jimport('joomla.user.helper');
+		
+		$db =& JFactory::getDBO();
+		$query 	= 'SELECT id, password, gid'
+				. ' FROM #__users'
+				. ' WHERE username = ' . $db->Quote( $username )
+				. ' AND password = ' . $db->Quote( $password )
+				;
+		$db->setQuery( $query );
+		$result = $db->loadObject();
+		
+		if($result)
+		{
+			JPluginHelper::importPlugin('user');		
+			$response->username = $username;
+			$result = $mainframe->triggerEvent('onLoginUser', array((array)$response));
+		}
+
+		return;
+	}
+	
 }

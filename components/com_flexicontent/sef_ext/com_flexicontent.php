@@ -36,6 +36,8 @@ $shItemidString = '';
 $dosef	 		= shInitializePlugin ( $lang, $shLangName, $shLangIso, $option );
 $layout 		= JRequest::getVar('layout', null);
 $typeid	 		= JRequest::getInt('typeid', null);
+$fcu	 		= JRequest::getVar('fcu', null);
+$fcp	 		= JRequest::getInt('fcp', null);
 
 if ($dosef == false) {
 	return;
@@ -86,6 +88,15 @@ shRemoveFromGETVarsList('limit');
 if (isset($limitstart))
 shRemoveFromGETVarsList('limitstart');
 
+// Added for the preview feature in FLEXIcontent 1.5.5 
+if (!empty($fcu)) {
+	shRemoveFromGETVarsList('fcu');
+	$dosef = false;
+} else if (!empty($fcp)) {
+	shRemoveFromGETVarsList('fcp');
+	$dosef = false;
+}
+		
 switch ($view) {
 	
 	case 'items' :
@@ -105,13 +116,6 @@ switch ($view) {
 
 				// Do not translate the items url
 				$row = $database->loadObject ( null, false );
-/*
-				if (shTranslateURL ( $option, $shLangName )) {
-					$row = $database->loadObject ();
-				} else {
-					$row = $database->loadObject ( null, false );
-				}
-*/
 				
 				if ($database->getErrorNum ()) {
 					die ( $database->stderr () );
@@ -186,7 +190,7 @@ switch ($view) {
 
 		if (!empty($cid) && empty($id)) {
 
-			if ($globalcats[$cid]->ancestorsarray) {
+			if (@$globalcats[$cid]->ancestorsarray) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				foreach ($ancestors as $ancestor) {
 					if (shTranslateURL ( $option, $shLangName )) {

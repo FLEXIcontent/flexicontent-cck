@@ -144,6 +144,10 @@ class FlexicontentModelItems extends JModel
 			);
 			$return = serialize($return); 
 
+			// Allow users to see their own content whatever the state is
+			if ($this->_item->created_by != $user->id && $this->_item->modified_by != $user->id) 
+			{
+
 			// Is the category published?
 			if ($cid) {
 				if (!$globalcats[$cid]->published) {
@@ -192,6 +196,7 @@ class FlexicontentModelItems extends JModel
 						}
 					}
 				}
+			}
 			}
 
 			//add the author email in order to display the gravatar
@@ -960,7 +965,7 @@ class FlexicontentModelItems extends JModel
 		$fields		= $this->getExtrafields();
 		
 		// NOTE: This event isn't used yet but may be useful in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
+		$results = $dispatcher->trigger('onAfterSaveItem', array( $item, &$post ));
 		
 		// versioning backup procedure
 		// first see if versioning feature is enabled

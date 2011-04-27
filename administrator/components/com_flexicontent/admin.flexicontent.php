@@ -26,8 +26,9 @@ require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
 
-// Import the field plugins
+// Import the plugins
 JPluginHelper::importPlugin('flexicontent_fields');
+JPluginHelper::importPlugin('flexicontent');
 JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 
 // Set filepath
