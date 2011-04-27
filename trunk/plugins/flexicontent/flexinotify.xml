@@ -21,8 +21,8 @@
 		<param name="sendername" type="text" size="40" default="" label="FLEXI_FROM_NAME" description="FLEXI_FROM_NAME_DESC" />
 		<param name="senderemail" type="text" size="40" default="" label="FLEXI_FROM_EMAIL" description="FLEXI_FROM_EMAIL_DESC" />
 		<param name="autologin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 </install>
