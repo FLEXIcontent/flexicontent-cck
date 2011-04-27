@@ -111,13 +111,15 @@ class plgFlexicontentFlexinotify extends JPlugin
 
 		$mainframe =& JFactory::getApplication();
 		
-		$siteurl = JURI::base();
-		$siteurl = str_replace('administrator/', '', $siteurl);
+		$siteurl 	= JURI::base();
+		$siteurl 	= str_replace('administrator/', '', $siteurl);
+		$siteurl	= str_replace('&amp;', '&', $siteurl);
 
-		$sitename	= '<a href="'.$siteurl.'">' . $mainframe->getCfg('sitename') . '</a>';
+		$sitename	= $mainframe->getCfg('sitename') . ' - ' . $siteurl;
 		$subname 	= $subscriber->name;
 		$autologin	= $params->get('autologin', 1) ? '&fcu='.$subscriber->username . '&fcp='.$subscriber->password : '';
 		$link 		= $siteurl . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug)) . $autologin;
+		$link		= str_replace('&amp;', '&', $link);
 		$title		= $item->title;
 		$maincat	= $globalcats[$item->catid]->title;
 		$itemid		= $item->id;
@@ -138,8 +140,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$mailer->setBody($message);
 		$mailer->IsHTML(false);
 
-		dump($mailer,'mailer');
-//		$mailer->send();
+		$mailer->send();
 	}
 
 }
