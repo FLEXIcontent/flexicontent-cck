@@ -256,7 +256,8 @@ class FlexicontentModelCategory extends JModel{
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		if ($params->get('orderbycustomfieldid', 0) != 0)
 			{
-			$filter_order		= 'f.value';
+			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+			$filter_order		= 'f.value'.$int;
 			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
 			}
 		

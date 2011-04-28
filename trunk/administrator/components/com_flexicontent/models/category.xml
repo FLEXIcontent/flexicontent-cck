@@ -84,6 +84,10 @@
 			<option value="ASC">FLEXI_ASC</option>
 			<option value="DESC">FLEXI_DESC</option>
 		</param>
+		<param name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE">
+			<option value="0">FLEXI_TEXT</option>
+			<option value="1">FLEXI_INT</option>
+		</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 	 	<param name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 	 		<option value="0">Hide</option>
