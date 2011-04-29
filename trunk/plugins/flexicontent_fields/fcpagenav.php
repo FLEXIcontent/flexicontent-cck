@@ -97,6 +97,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			// Determine sort order
 			$order_method = $cparams->get('orderby', '');
 			
+			
+			
 			switch ($order_method)
 			{
 
@@ -133,6 +135,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					break;
 					
 			}
+			
+			
 	
 			$types		= is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
 
@@ -141,7 +145,17 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($now).' )' . 
 						($types_to_exclude ? ' AND ie.type_id NOT IN (' . $types . ')' : '')
 						;
-	
+			
+			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+			$field_item = '';
+			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
+			if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+			$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id';
+			$xwhere .= ' AND f.field_id = '.$cparams->get('orderbycustomfieldid');
+			}
+			
+			
 			// array of articles in same category correctly ordered
 			$query 	= 'SELECT a.id, a.title,'
 					. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
@@ -149,6 +163,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					. ' FROM #__content AS a'
 					. ' LEFT JOIN #__categories AS cc ON cc.id = a.catid'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id'
+					. $field_item
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
 					. ' WHERE a.catid = ' . ($cid ? $cid : (int) $item->catid)
 					. $andaccess
@@ -167,8 +182,9 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	
 			// location of current content item in array list
 			$location = array_search($item->id, array_keys($list));
-
+			
 			$rows = array_values($list);
+			
 			
 			$field->prev = null;
 			$field->prevtitle = null;
@@ -176,6 +192,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$field->next = null;
 			$field->nexttitle = null;
 			$field->nexturl = null;
+			$field->category = null;
+			$field->categorytitle = null;
+			$field->categoryurl = null;
+			
 	
 			if ($location -1 >= 0) 	{
 				// the previous content item cannot be in the array position -1
