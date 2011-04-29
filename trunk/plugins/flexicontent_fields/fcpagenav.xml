@@ -7,7 +7,7 @@
 	<license>GNU/GPL v2</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
-	<version>1.1</version>
+	<version>1.2</version>
 	<description>Page navigation field plugin for FLEXIcontent</description>
 	<files>
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
@@ -37,6 +37,11 @@
 		</param>
 		<param name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="FLEXI_FIELD_PAGENAV_PREV_DESC" />
 		<param name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="FLEXI_FIELD_PAGENAV_NEXT_DESC" />
+		<param name="use_category_link" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</param>
+		<param name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" />
 		<param name="type_to_exclude" type="types" default="" label="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE" description="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE_DESC" />
 	</params>
 	<languages>
