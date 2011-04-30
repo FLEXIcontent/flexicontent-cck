@@ -180,14 +180,20 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		JPluginHelper::importPlugin('content');
-		// just a try : to implement later
-		foreach ($items as $item) {
-			$item->event = new stdClass();
-			$item->params = new JParameter($item->attribs);
-			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params,0));
-			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
-			$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $item, & $item->params,0));
+		// Allow to trigger content plugins on category description
+		$category->text			= $category->description;
+		$results 				= $dispatcher->trigger('onPrepareContent', array (& $category, & $category->params, 0));
+		$category->description 	= $category->text;
+
+		foreach ($items as $item) 
+		{
+			$item->event 	= new stdClass();
+			$item->params 	= new JParameter($item->attribs);
+			
+			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params, 0));
+
+			$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $item, & $item->params, 0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
 			$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $item->params, 0));
