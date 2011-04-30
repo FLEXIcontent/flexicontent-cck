@@ -213,6 +213,7 @@ echo $this->pane->endPane();
 	</tbody>
 
 	</table>
+	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="file" value="" />
 	<input type="hidden" name="files" value="<?php echo $this->files; ?>" />

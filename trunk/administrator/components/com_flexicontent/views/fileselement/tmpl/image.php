@@ -126,7 +126,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="center">
-				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<img src='<?php echo $srcb; ?>' alt='<?php echo $row->filename; ?>' />
+				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' ); ?>::<?php echo $row->filename; ?>">
 				<a style="cursor:pointer" onclick="qffileselementadd(document.getElementById('file<?php echo $row->id;?>'), '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<img src="<?php echo $src; ?>" alt="<?php echo $row->filename; ?>" />
 				</a>
@@ -162,6 +162,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	</tbody>
 
 	</table>
+	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="file" value="" />
 	<input type="hidden" name="files" value="<?php echo $this->files; ?>" />
