@@ -221,7 +221,15 @@ class FlexicontentFields
 				$field->catslug = $item->categoryslug;
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
+
+				// Small trick to be sure the standard content plugins will be triggered correctly
+				$flexiview = JRequest::getVar('view');
+				// Set the items view to article as in com_content
+				if ($flexiview == 'items') JRequest::setVar('view', 'article');
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				// Set it back to items for the com_flexicontent
+				if ($flexiview == 'article') JRequest::setVar('view', 'items');
+
 				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
