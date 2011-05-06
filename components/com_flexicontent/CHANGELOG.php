@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.5 stable - build 607 - Changelog -
+- FLEXIcontent 1.5.5 stable - build 608 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix
@@ -49,6 +49,7 @@ $ -> Language fix or change
 + Add : can now order a category view on a custom field value
 + Add : Preview feature with auto-login option
 + Add : Notification plugin
++ Add : View switch before content plugin are triggered to enhance compatibility
 
 - Removed features
 --------------------------------------------------------------------------------------------------
