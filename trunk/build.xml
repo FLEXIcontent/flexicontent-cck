@@ -223,7 +223,6 @@
 			<fileset dir="flexipack" />
 		</zip>
 -->
-		
 		<delete dir="flexipack" includeemptydirs="true" />
 		
 	</target>
