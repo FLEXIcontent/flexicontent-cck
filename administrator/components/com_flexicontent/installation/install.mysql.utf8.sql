@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_cats_item_relations` (
   PRIMARY KEY  (`catid`,`itemid`),
   KEY `catid` (`catid`),
   KEY `itemid` (`itemid`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   `id` int(11) NOT NULL auto_increment,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   KEY `id` (`id`),
   KEY `itemid` (`itemid`),
   KEY `userid` (`userid`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `access` int(11) unsigned NOT NULL default '0',
   `ordering` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   `field_id` int(11) NOT NULL default '0',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   KEY `valueorder` (`valueorder`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
   `field_id` int(11) NOT NULL default '0',
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
   PRIMARY KEY  (`field_id`,`type_id`),
   KEY `field_id` (`field_id`),
   KEY `type_id` (`type_id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `id` int(11) NOT NULL auto_increment,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `access` int(11) unsigned NOT NULL,
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `search_index` mediumtext NOT NULL,
   PRIMARY KEY  (`item_id`),
   FULLTEXT KEY `search_index` (`search_index`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `content_id` int(11) NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `rating_sum` int(11) NOT NULL,
   `rating_count` int(11) NOT NULL,
   KEY `extravote_idx` (`content_id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (
   `version` int(11) NOT NULL default '0',
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (
   KEY `item_id` (`item_id`),
   FULLTEXT KEY `value` (`value`),
   KEY `valueorder` (`valueorder`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `id` int(11) NOT NULL auto_increment,
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (`id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
   `tid` int(11) NOT NULL default '0',
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
   PRIMARY KEY  (`tid`,`itemid`),
   KEY `tid` (`tid`),
   KEY `itemid` (`itemid`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `id` int(11) NOT NULL auto_increment,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `access` int(11) unsigned NOT NULL default '0',
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   `state` int(3) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `version2item` (`item_id`,`version_id`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `template` varchar(50) NOT NULL default '',
@@ -159,4 +159,4 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `position` varchar(100) NOT NULL default '',
   `fields` text NOT NULL,
   PRIMARY KEY  (`template`,`layout`,`position`)
-) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
