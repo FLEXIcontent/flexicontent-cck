@@ -33,7 +33,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 			<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_TYPE' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_#' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_COUNT' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -136,7 +136,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 		<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_#' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_COUNT' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>

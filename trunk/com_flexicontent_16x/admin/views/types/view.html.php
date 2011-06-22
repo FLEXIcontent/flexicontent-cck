@@ -59,7 +59,7 @@ class FlexicontentViewTypes extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TYPES' ), 'types' );
-		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'Copy' );
+		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolBarHelper::publishList();
 		JToolBarHelper::unpublishList();
 		JToolBarHelper::addNew();
