@@ -56,7 +56,7 @@ class FlexicontentModelStats extends JModel
 		$query = 'SELECT count(i.id)'
 			. ' FROM #__content as i'
 			. ' JOIN #__categories as c ON i.catid = c.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt <= ' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			;
 
 		$this->_db->SetQuery($query);
@@ -67,7 +67,7 @@ class FlexicontentModelStats extends JModel
 		*/
 		$query = 'SELECT count(id)'
 			. ' FROM #__categories'
-			. ' WHERE lft >= ' . FLEXI_CATEGORY_LFT . ' AND rgt <= ' . FLEXI_CATEGORY_RGT
+			. ' WHERE lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			;
 
 		$this->_db->SetQuery($query);
@@ -109,7 +109,7 @@ class FlexicontentModelStats extends JModel
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' ORDER BY i.hits DESC'
 			. ' LIMIT 5'
 			;
@@ -131,7 +131,7 @@ class FlexicontentModelStats extends JModel
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' ORDER BY votes DESC'
 			. ' LIMIT 5'
 			;
@@ -154,7 +154,7 @@ class FlexicontentModelStats extends JModel
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' ORDER BY votes ASC'
 			. ' LIMIT 5'
 			;
@@ -177,7 +177,7 @@ class FlexicontentModelStats extends JModel
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' GROUP BY u.name'
 			. ' ORDER BY counter DESC'
 			. ' LIMIT 5'
@@ -202,7 +202,7 @@ class FlexicontentModelStats extends JModel
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
 			. ' WHERE i.modified_by > 0'
-			. ' AND c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' GROUP BY u.name'
 			. ' ORDER BY counter DESC'
 			. ' LIMIT 5'
@@ -226,7 +226,7 @@ class FlexicontentModelStats extends JModel
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' INNER JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			. ' GROUP BY f.itemid'
 			. ' ORDER BY favnr DESC'
 			. ' LIMIT 5'
@@ -250,7 +250,7 @@ class FlexicontentModelStats extends JModel
 		$query = 'SELECT state'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
-			. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+			. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 			;
 
 		$this->_db->SetQuery($query);
@@ -334,7 +334,7 @@ class FlexicontentModelStats extends JModel
 				. ' FROM #__content AS i'
 				. ' JOIN #__categories as c ON i.catid=c.id'
 				. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
-				. ' WHERE c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt<=' . FLEXI_CATEGORY_RGT
+				. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt<=' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				;
 
 		$this->_db->SetQuery($query);

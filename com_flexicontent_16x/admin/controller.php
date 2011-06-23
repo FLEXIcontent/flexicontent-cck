@@ -33,7 +33,7 @@ class FlexicontentController extends JController
 		parent::__construct();
 		$view = JRequest::getVar('view');
 		if($view && !FLEXI_CATEGORY) {
-			$msg = JText::_( 'FLEXI_NO_SECTION_CHOOSEN' );
+			$msg = JText::_( 'FLEXI_NO_CATEGORY_CHOOSEN' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
 		}

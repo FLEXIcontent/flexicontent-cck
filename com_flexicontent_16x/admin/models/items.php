@@ -146,7 +146,7 @@ class FlexicontentModelItems extends JModel{
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-			. ' WHERE (cat.lft >= ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . FLEXI_CATEGORY_RGT . ')'
+			. ' WHERE (cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')'
 			;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -199,7 +199,7 @@ class FlexicontentModelItems extends JModel{
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
 					. ' JOIN #__categories as cat ON c.catid=cat.id' 
-					. ' WHERE (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')'
+					. ' WHERE (cat.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')'
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -384,7 +384,7 @@ class FlexicontentModelItems extends JModel{
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' (cat.lft > ' . FLEXI_CATEGORY_LFT . ' AND cat.rgt < ' . FLEXI_CATEGORY_RGT . ')';
+		$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')';
 
 		$user 	=& JFactory::getUser();
 		$allitems	= $permission->DisplayAllItems;
