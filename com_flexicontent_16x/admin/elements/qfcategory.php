@@ -42,7 +42,7 @@ class JFormFieldQfcategory extends JFormField
 		//fetchElement($name, $value, &$node, $control_name)
 		$doc 		=& JFactory::getDocument();
 		//$fieldName	= $control_name.'['.$name.']';
-		$value		= $this->element["value"];
+		$value		= $this->__get('value');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item =& JTable::getInstance('flexicontent_categories', '');
