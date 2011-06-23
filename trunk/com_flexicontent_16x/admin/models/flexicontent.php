@@ -55,7 +55,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE state = -3'
-				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . (int)FLEXI_CATEGORY_RGT
+				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -81,7 +81,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE c.state = -4'
-				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= ' . (int)FLEXI_CATEGORY_RGT
+				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -107,7 +107,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE c.state = -5'
-				. ' AND cat.lft >= ' . (int)FLEXI_CATEGORY_LFT . ' AND cat.rgt <= '. (int)FLEXI_CATEGORY_RGT
+				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -464,7 +464,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistcat() {
 		$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__categories'
-				. ' WHERE lft> ' . FLEXI_CATEGORY_LFT . ' AND rgt<' . FLEXI_CATEGORY_RGT
+				. ' WHERE lft> ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND rgt<' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -681,7 +681,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$nullDate	= $db->getNullDate();
 		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext` FROM #__content as c"
 				. " JOIN #__categories as cat ON c.catid=cat.id "
-				." WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."';";
+				." WHERE cat.lft >= ".$this->_db->Quote(FLEXI_CATEGORY_LFT)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_CATEGORY_RGT).";";
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');

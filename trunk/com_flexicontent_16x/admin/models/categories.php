@@ -97,7 +97,7 @@ class FlexicontentModelCategories extends JModelList{
 				$query->where("c.published = 0");
 			}
 		}
-		$query->where(' (c.lft > ' . FLEXI_CATEGORY_LFT . ' AND c.rgt < ' . FLEXI_CATEGORY_RGT . ')');
+		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')');
 		// Filter by search in title
 		//$search = $this->getState('com_flexicontent.categories.search');
 		if (!empty($search)) {			
@@ -375,8 +375,8 @@ class FlexicontentModelCategories extends JModelList{
 		// Get all rows with parent of $id
 		$query = 'SELECT '.$get
 				. ' FROM #__categories'
-				. ' WHERE lft >= ' . FLEXI_CATEGORY_LFT
-				. ' AND rgt <= ' . FLEXI_CATEGORY_RGT
+				. ' WHERE lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT)
+				. ' AND rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
 				. ' AND '.$source.' = '.(int) $id;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();

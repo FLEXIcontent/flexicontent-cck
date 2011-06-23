@@ -32,7 +32,7 @@ if(!function_exists('FLEXIcontentSubmenu')) {
 		//Create Submenu
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view||($view=='flexicontent'));
 		// ensures the PHP version is correct
-		if (!$dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
+		if (FLEXI_CATEGORY && !$dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>')) {
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', ($view=='items'));
 			if ($permission->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', ($view=='types'));
 			if ($permission->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', ($view=='categories'));

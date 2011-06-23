@@ -153,7 +153,7 @@ class FlexicontentModelArchive extends JModelList{
 		$query->join('LEFT', '#__categories as c ON i.catid=c.id');
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id');
 		$query->join('LEFT', '#__users AS u ON u.id = i.checked_out');
-		$query->where('c.lft >= ' . FLEXI_CATEGORY_LFT . ' AND c.rgt <= ' . FLEXI_CATEGORY_RGT);
+		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT));
 		$query->where('i.state = -1');
 		$query->where('LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
 		$query->order($filter_order.' '.$filter_order_Dir.', i.ordering');

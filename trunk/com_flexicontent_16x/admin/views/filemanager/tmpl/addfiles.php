@@ -56,7 +56,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
                     <legend><?php echo JText::_( 'FLEXI_UPLOAD_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
                     <fieldset class="actions">
                     	<?php echo JText::_( 'FLEXI_DISPLAY_NAME' ).': '; ?><input type="text" id="file-upload-name" name="altname" />
-                    	<br /><br />
+                    	<br />
                         <input type="file" id="file-upload" name="Filedata" />                        
                         <input type="submit" id="file-upload-submit" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
                         <span id="upload-clear"></span>
