@@ -45,8 +45,8 @@ class FlexicontentFields
 		if (FLEXI_GC) $itemcache->gc(); 			//auto-clean expired item cache
 
 		// @TODO : move to the constructor
-		$taglist			= FlexicontentFields::_getTags($items);
-		$catlist			= FlexicontentFields::_getCategories($items);
+		$taglist		= FlexicontentFields::_getTags($items);
+		$catlist		= FlexicontentFields::_getCategories($items);
 		$vars['favourites']	= FlexicontentFields::_getFavourites($items);
 		$vars['favoured']	= FlexicontentFields::_getFavoured($items);
 		$vars['modifiers']	= FlexicontentFields::_getModifiers($items);
@@ -97,7 +97,7 @@ class FlexicontentFields
 				}
 			}
 
-			if ($items[$i]->fields)
+			if (@$items[$i]->fields)
 			{
 				foreach ($items[$i]->fields as $field)
 				{
@@ -106,7 +106,6 @@ class FlexicontentFields
 				}
 			}
 		}
-		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
 
 		return $items;
@@ -123,10 +122,9 @@ class FlexicontentFields
 	{
 		$db =& JFactory::getDBO();
 
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		if (!$item) return;
-		if ($item->sectionid != FLEXI_CATEGORY) return;
-
+		if(!(($item->lft >= FLEXI_CATEGORY_LFT)&&($item->rgt <= FLEXI_CATEGORY_RGT))) return;
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 		$dispatcher = &JDispatcher::getInstance();
@@ -142,16 +140,16 @@ class FlexicontentFields
 		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
 
 		$query 	= 'SELECT fi.*'
-				. ' FROM #__flexicontent_fields AS fi'
-				. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				. $joinaccess
-				. ' WHERE ie.item_id = ' . (int)$item->id
-				. ' AND fi.published = 1'
-				. $andaccess
-				. ' GROUP BY fi.id'
-				. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-				;
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+			. $joinaccess
+			. ' WHERE ie.item_id = ' . (int)$item->id
+			. ' AND fi.published = 1'
+			. $andaccess
+			. ' GROUP BY fi.id'
+			. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+		;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 
@@ -174,7 +172,6 @@ class FlexicontentFields
 		if ($item->fields) {
 			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields);
 		}
-		
 		return $item;
 	}
 

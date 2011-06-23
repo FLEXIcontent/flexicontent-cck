@@ -81,7 +81,6 @@ class FlexicontentViewCategory extends JView
 		$params->merge($cparams);
 
 		$total 		= & $this->get('Total');
-
 		// Bind Fields
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);

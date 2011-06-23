@@ -349,7 +349,7 @@ class FlexicontentModelItems extends JModel
 			if(!$item) {
 				return false;
 			}
-			
+
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = isset($item->version)?$item->version:0;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );

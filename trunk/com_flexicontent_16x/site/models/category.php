@@ -173,7 +173,7 @@ class FlexicontentModelCategory extends JModel{
 
 		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
 
-		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
+		$query = 'SELECT DISTINCT i.*, ie.*,c.lft,c.rgt,u.name as author, ty.name AS typename,'
 		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 		. ' FROM #__content AS i'
 		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
@@ -311,14 +311,14 @@ class FlexicontentModelCategory extends JModel{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
-		$where .= ' AND c.lft >= ' . FLEXI_CATEGORY_LFT .' AND c.rgt<= ' . FLEXI_CATEGORY_RGT;
+		$where .= ' AND c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT);
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
 			} else {
-				$where .= ' AND i.access <= '.$gid;
+				//$where .= ' AND i.access <= '.$gid;
 			}
 		}
 
@@ -384,7 +384,7 @@ class FlexicontentModelCategory extends JModel{
 	{
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
-		$ordering	= 'ordering ASC';
+		$ordering	= 'lft ASC';
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -395,14 +395,14 @@ class FlexicontentModelCategory extends JModel{
 		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON c.id = gi.axo AND gi.aco = "read" AND gi.axosection = "category"' : '' ;
 
 		$query = 'SELECT c.*,'
-				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
-				. ' FROM #__categories AS c'
-				. $joinaccess
-				. ' WHERE c.published = 1'
-				. ' AND c.parent_id = '. $this->_id
-				. $andaccess
-				. ' ORDER BY '.$ordering
-				;
+			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
+			. ' FROM #__categories AS c'
+			. $joinaccess
+			. ' WHERE c.published = 1'
+			. ' AND c.parent_id = '. $this->_id
+			. $andaccess
+			. ' ORDER BY '.$ordering
+			;
 		return $query;
 	}
 
