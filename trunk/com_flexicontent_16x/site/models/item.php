@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.modellist');
+jimport('joomla.application.component.model');
 
 /**
  * FLEXIcontent Component Item Model
@@ -27,7 +27,8 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItems extends JModelList{
+class FlexicontentModelItems extends JModel
+{
 	/**
 	 * Details data in details array
 	 *
@@ -55,30 +56,12 @@ class FlexicontentModelItems extends JModelList{
 	 *
 	 * @since 1.0
 	 */
-	public function __construct($config = array())
+	function __construct()
 	{
-		if (empty($config['filter_fields'])) {
-			$config['filter_fields'] = array(
-				'id', 'a.id',
-				'title', 'a.title',
-				'alias', 'a.alias',
-				'checked_out', 'a.checked_out',
-				'checked_out_time', 'a.checked_out_time',
-				'catid', 'a.catid', 'category_title',
-				'state', 'a.state',
-				'access', 'a.access', 'access_level',
-				'created', 'a.created',
-				'created_by', 'a.created_by',
-				'ordering', 'a.ordering',
-				'featured', 'a.featured',
-				'language', 'a.language',
-				'hits', 'a.hits',
-				'publish_up', 'a.publish_up',
-				'publish_down', 'a.publish_down',
-			);
-		}
+		parent::__construct();
 
-		parent::__construct($config);
+		$id 	= JRequest::getVar('id', 0, '', 'int');
+		$this->setId((int)$id);
 	}
 
 	/**
@@ -132,663 +115,206 @@ class FlexicontentModelItems extends JModelList{
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Method to auto-populate the model state.
+	 * Method to get data for the itemview
 	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @return	void
-	 * @since	1.6
-	 */
-	protected function populateState($ordering = 'ordering', $direction = 'ASC') {
-		$app = JFactory::getApplication();
-
-		// List state information
-		//$value = $app->getUserStateFromRequest('global.list.limit', 'limit', $app->getCfg('list_limit'));
-		$value = JRequest::getInt('limit', $app->getCfg('list_limit', 0));
-		$this->setState('list.limit', $value);
-
-		//$value = $app->getUserStateFromRequest($this->context.'.limitstart', 'limitstart', 0);
-		$value = JRequest::getInt('limitstart', 0);
-		$this->setState('list.start', $value);
-
-		$orderCol	= JRequest::getCmd('filter_order', 'a.ordering');
-		if (!in_array($orderCol, $this->filter_fields)) {
-			$orderCol = 'a.ordering';
-		}
-		$this->setState('list.ordering', $orderCol);
-
-		$listOrder	=  JRequest::getCmd('filter_order_Dir', 'ASC');
-		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', ''))) {
-			$listOrder = 'ASC';
-		}
-		$this->setState('list.direction', $listOrder);
-
-		$params = $app->getParams();
-		$this->setState('params', $params);
-		$user		= JFactory::getUser();
-
-		if ((!$user->authorise('core.edit.state', 'com_content')) &&  (!$user->authorise('core.edit', 'com_content'))){
-			// filter on published for those who do not have edit or edit.state rights.
-			$this->setState('filter.published', 1);
-		}
-
-		$this->setState('filter.language',$app->getLanguageFilter());
-
-		// process show_noauth parameter
-		if (!$params->get('show_noauth')) {
-			$this->setState('filter.access', true);
-		} else {
-			$this->setState('filter.access', false);
-		}
-
-		$this->setState('layout', JRequest::getCmd('layout'));
-	}
-	/**
-	 * Method to get a list of articles.
-	 *
-	 * Overriden to inject convert the attribs field into a JParameter object.
-	 *
-	 * @return	mixed	An array of objects on success, false on failure.
-	 * @since	1.6
-	 */
-	public function getItems() {
-		$items	= parent::getItems();
-		$user	= JFactory::getUser();
-		$userId	= $user->get('id');
-		$guest	= $user->get('guest');
-		$groups	= $user->getAuthorisedViewLevels();
-
-		// Get the global params
-		$globalParams = JComponentHelper::getParams('com_flexicontent', true);
-
-		// Convert the parameter fields into objects.
-		foreach($items as &$item) {
-			$articleParams = new JRegistry;
-			$articleParams->loadJSON($item->attribs);
-
-			// Unpack readmore and layout params
-			$item->alternative_readmore = $articleParams->get('alternative_readmore');
-			$item->layout = $articleParams->get('layout');
-
-			$item->params = clone $this->getState('params');
-
-			// For blogs, article params override menu item params only if menu param = 'use_article'
-			// Otherwise, menu item params control the layout
-			// If menu item is 'use_article' and there is no article param, use global
-			if ((JRequest::getString('layout') == 'blog') || (JRequest::getString('view') == 'featured')
-				|| ($this->getState('params')->get('layout_type') == 'blog')) {
-				// create an array of just the params set to 'use_article'
-				$menuParamsArray = $this->getState('params')->toArray();
-				$articleArray = array();
-
-				foreach ($menuParamsArray as $key => $value)
-				{
-					if ($value === 'use_article') {
-						// if the article has a value, use it
-						if ($articleParams->get($key) != '') {
-							// get the value from the article
-							$articleArray[$key] = $articleParams->get($key);
-						}
-						else {
-							// otherwise, use the global value
-							$articleArray[$key] = $globalParams->get($key);
-						}
-					}
-				}
-
-				// merge the selected article params
-				if (count($articleArray) > 0) {
-					$articleParams = new JRegistry;
-					$articleParams->loadArray($articleArray);
-					$item->params->merge($articleParams);
-				}
-			}
-			else {
-				// For non-blog layouts, merge all of the article params
-				$item->params->merge($articleParams);
-			}
-
-			// get display date
-			switch ($item->params->get('show_date'))
-			{
-				case 'modified':
-					$item->displayDate = $item->modified;
-					break;
-
-				case 'published':
-					$item->displayDate = ($item->publish_up == 0) ? $item->created : $item->publish_up;
-					break;
-
-				default:
-				case 'created':
-					$item->displayDate = $item->created;
-					break;
-			}
-
-			// Compute the asset access permissions.
-			// Technically guest could edit an article, but lets not check that to improve performance a little.
-			if (!$guest) {
-				$asset	= 'com_content.article.'.$item->id;
-
-				// Check general edit permission first.
-				if ($user->authorise('core.edit', $asset)) {
-					$item->params->set('access-edit', true);
-				}
-				// Now check if edit.own is available.
-				else if (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
-					// Check for a valid user and that they are the owner.
-					if ($userId == $item->created_by) {
-						$item->params->set('access-edit', true);
-					}
-				}
-			}
-
-			$access = $this->getState('filter.access');
-
-			if ($access) {
-				// If the access filter has been set, we already have only the articles this user can view.
-				$item->params->set('access-view', true);
-			}
-			else {
-				// If no access filter is set, the layout takes some responsibility for display of limited information.
-				if ($item->catid == 0 || $item->category_access === null) {
-					$item->params->set('access-view', in_array($item->access, $groups));
-				}
-				else {
-					$item->params->set('access-view', in_array($item->access, $groups) && in_array($item->category_access, $groups));
-				}
-			}
-		}
-		return $items;
-	}
-	
-	/**
-	 * Get the master query for retrieving a list of articles subject to the model state.
-	 *
-	 * @return	JDatabaseQuery
-	 * @since	1.6
-	 */
-	function getListQuery() {
-		// Create a new query object.
-		$db = $this->getDbo();
-		$query = $db->getQuery(true);
-
-		// Select the required fields from the table.
-		$query->select(
-			$this->getState(
-				'list.select',
-				'a.*, ie.*,c.lft,c.rgt,ua.name as author, ty.name AS typename,'
-				. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug'
-			)
-		);
-		// Process an Archived Article layout
-		if ($this->getState('filter.published') == 2) {
-			// If badcats is not null, this means that the article is inside an archived category
-			// In this case, the state is set to 2 to indicate Archived (even if the article state is Published)
-			$query->select($this->getState('list.select','CASE WHEN badcats.id is null THEN a.state ELSE 2 END AS state'));
-		}
-		else {
-			// Process non-archived layout
-			// If badcats is not null, this means that the article is inside an unpublished category
-			// In this case, the state is set to 0 to indicate Unpublished (even if the article state is Published)
-			$query->select($this->getState('list.select','CASE WHEN badcats.id is not null THEN 0 ELSE a.state END AS state'));
-		}
-
-		$query->from('#__content AS a');
-
-		// Join over the frontpage articles.
-		//if ($this->context != 'com_content.featured') {
-		//	$query->join('LEFT', '#__content_frontpage AS fp ON fp.content_id = a.id');
-		//}
-
-		$this->_buildQueryJoin($query);
-
-		// Join to check for category published state in parent categories up the tree
-		$query->select('c.published, CASE WHEN badcats.id is null THEN c.published ELSE 0 END AS parents_published');
-		$subquery = 'SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
-		$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
-		$subquery .= 'WHERE parent.extension = ' . $db->quote('com_content');
-
-		if ($this->getState('filter.published') == 2) {
-			// Find any up-path categories that are archived
-			// If any up-path categories are archived, include all children in archived layout
-			$subquery .= ' AND parent.published = 2 GROUP BY cat.id ';
-			// Set effective state to archived if up-path category is archived
-			$publishedWhere = 'CASE WHEN badcats.id is null THEN a.state ELSE 2 END';
-		}
-		else {
-			// Find any up-path categories that are not published
-			// If all categories are published, badcats.id will be null, and we just use the article state
-			$subquery .= ' AND parent.published != 1 GROUP BY cat.id ';
-			// Select state to unpublished if up-path category is unpublished
-			$publishedWhere = 'CASE WHEN badcats.id is null THEN a.state ELSE 0 END';
-		}
-		$query->join('LEFT OUTER', '(' . $subquery . ') AS badcats ON badcats.id = c.id');
-		$user	= JFactory::getUser();
-		// Filter by access level.
-		if ($access = $this->getState('filter.access')) {
-			$groups	= implode(',', $user->getAuthorisedViewLevels());
-			$query->where('a.access IN ('.$groups.')');
-		}
-
-		// Filter by published state
-		$published = $this->getState('filter.published');
-
-		if (is_numeric($published)) {
-			// Use article state if badcats.id is null, otherwise, force 0 for unpublished
-			$query->where($publishedWhere . ' = ' . (int) $published);
-		}
-		else if (is_array($published)) {
-			JArrayHelper::toInteger($published);
-			$published = implode(',', $published);
-			// Use article state if badcats.id is null, otherwise, force 0 for unpublished
-			$query->where($publishedWhere . ' IN ('.$published.')');
-		}
-
-		// Filter by featured state
-		$featured = $this->getState('filter.featured');
-		switch ($featured)
-		{
-			case 'hide':
-				$query->where('a.featured = 0');
-				break;
-
-			case 'only':
-				$query->where('a.featured = 1');
-				break;
-
-			case 'show':
-			default:
-				// Normally we do not discriminate
-				// between featured/unfeatured items.
-				break;
-		}
-
-		// Filter by a single or group of articles.
-		$articleId = $this->getState('filter.article_id');
-
-		if (is_numeric($articleId)) {
-			$type = $this->getState('filter.article_id.include', true) ? '= ' : '<> ';
-			$query->where('a.id '.$type.(int) $articleId);
-		}
-		else if (is_array($articleId)) {
-			JArrayHelper::toInteger($articleId);
-			$articleId = implode(',', $articleId);
-			$type = $this->getState('filter.article_id.include', true) ? 'IN' : 'NOT IN';
-			$query->where('a.id '.$type.' ('.$articleId.')');
-		}
-
-		// Filter by a single or group of categories
-		$categoryId = $this->getState('filter.category_id');
-
-		if (is_numeric($categoryId)) {
-			$type = $this->getState('filter.category_id.include', true) ? '= ' : '<> ';
-
-			// Add subcategory check
-			$includeSubcategories = $this->getState('filter.subcategories', false);
-			$categoryEquals = 'a.catid '.$type.(int) $categoryId;
-
-			if ($includeSubcategories) {
-				$levels = (int) $this->getState('filter.max_category_levels', '1');
-				// Create a subquery for the subcategory list
-				$subQuery = $db->getQuery(true);
-				$subQuery->select('sub.id');
-				$subQuery->from('#__categories as sub');
-				$subQuery->join('INNER', '#__categories as this ON sub.lft > this.lft AND sub.rgt < this.rgt');
-				$subQuery->where('this.id = '.(int) $categoryId);
-				if ($levels >= 0) {
-					$subQuery->where('sub.level <= this.level + '.$levels);
-				}
-
-				// Add the subquery to the main query
-				$query->where('('.$categoryEquals.' OR a.catid IN ('.$subQuery->__toString().'))');
-			}
-			else {
-				$query->where($categoryEquals);
-			}
-		}
-		else if (is_array($categoryId) && (count($categoryId) > 0)) {
-			JArrayHelper::toInteger($categoryId);
-			$categoryId = implode(',', $categoryId);
-			if (!empty($categoryId)) {
-				$type = $this->getState('filter.category_id.include', true) ? 'IN' : 'NOT IN';
-				$query->where('a.catid '.$type.' ('.$categoryId.')');
-			}
-		}
-
-		// Filter by author
-		$authorId = $this->getState('filter.author_id');
-		$authorWhere = '';
-
-		if (is_numeric($authorId)) {
-			$type = $this->getState('filter.author_id.include', true) ? '= ' : '<> ';
-			$authorWhere = 'a.created_by '.$type.(int) $authorId;
-		}
-		else if (is_array($authorId)) {
-			JArrayHelper::toInteger($authorId);
-			$authorId = implode(',', $authorId);
-
-			if ($authorId) {
-				$type = $this->getState('filter.author_id.include', true) ? 'IN' : 'NOT IN';
-				$authorWhere = 'a.created_by '.$type.' ('.$authorId.')';
-			}
-		}
-
-		// Filter by author alias
-		$authorAlias = $this->getState('filter.author_alias');
-		$authorAliasWhere = '';
-
-		if (is_string($authorAlias)) {
-			$type = $this->getState('filter.author_alias.include', true) ? '= ' : '<> ';
-			$authorAliasWhere = 'a.created_by_alias '.$type.$db->Quote($authorAlias);
-		}
-		else if (is_array($authorAlias)) {
-			$first = current($authorAlias);
-
-			if (!empty($first)) {
-				JArrayHelper::toString($authorAlias);
-
-				foreach ($authorAlias as $key => $alias)
-				{
-					$authorAlias[$key] = $db->Quote($alias);
-				}
-
-				$authorAlias = implode(',', $authorAlias);
-
-				if ($authorAlias) {
-					$type = $this->getState('filter.author_alias.include', true) ? 'IN' : 'NOT IN';
-					$authorAliasWhere = 'a.created_by_alias '.$type.' ('.$authorAlias .
-						')';
-				}
-			}
-		}
-
-		if (!empty($authorWhere) && !empty($authorAliasWhere)) {
-			$query->where('('.$authorWhere.' OR '.$authorAliasWhere.')');
-		}
-		else if (empty($authorWhere) && empty($authorAliasWhere)) {
-			// If both are empty we don't want to add to the query
-		}
-		else {
-			// One of these is empty, the other is not so we just add both
-			$query->where($authorWhere.$authorAliasWhere);
-		}
-
-		// Filter by start and end dates.
-		//$nullDate	= $db->Quote($db->getNullDate());
-		//$nowDate	= $db->Quote(JFactory::getDate()->toMySQL());
-
-		//$query->where('( a.publish_up = '.$this->_db->Quote($nullDate).' OR a.publish_up <= '.$this->_db->Quote($nowDate).' )');
-		//$query->where('( a.publish_down = '.$this->_db->Quote($nullDate).' OR a.publish_down >= '.$this->_db->Quote($nowDate).' )');
-
-		// Filter by Date Range or Relative Date
-		$dateFiltering = $this->getState('filter.date_filtering', 'off');
-		$dateField = $this->getState('filter.date_field', 'a.created');
-
-		switch ($dateFiltering)
-		{
-			case 'range':
-				$startDateRange = $db->Quote($this->getState('filter.start_date_range', $nullDate));
-				$endDateRange = $db->Quote($this->getState('filter.end_date_range', $nullDate));
-				$query->where('('.$dateField.' >= '.$startDateRange.' AND '.$dateField .
-					' <= '.$endDateRange.')');
-				break;
-
-			case 'relative':
-				$relativeDate = (int) $this->getState('filter.relative_date', 0);
-				$query->where($dateField.' >= DATE_SUB('.$nowDate.', INTERVAL ' .
-					$relativeDate.' DAY)');
-				break;
-
-			case 'off':
-			default:
-				break;
-		}
-
-		// process the filter for list views with user-entered filters
-		$params = $this->getState('params');
-
-		if ((is_object($params)) && ($params->get('filter_field') != 'hide') && ($filter = $this->getState('list.filter'))) {
-			// clean filter variable
-			$filter = JString::strtolower($filter);
-			$hitsFilter = intval($filter);
-			$filter = $db->Quote('%'.$db->getEscaped($filter, true).'%', false);
-
-			switch ($params->get('filter_field'))
-			{
-				case 'author':
-					$query->where(
-						'LOWER( CASE WHEN a.created_by_alias > '.$db->quote(' ').
-						' THEN a.created_by_alias ELSE ua.name END ) LIKE '.$filter.' '
-					);
-					break;
-
-				case 'hits':
-					$query->where('a.hits >= '.$hitsFilter.' ');
-					break;
-
-				case 'title':
-				default: // default to 'title' if parameter is not valid
-					$query->where('LOWER( a.title ) LIKE '.$filter);
-					break;
-			}
-		}
-		$cid = JRequest::getInt('cid');
-		$this->_buildQueryWhere($cid, $query);
-		//from flexicontent
-		// Second is to only select items the user has access to
-		//$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		//$query->where('i.state IN ('.$states.')');
-		
-		// First thing we need to do is to select only the requested items
-		//$query->where('rel.catid IN ('.$_group_cats.')';
-		
-		//$cid = JRequest::getInt('cid');
-		//$_group_cats = array($cid);
-
-		// Add the list ordering clause.
-		$query->order($this->getState('list.ordering', 'a.ordering').' '.$this->getState('list.direction', 'ASC'));
-		//echo "<xmp>";var_dump($query->__toString());echo "</xmp>";exit;
-		//echo $query->__toString()."<br /><br />";
-		return $query;
-	}
-	
-	function _buildQueryJoin(&$query) {
-		// Join over the categories.
-		$query->select('c.title AS category_title, c.path AS category_route, c.access AS category_access, c.alias AS category_alias');
-		$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
-
-		// Join over the users for the author and modified_by names.
-		$query->select("CASE WHEN a.created_by_alias > ' ' THEN a.created_by_alias ELSE ua.name END AS author");
-		$query->select("ua.email AS author_email");
-
-		$query->join('LEFT', '#__users AS ua ON ua.id = a.created_by');
-		$query->join('LEFT', '#__users AS uam ON uam.id = a.modified_by');
-
-		// Join on contact table
-		$query->select('contact.id as contactid' ) ;
-		$query->join('LEFT','#__contact_details AS contact on contact.user_id = a.created_by');
-
-		// Join over the categories to get parent category titles
-		$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
-		$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
-
-		// Join on voting table
-		$query->select('ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count as rating_count');
-		$query->join('LEFT', '#__content_rating AS v ON a.id = v.content_id');
-
-		//$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
-		$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id');
-		$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
-		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id');
-		////. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
-		//. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		//. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-	}
-	
-	/**
-	 * Method to build the WHERE clause
-	 *
-	 * @access private
-	 * @return array
-	 */
-	function _buildQueryWhere($cid, &$query) {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$now		= $mainframe->get('requestTime');
-		$nullDate	= $this->_db->getNullDate();
-		
-		$_group_cats = array($cid);
-		//Get active menu parameters.
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-
-		// Get the category parameters
-		$cparams 	= $this->_category_parameters;
-
-		// display sub-categories
-		$display_subcats = $cparams->get('display_subcategories_items', 0);
-		if($display_subcats) {
-			if(is_array($this->_childs))
-				foreach($this->_childs as $ch)
-					$_group_cats[] = $ch->id;
-		}
-		$_group_cats = array_unique($_group_cats);
-		$this->_group_cats = $_group_cats;
-		$_group_cats = "'".implode("','", $_group_cats)."'";
-		
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
-		// content language parameter UNUSED
-		$filterlang = $cparams->get('language', '');
-		$filtercat  = $cparams->get('filtercat', 0);
-		// show unauthorized items
-		$show_noauth = $cparams->get('show_noauth', 0);
-		
-		// First thing we need to do is to select only the requested items
-		$query->where('rel.catid IN ('.$_group_cats.')');
-
-		// Second is to only select items the user has access to
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$query->where('a.state IN ('.$states.')');
-		
-		// is the content current?
-		$query->where('( a.publish_up = '.$this->_db->Quote($nullDate).' OR a.publish_up <= '.$this->_db->Quote($now).' )');
-		$query->where('( a.publish_down = '.$this->_db->Quote($nullDate).' OR a.publish_down >= '.$this->_db->Quote($now).' )');
-
-
-		// Filter the category view with the active active language
-		/*if (FLEXI_FISH && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
-		}*/
-		
-		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT));
-
-		// Select only items user has access to if he is not allowed to show unauthorized items
-		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$query->where('(gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $gid . ')');
-			} else {
-				//$where .= ' AND i.access <= '.$gid;
-			}
-		}
-
-		/*
-		 * If we have a filter, and this is enabled... lets tack the AND clause
-		 * for the filter onto the WHERE clause of the item query.
-		 */
-		if ($cparams->get('use_filters'))
-		{
-			$filter 		= JRequest::getString('filter', '', 'request');
-
-			if ($filter)
-			{
-				// clean filter variables
-				$filter			= $this->_db->getEscaped( trim(JString::strtolower( $filter ) ) );
-
-				$query->where('LOWER( a.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $filter, true ).'%', false ));
-			}
-		}
-		
-		$filters = $this->getFilters();
-
-		if ($filters)
-		{
-			foreach ($filters as $filtre)
-			{
-				$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
-				if ($setfilter) {
-					$ids 	= $this->_getFiltered($filtre->id, $setfilter);
-					if ($ids)
-					{
-		 				$query->where('a.id IN (' . $ids . ')');
-					} else {
-		 				$query->where('a.id = 0');
-					}
-				}
-			}
-		}
-		$session  =& JFactory::getSession();
-		$alpha = JRequest::getVar('letter');
-		if($alpha===NULL) {
-			$alpha =  $session->get($option.'.category.letter');
-		}else{
-			$session->set($option.'.category.letter', $alpha);
-		}
-		if ($alpha == '0') {
-			$query->where('LOWER( a.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false ));
-		}		
-		elseif (!empty($alpha)) {
-			$query->where('LOWER( a.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false ));
-		}
-		
-		// Filter by language
-		if ($this->getState('filter.language')) {
-			$query->where('a.language in ('.$db->quote(JFactory::getLanguage()->getTag()).','.$db->quote('*').')');
-			$query->where('(contact.language in ('.$db->quote(JFactory::getLanguage()->getTag()).','.$db->quote('*').') OR contact.language IS NULL)');
-		}
-	}
-	
-	/**
-	 * Method to get the filter
-	 * 
 	 * @access public
-	 * @return object
-	 * @since 1.5
+	 * @return array
+	 * @since 1.0
 	 */
-	function getFilters()
-	{
+	function &getItem() {
 		$mainframe = &JFactory::getApplication();
+		global $globalcats;
 		
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		//$params 	= $this->_loadCategoryParams($this->_id);
-		$params 	= $this->_category_parameters;
-		$scope		= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
-		$filters	= null;
-		
-		$query  = 'SELECT fi.*'
-				. ' FROM #__flexicontent_fields AS fi'
-				. ' WHERE fi.access <= '.$gid
-				. $scope
-				. ' AND fi.published = 1'
-				. ' AND fi.isfilter = 1'
-				. ' ORDER BY fi.ordering, fi.name'
-				;
-			$this->_db->setQuery($query);
-			$filters = $this->_db->loadObjectList('name');
+		/*
+		* Load the Item data
+		*/
+		if ($this->_loadItem()) {
+			// Get the paramaters of the active menu item
+			$params = & $mainframe->getParams('com_flexicontent');
+			$user	= & JFactory::getUser();
+			$aid	= (int) $user->get('aid');
+			$gid	= (int) $user->get('gid');
+			$cid	= JRequest::getInt('cid');
 
-		foreach ($filters as $filter)
-		{
-			$filter->parameters = new JParameter($filter->attribs);
-		}
+			// Is the category published?
+			if ($cid) {
+				if (!$globalcats[$cid]->published) {
+					JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
+				}
+			}
+
+			// Do we have access to the category?
+			if (@$this->_item->id && @$this->_item->catid) {
+				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
+				foreach ($ancestors as $cat) {
+					if (FLEXI_ACCESS) {
+						if (FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $cat)) {
+							$canreadcat = true;
+						} else {
+							$canreadcat = false;
+							break;
+						}
+					} else {
+						if ($globalcats[$cat]->access <= $aid) {
+							$canreadcat = true;
+						} else {
+							$canreadcat = false;
+							break;
+						}
+					}
+				}
+
+				if (!@$canreadcat)
+				{
+					if (!$aid) {
+						// Redirect to login
+						$uri		= JFactory::getURI();
+						$return		= $uri->toString();
 		
-		return $filters;
+						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+						$url .= '&return='.base64_encode($return);
+		
+						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+					} else {
+						// Redirect to unauthorized page or 403
+						if ($params->get('unauthorized_page', '')) {
+							$mainframe->redirect($params->get('unauthorized_page'));				
+						} else {
+							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+							return false;
+						}
+					}
+				}
+			} else if (@$this->_item->id) {
+				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
+				return false;
+			}
+			
+			// Do we have access to the content itself
+			
+			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
+			{
+				if (!$aid) {
+					// Redirect to login
+					$uri		= JFactory::getURI();
+					$return		= $uri->toString();
+	
+					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+					$url .= '&return='.base64_encode($return);
+	
+					$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+				} else {
+					// Redirect to unauthorized page or 403
+					if ($params->get('unauthorized_page', '')) {
+						$mainframe->redirect($params->get('unauthorized_page'));				
+					} else {
+						JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+						return false;
+					}
+				}
+			} else if (@$this->_item->id) { // otherwise check for the standard states
+				$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				if (!@$canreaditem)
+				{
+					if (!$aid) {
+						// Redirect to login
+						$uri		= JFactory::getURI();
+						$return		= $uri->toString();
+		
+						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+						$url .= '&return='.base64_encode($return);
+		
+						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+					} else {
+						// Redirect to unauthorized page or 403
+						if ($params->get('unauthorized_page', '')) {
+							$mainframe->redirect($params->get('unauthorized_page'));				
+						} else {
+							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
+							return false;
+						}
+					}
+				}
+			}
+
+			//add the author email in order to display the gravatar
+			$query = 'SELECT email'
+			. ' FROM #__users'
+			. ' WHERE id = '. (int) $this->_item->created_by
+			;
+			$this->_db->setQuery($query);
+			$this->_item->creatoremail = $this->_db->loadResult();
+			
+			//reduce unneeded query
+			if ($this->_item->created_by_alias) {
+				$this->_item->creator = $this->_item->created_by_alias;
+			} else {
+				$query = 'SELECT name'
+				. ' FROM #__users'
+				. ' WHERE id = '. (int) $this->_item->created_by
+				;
+				$this->_db->setQuery($query);
+				$this->_item->creator = $this->_db->loadResult();
+			}
+
+			//reduce unneeded query
+			if ($this->_item->created_by == $this->_item->modified_by) {
+				$this->_item->modifier = $this->_item->creator;
+			} else {
+				$query = 'SELECT name'
+				. ' FROM #__users'
+				. ' WHERE id = '. (int) $this->_item->modified_by
+				;
+				$this->_db->setQuery($query);
+				$this->_item->modifier = $this->_db->loadResult();
+			}
+
+			if ($this->_item->modified == $this->_db->getNulldate()) {
+				$this->_item->modified = null;
+			}
+
+			//check session if uservisit already recorded
+			$session 	=& JFactory::getSession();
+			$hitcheck = false;
+			if ($session->has('hit', 'flexicontent')) {
+				$hitcheck 	= $session->get('hit', 0, 'flexicontent');
+				$hitcheck 	= in_array($this->_item->id, $hitcheck);
+			}
+			if (!$hitcheck) {
+				//record hit
+				$this->hit();
+
+				$stamp = array();
+				$stamp[] = $this->_item->id;
+				$session->set('hit', $stamp, 'flexicontent');
+			}
+			//we show the introtext and fulltext (chr(13) = carriage return)
+			//$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
+
+			$this->_loadItemParams();
+		}
+		else
+		{
+			$user =& JFactory::getUser();
+			$item =& JTable::getInstance('flexicontent_items', '');
+			if ($user->authorize('com_flexicontent', 'state'))	{
+				$item->state = 1;
+			}
+			$item->id					= 0;
+			$item->author				= null;
+			$item->created_by			= $user->get('id');
+			$item->text					= '';
+			$item->title				= null;
+			$item->metadesc				= '';
+			$item->metakey				= '';
+			$item->type_id				= JRequest::getVar('typeid', 0, '', 'int');
+			$item->typename				= null;
+			$item->search_index			= '';
+			$this->_item				= $item;
+		}
+		return $this->_item;
 	}
 
 	/**

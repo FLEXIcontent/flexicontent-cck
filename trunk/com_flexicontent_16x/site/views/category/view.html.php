@@ -72,7 +72,8 @@ class FlexicontentViewCategory extends JView
 		// Get data from the model		
 		$category 	= & $this->get('Category');
 		$categories	= & $this->get('Childs');
-		$items 		= & $this->get('Data');
+		//$items 		= & $this->get('Data');
+		$items 		= & $this->get('Items');
 		$filters 	= & $this->get('Filters');
 		$alpha	 	= & $this->get('Alphaindex');
 		$model		= & $this->getModel();
@@ -80,7 +81,7 @@ class FlexicontentViewCategory extends JView
 		$cparams	=& $category->parameters;
 		$params->merge($cparams);
 
-		$total 		= & $this->get('Total');
+		//$total 		= & $this->get('Total');
 		// Bind Fields
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
@@ -197,8 +198,7 @@ class FlexicontentViewCategory extends JView
 		$lists['filter']			= $filter;
 
 		// Add html to filter object
-		if ($filters)
-		{
+		if ($filters) {
 			// Make the filter compatible with Joomla standard cache
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -214,22 +214,20 @@ class FlexicontentViewCategory extends JView
 		// Create the pagination object
 		jimport('joomla.html.pagination');
 
-		$pageNav 	= new JPagination($total, $limitstart, $limit);
-
-		$this->assign('action', 			$uri->toString());
-
+		//$pageNav 	= new JPagination($total, $limitstart, $limit);
+		$pageNav = $this->get('Pagination');
+		$this->assign('action', 		$uri->toString());
 		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
-		
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , 	$categories);
-		$this->assignRef('items' , 			$items);
+		$this->assignRef('items' , 		$items);
 		$this->assignRef('category' , 		$category);
 		$this->assignRef('limitstart' , 	$limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);
 		$this->assignRef('filters' ,	 	$filters);
-		$this->assignRef('lists' ,	 		$lists);
-		$this->assignRef('alpha' ,	 		$alpha);
-		$this->assignRef('tmpl' ,			$tmpl);
+		$this->assignRef('lists' ,	 	$lists);
+		$this->assignRef('alpha' ,	 	$alpha);
+		$this->assignRef('tmpl' ,		$tmpl);
 		$this->assignRef('print_link' ,		$print_link);
 
 		/*

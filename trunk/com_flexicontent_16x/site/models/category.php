@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modellist');
 
 /**
  * FLEXIcontent Component Model
@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage Flexicontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModel{
+class FlexicontentModelCategory extends JModelList{
 	/**
 	 * Category id
 	 *
@@ -72,23 +72,56 @@ class FlexicontentModelCategory extends JModel{
 	var $_group_cats = array();
 
 	/**
+	 * Constructor.
+	 *
+	 * @param	array	An optional associative array of configuration settings.
+	 * @see		JController
+	 * @since	1.6
+	 */
+	public function __construct($config = array()) {
+		if (empty($config['filter_fields'])) {
+			$config['filter_fields'] = array(
+				'id', 'a.id',
+				'title', 'a.title',
+				'alias', 'a.alias',
+				'checked_out', 'a.checked_out',
+				'checked_out_time', 'a.checked_out_time',
+				'catid', 'a.catid', 'category_title',
+				'state', 'a.state',
+				'access', 'a.access', 'access_level',
+				'created', 'a.created',
+				'created_by', 'a.created_by',
+				'ordering', 'a.ordering',
+				'featured', 'a.featured',
+				'language', 'a.language',
+				'hits', 'a.hits',
+				'publish_up', 'a.publish_up',
+				'publish_down', 'a.publish_down',
+				'author', 'a.author'
+			);
+		}
+		$pk = JRequest::getInt('cid');
+		$this->setId((int)$pk);
+		
+		// Get the filter request variables
+		//$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
+		//$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+		parent::__construct($config);
+	}
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
-	{
+	/*function __construct() {
 		parent::__construct();
-
 		$mainframe = &JFactory::getApplication();
-
 		$cid			= JRequest::getInt('cid', 0);
-		
 		// we need to merge parameters here to get the correct page limit value
 		$params = $this->_loadCategoryParams($cid);
 
 		//get the number of entries from session
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');		
+		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');
 		$limitstart		= JRequest::getInt('limitstart');
 		
 		$this->setId((int)$cid);
@@ -99,6 +132,110 @@ class FlexicontentModelCategory extends JModel{
 		// Get the filter request variables
 		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+	}*/
+	
+	/**
+	 * Method to auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * return	void
+	 * @since	1.6
+	 */
+	protected function populateState($ordering = null, $direction = null) {
+		// Initiliase variables.
+		$app	= JFactory::getApplication('site');
+		$pk		= JRequest::getInt('cid');
+
+		$this->setState('category.id', $pk);
+
+		// Load the parameters. Merge Global and Menu Item params into new object
+		//$params = $app->getParams();//core joomla
+		// we need to merge parameters here to get the correct page limit value
+		$params = $this->_loadCategoryParams($pk);//flexicontent
+		$menuParams = new JRegistry;
+
+		if ($menu = $app->getMenu()->getActive()) {
+			$menuParams->loadJSON($menu->params);
+		}
+
+		$mergedParams = clone $menuParams;
+		$mergedParams->merge($params);
+
+		$this->setState('params', $mergedParams);
+		$user		= JFactory::getUser();
+				// Create a new query object.
+		$db		= $this->getDbo();
+		$query	= $db->getQuery(true);
+		$groups	= implode(',', $user->getAuthorisedViewLevels());
+
+		if ((!$user->authorise('core.edit.state', 'com_content')) &&  (!$user->authorise('core.edit', 'com_content'))){
+			// limit to published for people who can't edit or edit.state.
+			$this->setState('filter.published', 1);
+			// Filter by start and end dates.
+			$nullDate = $db->Quote($db->getNullDate());
+			$nowDate = $db->Quote(JFactory::getDate()->toMySQL());
+
+			$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
+			$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
+		}
+
+		// process show_noauth parameter
+		if (!$params->get('show_noauth')) {
+			$this->setState('filter.access', true);
+		} else {
+			$this->setState('filter.access', false);
+		}
+
+		// Optional filter text
+		$this->setState('list.filter', JRequest::getString('filter-search'));
+
+		// filter.order
+		$itemid = JRequest::getInt('cid', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$orderCol = $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order', 'filter_order', 'a.ordering', 'string');
+		// Get the filter request variables
+		//$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
+		//$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+		if (!in_array($orderCol, $this->filter_fields)) {
+			$orderCol = 'a.ordering';
+		}
+		$this->setState('list.ordering', $orderCol);
+
+		$listOrder = $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order_Dir',
+			'filter_order_Dir', 'ASC', 'cmd');
+		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', ''))) {
+			$listOrder = 'ASC';
+		}
+		$this->setState('list.direction', $listOrder);
+
+		$this->setState('list.start', JRequest::getVar('limitstart', 0, '', 'int'));
+		
+		// set limit for query. If list, use parameter. If blog, add blog parameters for limit.
+		/*if ((JRequest::getCmd('layout') == 'blog') || $params->get('layout_type') == 'blog') {
+			$limit = $params->get('num_leading_articles') + $params->get('num_intro_articles') + $params->get('num_links');
+			$this->setState('list.links', $params->get('num_links'));
+		}
+		else {*/
+			//$limit = $app->getUserStateFromRequest('com_content.category.list.' . $itemid . '.limit', 'limit', $params->get('display_num'));
+			$limit = $app->getUserStateFromRequest('com_flexicontent.category'.$pk.'.limit', 'limit', $params->def('limit', 0), 'int');
+		//}
+
+		$limitstart = JRequest::getInt('limitstart');
+		$this->setId((int)$pk);
+		/*$this->setState('limit', $limit);
+		$this->setState('limitstart', $limitstart);
+		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
+		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));*/
+
+		// set the depth of the category query based on parameter
+		//$showSubcategories = $params->get('show_subcategory_content', '0');
+
+		/*if ($showSubcategories) {
+			$this->setState('filter.max_category_levels', $params->get('show_subcategory_content', '1'));
+			$this->setState('filter.subcategories', true);
+		}*/
+		$this->setState('filter.language',$app->getLanguageFilter());
+		$this->setState('layout', JRequest::getCmd('layout'));
 	}
 
 	/**
@@ -114,6 +251,68 @@ class FlexicontentModelCategory extends JModel{
 		//$this->_data		= null;
 	}		
 
+	/**
+	 * Get the articles in the category
+	 *
+	 * @return	mixed	An array of articles or false if an error occurs.
+	 * @since	1.5
+	 */
+	function getItems() {
+		$params = $this->getState()->get('params');
+		$limit = $this->getState('list.limit');
+
+		if ($this->_data === null && $category = $this->getCategory()) {
+			$model = JModel::getInstance('Items', 'FlexicontentModel', array('ignore_request' => true));
+			$model->setState('params', $this->_loadCategoryParams(JRequest::getInt('cid')));
+			$model->setState('filter.category_id', $category->id);
+			$model->setState('filter.published', $this->getState('filter.published'));
+			$model->setState('filter.access', $this->getState('filter.access'));
+			$model->setState('filter.language', $this->getState('filter.language'));
+			//$model->setState('list.ordering', $this->_buildContentOrderBy());
+			$model->setState('list.start', $this->getState('list.start'));
+			$model->setState('list.limit', $limit);
+			$model->setState('list.direction', $this->getState('list.direction'));
+			$model->setState('list.filter', $this->getState('list.filter'));
+			// filter.subcategories indicates whether to include articles from subcategories in the list or blog
+			$model->setState('filter.subcategories', $this->getState('filter.subcategories'));
+			$model->setState('filter.max_category_levels', $this->setState('filter.max_category_levels'));
+			//$model->setState('list.links', $this->getState('list.links'));
+			//$model->setState('filter_order', $this->getState('filter_order'));
+			//$model->setState('filter_order_dir', $this->getState('filter_order_dir'));
+
+			if ($limit >= 0) {
+				/*$cparams 	= $this->_category->parameters;
+				$config = array();
+				$config['display_subcategories_items'] = $cparams->get('display_subcategories_items', 0);
+				// content language parameter UNUSED
+				$config['language'] = $cparams->get('language', '');
+				$config['filtercat']  = $cparams->get('filtercat', 0);
+				// show unauthorized items
+				$config['show_noauth'] = $cparams->get('show_noauth', 0);
+				$config['use_filters'] = $cparams->get('use_filters');*/
+				$model->_category_parameters = &$this->_category->parameters;
+				$this->_data = $model->getItems();
+
+				if ($this->_data === false) {
+					$this->setError($model->getError());
+				}
+			}
+			else {
+				$this->_data=array();
+			}
+
+			$this->_pagination = $model->getPagination();
+		}
+
+		return $this->_data;
+	}
+	
+	public function getPagination() {
+		if (empty($this->_pagination)) {
+			return null;
+		}
+		return $this->_pagination;
+	}
 
 	/**
 	 * Method to get Data
@@ -121,14 +320,12 @@ class FlexicontentModelCategory extends JModel{
 	 * @access public
 	 * @return mixed
 	 */
-	function getData()
+	/*function getData()
 	{
 		$format	= JRequest::getVar('format', null);
 		// Lets load the content if it doesn't already exist
-		if (empty($this->_data))
-		{
+		if (empty($this->_data)) {
 			$query = $this->_buildQuery();
-
 			$this->_total = $this->_getListCount($query);
 
 			if ((int)$this->getState('limitstart') < (int)$this->_total) {
@@ -137,9 +334,8 @@ class FlexicontentModelCategory extends JModel{
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
 			}
 		}
-
 		return $this->_data;
-	}
+	}*/
 
 	/**
 	 * Total nr of Categories
@@ -147,16 +343,70 @@ class FlexicontentModelCategory extends JModel{
 	 * @access public
 	 * @return integer
 	 */
-	function getTotal()
-	{
+	/*function getTotal() {
 		// Lets load the total nr if it doesn't already exist
-		if (empty($this->_total))
-		{
+		if (empty($this->_total)) {
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
 		}
 
 		return $this->_total;
+	}*/
+	
+	/**
+	 * Build the orderby for the query
+	 *
+	 * @return	string	$orderby portion of query
+	 * @since	1.5
+	 */
+	protected function _buildContentOrderBy()
+	{
+		$app		= JFactory::getApplication('site');
+		$db			= $this->getDbo();
+		//$params		= $this->state->params;
+		$itemid		= JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$orderCol	= $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order', 'filter_order', 'a.ordering', 'string');
+		$orderDirn	= $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order_Dir', 'filter_order_Dir', 'ASC', 'cmd');
+		$orderby	= ' ';
+
+		if (!in_array($orderCol, $this->filter_fields)) {
+			$orderCol = null;
+		}
+
+		if (!in_array(strtoupper($orderDirn), array('ASC', 'DESC', ''))) {
+			$orderDirn = 'ASC';
+		}
+
+		if ($orderCol && $orderDirn) {
+			$orderby .= $db->getEscaped($orderCol) . ' ' . $db->getEscaped($orderDirn) . ', ';
+		}
+
+		/*$articleOrderby		= $params->get('orderby_sec', 'rdate');
+		$articleOrderDate	= $params->get('order_date');
+		$categoryOrderby	= $params->def('orderby_pri', '');
+		$secondary			= ContentHelperQuery::orderbySecondary($articleOrderby, $articleOrderDate) . ', ';
+		switch ($categoryOrderby)
+		{
+			case 'alpha' :
+				$primary = 'c.path, ';
+				break;
+
+			case 'ralpha' :
+				$primary = 'c.path DESC, ';
+				break;
+
+			case 'order' :
+				$primary = 'c.lft, ';
+				break;
+
+			default :
+				$primary = '';
+				break;
+		}
+
+		$orderby .= $db->getEscaped($primary) . ' ' . $db->getEscaped($secondary) . ' a.created ';
+		*/
+		return $orderby;
 	}
 
 	/**
@@ -172,7 +422,6 @@ class FlexicontentModelCategory extends JModel{
 		$orderby		= $this->_buildItemOrderBy();
 
 		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-
 		$query = 'SELECT DISTINCT i.*, ie.*,c.lft,c.rgt,u.name as author, ty.name AS typename,'
 		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 		. ' FROM #__content AS i'
@@ -186,6 +435,7 @@ class FlexicontentModelCategory extends JModel{
 		. $where
 		. $orderby
 		;
+		//echo $query."<br />";exit;
 		return $query;
 	}
 
@@ -199,9 +449,10 @@ class FlexicontentModelCategory extends JModel{
 	{
 		$params = $this->_category->parameters;
 		
-		$filter_order		= $this->getState('filter_order');
-		$filter_order_dir	= $this->getState('filter_order_dir');
-
+		$filter_order		= $this->getState('filter_order', 'i.created');
+		$filter_order_dir	= $this->getState('filter_order_dir', 'DESC');
+		//$filter_order		= 'i.created';
+		//$filter_order_dir	= 'DESC';
 		if ($params->get('orderby')) {
 			$order = $params->get('orderby');
 			
@@ -210,6 +461,7 @@ class FlexicontentModelCategory extends JModel{
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'ASC';
 				break;
+				default:
 				case 'rdate' :
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'DESC';
@@ -243,9 +495,7 @@ class FlexicontentModelCategory extends JModel{
 				$filter_order_dir	= 'ASC';
 				break;
 			}
-			
-		}
-		
+		}		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 
 		return $orderby;
@@ -486,7 +736,7 @@ class FlexicontentModelCategory extends JModel{
 		$ordering	= 'ordering ASC';
 
 		if (FLEXI_ACCESS) {
-		$query = 'SELECT DISTINCTROW sc.*,'
+			$query = 'SELECT DISTINCTROW sc.*,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', sc.id, sc.alias) ELSE sc.id END as slug'
 				. ' FROM #__categories as sc'
 				. ' LEFT JOIN #__flexiaccess_acl AS gi ON sc.id = gi.axo AND gi.aco = "read" AND gi.axosection = "category"'
@@ -496,7 +746,7 @@ class FlexicontentModelCategory extends JModel{
 				. ' ORDER BY '.$ordering
 				;
 		} else {
-		$query = 'SELECT *,'
+			$query = 'SELECT *,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories'
 				. ' WHERE published = 1'
@@ -519,16 +769,14 @@ class FlexicontentModelCategory extends JModel{
 	 * @return array
 	 */
 
-	function getChilds()
-	{
+	function getChilds() {
 		$query = $this->_buildChildsquery();
 		$this->_childs = $this->_getList($query);
 //		$this->_childs = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 		$id = $this->_id;
 		$k = 0;
 		$count = count($this->_childs);
-		for($i = 0; $i < $count; $i++)
-		{
+		for($i = 0; $i < $count; $i++) {
 			$category =& $this->_childs[$i];
 			
 			$category->assigneditems	= $this->_getassigned( $category->id );
@@ -611,8 +859,7 @@ class FlexicontentModelCategory extends JModel{
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadCategoryParams($cid)
-	{
+	function _loadCategoryParams($cid) {
 		jimport("joomla.html.parameter");
 		$mainframe = &JFactory::getApplication();
 
