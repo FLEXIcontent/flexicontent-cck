@@ -104,6 +104,7 @@ if ($error) {
        	 	<strong>FLEXIcontent</strong><br/>
        	 	<span>Flexible content management system for Joomla! 1.6</span><br />
         	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a><br/>
+        	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
        	 	<span>Logo and icons</span><br />
         	<font class="small">by <a href="http://www.artefact-design.com" target="_blank">Greg Berthelot</a><br/>
 		</td>
