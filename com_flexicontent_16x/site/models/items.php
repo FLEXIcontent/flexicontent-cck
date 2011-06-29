@@ -556,8 +556,7 @@ class FlexicontentModelItems extends JModelList{
 			$hitsFilter = intval($filter);
 			$filter = $db->Quote('%'.$db->getEscaped($filter, true).'%', false);
 
-			switch ($params->get('filter_field'))
-			{
+			switch ($params->get('filter_field')) {
 				case 'author':
 					$query->where(
 						'LOWER( CASE WHEN a.created_by_alias > '.$db->quote(' ').
@@ -581,10 +580,10 @@ class FlexicontentModelItems extends JModelList{
 		// Second is to only select items the user has access to
 		//$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		//$query->where('i.state IN ('.$states.')');
-		
+
 		// First thing we need to do is to select only the requested items
 		//$query->where('rel.catid IN ('.$_group_cats.')';
-		
+
 		//$cid = JRequest::getInt('cid');
 		//$_group_cats = array($cid);
 

@@ -43,7 +43,7 @@ class FlexicontentHelperRoute
 		);
 
 		//Create the link
-		$link = 'index.php?option=com_flexicontent&view=items';
+		$link = 'index.php?option=com_flexicontent&view=item';
 
 		if($catid) {
 			$link .= '&cid='.$catid;

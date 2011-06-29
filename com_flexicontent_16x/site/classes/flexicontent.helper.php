@@ -179,7 +179,7 @@ class flexicontent_html{
 			$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 			$text = JText::_( 'FLEXI_CREATE_PDF' );
 
-			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
+			$link 	= 'index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -212,7 +212,7 @@ class flexicontent_html{
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -230,7 +230,7 @@ class flexicontent_html{
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -260,7 +260,7 @@ class flexicontent_html{
 			$overlib = JText::_( 'FLEXI_ADD_TIP' );
 			$text = JText::_( 'FLEXI_ADD' );
 
-			$link 	= 'index.php?view=items&task=add';
+			$link 	= 'index.php?view=item&task=add';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;

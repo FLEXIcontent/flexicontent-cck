@@ -69,11 +69,11 @@ class plgSystemFlexisystem extends JPlugin{
 		if (FLEXI_CATEGORY) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
-			// add the category tree to categories cache
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-			$catscache->setCaching(1); 		//force cache
-			$catscache->setLifeTime(84600); //set expiry to one day
-			$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+				// add the category tree to categories cache
+				$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+				$catscache->setCaching(1); 		//force cache
+				$catscache->setLifeTime(84600); //set expiry to one day
+				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}
@@ -240,7 +240,7 @@ class plgSystemFlexisystem extends JPlugin{
 			foreach ($children[$id] as $v) {
 				$id = $v->id;
 				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != FLEXI_CATEGORY) {
 					$ancestors[] 	= $v->parent_id;
 				} 
 				
