@@ -38,7 +38,7 @@ if ($this->perms['cantags']) {
 	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
 				width: 260,
 				matchContains: false,
 				mustMatch: false,

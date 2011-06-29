@@ -334,7 +334,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$cattmpl 	= JFolder::files($catdir);		
 			$ctmpl 		= array_diff($cattmpl,$files);
 			
-			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'item'.DS.'tmpl');
 			$itemtmpl 	= JFolder::files($itemdir);		
 			$itmpl 		= array_diff($itemtmpl,$files);
 			

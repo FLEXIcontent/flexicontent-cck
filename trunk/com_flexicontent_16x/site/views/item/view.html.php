@@ -27,8 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItems extends JView
-{
+class FlexicontentViewItem extends JView {
 	/**
 	 * Creates the item page
 	 *
@@ -43,10 +42,10 @@ class FlexicontentViewItems extends JView
 		$user		= & JFactory::getUser();
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		$dispatcher = & JDispatcher::getInstance();
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$dispatcher 	= & JDispatcher::getInstance();
+		$params		= & $mainframe->getParams('com_flexicontent');
 		$aid		= (int) $user->get('aid');
-		
+		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$cid		= JRequest::getInt('cid', 0);
 
@@ -54,7 +53,7 @@ class FlexicontentViewItems extends JView
 			$this->_displayForm($tpl);
 			return;
 		}
-		
+
 		//Set layout
 		$this->setLayout('item');
 
@@ -75,9 +74,8 @@ class FlexicontentViewItems extends JView
 		
 		//get item data
 		JRequest::setVar('loadcurrent', true);
-		$item 	= & $this->get('Item');
-				
-		$iparams	=& $item->parameters;
+		$item = $model->getItem();
+		$iparams =& $item->parameters;
 		$params->merge($iparams);
 
 		// Bind Fields
@@ -91,12 +89,10 @@ class FlexicontentViewItems extends JView
 			$this->assignRef('pane', $pane);
 		}
 
-		if ($item->id == 0)
-		{	
+		if ($item->id == 0) {	
 			$id	= JRequest::getInt('id', 0);
 			return JError::raiseError( 404, JText::sprintf( 'MANU ITEM #%d NOT FOUND', $id ) );
 		}
-		
 		$fields		=& $item->fields;
 
 		// Pathway need to be improved
@@ -153,29 +149,28 @@ class FlexicontentViewItems extends JView
 		} else {
 			$doc_title = $params->get( 'page_title' );
 		}
-		
+
 		$document->setTitle($doc_title);
-		
+
 		if ($item->metadesc) {
 			$document->setDescription( $item->metadesc );
 		}
-		
+
 		if ($item->metakey) {
 			$document->setMetadata('keywords', $item->metakey);
 		}
-		
+
 		if ($mainframe->getCfg('MetaTitle') == '1') {
-			$mainframe->addMetaTag('title', $item->title);
+			$document->setMetaData('title', $item->title);
 		}
-		
+
 		if ($mainframe->getCfg('MetaAuthor') == '1') {
-			$mainframe->addMetaTag('author', $item->author);
+			$document->setMetaData('author', $item->author);
 		}
 
 		$mdata = new JParameter($item->metadata);
 		$mdata = $mdata->toArray();
-		foreach ($mdata as $k => $v)
-		{
+		foreach ($mdata as $k => $v) {
 			if ($v) {
 				$document->setMetadata($k, $v);
 			}
@@ -184,9 +179,7 @@ class FlexicontentViewItems extends JView
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		
 		// increment the hit counter
-		if ($limitstart == 0)
-		{
-			$model =& $this->getModel();
+		if ($limitstart == 0) {
 			$model->hit();
 		}
 
@@ -233,7 +226,7 @@ class FlexicontentViewItems extends JView
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 		}
 
-		$print_link = JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
+		$print_link = JRoute::_('index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 
 		$this->assignRef('item' , 				$item);
 		$this->assignRef('user' , 				$user);

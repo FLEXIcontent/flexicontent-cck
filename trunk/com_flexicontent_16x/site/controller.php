@@ -67,10 +67,10 @@ class FlexicontentController extends JController
 		$user	=& JFactory::getUser();
 
 		// Create the view
-		$view = & $this->getView('items', 'html');
+		$view = & $this->getView('item', 'html');
 
 		// Get/Create the model
-		$model = & $this->getModel('items');
+		$model = & $this->getModel('item');
 
 		// first verify it's an edit action
 		if ($model->get('id') > 1)
@@ -101,7 +101,7 @@ class FlexicontentController extends JController
 		if ( $model->isCheckedOut($user->get('id')))
 		{
 			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-			$this->setRedirect(JRoute::_('index.php?view=items&id='.$model->get('id'), false), $msg);
+			$this->setRedirect(JRoute::_('index.php?view=item&id='.$model->get('id'), false), $msg);
 			return;
 		}
 
@@ -133,7 +133,7 @@ class FlexicontentController extends JController
 		$user	=& JFactory::getUser();
 
 		// Create the view
-		$view = & $this->getView('items', 'html');
+		$view = & $this->getView('item', 'html');
 
 		//general access check
 		if (FLEXI_ACCESS) {
@@ -159,7 +159,7 @@ class FlexicontentController extends JController
 		}
 
 		// Get/Create the model
-		$model = & $this->getModel('Items');
+		$model = & $this->getModel('Item');
 
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
@@ -187,7 +187,7 @@ class FlexicontentController extends JController
 		$user		= & JFactory::getUser();
 
 		//get model
-		$model = $this->getModel('Items');
+		$model = $this->getModel('Item');
 
 		//get data from request
 		$post = JRequest::get('post');
@@ -343,7 +343,7 @@ class FlexicontentController extends JController
 			$stamp[] = $id;
 			$session->set('vote', $stamp, 'flexicontent');
 
-			$model 	= $this->getModel('items');
+			$model 	= $this->getModel('item');
 			if ($model->storevote($id, $vote)) {
 				$msg = JText::_( 'FLEXI_VOTE COUNTED' );
 			} else {
@@ -355,7 +355,7 @@ class FlexicontentController extends JController
 		$cache = &JFactory::getCache('com_flexicontent');
 		$cache->clean();
 
-		$this->setRedirect(JRoute::_('index.php?view=items&cid='.$cid.'&id='.$id.'&layout='.$layout, false), $msg );
+		$this->setRedirect(JRoute::_('index.php?view=item&cid='.$cid.'&id='.$id.'&layout='.$layout, false), $msg );
 	}
 
 	/**
@@ -370,7 +370,7 @@ class FlexicontentController extends JController
 		$user 	=& JFactory::getUser();
 		$id 	=  JRequest::getInt('id', 0);
 		$db  	=& JFactory::getDBO();
-		$model 	=  $this->getModel('Items');
+		$model 	=  $this->getModel('Item');
 
 		if (!$user->get('id'))
 		{
@@ -406,7 +406,7 @@ class FlexicontentController extends JController
 	/**
 	 *  Method for voting (ajax)
 	 *
-	 * @TODO move the query part to the items model
+	 * @TODO move the query part to the item model
 	 * @access public
 	 * @since 1.5
 	 */
@@ -522,7 +522,7 @@ class FlexicontentController extends JController
 		}
 
 		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel('Items');
+		$model 	= $this->getModel('Item');
 		$tags 	= $model->getAlltags();
 
 		$used = null;
@@ -573,7 +573,7 @@ class FlexicontentController extends JController
 		$name 	= JRequest::getString('name', '');
 
 		if ($user->authorize('com_flexicontent', 'newtags')) {
-			$model 	= $this->getModel('items');
+			$model 	= $this->getModel('item');
 			$model->addtag($name);
 		}
 		return;
@@ -616,7 +616,7 @@ class FlexicontentController extends JController
 		$cid 	= JRequest::getInt('cid', 0);
 		$id 	= JRequest::getInt('id', 0);
 
-		$model 	= $this->getModel('items');
+		$model 	= $this->getModel('item');
 		if ($model->addfav()) {
 			$msg = JText::_( 'FLEXI_FAVOURITE_ADDED' );
 		} else {
@@ -627,7 +627,7 @@ class FlexicontentController extends JController
 		$cache = &JFactory::getCache('com_flexicontent');
 		$cache->clean();
 
-		$this->setRedirect(JRoute::_('index.php?view=items&cid='.$cid.'&id='. $id, false), $msg );
+		$this->setRedirect(JRoute::_('index.php?view=item&cid='.$cid.'&id='. $id, false), $msg );
 
 		return;
 	}
@@ -644,7 +644,7 @@ class FlexicontentController extends JController
 		$cid 	= JRequest::getInt('cid', 0);
 		$id 	= JRequest::getInt('id', 0);
 
-		$model 	= $this->getModel('items');
+		$model 	= $this->getModel('item');
 		if ($model->removefav()) {
 			$msg = JText::_( 'FLEXI_FAVOURITE_REMOVED' );
 		} else {
@@ -656,7 +656,7 @@ class FlexicontentController extends JController
 		$cache->clean();
 		
 		if ($cid) {
-			$this->setRedirect(JRoute::_('index.php?view=items&cid='.$cid.'&id='. $id, false), $msg );
+			$this->setRedirect(JRoute::_('index.php?view=item&cid='.$cid.'&id='. $id, false), $msg );
 		} else {
 			$this->setRedirect(JRoute::_('index.php?view=favourites', false), $msg );
 		}
@@ -676,7 +676,7 @@ class FlexicontentController extends JController
 		$id 	= JRequest::getInt( 'id', 0 );
 		$state 	= JRequest::getInt( 'state', 0 );
 
-		$model = $this->getModel('items');
+		$model = $this->getModel('item');
 
 		if(!$model->setitemstate($id, $state)) {
 			JError::raiseError( 500, $model->getError() );
@@ -945,7 +945,7 @@ class FlexicontentController extends JController
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 			//header("Content-type:text/json");
-			$model 		=  $this->getModel('items');
+			$model 		=  $this->getModel('item');
 			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
 			$array = array();
 			echo "[";

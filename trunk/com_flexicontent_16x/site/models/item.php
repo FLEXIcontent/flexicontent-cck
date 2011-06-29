@@ -27,7 +27,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItems extends JModel
+class FlexicontentModelItem extends JModel
 {
 	/**
 	 * Details data in details array
@@ -135,8 +135,9 @@ class FlexicontentModelItems extends JModel
 			$params = & $mainframe->getParams('com_flexicontent');
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
-			$gid	= (int) $user->get('gid');
+			//$gid	= (int) $user->get('gid');
 			$cid	= JRequest::getInt('cid');
+			$usergroups = $user->getAuthorisedGroups();
 
 			// Is the category published?
 			if ($cid) {
@@ -149,23 +150,31 @@ class FlexicontentModelItems extends JModel
 			if (@$this->_item->id && @$this->_item->catid) {
 				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
 				foreach ($ancestors as $cat) {
-					if (FLEXI_ACCESS) {
+					/*if (FLEXI_ACCESS) {
 						if (FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $cat)) {
 							$canreadcat = true;
 						} else {
 							$canreadcat = false;
 							break;
 						}
-					} else {
-						if ($globalcats[$cat]->access <= $aid) {
+					} else {*/
+						//if ($user->authorise('flexicontent.usercats','com_flexicontent') || ($globalcats[$cat]->access <= $aid)) {
+						if(in_array($globalcats[$cat]->access, $usergroups)) {
 							$canreadcat = true;
 						} else {
 							$canreadcat = false;
 							break;
 						}
-					}
+					//}
 				}
-
+				/*echo "<xmp>";
+				//var_dump(get_class_methods(get_class($user)));
+				var_dump($user->authorise('flexicontent.usercats', 'com_flexicontent'));
+				var_dump($user->getAuthorisedCategories('com_flexicontent', 'flexicontent.usercats'));
+				var_dump($user->getAuthorisedGroups());
+				var_dump($canreadcat);
+				echo "</xmp>";
+				exit;*/
 				if (!@$canreadcat)
 				{
 					if (!$aid) {
@@ -193,8 +202,8 @@ class FlexicontentModelItems extends JModel
 			}
 			
 			// Do we have access to the content itself
-			
-			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
+			//var_dump($this->_item->id, $this->_item->state, $gid);exit;
+			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 ) // access the workflow for editors or more
 			{
 				if (!$aid) {
 					// Redirect to login
@@ -215,7 +224,8 @@ class FlexicontentModelItems extends JModel
 					}
 				}
 			} else if (@$this->_item->id) { // otherwise check for the standard states
-				$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				/*$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;*/
+				$canreaditem = in_array($this->_item->access, $usergroups);
 				if (!@$canreaditem)
 				{
 					if (!$aid) {
@@ -333,16 +343,16 @@ class FlexicontentModelItems extends JModel
 
 			$where	= $this->_buildItemWhere();
 			$query = 'SELECT i.*, ie.*, c.access AS cataccess, c.id AS catid, c.published AS catpublished,'
-			. ' u.name AS author, u.usertype, ty.name AS typename,'
-			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. $where
+				. ' u.name AS author, u.usertype, ty.name AS typename,c.lft,c.rgt,'
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				. ' FROM #__content AS i'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. $where
 			;
 			$this->_db->setQuery($query);
 			$item = $this->_db->loadObject();
@@ -538,18 +548,17 @@ class FlexicontentModelItems extends JModel
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadItemParams()
-	{
-		global $mainframe;
-
+	function _loadItemParams() {
+		$mainframe = &JFactory::getApplication();
+		jimport('joomla.html.parameter');
 		// Get the page/component configuration
 		$params = clone($mainframe->getParams('com_flexicontent'));
 
 		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id
-				;
+			. ' FROM #__flexicontent_types AS t'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+			. ' WHERE ie.item_id = ' . (int)$this->_id
+			;
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		
@@ -573,7 +582,6 @@ class FlexicontentModelItems extends JModel
 			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
 		}
 */
-
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;
 	}
