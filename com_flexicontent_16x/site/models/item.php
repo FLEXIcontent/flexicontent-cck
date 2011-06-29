@@ -126,7 +126,6 @@ class FlexicontentModelItem extends JModel
 	function &getItem() {
 		$mainframe = &JFactory::getApplication();
 		global $globalcats;
-		
 		/*
 		* Load the Item data
 		*/
@@ -150,31 +149,13 @@ class FlexicontentModelItem extends JModel
 			if (@$this->_item->id && @$this->_item->catid) {
 				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
 				foreach ($ancestors as $cat) {
-					/*if (FLEXI_ACCESS) {
-						if (FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $cat)) {
-							$canreadcat = true;
-						} else {
-							$canreadcat = false;
-							break;
-						}
-					} else {*/
-						//if ($user->authorise('flexicontent.usercats','com_flexicontent') || ($globalcats[$cat]->access <= $aid)) {
-						if(in_array($globalcats[$cat]->access, $usergroups)) {
-							$canreadcat = true;
-						} else {
-							$canreadcat = false;
-							break;
-						}
-					//}
+					if(in_array($globalcats[$cat]->access, $usergroups)) {
+						$canreadcat = true;
+					} else {
+						$canreadcat = false;
+						break;
+					}
 				}
-				/*echo "<xmp>";
-				//var_dump(get_class_methods(get_class($user)));
-				var_dump($user->authorise('flexicontent.usercats', 'com_flexicontent'));
-				var_dump($user->getAuthorisedCategories('com_flexicontent', 'flexicontent.usercats'));
-				var_dump($user->getAuthorisedGroups());
-				var_dump($canreadcat);
-				echo "</xmp>";
-				exit;*/
 				if (!@$canreadcat)
 				{
 					if (!$aid) {
@@ -202,7 +183,6 @@ class FlexicontentModelItem extends JModel
 			}
 			
 			// Do we have access to the content itself
-			//var_dump($this->_item->id, $this->_item->state, $gid);exit;
 			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 ) // access the workflow for editors or more
 			{
 				if (!$aid) {
@@ -224,7 +204,6 @@ class FlexicontentModelItem extends JModel
 					}
 				}
 			} else if (@$this->_item->id) { // otherwise check for the standard states
-				/*$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;*/
 				$canreaditem = in_array($this->_item->access, $usergroups);
 				if (!@$canreaditem)
 				{
@@ -919,11 +898,11 @@ class FlexicontentModelItem extends JModel
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			if (FLEXI_ACCESS) {
+			/*if (FLEXI_ACCESS) {//commented by enjoyman, I don't understand these lines.
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
 				if ($canRight) FAccess::saveaccess( $item, 'item' );
-			}
+			}*/
 
 			$this->_item	=& $item;
 
