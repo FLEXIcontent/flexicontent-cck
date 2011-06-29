@@ -75,25 +75,12 @@ class FlexicontentController extends JController
 		// first verify it's an edit action
 		if ($model->get('id') > 1)
 		{
-			if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-			
-				if ( (!in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) && (!in_array('edit', $rights)))
-				{
-					// user isn't authorize to edit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
-			} else {
-				$canEdit	= $user->authorize('com_content', 'edit', 'content', 'all');
-				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own');
-				
-				if ( $canEdit || ($canEditOwn && ($model->get('created_by') == $user->get('id'))) )
-				{
-					// continue
-				} else {
-					// user isn't authorize to edit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
+			$canEdit	= $user->authorize('flexicontent.editall', 'com_flexicontent');
+			$canEditOwn	= $user->authorize('flexicontent.editown', 'com_flexicontent');
+			if ( !($canEdit || ($canEditOwn && ($model->get('created_by') == $user->get('id')))) )
+			{
+				// user isn't authorize to edit
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
 		}
 
@@ -136,26 +123,12 @@ class FlexicontentController extends JController
 		$view = & $this->getView('item', 'html');
 
 		//general access check
-		if (FLEXI_ACCESS) {
-			$canAdd 	= FAccess::checkUserElementsAccess($user->gmid, 'submit');
-
-			if ( @$canAdd['content'] || @$canAdd['category'] )
-			{
-				// continue
-			} else {
-				// user isn't authorize to edit
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-			}
-		} else {
-			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-			
-			if ($canAdd)
-			{
-				// continue
-			} else {
-				// user isn't authorize to edit
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-			}
+		$canAdd	= $user->authorize('flexicontent.create', 'com_flexicontent');
+		$canAddCat = $user->authorize('flexicontent.createcat', 'com_flexicontent');
+		if (!$canAdd && !$canAddCat)
+		{
+			// user isn't authorize to edit
+			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		}
 
 		// Get/Create the model

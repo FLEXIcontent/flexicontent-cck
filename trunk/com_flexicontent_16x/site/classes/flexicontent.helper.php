@@ -172,7 +172,7 @@ class flexicontent_html{
 		if ($params->get('show_pdf_icon')) {
 
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'pdf_button.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				$image = JHTML::_('image.site', 'pdf_button.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
