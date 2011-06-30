@@ -22,10 +22,18 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function plgFlexicontent_fieldsTextarea( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->field_type != 'textarea') return;
+		$textplugin =& JPluginHelper::getPlugin('flexicontent_fields', 'text');
+		$field_type = $field->field_type;
+		$field->field_type =  'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type =  'textarea';
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

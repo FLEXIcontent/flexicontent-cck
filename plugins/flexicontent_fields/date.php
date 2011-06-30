@@ -22,10 +22,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	function plgFlexicontent_fieldsDate( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
+        	JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsDate::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

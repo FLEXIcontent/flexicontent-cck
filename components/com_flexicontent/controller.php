@@ -960,5 +960,31 @@ class FlexicontentController extends JController
 			exit;
 		}
 	}
+	
+	function search()
+	{
+		// slashes cause errors, <> get stripped anyway later on. # causes problems.
+		$badchars = array('#','>','<','\\'); 
+		$searchword = trim(str_replace($badchars, '', JRequest::getString('searchword', null, 'post')));
+		// if searchword enclosed in double quotes, strip quotes and do exact match
+		if (substr($searchword,0,1) == '"' && substr($searchword, -1) == '"') { 
+			$searchword = substr($searchword,1,-1);
+			JRequest::setVar('searchphrase', 'exact');
+			JRequest::setVar('searchword', $searchword);
+		}
+		
+		// set Itemid id for links from menu
+		$menu = &JSite::getMenu();
+		$items	= $menu->getItems('link', 'index.php?option=com_flexicontent&view=search');
+
+		if(isset($items[0])) {
+			JRequest::setVar('Itemid', $items[0]->id);
+		}
+		$itemmodel = &$this->getModel('items');
+		$view  = &$this->getView('search', 'html');
+		$view->_models['items'] = &$itemmodel;
+		JRequest::setVar('view', 'search');
+		parent::display(true);
+	}
 }
 ?>

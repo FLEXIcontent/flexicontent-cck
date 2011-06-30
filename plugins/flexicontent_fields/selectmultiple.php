@@ -22,10 +22,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 	function plgFlexicontent_fieldsSelectmultiple( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_selectmultiple', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_selectmultiple', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsSelectmultiple::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

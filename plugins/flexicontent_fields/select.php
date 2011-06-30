@@ -21,10 +21,12 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	function plgFlexicontent_fieldsSelect( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'select') return;

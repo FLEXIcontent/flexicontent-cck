@@ -17,16 +17,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsText extends JPlugin
-{
-	function plgFlexicontent_fieldsText( &$subject, $params )
-	{
+class plgFlexicontent_fieldsText extends JPlugin{
+	function plgFlexicontent_fieldsText( &$subject, $params ) {
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+        	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
-	{
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
@@ -40,7 +39,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
-						
+
 		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
 		$required 	= $required ? ' required' : '';

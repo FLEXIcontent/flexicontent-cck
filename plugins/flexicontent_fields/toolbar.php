@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	function plgFlexicontent_fieldsToolbar( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_toolbar', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_toolbar', JPATH_ADMINISTRATOR);
 	}
 
 	function onDisplayField(&$field, $item)
@@ -217,7 +217,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$field->{$prop} = $display;
 	}
 
-	function onBeforeSaveField(&$field, &$post, $file)
+	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'toolbar') return;
