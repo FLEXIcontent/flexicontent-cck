@@ -24,8 +24,10 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		parent::__construct( $subject, $params );
         	JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item) {
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsCheckbox::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkbox') return;

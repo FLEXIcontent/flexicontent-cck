@@ -24,8 +24,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsMinigallery::onDisplayField($field, $item);
+	}
 
-	function onDisplayField(&$field, $item)
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
@@ -302,7 +305,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	}
 	
 
-	function onBeforeSaveField(&$field, &$post, $file)
+	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;

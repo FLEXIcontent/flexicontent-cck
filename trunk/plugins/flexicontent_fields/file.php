@@ -24,8 +24,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsFile::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

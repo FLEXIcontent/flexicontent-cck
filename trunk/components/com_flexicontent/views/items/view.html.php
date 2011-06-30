@@ -310,7 +310,7 @@ class FlexicontentViewItems extends JView
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
-			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$item ));
 		}
 		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 		$allowunauthorize = $params->get('allowunauthorize', 0);

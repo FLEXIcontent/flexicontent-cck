@@ -30,10 +30,14 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function plgFlexicontent_fieldsLinkslist( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_linkslist', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_linkslist', JPATH_ADMINISTRATOR);
+	}
+	
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsLinkslist::onDisplayField($field, $item);
 	}
 
-	function onDisplayField(&$field, $item)
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

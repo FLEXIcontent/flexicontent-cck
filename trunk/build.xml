@@ -59,6 +59,21 @@
 			</fileset>
 		</copy>
 
+		<copy file="modules/mod_flexiadvsearch/index.html" tofile="flexipack/modules/mod_flexiadvsearch/index.html" />
+		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.php" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.php" />
+		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" />
+		<copy file="language/en-GB/en-GB.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/en-GB.mod_flexiadvsearch.ini" />
+		<copy todir="flexipack/modules/mod_flexitagcloud/elements" >
+			<fileset dir="modules/mod_flexitagcloud/elements">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexiadvsearch/tmpl" >
+			<fileset dir="modules/mod_flexiadvsearch/tmpl">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
 		<!-- plugins -->
 		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="flexipack/plugins/checkbox/checkbox.php" />
 		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="flexipack/plugins/checkbox/checkbox.xml" />
@@ -194,6 +209,10 @@
 		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexisearch.ini" />
 		<copy file="administrator/language/fr-FR/fr-FR.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/fr-FR.plg_search_flexisearch.ini" />
+		
+		<copy file="plugins/search/flexiadvsearch.php" tofile="flexipack/plugins/search/flexiadvsearch.php" />
+		<copy file="plugins/search/flexiadvsearch.xml" tofile="flexipack/plugins/search/flexiadvsearch.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexiadvsearch.ini" />
 		
 		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/system/flexisystem.php" />
 		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />

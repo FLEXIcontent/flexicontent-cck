@@ -38,6 +38,7 @@
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
+		<param name="adv_size" type="text" default="30" size="2" label="Adv. search field size" description="Advanced search field size" />
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>

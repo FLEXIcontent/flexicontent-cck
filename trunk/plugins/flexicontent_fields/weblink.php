@@ -22,7 +22,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	function plgFlexicontent_fieldsWeblink( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_weblink', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_weblink', JPATH_ADMINISTRATOR);
+	}
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsWeblink::onDisplayField($field, $item);
 	}
 
 	function onDisplayField(&$field, $item)
