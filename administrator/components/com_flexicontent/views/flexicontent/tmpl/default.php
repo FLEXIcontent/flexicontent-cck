@@ -156,19 +156,17 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 			<td valign="top" width="400px" style="padding: 7px 0 0 5px">
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			
-			if (!$this->dopostinstall) {
+			if (!$this->dopostinstall || !$this->allplgpublish) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-
 			$title = JText::_( 'FLEXI_UNAPPROVED' );
 			echo $this->pane->startPanel( $title, 'unapproved' );
-				?>
+			?>
 				<table class="adminlist">
-				<?php
+			<?php
 					$k = 0;
 					$n = count($this->unapproved);
 					for ($i=0, $n; $i < $n; $i++) {
@@ -183,7 +181,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 						$canEditOwn	= 1;
 					}
 					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
-				?>
+			?>
 					<tr>
 						<td>
 						<?php

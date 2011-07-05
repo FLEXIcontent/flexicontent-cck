@@ -43,6 +43,13 @@ class FlexicontentController extends JController
 		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
+
+		$allplgpublish =& $session->get('flexicontent.allplgpublish');
+		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
+			$model 			= $this->getModel('flexicontent');
+			$allplgpublish 		= & $model->getAllPluginsPublished();
+			$session->set('flexicontent.allplgpublish', $allplgpublish);
+		}
 		
 		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
@@ -65,11 +72,10 @@ class FlexicontentController extends JController
 	}
 
 	function getPostinstallState() {
-		$model 				= $this->getModel('flexicontent');
-		$existtype 			= & $model->getExistType();
+		$model 			= $this->getModel('flexicontent');
+		$existtype 		= & $model->getExistType();
 		$existfields 		= & $model->getExistFields();
-		$allplgpublish 		= & $model->getAllPluginsPublished();
-		$existlang	 		= & $model->getExistLanguageColumn();
+		$existlang	 	= & $model->getExistLanguageColumn();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
 		$oldbetafiles		= & $model->getOldBetaFiles();
@@ -78,7 +84,7 @@ class FlexicontentController extends JController
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
 		$dopostinstall = true;
-		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+		if ((!$existfields) || (!$existtype) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
 			$dopostinstall = false;
 		}
 		return $dopostinstall;
