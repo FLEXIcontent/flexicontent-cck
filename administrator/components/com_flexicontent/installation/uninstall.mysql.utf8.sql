@@ -11,4 +11,5 @@ DROP TABLE IF EXISTS
 `#__flexicontent_tags`,
 `#__flexicontent_tags_item_relations`,
 `#__flexicontent_types`,
-`#__flexicontent_versions`;
+`#__flexicontent_versions`,
+`#__flexicontent_advsearch_index`;
