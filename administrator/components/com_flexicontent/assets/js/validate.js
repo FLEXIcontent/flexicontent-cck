@@ -175,6 +175,8 @@ var JFormValidator = new Class({
 
 	validate: function(el)
 	{
+	  // Declare the variable if not already / IE8 validation fix by ggppdk ;)
+	  el = $(el);
 	  // If the field is required make sure it has a value
 	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
 	      if ($(el).hasClass('required')) {
