@@ -26,7 +26,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
 		if($field->field_type != 'textarea') return;
-		$textplugin =& JPluginHelper::getPlugin('flexicontent_fields', 'text');
 		$field_type = $field->field_type;
 		$field->field_type =  'text';
 		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
@@ -78,6 +77,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// create the fulltext search index
 		$searchindex = flexicontent_html::striptagsandcut($post) . ' | ';		
 		$field->search = $field->issearch ? $searchindex : '';
+		if($field->isadvsearch) {
+			$db = &JFactory::getDBO();
+			$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='textarea';";
+			$db->setQuery($query);
+			$db->query();
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','textarea','0', ".$db->Quote($post).");";
+			$db->setQuery($query);
+			$db->query();
+		}
 	}
 
 
@@ -101,5 +109,26 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		} else {
 			$field->{$prop}	 = '';
 		}
+	}
+	
+	function onFLEXIAdvSearch(&$field, $item_id, $fieldsearch) {
+		if($field->field_type!='textarea') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT f.*,ai.search_index FROM #__flexicontent_advsearch_index as ai"
+				." JOIN #__flexicontent_files as f ON f.id=ai.extraid"
+				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='textarea' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			$objs = is_array($objs)?$objs:array();
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		return $resultfields;
 	}
 }

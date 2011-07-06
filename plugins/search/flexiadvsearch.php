@@ -97,19 +97,22 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$text = $db->getEscaped($text);
 		switch ($phrase) {
 			case 'exact':
-				$text		= $db->Quote( '"'.$db->getEscaped( $text, true ).'"', false );
+				//$text		= $db->Quote( '"'.$db->getEscaped( $text, true ).'"', false );
+				$text		= $db->Quote( '"'.$db->getEscaped( $text, false ).'"', false );
 				$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 				break;
 
 			case 'all':
 				$words = explode( ' ', $text );
 				$newtext = '+' . implode( ' +', $words );
-				$text		= $db->Quote( $db->getEscaped( $newtext, true ), false );
+				//$text		= $db->Quote( $db->getEscaped( $newtext, true ), false );
+				$text		= $db->Quote( $db->getEscaped( $newtext, false ), false );
 				$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 				break;
 			case 'any':
 			default:
-				$text		= $db->Quote( $db->getEscaped( $text, true ), false );
+				//$text		= $db->Quote( $db->getEscaped( $text, true ), false );
+				$text		= $db->Quote( $db->getEscaped( $text, false ), false );
 				$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 				break;
 		}
