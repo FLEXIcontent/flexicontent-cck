@@ -239,12 +239,13 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return === NULL) {
 			$query 	= 'SELECT COUNT( id )'
-					. ' FROM #__plugins'
-					. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
-					. ' OR element = ' . $this->_db->Quote('flexisearch')
-					. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
-					. ' AND published <> 1'
-					;
+				. ' FROM #__plugins'
+				. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
+				. ' OR element = ' . $this->_db->Quote('flexisearch')
+				. ' OR element = ' . $this->_db->Quote('flexisystem')
+				. ' OR element = ' . $this->_db->Quote('flexiadvsearch') . ')'
+				. ' AND published <> 1'
+				;
 			$this->_db->setQuery( $query );
 			$return = $this->_db->loadResult() ? false : true;
 		}
