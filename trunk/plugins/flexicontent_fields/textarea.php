@@ -78,14 +78,21 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$searchindex = flexicontent_html::striptagsandcut($post) . ' | ';		
 		$field->search = $field->issearch ? $searchindex : '';
 		if($field->isadvsearch) {
-			$db = &JFactory::getDBO();
-			$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='textarea';";
-			$db->setQuery($query);
-			$db->query();
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','textarea','0', ".$db->Quote($post).");";
-			$db->setQuery($query);
-			$db->query();
+			$this->onIndexAdvSearch($field, $post);
 		}
+	}
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'textarea') return;
+		$db = &JFactory::getDBO();
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='textarea';";
+		$db->setQuery($query);
+		$db->query();
+		$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','textarea','0', ".$db->Quote($post).");";
+		$db->setQuery($query);
+		$db->query();
+		return true;
 	}
 
 
