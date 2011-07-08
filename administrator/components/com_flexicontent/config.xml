@@ -166,6 +166,10 @@
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
+		<param name="trigger_onprepare_content_cat" type="radio" default="1" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" />
 		
 		<param name="" type="separator" default="FLEXI_FILES_CONF" level="level1" menu="hide" />
