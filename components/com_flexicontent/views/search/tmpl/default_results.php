@@ -47,7 +47,6 @@
 		<td colspan="3">
 			<div align="center">
 				<?php echo $this->pagination->getPagesLinks(); ?>
-				<?php //echo $this->pagination->getListFooter(true); ?>
 			</div>
 		</td>
 	</tr>
