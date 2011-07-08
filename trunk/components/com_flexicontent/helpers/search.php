@@ -129,7 +129,7 @@ class FLEXIadvsearchHelper
 		// replace line breaking tags with whitespace
 		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
 
-		return SearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword );
+		return FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword );
 	}
 
 	/**
