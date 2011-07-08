@@ -53,12 +53,15 @@ class FLEXIcontentViewSearch extends JView
 
 		//$params = &$mainframe->getParams();
 		$params = JComponentHelper::getParams('com_flexicontent');
-		$params->bind($params->_raw);
+		//$params->bind($params->_raw);
 		$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 
 		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
 		JRequest::setVar('typeid', $typeid_for_advsearch, '', 'int');
-		$itemmodel = $this->getModel('items');
+		if(!($itemmodel = $this->getModel('items'))) {
+			require_once(JPATH_COMPONENT.DS.'models'.DS.'items.php');
+			$itemmodel = new FlexicontentModelItems();
+		}
 		$item = &$itemmodel->getItem();
 
 		$fields			= & $itemmodel->getAdvSearchFields($typeid_for_advsearch);
