@@ -179,12 +179,17 @@ class FlexicontentViewCategory extends JView
 			return;
 		}
 		
+		// @TODO trigger the plugin selectively
+		// and delete the plugins tags if not active
+		if ($params->get('trigger_onprepare_content_cat')) // just check if the parmeter is active
+		{
 		JPluginHelper::importPlugin('content');
 
 		// Allow to trigger content plugins on category description
 		$category->text			= $category->description;
 		$results 				= $dispatcher->trigger('onPrepareContent', array (& $category, & $category->params, 0));
 		$category->description 	= $category->text;
+		}
 
 		foreach ($items as $item) 
 		{
