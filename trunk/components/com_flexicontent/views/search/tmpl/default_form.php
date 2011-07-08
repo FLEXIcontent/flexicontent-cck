@@ -11,6 +11,11 @@
 			<td nowrap="nowrap">
 				<input type="text" name="searchword" id="search_searchword" size="30" maxlength="20" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
 			</td>
+			<?php if($show_operator = $this->params->get('show_operator', 1)) {?>
+			<td nowrap="nowrap">
+				<?php echo $this->lists['operator']; ?>
+			</td>
+			<?php }?>
 			<td width="100%" nowrap="nowrap">
 				<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
 			</td>
@@ -111,6 +116,11 @@
 $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 ?>
 <input type="hidden" name="searchphrase" value="<?php echo $default_searchphrase;?>" />
+<?php } ?>
+<?php if(!$show_operator) {
+$default_operator = $this->params->get('default_operator', 'OR');
+?>
+<input type="hidden" name="logic" value="<?php echo $default_logic;?>" />
 <?php } ?>
 <?php if(!$show_searchordering) {
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
