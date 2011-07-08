@@ -102,7 +102,8 @@
 		<?php echo $this->pagination->getLimitBox( ); ?>
 	</div>
 	<div>
-		<?php echo $this->pagination->getPagesCounter(); ?>
+		<?php //echo $this->pagination->getPagesCounter(); ?>
+		<?php echo $this->pagination->getPagesLinks(); ?>
 	</div>
 </div>
 <?php endif; ?>
