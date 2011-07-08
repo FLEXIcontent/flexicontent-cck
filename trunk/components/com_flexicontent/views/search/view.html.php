@@ -68,9 +68,9 @@ class FLEXIcontentViewSearch extends JView
 				$field->field_type = 'text';
 			}
 			$label = $field->label;
-			//$fieldsearch = JRequest::getVar($field->name, array());
-			$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
-			$field->value[0] = isset($fieldsearch[0])?$fieldsearch[0]:NULL;
+			$fieldsearch = JRequest::getVar($field->name, array());
+			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
+			$field->value = isset($fieldsearch[0])?$fieldsearch:array();
 			$results = $dispatcher->trigger('onAdvSearchDisplayField', array( &$field, &$item ));
 			$field->label = $label;
 		}

@@ -38,6 +38,13 @@ JHTML::_('behavior.tooltip');
 	echo $output;
 	?>
 	</div>
+	<?php
+	if($linkadvsearch) {
+	?>
+	<a href="index.php?option=com_flexicontent&amp;task=search<?php echo $useitemid?'&amp;Itemid='.$mitemid:'';?>" class="flexiadvsearchlink"><?php echo $linkadvsearch_txt;?></a>
+	<?php
+	}
+	?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="task" value="search" />
 	<?php if($useitemid) {?>

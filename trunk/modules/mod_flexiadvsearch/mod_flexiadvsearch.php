@@ -24,6 +24,9 @@ $width			 = intval($params->get('width', 20));
 $maxlength		 = $width > 20 ? $width : 20;
 $text			 = $params->get('text', JText::_('search...'));
 $button_pos		 = $params->get('button_pos', 'left');
+$linkadvsearch		 = $params->get('linkadvsearch', 1);
+$linkadvsearch_txt		 = $params->get('linkadvsearch_txt', 'Advanced Search');
+if($linkadvsearch && !trim($linkadvsearch_txt)) $linkadvsearch_txt = 'Advanced Search';
 if ($imagebutton) {
     $img = modSearchHelper::getSearchImage( $button_text );
 }

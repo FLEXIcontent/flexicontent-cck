@@ -1025,6 +1025,12 @@ class flexicontent_html
 
 class flexicontent_upload
 {
+	function makeSafe($file) {//The range \xE01-\xE5B is thai language.
+		$file = str_replace(" ", "", $file);
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\xE01-\xE5B\.\_\- ]#', '#^\.#');
+		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+		return preg_replace($regex, '', $file);
+	}
 	function check($file, &$err, &$params)
 	{
 		if (!$params) {

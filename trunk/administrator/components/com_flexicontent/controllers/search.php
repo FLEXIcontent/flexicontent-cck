@@ -62,7 +62,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 			echo json_encode($keys).'|';
 			echo json_encode($items);
 		}else{
-			echo 'fail|';
+			echo 'fail|0';
 		}
 		exit;
 	}
@@ -74,7 +74,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 		$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
 		$db->setQuery($query);
 		if(!$field = $db->loadObject()) {
-			echo "fail|Cannot index.";
+			echo "fail|1";
 			exit;
 		}
 		$field->item_id = $itemid;
