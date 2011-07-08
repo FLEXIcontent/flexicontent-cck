@@ -18,8 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
-$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+	JHTML::_('behavior.mootools');
+	$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+}
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
