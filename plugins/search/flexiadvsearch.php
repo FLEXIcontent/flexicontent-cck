@@ -171,7 +171,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$db->setQuery($query);
 	$fields = $db->loadObjectList();
 	$fields = is_array($fields)?$fields:array();
-	$OR = '';
+	$CONDITION = '';
+	$OPERATOR = JRequest::getVar('operator', 'OR');
 	$items = array();
 	$resultfields = array();
 	foreach($fields as $field) {
@@ -208,7 +209,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	if(count($items)) {
 		$items = array_unique($items);
 		$items = "'".implode("','", $items)."'";
-		$OR = " OR a.id IN ({$items}) ";
+		$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
 	}
 	$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
 		. ' a.created AS created,'
@@ -224,7 +225,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. ' WHERE '
 		. '('
 		. '( '.$where.' )'
-		. $OR
+		. $CONDITION
 		. ')'
 		. ' AND a.state IN (1, -5)'
 		. ' AND c.published = 1'
@@ -236,7 +237,6 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	;
 	$db->setQuery( $query, 0, $limit );
 	$list = $db->loadObjectList();
-
 	if(isset($list)) {
 		foreach($list as $key => $row) {
 			if($row->sectionid==FLEXI_SECTION) {

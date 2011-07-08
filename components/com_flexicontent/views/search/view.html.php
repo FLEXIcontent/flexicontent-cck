@@ -119,6 +119,13 @@ class FLEXIcontentViewSearch extends JView
 			$searchphrases[] 	= JHTML::_('select.option',  'exact', JText::_( 'Exact phrase' ) );
 			$lists['searchphrase' ]= JHTML::_('select.radiolist',  $searchphrases, 'searchphrase', '', 'value', 'text', $state->get('match', $default_searchphrase) );
 		}
+		if($show_operator = $params->get('show_operator', 1)) {
+			$default_operator = $params->get('default_operator', 'OR');
+			$operators 		= array();
+			$operators[] 	= JHTML::_('select.option',  'OR', JText::_( 'OR' ) );
+			$operators[] 	= JHTML::_('select.option',  'AND', JText::_( 'AND' ) );
+			$lists['operator']= JHTML::_('select.genericlist',  $operators, 'operator', '', 'value', 'text', $state->get('logic', $default_operator) );
+		}
 		// log the search
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
