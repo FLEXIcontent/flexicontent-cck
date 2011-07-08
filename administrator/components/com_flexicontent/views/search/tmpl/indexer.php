@@ -8,18 +8,33 @@ jQuery(document).ready(function() {
 	var fields = new Array();
 	var items = new Array();
 	var number = 0;
+	var errorstring = new Array();
+	errorstring[0] = 'Not yet select article type for advance search.';
+	errorstring[1] = 'Cannot index because no flexicontent field(s) use advance search mode.';
 	function updateprogress() {
 		looper=looper+1;
-		if(looper>number) return;
+		if(looper>number) {
+			if(looper==(number+1)) {
+				jQuery('div#statuscomment').text('Completed!');
+			}
+			return;
+		}
 		fieldindex = Math.floor((looper-1)/items.length)%fields.length;
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
 			url: "index.php?option=com_flexicontent&controller=search&task=index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
 			success: function(response2, status2, xhr2) {
+				var arr = response2.split('|');
+				if(arr[0]=='fail') {
+					jQuery('div#statuscomment').text(errorstring[arr[1]]);
+					looper = number;
+					return;
+				}
 				width = onesector*looper;
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').text(percent.toFixed(2)+' %');
+				jQuery('div#statuscomment').text(looper+'/'+number+' sectors '+response2);
 				setTimeout(updateprogress, 100);
 			}
 		});
@@ -28,11 +43,18 @@ jQuery(document).ready(function() {
 		url: "index.php?option=com_flexicontent&controller=search&task=countrows",
 		success: function(response, status, xhr) {
 			var arr = response.split('|');
-			if(arr[0]=='fail') return;
+			if(arr[0]=='fail') {
+				jQuery('div#statuscomment').text(errorstring[arr[1]]);
+				return;
+			}
 			fields = jQuery.parseJSON(arr[2]);
 			items = jQuery.parseJSON(arr[3]);
 			number = fields.length*items.length;
-			onesector = 300/number;
+			onesector = (number==0)?300:(300/number);
+			if(number==0) {
+				jQuery('div#statuscomment').text(errorstring[1]);
+				return;
+			}
 			looper = 0;
 			updateprogress();
 		}
@@ -62,6 +84,10 @@ div#insideprogress{
 div#updatepercent{
 	clear:right;
 }
+div#statuscomment{
+	color:red;
+	margin-top:30px;
+}
 </style>
 <div class="clr"></div>
 <div>&nbsp;</div>
@@ -69,3 +95,6 @@ div#updatepercent{
 <div id="advancebar"><div id="insideprogress"></div></div>
 <div id="updatepercent">0 %</div>
 <div class="clr"></div>
+<div id="statuscomment"></div>
+<div class="clr"></div>
+

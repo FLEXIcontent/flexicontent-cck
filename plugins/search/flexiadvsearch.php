@@ -176,8 +176,10 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$resultfields = array();
 	foreach($fields as $field) {
 		if($field->item_id) {
-			//$fieldsearch = JRequest::getVar($field->name, array());
-			$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
+			$fieldsearch = JRequest::getVar($field->name, array());
+			//var_dump($field->name, $_REQUEST[$field->name]);
+			//echo "<br />";
+			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			if(isset($fieldsearch[0]) && trim($fieldsearch[0])) {
 				$fieldsearch = $fieldsearch[0];
 				$fieldsearch = explode(" ", $fieldsearch);
@@ -192,9 +194,13 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 					}
 				}
 				$results = $dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $field->item_id, $fieldsearch));
-				if(@$results[0]) {
-					$items[] = $field->item_id;
-					$resultfields[$field->item_id] = $results[0];
+				if(count($results)>0) {
+					foreach($results as $r) {
+						if($r) {
+							$items[] = $field->item_id;
+							$resultfields[$field->item_id] = $r;
+						}
+					}
 				}
 			}
 		}

@@ -46,6 +46,11 @@
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
+		<param name="linkadvsearch" type="radio" default="1" label="Link Advanced Search" description="Link to advanced search.">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
 		<param name="set_itemid" type="text" default="" label="Set Itemid" description="PARAMSETITEMID" />
 	</params>
 	<params group="advanced">
