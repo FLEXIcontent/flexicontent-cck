@@ -33,7 +33,7 @@ class FLEXIcontentViewSearch extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
@@ -51,14 +51,16 @@ class FLEXIcontentViewSearch extends JView
 		$state 		= &$this->get('state');
 		$searchword = $state->get('keyword');
 
-		$params = &$mainframe->getParams();
+		//$params = &$mainframe->getParams();
+		$params = JComponentHelper::getParams('com_flexicontent');
+		$params->bind($params->_raw);
 		$typeid_for_advsearch = $params->get('typeid_for_advsearch');
-		
+
 		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
 		JRequest::setVar('typeid', $typeid_for_advsearch, '', 'int');
 		$itemmodel = $this->getModel('items');
 		$item = &$itemmodel->getItem();
-		//$itemmodel->_item->type_id = $typeid_for_advsearch;
+
 		$fields			= & $itemmodel->getAdvSearchFields($typeid_for_advsearch);
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
@@ -183,7 +185,7 @@ class FLEXIcontentViewSearch extends JView
 			    $result->count		= $i + 1;
 			}
 		}
-		$this->result	= JText::sprintf( 'TOTALRESULTSFOUND', $total );
+		$this->result	= JText::sprintf( 'FLEXI_TOTALRESULTSFOUND', $total );
 
 		$this->assignRef('pagination',  $pagination);
 		$this->assignRef('fields',		$fields);
