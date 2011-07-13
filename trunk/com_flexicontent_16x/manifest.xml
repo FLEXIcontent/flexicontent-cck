@@ -9,7 +9,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.6.x Beta1</version>
-	<description>A flexible content management system for Joomla! 1.6</description>
+	<description>A flexible content management system for Joomla! 1.6/1.7</description>
 
 	<languages folder="site/language">
 		<language tag="en-GB">en-GB.com_flexicontent.ini</language>
