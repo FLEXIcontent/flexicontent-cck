@@ -24,6 +24,6 @@ if($flexi_category = $params->get('flexi_category')) {
 	if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', 0);
 }
 if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-define('FLEXI_VERSION',	'1.5.3c');
-define('FLEXI_RELEASE',	'stable (r354)');
+define('FLEXI_VERSION',	'1.6');
+define('FLEXI_RELEASE',	'Beta (r622)');
 ?>
