@@ -23,7 +23,7 @@ if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 }
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
-if ($this->CanUseTags) {
+if ($this->CanUseTags || $this->CanVersion) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
