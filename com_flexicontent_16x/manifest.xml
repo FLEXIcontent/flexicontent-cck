@@ -4,11 +4,11 @@
 	<name>com_flexicontent</name>
 	<creationDate>05 Oct 2010</creationDate>
 	<author>Emmanuel Danan</author>
-	<copyright>(C) 2009-2010 Emmanuel Danan</copyright>
+	<copyright>(C) 2009-2011 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.6.x Beta1</version>
+	<version>2.0 Beta1</version>
 	<description>A flexible content management system for Joomla! 1.6/1.7</description>
 
 	<languages folder="site/language">
