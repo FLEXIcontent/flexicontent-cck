@@ -362,7 +362,7 @@ class FlexicontentModelFlexicontent extends JModel
 		if ($fields) {
 			// create a temporary table to store the positions
 			$query = "
-					CREATE TABLE #__flexicontent_positions_tmp (
+					CREATE TABLE IF NOT EXISTS #__flexicontent_positions_tmp (
 					  `field` varchar(100) NOT NULL default '',
 					  `view` varchar(30) NOT NULL default '',
 					  `folder` varchar(100) NOT NULL default '',
@@ -403,7 +403,7 @@ class FlexicontentModelFlexicontent extends JModel
 							if ($fieldstopos) {
 								$field = implode(',', $fieldstopos);
 
-								$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
+								$query = 'REPLACE INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
 								$this->_db->setQuery($query);
 								$this->_db->query();
 							}
