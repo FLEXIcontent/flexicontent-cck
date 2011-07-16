@@ -70,8 +70,15 @@ if ($add_ccs && $caching && !${$layout}) {
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
-	
-	<?php foreach ($ordering as $ord) : ?>
+	<?php
+	$separator = "";
+	foreach ($ordering as $ord) :
+  	echo $separator;
+	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard']))
+  	  $separator = "<div class='mod_flexicontent_ordering_seperator' ></div>";
+    else
+  	  $separator = "";
+	?>
 	<div id="<?php echo $ord.$module->id; ?>" class="mod_flexicontent<?php echo (isset($list[$ord]['featured'])) ? ' twocol' : ''; ?>">
 		
 		<?php

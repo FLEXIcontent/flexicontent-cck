@@ -81,10 +81,26 @@ class modFlexicontentHelper
 		// get module fields parameters
 		$use_fields 			= $params->get('use_fields');
 		$display_label 			= $params->get('display_label');
-		$fields 				= explode(',', $params->get('fields'));
+		$fields = array_map( 'trim', explode(',', $params->get('fields')) );
+		if ($fields[0]=='') $fields = array();
+		
+		// get fields that when empty cause an item to be skipped
+		$skip_items = (int)$params->get('skip_items', 0);
+		$skiponempty_fields = array_map( 'trim', explode(',', $params->get('skiponempty_fields')) );
+		if ($skiponempty_fields[0]=='') $skiponempty_fields = array();
+		
+		if ($params->get('maxskipcount',50) > 100) {
+  		$params->set('maxskipcount',100);
+		}
+		
+		$striptags_onempty_fields = $params->get('striptags_onempty_fields');
+		$onempty_fields_combination = $params->get('onempty_fields_combination');
+		
 		// featured
 		$display_label_feat 	= $params->get('display_label_feat');
 		$fields_feat 			= explode(',', $params->get('fields_feat'));
+		$fields_feat = array_map( 'trim', explode(',', $params->get('fields_feat')) );
+		if ($fields_feat[0]=='') $fields_feat = array();
 
 		$rows = array();
 		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
@@ -96,109 +112,217 @@ class modFlexicontentHelper
 				array_push($rows, $items[$i]);
 			}
 		}
-
-		if ($use_fields) {
-			$rows = FlexicontentFields::getFields($rows, 'module');
+		
+		// Impementation of Empty Field Filter.
+		// The cost of the following code is minimal.
+		// The big time cost goes into rendering the fields ... 
+		// We need to create the display of the fields before examining if they are empty.
+		// The hardwired limit of max items skipped is 100.
+		if ( ($use_fields && count($fields)) || ($skip_items && count($skiponempty_fields)) ) {
+		  // 1. Add skipfields to the list of fields to be rendered
+		  $fields_merged = array();
+		  foreach ($fields as $fieldname)             $fields_merged[$fieldname] = 1;
+		  foreach ($skiponempty_fields as $fieldname) $fields_merged[$fieldname] = 1;
+		  $allfields = '';
+		  $comma = '';
+		  $fields = array();
+		  foreach ($fields_merged as $fieldname => $val) {
+		    $allfields .= $comma.$fieldname;
+		    $comma = ',';
+  		  $fields[] = $fieldname;
+		  }
+		  $params->set('fields',$allfields);
+		  
+		  // 2. Get fields values for the items
+			$items = FlexicontentFields::getFields($rows, 'module', $params);
+		  
+		  // 3. Skip Items with empty fields (if this filter is enabled)
+		  //    Other
+  		$rows = array();
+  		foreach($items as $item) {
+  		  if (!isset($order_count[$item->fetching]))    // Check to initialize counter for this ordering 
+  		    $order_count[$item->fetching] = 0;
+  		  if ($order_count[$item->fetching] >= $count)   // Check if enough encountered for this ordering 
+  		    continue;
+  		  
+	  	  // Construct display values array
+	  	  $field_val = array();
+		    foreach($item->fields as $itemfield) {
+		      $field_val[$itemfield->name] = $itemfield->display;
+		    }
+		    
+		    // Now check for empty values on field that when empty, the item must be skipped
+		    if ($skip_items) {
+  		    if ($onempty_fields_combination == 'any')
+  		      $skip_item = 0;
+  		    else //if ($skip_items && $onempty_fields_combination == 'all')
+  		      $skip_item = 1;		    
+  		    
+  		    foreach($skiponempty_fields as $skipfieldname) {
+  		      $val = $field_val[$skipfieldname];
+  		      if ($striptags_onempty_fields) $val = strip_tags ($field_val[$skipfieldname]) ;
+  		      $val = trim($val);
+  		      if ( !$val) {
+  		        if ($onempty_fields_combination=='any') {
+      	  	    $skip_item = 1;
+      	  	    break;
+      	  	  }
+      	  	} else {
+      	  	  if ($onempty_fields_combination == 'all') {
+      	  	    $skip_item = 0;
+      	  	    break;
+      	  	  }
+  		      }
+  		    }
+  		    if ($skip_item && count($skiponempty_fields)) {
+  		      if(!isset($order_skipcount[$item->fetching]) ) $order_skipcount[$item->fetching] = 0;
+  		      $order_skipcount[$item->fetching]++;
+  		      continue;
+  		    }
+		    }
+		    
+		    // 4. Increment counter for item's ordering and Add item to list of displayed items
+		    $order_count[$item->fetching]++;
+		    $rows[] = $item;
+		  }
 		}
+		
+		// For Debuging
+		/*foreach ($order_skipcount as $skipordering => $skipcount) {
+		  echo "SKIPS $skipordering ==> $skipcount<br>\n";
+		}*/
 
 		$lists	= array();
 		foreach ( $ordering as $ord )
 		{
-			$i		= 0;
 			$lists[$ord]	= array();
-			foreach ( $rows as $row )
-			{
-				if ($row->fetching == $ord)
-				{
-					if ($row->featured)
-					{						
-						// image processing
-						$thumb = '';
-						if ($mod_use_image_feat) {
-							if ($mod_image) {
-								if (isset($row->image)) {
-									$image	= unserialize($row->image);
-									$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+		}
 		
-				    				$h		= '&h=' . $mod_height_feat;
-				   					$w		= '&w=' . $mod_width_feat;
-				    				$aoe	= '&aoe=1';
-				    				$q		= '&q=95';
-				    				$zc		= $mod_method_feat ? '&zc=' . $mod_method_feat : '';
-				    				$conf	= $w . $h . $aoe . $q . $zc;
-				
-				    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=/'.$src.$conf;
-								} else {
-									$thumb	= '';
-								}
-							} else {
-								$thumb	= flexicontent_html::extractimagesrc($row);
-							}
+		$ord = "__start__";
+		foreach ( $rows as $row )  // Single pass of rows
+		{
+		  if ($ord != $row->fetching) {  // Detect change of next ordering group
+		    $ord = $row->fetching;
+		    $i = 0;
+		  }
+		  
+			if ($row->featured)
+			{						
+				// image processing
+				$thumb = '';
+				if ($mod_use_image_feat) {
+					if ($mod_image) {
+						if (isset($row->image)) {
+							$image	= unserialize($row->image);
+							$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+
+		    				$h		= '&h=' . $mod_height_feat;
+		   					$w		= '&w=' . $mod_width_feat;
+		    				$aoe	= '&aoe=1';
+		    				$q		= '&q=95';
+		    				$zc		= $mod_method_feat ? '&zc=' . $mod_method_feat : '';
+		    				$conf	= $w . $h . $aoe . $q . $zc;
+		
+		    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						} else {
+							$thumb	= '';
 						}
-						$lists[$ord]['featured'][$i]->image 	= $thumb;
-						$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
-						$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
-						$lists[$ord]['featured'][$i]->fulltitle = $row->title;
-						$lists[$ord]['featured'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat);
-						$lists[$ord]['featured'][$i]->typename 	= $row->typename;
-						$lists[$ord]['featured'][$i]->access 	= $row->access;
-						$lists[$ord]['featured'][$i]->featured 	= 1;
-						
-						if ($use_fields && $row->fields && $fields_feat) {
-							foreach ($fields_feat as $field) {
-								if ($display_label_feat) {
-									$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
-								}
-								$lists[$ord]['featured'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
-							}
-						}
-						
-						$i++;
 					} else {
-						// image processing
-						$thumb = '';
-						if ($mod_use_image) {
-							if ($mod_image) {
-								if (isset($row->image)) {
-									$image	= unserialize($row->image);
-									$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
-		
-				    				$h		= '&h=' . $mod_height;
-				   					$w		= '&w=' . $mod_width;
-				    				$aoe	= '&aoe=1';
-				    				$q		= '&q=95';
-				    				$zc		= $mod_method ? '&zc=' . $mod_method : '';
-				    				$conf	= $w . $h . $aoe . $q . $zc;
-				
-				    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=/'.$src.$conf;
-								} else {
-									$thumb	= '';
-								}
-							} else {
-								$thumb	= flexicontent_html::extractimagesrc($row);
-							}
-						}
-						$lists[$ord]['standard'][$i]->image 	= $thumb;
-						$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
-						$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
-						$lists[$ord]['standard'][$i]->fulltitle = $row->title;
-						$lists[$ord]['standard'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text);
-						$lists[$ord]['standard'][$i]->typename 	= $row->typename;
-						$lists[$ord]['standard'][$i]->access 	= $row->access;
-						$lists[$ord]['standard'][$i]->featured 	= 0;
-
-						if ($use_fields && $row->fields && $fields) {
-							foreach ($fields as $field) {
-								if ($display_label) {
-									$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
-								}
-								$lists[$ord]['standard'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
-							}
-						}
-
-						$i++;
+						//$thumb	= flexicontent_html::extractimagesrc($row);
+						$articleimage = flexicontent_html::extractimagesrc($row);
+						if ($articleimage) {
+						  $src	= JURI::base(true) . '/' . $articleimage;
+						  
+		    				$h		= '&h=' . $mod_height_feat;
+		   					$w		= '&w=' . $mod_width_feat;
+		    				$aoe	= '&aoe=1';
+		    				$q		= '&q=95';
+		    				$zc		= $mod_method_feat ? '&zc=' . $mod_method_feat : '';
+		    				$conf	= $w . $h . $aoe . $q . $zc;
+	    				
+		    			$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+		    		} else {
+		    		  $thumb = '';
+		    		}
 					}
 				}
+				$lists[$ord]['featured'][$i]->image 	= $thumb;
+				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
+				$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
+				$lists[$ord]['featured'][$i]->fulltitle = $row->title;
+				$lists[$ord]['featured'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat);
+				$lists[$ord]['featured'][$i]->typename 	= $row->typename;
+				$lists[$ord]['featured'][$i]->access 	= $row->access;
+				$lists[$ord]['featured'][$i]->featured 	= 1;
+				
+				if ($use_fields && $row->fields && $fields_feat) {
+					foreach ($fields_feat as $field) {
+						if ($display_label_feat) {
+							$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
+						}
+						$lists[$ord]['featured'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
+					}
+				}
+				
+				$i++;
+			} else {
+				// image processing
+				$thumb = '';
+				if ($mod_use_image) {
+					if ($mod_image) {
+						if (isset($row->image)) {
+							$image	= unserialize($row->image);
+							$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+
+		    				$h		= '&h=' . $mod_height;
+		   					$w		= '&w=' . $mod_width;
+		    				$aoe	= '&aoe=1';
+		    				$q		= '&q=95';
+		    				$zc		= $mod_method ? '&zc=' . $mod_method : '';
+		    				$conf	= $w . $h . $aoe . $q . $zc;
+		
+		    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						} else {
+							$thumb	= '';
+						}
+					} else {
+						//$thumb	= flexicontent_html::extractimagesrc($row);
+						$articleimage = flexicontent_html::extractimagesrc($row);
+						if ($articleimage) {
+						  $src	= JURI::base(true) . '/' . $articleimage;
+						  
+	    				$h		= '&h=' . $mod_height;
+	   					$w		= '&w=' . $mod_width;
+	    				$aoe	= '&aoe=1';
+	    				$q		= '&q=95';
+	    				$zc		= $mod_method ? '&zc=' . $mod_method : '';
+	    				$conf	= $w . $h . $aoe . $q . $zc;
+	    				
+		    			$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+		    		} else {
+		    		  $thumb = '';
+		    		}
+					}
+				}
+				$lists[$ord]['standard'][$i]->image 	= $thumb;
+				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
+				$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
+				$lists[$ord]['standard'][$i]->fulltitle = $row->title;
+				$lists[$ord]['standard'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text);
+				$lists[$ord]['standard'][$i]->typename 	= $row->typename;
+				$lists[$ord]['standard'][$i]->access 	= $row->access;
+				$lists[$ord]['standard'][$i]->featured 	= 0;
+
+				if ($use_fields && $row->fields && $fields) {
+					foreach ($fields as $field) {
+						if ($display_label) {
+							$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
+						}
+						$lists[$ord]['standard'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
+					}
+				}
+
+				$i++;
 			}
 		}
 
@@ -234,7 +358,13 @@ class modFlexicontentHelper
 		$option			= JRequest::getVar('option');
 		$fparams 		=& $mainframe->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
-
+		
+		// current item scope parameters
+		$method_curitem	= (int)$params->get('method_curitem', 1);
+			
+		// current language scope parameters
+		$method_curlang	= (int)$params->get('method_curlang', 1);
+		
 		// categories scope parameters
 		$method_cat 		= (int)$params->get('method_cat', 1);
 		$catids 			= $params->get('catids');
@@ -275,7 +405,11 @@ class modFlexicontentHelper
 		}
 		
 		// get module fetching parameters
-		$count 				= (int)$params->get('count', 5);
+		if ($params->get('skip_items',0) ) {
+		  $count = (int)$params->get('maxskipcount', 50);
+		} else {
+		  $count = (int)$params->get('count', 5);
+		}
 
 		// get module display parameters
 		$mod_image 			= $params->get('mod_image');
@@ -313,9 +447,6 @@ class modFlexicontentHelper
 			$db->setQuery($q);
 			$curitem	= $db->loadObject();
 
-			// exclude the current item
-			$where .=  ' AND i.id <> ' . $id;
-			
 			// Get item dates
 			if ($date_type == 1) {
 				$idate = $curitem->modified;
@@ -326,6 +457,28 @@ class modFlexicontentHelper
 			}
 			$idate 	= explode(' ', $idate);
 			$cdate 	= $idate[0] . ' 00:00:00';
+		}
+
+
+		// current item scope
+		$currid			= JRequest::getInt('id');
+  	if ($method_curitem == 1) { // exclude method  ---  exclude current item
+		  $where .=  ' AND i.id <> ' . $currid;
+		} else if ($method_curitem == 2) { // include method  ---  include current item ONLY
+		  $where .=  ' AND i.id = ' . $currid;
+		} else {
+		  // All Items including current
+		}
+
+		// current language scope
+		$language =& JFactory::getLanguage();
+    $currlangcode = $language->_lang;
+  	if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
+		  $where .=  ' AND ie.language <> ' . $currlangcode;
+		} else if ($method_curlang == 2) { // include method  ---  include items of current language ONLY
+		  $where .=  ' AND ie.language = "' . $currlangcode.'"';
+		} else {
+		  // Items of any language
 		}
 
 		// categories scope
@@ -671,3 +824,4 @@ class modFlexicontentHelper
 	}
 
 }
+

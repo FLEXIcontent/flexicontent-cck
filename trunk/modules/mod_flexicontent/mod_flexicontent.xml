@@ -24,13 +24,49 @@
 	</languages>
 	
 	<params addpath="/modules/mod_flexicontent/elements">
+		<param	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
+             	description="FLEXI_CHOOSE_TMPL_DESC" 
+             	directory="/modules/mod_flexicontent/tmpl" 
+             	default="default" hide_default="1" hide_none="1" 
+             	stripext="1" filter="\.php$" exclude="^_" /> 
 		<param name="" type="separator" default="FLEXI_FETCHING" level="level1" menu="hide" />
 		<param name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
 		<param name="ordering" type="fcordering" default="0" label="FLEXI_ORDERING" description="FLEXI_ORDERING_DESC" />
 
-		<param name="" type="separator" default="FLEXI_SCOPE" level="level1" menu="hide" />
-		<param name="" type="separator" default="FLEXI_CAT_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" menu="hide" />
+		<param name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="skiponempty_fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" />
+		<param name="maxskipcount" type="text" default="50" size="4" label="FLEXI_MAX_SKIP_COUNT" description="FLEXI_MAX_SKIP_COUNT_DESC" />
+		<param name="onempty_fields_combination" type="radio" default="any" label="FLEXI_EMPTY_FIELDS_COMBINATION" description="FLEXI_EMPTY_FIELDS_COMBINATION_DESC">
+			<option value="any">Skip on any empty</option>
+			<option value="all">Skip when all empty</option>
+		</param>
+		<param name="striptags_onempty_fields" type="radio" default="0" label="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS" description="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		
+	<param name="" type="jparamstab" description="FLEXI_SCOPE" />
+		
+		<param name="" type="separator" default="FLEXI_CURITEM_SCOPE" level="level1" menu="hide" />
+		<param name="method_curitem" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_CURITEM_DESC">
+			<option value="0">FLEXI_ALL</option>
+			<option value="1">FLEXI_EXCLUDE</option>
+			<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
+		</param>
+		
+		<param name="" type="separator" default="FLEXI_CURLANG_SCOPE" level="level1" menu="hide" />
+		<param name="method_curlang" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURLANG_DESC">
+			<option value="0">FLEXI_ALL</option>
+			<option value="1">FLEXI_EXCLUDE</option>
+			<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
+		</param>
+		
+		<param name="" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 		<param name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 		<param name="catids" type="flexicategories" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 		<param name="behaviour_cat" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
@@ -45,7 +81,7 @@
 			<option value="3">FLEXI_BOTH</option>
 		</param>
 
-		<param name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level1" menu="hide" />
 		<param name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 		<param name="types" type="types" label="FLEXI_TYPES" description="FLEXI_TYPES_DESC" />
 		<param name="behaviour_types" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
@@ -54,7 +90,7 @@
 			<option value="2">FLEXI_NOT_SAME_TYPE</option>
 		</param>
 
-		<param name="" type="separator" default="FLEXI_AUTH_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_AUTH_SCOPE" level="level1" menu="hide" />
 		<param name="method_auth" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
 			<option value="1">FLEXI_ALL</option>
 			<option value="2">FLEXI_EXCLUDE</option>
@@ -66,7 +102,7 @@
 			<option value="1">FLEXI_SAME_AUTHOR</option>
 			<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
 		</param>
-		<param name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level1" menu="hide" />
 		<param name="method_items" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
 			<option value="1">FLEXI_ALL</option>
 			<option value="2">FLEXI_EXCLUDE</option>
@@ -78,7 +114,7 @@
 			<option value="1">FLEXI_RELATED</option>
 		</param>
 
-		<param name="" type="separator" default="FLEXI_DATES_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_DATES_SCOPE" level="level1" menu="hide" />
 		<param name="date_type" type="radio" default="0" label="FLEXI_DATE_TYPE" description="FLEXI_DATE_TYPE_DESC">
 			<option value="0">FLEXI_DATE_CREATED</option>
 			<option value="1">FLEXI_DATE_MODIFIED</option>
@@ -101,27 +137,10 @@
 			<option value="1">FLEXI_DATE_ITEM</option>
 		</param>
 
-		<param name="" type="separator" default="FLEXI_DISPLAY" level="level1" menu="hide" />
+  <param name="" type="jparamstab" description="FLEXI_DISPLAY" />
 
-		<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
-		<param	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
-             	description="FLEXI_CHOOSE_TMPL_DESC" 
-             	directory="/modules/mod_flexicontent/tmpl" 
-             	default="default" hide_default="1" hide_none="1" 
-             	stripext="1" filter="\.php$" exclude="^_" /> 
-		<param name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="width" type="text" size="4" default="" label="FLEXI_MODULE_WIDTH" description="FLEXI_MODULE_WIDTH_DESC" />
-		<param name="height" type="text" size="4" default="" label="FLEXI_MODULE_HEIGHT" description="FLEXI_MODULE_HEIGHT_DESC" />
-
-		<param name="" type="separator" default="FLEXI_TITLE" level="level2" menu="hide" />
-		<param name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_title" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -131,7 +150,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="cuttitle" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
-		<param name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="display_title_feat" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -142,8 +161,8 @@
 		</param>
 		<param name="cuttitle_feat" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
 		
-		<param name="" type="separator" default="FLEXI_TEXT_PARAMS" level="level2" menu="hide" />
-		<param name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_TEXT_PARAMS" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_text" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -153,7 +172,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="mod_cut_text" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-		<param name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="display_text_feat" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -164,9 +183,9 @@
 		</param>
 		<param name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		
-		<param name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
 		<param name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-		<param name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -181,7 +200,7 @@
 		</param>		
 		<param name="mod_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 		<param name="mod_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-		<param name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="mod_use_image_feat" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -197,32 +216,48 @@
 		<param name="mod_width_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 		<param name="mod_height_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 
-		<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 		<param name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
-		<param name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 		
-		<param name="" type="separator" default="FLEXI_CUSTOM_PARAMS" level="level1" />
+  <param name="" type="jparamstab" description="FLEXI_CUSTOM_PARAMS" />
+  	
 		<param name="custom1" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM1" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom2" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM2" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom3" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM3" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom4" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM4" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom5" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM5" description="FLEXI_CUSTOM_DESC" />
-	</params>
-	<params group="advanced">
+
+  <param name="" type="jparamstab" description="FLEXI_MOD_ADVANCED" />
+  	
+		<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
+		<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+		<param name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="width" type="text" size="4" default="" label="FLEXI_MODULE_WIDTH" description="FLEXI_MODULE_WIDTH_DESC" />
+		<param name="height" type="text" size="4" default="" label="FLEXI_MODULE_HEIGHT" description="FLEXI_MODULE_HEIGHT_DESC" />
+		
+		<param name="" type="separator" default="Caching" level="level1" menu="hide" />
 		<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 			<option value="2">FLEXI_FORCE_CACHE</option>
 			<option value="1">FLEXI_USE_GLOBAL</option>
