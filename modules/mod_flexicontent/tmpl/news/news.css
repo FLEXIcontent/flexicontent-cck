@@ -60,3 +60,21 @@
 .mod_flexicontent_wrap-red a {
 	color: #FF0032;
 }
+
+
+.mod_flexicontent_ordering_seperator {
+  border-width:0px;
+  border-top:1px dashed #dddddd;
+  height:0px;
+  line-height:0px;
+  margin: 8px 12px 12px 8px;
+  float:none;
+}
+
+.image_featured img, .image_standard img {
+  padding:1px; border:1px solid #dddddd;  
+}
+
+.mod_flexicontent_standard_wrapper:hover .image_standard img, .mod_flexicontent_standard_wrapper:hover .image_featured img {
+  border:1px solid black;
+}
