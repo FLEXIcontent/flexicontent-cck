@@ -24,6 +24,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
+
 	function onAdvSearchDisplayField(&$field, &$item) {
 		plgFlexicontent_fieldsFile::onDisplayField($field, $item);
 	}
@@ -41,10 +42,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$prefix		= $app->isSite() ? 'administrator/' : '';
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
+		$dummy_required_form_field = "<input type=\"text\" class=\"{$required}\" name=\"{$field->name}[]\" value=\"\" style=\"display:none;\"/>";
 
 		$js = "
-		function qfSelectFile".$field->id."(id, file) {
 		
+		var req_container_innerHTML='".$dummy_required_form_field."';
+		var value_counter=".count($field->value).";
+		
+		function qfSelectFile".$field->id."(id, file) {
+		  value_counter++;
+		  var req_container = $('{$field->name}_req_container');
+		  req_container.innerHTML = '';
+		  
 			var name 	= 'a_name'+id;
 			var ixid 	= 'a_id'+id;			
 			var li 		= document.createElement('li');
@@ -95,6 +104,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		}
 		function deleteField".$field->id."(el) {
+		  var req_container = $('{$field->name}_req_container');
+		  value_counter--;
+		  if (value_counter<=0)
+		    req_container.innerHTML = req_container_innerHTML;
+		  
 			var field	= $(el);
 			var row		= field.getParent();
 			var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
@@ -140,9 +154,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$move 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
-
+		
+	  $field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
-		$field->html = '<ul id="sortables_'.$field->id.'">';
+		$field->html .= '<ul id="sortables_'.$field->id.'">';
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';

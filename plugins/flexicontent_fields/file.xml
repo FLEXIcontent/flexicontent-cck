@@ -38,12 +38,10 @@
 			<option value="1">Yes</option>
 			<option value="0">No</option>
 		</param>
-<!--
 		<param name="required" type="radio" default="0" label="Required" description="Required">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
--->
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_file.ini</language>
