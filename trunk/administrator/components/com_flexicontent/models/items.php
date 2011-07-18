@@ -247,9 +247,10 @@ class FlexicontentModelItems extends JModel
 
 		// insert items_ext datas
 		$itemext = array();
+		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-			$itemext = '('.(int)$row->id.', 1, '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
-			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
+		    $itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
+					$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
