@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm">
 
 <table class="adminform">
 	<tr>
@@ -93,7 +93,11 @@ defined('_JEXEC') or die('Restricted access');
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="left">
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<?php if(JRequest::getVar('object','')==''): ?>
 					<a style="cursor:pointer" onclick="window.parent.qfSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+					<?php else: ?>
+					<a style="cursor:pointer" onclick="window.parent.jSelectArticle('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', '<?php echo JRequest::getVar('object',''); ?>');">
+					<?php endif; ?>
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
