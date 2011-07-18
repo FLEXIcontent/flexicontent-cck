@@ -223,12 +223,18 @@ class FlexicontentFields
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
 
-				// Set the items view to article as in com_content
-				if ($flexiview == 'items') JRequest::setVar('view', 'article');
+				// Set the view and option to article and com_content
+				if ($flexiview == 'items') {
+				  JRequest::setVar('view', 'article');
+				  JRequest::setVar('option', 'com_content');
+				}
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
-				// Set it back to items for the com_flexicontent
-				if ($flexiview == 'article') JRequest::setVar('view', 'items');
-
+				// Set the view and option back to items and com_flexicontent
+				if ($flexiview == 'items') {
+				  JRequest::setVar('view', 'items');
+				  JRequest::setVar('option', 'com_flexicontent');
+				}
+				
 				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
@@ -257,12 +263,18 @@ class FlexicontentFields
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
 
-				// Set the items view to article as in com_content
-				if ($flexiview == 'items') JRequest::setVar('view', 'article');
+				// Set the view and option to article and com_content
+				if ($flexiview == 'items') {
+				  JRequest::setVar('view', 'article');
+				  JRequest::setVar('option', 'com_content');
+				}
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
-				// Set it back to items for the com_flexicontent
-				if ($flexiview == 'article') JRequest::setVar('view', 'items');
-
+				// Set the view and option back to items and com_flexicontent
+				if ($flexiview == 'items') {
+				  JRequest::setVar('view', 'items');
+				  JRequest::setVar('option', 'com_flexicontent');
+				}
+				
 				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
