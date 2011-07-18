@@ -61,6 +61,21 @@ switch ($cols)
 <div class="column"<?php echo $style; ?>>
 <?php foreach ($this->categories as $sub) : ?>
 
+  <?php
+  if ($this->params->get('hide_empty_cats')) {
+    $subcats_are_empty = 1;
+    if (!$sub->assigneditems) foreach($sub->subcats as $subcat) {
+      if ($subcat->assignedcats || $subcat->assignedsubitems) {
+        $subcats_are_empty = 0;
+        break;
+      }
+    } else {
+      $subcats_are_empty = 0;
+    }
+    if ($subcats_are_empty) continue;
+  }
+  ?>
+
 <div class="floattext">
     
 	<h2 class="flexicontent cat<?php echo $sub->id; ?>">
@@ -75,6 +90,12 @@ switch ($cols)
 	<ul class="catdets cat<?php echo $sub->id; ?>">
 		<?php
 		foreach ($sub->subcats as $subcat) :?>
+		    <?php
+			if ($this->params->get('hide_empty_subcats')) {
+				if (!$subcat->assignedcats && !$subcat->assignedsubitems) continue;
+			}
+	    	?>
+		
 			<li>
 				<a href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
 				<?php if ($this->params->get('showassignated')) : ?>
