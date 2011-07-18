@@ -166,6 +166,10 @@ window.addEvent('domready', function(){
 			<td align="center" width="35%">
 				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
 				<?php echo $this->lists['extdata']; ?>
+				<?php
+				    $types = & $this->get( 'Typeslist' );
+				    echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
+				?>
 				<input id="button-bind" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" />
 				<div id="log-bind"></div>
 			</td>
