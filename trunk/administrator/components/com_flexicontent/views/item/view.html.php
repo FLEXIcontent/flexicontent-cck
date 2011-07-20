@@ -123,6 +123,7 @@ class FlexicontentViewItem extends JView {
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
 		{
+		    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$row ));
 		}
 		

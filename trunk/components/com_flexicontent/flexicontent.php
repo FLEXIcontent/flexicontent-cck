@@ -46,7 +46,7 @@ if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($params->get('flexi_fish'
 JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
 
 // Import the plugins
-JPluginHelper::importPlugin('flexicontent_fields');
+//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger flexicontent_fields on DEMAND !!!
 JPluginHelper::importPlugin('flexicontent');
 
 // Require the base controller

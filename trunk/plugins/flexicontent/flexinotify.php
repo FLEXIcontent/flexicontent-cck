@@ -57,7 +57,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	 * @param 	object		The item object.
 	 * @param 	object		The complete $_POST data
 	 */
-	function onAfterSaveItem( &$item, $post )
+	function onAfterSaveItem( &$item, &$post )
 	{
 		global $mainframe;
 		$notify	= isset($post['notify']) ? true : false;
