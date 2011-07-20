@@ -196,17 +196,12 @@ class FlexicontentViewCategory extends JView
 			$item->event 	= new stdClass();
 			$item->params 	= new JParameter($item->attribs);
 			
-			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params, 0));
-
-			$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $item, & $item->params, 0));
-			$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
-			$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $item->params, 0));
-			$item->event->beforeDisplayContent = trim(implode("\n", $results));
-	
-			$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $item->params, 0));
-			$item->event->afterDisplayContent = trim(implode("\n", $results));
-
+			// !!! The triggering of the event onPrepareContent of content plugins
+			// !!! for description field (maintext) along with all other flexicontent
+			// !!! fields is handled by flexicontent.fields.php
+			// !!! Had serious performance impact
+			// CODE REMOVED
+			
 			// reappend the category slug according to the advanced routing parameters
 			if (!in_array($category->id, $globalnoroute)) {
 				$item->categoryslug = $category->slug;
@@ -227,8 +222,27 @@ class FlexicontentViewCategory extends JView
 				}
 			}
 		}
+		
+		// Just put category's description inside property 'text' in case the events modify the given text,
+		$category->text = $category->description;
+		
+		// Maybe here not to import all plugins but just those for description and make/use option which ones to trigger ?
+		JPluginHelper::importPlugin('content');
+		
+		// These events return text that could be displayed at appropriate positions by our templates
+		
+		$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $category, & $params, 0));
+		$category->event->afterDisplayTitle = trim(implode("\n", $results));
 
+		$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $category, & $params, 0));
+		$category->event->beforeDisplayContent = trim(implode("\n", $results));
 
+		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $category, & $params, 0));
+		$category->event->afterDisplayContent = trim(implode("\n", $results));
+
+		// Put text back into the catgory's description
+		$category->description = $category->text;
+				
 		// remove previous alpha index filter
 		$uri->delVar('letter');
 
