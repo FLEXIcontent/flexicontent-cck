@@ -106,11 +106,11 @@ class FlexicontentViewItems extends JView
 		$parents	= $cats->getParentlist();
 		$depth		= $params->get('item_depth', 0);
 		
-		JPluginHelper::importPlugin('content');
-		$item->event = new stdClass();
-		$results = $dispatcher->trigger('onPrepareContent', array (&$item, &$params, $limitstart));
-		$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
+		// !!! The triggering of the event onPrepareContent of content plugins
+		// !!! for description field (maintext) along with all other flexicontent
+		// !!! fields is handled by flexicontent.fields.php
+		// CODE REMOVED
+		
 		/*
 		 * Handle the metadata
 		 *
@@ -214,10 +214,14 @@ class FlexicontentViewItems extends JView
 			$tmpl = '.items.default';
 		}
 
-		/*
-		 * Handle display events
-		 * No need for it currently
-		*/
+		// Just put item's text (description field) inside property 'text' in case the events modify the given text,
+		$item->text = $item->fields['text']->display;		
+		
+		// Maybe here not to import all plugins but just those for description field ?
+		JPluginHelper::importPlugin('content');
+		
+		// These events return text that could be displayed at appropriate positions by our templates
+		
 		$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
@@ -227,6 +231,9 @@ class FlexicontentViewItems extends JView
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
+		// Put text back into the description field
+		$item->fields['text']->display = $item->text;
+				
 		$pathway 	=& $mainframe->getPathWay();
 		if (count($globaltypes) > 0) {
 			if (!in_array($item->id, $globaltypes)) {
