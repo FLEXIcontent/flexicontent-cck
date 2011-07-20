@@ -97,14 +97,14 @@ class FlexicontentFields
 				}
 			}
 
-			if ($items[$i]->fields)
-			{
-				foreach ($items[$i]->fields as $field)
-				{
-					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
-				}
-			}
+			//if ($items[$i]->fields)
+			//{
+			//	foreach ($items[$i]->fields as $field)
+			//	{
+			//		$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+			//		$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+			//	}
+			//}
 		}
 		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
@@ -252,7 +252,7 @@ class FlexicontentFields
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
 				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'), true, 'noncore');
+					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
 					foreach ($field->parameters->get('plugins') as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
@@ -297,22 +297,38 @@ class FlexicontentFields
 	{
 		if (!$items) return;
 		if (!$params) return $items;
-		if ($view == 'module') return $items;
 		
 		if ($view == 'category')	$layout = 'clayout';
 		if ($view == 'items') 		$layout = 'ilayout';
 
-		$fbypos		= flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		if ($view == 'category' || $view == 'items') {
+		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		}	else { // $view == 'module', or other
+			// Create a fake template position, for module fields
+		  $fbypos[0] = new stdClass();
+		  $fbypos[0]->fields = explode(',', $params->get('fields'));
+		}
 				
+		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
+		  // 'text' item field is implicitely used by category (its description text), render it
+		  if ($view == 'category') {
+		    $field = $items[$i]->fields['text'];
+		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+		  }
+		  
+		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {
 				foreach ($pos->fields as $f) {
-					if ((isset($items[$i]->fields[$f]->display) && $items[$i]->fields[$f]->display)) {
-						$items[$i]->positions[$pos->position]->{$f}->id 		= $items[$i]->fields[$f]->id;
-						$items[$i]->positions[$pos->position]->{$f}->name 		= $items[$i]->fields[$f]->name;
-						$items[$i]->positions[$pos->position]->{$f}->label 		= $items[$i]->fields[$f]->parameters->get('display_label') ? $items[$i]->fields[$f]->label : '';
-						$items[$i]->positions[$pos->position]->{$f}->display	= $items[$i]->fields[$f]->display;
+				  $field = $items[$i]->fields[$f];
+				  $values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+				  $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					if (isset($field->display) && $field->display) {
+						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
+						$items[$i]->positions[$pos->position]->{$f}->name 		= $field->name;
+						$items[$i]->positions[$pos->position]->{$f}->label 		= $field->parameters->get('display_label') ? $field->label : '';
+						$items[$i]->positions[$pos->position]->{$f}->display	= $field->display;
 					}					
 				}	
 			}
