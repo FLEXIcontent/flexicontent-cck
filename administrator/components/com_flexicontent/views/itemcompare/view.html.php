@@ -63,13 +63,13 @@ class FlexicontentViewItemcompare extends JView {
 		foreach ($fields as $field)
 		{
 			if ($field->value) {
-			    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+                JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
 			} else {
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 			if ($field->version) {
-			    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+                JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
 			} else {
 				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';

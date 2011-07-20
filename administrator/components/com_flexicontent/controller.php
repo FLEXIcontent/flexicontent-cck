@@ -540,8 +540,8 @@ VALUES
 				}*/
 				foreach($fields as $field) {
 					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
-
-				    // process field mambots onBeforeSaveField
+					
+					// process field mambots onBeforeSaveField
 					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
 					// add the new values to the database 
