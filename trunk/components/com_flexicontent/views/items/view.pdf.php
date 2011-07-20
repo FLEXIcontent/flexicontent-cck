@@ -67,7 +67,7 @@ class FlexicontentViewItems extends JView
 				$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
 */
 			} else {
-			    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+                JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				echo $field->label . ': ';
 				echo $field->display . '<br />';

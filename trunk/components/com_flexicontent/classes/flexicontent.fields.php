@@ -35,7 +35,7 @@ class FlexicontentFields
 		}
 		if (!$items) return $items;
 
-		JPluginHelper::importPlugin('flexicontent_fields');
+		//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
@@ -201,7 +201,7 @@ class FlexicontentFields
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
 		{
-		    JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
+            JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
 			$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -242,7 +242,7 @@ class FlexicontentFields
 		}
 		else
 		{
-		    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+            JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
