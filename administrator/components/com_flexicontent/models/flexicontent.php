@@ -732,8 +732,10 @@ class FlexicontentModelFlexicontent extends JModel
 				}
 				$fields[] = $f;
 				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					
+				    // process field mambots onBeforeSaveField
+					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
 					// add the new values to the database 
 					$obj = new stdClass();
