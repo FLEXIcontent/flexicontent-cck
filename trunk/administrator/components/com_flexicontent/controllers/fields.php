@@ -399,6 +399,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		//$id		= JRequest::getVar( 'id', 0 );
 		JRequest::setVar( 'view', 'field' );
 		//JRequest::setVar( 'hidemainmenu', 1 );
+		JPlugin::loadLanguage('plg_flexicontent_fields_'.JRequest::getVar('field_type'), JPATH_ADMINISTRATOR);
 
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
