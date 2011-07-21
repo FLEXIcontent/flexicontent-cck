@@ -211,7 +211,7 @@ class FlexicontentFields
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
 				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'), true, 'core');
+					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
 					foreach ($field->parameters->get('plugins') as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
@@ -315,6 +315,7 @@ class FlexicontentFields
 		  // 'text' item field is implicitely used by category (its description text), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
+		    $values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 		  }
 		  
