@@ -47,7 +47,7 @@
 			<option value="0">No</option>
 		</param>
 		<param name="addthis-user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USER" description="FLEXI_FIELD_TOOLBAR_USER_DESC" />
-		<param name="display-resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_DISPLAY_RESIZER_DESC">
+		<param name="display-resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC">
 			<option value="1">Yes</option>
 			<option value="0">No</option>
 		</param>
