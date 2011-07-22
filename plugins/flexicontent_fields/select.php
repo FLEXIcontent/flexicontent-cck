@@ -36,7 +36,10 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$empty_option		= $field->parameters->get( 'empty_option', 1 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$default_value		= $field->parameters->get( 'default_value' ) ;
-						
+		
+		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
+		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
+		
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 
@@ -63,7 +66,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			} else {
 			
 				$options = array();
-				if ($empty_option) $options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+				if ($empty_option) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}
@@ -77,7 +80,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			}
 
 			$options = array(); 
-			$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+			if($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			$i = 1;
 			$display = "";
 			foreach ($listarrays as $listarray) {

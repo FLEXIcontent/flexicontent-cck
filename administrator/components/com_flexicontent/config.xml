@@ -25,6 +25,7 @@
 		
 		<param name="" type="separator" default="Searching" level="level1" menu="hide" />
 		<param name="typeid_for_advsearch" type="types" default="1" label="Type for ADV. Search" description="Select form(type) for advanced search." />
+		<param name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
 		<param name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

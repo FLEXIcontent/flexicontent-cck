@@ -5,7 +5,7 @@
 		<tr>
 			<td nowrap="nowrap">
 				<label for="search_searchword">
-					<?php echo JText::_( 'Search Keyword' ); ?>:
+					<?php echo JText::_( $this->searchkeywordlabel ); ?>:
 				</label>
 			</td>
 			<td nowrap="nowrap">
