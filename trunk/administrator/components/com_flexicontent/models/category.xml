@@ -69,7 +69,8 @@
 		</param>
     	<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
             <option value="0">FLEXI_NO</option> 
-            <option value="1">FLEXI_YES</option> 
+            <option value="1">1st sublevel</option> 
+            <option value="2">All sublevels</option> 
         </param> 
 		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 			<option value="">Default</option>

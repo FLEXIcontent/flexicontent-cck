@@ -274,14 +274,13 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe, $option;
-
+		global $mainframe, $option, $globalcats;
+	    
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
-		$_group_cats = array($this->_id);
 		//Get active menu parameters.
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
@@ -291,11 +290,23 @@ class FlexicontentModelCategory extends JModel{
 
 		// display sub-categories
 		$display_subcats = $cparams->get('display_subcategories_items', 0);
-		if($display_subcats) {
+		
+		// Display items from current category
+		$_group_cats = array($this->_id);
+		
+		// Display items from (current and) immediate sub-categories (1-level)
+		if ($display_subcats==1) {
 			if(is_array($this->_childs))
 				foreach($this->_childs as $ch)
 					$_group_cats[] = $ch->id;
 		}
+		
+		// Display items from (current and) all sub-categories (any-level)
+		if ($display_subcats==2) {
+			// descendants also includes current category
+			$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
+		}
+		
 		$_group_cats = array_unique($_group_cats);
 		$this->_group_cats = $_group_cats;
 		$_group_cats = "'".implode("','", $_group_cats)."'";
