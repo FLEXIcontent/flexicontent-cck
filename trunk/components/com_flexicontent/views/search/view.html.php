@@ -56,6 +56,7 @@ class FLEXIcontentViewSearch extends JView
 		//$params->bind($params->_raw);
 		$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 
+		$searchkeywordlabel = $params->get('searchkeywordlabel', 'Search Keyword');
 		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
 		JRequest::setVar('typeid', $typeid_for_advsearch, '', 'int');
 		if(!($itemmodel = $this->getModel('items'))) {
@@ -214,6 +215,8 @@ class FLEXIcontentViewSearch extends JView
 		$this->assign('total',			$total);
 		$this->assign('error',			$error);
 		$this->assign('action', 	    $uri->toString());
+		
+		$this->assign('searchkeywordlabel', 	    $searchkeywordlabel);
 
 		parent::display($tpl);
 	}
