@@ -110,6 +110,8 @@ class FlexicontentViewField extends JView {
 				");
 			
 		}
+		// Import field to execute its constructor, e.g. needed for loading language file etc
+		JPluginHelper::importPlugin('flexicontent_fields', $row->field_type);
 		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
 		if (FLEXI_ACCESS) {
