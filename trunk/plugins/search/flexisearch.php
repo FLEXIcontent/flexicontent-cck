@@ -30,7 +30,7 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
  */
 function &plgSearchFlexisearchAreas() {
 	static $areas = array(
-	'flexicontent' => 'FLEXICONTENT'
+	'flexisearch' => 'Content Standard Search'
 	);
 	return $areas;
 }
