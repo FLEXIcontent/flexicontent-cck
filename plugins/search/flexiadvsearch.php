@@ -68,7 +68,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 
 	if (is_array( $areas )) {
-		if (!array_intersect( $areas, array_keys( plgSearchFlexisearchAreas() ) )) {
+		if (!array_intersect( $areas, array_keys( plgSearchFlexiadvsearchAreas() ) )) {
 			return array();
 		}
 	}
