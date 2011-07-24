@@ -46,6 +46,7 @@ defined('_JEXEC') or die('Restricted access');
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <!-- 			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
 			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <!-- 			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
@@ -114,6 +115,9 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 			<td align="left">
 				<?php echo $row->name; ?>
+			</td>
+			<td align="left">
+				<?php echo ($row->type?$row->type:"Core Field"); ?>
 			</td>
 			<td>
 				<?php

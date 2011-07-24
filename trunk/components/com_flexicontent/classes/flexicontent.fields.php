@@ -179,6 +179,44 @@ class FlexicontentFields
 	}
 
 	/**
+	 * Method to render (display method) a field on demand and return thedisplay
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5.5
+	 */
+	function getFieldDisplay($item, $fieldname, $values=null, $method='display')
+	{
+	  // Check if we have already created the display and return it
+	  if ( isset($item->onDemandFields[$fieldname]->{$method}) ) {
+	    return $item->onDemandFields[$fieldname]->{$method};
+	  } else {
+	    $item->onDemandFields[$fieldname] = new stdClass();
+	  }
+	  
+	  // Find the field inside item
+	  foreach ($item->fields as $field) {
+	    if ($field->name==$fieldname) break;
+	  }
+	  
+	  // If not found return error message so that user can correct the field name
+	  if ($field->name!=$fieldname) {
+	  	$item->onDemandFields[$fieldname]->{$method} = "Field: $fieldname was not found";
+	  	return $item->onDemandFields[$fieldname]->{$method};
+	  }
+	  
+	  // Get field's values
+	  if ($values===null) {
+	  	$values = isset($items->fieldvalues[$field->id]) ? $items->fieldvalues[$field->id] : array();
+	  }
+	  
+	  // Render the (display) method of the field and return it
+	  $field = FlexicontentFields::renderField($items, $field, $values, $method);
+	  $item->onDemandFields[$fieldname]->{$method} = $field->{$method};
+	  return $item->onDemandFields[$fieldname]->{$method};
+	}
+	
+	/**
 	 * Method to render a field
 	 * 
 	 * @access public
@@ -229,7 +267,11 @@ class FlexicontentFields
 				  JRequest::setVar('view', 'article');
 				  JRequest::setVar('option', 'com_content');
 				}
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				
+				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
+				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) 
+					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == 'items') {
 				  JRequest::setVar('view', 'items');
@@ -315,7 +357,6 @@ class FlexicontentFields
 		  // 'text' item field is implicitely used by category (its description text), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
-		    $values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 		  }
 		  

@@ -164,7 +164,7 @@ class FlexicontentModelFields extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
-		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering'
+		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type'
 					. ' FROM #__flexicontent_fields AS t'
 					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
 					. ' LEFT JOIN #__groups AS g ON g.id = t.access'

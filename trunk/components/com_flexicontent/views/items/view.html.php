@@ -304,20 +304,23 @@ class FlexicontentViewItems extends JView
 		$used 		=& $this->get('Usedtags');
 		//$params		=& $mainframe->getParams('com_flexicontent');
 		//$params		=& JComponentHelper::getParams('com_flexicontent');
+		$params	=& $item->parameters;
+		
 		$Itemid		=&JRequest::getVar('Itemid', 0);
 		if($Itemid) {
 			$db = &JFactory::getDBO();
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
-			$params = new JParameter($paramsstring);
+			$mparams = new JParameter($paramsstring);
+			$params->merge($mparams);
 		}
 		$tparams	=& $this->get( 'Typeparams' );
 		
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
-		    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$item ));
 		}
 		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
