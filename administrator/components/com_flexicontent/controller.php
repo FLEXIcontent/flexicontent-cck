@@ -378,7 +378,7 @@ VALUES
 					`state` int(3) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
-					) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
+					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
 					;
 		$db->setQuery($query);
 		
