@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Select Multiple</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>March 2009</creationDate>
+	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.vistamedia.fr</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_SELECTMULTIPLE</description>
+	<files>
+		<filename plugin="selectmultiple">selectmultiple.php</filename>
+	</files>
+	<config>
+	<fields name="attribs">
+		<fieldset name="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-selectmultiple" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
+			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
+		</fieldset>
+	</fields>
+	</config>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_selectmultiple.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_selectmultiple.ini</language>
+	</languages>
+</install>
