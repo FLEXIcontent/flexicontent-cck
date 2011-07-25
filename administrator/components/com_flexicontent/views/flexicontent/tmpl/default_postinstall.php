@@ -37,6 +37,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
+<?php if (!$this->existmenuitems) : ?>
+<script type="text/javascript">
+	window.addEvent('domready', function(){
+		$('existmenuitems').addEvent('click', function(e) {
+			$('existmenuitems-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&task=createMenuItems&<?php echo JUtility::getToken();?>=1&format=raw";
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existmenuitems-log')
+			});
+			ajax.request.delay(500, ajax);
+		});
+	});
+</script>
+<?php endif; ?>
 <?php if (!$this->existtype) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
@@ -219,6 +237,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</td>
 			</tr>
+			<tr>
+				<td class="key" style="width:280px;">
+					<?php echo JText::_( 'Default Menu Items' ); ?>
+				</td>
+				<td id="existmenuitems-log">
+					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</td>
+			</tr>
+			<tr>
 			<tr>
 				<td class="key">
 					<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>

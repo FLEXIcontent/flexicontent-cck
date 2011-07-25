@@ -94,6 +94,7 @@ class FlexicontentViewFlexicontent extends JView
 		$existmenu 	= & $this->get( 'Existmenu' );
 
 		// install check
+		$existmenuitems		= & $this->get( 'ExistMenuItems' );
 		$existtype 			= & $this->get( 'ExistType' );
 		$existfields 		= & $this->get( 'ExistFields' );
 		$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
@@ -187,6 +188,7 @@ class FlexicontentViewFlexicontent extends JView
 		// install check
 		$this->assignRef('dopostinstall', $dopostinstall);
 		$this->assignRef('allplgpublish', $allplgpublish);
+		$this->assignRef('existmenuitems'		, $existmenuitems);
 		$this->assignRef('existtype'			, $existtype);
 		$this->assignRef('existfields'			, $existfields);
 		$this->assignRef('existfplg'			, $existfplg);

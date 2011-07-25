@@ -128,6 +128,31 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	
+	/**
+	 * Method to check if default Flexi Menu Items exist
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistMenuItems()
+	{
+		$this->_db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+		$flexi_comp_id = $this->_db->loadResult();	
+		
+		$query 	= 'SELECT COUNT( m.id )'
+				. ' FROM #__menu as m'
+				. ' JOIN #__menu_types AS mt on mt.menutype=m.menutype '
+				. ' WHERE m.menutype ="flexihiddenmenu" AND m.published=1 AND (m.alias="flexi_default_item" OR m.alias="flexi_default_cat") AND m.componentid="'.$flexi_comp_id.'"'
+				;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+			
+		if ($count >=2) {
+			return true;
+		}
+		return false;
+	}
+		
 	
 	/**
 	 * Method to check if there is at least one type created
