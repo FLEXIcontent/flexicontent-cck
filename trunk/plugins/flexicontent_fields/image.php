@@ -29,7 +29,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		plgFlexicontent_fieldsImage::onDisplayField($field, $item);
 	}
 	
-	function onDisplayField(&$field, &$item)
+	function onDisplayField(&$field, $item)
 	{
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
