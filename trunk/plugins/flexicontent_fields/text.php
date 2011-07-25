@@ -23,6 +23,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
         	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->field_type != 'text') return;
 		plgFlexicontent_fieldsText::onDisplayField($field, $item);
 	}
 	function onDisplayField(&$field, &$item) {
