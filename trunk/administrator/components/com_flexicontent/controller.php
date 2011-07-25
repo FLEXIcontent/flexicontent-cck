@@ -69,6 +69,7 @@ class FlexicontentController extends JController
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
+		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 	}
 
 	function getPostinstallState() {
@@ -83,8 +84,9 @@ class FlexicontentController extends JController
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+		$existmenuitems	 	= & $model->getExistMenuItems();
 		$dopostinstall = true;
-		if ((!$existfields) || (!$existtype) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+		if ((!$existfields) || (!$existtype) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) || (!$existmenuitems)) {
 			$dopostinstall = false;
 		}
 		return $dopostinstall;
@@ -199,7 +201,46 @@ class FlexicontentController extends JController
 			}
 		}
 	}
+	
+	/**
+	 * Method to create default menu items used for SEF links
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createMenuItems()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$db 	=& JFactory::getDBO();
+		$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+		$flexi_comp_id = $db->loadResult();	
+		
+		$db->setQuery("DELETE FROM #__menu_types WHERE menutype='flexihiddenmenu' ");	
+		$db->query();
+		
+		$db->setQuery("INSERT INTO #__menu_types (`menutype`,`title`,`description`) ".
+			"VALUES ('flexihiddenmenu', 'FLEXIcontent Hidden Menu', 'A hidden menu to host Flexicontent needed links')");
+		$db->query();
+		
+		$db->setQuery("DELETE FROM #__menu WHERE menutype='flexihiddenmenu' ");	
+		$db->query();
+		
+		$query 	=	"INSERT INTO #__menu (`menutype`,`name`,`alias`,`link`,`type`,`published`,`parent`,`componentid`,`sublevel`,`ordering`,`checked_out`,`checked_out_time`,`pollid`,`browserNav`,`access`,`utaccess`,`params`,`lft`,`rgt`,`home`)
+		VALUES
+		('flexihiddenmenu','Site Content','flexi_default_item','index.php?option=com_flexicontent&view=items&id=-1','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'',0,0,0),
+		('flexihiddenmenu','Site Category','flexi_default_cat','index.php?option=com_flexicontent&view=category&id=-1','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'',0,0,0)" ;
+		
+		$db->setQuery($query);
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+	
 	/**
 	 * Method to create default fields data
 	 * 

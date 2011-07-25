@@ -40,8 +40,8 @@ define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 
 if (!defined('FLEXI_SECTION'))	define('FLEXI_SECTION', $params->get('flexi_section'));
 if (!defined('FLEXI_ACCESS')) 	define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-define('FLEXI_VERSION',	'1.5.5');
-define('FLEXI_RELEASE',	'beta (r674)');
+define('FLEXI_VERSION',	'1.5.6');
+define('FLEXI_RELEASE',	'beta (r678)');
 
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($variable, $dopostinstall=true) {
