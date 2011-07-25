@@ -239,7 +239,7 @@ class FlexicontentFields
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
 		{
-            JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
+			JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
 			$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -261,6 +261,7 @@ class FlexicontentFields
 				$field->catslug = $item->categoryslug;
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
+				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
 				if ($flexiview == 'items') {
@@ -284,7 +285,7 @@ class FlexicontentFields
 		}
 		else
 		{
-            JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -306,6 +307,7 @@ class FlexicontentFields
 				$field->catslug = $item->categoryslug;
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
+				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
 				if ($flexiview == 'items') {
@@ -349,6 +351,7 @@ class FlexicontentFields
 			// Create a fake template position, for module fields
 		  $fbypos[0] = new stdClass();
 		  $fbypos[0]->fields = explode(',', $params->get('fields'));
+		  $fbypos[0]->position = $view;
 		}
 				
 		// *** RENDER fields on DEMAND, (if present in template positions)
@@ -363,6 +366,10 @@ class FlexicontentFields
 		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {
 				foreach ($pos->fields as $f) {
+					if (!isset($items[$i]->fields[$f])) {
+						echo "-- Field with name: <b>$f</b> was not found in this Item, please check your configuration --<br>";
+						continue;
+					}
 				  $field = $items[$i]->fields[$f];
 				  $values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 				  $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');

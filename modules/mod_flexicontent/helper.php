@@ -138,18 +138,18 @@ class modFlexicontentHelper
 		  
 		  // 3. Skip Items with empty fields (if this filter is enabled)
 		  //    Other
-  		$rows = array();
-  		foreach($items as $item) {
-  		  if (!isset($order_count[$item->fetching]))    // Check to initialize counter for this ordering 
-  		    $order_count[$item->fetching] = 0;
-  		  if ($order_count[$item->fetching] >= $count)   // Check if enough encountered for this ordering 
-  		    continue;
-  		  
-	  	  // Construct display values array
-	  	  $field_val = array();
-		    foreach($item->fields as $itemfield) {
-		      $field_val[$itemfield->name] = $itemfield->display;
-		    }
+		  $rows = array();
+		  foreach($items as $item) {
+		  	if (!isset($order_count[$item->fetching]))    // Check to initialize counter for this ordering 
+		  		$order_count[$item->fetching] = 0;
+		  	if ($order_count[$item->fetching] >= $count)   // Check if enough encountered for this ordering 
+		  		continue;
+		  	
+		  	// Construct display values array
+		  	$field_val = array();
+		  	foreach($skiponempty_fields as $skipfieldname) {
+		  		$field_val[$skipfieldname] = $item->fields[$skipfieldname]->display;
+		  	}
 		    
 		    // Now check for empty values on field that when empty, the item must be skipped
 		    if ($skip_items) {
@@ -798,6 +798,8 @@ class modFlexicontentHelper
 			case 'random':
 				$orderby = ' ORDER BY RAND()';
 				break;
+			default:
+				$orderby = '';
 		}
 		
 		if (!isset($query)) {
