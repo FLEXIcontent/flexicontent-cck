@@ -215,7 +215,7 @@ class FlexicontentViewItems extends JView
 		}
 
 		// Just put item's text (description field) inside property 'text' in case the events modify the given text,
-		$item->text = $item->fields['text']->display;		
+		$item->text = @$item->fields['text']->display;
 		
 		// Maybe here not to import all plugins but just those for description field ?
 		JPluginHelper::importPlugin('content');
