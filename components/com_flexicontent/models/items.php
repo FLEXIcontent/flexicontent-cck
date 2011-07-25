@@ -1408,7 +1408,8 @@ class FlexicontentModelItems extends JModel
 		foreach ($fields as $field) {
 			$field->item_id		= 0;
 			$field->value 		= $this->getExtrafieldvalue($field->id, 0);
-			$field->parameters 	= new JParameter($field->attribs);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.$field->field_type.'.xml';
+			$field->parameters 	= new JParameter($field->attribs, $path);
 		}
 		return $fields;
 	}
