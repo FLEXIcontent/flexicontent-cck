@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
+<install type="component" version="1.6.0" method="upgrade">
+	<name>com_flexicontent</name>
+	<creationDate>05 Oct 2010</creationDate>
+	<author>Emmanuel Danan</author>
+	<copyright>(C) 2009-2011 Emmanuel Danan</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>2.0 Beta1</version>
+	<description>A flexible content management system for Joomla! 1.6/1.7</description>
+
+	<languages folder="site/language">
+		<language tag="en-GB">en-GB.com_flexicontent.ini</language>
+		<language tag="fr-FR">fr-FR.com_flexicontent.ini</language>
+	</languages>
+
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>flexicontent.php</filename>
+		<filename>controller.php</filename>
+		<filename>router.php</filename>
+		<filename>LICENSE.php</filename>
+		<filename>CHANGELOG.php</filename>
+		<filename>TODO.php</filename>
+		<filename>README.php</filename>
+		<folder>assets</folder>
+		<folder>classes</folder>
+		<folder>controllers</folder>
+		<folder>helpers</folder>
+		<folder>librairies</folder>
+		<folder>models</folder>
+		<folder>sef_ext</folder>
+		<folder>templates</folder>
+		<folder>views</folder>
+	</files>
+
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
+			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
+			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
+		</sql>
+	</uninstall>
+
+	<administration>
+		<menu img="components/com_flexicontent/assets/images/flexicontent.png">COM_FLEXICONTENT</menu>
+		<files folder="admin">
+			<filename>index.html</filename>
+			<filename>admin.flexicontent.php</filename>
+			<filename>controller.php</filename>
+			<filename>defineconstants.php</filename>
+			<filename>config.xml</filename>
+			<filename>access.xml</filename>
+			<folder>installation</folder>
+			<folder>assets</folder>
+			<folder>views</folder>
+			<folder>models</folder>
+			<folder>controllers</folder>
+			<folder>tables</folder>
+			<folder>elements</folder>
+		</files>
+		<languages folder="admin/language">
+			<language tag="en-GB">en-GB.com_flexicontent.ini</language>
+			<language tag="en-GB">en-GB.com_flexicontent.sys.ini</language>
+			<language tag="fr-FR">fr-FR.com_flexicontent.ini</language>
+		</languages>
+		<params>
+			<param name="flexi_category" default="" />
+			<param name="comments" default="0" />
+			<param name="support_url" default="" />
+			<param name="add_tooltips" default="1" />
+			<param name="disablecss" default="0" />
+			<param name="show_updatecheck" default="1" />
+			<param name="new_item_state" default="-4" />
+			<param name="flexi_fish" default="0" />
+			<param name="filtercat" default="0" />
+			<param name="filtertag" default="0" />
+			<param name="disable_lang_select" default="1" />
+			<param name="use_versioning" default="1" />
+			<param name="nr_versions" default="10" />
+			<param name="versionsperpage" default="5" />
+			<param name="auto_approve" default="1" />
+			<param name="disable_diff" default="0" />
+			<param name="show_title" default="1" />
+			<param name="link_titles" default="1" />
+			<param name="show_readmore" default="1" />
+			<param name="show_intro" default="1" />
+			<param name="form_extra_css" default="" />
+			<param name="show_icons" default="1" />
+			<param name="show_pdf_icon" default="1" />
+			<param name="show_print_icon" default="1" />
+			<param name="show_email_icon" default="1" />
+
+			<param name="catlimit" default="100" />
+			<param name="limit" default="10" />
+			<param name="feed_summary" default="0" />
+
+			<param name="upload_extensions" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP" />
+			<param name="upload_maxsize" default="10000000" />
+			<param name="file_path" default="components/com_flexicontent/uploads" />
+			<param name="media_path" default="components/com_flexicontent/medias" />
+			<param name="restrict_uploads" default="1" />
+			<param name="check_mime" default="1" />
+			<param name="image_extensions" default="bmp,gif,jpg,png" />
+			<param name="ignore_extensions" default="" />	
+			<param name="upload_mime" default="image/jpeg,image/gif,image/png,image/bmp,application/x-shockwave-flash,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" />
+			<param name="upload_mime_illegal" default="text/html" />
+			<param name="enable_flash" default="0" />
+			<param name="advcache" default="1" />
+			<param name="advcache_time" default="3600" />
+			<param name="purge_gc" default="1" />
+		</params>
+	</administration>
+
+<additional>
+	<plugin name="checkbox" folder="plugins/checkbox">Checkbox field</plugin>
+	<plugin name="checkboximage" folder="plugins/checkboximage">Checkbox Image field</plugin>
+	<plugin name="core" folder="plugins/core">Core and Autogenerated fields</plugin>
+	<plugin name="date" folder="plugins/date">Date field</plugin>
+	<plugin name="email" folder="plugins/email">Email field</plugin>
+	<plugin name="extendedweblink" folder="plugins/extendedweblink">Extended Weblink field</plugin>
+	<plugin name="file" folder="plugins/file">File field</plugin>
+	<plugin name="image" folder="plugins/image">Image field</plugin>
+	<plugin name="linkslist" folder="plugins/linkslist">Links list field</plugin>
+	<plugin name="minigallery" folder="plugins/minigallery">Minigallery field</plugin>
+	<plugin name="radio" folder="plugins/radio">Radio field</plugin>
+	<plugin name="radioimage" folder="plugins/radioimage">Radio Image field</plugin>
+	<plugin name="select" folder="plugins/select">Select list field</plugin>
+	<plugin name="selectmultiple" folder="plugins/selectmultiple">Multiple select list field</plugin>
+	<plugin name="text" folder="plugins/text">Text field</plugin>
+	<plugin name="textarea" folder="plugins/textarea">Textarea field</plugin>
+	<plugin name="weblink" folder="plugins/weblink">Weblink field</plugin>
+
+	<plugin name="flexisearch" folder="plugins/search">Search plugin for FLEXIcontent</plugin>
+	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
+</additional>
+
+<installfile>install.php</installfile>
+<uninstallfile>uninstall.php</uninstallfile>
+
+</install>

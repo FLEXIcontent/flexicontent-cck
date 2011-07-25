@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="FLEXICONTENT_ITEM_SUBMISSION">
+		<message>
+			<![CDATA[FLEXICONTENT_ITEM_SUBMISSION_TIP]]>
+		</message>
+	</layout>
+	<state>
+		<name>FLEXICONTENT_ITEM_SUBMISSION</name>
+		<description>FLEXICONTENT_ITEM_SUBMISSION_DESC</description>
+		<url addpath="/administrator/components/com_flexicontent/elements">
+		<param name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC"> 
+			<option value="1">Article</option> 
+		</param>
+		</url>
+		<params addpath="/administrator/components/com_flexicontent/elements">
+			<param name="cid" type="flexicategories" multiple="true" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
+			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+				<option value="0">NO</option>
+				<option value="1">YES</option>
+			</param>
+			<param name="autopublished" type="radio" default="0" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC">
+				<option value="0">NO</option>
+				<option value="1">YES</option>
+			</param>
+			<param name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" />
+		</params>
+	</state>
+</metadata>

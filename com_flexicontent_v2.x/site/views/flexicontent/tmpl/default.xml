@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="FLEXICONTENT_MAIN">
+		<message>
+			<![CDATA[FLEXICONTENT_MAIN_TIP]]>
+		</message>
+	</layout>
+	<state>
+		<name>FLEXICONTENT_MAIN</name>
+		<description>FLEXICONTENT_MAIN_DESC</description>
+		<params addpath="/administrator/components/com_flexicontent/elements">
+			<param name="rootcat" type="qfcategory" default="0" label="FLEXI_SELECT_ROOT_CATEGORY" description="FLEXI_SELECT_ROOT_CATEGORY_DESC" />
+            <param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
+                <option value="0">FLEXI_ROOT</option> 
+                <option value="1">FLEXI_LEVEL_1</option> 
+                <option value="2">FLEXI_LEVEL_2</option> 
+                <option value="3">FLEXI_LEVEL_3</option> 
+                <option value="4">FLEXI_LEVEL_4</option> 
+                <option value="5">FLEXI_LEVEL_5</option> 
+            </param> 
+			<param name="introtext" type="textarea" default="" label="FLEXI_INTROTEXT_FIELD" rows="8" cols="30" description="FLEXI_INTROTEXT_FIELD_TIP"/>
+			<param name="showintrotext" type="radio" default="0" label="FLEXI_DISPLAY_INTROTEXT" description="FLEXI_DISPLAY_INTROTEXT_TIP">
+				<option value="0">Hide</option>
+				<option value="1">Show</option>
+			</param>
+			<param name="showassignated" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
+				<option value="0">Hide</option>
+				<option value="1">Show</option>
+			</param>
+			<param name="catlimit" type="text" default="200" size="4" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" />
+			
+			<param name="@spacer" type="spacer" default="" label="" description="" />
+
+			<param name="columns_count" type="list" default="1" label="FLEXI_COLUMNS_COUNT" description="FLEXI_COLUMNS_COUNT_DESC">
+				<option value="1">FLEXI_1_COL</option>
+				<option value="2">FLEXI_2_COLS</option>
+				<option value="3">FLEXI_3_COLS</option>
+				<option value="4">FLEXI_4_COLS</option>
+			</param>
+			<param name="column1" type="text" default="200" size="4" label="FLEXI_COLUMN1_BLOCKS_COUNT" description="FLEXI_COLUMN1_BLOCKS_COUNT_DESC" />
+			<param name="column2" type="text" default="0" size="4" label="FLEXI_COLUMN2_BLOCKS_COUNT" description="FLEXI_COLUMN2_BLOCKS_COUNT_DESC" />
+			<param name="column3" type="text" default="0" size="4" label="FLEXI_COLUMN3_BLOCKS_COUNT" description="FLEXI_COLUMN3_BLOCKS_COUNT_DESC" />
+
+		</params>
+	</state>
+	<fieldgroups>
+	</fieldgroups>	
+</metadata>

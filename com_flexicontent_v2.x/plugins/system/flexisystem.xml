@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system" method="upgrade">
+	<name>System - FLEXIcontent</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>June 2009</creationDate>
+	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.vistamedia.fr</authorUrl>
+	<version>1.1</version>
+	<description>FLEXI_PLUGIN_SYSTEM</description>
+	<files>
+		<filename plugin="flexisystem">flexisystem.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_system_flexisystem.ini</language>
+		<language tag="fr-FR">fr-FR.plg_system_flexisystem.ini</language>
+	</languages>
+	<config>
+	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="basic">
+			<field name="redirect_cats" type="flexiusergroup" size="10" multiple="true" default="" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
+				<option value="-1">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="-2">All User Groups</option>
+			</field>
+			<field name="redirect_articles" type="flexiusergroup" size="10" multiple="true" default="" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
+				<option value="-1">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="-2">All User Groups</option>
+			</field>
+		</fieldset>
+	</fields>
+	</config>
+</install>
