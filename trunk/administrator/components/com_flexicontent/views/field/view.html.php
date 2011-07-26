@@ -70,6 +70,10 @@ class FlexicontentViewField extends JView {
 		$typesselected		= & $this->get( 'Typesselected' );
 		JHTML::_('behavior.tooltip');
 		
+		if($row->field_type) {
+			JPlugin::loadLanguage('plg_flexicontent_fields_'.$row->field_type, JPATH_ADMINISTRATOR);
+		}
+		
 		//build selectlists
 		$lists = array();
 		//build type select list
