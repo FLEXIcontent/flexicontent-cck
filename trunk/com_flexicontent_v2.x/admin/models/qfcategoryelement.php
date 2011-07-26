@@ -128,8 +128,8 @@ class FlexicontentModelQfcategoryelement extends JModel
 		if ($search) {			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
-					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
-					. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT).' AND c.rgt<='.$this->_db->Quote(FLEXI_CATEGORY_RGT)
+					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
+					. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 					. $where
 					;
 			$this->_db->setQuery( $query );
@@ -142,11 +142,11 @@ class FlexicontentModelQfcategoryelement extends JModel
 					. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
 					//. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' WHERE c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT).' AND c.rgt<='.$this->_db->Quote(FLEXI_CATEGORY_RGT)
+					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 					//. ' AND sec.scope = ' . $this->_db->Quote('content')
 					. $where
 					. ' GROUP BY c.id'
-					. $orderby
+					//. $orderby
 					;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
@@ -165,7 +165,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 		}
     	
     	//get list of the items
-    	$list = flexicontent_cats::treerecurse(FLEXI_CATEGORY, '', array(), $children, false, max(0, $levellimit-1));
+    	$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID=1, '', array(), $children, false, max(0, $levellimit-1));
 
     	//eventually only pick out the searched items.
 		if ($search) {

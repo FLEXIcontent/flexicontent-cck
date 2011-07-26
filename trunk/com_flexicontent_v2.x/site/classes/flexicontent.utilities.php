@@ -1,13 +1,12 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 class FLEXIUtilities {
-	function getFlexiSection() {
-		static $flexisection;
-		if(!isset($flexisection) && defined('FLEXI_CATEGORY') && FLEXI_CATEGORY && !FLEXIUtilities::isJ15()) {
-			$flexisection = &JTable::getInstance('flexicontent_categories','');
-			$flexisection->load(FLEXI_CATEGORY);
-		}elseif(!isset($flexisection)) $flexisection = null;
-		return $flexisection;
+	function get_flexi_cat_extension() {
+		static $flexi_cat_extension;
+		
+		$params =& JComponentHelper::getParams('com_flexicontent');
+		$flexi_cat_extension = $params->get('flexi_cat_extension','com_content');
+		return $flexi_cat_extension;
 	}
 	function isJ15() {
 		static $j15;

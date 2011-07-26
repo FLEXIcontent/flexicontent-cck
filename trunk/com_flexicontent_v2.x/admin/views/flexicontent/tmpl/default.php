@@ -41,9 +41,9 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
-						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_category')) {
+						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_cat_extension')) {
 							echo '<div class="fc-error">';
-							if (!$this->params->get('flexi_category') || $this->params->get('flexi_category') == 0) echo JText::_( 'FLEXI_NO_CATEGORY_CHOOSEN' ) . '<br />';
+							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '') echo JText::_( 'FLEXI_CONFIGURATION_NOT_SAVED' ) . '<br />';
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';

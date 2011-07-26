@@ -33,18 +33,15 @@ class plgSystemFlexisystem extends JPlugin{
 		parent::__construct( $subject, $config );
 
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		if (!defined('FLEXI_CATEGORY')) {
-			define('FLEXI_CATEGORY', $fparams->get('flexi_category'));
+		if (!defined('FLEXI_CAT_EXTENSION')) {
+			define('FLEXI_CAT_EXTENSION', $fparams->get('flexi_cat_extension', 'com_content'));
 			$db = &JFactory::getDBO();
-			if(FLEXI_CATEGORY) {
-				$query = "SELECT lft,rgt FROM #__categories WHERE id='".FLEXI_CATEGORY."';";
+			if(FLEXI_CAT_EXTENSION) {
+				$query = "SELECT lft,rgt FROM #__categories WHERE id=1";
 				$db->setQuery($query);
 				$obj = $db->loadObject();
-				if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', $obj->lft);
-				if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', $obj->rgt);
-			}else{
-				if (!defined('FLEXI_CATEGORY_LFT'))	define('FLEXI_CATEGORY_LFT', NULL);
-				if (!defined('FLEXI_CATEGORY_RGT'))	define('FLEXI_CATEGORY_RGT', NULL);
+				if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
+				if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 			}
 		}
 		if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
@@ -66,7 +63,7 @@ class plgSystemFlexisystem extends JPlugin{
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 
 		$this->trackSaveConf();
-		if (FLEXI_CATEGORY) {
+		if (FLEXI_CAT_EXTENSION) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
 				// add the category tree to categories cache
@@ -189,8 +186,8 @@ class plgSystemFlexisystem extends JPlugin{
 		// get the category tree and append the ancestors to each node		
 		$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
-				. ' FROM #__categories'
-				. ' WHERE lft > ' . FLEXI_CATEGORY_LFT . ' AND rgt < ' . FLEXI_CATEGORY_RGT
+				. ' FROM #__categories as c'
+				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND lft > ' . FLEXI_LFT_CATEGORY . ' AND rgt < ' . FLEXI_RGT_CATEGORY
 				. ' ORDER BY parent_id, lft'
 				;
 		$db->setQuery($query);
@@ -212,7 +209,7 @@ class plgSystemFlexisystem extends JPlugin{
 		$parents = array_unique($parents);
 
 		//get list of the items
-		$globalcats = plgSystemFlexisystem::_getCatAncestors(FLEXI_CATEGORY, '', array(), $children, true, max(0, $levellimit-1));
+		$globalcats = plgSystemFlexisystem::_getCatAncestors($ROOT_CATEGORY_ID=1, '', array(), $children, true, max(0, $levellimit-1));
 
 		foreach ($globalcats as $cat) {
 			$cat->ancestorsonlyarray	= $cat->ancestors;
@@ -240,7 +237,7 @@ class plgSystemFlexisystem extends JPlugin{
 			foreach ($children[$id] as $v) {
 				$id = $v->id;
 				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != FLEXI_CATEGORY) {
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != ($ROOT_CATEGORY_ID=1)) {
 					$ancestors[] 	= $v->parent_id;
 				} 
 				

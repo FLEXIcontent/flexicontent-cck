@@ -60,7 +60,7 @@ class flexicontent_cats {
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
 				.' FROM #__categories'
 				.' WHERE id ='. $db->Quote((int)$cid)
-				.' AND lft >= ' . $db->Quote(FLEXI_CATEGORY_LFT) . ' AND rgt <= ' . $db->Quote(FLEXI_CATEGORY_RGT)
+				.' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND rgt <= ' . $db->Quote(FLEXI_RGT_CATEGORY)
 				.' AND published = 1'
 			;
 			$db->setQuery($query);
@@ -73,7 +73,7 @@ class flexicontent_cats {
 	{
 		$db 		=& JFactory::getDBO();
 		
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND lft >= ' . $db->Quote(FLEXI_CATEGORY_LFT).' AND rgt<='.$db->Quote(FLEXI_CATEGORY_RGT);
+		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND rgt<='.$db->Quote(FLEXI_RGT_CATEGORY);
 		$db->setQuery( $query );
 
 		if($cid != 0) {
@@ -101,11 +101,11 @@ class flexicontent_cats {
 		$where		= array();
 		//$where[] = "parent_id != '0'";
 		if ($published) $where[] = 'published = 1';
-		if(defined('FLEXI_CATEGORY')) {
+		if(defined('FLEXI_CAT_EXTENSION')) {
 			if ($published) {
-				$where[] = 'section = ' . FLEXI_CATEGORY;
+				$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
 			} else {
-				$where[] = 'section = ' . FLEXI_CATEGORY;
+				$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
 			}
 		}
 
@@ -135,7 +135,7 @@ class flexicontent_cats {
 		}
 
 		//get list of the items
-		$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
+		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID=1, '', array(), $children, true, max(0, $levellimit-1));
 
 		return $list;
 	}
@@ -168,13 +168,13 @@ class flexicontent_cats {
 				}
 
 				if ($title) {
-					if ( $v->parent_id == FLEXI_CATEGORY ) {
+					if ( $v->parent_id == ($ROOT_CATEGORY_ID=1) ) {
 						$txt    = ''.$v->title;
 					} else {
 						$txt    = $pre.$v->title;
 					}
 				} else {
-					if ( $v->parent_id == FLEXI_CATEGORY ) {
+					if ( $v->parent_id == ($ROOT_CATEGORY_ID=1) ) {
 						$txt    = '';
 					} else {
 						$txt    = $pre;
@@ -234,11 +234,12 @@ class flexicontent_cats {
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					} else {
-						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
+						$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 						// FLEXIaccess rule $viewtree enables tree view
 						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}
 				} else {
+					$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 				}
 			}

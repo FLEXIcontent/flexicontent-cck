@@ -18,34 +18,37 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 /**
- * Renders a fields element
+ * Renders a types element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementTypes extends JElement
+class JFormFieldTypes extends JFormField
 {
-	/**
-	 * Element name
-	 * @access	protected
-	 * @var		string
-	 */
-	var	$_name = 'Types';
+/**
+	* Element name
+	*
+	* @access	protected
+	* @var		string
+	*/
+	var	$type = 'Types';
 
-	function fetchElement($name, $value, &$node, $control_name) {
+	function getInput() {
+		$doc 		=& JFactory::getDocument();
 		$db =& JFactory::getDBO();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'
 		. ' ORDER BY name ASC, id ASC'
 		;
-		
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
 		$class = '';
 		return JHTML::_('select.genericlist', $types, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
 	}
 }
+?>

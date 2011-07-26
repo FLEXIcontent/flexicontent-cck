@@ -42,11 +42,11 @@ class FlexicontentViewFavourites extends JView
 		$document 	= & JFactory::getDocument();
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$uri 		= & JFactory::getURI();
 
 		$limitstart		= JRequest::getInt('limitstart');
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.favourites.limit', 'limit', $params->def('limit', 0), 'int');
+		$limit			= JFactory::getApplication()->getUserStateFromRequest('com_flexicontent.favourites.limit', 'limit', $params->def('limit', 0), 'int');
 
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -54,13 +54,14 @@ class FlexicontentViewFavourites extends JView
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
 		}
 
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
 		if (is_object( $menu )) {
+			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		
 			
 			if (!$menu_params->get( 'page_title')) {

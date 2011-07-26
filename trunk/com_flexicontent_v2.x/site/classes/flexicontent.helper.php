@@ -1489,7 +1489,7 @@ class FLEXIUtilities {
 			$db =& JFactory::getDBO();
 			$query = "SELECT c.id,c.version FROM #__content as c"
 					. " JOIN #__categories as cat ON c.catid=cat.id"
-					. " WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."';";
+					. " WHERE cat.lft >= '".FLEXI_LFT_CATEGORY."' AND cat.rgt <= '".FLEXI_RGT_CATEGORY."';";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
@@ -1523,7 +1523,7 @@ class FLEXIUtilities {
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
 					" JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
 					" JOIN #__categories as cat ON c.catid=cat.id" .
-					" WHERE cat.lft >= '".FLEXI_CATEGORY_LFT."' AND cat.rgt <= '".FLEXI_CATEGORY_RGT."' AND c.version > '1';";
+					" WHERE cat.lft >= '".FLEXI_LFT_CATEGORY."' AND cat.rgt <= '".FLEXI_RGT_CATEGORY."' AND c.version > '1';";
 			$db->setQuery($query);
 			//echo str_replace("#__", "jos_", $query);
 			$rows = $db->loadObjectList("id");

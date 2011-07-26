@@ -55,7 +55,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE state = -3'
-				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -81,7 +81,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE c.state = -4'
-				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -107,7 +107,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__content as c'
 				. ' JOIN #__categories as cat ON c.id=cat.id'
 				. ' WHERE c.state = -5'
-				. ' AND cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_CATEGORY_RGT)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -463,8 +463,8 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistcat() {
 		$query 	= 'SELECT COUNT( id )'
-				. ' FROM #__categories'
-				. ' WHERE lft> ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND rgt<' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
+				. ' FROM #__categories as cat'
+				. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND lft> ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND rgt<' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -476,16 +476,16 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if FLEXI_CATEGORY still exists
+	 * Method to check if FLEXI_CAT_EXTENSION still exists
 	 *
 	 * @access public
 	 * @return	boolean	True on success
 	 */
 	function getExistsec() {
-		if (FLEXI_CATEGORY) {
+		if (FLEXI_CAT_EXTENSION) {
 			$query = 'SELECT COUNT( id )'
-			. ' FROM #__sections'
-			. ' WHERE id = ' . FLEXI_CATEGORY
+			. ' FROM #__categories'
+			. ' WHERE id = 1 AND extension=\'system\''
 			;
 			$this->_db->setQuery( $query );
 			$count = $this->_db->loadResult();
@@ -493,23 +493,10 @@ class FlexicontentModelFlexicontent extends JModel
 			if ($count > 0) {
 				return true;
 			} else {
-				// Save the created category as flexi_category for the component
-				$component =& JComponentHelper::getParams('com_flexicontent');
-				$component->set('flexi_category', '');
-				$cparams = $component->toString();
-
-				$flexi =& JComponentHelper::getComponent('com_flexicontent');
-
-				$query 	= 'UPDATE #__components'
-						. ' SET params = ' . $this->_db->Quote($cparams)
-						. ' WHERE id = ' . $flexi->id;
-						;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-				return true;
+				die("Category table corrupterd, SYSTEM root category not found");
 			}
 		}
-	return false;
+		return false;
 	}
 
 	/**
@@ -648,7 +635,7 @@ class FlexicontentModelFlexicontent extends JModel
 	
 	function getDiffVersions($current_versions=array(), $last_versions=array()) {
 		// check if the category was chosen to avoid adding data on static contents
-		if (!FLEXI_CATEGORY) return array();
+		if (!FLEXI_CAT_EXTENSION) return array();
 
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
@@ -663,12 +650,12 @@ class FlexicontentModelFlexicontent extends JModel
 		//$and = "";
 
 		// check if the section was chosen to avoid adding data on static contents
-		if (!FLEXI_CATEGORY) return false;
+		if (!FLEXI_CAT_EXTENSION) return false;
 		return FLEXIUtilities::currentMissing();
 	}
 	function addCurrentVersionData() {
 		// check if the section was chosen to avoid adding data on static contents
-		if (!FLEXI_CATEGORY) return true;
+		if (!FLEXI_CAT_EXTENSION) return true;
 
 		// @TODO: move somewhere else
 		$this->formatFlexiPlugins();
@@ -681,7 +668,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$nullDate	= $db->getNullDate();
 		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext` FROM #__content as c"
 				. " JOIN #__categories as cat ON c.catid=cat.id "
-				." WHERE cat.lft >= ".$this->_db->Quote(FLEXI_CATEGORY_LFT)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_CATEGORY_RGT).";";
+				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."' AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');

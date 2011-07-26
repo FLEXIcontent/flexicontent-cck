@@ -89,7 +89,7 @@ class FlexicontentModelCategories extends JModelList{
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
 		$query->join('LEFT', '#__usergroups AS g ON g.id = c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
-		//$query->where("c.extension = 'com_content'");
+		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
 				$query->where("c.published = 1");
@@ -97,7 +97,7 @@ class FlexicontentModelCategories extends JModelList{
 				$query->where("c.published = 0");
 			}
 		}
-		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')');
+		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
 		// Filter by search in title
 		//$search = $this->getState('com_flexicontent.categories.search');
 		if (!empty($search)) {			
@@ -140,10 +140,10 @@ class FlexicontentModelCategories extends JModelList{
 						
 			$cids = implode( ',', $cid );
 
-			$query = 'UPDATE #__categories'
+			$query = 'UPDATE #__categories as c'
 				. ' SET published = ' . (int) $publish
 				. ' WHERE id IN ('. $cids .')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'  // fx_cat_ext not needed but ...
 			;
 			$this->_db->setQuery( $query );
 			if (!$this->_db->query()) {
@@ -212,7 +212,7 @@ class FlexicontentModelCategories extends JModelList{
 		// execute updateOrder for each parent group
 		$groupings = array_unique( $groupings );
 		foreach ($groupings as $group){
-			$row->reorder('parent_id = '.$group.' AND section = '.FLEXI_CATEGORY);
+			$row->reorder('parent_id = '.$group.' AND extension = "'.FLEXI_CAT_EXTENSION.'"');
 		}
 
 		return true;
@@ -240,7 +240,7 @@ class FlexicontentModelCategories extends JModelList{
 		$query = 'SELECT c.id, c.parent_id, c.title, COUNT( e.catid ) AS numcat'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS e ON e.catid = c.id'
-				. ' WHERE c.id IN ('. $allcids .')'
+				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.id IN ('. $allcids .')'  // fx_cat_ext not needed but ...
 				. ' GROUP BY c.id'
 				;
 		$this->_db->setQuery( $query );
@@ -374,9 +374,9 @@ class FlexicontentModelCategories extends JModelList{
 
 		// Get all rows with parent of $id
 		$query = 'SELECT '.$get
-				. ' FROM #__categories'
-				. ' WHERE lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT)
-				. ' AND rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT)
+				. ' FROM #__categories as c'
+				. ' WHERE lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY)
+				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" AND rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)  // fx_cat_ext not needed but ...
 				. ' AND '.$source.' = '.(int) $id;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();

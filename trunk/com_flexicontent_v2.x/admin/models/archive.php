@@ -153,7 +153,7 @@ class FlexicontentModelArchive extends JModelList{
 		$query->join('LEFT', '#__categories as c ON i.catid=c.id');
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id');
 		$query->join('LEFT', '#__users AS u ON u.id = i.checked_out');
-		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT));
+		$query->where('c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY));
 		$query->where('i.state = -1');
 		$query->where('LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
 		$query->order($filter_order.' '.$filter_order_Dir.', i.ordering');
@@ -259,7 +259,7 @@ class FlexicontentModelArchive extends JModelList{
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid = '.(int)$id
+				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND rel.itemid = '.(int)$id
 				;
 	
 		$this->_db->setQuery( $query );

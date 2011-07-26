@@ -383,6 +383,7 @@ class FlexicontentViewItem extends JView {
 		JHTML::_('behavior.tooltip');
 
 		// Create the type parameters
+		jimport( 'joomla.html.parameter' );
 		$tparams = new JParameter($tparams);
 
 		//ensure $used is an array

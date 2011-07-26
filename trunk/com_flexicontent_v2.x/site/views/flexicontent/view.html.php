@@ -37,15 +37,13 @@ class FlexicontentViewFlexicontent extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
-
 		//initialize variables
 		$document 	= & JFactory::getDocument();
 		$menus		= &JSite::getMenu();
 		$menu		= $menus->getActive();
 		
 		// Get the page/component configuration
-		$params = $mainframe->getParams('com_flexicontent');
+		$params = & JComponentHelper::getParams('com_flexicontent');
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -53,19 +51,21 @@ class FlexicontentViewFlexicontent extends JView
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
 		}
 
 		$limitstart	= JRequest::getInt('limitstart');
 		$limit 		= $params->def('catlimit', 0);
 		$total		= $this->get('Total');
 		$categories	= & $this->get('Data');
+		
 		$categories	= !is_array($categories)?array():$categories;
 
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
 		if (is_object( $menu )) {
+			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		
 			
 			if (!$menu_params->get( 'page_title')) {
@@ -82,8 +82,8 @@ class FlexicontentViewFlexicontent extends JView
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 
-		if ($mainframe->getCfg('MetaTitle') == '1') {
-				$mainframe->addMetaTag('title', $params->get('page_title'));
+		if (JApplication::getCfg('MetaTitle') == '1') {
+				$document->setMetaData('title', $params->get('page_title'));
 		}
 				
 		if ($params->get('show_feed_link', 1) == 1) {

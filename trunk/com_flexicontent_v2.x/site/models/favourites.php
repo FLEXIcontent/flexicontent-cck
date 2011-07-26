@@ -56,7 +56,7 @@ class FlexicontentModelFavourites extends JModel
 		global $mainframe;
 
 		// Get the paramaters of the active menu item
-		$params = & $mainframe->getParams('com_flexicontent');
+		$params = & JComponentHelper::getParams('com_flexicontent');
 
 		//get the number of events from database
 		$limit			= JRequest::getInt('limit', $params->get('limit'));
@@ -118,7 +118,7 @@ class FlexicontentModelFavourites extends JModel
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
         // Get the WHERE and ORDER BY clauses for the query
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
@@ -186,15 +186,13 @@ class FlexicontentModelFavourites extends JModel
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE f.userid = '.(int)$user->get('id');
 		
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
-
-		$where .= ' AND i.sectionid = '.FLEXI_CATEGORY;
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

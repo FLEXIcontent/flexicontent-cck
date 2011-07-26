@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItems extends JModel{
+class FlexicontentModelItems extends JModel {
 	/**
 	 * Items data
 	 *
@@ -146,7 +146,7 @@ class FlexicontentModelItems extends JModel{
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-			. ' WHERE (cat.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')'
+			. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND (cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')'
 			;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -199,7 +199,7 @@ class FlexicontentModelItems extends JModel{
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
 					. ' JOIN #__categories as cat ON c.catid=cat.id' 
-					. ' WHERE (cat.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')'
+					. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')'
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -315,10 +315,11 @@ class FlexicontentModelItems extends JModel{
 				. ' LEFT JOIN #__usergroups AS g ON g.id = i.access'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 				. ' JOIN #__categories AS cat ON i.catid=cat.id'
-				. $where
+				. $where. (($where=='')?" WHERE ":" AND ") . "cat.extension='".FLEXI_CAT_EXTENSION."' "
 				. ' GROUP BY i.id'
 				. $orderby
 				;
+				//echo $query; exit();
 		return $query;
 	}
 
@@ -384,7 +385,7 @@ class FlexicontentModelItems extends JModel{
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_CATEGORY_RGT) . ')';
+		$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
 
 		$user 	=& JFactory::getUser();
 		$allitems	= $permission->DisplayAllItems;
@@ -817,7 +818,7 @@ class FlexicontentModelItems extends JModel{
 			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle from #__content AS c'
 					. ' LEFT JOIN #__categories AS cat on cat.id = c.catid'
 					. ' WHERE c.state = -4'
-					. ' AND c.created_by = ' . (int) $user->get('id')
+					. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND c.created_by = ' . (int) $user->get('id')
 					. ' AND c.id IN ( '. implode(',', $cid).' )'
 					. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
 					;
@@ -1082,7 +1083,7 @@ class FlexicontentModelItems extends JModel{
 				}
 			}
 			
-			$where = $this->_db->nameQuote('sectionid').' = '.FLEXI_CATEGORY; 
+			$where = ''; 
 			$row->reorder($where);
 			return true;
 
@@ -1327,7 +1328,7 @@ class FlexicontentModelItems extends JModel{
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid = '.(int)$id
+				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND rel.itemid = '.(int)$id
 				;
 	
 		$this->_db->setQuery( $query );
@@ -1470,7 +1471,7 @@ class FlexicontentModelItems extends JModel{
 		// Loop throught the section object and create cat -> subcat -> items -> fields
 		
 		// Get the categories of the created section
-		$query = "SELECT * FROM #__categories WHERE id!='".$topcat->id."' AND parent_id!='0'  AND level>'0';";
+		$query = "SELECT * FROM #__categories as c WHERE c.extension='".FLEXI_CAT_EXTENSION."' AND id!='".$topcat->id."' AND parent_id!='0'  AND level>'0';";
 		$this->_db->setQuery($query);
 		$categories = $this->_db->loadObjectList();
 		/*//get children
@@ -1545,9 +1546,9 @@ class FlexicontentModelItems extends JModel{
 		}
 		unset($map_old_new);
 
-		// Save the created category as flexi_category for the component
+		// Save the parameter 'flexi_cat_extension' for the component
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		$fparams->set('flexi_category', $topcat_id);
+		$fparams->set('flexi_cat_extension', $topcat->extension);
 		$fparams = $fparams->toString();
 
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
