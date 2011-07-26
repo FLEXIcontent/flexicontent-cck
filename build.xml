@@ -145,6 +145,10 @@
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_textarea.ini" tofile="flexipack/plugins/textarea/en-GB.plg_flexicontent_fields_textarea.ini" />
 		<copy file="administrator/language/fr-FR/fr-FR.plg_flexicontent_fields_textarea.ini" tofile="flexipack/plugins/textarea/fr-FR.plg_flexicontent_fields_textarea.ini" />
 		
+		<copy file="plugins/flexicontent_fields/textselect.php" tofile="flexipack/plugins/text/textselect.php" />
+		<copy file="plugins/flexicontent_fields/textselect.xml" tofile="flexipack/plugins/text/textselect.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_textselect.ini" tofile="flexipack/plugins/text/en-GB.plg_flexicontent_fields_textselect.ini" />
+		
 		<copy file="plugins/flexicontent_fields/weblink.php" tofile="flexipack/plugins/weblink/weblink.php" />
 		<copy file="plugins/flexicontent_fields/weblink.xml" tofile="flexipack/plugins/weblink/weblink.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_weblink.ini" tofile="flexipack/plugins/weblink/en-GB.plg_flexicontent_fields_weblink.ini" />
