@@ -1052,7 +1052,7 @@ class flexicontent_html{
 			}
 			// If all levels is allowed, push it into the array.
 			elseif ($params) {
-				array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_LEVELS')));
+				//array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_LEVELS')));
 			}
 		}
 
