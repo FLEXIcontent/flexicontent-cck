@@ -59,10 +59,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
-			
+
 			if (!$query || !is_array($results)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
-			
 			} else {
 			
 				$options = array();
@@ -124,7 +123,6 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			
 			if (!$results) {
 				$field->{$prop} = '';
-			
 			} else {
 
 				foreach($results as $result) {
@@ -132,7 +130,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 						$searchindex	= $pretext . JText::_($result->text) . $posttext;
 					}
 				}
-				
+				$searchindex2 = $searchindex;
 				$searchindex .= ' | ';
 
 				$field->search = $field->issearch ? $searchindex : '';
@@ -152,12 +150,31 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 					$searchindex = $listarray[1];
 				} 
 			}
-			
-		$searchindex .= ' | ';
-
-		$field->search = $field->issearch ? $searchindex : '';
-		
+			$searchindex2 = $searchindex;
+			$searchindex .= ' | ';
+			$field->search = $field->issearch ? $searchindex : '';
 		}
+		if($field->isadvsearch) {
+			plgFlexicontent_fieldsSelect::onIndexAdvSearch($field, $searchindex2);
+		}
+	}
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'select') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='select';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','select','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
@@ -255,6 +272,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				$options = array();
 				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 				foreach($results as $result) {
+
 					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';
@@ -278,5 +296,25 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
 		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 		}
+	}
+	
+	function onFLEXIAdvSearch(&$field, $item_id, $fieldsearch) {
+		if($field->field_type!='select') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='select' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			$objs = is_array($objs)?$objs:array();
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		return $resultfields;
 	}
 }
