@@ -19,6 +19,7 @@
 		</param>
 	</params>
 	<params group="group-textselect" addpath="/administrator/components/com_flexicontent/elements">
+		<param name="" type="separator" default="FLEXI_FIELD_TEXT" level="level1" menu="hide" />
 		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -52,7 +53,7 @@
 		</param>
 		
 		
-		
+		<param name="" type="separator" default="FLEXI_FIELD_SELECT" level="level1" menu="hide" />
 		
 		
 		<param name="select_remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
@@ -75,10 +76,6 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_BEFORE_SELECT</option>
 			<option value="2">FLEXI_IN_SELECT</option>
-		</param>
-		<param name="select_required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
 		</param>
 	</params>
 	<languages>
