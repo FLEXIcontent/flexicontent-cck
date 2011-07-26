@@ -30,7 +30,7 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
  */
 function &plgSearchFlexiadvsearchAreas() {
 	static $areas = array(
-	'flexiadvsearch' => 'Content Advanced Search'
+	'flexicontent' => 'FLEXICONTENT'
 	);
 	return $areas;
 }
@@ -66,9 +66,10 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 	require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
 
 	if (is_array( $areas )) {
-		if (!array_intersect( $areas, array_keys( plgSearchFlexiadvsearchAreas() ) )) {
+		if (!array_intersect( $areas, array_keys( plgSearchFlexisearchAreas() ) )) {
 			return array();
 		}
 	}
@@ -184,16 +185,6 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 			if(isset($fieldsearch[0]) && trim($fieldsearch[0])) {
 				$fieldsearch = $fieldsearch[0];
 				$fieldsearch = explode(" ", $fieldsearch);
-				foreach($fieldsearch as $fsearch) {
-					if((stristr($field->value, $fsearch)!== FALSE)) {
-						$items[] = $field->item_id;
-						$obj = new stdClass;
-						$obj->label = $field->label;
-						$obj->value = $field->value;
-						$resultfields[$field->item_id][] = $obj;
-						break;
-					}
-				}
 				$results = $dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $field->item_id, $fieldsearch));
 				if(count($results)>0) {
 					foreach($results as $r) {

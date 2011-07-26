@@ -164,7 +164,6 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 		if(!$post) return;
-		
 		$newpost = array();
 		$new = 0;
 
@@ -188,9 +187,30 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		}
 
 		$searchindex .= ' | ';
-		
+
 		$field->search = $field->issearch ? $searchindex : '';
-		
+
+		if($field->isadvsearch) {
+			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
+		}
+	}
+
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'text') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='text';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','text','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
@@ -254,5 +274,34 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		} else {
 			$field->{$prop} = '';
 		}
+	}
+	
+	function onFLEXIAdvSearch(&$field, $item_id, $fieldsearch) {
+		if($field->field_type!='text') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			if((stristr($field->value, $fsearch)!== FALSE)) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $field->value;
+				$resultfields[] = $obj;
+				break;
+			}
+		}
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			$objs = is_array($objs)?$objs:array();
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		return $resultfields;
 	}
 }

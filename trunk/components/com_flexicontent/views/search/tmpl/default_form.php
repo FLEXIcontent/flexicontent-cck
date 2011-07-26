@@ -9,7 +9,7 @@
 				</label>
 			</td>
 			<td nowrap="nowrap">
-				<input type="text" name="searchword" id="search_searchword" size="30" maxlength="20" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
+				<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
 			</td>
 			<?php if($show_operator = $this->params->get('show_operator', 1)) {?>
 			<td nowrap="nowrap">

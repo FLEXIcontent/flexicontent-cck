@@ -122,9 +122,20 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if($field->field_type!='textarea') return;
 		$db = &JFactory::getDBO();
 		$resultfields = array();
+		
 		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT f.*,ai.search_index FROM #__flexicontent_advsearch_index as ai"
-				." JOIN #__flexicontent_files as f ON f.id=ai.extraid"
+			if((stristr($field->value, $fsearch)!== FALSE)) {
+				//$items[] = $field->item_id;
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $field->value;
+				//$resultfields[$field->item_id][] = $obj;
+				$resultfields[] = $obj;
+				break;
+			}
+		}
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index FROM #__flexicontent_advsearch_index as ai"
 				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='textarea' AND ai.search_index like '%{$fsearch}%';";
 			$db->setQuery($query);
 			$objs = $db->loadObjectList();
