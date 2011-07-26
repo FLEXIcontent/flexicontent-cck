@@ -35,7 +35,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 			}
 		}
 		$field->parameters->set('sql_mode', 1);
-		$query = "select value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}';";
+		$query = "select distinct value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}' GROUP BY `value`;";
 		$field->parameters->set('field_elements', $query);
 		$field->field_type = 'select';
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
