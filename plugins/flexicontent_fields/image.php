@@ -626,6 +626,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// eliminate duplicate records in the array
 		$values = array_unique($values);
+		sort($values);
 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_FIELD_PLEASE_SELECT'));
