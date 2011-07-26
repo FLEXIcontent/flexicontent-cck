@@ -69,7 +69,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
 
 	if (is_array( $areas )) {
-		if (!array_intersect( $areas, array_keys( plgSearchFlexisearchAreas() ) )) {
+		if (!array_intersect( $areas, array_keys( plgSearchFlexiadvsearchAreas() ) )) {
 			return array();
 		}
 	}
