@@ -59,9 +59,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$db->setQuery($query);
 			$options = $db->loadObjectList();
 			
-			if (!$options) {
+			if (!$query || !is_array($options)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
-			
 			} else {
 			
 				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);

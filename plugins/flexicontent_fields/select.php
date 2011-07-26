@@ -60,7 +60,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
-			if (!$results) {
+			if (!$query || !is_array($results)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			
 			} else {
