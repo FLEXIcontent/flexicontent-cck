@@ -561,7 +561,7 @@ class FlexicontentModelCategory extends JModelList{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
-		$where .= ' AND c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT);
+		$where .= ' AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY);
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
@@ -964,7 +964,7 @@ class FlexicontentModelCategory extends JModelList{
 			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
 			. ' AND i.state IN (1, -5)'
-			. ' AND c.lft >= '.FLEXI_CATEGORY_LFT.' AND c.rgt<='.FLEXI_CATEGORY_RGT
+			. ' AND c.lft >= '.FLEXI_LFT_CATEGORY.' AND c.rgt<='.FLEXI_RGT_CATEGORY
 			. $and2
 			. ' GROUP BY alpha'
 			. ' ORDER BY alpha ASC';

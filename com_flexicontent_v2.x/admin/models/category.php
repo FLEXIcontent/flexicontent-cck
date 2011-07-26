@@ -143,7 +143,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$category->name					= null;
 			$category->alias				= null;
 			//$category->image				= JText::_( 'FLEXI_CHOOSE_IMAGE' );
-			$category->section				= FLEXI_CATEGORY;
+			$category->extension				= FLEXI_CAT_EXTENSION;
 			$category->image_position		= 'left';
 			$category->description			= null;
 			$category->published			= 1;
@@ -489,7 +489,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		$this->setState('com_flexicontent.category.parent_id', $parentId);
 
 		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', 'com_content');
+			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
 		}
 		// Load the User state.
 		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {

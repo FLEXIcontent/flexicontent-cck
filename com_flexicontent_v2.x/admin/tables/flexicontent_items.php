@@ -399,8 +399,8 @@ class flexicontent_items extends JTable{
 			$this->sectionid = $db->loadResult();
 
 			$query = 'SELECT name'
-			. ' FROM #__categories'
-			. ' WHERE id = '. (int) $this->catid
+			. ' FROM #__categories c'
+			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND id = '. (int) $this->catid
 			;
 			$db->setQuery( $query );
 			$this->catid = $db->loadResult();

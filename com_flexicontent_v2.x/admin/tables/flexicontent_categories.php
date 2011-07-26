@@ -100,9 +100,9 @@ class flexicontent_categories extends JTableNested{
 
 		/*// check for existing name
 		$query = 'SELECT id'
-			. ' FROM #__categories '
-			. ' WHERE title = '.$this->_db->Quote($this->title)
-			. ' AND lft>=' . FLEXI_CATEGORY_LFT . ' AND rgt<=' . FLEXI_CATEGORY_RGT
+			. ' FROM #__categories c'
+			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND title = '.$this->_db->Quote($this->title)
+			. ' AND lft>=' . FLEXI_LFT_CATEGORY . ' AND rgt<=' . FLEXI_RGT_CATEGORY
 			;
 		$this->_db->setQuery( $query );
 		$xid = intval( $this->_db->loadResult() );

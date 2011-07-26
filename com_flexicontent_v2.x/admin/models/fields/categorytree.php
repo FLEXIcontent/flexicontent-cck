@@ -119,7 +119,7 @@ class JFormFieldCategoryTree extends JFormFieldList{
 		$filter = (bool)$this->element->getAttribute('filter');
 		if($top == 1) {
 			$obj = new stdClass;
-			$obj->value = FLEXI_CATEGORY;
+			$obj->value = $ROOT_CATEGORY_ID = 1;
 			$obj->level = 0;
 			$obj->text = JText::_( 'FLEXI_TOPLEVEL' );
 			$catlist[] 	= $obj;

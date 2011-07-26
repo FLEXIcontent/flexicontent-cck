@@ -36,19 +36,17 @@ class FlexicontentViewTags extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
-
 		//initialize variables
 		$document 	= & JFactory::getDocument();
 		$menu		= & JSite::getMenu();
 		$uri 		= & JFactory::getURI();
 		$item    	= $menu->getActive();
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		
 		$tid 			= JRequest::getInt('id', 0);
 		$limitstart		= JRequest::getInt('limitstart');
 		$filter			= JRequest::getString('filter');
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
+		$limit			= JFactory::getApplication()->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
 
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -56,15 +54,15 @@ class FlexicontentViewTags extends JView
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
 		}
 
 		//params
 		@$params->def( 'page_title', $item->name);
 
 		//pathway
-		$pathway 	= & $mainframe->getPathWay();
+		$pathway 	= & JFactory::getApplication()->getPathWay();
 		@$pathway->setItemName( 1, $item->name );
 
 		//Set Page title

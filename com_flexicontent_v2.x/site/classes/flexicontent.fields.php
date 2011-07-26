@@ -124,7 +124,7 @@ class FlexicontentFields
 
 		$mainframe = &JFactory::getApplication();
 		if (!$item) return;
-		if(!(($item->lft >= FLEXI_CATEGORY_LFT)&&($item->rgt <= FLEXI_CATEGORY_RGT))) return;
+		if(!(($item->lft >= FLEXI_LFT_CATEGORY)&&($item->rgt <= FLEXI_RGT_CATEGORY))) return;
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 		$dispatcher = &JDispatcher::getInstance();

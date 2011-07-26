@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_TAGS">
 		<message>
 			<![CDATA[FLEXICONTENT_TAGS_TIP]]>
 		</message>
 	</layout>
-	<state>
-		<name>FLEXICONTENT_TAGS</name>
-		<description>FLEXICONTENT_TAGS_DESC</description>
-		<url addpath="/administrator/components/com_flexicontent/elements">
-			<param name="id" type="tag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
-		</url>
-		<params>
-			<param name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+	
+	<fields name="request">
+		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="id" type="tag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
+		</fieldset> 
+	</fields>
+	
+	<fields name="params">
+		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
-			</param>
-			<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
+			</field>
+			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
 	 			<option value="0">No</option>
 	 			<option value="1">Yes</option>
-		 	</param>
-			<param name="@spacer" type="spacer" default="" label="" description="" />
-			<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-			<param name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
+		 	</field>
+			<field name="@spacer" type="spacer" default="" label="" description="" />
+			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+			<field name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
 				<option value="2">Auto</option>
-			</param>
-			<param name="show_pagination_results" type="radio" default="1" label="Pagination Results" description="PARAMPAGINATIONRESULTS">
+			</field>
+			<field name="show_pagination_results" type="radio" default="1" label="Pagination Results" description="PARAMPAGINATIONRESULTS">
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
-			</param>
-		</params>
-	</state>
+			</field>
+		</fieldset>
+	</fields>
+	
 </metadata>

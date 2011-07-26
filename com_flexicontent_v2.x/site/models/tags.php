@@ -60,10 +60,8 @@ class FlexicontentModelTags extends JModel
 	{
 		parent::__construct();
 		
-		global $mainframe;
-
 		// Get the paramaters of the active menu item
-		$params = & $mainframe->getParams('com_flexicontent');
+		$params = & JComponentHelper::getParams('com_flexicontent');
 
 		//get the number of events from database
 		$limit			= JRequest::getInt('limit', $params->get('limit'));
@@ -137,12 +135,10 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildQuery()
 	{   	
-		global $mainframe;
-
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid = max ($user->getAuthorisedViewLevels());
         // Get the WHERE and ORDER BY clauses for the query
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
@@ -208,11 +204,9 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe;
-
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$gid = max ($user->getAuthorisedViewLevels());
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		// shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		$filtertag  = $params->get('filtertag', 0);
@@ -227,8 +221,6 @@ class FlexicontentModelTags extends JModel
 
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
-
-		$where .= ' AND i.sectionid = '.FLEXI_CATEGORY;
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

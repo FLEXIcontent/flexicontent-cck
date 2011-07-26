@@ -175,7 +175,6 @@ class FlexicontentModelItemelement extends JModel
 		$where = array();
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' sectionid = ' . FLEXI_CATEGORY;
 
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {

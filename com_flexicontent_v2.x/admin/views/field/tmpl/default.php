@@ -127,17 +127,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</fieldset>
 			<?php
 				if ($this->permission->CanRights) :
-				$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						var slideaccess = new Fx.Slide('tabacces');
-						var slidenoaccess = new Fx.Slide('notabacces');
-						slideaccess.hide();
-						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-							slideaccess.toggle();
-							slidenoaccess.toggle();
-						});
-					});
-				");
 			?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
@@ -148,9 +137,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				        	</td>
 				    	</tr>
 					</table>
-					<div id="notabacces">
-					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-					</div>
                			</fieldset>
 			<?php endif; ?>
 		</td>

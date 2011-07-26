@@ -349,7 +349,6 @@ class FlexicontentModelFileselement extends JModel
 		// File field relation sub query
 		$query = 'SELECT i.id,i.title'
 			. ' FROM #__content AS i '
-			. ' WHERE i.sectionid = ' . FLEXI_CATEGORY
 			;
 		$this->_db->setQuery( $query );
 		$lists = $this->_db->loadObjectList();

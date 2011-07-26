@@ -18,7 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 /**
  * Renders an Item element
  *
@@ -27,7 +28,7 @@ defined('_JEXEC') or die();
  * @since 1.0
  */
 
-class JElementFlexicategories extends JElement
+class JFormFieldFlexicategories extends JFormField
 {
    /**
 	* Element name
@@ -35,12 +36,13 @@ class JElementFlexicategories extends JElement
 	* @access	protected
 	* @var		string
 	*/
-	var	$_name = 'Title';
+	var	$type = 'Flexicategories';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
+	
+	function getInput() {
 		$doc 		=& JFactory::getDocument();
-		$fieldName	= $control_name.'['.$name.']';
+		$value		= $this->__get('value');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$values = explode(",", $value);
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
@@ -55,7 +57,7 @@ class JElementFlexicategories extends JElement
 			document.getElementById('a_id').value = values;
 		}";
 		$doc->addScriptDeclaration($js);
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox required validate-cid" multiple="multiple" size="8"', true);
+		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
 		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
 		return $html;
 	}

@@ -686,7 +686,7 @@ class FlexicontentModelItems extends JModelList{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}*/
 		
-		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_CATEGORY_LFT) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_CATEGORY_RGT));
+		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY));
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
@@ -1102,7 +1102,7 @@ class FlexicontentModelItems extends JModelList{
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 		. ' FROM #__categories AS c'
 		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-		. ' WHERE rel.itemid = '.$this->_id
+		. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" rel.itemid = '.$this->_id
 		;
 
 		$this->_db->setQuery( $query );
@@ -1311,7 +1311,7 @@ class FlexicontentModelItems extends JModelList{
 			}
 			
 			// auto assign the section
-			$item->sectionid 	= FLEXI_CATEGORY;
+			$item->sectionid 	= 0;
 
 			// set type and language
  			$item->type_id 		= (int)$typeid;

@@ -131,8 +131,8 @@ class FlexicontentViewCategory extends JView
 
 		$document->setTitle( $params->get( 'page_title' ) );
 
-		if ($mainframe->getCfg('MetaTitle') == '1') {
-				//$mainframe->addMetaTag('title', $category->title);//--->wait for change to be 1.6 style.
+		if (JApplication::getCfg('MetaTitle') == '1') {
+				$document->setMetaData('title', $category->title);
 		}
 		
 		if ($params->get('show_feed_link', 1) == 1) {

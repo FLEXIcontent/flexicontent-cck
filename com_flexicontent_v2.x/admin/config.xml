@@ -4,7 +4,11 @@
 		<fieldset name="component" label="Options" description="FLEXI_GENERAL_CONF">
 			<field name="separator1" label="" type="separator" default="FLEXI_GENERAL_CONF" level="level1" menu="hide" />
 
-			<field name="flexi_category" type="categoryparent" size="1" default="" label="FLEXI_SELECT_A_SECTION" description="FLEXI_SELECT_A_SECTION_DESC"  menu="hide" />
+<!--			<field name="flexi_category" type="categoryparent" size="1" default="" label="FLEXI_SELECT_A_SECTION" description="FLEXI_SELECT_A_SECTION_DESC"  menu="hide" />-->
+			<field name="flexi_cat_extension" type="list" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide">
+				<option value="com_content">com_content Categories</option>
+			</field>
+
 			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
