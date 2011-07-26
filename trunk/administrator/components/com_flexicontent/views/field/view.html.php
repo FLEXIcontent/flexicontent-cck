@@ -70,6 +70,9 @@ class FlexicontentViewField extends JView {
 		$typesselected		= & $this->get( 'Typesselected' );
 		JHTML::_('behavior.tooltip');
 		
+		// Import field to execute its constructor, e.g. needed for loading language file etc
+		JPluginHelper::importPlugin('flexicontent_fields', $row->field_type);
+		// If constructor does not load language file then this will load it
 		if($row->field_type) {
 			JPlugin::loadLanguage('plg_flexicontent_fields_'.$row->field_type, JPATH_ADMINISTRATOR);
 		}
@@ -114,8 +117,6 @@ class FlexicontentViewField extends JView {
 				");
 			
 		}
-		// Import field to execute its constructor, e.g. needed for loading language file etc
-		JPluginHelper::importPlugin('flexicontent_fields', $row->field_type);
 		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
 		if (FLEXI_ACCESS) {
