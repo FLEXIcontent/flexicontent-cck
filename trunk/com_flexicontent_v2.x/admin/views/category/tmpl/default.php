@@ -105,8 +105,10 @@ dump($this->row);
 							<?php echo $this->iform->getInput('copycid'); ?>
 						</td>
 						<td>
+							<?php echo $this->iform->getLabel('language'); ?>
 						</td>
 						<td>
+							<?php echo $this->iform->getInput('language'); ?>
 						</td>
 					</tr>
 				</table>
@@ -155,12 +157,52 @@ dump($this->row);
 			<td valign="top" width="320px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
-				echo JHtml::_('sliders.panel',JText::_('FLEXI_ACCESS'), 'access-options');
+				//echo JHtml::_('sliders.panel',JText::_('FLEXI_ACCESS'), 'access-options');
+				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');
 				?>
 				<fieldset class="panelform">
+					<ul class="adminformlist">
+						<li><?php echo $this->iform->getLabel('created_user_id'); ?>
+						<?php echo $this->iform->getInput('created_user_id'); ?></li>
+
+						<?php if (intval($this->iform->getValue('created_time'))) : ?>
+							<li><?php echo $this->iform->getLabel('created_time'); ?>
+							<?php echo $this->iform->getInput('created_time'); ?></li>
+						<?php endif; ?>
+
+						<?php if ($this->iform->getValue('modified_user_id')) : ?>
+							<li><?php echo $this->iform->getLabel('modified_user_id'); ?>
+							<?php echo $this->iform->getInput('modified_user_id'); ?></li>
+
+							<li><?php echo $this->iform->getLabel('modified_time'); ?>
+							<?php echo $this->iform->getInput('modified_time'); ?></li>
+						<?php endif; ?>
+
+					</ul>
 					<?php echo $this->iform->getLabel('access'); ?>
 					<?php echo $this->iform->getInput('access'); ?>
 				</fieldset>
+
+				<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_FIELDSET_LABEL'), 'meta-options'); ?>
+				<fieldset class="panelform">
+				<ul class="adminformlist">
+					<li><?php echo $this->iform->getLabel('metadesc'); ?>
+					<?php echo $this->iform->getInput('metadesc'); ?></li>
+
+					<li><?php echo $this->iform->getLabel('metakey'); ?>
+					<?php echo $this->iform->getInput('metakey'); ?></li>
+
+					<?php foreach($this->iform->getGroup('metadata') as $field): ?>
+						<?php if ($field->hidden): ?>
+							<li><?php echo $field->input; ?></li>
+						<?php else: ?>
+							<li><?php echo $field->label; ?>
+							<?php echo $field->input; ?></li>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</ul>
+				</fieldset>
+
 				<?php
 				$fieldSets = $this->iform->getFieldsets('params');
 				foreach ($fieldSets as $name => $fieldSet) :
@@ -217,9 +259,10 @@ dump($this->row);
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="id" value="<?php echo $this->iform->getValue('id'); ?>" />
-<input type="hidden" name="controller" value="categories" />
+<input type="hidden" name="controller" value="category" />
 <input type="hidden" name="view" value="category" />
 <input type="hidden" name="task" value="" />
+<?php echo $this->iform->getInput('extension'); ?>
 </form>
 
 <?php

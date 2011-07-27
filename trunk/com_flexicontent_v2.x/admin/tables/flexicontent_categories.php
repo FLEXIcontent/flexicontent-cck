@@ -121,4 +121,72 @@ class flexicontent_categories extends JTableNested{
 		}
 		return true;
 	}
+	
+	/**
+	 * Overloaded bind function.
+	 *
+	 * @param   array   $array   named array
+	 * @param   string  $ignore  An optional array or space separated list of properties
+	 *                           to ignore while binding.
+	 *
+	 * @return  mixed   Null if operation was satisfactory, otherwise returns an error
+	 *
+	 * @see     JTable:bind
+	 * @since   11.1
+	 */
+	public function bind($array, $ignore = '')
+	{
+		if (isset($array['params']) && is_array($array['params'])) {
+			$registry = new JRegistry;
+			$registry->loadArray($array['params']);
+			$array['params'] = (string)$registry;
+		}
+
+		if (isset($array['metadata']) && is_array($array['metadata'])) {
+			$registry = new JRegistry;
+			$registry->loadArray($array['metadata']);
+			$array['metadata'] = (string)$registry;
+		}
+
+		// Bind the rules.
+		if (isset($array['rules']) && is_array($array['rules'])) {
+			$rules = new JRules($array['rules']);
+			$this->setRules($rules);
+		}
+
+		return parent::bind($array, $ignore);
+	}
+	
+	/**
+	 * Overriden JTable::store to set created/modified and user id.
+	 *
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   11.1
+	 */
+	public function store($updateNulls = false)
+	{
+		$date	= JFactory::getDate();
+		$user	= JFactory::getUser();
+
+		if ($this->id) {
+			// Existing category
+			$this->modified_time	= $date->toMySQL();
+			$this->modified_user_id	= $user->get('id');
+		} else {
+			// New category
+			$this->created_time		= $date->toMySQL();
+			$this->created_user_id	= $user->get('id');
+		}
+	// Verify that the alias is unique
+		$table = JTable::getInstance('flexicontent_categories','');
+		if ($table->load(array('alias'=>$this->alias,'parent_id'=>$this->parent_id,'extension'=>$this->extension)) && ($table->id != $this->id || $this->id==0)) {
+
+			$this->setError(JText::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
+			return false;
+		}
+		return parent::store($updateNulls);
+	}
 }
