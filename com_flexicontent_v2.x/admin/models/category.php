@@ -171,7 +171,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$category = $this->getTable();
 			return $category->checkin($this->_id);
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -235,7 +235,9 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data) {
+	function save($data) {
+		// Initialise variables;
+		$dispatcher = JDispatcher::getInstance();
 		$pk		= (!empty($data['id'])) ? $data['id'] : (int)$this->getState($this->getName().'.id');
 		$isNew	= true;
 		
@@ -248,8 +250,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if ($category->parent_id != $data['jform']['parent_id'] || $data['id'] == 0) {
-			$category->setLocation($data['jform']['parent_id'], 'last-child');
+		if ($category->parent_id != $data['parent_id'] || $data['id'] == 0) {
+			$category->setLocation($data['parent_id'], 'last-child');
 		}
 
 		// Alter the title for save as copy
@@ -262,47 +264,40 @@ class FlexicontentModelCategory extends JModelAdmin
 				$data['title'] .= ' (2)';
 			}
 		}
-		$category->setRules($data['jform']['rules']);
+		$category->setRules($data['rules']);
+		
+		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
+		//$params			= $data["params"];
+		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
+		
+		if($copyparams) {
+			$data['params'] = array();
+		}
+
 		// bind it to the table
-		if (!$category->bind($data['jform'])) {
+		if (!$category->bind($data)) {
 			$this->setError(500, $this->_db->getErrorMsg() );
 			return false;
 		}
-		
+		if ($copyparams) {
+			$category->params = $this->getParams($copyparams);
+		}
 		// Bind the rules.
 		if (isset($data['rules'])) {
 			$rules = new JRules($data['rules']);
 			$category->setRules($rules);
 		}
 
-		/*if (!$category->id) {
-			$category->ordering = $category->getNextOrder();
-		}*/
-		
-		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
-		$params			= $data["jform"]["params"];
-		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
-		
-		if ($copyparams) {
-			$category->params = $this->getParams($copyparams);
-		} else{
-			// Build parameter INI string
-			if (is_array($params))
-			{
-				$txt = array ();
-				foreach ($params as $k => $v) {
-					if (is_array($v)) {
-						$v = implode('|', $v);
-					}
-					$txt[] = "$k=$v";
-				}
-				$category->params = implode("\n", $txt);
-			}
-		}
-
 		// Make sure the data is valid
 		if (!$category->check()) {
 			$this->setError($category->getError());
+			return false;
+		}
+		
+		// Trigger the onContentBeforeSave event.
+		$result = $dispatcher->trigger($this->event_before_save, array($this->option.'.'.$this->name, &$table, $isNew));
+		if (in_array(false, $result, true)) {
+			$this->setError($table->getError());
 			return false;
 		}
 
@@ -311,16 +306,42 @@ class FlexicontentModelCategory extends JModelAdmin
 			$this->setError(500, $this->_db->getErrorMsg() );
 			return false;
 		}
-		
-		// Rebuild the tree path.
+
+		// Trigger the onContentAfterSave event.
+		$dispatcher->trigger($this->event_after_save, array($this->option.'.'.$this->name, &$table, $isNew));
+
+		// Rebuild the path for the category:
 		if (!$category->rebuildPath($category->id)) {
+			$this->setError($table->getError());
+			return false;
+		}
+
+		// Rebuild the paths of the category's children:
+		if (!$category->rebuild($category->id, $category->lft, $category->level, $category->path)) {
 			$this->setError($category->getError());
 			return false;
 		}
-		$category->checkin();
+		$this->setState($this->getName().'.id', $table->id);
+
+		// Clear the cache
+		$this->cleanCache();
+		//$category->checkin();
 
 		$this->_category	=& $category;
 		return true;
+	}
+	
+	/**
+	 * Custom clean the cache of com_content and content modules
+	 *
+	 * @since	1.6
+	 */
+	protected function cleanCache()
+	{
+		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache->clean();
+		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache->clean();
 	}
 	
 	/**

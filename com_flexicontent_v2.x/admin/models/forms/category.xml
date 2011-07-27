@@ -56,12 +56,7 @@
 
 	<field
 		name="extension"
-		type="text"
-		label="COM_CATEGORIES_FIELD_EXTENSION_LABEL"
-		description="COM_CATEGORIES_FIELD_EXTENSION_DESC"
-		class="readonly"
-		size="40"
-		readonly="true" />
+		type="hidden" />
 
 	<field
 		name="title"
@@ -121,7 +116,7 @@
 		type="accesslevel"
 		label="JFIELD_ACCESS_LABEL"
 		description="JFIELD_ACCESS_DESC"
-		class="inputbox"/>
+		class="inputbox" />
 
 	<field
 		name="metadesc"
@@ -141,8 +136,10 @@
 
 	<field
 		name="created_user_id"
-		type="hidden"
-		filter="unset"/>
+		type="user"
+		label="JGLOBAL_FIELD_CREATED_BY_LABEL"
+		desc="JGLOBAL_FIELD_CREATED_BY_DESC"
+		/>
 
 	<field
 		name="created_time"
@@ -154,7 +151,10 @@
 
 	<field
 		name="modified_user_id"
-		type="hidden"
+		type="user"
+		label="JGLOBAL_FIELD_MODIFIED_BY_LABEL"
+		class="readonly"
+		readonly="true"
 		filter="unset"/>
 
 	<field
@@ -203,8 +203,8 @@
 			<field
 				name="image"
 				type="media"
-				label="COM_CATEGORIES_FIELD_IMAGE_LABEL"
-				description="COM_CATEGORIES_FIELD_IMAGE_DESC" />
+				label="FLEXI_IMAGE"
+				description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
 			<field
 				name="note"
 				type="text"
@@ -233,7 +233,6 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-			<field name="language" type="languages" client="site" label="FLEXI_Content_language" description="FLEXI_PARAMCONTENTLANGUAGE" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
 				<option value="0">FLEXI_No</option>
