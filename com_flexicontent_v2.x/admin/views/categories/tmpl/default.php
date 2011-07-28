@@ -73,12 +73,13 @@ $userId		= $user->get('id');
 		foreach ($this->rows as $row) {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
-			$published 	= JHTML::_('grid.published', $row, $i );
 			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
 			$canEditOwn	= $user->authorise('flexicontent.editowncat', 'flexicontent.category.'.$row->id) && ($row->created_user_id == $userId);
 			$canCheckin	= $user->authorise('core.admin', 'com_checkin') || ($row->checked_out == $userId) || ($row->checked_out == 0);
+			$canChange	= $user->authorise('flexicontent.editcat.state',	'flexicontent.category.'.$row->id) && $canCheckin;
+			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
