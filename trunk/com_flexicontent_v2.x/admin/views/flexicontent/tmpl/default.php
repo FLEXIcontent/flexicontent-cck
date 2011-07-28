@@ -55,8 +55,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 						}
 						if (!$this->dopostinstall && $this->permission->CanAdd)
 						{
-							$link = 'index.php?option='.$option.'&amp;view=item';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ) );
+							$link = 'index.php?option='.$option.'&amp;view=types&tmpl=component&format=raw';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 0 );
 						}
 						
 						if (!$this->dopostinstall && ($this->permission->CanCats || $this->permission->CanAddCats) )

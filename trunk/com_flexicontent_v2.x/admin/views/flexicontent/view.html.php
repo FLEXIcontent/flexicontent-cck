@@ -190,7 +190,7 @@ class FlexicontentViewFlexicontent extends JView{
 	 * @param string $text image description
 	 * @param boolean $modal 1 for loading in modal
 	 */
-	function quickiconButton( $link, $image, $text, $modal = 0 )
+	function quickiconButton( $link, $image, $text, $modal = 0, $modaliframe = 1 )
 	{
 		//initialise variables
 		$lang 		= & JFactory::getLanguage();
@@ -201,8 +201,9 @@ class FlexicontentViewFlexicontent extends JView{
 				<?php
 				if ($modal == 1) {
 					JHTML::_('behavior.modal');
+					$rel = $modaliframe?" rel=\"{handler: 'iframe', size: {x: 900, y: 500}}\"":'';
 				?>
-					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal" rel="{handler: 'iframe', size: {x: 900, y: 500}}">
+					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal"<?php echo $rel;?>>
 				<?php
 				} else {
 				?>
