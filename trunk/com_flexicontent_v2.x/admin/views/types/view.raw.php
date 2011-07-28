@@ -54,7 +54,7 @@ text-shadow:0 0 1px #CCCCCC;">
 <?php
 
 foreach($rows as $obj) {
-	echo "<a href=\"index.php?option=com_flexicontent&amp;controller=items&amp;task=add&amp;typeid={$obj->id}\" style=\"color:blue;\">";
+	echo "<a href=\"index.php?option=com_flexicontent&amp;task=items.add&amp;typeid={$obj->id}\" style=\"color:blue;\">";
 	echo $obj->name;
 	echo "</a><br />";
 }

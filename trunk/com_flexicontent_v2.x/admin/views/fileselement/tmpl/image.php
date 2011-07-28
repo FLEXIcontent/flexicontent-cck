@@ -28,7 +28,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			?>
 				
 			<!-- File Upload Form -->
-            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
+            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;task=filemanager.upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
                 <fieldset>
                     <legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
                     <fieldset class="actions">

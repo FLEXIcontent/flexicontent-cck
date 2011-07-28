@@ -59,12 +59,12 @@ class FlexicontentViewTypes extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TYPES' ), 'types' );
-		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-		JToolBarHelper::publishList();
-		JToolBarHelper::unpublishList();
-		JToolBarHelper::addNew();
-		JToolBarHelper::editList();
-		JToolBarHelper::deleteList();
+		JToolBarHelper::customX( 'types.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		JToolBarHelper::publishList('types.publish');
+		JToolBarHelper::unpublishList('types.unpublish');
+		JToolBarHelper::addNew('types.add');
+		JToolBarHelper::editList('types.edit');
+		JToolBarHelper::deleteList('types.remove');
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model

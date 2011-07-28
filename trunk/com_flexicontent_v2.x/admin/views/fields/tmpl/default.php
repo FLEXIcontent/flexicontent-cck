@@ -81,7 +81,7 @@ defined('_JEXEC') or die('Restricted access');
 		$i = 0;
 		$n = count($this->rows);
 		foreach($this->rows as $row) {
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=fields&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;cid[]='. $row->id;
 			if ($row->id > 6) {
 				$published 	= JHTML::_('grid.published', $row, $i );
 			} else {

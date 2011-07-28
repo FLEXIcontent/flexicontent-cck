@@ -42,9 +42,9 @@ class FlexicontentViewFile extends JView {
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('filemanager.apply');
+		JToolBarHelper::save('filemanager.save');
+		JToolBarHelper::cancel('filemanager.cancel');
 
 		//Get data from the model
 		$model		= & $this->getModel();

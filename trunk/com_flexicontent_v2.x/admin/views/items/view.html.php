@@ -128,19 +128,19 @@ class FlexicontentViewItems extends JView {
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
 		if ($permission->CanAdd) {
-			JToolBarHelper::addNew();
+			JToolBarHelper::addNew('items.add');
 			if ($permission->CanCopy) {
-				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+				JToolBarHelper::customX( 'items.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
 			}
 		}
 		if ($permission->CanEdit) {
-			JToolBarHelper::editList();
+			JToolBarHelper::editList('items.edit');
 		}
 		if ($permission->CanDelete) {
-			JToolBarHelper::deleteList();
+			JToolBarHelper::deleteList('items.remove');
 		}
 		if (!$permission->CanPublish) {
-			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+			JToolBarHelper::customX( 'items.approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
@@ -285,8 +285,8 @@ class FlexicontentViewItems extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );
-		JToolBarHelper::save('copymove');
-		JToolBarHelper::cancel();
+		JToolBarHelper::save('items.copymove');
+		JToolBarHelper::cancel('items.cancel');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');

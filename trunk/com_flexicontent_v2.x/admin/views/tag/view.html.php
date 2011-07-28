@@ -51,10 +51,10 @@ class FlexicontentViewTag extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tagadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('tags.apply');
+		JToolBarHelper::save('tags.save');
+		JToolBarHelper::custom( 'tags.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('tags.cancel');
 
 
 		//Get data from the model

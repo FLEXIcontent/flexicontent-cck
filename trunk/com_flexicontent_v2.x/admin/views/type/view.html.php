@@ -55,10 +55,10 @@ class FlexicontentViewType extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('types.apply');
+		JToolBarHelper::save('types.save');
+		JToolBarHelper::custom( 'types.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('types.cancel');
 
 		//Get data from the model
 		$model		= & $this->getModel();

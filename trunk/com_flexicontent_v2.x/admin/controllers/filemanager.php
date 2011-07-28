@@ -412,7 +412,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&controller=filemanager&task=edit', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&task=filemanager.edit', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
 		}
 
 		$model->checkout( $user->get('id') );
@@ -478,7 +478,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			switch ($task)
 			{
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&controller=filemanager&task=edit&cid[]='.(int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&task=filemanager.edit&cid[]='.(int) $model->get('id');
 					break;
 
 				default :

@@ -926,7 +926,7 @@ class FlexicontentModelItems extends JModel {
 		$lang =& JFactory::getLanguage();
 		$lang->load('com_messages');
 		
-		$item->url = JURI::base() . 'index.php?option=com_flexicontent&controller=items&task=edit&cid[]=' . $item->id;
+		$item->url = JURI::base() . 'index.php?option=com_flexicontent&task=items.edit&cid[]=' . $item->id;
 
 		foreach ($users as $user)
 		{

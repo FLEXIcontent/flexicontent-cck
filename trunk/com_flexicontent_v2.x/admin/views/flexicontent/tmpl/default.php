@@ -147,7 +147,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			
-			if ($this->dopostinstall) {
+			if ($this->dopostinstall  || !$this->allplgpublish) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
@@ -168,7 +168,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
 						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -205,7 +205,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
 						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -242,7 +242,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
 						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>

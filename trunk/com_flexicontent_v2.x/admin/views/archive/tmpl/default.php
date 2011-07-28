@@ -57,7 +57,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
@@ -92,7 +92,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				$ix = 0;
 				foreach ($row->categories as $key => $category) :
 				
-					$catlink	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $category->id;
+					$catlink	= 'index.php?option=com_flexicontent&amp;task=categories.edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">

@@ -53,10 +53,10 @@ class FlexicontentViewField extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('fields.apply');
+		JToolBarHelper::save('fields.save');
+		JToolBarHelper::custom( 'fields.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('fields.cancel');
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -83,7 +83,7 @@ class FlexicontentViewField extends JView {
 								update:$('fieldspecificproperties')
 							};
 							new Request.HTML({
-								url: 'index.php?option=com_flexicontent&controller=fields&task=getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&format=raw',
+								url: 'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&format=raw',
 								method: 'get',
 								update: $('fieldspecificproperties'),
 								evalScripts: false,

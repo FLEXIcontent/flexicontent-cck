@@ -40,11 +40,19 @@ class FlexicontentController extends JController
 		$session  =& JFactory::getSession();
 		
 		$dopostinstall =& $session->get('flexicontent.postinstall', true);
-		if($dopostinstall===true) {
+		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
 		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && $dopostinstall) {
+		$allplgpublish =& $session->get('flexicontent.allplgpublish');
+		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
+			$model 			= $this->getModel('flexicontent');
+			$allplgpublish 		= & $model->getAllPluginsPublished();
+			$session->set('flexicontent.allplgpublish', $allplgpublish);
+		}
+		
+		//if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
+		if($view && !$dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -68,7 +76,7 @@ class FlexicontentController extends JController
 		$model 				= $this->getModel('flexicontent');
 		$existtype 			= & $model->getExistType();
 		$existfields 		= & $model->getExistFields();
-		$allplgpublish 		= & $model->getAllPluginsPublished();
+		//$allplgpublish 		= & $model->getAllPluginsPublished();
 		$existlang	 		= & $model->getExistLanguageColumn();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
@@ -78,7 +86,7 @@ class FlexicontentController extends JController
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
 		$dopostinstall = false;
-		if ((!$existfields) || (!$existtype) || (!$allplgpublish) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
+		if ((!$existtype) || (!$existfields) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
 			$dopostinstall = true;
 		}
 		if(!$model->checkInitialPermission())

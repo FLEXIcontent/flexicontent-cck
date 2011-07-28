@@ -92,7 +92,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 				$k = 0;
 				for ($i=0, $n=count($this->popular); $i < $n; $i++) {
 				$row = $this->popular[$i];
-				$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+				$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 				<tr>
 					<td width="65%">
@@ -144,7 +144,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 			$k = 0;
 			for ($i=0, $n=count($this->favoured); $i < $n; $i++) {
 			$row = $this->favoured[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -199,7 +199,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
 			$k = 0;
 			for ($i=0, $n=count($this->rating); $i < $n; $i++) {
 			$row = $this->rating[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -238,7 +238,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
 			$k = 0;
 			for ($i=0, $n=count($this->worstrating); $i < $n; $i++) {
 			$row = $this->worstrating[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
