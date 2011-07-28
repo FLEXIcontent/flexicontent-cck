@@ -50,8 +50,8 @@ class FlexicontentModelType extends JModelAdmin{
 		$array = is_array($array)?$array:array($array);
 		$id = $array[0];
 		if(!$id) {
-			$data = JRequest::get( 'post' );
-			$id = $data['jform']['id'];
+			$data = JRequest::get( 'id', 0 );
+			$id = @$data['jform']['id'];
 		}
 		$this->setId((int)$id);
 	}
@@ -295,7 +295,8 @@ class FlexicontentModelType extends JModelAdmin{
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		$insertid = $this->_db->insertid();
+		$insertid = (int)$this->_db->insertid();
+		$this->setId($insertid);
 		$this->_type	=& $type;
 
 		$core = $this->_getCoreFields();

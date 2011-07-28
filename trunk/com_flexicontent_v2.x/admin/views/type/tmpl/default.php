@@ -110,8 +110,10 @@ defined('_JEXEC') or die('Restricted access');
 		</tr>
 	</table>
 <?php echo JHTML::_( 'form.token' ); ?>
+
+<?php echo $this->form->getInput('id'); ?>
+
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue('id'); ?>" />
 <input type="hidden" name="controller" value="types" />
 <input type="hidden" name="view" value="type" />
 <input type="hidden" name="task" value="" />
