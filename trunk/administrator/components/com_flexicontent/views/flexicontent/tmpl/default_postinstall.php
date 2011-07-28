@@ -239,7 +239,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			</tr>
 			<tr>
 				<td class="key" style="width:280px;">
-					<?php echo JText::_( 'Default Menu Items' ); ?>
+					<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
 				</td>
 				<td id="existmenuitems-log">
 					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>

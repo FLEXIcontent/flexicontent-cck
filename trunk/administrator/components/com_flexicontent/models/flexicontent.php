@@ -127,7 +127,6 @@ class FlexicontentModelFlexicontent extends JModel
 		return $genstats;
 	}
 	
-	
 	/**
 	 * Method to check if default Flexi Menu Items exist
 	 *
@@ -136,23 +135,29 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistMenuItems()
 	{
+		// Try to get id of Flexicontent component
 		$this->_db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
-		$flexi_comp_id = $this->_db->loadResult();	
+		$flexi_comp_id = $this->_db->loadResult();
+		// Try to get params of Flexicontent component, and then 'default_menu_itemid' parameter
+		$params =& JComponentHelper::getParams('com_flexicontent');
+		if ($params) {
+			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
+		} else {
+			$_component_default_menuitem_id = '';
+		}
 		
 		$query 	= 'SELECT COUNT( m.id )'
 				. ' FROM #__menu as m'
-				. ' JOIN #__menu_types AS mt on mt.menutype=m.menutype '
-				. ' WHERE m.menutype ="flexihiddenmenu" AND m.published=1 AND (m.alias="flexi_default_item" OR m.alias="flexi_default_cat") AND m.componentid="'.$flexi_comp_id.'"'
+				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'" AND m.componentid="'.$flexi_comp_id.'"'
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
 			
-		if ($count >=2) {
+		if ($count >=1) {
 			return true;
 		}
 		return false;
 	}
-		
 	
 	/**
 	 * Method to check if there is at least one type created
