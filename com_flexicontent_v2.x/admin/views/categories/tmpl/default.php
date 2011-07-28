@@ -72,7 +72,7 @@ $userId		= $user->get('id');
 		$canEdit	= $this->permission->CanCats;
 		foreach ($this->rows as $row) {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
 			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
@@ -143,7 +143,7 @@ $userId		= $user->get('id');
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="categories" />
+	<!---input type="hidden" name="controller" value="categories" /--->
 	<input type="hidden" name="view" value="categories" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />

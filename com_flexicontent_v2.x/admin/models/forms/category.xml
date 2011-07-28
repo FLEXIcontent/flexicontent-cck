@@ -5,7 +5,7 @@
 		name="id"
 		type="text"
 		default="0"
-		label="JGLOBAL_FIELD_ID_LABEL"
+		label="FLEXI_TITLE"
 		description ="JGLOBAL_FIELD_ID_DESC"
 		class="readonly"
 		readonly="true" />
@@ -114,7 +114,7 @@
 	<field
 		name="access"
 		type="accesslevel"
-		label="JFIELD_ACCESS_LABEL"
+		label="FLEXI_ACCESS"
 		description="JFIELD_ACCESS_DESC"
 		class="inputbox" />
 
@@ -215,7 +215,7 @@
 		</fieldset>
 		<fieldset
 			name="standard">
-			<field name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" onchange="activatePanel(this.value);" />
+			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" onchange="activatePanel(this.value);" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">Use Global</option>

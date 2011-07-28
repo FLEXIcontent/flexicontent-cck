@@ -59,20 +59,32 @@ require_once(dirname(__FILE__).DS.'defineconstants.php');
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
 // Require specific controller if requested
-if( $controller = JRequest::getWord('controller') ) {
+/*$controller = JRequest::getWord('controller');
+$task = JRequest::getVar('task');
+if(!$controller) {
+	$list = explode('.', $task);
+	if(count($list)>=2) {
+		$controller = $list[0];
+		$task = $list[1];
+	}
+	unset($list);
+}
+if( $controller ) {
 	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
 	if (file_exists($path)) {
 		require_once $path;
 	} else {
 		$controller = '';
 	}
-}
+}*/
 
 //Create the controller
-$classname  = 'FlexicontentController'.$controller;
-$controller = new $classname( );
+//$classname  = 'FlexicontentController'.$controller;
+//$controller = new $classname( );
+
+$controller	= JController::getInstance('Flexicontent');
 
 // Perform the Request task
-$controller->execute( JRequest::getWord('task'));
+$controller->execute( JRequest::getVar('task') );
 $controller->redirect();
 ?>

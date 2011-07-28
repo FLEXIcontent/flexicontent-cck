@@ -56,7 +56,7 @@
 	<section name="category">
 		<action name="flexicontent.deletecat" title="Delete this category" description="Delete this category" />
 		<action name="flexicontent.deleteowncat" title="Delete own category" description="Delete own category" />
-		<action name="flexicontent.editcat" title="Edit this category" description="Edit this category" />
+		<action name="flexicontent.edit.category" title="Edit this category" description="Edit this category" />
 		<action name="flexicontent.editowncat" title="Edit own category" description="Edit own category" />
 		<action name="flexicontent.editcat.state" title="Publish this category" description="Publish this category" />
 		<action name="flexicontent.editowncat.state" title="Publish own category" description="Publish own category" />

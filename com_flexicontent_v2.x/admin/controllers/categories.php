@@ -52,7 +52,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 * @return void
 	 * @since 1.0
 	 */
-	function save() {
+	/*function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -111,7 +111,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 		}
 		$model->checkin();
 		$this->setRedirect($link, $msg);
-	}
+	}*/
 
 	/**
 	 * Logic to publish categories
@@ -359,8 +359,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 * @return void
 	 * @since 1.0
 	 */
-	function edit( )
-	{	
+	/*function edit( )
+	{
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -377,7 +377,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 
 		$model->checkout( $user->get('id') );
 		parent::display();
-	}
+	}*/
 
 	/**
 	 * Logic to copy params from one category to others

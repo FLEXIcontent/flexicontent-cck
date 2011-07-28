@@ -47,61 +47,46 @@ dump($this->row);
 					<tr>
 						<td class="key">
 							<label for="title">
-								<?php //echo JText::_( 'FLEXI_TITLE' ).':'; ?>
 								<?php echo $this->iform->getLabel('title'); ?>
 							</label>
 						</td>
 						<td>
-							<?php /*<input id="title" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />*/?>
 							<?php echo $this->iform->getInput('title'); ?>
 						</td>
 						<td>
 							<label for="published">
-								<?php //echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
 								<?php echo $this->iform->getLabel('published'); ?>
 							</label>
 						</td>
 						<td>
-							<?php
-							//$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-							//echo $html;
-							?>
 							<?php echo $this->iform->getInput('published'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<label for="alias">
-								<?php //echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 								<?php echo $this->iform->getLabel('alias'); ?>
 							</label>
 						</td>
 						<td>
-							<?php /*<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="100" value="<?php echo $this->row->alias; ?>" />*/?>
 							<?php echo $this->iform->getInput('alias'); ?>
 						</td>
 						<td>
 							<label for="parent">
-								<?php //echo JText::_( 'FLEXI_PARENT' ).':'; ?>
 								<?php echo $this->iform->getLabel('parent_id'); ?>
 							</label>
 						</td>
 						<td>
-							<?php //echo $this->Lists['parent_id'];?>
 							<?php echo $this->iform->getInput('parent_id'); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<label for="copycid">
-								<?php //echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
 								<?php echo $this->iform->getLabel('copycid'); ?>
 							</label>
 						</td>
 						<td>
-							<?php				
-								//echo $this->Lists['copyid'];
-							?>
 							<?php echo $this->iform->getInput('copycid'); ?>
 						</td>
 						<td>
@@ -145,10 +130,6 @@ dump($this->row);
 				<table class="adminform">
 					<tr>
 						<td>
-							<?php
-							// parameters : areaname, content, hidden field, width, height, rows, cols
-							//echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
-							?>
 							<?php echo $this->iform->getInput('description'); ?>
 						</td>
 					</tr>
@@ -157,7 +138,6 @@ dump($this->row);
 			<td valign="top" width="320px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
-				//echo JHtml::_('sliders.panel',JText::_('FLEXI_ACCESS'), 'access-options');
 				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');
 				?>
 				<fieldset class="panelform">
@@ -236,8 +216,7 @@ dump($this->row);
 							<table>
 							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
 								$fieldname =  $field->__get('fieldname');
-								//$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
-								$value = NULL;
+								$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
 							?>
 							<tr>
 								<td><?php echo $tmpl->params->getLabel($fieldname, $name); ?></td>

@@ -55,11 +55,11 @@ class FlexicontentViewCategories extends JView {
 			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 400);
 		}
 		JToolBarHelper::spacer();
-		JToolBarHelper::publishList();
-		JToolBarHelper::unpublishList();
-		JToolBarHelper::addNew();
-		JToolBarHelper::editList();
-		JToolBarHelper::deleteList();
+		JToolBarHelper::publishList('categories.publish');
+		JToolBarHelper::unpublishList('categories.unpublish');
+		JToolBarHelper::addNew('category.add');
+		JToolBarHelper::editList('category.edit');
+		JToolBarHelper::deleteList('categories.remove');
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
