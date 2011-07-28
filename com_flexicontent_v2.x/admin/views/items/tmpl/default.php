@@ -32,7 +32,7 @@ function dostate(state, id) {
 }
 
 function fetchcounter() {
-	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
+	var url = "index.php?option=com_flexicontent&task=items.getorphans&format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
@@ -189,7 +189,7 @@ window.addEvent('domready', function(){
 <div class="flexicontent">
 
 <?php if ($this->unassociated) : ?>
-<form action="index.php?option=com_flexicontent&controller=items&task=bindextdata&format=raw" method="post" name="bindForm" id="bindForm">
+<form action="index.php?option=com_flexicontent&task=items.bindextdata&format=raw" method="post" name="bindForm" id="bindForm">
 	<div class="fc-error">
 	<table>
 		<tr>
@@ -417,7 +417,7 @@ window.addEvent('domready', function(){
 			$publish_up->setOffset($config->getValue('config.offset'));
 			$publish_down->setOffset($config->getValue('config.offset'));
 
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			if ($this->permission->CanRights) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			}else $access = $this->escape($row->access_level);
@@ -598,7 +598,7 @@ window.addEvent('domready', function(){
 				$ix = 0;
 				foreach ($row->categories as $key => $category) :
 					$typeofcats = ((int)$category->id == (int)$row->maincat) ? ' maincat' : ' secondarycat';
-					$catlink	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $category->id;
+					$catlink	= 'index.php?option=com_flexicontent&amp;task=categories.edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->permission->CanCats) :
 				?>

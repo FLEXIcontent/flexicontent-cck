@@ -2,7 +2,7 @@ var itemscreen = new Class(
 {
 	options:  {
 		id: "",
-		script_url: "index.php?option=com_flexicontent&controller=items&format=raw",
+		script_url: "index.php?option=com_flexicontent&format=raw",
 		task: ""
 	},
 
@@ -43,7 +43,6 @@ var itemscreen = new Class(
 	},
 
 	reseter: function( task, id, div, url ) {
-		//var url = 'index.php?option=com_flexicontent&controller=items&task=' + task + '&id=' + id + '&format=raw';
 		new Request.HTML({
 			url: url+'&format=raw&task='+task+'&id='+id,
 			method: 'get',

@@ -62,7 +62,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=tags&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=tags.edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
    		?>

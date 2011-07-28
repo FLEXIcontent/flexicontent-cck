@@ -65,11 +65,11 @@ class FlexicontentViewTags extends JView {
 			$toolbar =&JToolBar::getInstance('toolbar');
 			$toolbar->appendButton('Popup',  'import', 'FLEXI_IMPORT', JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 400, 400);
 		}
-		JToolBarHelper::publishList();
-		JToolBarHelper::unpublishList();
-		JToolBarHelper::addNew();
-		JToolBarHelper::editList();
-		JToolBarHelper::deleteList();
+		JToolBarHelper::publishList('tags.publish');
+		JToolBarHelper::unpublishList('tags.unpublish');
+		JToolBarHelper::addNew('tags.add');
+		JToolBarHelper::editList('tags.edit');
+		JToolBarHelper::deleteList('tags.remove');
 		if(JAccess::check($user->get("id"), 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model

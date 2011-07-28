@@ -32,8 +32,8 @@ var stateselector = {
 var processstate = new Class({  
 	options:  {
 		id: "",
-		script_url: "index.php?option=com_flexicontent&controller=items&format=raw",
-		task: "setitemstate",
+		script_url: "index.php?option=com_flexicontent&format=raw",
+		task: "items.setitemstate",
 		state: ""
 	},
 

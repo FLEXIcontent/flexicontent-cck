@@ -143,9 +143,9 @@ class FlexicontentViewTemplate extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('templates.apply');
+		JToolBarHelper::save('templates.save');
+		JToolBarHelper::cancel('templates.cancel');
 		
 		//assign data to template
 		$this->assignRef('layout'   	, $layout);

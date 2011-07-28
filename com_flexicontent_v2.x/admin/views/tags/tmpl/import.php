@@ -31,7 +31,7 @@ window.addEvent('domready', function(){
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&controller=tags&task=import&layout=import&format=raw" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=tags.import&layout=import&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend><?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?><span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="text-decoration: none; color: #333;"><img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/></span></legend><br />
@@ -53,5 +53,5 @@ window.addEvent('domready', function(){
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="controller" value="tags" />
 <input type="hidden" name="view" value="tags" />
-<input type="hidden" name="task" value="import" />
+<input type="hidden" name="tags.task" value="import" />
 </form>

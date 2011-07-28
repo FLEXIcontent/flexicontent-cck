@@ -28,7 +28,7 @@ if ($this->permission->CanUseTags) {
 	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&format=raw&".JUtility::getToken()."=1\", {
 				width: 260,
 				matchContains: false,
 				mustMatch: false,
@@ -71,7 +71,7 @@ if ($this->permission->CanUseTags) {
 		});
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
@@ -95,10 +95,10 @@ if ($this->permission->CanUseTags) {
 ?>
 <script language="javascript" type="text/javascript">
 window.addEvent( "domready", function() {
-    var hits = new itemscreen('hits', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'gethits'});
+    var hits = new itemscreen('hits', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'items.gethits'});
     hits.fetchscreen();
 
-    var votes = new itemscreen('votes', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'getvotes'});
+    var votes = new itemscreen('votes', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'items.getvotes'});
     votes.fetchscreen();
 });
 function addToList(id, name) {
@@ -115,19 +115,19 @@ function addtag(id, tagname) {
 	}
 	
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&controller=tags&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
 function reseter(task, id, div){
 	var form = document.adminForm;
 	
-	if (task == 'resethits') {
+	if (task == 'items.resethits') {
 		form.hits.value = 0;
 	} else {
 	}
 		
 	var res = new itemscreen();
-	res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
+	res.reseter( task, id, div, 'index.php?option=com_flexicontent' );
 }
 function clickRestore(link) {
 	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ); ?>")) {
@@ -412,7 +412,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<td>
 				<div id="hits"></div>
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->form->getValue('id'); ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resethits', '<?php echo $this->form->getValue('id'); ?>', 'hits')" />
 				</span>
 				<div id="hits"></div>
 			</td>
@@ -424,7 +424,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<td>
 				<div id="votes"></div>
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resetvotes', '<?php echo $this->form->getValue('id'); ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resetvotes', '<?php echo $this->form->getValue('id'); ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
@@ -517,7 +517,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->form->getValue('id');?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
 				<?php }?></td>
 			</tr>
 			<?php

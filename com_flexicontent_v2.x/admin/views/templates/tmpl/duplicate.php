@@ -31,7 +31,7 @@ window.addEvent('domready', function(){
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&controller=templates&task=duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=templates.duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend><?php echo trim(JText::_( 'FLEXI_DUPLICATE_TEMPLATE' )); ?><span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC' ); ?>" style="text-decoration: none; color: #333;"><img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/></span></legend><br />

@@ -31,7 +31,7 @@ window.addEvent('domready', function(){
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&controller=templates&task=duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=templates.duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend>

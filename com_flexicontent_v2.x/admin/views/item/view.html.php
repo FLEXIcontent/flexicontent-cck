@@ -71,10 +71,10 @@ class FlexicontentViewItem extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
+		JToolBarHelper::apply('items.apply');
+		JToolBarHelper::save('items.save');
+		JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('items.cancel');
 
 		//Get data from the model
 		$model			= & $this->getModel();

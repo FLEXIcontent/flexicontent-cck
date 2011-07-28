@@ -502,7 +502,7 @@ class FlexicontentControllerItems extends JController {
 		} else {
 			$msg = JText::_( 'FLEXI_NOTHING_TO_RESTORE' );
 		}
-		$this->setRedirect( 'index.php?option=com_flexicontent&controller=items&task=edit&cid[]='.$id, $msg );
+		$this->setRedirect( 'index.php?option=com_flexicontent&task=items.edit&cid[]='.$id, $msg );
 	}
 
 	/**
@@ -743,7 +743,7 @@ class FlexicontentControllerItems extends JController {
 				if((int)$v->nr==(int)$currentversion) {//is current version?
 					echo "<a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&view=item&cid=".$item->id."&version=".$v->nr."\");' href='#'>".JText::_( 'FLEXI_CURRENT' )."</a>";
 				}else{
-					echo "<a class='modal-versions' href='index.php?option=com_flexicontent&view=itemcompare&cid[]=".$item->id."&version=".$v->nr."&tmpl=component' title='".JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' )."' rel='{handler: \"iframe\", size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}'>".$view."</a><a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&controller=items&task=edit&cid=".$item->id."&version=".$v->nr."&".JUtility::getToken()."=1\");' href='#' title='".JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr )."'>".$revert;
+					echo "<a class='modal-versions' href='index.php?option=com_flexicontent&view=itemcompare&cid[]=".$item->id."&version=".$v->nr."&tmpl=component' title='".JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' )."' rel='{handler: \"iframe\", size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}'>".$view."</a><a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&task=items.edit&cid=".$item->id."&version=".$v->nr."&".JUtility::getToken()."=1\");' href='#' title='".JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr )."'>".$revert;
 				}
 				echo "</td></tr>";
 		}
