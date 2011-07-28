@@ -25,12 +25,16 @@ var itemscreen = new Class(
 			dooptions = options;
 		}
 		$(doname).set('html', '<p class="qf_centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-		new Request.HTML({
-			url: this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id,
-			method: 'get',
-			update: $(this.name),
-			evalScripts: false
-		}).send();
+		if(this.options.id>0) {
+			new Request.HTML({
+				url: this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id,
+				method: 'get',
+				update: $(this.name),
+				evalScripts: false
+			}).send();
+		}else{
+			$(this.name).set('html', '0');
+		}
 	},
 
 	addtag: function( cid, tagname, url ) {
