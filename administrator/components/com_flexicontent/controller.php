@@ -229,12 +229,28 @@ class FlexicontentController extends JController
 		$db->query();
 		
 		$query 	=	"INSERT INTO #__menu (`menutype`,`name`,`alias`,`link`,`type`,`published`,`parent`,`componentid`,`sublevel`,`ordering`,`checked_out`,`checked_out_time`,`pollid`,`browserNav`,`access`,`utaccess`,`params`,`lft`,`rgt`,`home`)
-		VALUES
-		('flexihiddenmenu','Site Content','flexi_default_item','index.php?option=com_flexicontent&view=items&id=-1','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'',0,0,0),
-		('flexihiddenmenu','Site Category','flexi_default_cat','index.php?option=com_flexicontent&view=category&id=-1','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'',0,0,0)" ;
+		VALUES ".
+		"('flexihiddenmenu','Site Content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'rootcat=0',0,0,0)";
 		
 		$db->setQuery($query);
-		if (!$db->query()) {
+		$result = $db->query();
+		if($result) {
+			// Save the created menu item as default_menu_itemid for the component
+			$component =& JComponentHelper::getParams('com_flexicontent');
+			$component->set('default_menu_itemid', $db->insertid());
+			$cparams = $component->toString();
+
+			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+
+			$query 	= 'UPDATE #__components'
+					. ' SET params = ' . $db->Quote($cparams)
+					. ' WHERE id = ' . $flexi->id;
+					;
+			$db->setQuery($query);
+			$result = $db->query();
+		}
+		
+		if (!$result) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
 			echo '<span class="install-ok"></span>';

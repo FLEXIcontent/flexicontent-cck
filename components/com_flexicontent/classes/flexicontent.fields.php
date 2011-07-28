@@ -360,7 +360,7 @@ class FlexicontentFields
 		  // 'text' item field is implicitely used by category (its description text), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
-		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
 		  }
 		  
 		  // render fields if they are present in a template position (or dummy position ...)

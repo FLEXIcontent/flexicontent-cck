@@ -30,8 +30,9 @@ function FLEXIcontentBuildRoute(&$query)
 	// 1. Get a menu item based on Itemid or currently active
 	$menu = &JSite::getMenu();
 	if (empty($query['Itemid'])) {
-		$menuItem = &$menu->getActive();
-		$query['Itemid'] = @$menuItem->id;
+		//  USE current Active ID it is now handled in route.php and also add a global config option whether to enable this
+		//$menuItem = &$menu->getActive();
+		//$query['Itemid'] = @$menuItem->id;
 	} else {
 		$menuItem = &$menu->getItem($query['Itemid']);
 	}
