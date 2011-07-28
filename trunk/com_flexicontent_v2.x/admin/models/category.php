@@ -47,6 +47,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
+		if(!@$array[0]) $array = JRequest::getVar('id',  0, '', 'array');
 		$this->setId((int)$array[0]);
 	}
 
@@ -182,18 +183,18 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)
 	{
 		if ($this->_id)
 		{
-			// Make sure we have a user id to checkout the category with
-			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
-				$uid	= $user->get('id');
-			}
+			// Make sure we have an item id to checkout the category with
+			if(is_null($pk)) $pk = $this->_id;
+
+			$user	=& JFactory::getUser();
+			$uid	= $user->get('id');
 			// Lets get to it and checkout the thing...
 			$category = $this->getTable();
-			if(!$category->checkout($uid, $this->_id)) {
+			if(!$category->checkout($uid, $pk)) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -248,6 +249,8 @@ class FlexicontentModelCategory extends JModelAdmin
 			$category->load($pk);
 			$isNew = false;
 		}
+		if(isset($_REQUEST['jform']['attribs']))
+			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['attribs']);
 
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if ($category->parent_id != $data['parent_id'] || $data['id'] == 0) {
@@ -321,7 +324,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$this->setError($category->getError());
 			return false;
 		}
-		$this->setState($this->getName().'.id', $table->id);
+		$this->setState($this->getName().'.id', $category->id);
 
 		// Clear the cache
 		$this->cleanCache();
@@ -445,6 +448,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @since	1.6
 	 */
 	public function getItem($pk = null) {
+		$pk = $pk?$pk:$this->_id;
 		if ($result = parent::getItem($pk)) {
 			// Prime required properties.
 			if (empty($result->id)) {

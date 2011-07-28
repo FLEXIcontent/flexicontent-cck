@@ -67,6 +67,12 @@ class FlexicontentControllerCategory extends JControllerForm
 	{
 		return JFactory::getUser()->authorise('core.create', $this->extension);
 	}
+	
+	function edit() {
+		$cid		= JRequest::getVar('cid', array(), 'get', 'array');
+		if(count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
+		parent::edit();
+	}
 
 	/**
 	 * Method to check if you can edit a record.
