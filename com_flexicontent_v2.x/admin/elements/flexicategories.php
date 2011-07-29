@@ -41,13 +41,13 @@ class JFormFieldFlexicategories extends JFormField
 	
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
-		$value		= $this->__get('value');
+		//var_dump($this->value);
+		//$value		= $this->__get('value');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$values = explode(",", $value);
+		//$values = $this->values;
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
-		$js = "
-		function FLEXIClickCategory(obj) {
+		/*$js = "function FLEXIClickCategory(obj) {
 			values=new Array();
 			for(i=0,j=0;i<obj.options.length;i++) {
 				if(obj.options[i].selected==true)
@@ -56,9 +56,11 @@ class JFormFieldFlexicategories extends JFormField
 			values = values.concat();
 			document.getElementById('a_id').value = values;
 		}";
-		$doc->addScriptDeclaration($js);
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
+		$doc->addScriptDeclaration($js);*/
+		//var_dump($this->value);
+		//$html = flexicontent_cats::buildcatselect($tree, $this->name, $this->value, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
+		$html = flexicontent_cats::buildcatselect($tree, $this->name, $this->value, false, ' class="inputbox validate-cid" multiple="multiple" size="8"', true);
+		//$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"{$this->name}\" value=\"$value\" />";
 		return $html;
 	}
 }
