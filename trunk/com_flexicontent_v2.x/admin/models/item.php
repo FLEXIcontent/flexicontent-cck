@@ -513,7 +513,7 @@ class FlexicontentModelItem extends JModelAdmin {
 		$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 		$oldstate	= JRequest::getVar( 'oldstate', 0, '', 'int' );
 		//$params		= JRequest::getVar( 'params', null, 'post', 'array' );
-		$params		= $data['jform']['attribs'];
+		/*$params		= $data['jform']['attribs'];
 
 		// Build parameter INI string
 		if (is_array($params)) {
@@ -525,7 +525,7 @@ class FlexicontentModelItem extends JModelAdmin {
 				$txt[] = "$k=$v";
 			}
 			$item->attribs = implode("\n", $txt);
-		}
+		}*/
 
 		// Get metadata string
 		//$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
