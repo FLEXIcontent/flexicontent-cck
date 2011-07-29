@@ -113,7 +113,8 @@ class FlexicontentModelFlexicontent extends JModel
 		// Get the components parameters
 		$params 	=& $mainframe->getParams('com_flexicontent');
 		// Get the root category from this directory
-		$rootcat	= $params->get('rootcat');
+		$rootcat = JRequest::getVar('rootcat',false);
+		if(!$rootcat) $rootcat = $params->get('rootcat',0);
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		if(empty($lang)){
@@ -201,7 +202,8 @@ class FlexicontentModelFlexicontent extends JModel
 		// Get the components parameters
 		$params 	=& $mainframe->getParams('com_flexicontent');
 		// Get the root category from this directory
-		$rootcat	= $params->get('rootcat');
+		$rootcat = JRequest::getVar('rootcat',false);
+		if(!$rootcat) $rootcat = $params->get('rootcat',0);
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		

@@ -73,7 +73,7 @@ class FlexicontentViewFlexicontent extends JView
 			}
 			
 		} else {
-			$params->set('page_title',	JText::_( 'FLEXI_ITEM' ));
+			$params->set('page_title',	JText::_( 'Site Directory' ));
 		}
 
 		/*

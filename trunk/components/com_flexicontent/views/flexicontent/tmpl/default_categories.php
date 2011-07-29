@@ -21,10 +21,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 <?php
 // Get the directory menu parameters 
-$cols	= $this->params->get('columns_count');
-$c1		= $this->params->get('column1');
-$c2		= $this->params->get('column2');
-$c3		= $this->params->get('column3');
+$cols = JRequest::getVar('columns_count',false);
+if(!$cols) $cols = $this->params->get('columns_count',1);
+$c1 = $this->params->get('column1',false);
+if(!$c1) $c1 = $this->params->get('column1',200);
+$c2 = $this->params->get('column2',false);
+if(!$c2) $c2 = $this->params->get('column2',200);
+$c3 = $this->params->get('column3',false);
+if(!$c3) $c3 = $this->params->get('column3',200);
 $i = 0;
 switch ($cols) 
 {
