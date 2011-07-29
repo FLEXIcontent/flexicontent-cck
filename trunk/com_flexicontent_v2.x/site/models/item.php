@@ -1391,6 +1391,7 @@ class FlexicontentModelItem extends JModel
 			;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList('name');
+		jimport("joomla.html.parameter");
 		foreach ($fields as $field) {
 			$field->item_id		= (int)$this->_id;
 			$field->value 		= $this->getExtrafieldvalue($field->id, $version);
