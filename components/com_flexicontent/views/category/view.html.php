@@ -216,8 +216,10 @@ class FlexicontentViewCategory extends JView
 
 					if (count($allowed) > 0)
 					{
-						$rcat = $allowed[0];
-						$item->categoryslug = $globalcats[$rcat]->slug;
+						foreach ($allowed as $rcat) {
+							$item->categoryslug = $globalcats[$rcat]->slug;
+							break; // Trick we don't need all $allowed only one of them
+						}
 					}
 				}
 			}

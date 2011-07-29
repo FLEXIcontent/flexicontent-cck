@@ -71,12 +71,12 @@ class FlexicontentViewField extends JView {
 		JHTML::_('behavior.tooltip');
 		
 		// Import field to execute its constructor, e.g. needed for loading language file etc
-		JPluginHelper::importPlugin('flexicontent_fields', $row->field_type);
+		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
 		// If constructor does not load language file then this will load it
 		if($row->field_type) {
-			JPlugin::loadLanguage('plg_flexicontent_fields_'.$row->field_type, JPATH_ADMINISTRATOR);
+			JPlugin::loadLanguage('plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type), JPATH_ADMINISTRATOR);
 		}
-		
+				
 		//build selectlists
 		$lists = array();
 		//build type select list
