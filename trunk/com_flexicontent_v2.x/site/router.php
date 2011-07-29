@@ -61,7 +61,7 @@ function FLEXIcontentBuildRoute(&$query)
 	};
 
 	// are we dealing with a content that is attached to a menu item?
-	if (($mView == 'items') and (isset($query['id'])) and ($mId == intval($query['id']))) {
+	if (($mView == 'item') and (isset($query['id'])) and ($mId == intval($query['id']))) {
 		unset($query['view']);
 		unset($query['cid']);
 		unset($query['id']);
@@ -170,7 +170,7 @@ function FLEXIcontentParseRoute($segments)
 		}
 
 	if($count == 2) {
-		$vars['view'] 	= 'items';
+		$vars['view'] 	= 'item';
 		$vars['cid'] 	= $segments[$count-2];
 		$vars['id'] 	= $segments[$count-1];
 		return $vars;
