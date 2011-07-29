@@ -44,7 +44,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$document	= & JFactory::getDocument();
 		$lang       = $document->getLanguage();
 		if(FLEXI_FISH) {
-			$lang = $item->lang?$item->lang:$lang;
+			$lang = @$item->lang?$item->lang:$lang;
 		}else{
 			$lang = $item->params->get('language', $lang);
 		}

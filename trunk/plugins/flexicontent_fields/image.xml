@@ -106,6 +106,7 @@
 			<option value="2">Medium</option>
 			<option value="3">Large</option>
 		</param>
+		<param name="" type="separator" default="Behaviour Parameters" level="level1" menu="hide" />
 		<param name="linkto_url" type="radio" default="0" label="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -114,6 +115,18 @@
 			<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
 			<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
 			<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
+		</param>
+		<param name="list_all_media_files" type="radio" default="0" label="List All Media Files" description="When selecting an image file all media files will be listed, not just the ones used for image field">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="always_allow_removal" type="radio" default="0" label="Always allow image removal" description="Even when image file is not used by other items allow to remove it instead of only allowing to deleting it">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="limit_by_uploader" type="radio" default="0" label="Limit to the uploader" description="Do not show pictures uploaded by other users">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
 		</param>
 		<param name="required" type="radio" default="0" label="Required" description="Required">
 			<option value="0">No</option>
