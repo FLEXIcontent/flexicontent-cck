@@ -2,7 +2,8 @@ var itemscreen = new Class(
 {
 	options:  {
 		id: "",
-		script_url: "index.php?option=com_flexicontent&format=raw",
+		//script_url: "index.php?option=com_flexicontent&format=raw",
+		script_url: "index.php?option=com_flexicontent&tmpl=component",
 		task: ""
 	},
 
