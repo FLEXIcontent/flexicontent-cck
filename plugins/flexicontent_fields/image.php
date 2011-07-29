@@ -34,6 +34,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 1);
+		$always_allow_removal = $field->parameters->get('always_allow_removal', 0);
 		
 		$js = "
 			function fx_img_toggle_required (obj_changed, obj_req_toggle) {
@@ -66,7 +67,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$value = unserialize($value);
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
-				$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
+				if ($always_allow_removal)
+					$remove = '';
+				else
+					$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
 				$adminprefix = $app->isAdmin() ? '../' : '';
 				$field->html	.= '
 				<div style="float:left; margin-right: 5px;">
@@ -605,23 +609,36 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$required		= $field->parameters->get( 'required', 0 ) ;
 		$required		= $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 1);
+		$list_all_media_files = $field->parameters->get('list_all_media_files', 0);
+		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);
 		
 		$db =& JFactory::getDBO();
 		$app =& JFactory::getApplication();
+		$user =& JFactory::getUser();
 		
-		$query = 'SELECT value'
+		if ($list_all_media_files) {
+			$query = 'SELECT filename'
+				. ' FROM #__flexicontent_files'
+				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
+				.(($limit_by_uploader)?" AND uploaded_by={$user->id}":"")
+				;
+		} else {
+			$query = 'SELECT value'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = '. (int) $field->id
 				;
+		}
 		$db->setQuery($query);
 		$values = $db->loadResultArray();
 		
 
-		for($n=0, $c=count($values); $n<$c; $n++)
-		{
-		  if (!$values[$n]) {  unset($values[$n]);  continue; 	}
-			$values[$n] = unserialize($values[$n]);
-			$values[$n] = $values[$n]['originalname'];
+		if (!$list_all_media_files) {
+			for($n=0, $c=count($values); $n<$c; $n++)
+			{
+			  if (!$values[$n]) {  unset($values[$n]);  continue; 	}
+				$values[$n] = unserialize($values[$n]);
+				$values[$n] = $values[$n]['originalname'];
+			}
 		}
 		
 		// eliminate duplicate records in the array

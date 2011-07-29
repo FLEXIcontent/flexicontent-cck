@@ -28,7 +28,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		plgFlexicontent_fieldsMinigallery::onDisplayField($field, $item);
 	}
 
-	function onDisplayField(&$field, &$item)
+	function onDisplayField(&$field, $item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
