@@ -304,7 +304,7 @@ class FlexicontentControllerItems extends JController {
 		$state 	= JRequest::getVar( 'state', 0 );
 
 		$model = $this->getModel('items');
-
+		@ob_end_clean();
 		if(!$model->setitemstate($id, $state)) {
 			JError::raiseError(500, $model->getError());
 		}
@@ -333,6 +333,7 @@ class FlexicontentControllerItems extends JController {
 		$cache->clean();
 		$path = JURI::root().'components/com_flexicontent/assets/images/';
 		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />';
+		exit;
 	}
 
 	/**
@@ -672,6 +673,26 @@ class FlexicontentControllerItems extends JController {
 	}
 
 	/**
+	 * Method to get hits
+	 * 
+	 * @since 1.0
+	 */
+	function gethits() {
+		$id 	= JRequest::getInt('id', 0);
+		$model 	= $this->getModel('item');
+		
+		@ob_end_clean();
+		$hits 	= $model->gethits($id);
+		
+		if ($hits) {
+			echo $hits;
+		} else {
+			echo 0;
+		}
+		exit;
+	}
+	
+	/**
 	 * Method to fetch the votes
 	 * 
 	 * @since 1.5
@@ -681,7 +702,7 @@ class FlexicontentControllerItems extends JController {
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
 		$votes 	= $model->getvotes($id);
-
+		@ob_end_clean();
 		if ($votes) {
 			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * 20), 2);
 			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
@@ -689,23 +710,7 @@ class FlexicontentControllerItems extends JController {
 		} else {
 			echo JText::_( 'FLEXI_NOT_RATED_YET' );
 		}
-	}
-
-	/**
-	 * Method to get hits
-	 * 
-	 * @since 1.0
-	 */
-	function gethits() {
-		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel('item');
-		$hits 	= $model->gethits($id);
-
-		if ($hits) {
-			echo $hits;
-		} else {
-			echo 0;
-		}
+		exit;
 	}
 	
 	function getversionlist() {
