@@ -76,6 +76,7 @@ if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
 $view 		= isset ($view) ? @$view : null;
 $Itemid		= isset ($Itemid) ? @$Itemid : null;
 $task 		= isset($task) ? @$task : null;
+$format		= isset($format) ? @$format : null;
 $return 	= isset ($return) ? @$return : null;
 
 // V 1.2.4.m
@@ -96,7 +97,12 @@ if (!empty($fcu)) {
 	shRemoveFromGETVarsList('fcp');
 	$dosef = false;
 }
-		
+
+// Do not convert to SEF urls, the urls for vote and favourites
+if($format == 'raw') {
+	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
+}
+
 switch ($view) {
 	
 	case 'items' :
@@ -242,6 +248,10 @@ switch ($view) {
 		if (!empty($id))
 			shRemoveFromGETVarsList ( 'id' );
 
+	break;
+	
+	case 'search' :
+		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_SEARCH'] . '/';
 	break;
 	
 	case 'favourites' :
