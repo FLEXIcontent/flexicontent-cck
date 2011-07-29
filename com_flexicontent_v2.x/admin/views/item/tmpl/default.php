@@ -377,7 +377,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				?>
 			</td>
 			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
-			
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		if ( !$this->form->getValue("hits") ) {
@@ -575,89 +574,81 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				</td>
 			</tr>
 		</table>
-			<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
-			<table>
-			<tr>
-			<td>
-			<?php
-			echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
-			/*if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-			endif;*/
+		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
+
+		<?php
+		echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
+		/*if (isset($fieldSet->description) && trim($fieldSet->description)) :
+			echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+		endif;*/
+		?>
+		<fieldset class="panelform">
+		<ul class="adminformlist">
+			<li><?php echo $this->form->getLabel('access');?>
+			<?php echo $this->form->getInput('access');?></li>
+			<li><?php echo $this->form->getLabel('created_by');?>
+			<?php echo $this->form->getInput('created_by');?></li>
+			<li><?php echo $this->form->getLabel('created_by_alias');?>
+			<?php echo $this->form->getInput('created_by_alias');?></li>
+			<li><?php echo $this->form->getLabel('created');?>
+			<?php echo $this->form->getInput('created');?></li>
+			<li><?php echo $this->form->getLabel('publish_up');?>
+			<?php echo $this->form->getInput('publish_up');?></li>
+			<li><?php echo $this->form->getLabel('publish_down');?>
+			<?php echo $this->form->getInput('publish_down');?></li>
+		</ul>
+		</fieldset>
+
+		<?php
+		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
+		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+		?>
+		<fieldset class="panelform">
+			<?php echo $this->form->getLabel('metadesc'); ?>
+			<?php echo $this->form->getInput('metadesc'); ?>
+
+			<?php echo $this->form->getLabel('metakey'); ?>
+			<?php echo $this->form->getInput('metakey'); ?>
+			<?php foreach($this->form->getGroup('metadata') as $field): ?>
+				<?php if ($field->hidden): ?>
+					<?php echo $field->input; ?>
+				<?php else: ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</fieldset>
+		<?php
+		$fieldSets = $this->form->getFieldsets('attribs');
+		foreach ($fieldSets as $name => $fieldSet) :
+			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+			echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 			?>
 			<fieldset class="panelform">
-			<ul class="adminformlist">
-				<li><?php echo $this->form->getLabel('access');?>
-				<?php echo $this->form->getInput('access');?></li>
-				<li><?php echo $this->form->getLabel('created_by');?>
-				<?php echo $this->form->getInput('created_by');?></li>
-				<li><?php echo $this->form->getLabel('created_by_alias');?>
-				<?php echo $this->form->getInput('created_by_alias');?></li>
-				<li><?php echo $this->form->getLabel('created');?>
-				<?php echo $this->form->getInput('created');?></li>
-				<li><?php echo $this->form->getLabel('publish_up');?>
-				<?php echo $this->form->getInput('publish_up');?></li>
-				<li><?php echo $this->form->getLabel('publish_down');?>
-				<?php echo $this->form->getInput('publish_down');?></li>
-			</ul>
+				<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
+				<?php endforeach; ?>
 			</fieldset>
+		<?php endforeach;
+		?>
 
-			<?php
-			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-			//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+		<?php
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+		foreach ($this->tmpls as $tmpl) {
+			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+			echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
 			?>
 			<fieldset class="panelform">
-				<?php echo $this->form->getLabel('metadesc'); ?>
-				<?php echo $this->form->getInput('metadesc'); ?>
-
-				<?php echo $this->form->getLabel('metakey'); ?>
-				<?php echo $this->form->getInput('metakey'); ?>
-				<?php foreach($this->form->getGroup('metadata') as $field): ?>
-					<?php if ($field->hidden): ?>
-						<?php echo $field->input; ?>
-					<?php else: ?>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
-					<?php endif; ?>
+				<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
 				<?php endforeach; ?>
 			</fieldset>
 			<?php
-			$fieldSets = $this->form->getFieldsets('attribs');
-			foreach ($fieldSets as $name => $fieldSet) :
-				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-				echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
-				?>
-				<fieldset class="panelform">
-					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
-					<?php endforeach; ?>
-				</fieldset>
-			<?php endforeach;
-			?>
-			</td>
-			</tr>
-			<tr>
-			<td>
-			<?php
-			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-			foreach ($this->tmpls as $tmpl) {
-				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
-				?>
-				<fieldset class="panelform">
-					<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
-					<?php endforeach; ?>
-				</fieldset>
-				<?php
-			}
-			?>
-			</td>
-			</tr>
-			</table>
-			<?php echo JHtml::_('sliders.end'); ?>
+		}
+		?>
+		<?php echo JHtml::_('sliders.end'); ?>
 		</td>
 	</tr>
 </table>
