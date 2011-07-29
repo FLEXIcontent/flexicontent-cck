@@ -38,7 +38,7 @@ class FlexicontentHelperRoute
 	function getItemRoute($id, $catid = 0, $Itemid=0)
 	{
 		$needles = array(
-			'items'  => (int) $id,
+			'item'  => (int) $id,
 			'category' => (int) $catid
 		);
 
@@ -104,8 +104,8 @@ class FlexicontentHelperRoute
 
 		foreach($items as $item)
 		{								
-			if ((@$item->query['view'] == 'items') && (@$item->query['id'] == $needles['items'])) {
-				if ((@$item->query['view'] == 'items') && (@$item->query['cid'] == $needles['category'])) {
+			if ((@$item->query['view'] == 'item') && (@$item->query['id'] == $needles['item'])) {
+				if ((@$item->query['view'] == 'item') && (@$item->query['cid'] == $needles['category'])) {
 					$match = $item; // priority 1: item id+cid
 					break;
 				} else {
