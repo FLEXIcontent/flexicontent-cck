@@ -108,7 +108,16 @@ function FLEXIcontentBuildRoute(&$query)
 		$segments[] = @$query['id'];  // Required ...
 		unset($query['id']);
 		break;
-	case 'favourites': case 'fileselement': default:
+	case 'flexicontent':    // (aka directory view)
+		if (isset($query['rootcat'])) {
+			$segments[] = 'catalog';
+			$segments[] = $query['rootcat'];
+			unset($query['rootcat']);
+		} else {
+			// IMPLY view = 'flexicontent' when count($segments) == 0
+		}
+		break;
+	case 'favourites': case 'fileselement': case 'search': default:
 		// EXPLICIT view (will be contained in the url)
 		if($view!=='') $segments[] = $view;
 		if (isset($query['id'])) {
@@ -186,7 +195,20 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 	
-	// 4.d 'favourites' & 'fileselement' view
+	// 4.d 'search' view
+	if($segments[0] == 'search') {
+		$vars['view'] = 'search';
+		return $vars;
+	}
+	
+	// 4.e 'flexicontent' view (aka directory view)
+	if($segments[0] == 'catalog') {
+		$vars['view'] = 'flexicontent';
+		$vars['rootcat'] = $segments[1];
+		return $vars;
+	}
+	
+	// 4.f 'favourites' & 'fileselement' view
 	if($segments[0] == 'favourites' || $segments[0] == 'fileselement') {
 		$vars['view'] = $segments[0];
 		return $vars;
