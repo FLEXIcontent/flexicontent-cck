@@ -136,6 +136,7 @@
 	<plugin name="selectmultiple" folder="plugins/selectmultiple">Multiple select list field</plugin>
 	<plugin name="text" folder="plugins/text">Text field</plugin>
 	<plugin name="textarea" folder="plugins/textarea">Textarea field</plugin>
+	<plugin name="textselect" folder="plugins/textselect">TextSelect field</plugin>
 	<plugin name="weblink" folder="plugins/weblink">Weblink field</plugin>
 	<plugin name="toolbar" folder="plugins/toolbar">Article toolbar field</plugin>
 	<plugin name="fcpagenav" folder="plugins/fcpagenav">Page navigation field</plugin>
