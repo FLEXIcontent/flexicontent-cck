@@ -17,7 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$cid = $this->params->get("cid");
+$cids = $this->params->get("cid");
 
 JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
@@ -144,7 +144,7 @@ function submitbutton( pressbutton ) {
 		invalid[0].focus();
 			//form.title.focus();
 			return false;
-	}<?php if(!$cid) {?> else if ( form.cid.selectedIndex == -1 ) {
+	}<?php if(!$cids) {?> else if ( form.cid.selectedIndex == -1 ) {
 		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
 		validator.handleResponse(false,form.cid);
 		var invalid = $$('.invalid');
@@ -194,8 +194,7 @@ function deleteTag(obj) {
 			</div>
 			<div class="flexi_formblock">
 <?php
-if ($cid) :
-	$cids = explode(",", $cid);
+if ($cids) :
 	global $globalcats;
 	$cats = array();
 	foreach($cids as $cid) :

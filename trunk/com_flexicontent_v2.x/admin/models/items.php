@@ -1184,8 +1184,8 @@ class FlexicontentModelItems extends JModel {
 			
 			foreach ($items as $item) {
 				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
-				$canDelete 		= in_array('flexicontent.delete', $rights) || ($permission->CanDelete);
-				$canDeleteOwn	= (in_array('flexicontent.deleteown', $rights) && ($item->created_by == $user->id));
+				$canDelete 		= in_array('delete', $rights) || ($permission->CanDelete);
+				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id));
 				
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}
