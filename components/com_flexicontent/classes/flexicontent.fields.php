@@ -185,7 +185,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	function getFieldDisplay($item, $fieldname, $values=null, $method='display')
+	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display')
 	{
 	  // Check if we have already created the display and return it
 	  if ( isset($item->onDemandFields[$fieldname]->{$method}) ) {
@@ -210,8 +210,11 @@ class FlexicontentFields
 	  	$values = isset($items->fieldvalues[$field->id]) ? $items->fieldvalues[$field->id] : array();
 	  }
 	  
+	  // Set other field data like label
+	  $item->onDemandFields[$fieldname]->label = $field->label;
+	  
 	  // Render the (display) method of the field and return it
-	  $field = FlexicontentFields::renderField($items, $field, $values, $method);
+	  $field = FlexicontentFields::renderField($item, $field, $values, $method);
 	  $item->onDemandFields[$fieldname]->{$method} = $field->{$method};
 	  return $item->onDemandFields[$fieldname]->{$method};
 	}
