@@ -117,7 +117,8 @@ defined('_JEXEC') or die('Restricted access');
 				<?php echo $row->name; ?>
 			</td>
 			<td align="left">
-				<?php echo ($row->type?$row->type:"Core Field"); ?>
+				<?php $row->field_friendlyname = str_ireplace("FLEXIcontent - ","",$row->field_friendlyname); ?>
+				<?php echo ($row->iscore?"[Core] "/*.$row->type*/ : "{$row->field_friendlyname}"/*." [{$row->type}]"*/); ?>
 			</td>
 			<td>
 				<?php

@@ -121,7 +121,7 @@ class FlexicontentModelCategories extends JModel
 			$search_rows = $this->_db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned'
+		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config '
 					. ' FROM #__categories AS c'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 					. ' LEFT JOIN #__groups AS g ON g.id = c.access'
@@ -137,6 +137,16 @@ class FlexicontentModelCategories extends JModel
 		$rows = $this->_db->loadObjectList();
 		//establish the hierarchy of the categories
 		$children = array();
+		
+		// Parse configuration for every row
+   	foreach ($rows as $cat) {
+   		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$cat->config);
+   		$cat->config = new stdClass();
+   		foreach($config_arr as $config_var) {
+   			list($varname,$varval) = explode('=',$config_var);
+   			if(!empty($varname)) $cat->config->{$varname} = $varval;
+   		}
+   	}
 		
     	//set depth limit
    		$levellimit = 10;

@@ -226,6 +226,9 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
+			<th width="" class="center">
+				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
+			</th>
 			<th width="<?php echo $this->CanOrder ? '90' : '60'; ?>" class="center">
 				<?php
 				if ($this->filter_cats == '' || $this->filter_cats == 0) :
@@ -318,6 +321,7 @@ window.addEvent('domready', function(){
 			<td class="left col_state">
 				<?php echo $this->lists['state']; ?>
 			</td>
+			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left col_cats">
@@ -560,6 +564,11 @@ window.addEvent('domready', function(){
 			</div>
 			<?php endif ; ?>
 			</td>
+			
+			<td align="center">
+				<?php echo ($row->config->ilayout ? $row->config->ilayout : "default<sup>[1]</sup>") ?>
+			</td>
+			
 			<?php if ($this->CanOrder) : ?>
 			<td class="order">
 				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
@@ -665,7 +674,9 @@ window.addEvent('domready', function(){
 			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
-
+	
+	<sup>[1]</sup> Not Set. The default template will be used.
+	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />
