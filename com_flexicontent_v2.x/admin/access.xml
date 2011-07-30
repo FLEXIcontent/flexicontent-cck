@@ -35,6 +35,7 @@
 		<action name="flexicontent.deleteallcat" title="Can delete category" description="Can delete category" />
 		<action name="flexicontent.editallcat" title="Can edit category" description="Can edit category" />
 		<action name="flexicontent.editallcat.state" title="Can edit state of category" description="Can edit state of category" />
+		<action name="flexicontent.multicat" title="Use multiple Categories" description="Use multiple Categories" />
 		
 		<action name="flexicontent.managefile" title="Can manage files" description="Can manage files" />
 		<action name="flexicontent.uploadfiles" title="Upload file" description="Upload file" />

@@ -44,6 +44,7 @@ class FlexicontentHelperPerm{
 			$permission->CanEditAllCats 	= ($check || JAccess::check($user->id, 'flexicontent.editallcat',			'com_flexicontent'));
 			$permission->CanDeleteAllCats = ($check || JAccess::check($user->id, 'flexicontent.deleteallcat', 		'com_flexicontent'));
 			$permission->CanPublishAllCats = ($check || JAccess::check($user->id, 'flexicontent.editallcat.state', 	'com_flexicontent'));
+			$permission->MultiCat = ($check || JAccess::check($user->id, 'flexicontent.multicat', 	'com_flexicontent'));
 			//files
 			$permission->CanFiles	 	= ($check || JAccess::check($user->id, 'flexicontent.managefile', 		'com_flexicontent'));
 			$permission->CanUpload	 	= ($check || JAccess::check($user->id, 'flexicontent.uploadfiles', 		'com_flexicontent'));
@@ -82,8 +83,9 @@ class FlexicontentHelperPerm{
 			$rule_string = $db->loadResult();
 			$rule = new JRules($rule_string);
 			$actions[$id] = array();
+			$groups = $user->getAuthorisedGroups();
 			foreach($rule->getData() as $action=>$data) {
-				$actions[$id][] = $action;
+				if($data->allow($groups)) $actions[$id][] = str_replace("flexicontent.", "", $action);
 			}
 		}
 		return $actions[$id];

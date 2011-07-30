@@ -306,77 +306,37 @@ class FlexicontentViewItem extends JView {
 			$mainframe->redirect($url, JText::_( 'FLEXI_ALERTNOTAUTH' ));
 		}
 
+		// load permission
+		$permission = FlexicontentHelperPerm::getPerm();
 		// check if it's an edit action
 		if ($item->id) {
 			// EDIT action
-			if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			
-				if ( (!in_array('editown', $rights) && $item->created_by == $user->get('id')) && (!in_array('edit', $rights)) )
-				{
-					// user isn't authorize to edit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
-			} else {
-				$canEdit	= $user->authorize('com_content', 'edit', 'content', 'all');
-				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own');
-				
-				if ( $canEdit || ($canEditOwn && ($item->created_by == $user->get('id'))) )
-				{
-					// continue
-				} else {
-					// user isn't authorize to edit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
+			$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
+			if ( !$permission->CanEdit && !($canEditOwn && ($item->created_by == $user->get('id'))) ) {
+				// user isn't authorize to edit
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
 		} else {
 			// SUBMIT action
-			if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-	
-				if ( !@$canAdd['content'] && !@$canAdd['category'] )
-				{
-					// user isn't authorize to submit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
-			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-				
-				if (!$canAdd)
-				{
-					// user isn't authorize to submit
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-				}
+			if (!$permission->CanAdd) {
+				// user isn't authorize to submit
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
 		}
 
 		$perms 	= array();
-		if (FLEXI_ACCESS) {
-			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
-			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
+		$perms['multicat'] = $permission->MultiCat;
+		$perms['cantags'] = $permission->CanTags;
+		$perms['canparams'] = $permission->CanParams;
 
-			if ($item->id) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$perms['canedit']		= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
-				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
-				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
-			} else {
-				$perms['canedit']		= ($user->gid < 25) ? 0 : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? 0 : 1;
-				$perms['candelete']		= ($user->gid < 25) ? 0 : 1;
-				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
-			}
-		} else {
-			$perms['multicat']		= 1;
-			$perms['cantags'] 		= 1;
-			$perms['canparams'] 	= 1;
-			$perms['canedit']		= ($user->gid >= 20);
-			$perms['canpublish']	= ($user->gid >= 21);
-			$perms['candelete']		= ($user->gid >= 21);
-			$perms['canright']		= ($user->gid >= 21);
-		}
+		$itemrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+		//$catrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $item->catid);
+		//$rights = array_merge($itemrights, $catrights);//I not sure if it will merged or not?//by enjoyman
+		$rights = $itemrights;
+		$perms['canedit'] = ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) );
+		$perms['canpublish'] = ( (in_array('editown.state', $rights) && $item->created_by == $user->get('id')) || (in_array('edit.state', $rights)) );
+		$perms['candelete'] = ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) );
+		$perms['canright'] = $permission->CanRights;
 
 		//Add the js includes to the document <head> section
 		JHTML::_('behavior.formvalidation');
