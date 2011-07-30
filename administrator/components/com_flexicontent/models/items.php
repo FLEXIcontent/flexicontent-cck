@@ -116,11 +116,19 @@ class FlexicontentModelItems extends JModel
 			{
 				$item =& $this->_data[$i];
 				$item->categories = $this->getCategories($item->id);
-				}
-				$k = 1 - $k;
+				
+				// Parse configuration for every row
+	   		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$item->config);
+	   		$item->config = new stdClass();
+	   		foreach($config_arr as $config_var) {
+	   			list($varname,$varval) = explode('=',$config_var);
+	   			if(!empty($varname)) $item->config->{$varname} = $varval;
+	   		}
 			}
+			$k = 1 - $k;
+		}
 		return $this->_data;
-					}			
+	}			
 			
 	/**
 	 * Method to set the default site language to an item with no language
@@ -309,7 +317,8 @@ class FlexicontentModelItems extends JModel
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
+		$query 		= 'SELECT i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
+					. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'

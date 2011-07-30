@@ -41,6 +41,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -110,6 +111,9 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				?>
 			</td>
 			<td align="center">
+				<?php echo ($row->config->clayout ? $row->config->clayout : "default <sup>[1]</sup>") ?>
+			</td>
+			<td align="center">
 				<?php echo $row->nrassigned?>
 				<a href="<?php echo $items; ?>">
 				[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
@@ -139,7 +143,9 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	</tbody>
 
 	</table>
-
+  
+  <sup>[1]</sup> Params not saved yet, default values will be used.
+  
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="categories" />
