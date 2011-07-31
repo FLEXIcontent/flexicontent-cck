@@ -20,8 +20,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $cids = $this->params->get("cid");
 
 JHTML::_('behavior.mootools');
-$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.min.js');
-$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));

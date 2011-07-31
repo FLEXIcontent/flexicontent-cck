@@ -36,7 +36,12 @@ class FlexicontentViewFlexicontent extends JView{
 	 */
 	function display( $tpl = null ) {
 		$mainframe = &JFactory::getApplication();
-		
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$layout = JRequest::getVar('layout', 'default');
+		if($layout=='fversion') {
+			$this->fversion($tpl, $params);
+			return;
+		}
 		//Load pane behavior
 		jimport('joomla.html.pane');
 		// load the file system librairies
@@ -75,7 +80,6 @@ class FlexicontentViewFlexicontent extends JView{
 		$document	= & JFactory::getDocument();
 		$pane   	= & JPane::getInstance('sliders');
 		$template	= $mainframe->getTemplate();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$user		= & JFactory::getUser();		
 		// Get data from the model
 		$openquest	= & $this->get( 'Openquestions' );
@@ -138,15 +142,6 @@ class FlexicontentViewFlexicontent extends JView{
 		$permission = FlexicontentHelperPerm::getPerm();
 		//Create Submenu
 		FLEXIcontentSubmenu();
-		
-		//updatecheck
-		if($params->get('show_updatecheck', 1) == 1) {
-		$cache = & JFactory::getCache('com_flexicontent');
-		$cache->setCaching( 1 );
-		$cache->setLifeTime( 100 );
-		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
-		$this->assignRef('check'		, $check);
-		}
 
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('unapproved'	, $unapproved);
@@ -174,6 +169,8 @@ class FlexicontentViewFlexicontent extends JView{
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
 		$this->assignRef('initialpermission'		, $initialpermission);
+		
+		$this->assignRef('document'		, $document);
 
 		// assign Rights to the template
 		$this->assignRef('permission'		, $permission);
@@ -325,6 +322,17 @@ class FlexicontentViewFlexicontent extends JView{
 		}
 		
 		return $check;
-	 }
+	}
+	function fversion(&$tpl, &$params) {
+		//updatecheck
+		if($params->get('show_updatecheck', 1) == 1) {
+			$cache = & JFactory::getCache('com_flexicontent');
+			$cache->setCaching( 1 );
+			$cache->setLifeTime( 100 );
+			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
+			$this->assignRef('check'		, $check);
+		}
+		parent::display($tpl);
+	}
 }
 ?>
