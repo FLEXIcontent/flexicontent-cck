@@ -247,14 +247,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$thumb_size = 0;
 				if ($view == 'category')
-				  $thumb_size =  $field->parameters->get('thumbincatview',0);
+				  $thumb_size =  $field->parameters->get('thumbincatview',2);
 				if($view == 'items')
-				  $thumb_size =  $field->parameters->get('thumbinitemview',0);
+				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
 				switch ($thumb_size)
 				{
 				  case 1: $src = $srcs; break;
 				  case 2: $src = $srcm; break;
 				  case 3: $src = $srcb; $popuptype = 0; break;
+				  default: $src = $srcs; break;
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
