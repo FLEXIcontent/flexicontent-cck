@@ -766,7 +766,7 @@ class FlexicontentModelItem extends JModel {
 							&& ( ($field->field_type!='tags') || ($field->name!='tags') )
 						) {
 							unset($obj->version);
-							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+							if (!empty($post[$field->name])) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
 						$i++;
 					}
@@ -794,7 +794,7 @@ class FlexicontentModelItem extends JModel {
 						&& ( ($field->field_type!='tags') || ($field->name!='tags') )
 					) {
 						unset($obj->version);
-						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						if (!empty($post[$field->name])) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 					}
 				}
 				// process field mambots onAfterSaveField
