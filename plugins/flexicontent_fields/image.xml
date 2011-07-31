@@ -116,19 +116,19 @@
 			<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
 			<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
 		</param>
-		<param name="list_all_media_files" type="radio" default="0" label="List All Media Files" description="When selecting an image file all media files will be listed, not just the ones used for image field">
+		<param name="list_all_media_files" type="radio" default="0" label="FLEXI_LIST_ALL_MEDIA_FILES" description="FLEXI_LIST_ALL_MEDIA_FILES_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
-		<param name="always_allow_removal" type="radio" default="0" label="Always allow image removal" description="Even when image file is not used by other items allow to remove it instead of only allowing to deleting it">
+		<param name="always_allow_removal" type="radio" default="0" label="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL" description="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
-		<param name="limit_by_uploader" type="radio" default="0" label="Limit to the uploader" description="Do not show pictures uploaded by other users">
+		<param name="limit_by_uploader" type="radio" default="0" label="FLEXI_LIMIT_BY_UPLOADER" description="FLEXI_LIMIT_BY_UPLOADER_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
-		<param name="required" type="radio" default="0" label="Required" description="Required">
+		<param name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
