@@ -596,7 +596,7 @@ class FlexicontentModelItems extends JModel
 				
 				foreach($fields as $field)
 				{
-					if ($field->iscore != 1 && !empty($field->value) {
+					if ($field->iscore != 1 && !empty($field->value)) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;
