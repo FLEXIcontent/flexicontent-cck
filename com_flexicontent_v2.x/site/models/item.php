@@ -1011,7 +1011,7 @@ class FlexicontentModelItem extends JModel
 			$jcorefields = flexicontent_html::getJCoreFields();
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
-				$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
 				if (is_array($post[$field->name])) {

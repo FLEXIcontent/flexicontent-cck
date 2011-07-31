@@ -224,16 +224,21 @@ class FlexicontentController extends JController
 			$adminRows = $db->loadObjectList();
 
 			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
-
+			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'message.php');
+			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'config.php');
+			//Send a message to the admins personal message boxes
+			$message = new MessagesModelMessage();
 			// send email notification to admins
 			foreach ($adminRows as $adminRow) {
 
 				//Not really  needed cause in com_message you can set to be notified about new messages by email
 				//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
 
-				//Send a message to the admins personal message boxes
-				$message = new TableMessage($db);
-				$message->send($user->get('id'), $adminRow->id, JText::_( 'FLEXI_NEW_ITEM' ), JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring));
+				$data["user_id_to"] = $adminRow->id;
+				$data["subject"] = JText::_( 'FLEXI_NEW_ITEM' );
+				$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring);
+				//$message->send($user->get('id'), $adminRow->id, JText::_( 'FLEXI_NEW_ITEM' ), );
+				$message->save($data);
 			}
 
 		} else {
