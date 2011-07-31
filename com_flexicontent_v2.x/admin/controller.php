@@ -687,5 +687,14 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
+	
+	function fversioncompare() {
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		@ob_end_clean();
+			JRequest::setVar('layout', 'fversion');
+			parent::display();
+		exit;
+	}
 }
 ?>
