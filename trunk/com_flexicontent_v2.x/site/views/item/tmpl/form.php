@@ -93,7 +93,7 @@ if ($this->perms['cantags']) {
 }
 ?>
 <script language="javascript" type="text/javascript">
-Window.onDomReady(function(){
+window.addEvent( "domready", function() {
 	document.formvalidator.setHandler('cid',
 		function (value) {
 			if(value == -1) {
@@ -128,12 +128,12 @@ function addtag(id, tagname) {
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
-		return;
+		return false;
 	}
 
 	var form = document.adminForm;
 	var validator = document.formvalidator;
-	var title = $(form.title).getValue();
+	var title = form.title.value;
 	title.replace(/\s/g,'');
 
 	if ( title.length==0 ) {
@@ -259,6 +259,7 @@ endif;
 			else :
 			?>
 			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
+			<input type="hidden" id="vstate" name="vstate" value="1" />
 			<?php 
 			endif; 
 			if (FLEXI_FISH) :

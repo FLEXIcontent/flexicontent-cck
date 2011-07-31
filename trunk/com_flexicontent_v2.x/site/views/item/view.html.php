@@ -353,7 +353,7 @@ class FlexicontentViewItem extends JView {
 		
 		//add css file
 		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
-		$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
+		//$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
 		$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
 		
 		//Get the lists
