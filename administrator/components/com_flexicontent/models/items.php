@@ -596,13 +596,13 @@ class FlexicontentModelItems extends JModel
 				
 				foreach($fields as $field)
 				{
-					if ($field->iscore != 1) {
+					if ($field->iscore != 1 && !empty($field->value) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;
+						$this->_db->setQuery($query);
+						$this->_db->query();
 					}
-					$this->_db->setQuery($query);
-					$this->_db->query();
 				}
 				
 				// fix issue 39 => http://code.google.com/p/flexicontent/issues/detail?id=39
