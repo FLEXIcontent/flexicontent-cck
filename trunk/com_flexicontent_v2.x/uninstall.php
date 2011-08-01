@@ -53,6 +53,9 @@ $flexiplugins = array(
 	"extendedweblink"	=>	"flexicontent_fields",
 	"linkslist"			=>	"flexicontent_fields",
 	"minigallery"		=>	"flexicontent_fields",
+	"toolbar"			=>	"flexicontent_fields",
+	"fcpagenav"			=>	"flexicontent_fields",
+	"fcloadmodule"		=>	"flexicontent_fields",
 	"flexisearch"		=>	"search",
 	"flexisystem"		=>	"system"
 );

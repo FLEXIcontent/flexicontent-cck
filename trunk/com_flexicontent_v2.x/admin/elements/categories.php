@@ -1,7 +1,8 @@
 <?php
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-jimport('joomla.form.field');
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 
 if(!class_exists('FLEXIUtilities')) {
 	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
@@ -24,8 +25,7 @@ class JFormFieldCategories extends JFormField{
 	 * @return	array		An array of JHtml options.
 	 */
 	protected function getInput() {
-		$html = "";
-		$fieldName	= $this->inputName;
+		$fieldName	= $this->name;
 		$fieldValue	= $this->value;
 		$tree = flexicontent_cats::getCategoriesTree();
 		$html = "<select name=\"$fieldName\">\n";

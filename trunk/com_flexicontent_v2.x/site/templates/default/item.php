@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 250 2010-06-09 08:01:27Z emmanuel.danan $
+ * @version 1.5 stable $Id: item.php 558 2011-03-30 12:18:10Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -26,7 +26,7 @@ $tmpl = $this->tmpl;
 <!-- BOF buttons -->
 <p class="buttons">
 	<?php echo flexicontent_html::pdfbutton( $this->item, $this->params ); ?>
-	<?php echo flexicontent_html::mailbutton( 'items', $this->params, null , $this->item->slug ); ?>
+	<?php echo flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug ); ?>
 	<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 	<?php echo flexicontent_html::editbutton( $this->item, $this->params ); ?>
 </p>
@@ -130,6 +130,12 @@ $tmpl = $this->tmpl;
 
 	<div class="clear"></div>
 
+	<?php if (isset($this->item->toc)) : ?>
+	<!-- BOF TOC -->
+	<?php echo $this->item->toc; ?>
+	<!-- EOF TOC -->
+	<?php endif; ?>
+
 	<?php if (isset($this->item->positions['description'])) : ?>
 <!-- BOF description -->
 	<div class="description">
@@ -164,7 +170,7 @@ $tmpl = $this->tmpl;
 <!-- EOF bottom block -->
 	<?php endif; ?>
 
-	<?php if ($this->params->get('comments')) : ?>
+	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
 <!-- BOF comments -->
 	<div class="comments">
 		<?php

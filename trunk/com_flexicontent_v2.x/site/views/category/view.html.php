@@ -144,7 +144,7 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 		
-		$themes		= flexicontent_tmpl::getTemplates();
+		$themes		= flexicontent_tmpl::parseTemplates();
 		
 		if ($params->get('clayout')) {
 			// Add the templates css files if availables

@@ -18,6 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 
 /**
  * Renders a author element
@@ -26,17 +28,16 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JElementAuthor extends JElement
+class JFormFieldAuthor extends JFormField
 {
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'Author';
+	var	$type = 'Author';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
-		return JHTML::_('list.users', $control_name.'['.$name.']', $value);
+	function getInput() {
+		return JHTML::_('list.users', $this->name, $this->value);
 	}
 }

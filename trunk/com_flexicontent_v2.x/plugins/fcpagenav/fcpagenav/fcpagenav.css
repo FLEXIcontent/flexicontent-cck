@@ -1,0 +1,8 @@
+.pagination {
+	text-align: center;
+	display: block;
+}
+.pagination .pagenav_prev { 
+	margin-right: 20px;
+}
+.pagination .pagenav_next {}

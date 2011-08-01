@@ -146,7 +146,7 @@ class FlexicontentModelItems extends JModel {
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-			. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND (cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')'
+			. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
 			;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -199,7 +199,7 @@ class FlexicontentModelItems extends JModel {
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
 					. ' JOIN #__categories as cat ON c.catid=cat.id' 
-					. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')'
+					. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);

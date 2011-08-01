@@ -28,7 +28,7 @@ if ($this->permission->CanUseTags) {
 	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&format=raw&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&tmpl=component&".JUtility::getToken()."=1\", {
 				width: 260,
 				matchContains: false,
 				mustMatch: false,
@@ -71,7 +71,7 @@ if ($this->permission->CanUseTags) {
 		});
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&tmpl=component&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
@@ -115,7 +115,7 @@ function addtag(id, tagname) {
 	}
 	
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&tmpl=component&<?php echo JUtility::getToken();?>=1');
 }
 
 function reseter(task, id, div){

@@ -71,8 +71,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			//sanitize filename further and make unique
 			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
 			$filepath 	= JPath::clean($path.strtolower($filename));
-			
-			if (!flexicontent_upload::check( $file, $err )) {
+			$params = null;
+			if (!flexicontent_upload::check( $file, $err, $params )) {
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance('com_flexicontent.error.php');
@@ -83,7 +83,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					JError::raiseNotice(100, JText::_($err));
 					// REDIRECT
 					if ($return) {
-						$mainframe->redirect(base64_decode($return));
+						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 					}
 					return;
 				}
@@ -103,7 +103,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
 					// REDIRECT
 					if ($return) {
-						$mainframe->redirect(base64_decode($return));
+						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 					}
 					return;
 				}
@@ -170,7 +170,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
 					
 					$option = JRequest::getVar('option');
-					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
 					if($filter_item) {
 						$session = JFactory::getSession();
 						$files = $session->get('fileselement.'.$filter_item, null);
@@ -184,13 +184,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					
 					// REDIRECT
 					if ($return) {
-						$mainframe->redirect(base64_decode($return));
+						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 					}
 					return;
 				}
 			}
 		}
-		$mainframe->redirect(base64_decode($return));
+		$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 	}
 	
 	function ftpValidate()
@@ -222,7 +222,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARNFILEURLFORM' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return));
+				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 			}
 			return;
 		}
@@ -266,7 +266,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 
 		// REDIRECT
 		if ($return) {
-			$mainframe->redirect(base64_decode($return));
+			$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 		}
 	}
 
@@ -320,7 +320,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILE_DIR' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return));
+				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 			}
 			return;
 		}
@@ -383,7 +383,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		} else {
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILES_IN_DIR' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return));
+				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 			}
 			return;
 		}
@@ -391,7 +391,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					
 		// REDIRECT
 		if ($return) {
-			$mainframe->redirect(base64_decode($return));
+			$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
 		}
 	}
 

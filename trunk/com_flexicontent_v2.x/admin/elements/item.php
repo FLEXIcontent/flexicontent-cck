@@ -40,7 +40,8 @@ class JFormFieldItem extends JFormField
 	
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
-		$value		= $this->__get('value');
+		$value		= $this->value;
+
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item =& JTable::getInstance('flexicontent_items', '');

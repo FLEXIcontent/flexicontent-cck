@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 307 2010-06-16 10:16:33Z enjoyman $
+ * @version 1.0 $Id: file.php 655 2011-07-17 02:52:12Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -25,7 +25,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
 
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsFile::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
@@ -37,10 +40,20 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$document	=& JFactory::getDocument();
 		$app		=& JFactory::getApplication();
 		$prefix		= $app->isSite() ? 'administrator/' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
+		$dummy_required_form_field = "<input type=\"text\" class=\"{$required}\" name=\"{$field->name}[]\" value=\"\" style=\"display:none;\"/>";
 
 		$js = "
-		function qfSelectFile".$field->id."(id, file) {
 		
+		var req_container_innerHTML='".$dummy_required_form_field."';
+		var value_counter=".count($field->value).";
+		
+		function qfSelectFile".$field->id."(id, file) {
+		  value_counter++;
+		  var req_container = $('{$field->name}_req_container');
+		  req_container.innerHTML = '';
+		  
 			var name 	= 'a_name'+id;
 			var ixid 	= 'a_id'+id;			
 			var li 		= document.createElement('li');
@@ -52,7 +65,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			var filelist = document.getElementById('sortables_".$field->id."');
 			
 			$(li).addClass('sortabledisabled');
-			$(span).addClass('drag');
+			$(span).addClass('drag".$field->id."');
 			
 			var button = document.createElement('input');
 			button.type = 'button';
@@ -84,59 +97,44 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			span.appendChild(img);
 			
 			new Sortables($('sortables_".$field->id."'), {
-				'handles': $('sortables_".$field->id."').getElements('span.drag'),
-				'onDragStart': function(element, ghost){
-					ghost.setStyles({
-					'list-style-type': 'none',
-					'opacity': 1
-					});
-					element.setStyle('opacity', 0.3);
-				},
-				'onDragComplete': function(element, ghost){
-					element.setStyle('opacity', 1);
-					ghost.remove();
-					this.trash.remove();
-				}
+				'constrain': true,
+				'clone': true,
+				'handle': '.drag".$field->id."'
 			});			
-		}
 		
-			function deleteField".$field->id."(el) {
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-				}).chain(function(){
-					row.remove();
-				});
-			}
+		}
+		function deleteField".$field->id."(el) {
+		  var req_container = $('{$field->name}_req_container');
+		  value_counter--;
+		  if (value_counter<=0)
+		    req_container.innerHTML = req_container_innerHTML;
+		  
+			var field	= $(el);
+			var row		= field.getParent();
+			var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+			
+			fx.start({
+				'height': 0,
+				'opacity': 0			
+			}).chain(function(){
+				row.remove();
+			});
+		}
 		";
 		$document->addScriptDeclaration($js);
 
-			//add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
 					});			
 				});
 			";
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
-
 
 			$css = '
 			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -146,7 +144,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -156,32 +154,34 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$move 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
-
-		$i = 0;
-		$field->html = '<ul id="sortables_'.$field->id.'">';
 		
+	  $field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
+		$i = 0;
+		$field->html .= '<ul id="sortables_'.$field->id.'">';
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
-				$field->html .= "<input size=\"".$size."\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
+				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
 				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"".$field->name."[]\" value=\"".$file."\" />";
 				$field->html .= "<input class=\"inputbox fcbutton\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
-				$field->html .= "<span class=\"drag\">".$move."</span>";
+				$field->html .= "<span class=\"drag".$field->id."\">".$move."</span>";
 				$field->html .= '</li>';
 				$i++;
 			}
 		}
+		$files = implode(":", $field->value);
 		$user = & JFactory::getUser();
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
+		//$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
+		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
-						</ul>
-						<div class=\"button-add\">
-							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-							</div>
-						</div>
-						";
+		</ul>
+		<div class=\"button-add\">
+			<div class=\"blank\">
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+			</div>
+		</div>
+		";
 	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
@@ -249,9 +249,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	}
 	
 
-	function onBeforeSaveField(&$field, &$post, &$file) {
+	function onBeforeSaveField($field, &$post, &$file)
+	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'file') return;
+		if(!$post) return;
 
 		global $mainframe;
 		

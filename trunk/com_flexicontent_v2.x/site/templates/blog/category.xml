@@ -89,6 +89,7 @@
 		<group>under-description-line1-nolabel</group>
 		<group>under-description-line2</group>
 		<group>under-description-line2-nolabel</group>
+		<group>renderonly</group>
 	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>

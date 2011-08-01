@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 374 2010-07-23 04:15:36Z enjoyman $
+ * @version 1.5 stable $Id: flexicontent.fields.php 707 2011-07-28 17:51:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,7 +27,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getFields($items, $view = 'items', $params = null, $aid = 0)
+	function getFields($items, $view = 'item', $params = null, $aid = 0)
 	{
 		if (!is_array($items)) {
 			$rows[] = $items;
@@ -35,7 +35,7 @@ class FlexicontentFields
 		}
 		if (!$items) return $items;
 
-		JPluginHelper::importPlugin('flexicontent_fields');
+		//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
@@ -45,8 +45,8 @@ class FlexicontentFields
 		if (FLEXI_GC) $itemcache->gc(); 			//auto-clean expired item cache
 
 		// @TODO : move to the constructor
-		$taglist		= FlexicontentFields::_getTags($items);
-		$catlist		= FlexicontentFields::_getCategories($items);
+		$taglist			= FlexicontentFields::_getTags($items);
+		$catlist			= FlexicontentFields::_getCategories($items);
 		$vars['favourites']	= FlexicontentFields::_getFavourites($items);
 		$vars['favoured']	= FlexicontentFields::_getFavoured($items);
 		$vars['modifiers']	= FlexicontentFields::_getModifiers($items);
@@ -97,15 +97,16 @@ class FlexicontentFields
 				}
 			}
 
-			if (@$items[$i]->fields)
-			{
-				foreach ($items[$i]->fields as $field)
-				{
-					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
-				}
-			}
+			//if ($items[$i]->fields)
+			//{
+			//	foreach ($items[$i]->fields as $field)
+			//	{
+			//		$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+			//		$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+			//	}
+			//}
 		}
+		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
 
 		return $items;
@@ -124,7 +125,8 @@ class FlexicontentFields
 
 		$mainframe = &JFactory::getApplication();
 		if (!$item) return;
-		if(!(($item->lft >= FLEXI_LFT_CATEGORY)&&($item->rgt <= FLEXI_RGT_CATEGORY))) return;
+		//if(!(($item->lft >= FLEXI_LFT_CATEGORY)&&($item->rgt <= FLEXI_RGT_CATEGORY))) return;
+
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 		$dispatcher = &JDispatcher::getInstance();
@@ -140,20 +142,20 @@ class FlexicontentFields
 		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
 
 		$query 	= 'SELECT fi.*'
-			. ' FROM #__flexicontent_fields AS fi'
-			. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-			. $joinaccess
-			. ' WHERE ie.item_id = ' . (int)$item->id
-			. ' AND fi.published = 1'
-			. $andaccess
-			. ' GROUP BY fi.id'
-			. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-		;
+				. ' FROM #__flexicontent_fields AS fi'
+				. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+				. $joinaccess
+				. ' WHERE ie.item_id = ' . (int)$item->id
+				. ' AND fi.published = 1'
+				. $andaccess
+				. ' GROUP BY fi.id'
+				. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+				;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 
-		$item->parameters	= new JParameter( $item->attribs );
+		$item->parameters	= isset($item->parameters) ? $item->parameters : new JParameter( $item->attribs );
 		$item->params		= $item->parameters;
 		$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
 		$item->modified		= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;
@@ -172,9 +174,51 @@ class FlexicontentFields
 		if ($item->fields) {
 			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields);
 		}
+		
 		return $item;
 	}
 
+	/**
+	 * Method to render (display method) a field on demand and return thedisplay
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5.5
+	 */
+	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display')
+	{
+	  // Check if we have already created the display and return it
+	  if ( isset($item->onDemandFields[$fieldname]->{$method}) ) {
+	    return $item->onDemandFields[$fieldname]->{$method};
+	  } else {
+	    $item->onDemandFields[$fieldname] = new stdClass();
+	  }
+	  
+	  // Find the field inside item
+	  foreach ($item->fields as $field) {
+	    if ($field->name==$fieldname) break;
+	  }
+	  
+	  // If not found return error message so that user can correct the field name
+	  if ($field->name!=$fieldname) {
+	  	$item->onDemandFields[$fieldname]->{$method} = "Field: $fieldname was not found";
+	  	return $item->onDemandFields[$fieldname]->{$method};
+	  }
+	  
+	  // Get field's values
+	  if ($values===null) {
+	  	$values = isset($items->fieldvalues[$field->id]) ? $items->fieldvalues[$field->id] : array();
+	  }
+	  
+	  // Set other field data like label
+	  $item->onDemandFields[$fieldname]->label = $field->label;
+	  
+	  // Render the (display) method of the field and return it
+	  $field = FlexicontentFields::renderField($item, $field, $values, $method);
+	  $item->onDemandFields[$fieldname]->{$method} = $field->{$method};
+	  return $item->onDemandFields[$fieldname]->{$method};
+	}
+	
 	/**
 	 * Method to render a field
 	 * 
@@ -193,10 +237,12 @@ class FlexicontentFields
 		$field->value 		= $values;
 		$field->parameters 	= new JParameter( $field->attribs );
 		$params				= $item->parameters;
+		$flexiview 			= JRequest::getVar('view');
 		
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
 		{
+			JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
 			$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -206,18 +252,42 @@ class FlexicontentFields
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
 				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'), true, 'core');
+					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
 					foreach ($field->parameters->get('plugins') as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				$field->slug = $item->slug;
+				$field->catid = $item->catid;
+				$field->catslug = $item->categoryslug;
+				$field->fieldid = $field->id;
+				$field->id = $item->id;
+				$field->state = $item->state;
+
+				// Set the view and option to article and com_content
+				if ($flexiview == 'item') {
+				  JRequest::setVar('view', 'article');
+				  JRequest::setVar('option', 'com_content');
+				}
+				
+				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
+				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) 
+					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				
+				// Set the view and option back to items and com_flexicontent
+				if ($flexiview == 'item') {
+				  JRequest::setVar('view', 'item');
+				  JRequest::setVar('option', 'com_flexicontent');
+				}
+				
+				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
 		}
 		else
 		{
+			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -227,13 +297,32 @@ class FlexicontentFields
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
 				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'), true, 'noncore');
+					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
 					foreach ($field->parameters->get('plugins') as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
+				$field->slug = $item->slug;
+				$field->catid = $item->catid;
+				$field->catslug = $item->categoryslug;
+				$field->fieldid = $field->id;
+				$field->id = $item->id;
+				$field->state = $item->state;
+
+				// Set the view and option to article and com_content
+				if ($flexiview == 'item') {
+				  JRequest::setVar('view', 'article');
+				  JRequest::setVar('option', 'com_content');
+				}
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				// Set the view and option back to items and com_flexicontent
+				if ($flexiview == 'item') {
+				  JRequest::setVar('view', 'item');
+				  JRequest::setVar('option', 'com_flexicontent');
+				}
+				
+				$field->id = $field->fieldid;
 				$field->display = $field->text;
 			}
 		}
@@ -249,28 +338,49 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderPositions($items, $view = 'items', $params = null)
+	function renderPositions($items, $view = 'item', $params = null)
 	{
 		if (!$items) return;
 		if (!$params) return $items;
-		if ($view == 'module') return $items;
 		
 		if ($view == 'category')	$layout = 'clayout';
-		if ($view == 'items') 		$layout = 'ilayout';
+		if ($view == 'item') 		$layout = 'ilayout';
 
-		$fbypos		= flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		if ($view == 'category' || $view == 'item') {
+		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		}	else { // $view == 'module', or other
+			// Create a fake template position, for module fields
+		  $fbypos[0] = new stdClass();
+		  $fbypos[0]->fields = explode(',', $params->get('fields'));
+		  $fbypos[0]->position = $view;
+		}
 				
+		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
+		  // 'text' item field is implicitely used by category (its description text), render it
+		  if ($view == 'category') {
+		    $field = $items[$i]->fields['text'];
+		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+		  }
+		  
+		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {
 				foreach ($pos->fields as $f) {
-					if ((isset($items[$i]->fields[$f]->display) && $items[$i]->fields[$f]->display)) {
-						$items[$i]->positions[$pos->position]->{$f}->id 		= $items[$i]->fields[$f]->id;
-						$items[$i]->positions[$pos->position]->{$f}->name 		= $items[$i]->fields[$f]->name;
-						$items[$i]->positions[$pos->position]->{$f}->label 		= $items[$i]->fields[$f]->parameters->get('display_label') ? $items[$i]->fields[$f]->label : '';
-						$items[$i]->positions[$pos->position]->{$f}->display	= $items[$i]->fields[$f]->display;
-					}					
-				}	
+					if (!isset($items[$i]->fields[$f])) {
+						// Field with name: $f does not exist for the type of current item, we simply skip it
+						continue;
+					}
+					$field = $items[$i]->fields[$f];
+					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					if (isset($field->display) && $field->display) {
+						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
+						$items[$i]->positions[$pos->position]->{$f}->name 		= $field->name;
+						$items[$i]->positions[$pos->position]->{$f}->label 		= $field->parameters->get('display_label') ? $field->label : '';
+						$items[$i]->positions[$pos->position]->{$f}->display	= $field->display;
+					}
+				}
 			}
 		}
 		return $items;

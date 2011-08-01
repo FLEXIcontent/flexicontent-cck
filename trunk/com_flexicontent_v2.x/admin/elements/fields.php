@@ -18,6 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 
 /**
  * Renders a fields element
@@ -26,24 +28,27 @@ defined('_JEXEC') or die();
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementFields extends JElement
+class JFormFieldFields extends JFormField
 {
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'Fields';
+	var	$type = 'Fields';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
+	function getInput() {
+		$value = $this->value;
+		$values = explode("|", $value);
 
 		$db =& JFactory::getDBO();
+		
+		$and = ($node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
 		
 		$query = 'SELECT id AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
-//		. ' ORDER BY iscore DESC, label ASC, id ASC'
+		. $and
 		. ' ORDER BY label ASC, id ASC'
 		;
 		
@@ -52,6 +57,6 @@ class JElementFields extends JElement
 
 		$class = 'multiple="true" size="10"';
 		
-		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
+		return JHTML::_('select.genericlist', $fields, $this->name.'[]', $class, 'value', 'text', $values);
 	}
 }

@@ -35,13 +35,13 @@ class JFormFieldPluginlist extends JFormFieldList{
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'Pluginlist';
+	var	$type = 'Pluginlist';
 
 	function getInput() {
 		//$name, $value, &$node, $control_name
 		$name = $this->name;
 		$value = $this->value;
-		$value = explode("|", $value);
+		$values = explode("|", $value);
 		$plugins 	= array();
 //		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
@@ -62,6 +62,6 @@ class JFormFieldPluginlist extends JFormFieldList{
 		}
 
 		$class = 'class="inputbox" multiple="true" size="5"';
-		return JHTMLSelect::genericList($plugins, $name.'[]', $class, 'value', 'text', $value, $name);
+		return JHTML::_('select.genericlist', $plugins, $name.'[]', $class, 'value', 'text', $values, $name);
 	}
 }

@@ -686,7 +686,7 @@ class FlexicontentModelItems extends JModelList{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}*/
 		
-		$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY));
+		//$query->where('c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) .' AND c.rgt<= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY));
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {

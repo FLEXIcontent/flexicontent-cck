@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: selectmultiple.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: selectmultiple.php 687 2011-07-26 04:55:37Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.selectmultiple
@@ -22,23 +22,25 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 	function plgFlexicontent_fieldsSelectmultiple( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_selectmultiple', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_selectmultiple', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsSelectmultiple::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$size				= $field->parameters->get( 'size', 6 ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 		
 		// initialise property
@@ -57,12 +59,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$db->setQuery($query);
 			$options = $db->loadObjectList();
 			
-			if (!$options) {
+			if (!$query || !is_array($options)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
-			
 			} else {
 			
-				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple"'.$required.$size, 'value', 'text', $field->value);
+				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 			}
 
 		} else { // Elements mode
@@ -83,9 +84,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					}
 				}
 			}			
-			
-		$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple"'.$required.$size, 'value', 'text', $field->value);
-		
+			$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 		}
 	}
 
@@ -174,6 +173,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$separatorf			= $field->parameters->get( 'separatorf' ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		$text_or_value		= $field->parameters->get( 'text_or_value', 1 ) ;
 						
 		switch($separatorf)
 		{
@@ -222,7 +222,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				foreach($results as $result) {
 					for($n=0, $c=count($values); $n<$c; $n++) {
 						if ($result->value == $values[$n]) {
-							$display[] = $pretext . JText::_($result->text) . $posttext;
+							$display[] = $pretext . JText::_($text_or_value ? $result->text : $result->value) . $posttext;
 						}
 					}
 				}
@@ -247,7 +247,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			foreach ($listarrays as $listarray) {
 				for($n=0, $c=count($values); $n<$c; $n++) {
 					if ($values[$n] == $listarray[0]) {
-						$display[] = JText::_($listarray[1]);
+						$display[] = JText::_($text_or_value ? $listarray[1] : $listarray[0]);
 					}
 				}
 			}			
@@ -269,7 +269,10 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
-						
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
@@ -279,16 +282,17 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$results = $db->loadObjectList();
 			
 			if (!$results) {
-				$field->html = '';
+				$field->html .= '';
 			
 			} else {
 			
 				$options = array();
-				$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, $result->text);
 				}
-				$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			}
 
 		} else { // Elements mode
@@ -300,12 +304,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			}
 
 			$options = array(); 
-			$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 			foreach ($listarrays as $listarray) {
 				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}			
-			
-			$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 		}
 	}
 }

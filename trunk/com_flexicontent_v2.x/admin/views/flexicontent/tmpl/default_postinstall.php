@@ -23,7 +23,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		var ajaxloader = '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">';
 <?php if(!$this->existfields) : //@TODO must write a class for that!!! I'm a dirty lazy pig :-) ?>
 		$('existfields').addEvent('click', function(e) {
-			var url = "index.php?option=com_flexicontent&task=createdefaultfields&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createdefaultfields&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			e = new Event(e).stop();
 			if(MooTools.version>="1.2.4") {
 				$('existfields-log').set('html', ajaxloader);
@@ -42,10 +42,31 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			}
 		});
 <?php endif; ?>
+<?php if(!$this->existmenuitems) : ?>
+		$('existmenuitems').addEvent('click', function(e) {
+			e = new Event(e).stop();
+			var url = "index.php?option=com_flexicontent&task=createMenuItems&<?php echo JUtility::getToken();?>=1&tmpl=component";
+			if(MooTools.version>="1.2.4") {
+				$('existmenuitems-log').set('html', ajaxloader);
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existmenuitems-log')
+				}).send();
+			}else{
+				$('existmenuitems-log').setHTML(ajaxloader);
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existmenuitems-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
+		});
+<?php endif; ?>
 <?php if(!$this->existtype) : ?>
 		$('existtype').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createdefaultype&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createdefaultype&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existtype-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -66,7 +87,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->allplgpublish) : ?>
 		$('publishplugins').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=publishplugins&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=publishplugins&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('publishplugins-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -87,7 +108,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->existlang) : ?>
 		$('existlang').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createlangcolumn&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createlangcolumn&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existlang-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -108,7 +129,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->existversions) : ?>
 		$('existversions').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createversionstable&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existversions-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -129,7 +150,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->existversionsdata) : ?>
 		$('existversionsdata').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=populateversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=populateversionstable&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existversionsdata-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -150,7 +171,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->cachethumb) : ?>
 		$('cachethumb').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('cachethumb-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -171,7 +192,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->oldbetafiles) : ?>
 	$('oldbetafiles').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('oldbetafiles-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -192,7 +213,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->nooldfieldsdata) : ?>
 $('oldfieldsdata').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('oldfieldsdata-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -213,7 +234,7 @@ $('oldfieldsdata').addEvent('click', function(e) {
 <?php if($this->missingversion) : ?>
 $('missingversion').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('missingversion-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -234,7 +255,7 @@ $('missingversion').addEvent('click', function(e) {
 <?php if(!$this->initialpermission) : ?>
 		$('initialpermission').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=initialpermission&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=initialpermission&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('initialpermission-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -269,6 +290,14 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 		<td id="existtype-log">
 			<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key" style="width:280px;">
+			<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
+		</td>
+		<td id="existmenuitems-log">
+			<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>

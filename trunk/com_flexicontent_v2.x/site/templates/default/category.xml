@@ -13,6 +13,7 @@
 	</fields>
 	<fieldgroups>
 		<group>table</group>
+		<group>renderonly</group>
 	</fieldgroups>	
 	<csscategory>
 		<file>css/category.css</file>

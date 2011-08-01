@@ -32,7 +32,7 @@ function dostate(state, id) {
 }
 
 function fetchcounter() {
-	var url = "index.php?option=com_flexicontent&task=items.getorphans&format=raw";
+	var url = "index.php?option=com_flexicontent&task=items.getorphans&tmpl=component";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
@@ -189,7 +189,7 @@ window.addEvent('domready', function(){
 <div class="flexicontent">
 
 <?php if ($this->unassociated) : ?>
-<form action="index.php?option=com_flexicontent&task=items.bindextdata&format=raw" method="post" name="bindForm" id="bindForm">
+<form action="index.php?option=com_flexicontent&task=items.bindextdata&tmpl=component" method="post" name="bindForm" id="bindForm">
 	<div class="fc-error">
 	<table>
 		<tr>
@@ -199,7 +199,7 @@ window.addEvent('domready', function(){
 			</span>
 			</td>
 			<td align="center" width="35%">
-				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
+				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;<?php echo count($this->unassociated); ?>&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
 				<?php echo $this->lists['extdata']; ?>
 				<input id="button-bind" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" />
 				<div id="log-bind"></div>

@@ -60,7 +60,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 					$('<?php echo 'up-'.$row->name ?>').setHTML('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
 					e = new Event(e).stop();
 		
-					var url = "index.php?option=com_flexicontent&task=templates.remove&format=raw&dir=<?php echo $row->name ?>&<?php echo JUtility::getToken();?>=1";
+					var url = "index.php?option=com_flexicontent&task=templates.remove&tmpl=component&dir=<?php echo $row->name ?>&<?php echo JUtility::getToken();?>=1";
 		 
 					var ajax = new Ajax(url, {
 						method: 'get',

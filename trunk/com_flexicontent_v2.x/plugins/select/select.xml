@@ -13,8 +13,8 @@
 		<filename plugin="select">select.php</filename>
 	</files>
 	<config>
-	<fields name="attribs">
-		<fieldset name="standard">
+	<fields name="params">
+		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
@@ -36,8 +36,26 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 			<field name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+			<field name="firstoptiontext" type="text" default="Please Select" label="First option text" description="First option text." />
+			<field name="usefirstoption" type="radio" default="1" label="Use first option" description="Use 'Please Select' option, if you don't need to use this option you can click No.">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE" description="FLEXI_LABEL_OR_VALUE_DESC">
+				<option value="0">FLEXI_VALUE</option>
+				<option value="1">FLEXI_LABEL</option>
+			</field>
+			<field name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
 		</fieldset>
 	</fields>
 	</config>

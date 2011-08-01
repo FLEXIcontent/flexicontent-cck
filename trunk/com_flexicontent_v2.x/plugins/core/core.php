@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: core.php 585 2011-04-22 07:04:14Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -17,13 +17,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsCore extends JPlugin{
-	function plgFlexicontent_fieldsCore( &$subject, $params ) {
+class plgFlexicontent_fieldsCore extends JPlugin
+{
+	function plgFlexicontent_fieldsCore( &$subject, $params )
+	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 	}
 
-	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' ) {
+	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
+	{
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
 		$view = JRequest::setVar('view', JRequest::getVar('view', 'items'));
@@ -68,16 +71,6 @@ class plgFlexicontent_fieldsCore extends JPlugin{
 		switch ($field->field_type)
 		{
 			case 'created': // created
-/*
-			$config =& JFactory::getConfig();
-			$tzoffset = $config->getValue('config.offset');
-			if ($item->created && strlen(trim( $item->created )) <= 10) {
-				$item->created 	.= ' 00:00:00';
-			}
-			$date =& JFactory::getDate($item->created, $tzoffset);
-			$item->created = $date->toMySQL();
-*/
-
 			$field->value[] = $item->created;
 			$dateformat = $dateformat ? $dateformat : $customdate;
 			$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
@@ -101,7 +94,7 @@ class plgFlexicontent_fieldsCore extends JPlugin{
 
 			case 'title': // hits
 			$field->value[] = $item->title;
-			$field->display = $pretext.JText::_($item->title).$posttext;
+			$field->display = $pretext.$item->title.$posttext;
 			break;
 
 			case 'hits': // hits
@@ -125,13 +118,11 @@ class plgFlexicontent_fieldsCore extends JPlugin{
 			break;
 
 			case 'voting': // voting button
-// remove dummy value in next version for legacy purposes
 			$field->value[] = 'button'; // dummy value to force display
 			$field->display = flexicontent_html::ItemVote( $field, 'main', $vote );
 			break;
 
 			case 'favourites': // favourites button
-// remove dummy value in next version for legacy purposes
 			$field->value[] = 'button'; // dummy value to force display
 			$favs = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS').')' : '';
 			$field->display = '
@@ -144,26 +135,26 @@ class plgFlexicontent_fieldsCore extends JPlugin{
 				';
 			break;
 
-
-			case 'score': // voting score
-			if ($view == 'category') break;
-// remove dummy value in next version for legacy purposes
-			$field->value[] = 'button'; // dummy value to force display
-			$field->display = '<span id="fcfav">'.flexicontent_html::favicon( $field, $favoured ).'</span><span id="fcfav-reponse"><small>('.JText::_('Favoured').' '.$favourites.')</small></span>';
-			break;
-
-			
 			case 'categories': // assigned categories
+			global $globalnoroute;
+			if ( !is_array($globalnoroute) ) $globalnoroute = array();
 			$display = '';
 			if ($categories) :
-			foreach ($categories as $category) {
-				$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
-				$field->value[] = $category->title; 
-			}
-			$field->display = implode($separatorf, $field->display);
+				foreach ($categories as $category) {
+					if (!in_array($category->id, @$globalnoroute)) :
+						$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
+						$field->value[] = $category->title;
+					endif;
+				}
+				if (isset($field->display)) :
+					$field->display = implode($separatorf, $field->display);
+				else :
+					$field->value[] = '';
+					$field->display = '';
+				endif;
 			else :
-			$field->value[] = '';
-			$field->display = '';
+				$field->value[] = '';
+				$field->display = '';
 			endif;
 			break;
 
@@ -214,17 +205,162 @@ class plgFlexicontent_fieldsCore extends JPlugin{
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		if($field->iscore != 1) return;
-
+		if(!$post) return;
+		
 		switch ($field->field_type)
 		{
 			case 'title': // title
-			$field->search = $post . ' | ';
+				if ($field->issearch) {
+					$field->search = $post . ' | ';
+				} else {
+					$field->search = '';
+				}
 			break;
 
 			case 'maintext': // maintext
-			$field->search = flexicontent_html::striptagsandcut($post) . ' | ';
+				if ($field->issearch) {
+					$field->search = flexicontent_html::striptagsandcut($post) . ' | ';
+				} else {
+					$field->search = '';
+				}
 			break;
 		}
 
+	}
+
+	function onDisplayFilter(&$filter, $value='')
+	{
+		if($filter->iscore != 1) return; // performance check
+		
+		$db =& JFactory::getDBO();
+
+		switch ($filter->field_type)
+		{
+			case 'createdby': // Created by
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT DISTINCT i.created_by AS value, u.name AS text'
+						. ' FROM #__content AS i'
+						. ' LEFT JOIN #__users AS u'
+						. ' ON i.created_by = u.id'
+						. ' WHERE i.created_by <> 0'
+						. ' ORDER BY u.name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'modifiedby': // Modified by
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
+						. ' FROM #__content AS i'
+						. ' LEFT JOIN #__users AS u'
+						. ' ON i.modified_by = u.id'
+						. ' WHERE i.modified_by <> 0'
+						. ' ORDER BY u.name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'type': // Type
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT id AS value, name AS text'
+						. ' FROM #__flexicontent_types'
+						. ' ORDER BY name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'state': // State
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				$options[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+				$options[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+				$options[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
+				$options[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
+				$options[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'tags': // Tags
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+				
+				$query 	= ' SELECT id AS value, name AS text'
+						. ' FROM #__flexicontent_tags'
+						. ' ORDER BY name ASC'
+						;
+				$db->setQuery($query);
+				$lists = $db->loadObjectList();
+				
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				foreach ($lists as $list) {
+					$options[] = JHTML::_('select.option', $list->value, $list->text); 
+					}			
+				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+		}
 	}
 }

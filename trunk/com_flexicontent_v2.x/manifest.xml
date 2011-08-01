@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <install type="component" version="1.6.0" method="upgrade">
-	<name>com_flexicontent</name>
-	<creationDate>26 Jul 2011</creationDate>
+	<name>FLEXIcontent</name>
+	<creationDate>1 Aug 2011</creationDate>
 	<author>Emmanuel Danan</author>
 	<copyright>(C) 2009-2011 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.0 Beta2</version>
+	<version>2.0 Beta3 r729</version>
 	<description>A flexible content management system for Joomla! 1.6/1.7</description>
 
 	<languages folder="site/language">
@@ -50,7 +50,7 @@
 	</uninstall>
 
 	<administration>
-		<menu img="components/com_flexicontent/assets/images/flexicontent.png">COM_FLEXICONTENT</menu>
+		<menu img="components/com_flexicontent/assets/images/flexicontent.png">FLEXIcontent</menu>
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>admin.flexicontent.php</filename>
@@ -93,6 +93,7 @@
 			<param name="show_readmore" default="1" />
 			<param name="show_intro" default="1" />
 			<param name="form_extra_css" default="" />
+			<param name="autoflogin" default="1" />
 			<param name="show_icons" default="1" />
 			<param name="show_pdf_icon" default="1" />
 			<param name="show_print_icon" default="1" />
@@ -101,6 +102,8 @@
 			<param name="catlimit" default="100" />
 			<param name="limit" default="10" />
 			<param name="feed_summary" default="0" />
+			<param name="trigger_onprepare_content_cat" default="1" />
+			<param name="filter_types" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" />
 
 			<param name="upload_extensions" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP" />
 			<param name="upload_maxsize" default="10000000" />
@@ -136,10 +139,16 @@
 	<plugin name="selectmultiple" folder="plugins/selectmultiple">Multiple select list field</plugin>
 	<plugin name="text" folder="plugins/text">Text field</plugin>
 	<plugin name="textarea" folder="plugins/textarea">Textarea field</plugin>
+	<plugin name="textselect" folder="plugins/textselect">TextSelect field</plugin>
 	<plugin name="weblink" folder="plugins/weblink">Weblink field</plugin>
-
+	<plugin name="toolbar" folder="plugins/toolbar">Article toolbar field</plugin>
+	<plugin name="fcpagenav" folder="plugins/fcpagenav">Page navigation field</plugin>
+	<plugin name="fcloadmodule" folder="plugins/fcloadmodule">Load module field</plugin>
+	<plugin name="flexinotify" folder="plugins/flexicontent">Notifications plugin for FLEXIcontent (new!!!)</plugin>
 	<plugin name="flexisearch" folder="plugins/search">Search plugin for FLEXIcontent</plugin>
+	<plugin name="flexiadvsearch" folder="plugins/search">Advanced search plugin for flexicontent.</plugin>
 	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
+	<plugin name="flexiadvroute" folder="plugins/system">System plugin for advanced FLEXIcontent routing</plugin>
 </additional>
 
 <installfile>install.php</installfile>

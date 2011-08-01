@@ -38,7 +38,7 @@ if ($this->perms['cantags']) {
 	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".JUtility::getToken()."=1\", {
 				width: 260,
 				matchContains: false,
 				mustMatch: false,
@@ -122,7 +122,7 @@ function addtag(id, tagname) {
 	}
 	if(id) return;
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&tmpl=component&<?php echo JUtility::getToken();?>=1');
 }
 
 function submitbutton( pressbutton ) {

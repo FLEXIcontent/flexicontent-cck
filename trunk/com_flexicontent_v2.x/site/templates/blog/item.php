@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 250 2010-06-09 08:01:27Z emmanuel.danan $
+ * @version 1.5 stable $Id: item.php 558 2011-03-30 12:18:10Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -26,7 +26,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- BOF buttons -->
 	<p class="buttons">
 		<?php echo flexicontent_html::pdfbutton( $this->item, $this->params ); ?>
-		<?php echo flexicontent_html::mailbutton( 'items', $this->params, null , $this->item->slug ); ?>
+		<?php echo flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::editbutton( $this->item, $this->params ); ?>
 	</p>
@@ -109,6 +109,12 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php echo $this->item->event->beforeDisplayContent; ?>
 	<!-- EOF event beforeDisplayContent -->
 
+	<?php if (isset($this->item->toc)) : ?>
+	<!-- BOF TOC -->
+	<?php echo $this->item->toc; ?>
+	<!-- EOF TOC -->
+	<?php endif; ?>
+
 	<div class="description">
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
@@ -138,7 +144,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- EOF item informations -->
 
 	<!-- BOF comments -->
-	<?php if ($this->params->get('comments')) : ?>
+	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
 	<div class="comments">
 	<?php
 		if ($this->params->get('comments') == 1) :

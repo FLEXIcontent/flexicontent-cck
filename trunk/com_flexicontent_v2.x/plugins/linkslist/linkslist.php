@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: linkslist.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: linkslist.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.list
@@ -30,22 +30,26 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function plgFlexicontent_fieldsLinkslist( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_linkslist', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_linkslist', JPATH_ADMINISTRATOR);
+	}
+	
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsLinkslist::onDisplayField($field, $item);
 	}
 
-	function onDisplayField(&$field, $item)
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'linkslist') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		switch($separator)
 		{
@@ -86,7 +90,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		foreach ($items as $id => $item)
 		{
 			$checked  = in_array($id, $field->value) ? ' checked="checked"' : null;
-			$options[] = '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$id.'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$id.'</label>';			 
+			$options[] = '<label><input type="checkbox" class="'.$required.'" name="'.$field->name.'[]" value="'.$id.'" id="'.$field->name.'_'.$id.'"'.$checked.' />'.$id.'</label>';			 
 		}			
 			
 		$field->html = implode($separator, $options);
@@ -130,30 +134,34 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		if(!$post) return;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-		$listelements = explode("%% ", $field_elements);
-		$listarrays = array();
-		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
-			}
-
-		$i = 0;
-		$display = array();
-		foreach ($listarrays as $listarray) {
-			for($n=0, $c=count($post); $n<$c; $n++) {
-				if ($post[$n] == $listarray[0]) {
-					$display[] = $listarray[1];
-					}
-				} 
-			$i++;
-			}			
+		if ($field->issearch) {
+			$searchindex = '';
 			
-		$searchindex  = implode(' ', $display);
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+			$listelements = explode("%% ", $field_elements);
+			$listarrays = array();
+			foreach ($listelements as $listelement) {
+				$listarrays[] = explode("::", $listelement);
+				}
+	
+			$i = 0;
+			$display = array();
+			foreach ($listarrays as $listarray) {
+				for($n=0, $c=count($post); $n<$c; $n++) {
+					if ($post[$n] == $listarray[0]) {
+						$display[] = $listarray[1];
+						}
+					} 
+				$i++;
+				}			
+				
+			$searchindex  = implode(' ', $display);
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')

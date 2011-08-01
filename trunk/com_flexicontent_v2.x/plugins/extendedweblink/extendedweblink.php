@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: extendedweblink.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: extendedweblink.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.extendedweblink
@@ -22,23 +22,25 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	function plgFlexicontent_fieldsExtendedWeblink( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsExtendedWeblink::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'extendedweblink') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$default_value		= $field->parameters->get( 'default_value', '' ) ;
 		$size				= $field->parameters->get( 'size', 30 ) ;
 								
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_value) {
@@ -51,29 +53,18 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 		if ($multiple) {
 			$document	= & JFactory::getDocument();
-			if(!isset($document->jquery_ui_core)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
-				$document->jquery_ui_core = true;
-			}
-			if(!isset($document->jquery_ui_widget)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
-				$document->jquery_ui_widget = true;
-			}
-			if(!isset($document->jquery_ui_mouse)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
-				$document->jquery_ui_mouse = true;
-			}
-			if(!isset($document->jquery_ui_sortable)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
-				$document->jquery_ui_sortable = true;
-			}
 
 			//add the drag and drop sorting feature
 			$js = "
-			jQuery(function() {
-				jQuery( '#sortables_".$field->id."' ).sortable();
-			});
+			window.addEvent('domready', function(){
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
+					});			
+				});
 			";
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -86,8 +77,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					//var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
 					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
@@ -101,6 +91,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					thisNewField.getElements('span span').setHTML('0');
 
 					thisNewField.injectAfter(thisField);
+		
+					new Sortables($('sortables_".$field->id."'), {
+						'constrain': true,
+						'clone': true,
+						'handle': '.drag".$field->id."'
+					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
 						this.setOptions({duration: 600});
@@ -121,14 +117,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				//var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.destroy();
+						row.remove();
 					});
 				curRowNum".$field->id."--;
 				}
@@ -145,7 +140,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -180,17 +175,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					<table class="admintable"><tbody>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-						<td><input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+						<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 						</tr>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-						<td><input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+						<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 						</tr>
 						'.$linktext.'
 						'.$class.'
 						'.$id.'
 					</tbody></table>
-					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span>
+					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
 					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					
@@ -217,11 +212,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				<table class="admintable"><tbody>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-					<td><input class="urllink" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+					<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 					</tr>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-					<td><input class="urltitle" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+					<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 					</tr>
 					'.$linktext.'
 					'.$class.'
@@ -237,6 +232,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'extendedweblink') return;
+		if(!$post) return;
 		
 		// reformat the post
 		$newpost = array();
@@ -268,17 +264,21 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$post = $newpost;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		foreach ($post as $v)
-		{
-			$searchindex .= $v['link'];
-			$searchindex .= ' ';
-			$searchindex .= $v['title'];
-			$searchindex .= ' ';
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			foreach ($post as $v)
+			{
+				$searchindex .= $v['link'];
+				$searchindex .= ' ';
+				$searchindex .= $v['title'];
+				$searchindex .= ' ';
+			}
+			$searchindex .= ' | ';
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
 		}
-		$searchindex .= ' | ';
-		$field->search = $searchindex;
 	}
 
 

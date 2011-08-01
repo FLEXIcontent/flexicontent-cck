@@ -39,11 +39,11 @@ class FlexicontentController extends JController
 		}
 		$session  =& JFactory::getSession();
 		
-		$dopostinstall =& $session->get('flexicontent.postinstall', true);
+		$dopostinstall =& $session->get('flexicontent.postinstall');
 		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
-		
+
 		$allplgpublish =& $session->get('flexicontent.allplgpublish');
 		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
 			$model 			= $this->getModel('flexicontent');
@@ -51,8 +51,7 @@ class FlexicontentController extends JController
 			$session->set('flexicontent.allplgpublish', $allplgpublish);
 		}
 		
-		//if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
-		if($view && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -70,13 +69,13 @@ class FlexicontentController extends JController
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
+		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 	}
 
 	function getPostinstallState() {
 		$model 				= $this->getModel('flexicontent');
 		$existtype 			= & $model->getExistType();
 		$existfields 		= & $model->getExistFields();
-		//$allplgpublish 		= & $model->getAllPluginsPublished();
 		$existlang	 		= & $model->getExistLanguageColumn();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
@@ -85,12 +84,12 @@ class FlexicontentController extends JController
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
-		$dopostinstall = false;
-		if ((!$existtype) || (!$existfields) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)) {
-			$dopostinstall = true;
+		$existmenuitems	 	= & $model->getExistMenuItems();
+		$checkinitialpermission = $model->checkInitialPermission();
+		$dopostinstall = true;
+		if ((!$existfields) || (!$existtype) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) || (!$existmenuitems) || (!$checkinitialpermission)) {
+			$dopostinstall = false;
 		}
-		if(!$model->checkInitialPermission())
-			$dopostinstall = true;
 		return $dopostinstall;
 	}
 	/**
@@ -107,6 +106,7 @@ class FlexicontentController extends JController
 	 *
 	 */
 	function saveacl() {
+
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		$option = JRequest::getVar('option');
 		$mainframe = &JFactory::getApplication();
@@ -201,7 +201,62 @@ class FlexicontentController extends JController
 			}
 		}
 	}
+	
+	/**
+	 * Method to create default menu items used for SEF links
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createMenuItems()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$db 	=& JFactory::getDBO();
+		$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
+		$flexi_comp_id = $db->loadResult();	
+		
+		$db->setQuery("DELETE FROM #__menu_types WHERE menutype='flexihiddenmenu' ");	
+		$db->query();
+		
+		$db->setQuery("INSERT INTO #__menu_types (`menutype`,`title`,`description`) ".
+			"VALUES ('flexihiddenmenu', 'FLEXIcontent Hidden Menu', 'A hidden menu to host Flexicontent needed links')");
+		$db->query();
+		
+		$db->setQuery("DELETE FROM #__menu WHERE menutype='flexihiddenmenu' ");	
+		$db->query();
+		
+		$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`ordering`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`)
+		VALUES ".
+		"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,1,0,'0000-00-00 00:00:00',0,0,'rootcat=0',0,0,0)";
+		
+		$db->setQuery($query);
+		$result = $db->query();
+		if($result) {
+			// Save the created menu item as default_menu_itemid for the component
+			$component =& JComponentHelper::getParams('com_flexicontent');
+			$component->set('default_menu_itemid', $db->insertid());
+			$cparams = $component->toString();
+
+			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+
+			$query 	= 'UPDATE #__extensions'
+					. ' SET params = ' . $db->Quote($cparams)
+					. ' WHERE extension_id = ' . $flexi->id;
+					;
+			$db->setQuery($query);
+			$result = $db->query();
+		}
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+	
 	/**
 	 * Method to create default fields data
 	 * 
@@ -261,12 +316,14 @@ VALUES
 				. ' AND (folder = ' . $db->Quote('flexicontent_fields')
 				. ' OR element = ' . $db->Quote('flexisearch')
 				. ' OR element = ' . $db->Quote('flexisystem') . ')'
+				. ' OR element = ' . $db->Quote('flexiadvsearch')
+				. ' OR element = ' . $db->Quote('flexiadvroute')
 				;
 		
 		$db->setQuery($query);
 		if (!$db->query()) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&tmpl=component">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 			} else {
 				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
 				return false;
@@ -298,7 +355,7 @@ VALUES
 		$success = JPath::setPermissions($phpthumbcache, '0777', '0777');
 		if (!$success) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&tmpl=component">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 			} else {
 				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
 				return false;
@@ -410,7 +467,7 @@ VALUES
 					`state` int(3) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
-					) TYPE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
+					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
 					;
 		$db->setQuery($query);
 		
@@ -572,6 +629,8 @@ VALUES
 					$db->query();
 				}*/
 				foreach($fields as $field) {
+					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					
 					// process field mambots onBeforeSaveField
 					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 

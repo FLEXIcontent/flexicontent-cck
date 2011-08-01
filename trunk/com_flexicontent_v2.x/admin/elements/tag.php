@@ -37,7 +37,7 @@ class JFormFieldTag extends JFormField
 	* @var		string
 	*/
 	var	$type = 'Tag';
-	
+
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		$value		= $this->__get('value');
@@ -51,6 +51,14 @@ class JFormFieldTag extends JFormField
 		}
 
 		$js = "
+		window.addEvent( 'domready', function()
+		{
+			$('remove').addEvent('click', function(){
+				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_TAG' )."');
+				$('a_id').setProperty('value', '0');
+			});
+		});
+
 		function qfSelectTag(id, title) {
 			document.getElementById('a_id').value = id;
 			document.getElementById('a_name').value = title;

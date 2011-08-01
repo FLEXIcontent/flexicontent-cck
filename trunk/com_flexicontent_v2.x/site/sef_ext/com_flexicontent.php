@@ -71,7 +71,7 @@ $task 		= isset($task) ? @$task : null;
 
 switch ($view) {
 	
-	case 'items' :
+	case 'item' :
 
 		if (!empty($id)) {
 		

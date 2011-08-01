@@ -17,15 +17,19 @@
 		<language tag="fr-FR">fr-FR.plg_system_flexisystem.ini</language>
 	</languages>
 	<config>
-	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">
+	<fields name="params">
 		<fieldset name="basic">
-			<field name="redirect_cats" type="flexiusergroup" size="10" multiple="true" default="" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
-				<option value="-1">FLEXI_SYSTEM_NO_REDIRECT</option>
-				<option value="-2">All User Groups</option>
+			<field name="redirect_cats" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
+				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="23">MANAGER</option>
+				<option value="24">ADMINISTRATOR</option>
+				<option value="25">SUPER ADMINISTRATOR</option>
 			</field>
-			<field name="redirect_articles" type="flexiusergroup" size="10" multiple="true" default="" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
-				<option value="-1">FLEXI_SYSTEM_NO_REDIRECT</option>
-				<option value="-2">All User Groups</option>
+			<field name="redirect_articles" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
+				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="23">MANAGER</option>
+				<option value="24">ADMINISTRATOR</option>
+				<option value="25">SUPER ADMINISTRATOR</option>
 			</field>
 		</fieldset>
 	</fields>

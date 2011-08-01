@@ -18,6 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+jimport('joomla.html.html');
 jimport('joomla.form.formfield');
 /**
  * Renders a fields element
@@ -30,11 +31,13 @@ jimport('joomla.form.formfield');
 class JFormFieldSeparator extends JFormField{
 	/**
 	 * Element name
+	 *
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'separator';
-	protected function getInput() {
+	var	$type = 'Separator';
+
+	function getInput() {
 		$level = $this->element->getAttribute('level');
 		if ($level == 'level2') {
 			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
