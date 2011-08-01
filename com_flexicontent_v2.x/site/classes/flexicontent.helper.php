@@ -1401,6 +1401,8 @@ class flexicontent_tmpl
 	 * @return object
 	 */
 	function getFieldsByPositions($folder, $type) {
+		if ($type=='item') $type='items';
+		
 		static $templates;
 		if(!isset($templates[$folder])) {
 			$templates[$folder] = array();
