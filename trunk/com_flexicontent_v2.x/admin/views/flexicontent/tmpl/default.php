@@ -268,7 +268,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
                 
                   <?php
 			if($this->params->get('show_updatecheck', 1) == 1) {	 
-				if(@$this->check['connect'] == 0) {
+				/*if(@$this->check['connect'] == 0) {
 					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
 				} else {
 					if (@$this->check['current'] == 0 ) {	 
@@ -276,11 +276,12 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					} else {
 						$title = JText::_( 'FLEXI_NEW_VERSION' );
 					}
-				}
+				}*/
 				$this->document->addScriptDeclaration("
 				jQuery(document).ready(function () {
 					jQuery('#updatecomponent').click(function(e){
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
+							jQuery('#displayfversion').html('<p class=\"qf_centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							jQuery.ajax({
 								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
 								success: function(str) {
@@ -292,16 +293,12 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				});
 				");
 				echo $this->pane->startPane( 'stat-pane' );
-				echo $this->pane->startPanel( $title, 'updatecomponent' );
+				echo $this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
 				echo "<div id=\"displayfversion\"></div>";
 				echo $this->pane->endPanel();
 				echo $this->pane->endPane();
 			}
-			
 			?>
-                
-				<?php echo $this->pane->endPane();
-				?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
