@@ -566,7 +566,7 @@ window.addEvent('domready', function(){
 			</td>
 			
 			<td align="center">
-				<?php echo ($row->config->ilayout ? $row->config->ilayout : "default<sup>[1]</sup>") ?>
+				<?php echo (@$row->config->ilayout ? $row->config->ilayout : "default<sup>[1]</sup>") ?>
 			</td>
 			
 			<?php if ($this->CanOrder) : ?>

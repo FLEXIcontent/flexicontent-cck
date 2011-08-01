@@ -121,7 +121,8 @@ class FlexicontentModelItems extends JModel
 	   		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$item->config);
 	   		$item->config = new stdClass();
 	   		foreach($config_arr as $config_var) {
-	   			list($varname,$varval) = explode('=',$config_var);
+	   			if(!$config_var) continue;
+	   			list($varname,$varval) = explode('=', $config_var);
 	   			if(!empty($varname)) $item->config->{$varname} = $varval;
 	   		}
 			}
