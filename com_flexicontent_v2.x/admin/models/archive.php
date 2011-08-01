@@ -128,6 +128,41 @@ class FlexicontentModelArchive extends JModelList{
 		return $this->_data;
 	}
 
+	/**
+	 * Method to get the total nr of items
+	 *
+	 * @access public
+	 * @return integer
+	 */
+	function getTotal()
+	{
+		// Lets load the content if it doesn't already exist
+		if (empty($this->_total))
+		{
+			$query = $this->_buildQuery();
+			$this->_total = $this->_getListCount($query);
+		}
+
+		return $this->_total;
+	}
+
+	/**
+	 * Method to get a pagination object for the items
+	 *
+	 * @access public
+	 * @return integer
+	 */
+	function getPagination()
+	{
+		// Lets load the content if it doesn't already exist
+		if (empty($this->_pagination))
+		{
+			jimport('joomla.html.pagination');
+			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		}
+
+		return $this->_pagination;
+	}
 
 	/**
 	 * Method to build the query for the categories
@@ -136,30 +171,71 @@ class FlexicontentModelArchive extends JModelList{
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getListQuery() {
+	function _buildQuery()
+	{
 		// Get the WHERE and ORDER BY clauses for the query
+		$where		= $this->_buildContentWhere();
+		$orderby	= $this->_buildContentOrderBy();
+
+		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
+					. ' FROM #__content AS i'
+					. ' LEFT JOIN #__categories AS c ON i.catid=c.id'
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+					. $where
+					. $orderby
+					;
+
+		return $query;
+	}
+
+	/**
+	 * Method to build the orderby clause of the query for the items
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentOrderBy()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$query = $this->_db->getQuery(true);
+
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', i.ordering';
+
+		return $orderby;
+	}
+
+	/**
+	 * Method to build the where clause of the query for the items
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentWhere()
+	{
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.archive.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$where = array();
 		
-		$query->select('DISTINCT rel.itemid, i.*, u.name AS editor');
-		$query->from('#__content AS i');
-		$query->join('LEFT', '#__categories as c ON i.catid=c.id');
-		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id');
-		$query->join('LEFT', '#__users AS u ON u.id = i.checked_out');
-		$query->where('c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY));
-		$query->where('i.state = -1');
-		$query->where('LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
-		$query->order($filter_order.' '.$filter_order_Dir.', i.ordering');
+		$where[] = ' i.state = -1';
+		$where[] = ' c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY);
+		
+		if ($search) {
+			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+		}
 
-		//echo str_replace('#__', 'jos_', $query->__toString());
-		return $query;
+		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+
+		return $where;
 	}
 
 	/**

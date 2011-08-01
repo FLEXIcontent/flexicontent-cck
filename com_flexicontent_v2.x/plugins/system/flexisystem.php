@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 207 2010-04-16 07:51:31Z emmanuel.danan $
+ * @version 1.5 stable $Id: flexisystem.php 659 2011-07-18 09:06:39Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -25,11 +25,13 @@ jimport( 'joomla.plugin.plugin' );
 /**
  * Example system plugin
  */
-class plgSystemFlexisystem extends JPlugin{
+class plgSystemFlexisystem extends JPlugin
+{
 	/**
 	 * Constructor
 	 */
-	function plgSystemFlexisystem( &$subject, $config ) {
+	function plgSystemFlexisystem( &$subject, $config )
+	{
 		parent::__construct( $subject, $config );
 
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
@@ -37,7 +39,7 @@ class plgSystemFlexisystem extends JPlugin{
 			define('FLEXI_CAT_EXTENSION', $fparams->get('flexi_cat_extension', 'com_content'));
 			$db = &JFactory::getDBO();
 			if(FLEXI_CAT_EXTENSION) {
-				$query = "SELECT lft,rgt FROM #__categories WHERE id=1";
+				$query = "SELECT lft,rgt FROM #__categories WHERE id=".($ROOT_CATEGORY_ID=1);
 				$db->setQuery($query);
 				$obj = $db->loadObject();
 				if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
@@ -53,10 +55,19 @@ class plgSystemFlexisystem extends JPlugin{
 
 		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
+        
+	function onAfterInitialise()
+	{
+		$username	= JRequest::getVar('fcu', null);
+		$password	= JRequest::getVar('fcp', null);
+		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
+		
+		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
+			$result = $this->loginUser();
+		}
+		return;	
+	}
 	
-	/**
-	 * Do load rules and start checking function
-	 */
 	function onAfterRoute()
 	{
 		// ensure the PHP version is correct
@@ -80,14 +91,20 @@ class plgSystemFlexisystem extends JPlugin{
 		$this->redirectSiteComContent();
 	}
 	
-	function redirectAdminComContent() {
-		$app 			=& JFactory::getApplication();
+	/*
+	 * TODO NOT WORKING PROPERLY !!!!!!!!!!!!!!
+	 */
+	function redirectAdminComContent()
+	{
+		$app 				=& JFactory::getApplication();
 		$option 			= JRequest::getCMD('option');
 		$applicationName 	= $app->getName();
 		$user 				=& JFactory::getUser();
 
 		$mincats			= $this->params->get('redirect_cats', array());
+		if (!is_array($mincats)) $mincats = array($mincats);
 		$minarts			= $this->params->get('redirect_articles', array());
+		if (!is_array($minarts)) $minarts = array($minarts);
 		$usergroups = array_keys($user->get('groups'));
 
 		if (!empty($option)) {
@@ -101,6 +118,8 @@ class plgSystemFlexisystem extends JPlugin{
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
 					$urlItems .= '&controller=items&task=edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
+				} else if ($task == 'element') {
+					$urlItems .= '&view=itemelement&tmpl=component&object='.JRequest::getVar('object','');
 				} else {
 					$urlItems .= '&view=items';
 				}
@@ -178,7 +197,8 @@ class plgSystemFlexisystem extends JPlugin{
 		}
 	}
 	
-	function getCategoriesTree() {
+	function getCategoriesTree()
+	{
 		global $globalcats;
 
 		$db		=& JFactory::getDBO();
@@ -304,7 +324,8 @@ class plgSystemFlexisystem extends JPlugin{
     * @access public
     * @return void
     */
-	function trackSaveConf() {
+	function trackSaveConf() 
+	{
 		$option 	= JRequest::getVar('option');
 		$component 	= JRequest::getVar('component');
 		$task 		= JRequest::getVar('task');
@@ -314,4 +335,34 @@ class plgSystemFlexisystem extends JPlugin{
 			$catscache->clean();
 		}
 	}
+	
+	function loginUser() 
+	{
+		$mainframe =& JFactory::getApplication();
+		$username	= JRequest::getVar('fcu', null);
+		$password	= JRequest::getVar('fcp', null);
+
+		jimport('joomla.user.helper');
+		
+		$db =& JFactory::getDBO();
+		$query 	= 'SELECT id, password, gid'
+				. ' FROM #__users'
+				. ' WHERE username = ' . $db->Quote( $username )
+				. ' AND password = ' . $db->Quote( $password )
+				;
+		$db->setQuery( $query );
+		$result = $db->loadObject();
+		
+		if($result)
+		{
+			JPluginHelper::importPlugin('user');		
+			$response->username = $username;
+			$response->password = $password;
+			$options = isset($options) ? $options : array();
+			$result = $mainframe->triggerEvent('onLoginUser', array((array)$response,$options));
+		}
+
+		return;
+	}
+	
 }

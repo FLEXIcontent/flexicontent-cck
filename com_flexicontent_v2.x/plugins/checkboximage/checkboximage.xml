@@ -13,8 +13,8 @@
 		<filename plugin="checkboximage">checkboximage.php</filename>
 	</files>
 	<config>
-	<fields name="attribs">
-		<fieldset name="standard">
+	<fields name="params">
+		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
@@ -35,6 +35,15 @@
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
+			</field>
+			<field name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
 			</field>
 		</fieldset>
 	</fields>

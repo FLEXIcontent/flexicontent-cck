@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 327 2010-06-22 11:36:53Z enjoyman $
+ * @version 1.5 stable $Id: flexicontent.helper.php 632 2011-07-08 02:01:38Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -20,7 +20,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.form.form');
 
-class flexicontent_html{
+class flexicontent_html
+{
 	/**
 	 * Strip html tags and cut after x characters
 	 *
@@ -29,7 +30,8 @@ class flexicontent_html{
 	 * @return 	string
 	 * @since 1.5
 	 */
-	function striptagsandcut( $text, $chars=null ) {
+	function striptagsandcut( $text, $chars=null )
+	{
 		// first strip html tags
 		$cleantext = strip_tags($text);
 
@@ -62,20 +64,21 @@ class flexicontent_html{
 	 * @return 	string
 	 * @since 1.5
 	 */
-	function extractimagesrc( $row ) {
+	function extractimagesrc( $row )
+	{
 		jimport('joomla.filesystem.file');
 
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
-
+			
 		preg_match ($regex, $row->introtext, $matches);
-
+		
 		if(!count($matches)) preg_match ($regex, $row->fulltext, $matches);
-
+		
 		$images = (count($matches)) ? $matches : array();
-
+		
 		$image = '';
 		if (count($images)) $image = $images[2];
-
+		
 		$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
 
 		return $image;
@@ -90,7 +93,7 @@ class flexicontent_html{
 	 */
 	function printbutton( $print_link, &$params )
 	{
-		if ($params->get( 'show_print_icon' )) {
+		if ( $params->get('show_print_icon') || JRequest::getCmd('print') ) {
 
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 
@@ -126,7 +129,7 @@ class flexicontent_html{
 	 */
 	function mailbutton($view, &$params, $slug = null, $itemslug = null )
 	{
-		if ($params->get('show_email_icon')) {
+		if ( $params->get('show_email_icon') && !JRequest::getCmd('print') ) {
 
 			$uri    =& JURI::getInstance();
 			$base  	= $uri->toString( array('scheme', 'host', 'port'));
@@ -134,7 +137,7 @@ class flexicontent_html{
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
-			} elseif($view == 'items') {
+			} elseif($view == 'item') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
@@ -169,7 +172,7 @@ class flexicontent_html{
 	 */
 	function pdfbutton( $item, &$params)
 	{
-		if ($params->get('show_pdf_icon')) {
+		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'pdf_button.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
@@ -205,7 +208,7 @@ class flexicontent_html{
 			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)))
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
@@ -223,7 +226,7 @@ class flexicontent_html{
 			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
@@ -404,7 +407,8 @@ class flexicontent_html{
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid ) {
+ 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
+	{
 		$live_path = JURI::base();
 
 		$document =& JFactory::getDocument();
@@ -421,7 +425,8 @@ class flexicontent_html{
 		
 		global $VoteAddScript;
 		
-	 	if (!$VoteAddScript) { 
+	 	if (!$VoteAddScript)
+	 	{ 
 			$css 	= $live_path.'components/com_flexicontent/assets/css/fcvote.css';
 			$js		= $live_path.'components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
@@ -442,17 +447,18 @@ class flexicontent_html{
 				);
 			-->
 			</script>";
-     		$VoteAddScript = 1;
+
+			$css = '
+			.'.$class.' .fcvote {line-height:'.$dim.'px;}
+			.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
+			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
+			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
+			';
+			$document->addStyleDeclaration($css);
+
+     	$VoteAddScript = 1;
 	 	}
 		
-		$css = '
-		.'.$class.' .fcvote {line-height:'.$dim.'px;}
-		.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
-		.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
-		.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
-		';
-		$document->addStyleDeclaration($css);
-
 		if ($rating_count != 0) {
 			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*20,2);
 		} elseif ($unrated == 0) {
@@ -504,7 +510,8 @@ class flexicontent_html{
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function favicon($field, $favoured) {
+	function favicon($field, $favoured)
+	{
         	$live_path 	= JURI::base();
 		$user		= & JFactory::getUser();
 		$document 	= & JFactory::getDocument();
@@ -566,7 +573,8 @@ class flexicontent_html{
 	 * @return array
 	 * @since 1.5
 	 */
-	function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"') {
+	function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"')
+	{
 		$typelist 	= array();
 		
 		if($top) {
@@ -586,7 +594,8 @@ class flexicontent_html{
 	 * @return array
 	 * @since 1.5
 	 */
-	function buildauthorsselect($list, $name, $selected, $top, $class = 'class="inputbox"') {
+	function buildauthorsselect($list, $name, $selected, $top, $class = 'class="inputbox"')
+	{
 		$typelist 	= array();
 		
 		if($top) {
@@ -1068,6 +1077,12 @@ class flexicontent_html{
 
 class flexicontent_upload
 {
+	function makeSafe($file) {//The range \xE01-\xE5B is thai language.
+		$file = str_replace(" ", "", $file);
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\xE01-\xE5B\.\_\- ]#', '#^\.#');
+		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+		return preg_replace($regex, '', $file);
+	}
 	function check($file, &$err, &$params)
 	{
 		if (!$params) {
@@ -1240,14 +1255,16 @@ class flexicontent_upload
 	}
 }
 
-class flexicontent_tmpl {
+class flexicontent_tmpl
+{
 	/**
-	 * Get the template list
+	 * Parse all FLEXIcontent templates files
 	 *
 	 * @return 	object	object of templates
 	 * @since 1.5
 	 */
-	function getTemplates($tmpldir='') {
+	function parseTemplates($tmpldir='')
+	{
 		jimport('joomla.filesystem.file');
 		$themes = new stdClass();
 		
@@ -1258,7 +1275,7 @@ class flexicontent_tmpl {
 			$tmplxml = $tmpldir.DS.$tmpl.DS.'item.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->items->{$tmpl}->name 		= $tmpl;
-				$themes->items->{$tmpl}->view 		= 'items';
+				$themes->items->{$tmpl}->view 		= 'item';
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
 				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';	
 				//$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
@@ -1347,6 +1364,24 @@ class flexicontent_tmpl {
 			}
 		}
 		return $themes;
+	}
+
+	function getTemplates()
+	{
+		/*if (FLEXI_CACHE)
+		{
+			// add the templates to templates cache
+			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache->setCaching(1); 		//force cache
+			$tmplcache->setLifeTime(84600); //set expiry to one day
+		    $tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
+		}
+		else 
+		{*/
+			$tmpls = flexicontent_tmpl::parseTemplates();
+		//}
+	    
+	    return $tmpls;
 	}
 
 	function getThemes($tmpldir='')
@@ -1477,10 +1512,11 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
+		if(!$id && $justvalue) {$v=0;return $v;}
 		if($id) {
 			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
 			return $return;
-		}elseif($justvalue) {$v=0;return $v;}
+		}
 		return $g_lastversions;
 	}
 	function &getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
@@ -1489,7 +1525,8 @@ class FLEXIUtilities {
 			$db =& JFactory::getDBO();
 			$query = "SELECT c.id,c.version FROM #__content as c"
 					. " JOIN #__categories as cat ON c.catid=cat.id"
-					. " WHERE cat.lft >= '".FLEXI_LFT_CATEGORY."' AND cat.rgt <= '".FLEXI_RGT_CATEGORY."';";
+					. " WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";
+					//. " AND cat.lft >= '".FLEXI_LFT_CATEGORY."' AND cat.rgt <= '".FLEXI_RGT_CATEGORY."';";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
@@ -1498,10 +1535,11 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
+		if(!$id && $justvalue) {$v=0;return $v;}
 		if($id) {
 			$return = $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
 			return $return;
-		}elseif($justvalue) {$v=0;return $v;}
+		}
 		return $g_currentversions;
 	}
 	function &getLastItemVersion($id) {
@@ -1518,20 +1556,17 @@ class FLEXIUtilities {
 	function &currentMissing() {
 		static $status;
 		if(!$status) {
-			$status = array();
 			$db =& JFactory::getDBO();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-					" JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
 					" JOIN #__categories as cat ON c.catid=cat.id" .
-					" WHERE cat.lft >= '".FLEXI_LFT_CATEGORY."' AND cat.rgt <= '".FLEXI_RGT_CATEGORY."' AND c.version > '1';";
+					" WHERE c.version > '1' AND iv.version IS NULL AND cat.extension='".FLEXI_CAT_EXTENSION."' LIMIT 0,1";
 			$db->setQuery($query);
-			//echo str_replace("#__", "jos_", $query);
 			$rows = $db->loadObjectList("id");
-			
-			foreach($rows as $r) {
-				if(!$r->iversion) {
-					$status[$r->id] = array('id'=>$r->id, 'version'=>$r->version);
-				}
+			$rows = is_array($rows)?$rows:array();
+			$status = false;
+			if(count($rows)>0) {
+				$status = true;
 			}
 			unset($rows);
 		}

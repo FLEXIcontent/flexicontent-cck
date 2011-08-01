@@ -19,7 +19,8 @@ if($flexi_cat_extension = $params->get('flexi_cat_extension','com_content')) {
 		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 	}
 }
+if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 define('FLEXI_VERSION',	'2.0');
-define('FLEXI_RELEASE',	'Beta (r686)');
+define('FLEXI_RELEASE',	'Beta (r722)');
 ?>

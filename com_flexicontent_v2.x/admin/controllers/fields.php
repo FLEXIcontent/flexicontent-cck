@@ -381,7 +381,10 @@ class FlexicontentControllerFields extends FlexicontentController{
 		//$id		= JRequest::getVar( 'id', 0 );
 		JRequest::setVar( 'view', 'field' );
 		//JRequest::setVar( 'hidemainmenu', 1 );
-
+		
+		// Import field to execute its constructor, e.g. needed for loading language file etc
+		JPluginHelper::importPlugin('flexicontent_fields', JRequest::getVar('field_type'));
+		
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
 

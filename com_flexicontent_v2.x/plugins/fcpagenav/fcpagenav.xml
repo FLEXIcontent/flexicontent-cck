@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Page Navigation</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>January 2011</creationDate>
+	<copyright>Copyright (C) 2011 Emmanuel Danan</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.vistamedia.fr</authorUrl>
+	<version>1.2</version>
+	<description>Page navigation field plugin for FLEXIcontent</description>
+	<files>
+		<filename plugin="fcpagenav">fcpagenav.php</filename>
+		<folder plugin="fcpagenav">fcpagenav</folder>
+	</files>
+	<config>
+	<fields name="params">
+		<fieldset name="basic" addfieldpath="/plugins/flexicontent_fields/fcpagenav">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="backend_hidden" type="hidden" default="1" />
+		</fieldset>
+		<fieldset name="group-fcpagenav">
+			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="use_tooltip" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_USETIP" description="FLEXI_FIELD_PAGENAV_USETIP_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="tooltip_title_next" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT" description="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT_DESC" />
+			<field name="tooltip_title_prev" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV" description="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV_DESC" />
+			<field name="use_title" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USETITLE" description="FLEXI_FIELD_PAGENAV_USETITLE_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="FLEXI_FIELD_PAGENAV_PREV_DESC" />
+			<field name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="FLEXI_FIELD_PAGENAV_NEXT_DESC" />
+			<field name="use_category_link" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" />
+			<field name="type_to_exclude" type="types" default="" label="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE" description="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE_DESC" />
+		</fieldset>
+	</fields>
+	</config>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcpagenav.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_fcpagenav.ini</language>
+	</languages>
+</install>

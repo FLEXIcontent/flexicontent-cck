@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: text.php 691 2011-07-26 11:15:35Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -20,10 +20,13 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsText extends JPlugin{
 	function plgFlexicontent_fieldsText( &$subject, $params ) {
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+        	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item) {
+	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->field_type != 'text') return;
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
@@ -37,13 +40,13 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
-						
+
 		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
-		$required 	= $required ? ' class="required"' : '';
+		$required 	= $required ? ' required' : '';
 		
 		// initialise property
-		if($item->getValue('version') < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
@@ -55,31 +58,21 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			}
 		}
 		
-		if ($multiple) {// handle multiple records
+		if ($multiple) // handle multiple records
+		{
 			$document	= & JFactory::getDocument();
-			if(!isset($document->jquery_ui_core)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
-				$document->jquery_ui_core = true;
-			}
-			if(!isset($document->jquery_ui_widget)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
-				$document->jquery_ui_widget = true;
-			}
-			if(!isset($document->jquery_ui_mouse)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
-				$document->jquery_ui_mouse = true;
-			}
-			if(!isset($document->jquery_ui_sortable)){
-				$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
-				$document->jquery_ui_sortable = true;
-			}
 
 			//add the drag and drop sorting feature
 			$js = "
-			jQuery(function() {
-				jQuery( '#sortables_".$field->id."' ).sortable();
-			});
+			window.addEvent('domready', function(){
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
+					});			
+				});
 			";
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -88,22 +81,29 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 			function addField".$field->id."(el) {
 				if((curRowNum".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
+
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					//var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					thisNewField.getFirst().setProperty('value','');
 
 					thisNewField.injectAfter(thisField);
+		
+					new Sortables($('sortables_".$field->id."'), {
+						'constrain': true,
+						'clone': true,
+						'handle': '.drag".$field->id."'
+					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
 						this.setOptions({duration: 600});
 						this.start({ 'opacity': 0 });
-					})
-					.chain(function(){
-						this.setOptions({duration: 300});
-						this.start({ 'opacity': 1 });
-					});
+						})
+						.chain(function(){
+							this.setOptions({duration: 300});
+							this.start({ 'opacity': 1 });
+						});
+
 					curRowNum".$field->id."++;
 					}
 				}
@@ -113,15 +113,15 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 				var field	= $(el);
 				var row		= field.getParent();
-				//var fx	= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				
 				fx.start({
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.destroy();
+						row.remove();
 					});
-					curRowNum".$field->id."--;
+				curRowNum".$field->id."--;
 				}
 			}
 			";
@@ -135,7 +135,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -144,30 +144,33 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 			$move2 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 			$n = 0;
-			$field->html = '<ul id="sortables_'.$field->id.'" style="float:left;">';
+			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
-				$field->html	.= '<li>'.$pretext.'<input name="jform['.$field->name.'][]" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag">'.$move2.'</span></li>';
+				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
 				}
 			$field->html .=	'</ul>';
 			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
-			$field->html	= '<div>'.$pretext.'<input name="jform['.$field->name.'][]" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';
+			$field->html	= '<div>'.$pretext.'<input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';
 		}
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file ) {
+	function onBeforeSaveField( $field, &$post, &$file )
+	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
-		
+		if(!$post) return;
 		$newpost = array();
 		$new = 0;
 
-		foreach ($post as $n=>$v) {
-			if ($post[$n] != '') {
+		foreach ($post as $n=>$v)
+		{
+			if ($post[$n] != '')
+			{
 				$newpost[$new] = $post[$n];
 			}
 			$new++;
@@ -184,12 +187,35 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		}
 
 		$searchindex .= ' | ';
-		$field->search = $searchindex;
-		
+
+		$field->search = $field->issearch ? $searchindex : '';
+
+		if($field->isadvsearch) {
+			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
+		}
+	}
+
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'text') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='text';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','text','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
@@ -248,5 +274,34 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		} else {
 			$field->{$prop} = '';
 		}
+	}
+	
+	function onFLEXIAdvSearch(&$field, $item_id, $fieldsearch) {
+		if($field->field_type!='text') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			if((stristr($field->value, $fsearch)!== FALSE)) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $field->value;
+				$resultfields[] = $obj;
+				break;
+			}
+		}
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			$objs = is_array($objs)?$objs:array();
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		return $resultfields;
 	}
 }

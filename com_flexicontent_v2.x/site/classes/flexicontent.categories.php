@@ -18,7 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-class flexicontent_cats {
+class flexicontent_cats
+{
 	/**
 	 * Parent Categories
 	 *
@@ -60,12 +61,11 @@ class flexicontent_cats {
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
 				.' FROM #__categories'
 				.' WHERE id ='. $db->Quote((int)$cid)
-				.' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND rgt <= ' . $db->Quote(FLEXI_RGT_CATEGORY)
+				//.' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND rgt <= ' . $db->Quote(FLEXI_RGT_CATEGORY)
 				.' AND published = 1'
 			;
 			$db->setQuery($query);
-			if($object = $db->loadObject())
-				$this->category[] = $object;
+			$this->category[] 	= $db->loadObject();
 		}
 	}
 	
@@ -73,7 +73,7 @@ class flexicontent_cats {
 	{
 		$db 		=& JFactory::getDBO();
 		
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND rgt<='.$db->Quote(FLEXI_RGT_CATEGORY);
+		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid;// .' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND rgt<='.$db->Quote(FLEXI_RGT_CATEGORY);
 		$db->setQuery( $query );
 
 		if($cid != 0) {
@@ -92,21 +92,19 @@ class flexicontent_cats {
 	}
 	
 	/**
-	    * Get the categorie tree
-	    *
-	    * @return array
-	    */
-	function getCategoriesTree( $published=null ) {
+    * Get the categorie tree
+    *
+    * @return array
+    */
+	function getCategoriesTree( $published=null )
+	{
 		$db			=& JFactory::getDBO();
-		$where		= array();
-		//$where[] = "parent_id != '0'";
-		if ($published) $where[] = 'published = 1';
-		if(defined('FLEXI_CAT_EXTENSION')) {
-			if ($published) {
-				$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
-			} else {
-				$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
-			}
+		
+		if ($published) {
+			$where[] = 'published = 1';
+			$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
+		} else {
+			$where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
@@ -182,7 +180,7 @@ class flexicontent_cats {
 				}
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 		= "{$indent}{$txt}";
+				$list[$id]->treename 		= "$indent$txt";
 				$list[$id]->ancestors 		= $ancestors;
 				$list[$id]->childrenarray 	= @$children[$id];
 				$list[$id]->children 		= count( @$children[$id] );
@@ -203,7 +201,8 @@ class flexicontent_cats {
 	 * @param string $class
 	 * @return void
 	 */
-	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true) {
+	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true)
+	{
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
 

@@ -30,7 +30,7 @@ jimport('joomla.form.formfield');
 
 class JFormFieldQfcategory extends JFormField
 {
-   /**
+ /**
 	* Element name
 	*
 	* @access	protected
@@ -39,9 +39,7 @@ class JFormFieldQfcategory extends JFormField
 	var	$type = 'Qfcategory';
 
 	function getInput() {
-		//fetchElement($name, $value, &$node, $control_name)
 		$doc 		=& JFactory::getDocument();
-		//$fieldName	= $control_name.'['.$name.']';
 		$value		= $this->__get('value');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 

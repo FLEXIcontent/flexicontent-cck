@@ -180,7 +180,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" '
 				. ($rootcat ? 'AND c.parent_id = ' . $rootcat. ' ' : ' ')
 				. $and
@@ -234,7 +234,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" '
 				. ($rootcat ? 'AND c.parent_id = ' . $rootcat. ' ' : ' ')
 				. $and
@@ -343,7 +343,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ' AND c.parent_id = '.(int)$id
 				. $and
 				//. ' ORDER BY '.$ordering
@@ -394,7 +394,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 				. ' WHERE c.published = 1'
-				. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ' AND c.access <= '.$gid
 				. $and
 				. ' AND i.state IN (1, -5)'

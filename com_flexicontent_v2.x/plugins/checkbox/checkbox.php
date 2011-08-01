@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: checkbox.php 341 2010-06-27 09:14:47Z emmanuel.danan $
+ * @version 1.0 $Id: checkbox.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.checkbox
@@ -22,22 +22,23 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 	function plgFlexicontent_fieldsCheckbox( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
+        	JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
-
-	function onDisplayField(&$field, $item)
-	{
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsCheckbox::onDisplayField($field, $item);
+	}
+	function onDisplayField(&$field, &$item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkbox') return;
 
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
-		$required 	= $required ? ' class="required"' : '';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required validate-checkbox' : '';
 
 		switch($separator)
 		{
@@ -74,21 +75,19 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
-			}
-
+		}
 		$i = 0;
 		$options  = "";
 		foreach ($listarrays as $listarray) {
 			$checked  = "";
 			for($n=0, $c=count($field->value); $n<$c; $n++) {
 				if ($field->value[$n] == $listarray[0]) {
-						$checked = ' checked="checked"';
-					}
-				} 
-			$options .= '<label><input type="checkbox" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+					$checked = ' checked="checked"';
+				}
+			} 
+			$options .= '<label><input type="checkbox" class="'.$required.'" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
-			}			
-			
+		}
 		$field->html	= $options;
 	}
 
@@ -100,31 +99,35 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if(!$post) return;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-
-		$listelements = explode("%% ", $field_elements);
-		$listarrays = array();
-		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
-			}
-
-		$i = 0;
-		$display = array();
-		foreach ($listarrays as $listarray) {
-			for($n=0, $c=count($post); $n<$c; $n++) {
-				if ($post[$n] == $listarray[0]) {
-					$display[] = $listarray[1];
-					}
-				} 
-			$i++;
-			}			
+		if ($field->issearch) {
+			$searchindex = '';
 			
-		$searchindex  = implode(' ', $display);
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+	
+			$listelements = explode("%% ", $field_elements);
+			$listarrays = array();
+			foreach ($listelements as $listelement) {
+				$listarrays[] = explode("::", $listelement);
+				}
+	
+			$i = 0;
+			$display = array();
+			foreach ($listarrays as $listarray) {
+				for($n=0, $c=count($post); $n<$c; $n++) {
+					if ($post[$n] == $listarray[0]) {
+						$display[] = $listarray[1];
+						}
+					} 
+				$i++;
+				}			
+				
+			$searchindex  = implode(' ', $display);
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 	}
 
 
@@ -191,6 +194,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
 						
 		$listelements = explode("%% ", $field_elements);
 		$listarrays = array();
@@ -199,11 +205,11 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			}
 
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 		foreach ($listarrays as $listarray) {
 			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}			
-			
-		$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 	}
 }

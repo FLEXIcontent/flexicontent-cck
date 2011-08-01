@@ -90,6 +90,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				<?php 
 				$nr = count($row->categories);
 				$ix = 0;
+				if (!is_array($row->categories))
+					$row->categories = array();
 				foreach ($row->categories as $key => $category) :
 				
 					$catlink	= 'index.php?option=com_flexicontent&amp;task=categories.edit&amp;cid[]='. $category->id;

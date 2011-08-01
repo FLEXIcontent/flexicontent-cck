@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 307 2010-06-16 10:16:33Z enjoyman $
+ * @version 1.0 $Id: image.php 714 2011-07-29 06:27:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -22,11 +22,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function plgFlexicontent_fieldsImage( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
 	}
-
+	
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsImage::onDisplayField($field, $item);
+	}
+	
 	function onDisplayField(&$field, $item)
 	{
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
+		$autoupload = $field->parameters->get('autoupload', 1);
+		$always_allow_removal = $field->parameters->get('always_allow_removal', 0);
+		
+		$js = "
+			function fx_img_toggle_required (obj_changed, obj_req_toggle) {
+			  if (obj_changed.value!='') {
+					obj_changed.className='';
+			  	obj_req_toggle.className='';
+			  } else {
+					obj_changed.className='required';
+			  	obj_req_toggle.className='required';
+			  }
+			}
+			";
+		$document	= & JFactory::getDocument();
+		$document->addScriptDeclaration($js);
+
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
@@ -35,6 +58,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->html = '';
 		$select = $this->buildSelectList( $field );
 		$app =& JFactory::getApplication();
+		$linkto_url = $field->parameters->get('linkto_url',0);
 		
 		// if an image exists it display the existing image
 		if ($field->value  && $field->value[0] != '')
@@ -43,7 +67,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$value = unserialize($value);
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
-				$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
+				if ($always_allow_removal)
+					$remove = '';
+				else
+					$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
 				$adminprefix = $app->isAdmin() ? '../' : '';
 				$field->html	.= '
 				<div style="float:left; margin-right: 5px;">
@@ -54,7 +81,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<input name="'.$field->name.'[originalname]" type="hidden" value="'.$value['originalname'].'" />
 				</div>
 				<div style="float:left;">
-					<table class="admintable">
+					<table class="admintable">'.
+					($linkto_url ? '
+						<tr>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
+							<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+						</tr>'
+						:
+						'').'
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
 							<td><input name="'.$field->name.'[alt]" value="'.$value['alt'].'" type="text" /></td>
@@ -75,7 +109,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		else
 		{
 			// else display the form for adding a new image
-			$onchange = ($field->parameters->get('autoupload', 1) && $app->isAdmin()) ? ' onchange="javascript: submitbutton(\'apply\')"' : '';
+			$class = ' class="'.$required.' "';
+			$onchange= ' onchange="';
+			$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
+			$onchange .= ($autoupload && $app->isAdmin()) ? ' submitbutton(\'apply\')"' : '';
+			$onchange .= ' "';
 			$field->html	.= '
 			<div style="float:left; margin-right: 5px;">
 				<div class="empty_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>
@@ -92,12 +130,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'"'.$onchange.' type="file" /></td>
+						<td><input name="'.$field->name.'" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).':</td>
 						<td>'.$select.'</td>
-					</tr>
+					</tr>'.
+					($linkto_url ? '
+					<tr>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
+						<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+					</tr>'
+					:
+					'').'
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
 						<td><input name="'.$field->name.'[alt]" type="text" /></td>
@@ -127,7 +172,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
 		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
-
+		
+		$linkto_url	= $field->parameters->get('linkto_url',0);
+		$url_target = $field->parameters->get('url_target','_self');
+		
 		if ($values && $values[0] != '')
 		{				
 			$document	= & JFactory::getDocument();
@@ -135,37 +183,40 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// load the tooltip library if redquired
 			if ($uselegend) JHTML::_('behavior.tooltip');
 			
-			if ($usepopup && $mainframe->isSite() && ($popuptype == 1))
+			if ( $mainframe->isSite() && !$multiboxadded &&
+						(
+							($linkto_url && $url_target=='multibox') ||
+							($usepopup && $popuptype == 1)
+						)
+					)
 			{
-				if (!$multiboxadded) {
-			// Multibox integration 
-			$document->addStyleSheet('components/com_flexicontent/librairies/multibox/multibox.css');
+				// Multibox integration 
+				$document->addStyleSheet('components/com_flexicontent/librairies/multibox/multibox.css');
 
-			$csshack = '
-			<!--[if lte IE 6]>
-			<style type="text/css">
-			.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
-				behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
-			}
-			</style>
-			<![endif]-->
-			';
-			$document->addCustomTag($csshack);
-
-			JHTML::_('behavior.mootools');
-			$document->addScript('components/com_flexicontent/librairies/multibox/js/overlay.js');
-			$document->addScript('components/com_flexicontent/librairies/multibox/js/multibox.js');
-
-			$box = "
-			var box = {};
-			window.addEvent('domready', function(){
-				box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true});
-			});
-			";
-			$document->addScriptDeclaration($box);
-			
-			$multiboxadded = 1;
+				$csshack = '
+				<!--[if lte IE 6]>
+				<style type="text/css">
+				.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
+					behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
 				}
+				</style>
+				<![endif]-->
+				';
+				$document->addCustomTag($csshack);
+
+				JHTML::_('behavior.mootools');
+				$document->addScript('components/com_flexicontent/librairies/multibox/js/overlay.js');
+				$document->addScript('components/com_flexicontent/librairies/multibox/js/multibox.js');
+
+				$box = "
+				var box = {};
+				window.addEvent('domready', function(){
+					box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true});
+				});
+				";
+				$document->addScriptDeclaration($box);
+			
+				$multiboxadded = 1;
 			}
 			
 			$i = 0;
@@ -176,25 +227,58 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$size	= getimagesize($path);
 				$hl 	= $size[1];
 				$wl 	= $size[0];
-				$title	= isset($value['title']) ? $value['title'] : '';
-				$alt	= isset($value['alt']) ? $value['alt'] : '';
-				$desc	= isset($value['desc']) ? $value['desc'] : '';
+				$title	= @$value['title'] ? $value['title'] : '';
+				$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
+				$desc	= @$value['desc'] ? $value['desc'] : '';
+
 				$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];
 				$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];
 				$srcb	= $field->parameters->get('dir') . '/l_' . $value['originalname'];
+				
+				$urllink = @$value['urllink'] ? $value['urllink'] : '';
+				if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
+				
 				$tip	= JText::_( 'FLEXI_FIELD_LEGEND' ) . '::' . $title;
 				$id		= $field->item_id . '_' . $field->id . '_' . $i;
 				$legend = ($uselegend && !empty($title))? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
-			
-				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'items'));
-				$src 	= ($view == 'category') ? $srcs : $srcm;
+				
+				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'item'));
+				
+				$thumb_size = 0;
+				if ($view == 'category')
+				  $thumb_size =  $field->parameters->get('thumbincatview',0);
+				if($view == 'item')
+				  $thumb_size =  $field->parameters->get('thumbinitemview',0);
+				switch ($thumb_size)
+				{
+				  case 1: $src = $srcs; break;
+				  case 2: $src = $srcm; break;
+				  case 3: $src = $srcb; $popuptype = 0; break;
+				}
+				
+				// ADD some extra (display) properties that point to all sizes
+				$field->{"display_small"} = JURI::base() . $srcs;
+				$field->{"display_medium"} = JURI::base() . $srcm;
+				$field->{"display_large"} = JURI::base() . $srcb;    
+				
 				// first condition is for the display for the preview feature
 				if ($mainframe->isAdmin()) {
 					$field->{$prop} = '<img class="hasTip" src="../'.$srcs.'" alt ="'.$alt.'" title="'.$tip.'" />';
-				}
-				else if ($usepopup && $popuptype == 1)
-				{
+				} else if ($linkto_url && $url_target=='multibox' && $urllink) {
+					$field->{$prop} = '
+					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$id.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>
+						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+					<script>document.write(\'</a>\')</script>
+					<div class="multiBoxDesc mbox_img_url mb'.$id.'">'.($desc ? $desc : $title).'</div>
+					';
+				} else if ($linkto_url && $urllink) {
+					$field->{$prop} = '
+					<a href="'.$urllink.'" target="'.$url_target.'">
+						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+					</a>
+					';
+				} else if ($usepopup && $popuptype == 1) {
 					$field->{$prop} = '
 					<a href="'.$srcb.'" id="mb'.$id.'" class="mb">
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
@@ -228,20 +312,25 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
+		if(!$post) return;
 
 		global $mainframe;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		$searchindex .= $post['alt'];
-		$searchindex .= ' ';
-		$searchindex .= $post['title'];
-		$searchindex .= ' ';
-		$searchindex .= $post['desc'];
-		$searchindex .= ' | ';
-
-		$field->search = $searchindex;
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			$searchindex .= $post['alt'];
+			$searchindex .= ' ';
+			$searchindex .= $post['title'];
+			$searchindex .= ' ';
+			$searchindex .= $post['desc'];
+			$searchindex .= ' | ';
+	
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
 
 		// Upload the original file
 		$this->uploadOriginalFile($field, $post, $file);
@@ -517,29 +606,52 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 	function buildSelectList( $field )
 	{
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
+		$autoupload = $field->parameters->get('autoupload', 1);
+		$list_all_media_files = $field->parameters->get('list_all_media_files', 0);
+		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);
+		
 		$db =& JFactory::getDBO();
 		$app =& JFactory::getApplication();
+		$user =& JFactory::getUser();
 		
-		$query = 'SELECT value'
+		if ($list_all_media_files) {
+			$query = 'SELECT filename'
+				. ' FROM #__flexicontent_files'
+				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
+				.(($limit_by_uploader)?" AND uploaded_by={$user->id}":"")
+				;
+		} else {
+			$query = 'SELECT value'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = '. (int) $field->id
 				;
+		}
 		$db->setQuery($query);
 		$values = $db->loadResultArray();
 		
 
-		for($n=0, $c=count($values); $n<$c; $n++)
-		{
-			$values[$n] = unserialize($values[$n]);
-			$values[$n] = $values[$n]['originalname'];
+		if (!$list_all_media_files) {
+			for($n=0, $c=count($values); $n<$c; $n++)
+			{
+			  if (!$values[$n]) {  unset($values[$n]);  continue; 	}
+				$values[$n] = unserialize($values[$n]);
+				$values[$n] = $values[$n]['originalname'];
+			}
 		}
 		
 		// eliminate duplicate records in the array
 		$values = array_unique($values);
+		sort($values);
 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_FIELD_PLEASE_SELECT'));
-		$onchange = ($field->parameters->get('autoupload', 1) && $app->isAdmin()) ? ' onchange="javascript: submitbutton(\'apply\')"' : '';
+		$class = ' class="'.$required.' "';
+		$onchange= ' onchange="';
+		$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'_newfile\')); ' : '';
+		$onchange .= ($autoupload && $app->isAdmin()) ? ' submitbutton(\'apply\')"' : '';
+		$onchange .= ' "';
 		foreach ($values as $value) {
 			$options[] = JHTML::_('select.option', $value, $value); 
 		}
@@ -564,12 +676,39 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$values[$n] = unserialize($values[$n]);
 			$values[$n] = $values[$n]['originalname'];
-			if ($values[$n] == $record) { $i++; }
+			if ($values[$n] == $record) {
+				if (++$i > 1) return false;
+			}
 		}
-		
-		if ($i > 1) return false;
 		
 		return true;
 	}
 
+	function listImageUses( $field, $record )
+	{
+		// Function is not called anywhere, used only for debugging
+		
+		$db =& JFactory::getDBO();
+
+		$query = 'SELECT value, item_id'
+				. ' FROM #__flexicontent_fields_item_relations'
+				. ' WHERE field_id = '. (int) $field->id
+				;
+		$db->setQuery($query);
+		$values = $db->loadObjectList();
+		
+		$itemid_list = ''; $sep = '';
+		for($n=0, $c=count($values); $n<$c; $n++)
+		{
+			$val = unserialize($values[$n]->value);
+			$val = $val['originalname'];
+			if ($val == $record) {
+				$itemid_list .= $sep . $values[$n]->item_id.",";
+				$sep = ',';
+			}
+		}
+		
+		return $itemid_list;
+	}
+	
 }

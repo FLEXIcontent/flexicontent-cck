@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: minigallery.php 362 2010-07-05 12:21:11Z enjoyman $
+ * @version 1.0 $Id: minigallery.php 714 2011-07-29 06:27:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -17,10 +17,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsMinigallery extends JPlugin {
-	function plgFlexicontent_fieldsMinigallery( &$subject, $params ) {
+class plgFlexicontent_fieldsMinigallery extends JPlugin
+{
+	function plgFlexicontent_fieldsMinigallery( &$subject, $params )
+	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
+	}
+	function onAdvSearchDisplayField(&$field, &$item) {
+		plgFlexicontent_fieldsMinigallery::onDisplayField($field, $item);
 	}
 
 	function onDisplayField(&$field, $item)
@@ -34,10 +39,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/media');
+		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$app			= & JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
 		$clientpref		= $app->isAdmin() ? '' : 'administrator/';
+		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $required ? ' required' : '';
 
 		$js = "
 		function randomString() {
@@ -52,7 +59,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 		}
 
 		function qfSelectFile".$field->id."(id, file) {
-		
 			var name 	= 'a_name'+id;
 			var ixid 	= randomString();			
 			var li 		= document.createElement('li');
@@ -63,10 +69,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			
 			var filelist = document.getElementById('sortables_".$field->id."');
 			if(file.substring(0,7)!='http://')
-				file = '".JPATH_ROOT."/components/com_flexicontent/medias/'+file;
+				file = '".str_replace('\\','/', JPATH_ROOT)."/components/com_flexicontent/medias/'+file;
 			$(li).addClass('minigallery');
 			$(thumb).addClass('thumbs');
-			$(span).addClass('drag');
+			$(span).addClass('drag".$field->id."');
 			
 			var button = document.createElement('input');
 			button.type = 'button';
@@ -80,7 +86,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
-			hid.name = '".$field->name."['+ixid+']';
+			//hid.name = '".$field->name."['+ixid+']';
+			hid.name = '".$field->name."[]';
 			hid.value = id;
 			hid.id = ixid;
 			
@@ -95,19 +102,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			span.appendChild(img);
 			
 			new Sortables($('sortables_".$field->id."'), {
-				'handles': $('sortables_".$field->id."').getElements('span.drag'),
-				'onDragStart': function(element, ghost){
-					ghost.setStyles({
-					'list-style-type': 'none',
-					'opacity': 1
-					});
-					element.setStyle('opacity', 0.3);
-				},
-				'onDragComplete': function(element, ghost){
-					element.setStyle('opacity', 1);
-					ghost.remove();
-					this.trash.remove();
-				}
+				'constrain': true,
+				'clone': true,
+				'handle': '.drag".$field->id."'
 			});			
 		}
 		
@@ -130,24 +127,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
-					'handles': $('sortables_".$field->id."').getElements('span.drag'),
-					'onDragStart': function(element, ghost){
-						ghost.setStyles({
-						   'list-style-type': 'none',
-						   'opacity': 1
-						});
-						element.setStyle('opacity', 0.3);
-					},
-					'onDragComplete': function(element, ghost){
-						element.setStyle('opacity', 1);
-						ghost.remove();
-						this.trash.remove();
-					}
+					'constrain': true,
+					'clone': true,
+					'handle': '.drag".$field->id."'
 					});			
 				});
 			";
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
-
 
 			$css = '
 			#sortables_'.$field->id.' { margin: 0 0 10px 0; padding: 0px; list-style: none; white-space: nowrap; }
@@ -163,7 +150,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag img {
+			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
 			}
@@ -190,21 +177,21 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
 				$field->html .= '<input class="inputbox fcbutton" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
-				$field->html .= '<span class="drag">'.$move.'</span>';
+				$field->html .= '<span class="drag'.$field->id.'">'.$move.'</span>';
 				$field->html .= '</li>';
 				$i++;
 			}
 		}
 
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id;
+		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
-						</ul>
-						<div class=\"button-add\">
-							<div class=\"blank\">
-								<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-							</div>
-						</div>
-						";
+		</ul>
+		<div class=\"button-add\">
+			<div class=\"blank\">
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+			</div>
+		</div>
+		";
 	}
 
 
@@ -220,7 +207,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 		
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/media');
+		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 
 		// some parameter shortcuts
 		$thumbposition		= $field->parameters->get( 'thumbposition', 3 ) ;
@@ -248,17 +235,24 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			break;
 		}
 
+	  static $js_and_css_added = false;
+	  
 		if ($values)
 		{
-//			JHTML::_('behavior.mootools');
-			$document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
-			// this allows you to override the default css files
-			$document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
-			JHTML::_('behavior.mootools');
-			$document->addScript('plugins/flexicontent_fields/minigallery/backgroundslider.js');
-			$document->addScript('plugins/flexicontent_fields/minigallery/slideshow.js');
+			if (!$js_and_css_added) {
+			  $document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
+			  // this allows you to override the default css files
+			  $document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+			  JHTML::_('behavior.mootools');
+			  $document->addScript('plugins/flexicontent_fields/minigallery/backgroundslider.js');
+			  $document->addScript('plugins/flexicontent_fields/minigallery/slideshow.js');
+			}
+		  $js_and_css_added = true;
+			
+			$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
+			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
 
-		  	$js = "
+		  $js = "
 		  	window.addEvent('domready',function(){
 					var obj = {
 						wait: ".$field->parameters->get( 'wait', 4000 ).", 
@@ -269,14 +263,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 						thumbnails: true,
 						backgroundSlider: true
 					}
-				show = new SlideShow('slideshowContainer".$item->id."','slideshowThumbnail".$item->id."',obj);
+				show = new SlideShow('$htmltag_id','$slidethumb',obj);
 				show.play();
 				});
 			";
 			$document->addScriptDeclaration($js);
 			
 			$css = "
-			.slideshowContainer".$item->id." {
+			.$htmltag_id {
 				width: ".$w_l."px;
 				height: ".$h_l."px;
 				margin-".$marginpos.": 5px;
@@ -287,7 +281,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 				$css .= "#thumbnails { width: ".$w_l."px; }";
 			}
 			if ($thumbposition == 2 || $thumbposition == 4) {
-				$css .= ".slideshowContainer".$item->id." { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
+				$css .= ".$htmltag_id { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
 			}
 
 			$document->addStyleDeclaration($css);
@@ -295,7 +289,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 			$display = array();
 			
 			$field->{$prop}  = '';
-			$field->{$prop} .= ($thumbposition > 2) ? '<div id="slideshowContainer'.$item->id.'" class="slideshowContainer'.$item->id.'"></div>' : '';
+			$field->{$prop} .= ($thumbposition > 2) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
 			$field->{$prop} .= '<div id="thumbnails">';
 			$n = 0;
 			foreach ($values as $value) {
@@ -308,32 +302,24 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin {
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
-					$display[]	= '<a href="'.$srcb.'" class="slideshowThumbnail'.$item->id.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
+					$display[]	= '<a href="'.$srcb.'" class="'.$slidethumb.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 				}
 				$n++;
 				}
 			$field->{$prop} .= implode(' ', $display);
 			$field->{$prop} .= '</div>';
-			$field->{$prop} .= ($thumbposition < 3) ? '<div id="slideshowContainer'.$item->id.'" class="slideshowContainer'.$item->id.'"></div>' : '';
+			$field->{$prop} .= ($thumbposition < 3) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
 		}
 	}
 	
 
-	function onBeforeSaveField(&$field, &$post, &$file)
+	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
+		if(!$post) return;
 
 		global $mainframe;
-		
-/*
-		$newpost = array();
-		
-		for ($n=0, $c=count($post); $n<$c; $n++)
-		{
-			if ($post[$n] != '') $newpost[] = $post[$n];
-		}
-*/
 		
 		$post = array_unique($post);
 	}

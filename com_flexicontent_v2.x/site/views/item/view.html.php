@@ -79,7 +79,7 @@ class FlexicontentViewItem extends JView {
 		$params->merge($iparams);
 
 		// Bind Fields
-		$item 	= FlexicontentFields::getFields($item, 'items', $params, $aid);
+		$item 	= FlexicontentFields::getFields($item, 'item', $params, $aid);
 		$item	= $item[0];
 
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
@@ -183,7 +183,7 @@ class FlexicontentViewItem extends JView {
 			$model->hit();
 		}
 
-		$themes		= flexicontent_tmpl::getTemplates();
+		$themes		= flexicontent_tmpl::parseTemplates();
 		$tmplvar	= $themes->items->{$params->get('ilayout', 'default')}->tmplvar;
 
 		if ($params->get('ilayout')) {

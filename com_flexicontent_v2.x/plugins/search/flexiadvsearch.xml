@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="search" method="upgrade">
+	<name>ADV Search - FLEXIcontent</name>
+	<author>Suriya Kaewmungmuang</author>
+	<creationDate>29 June 2011</creationDate>
+	<copyright>Copyright (C) 2011 flexicontent.org</copyright>
+	<license>GNU/GPL v3</license>
+	<authorEmail>enjoyman@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Advanced search plugin for flexicontent.</description>
+	<files>
+		<filename plugin="flexiadvsearch">flexiadvsearch.php</filename>
+	</files>
+	<config>
+	<fields name="params">
+		<fieldset name="basic">
+			<field name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+		</fieldset>
+	</fields>
+	</config>
+	<languages>
+		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.ini</language>
+	</languages>
+</install>

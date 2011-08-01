@@ -13,15 +13,15 @@
 		<filename plugin="radioimage">radioimage.php</filename>
 	</files>
 	<config>
-	<fields name="attribs">
-		<fieldset name="standard">
+	<fields name="params">
+		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-radioimage">
-			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 			<field name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 			<field name="separator" type="list" default="0" label="FLEXI_FIELD_SEPARATOR_BACKEND" description="FLEXI_FIELD_SEPARATOR_BACKEND_DESC">
 				<option value="0">FLEXI_SPACE</option>
@@ -30,6 +30,15 @@
 				<option value="3">FLEXI_COMMA</option>
 			</field>
 			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
+			<field name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
 		</fieldset>
 	</fields>
 	</config>

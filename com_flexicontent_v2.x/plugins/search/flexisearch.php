@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: flexisearch.php 280 2010-06-12 07:14:46Z emmanuel.danan $
+ * @version 1.0 $Id: flexisearch.php 677 2011-07-24 15:19:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -30,7 +30,7 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
  */
 function &plgSearchFlexisearchAreas() {
 	static $areas = array(
-	'flexicontent' => 'FLEXICONTENT'
+	'flexisearch' => 'Content Standard Search'
 	);
 	return $areas;
 }

@@ -18,6 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $mainframe = &JFactory::getApplication();
+$template	= $mainframe->getTemplate();
 $option = JRequest::getVar('option');
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<')) {
@@ -38,7 +39,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					<td>
 						<div id="cpanel">
 						<?php
-						if ($this->dopostinstall)  {
+						if (!$this->dopostinstall)  {
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
@@ -50,17 +51,17 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							echo '</div>';
 						}
 
-						if (!$this->dopostinstall) {
+						if ($this->dopostinstall) {
 							$link = 'index.php?option='.$option.'&amp;view=items';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
 						}
-						if (!$this->dopostinstall && $this->permission->CanAdd)
+						if ($this->dopostinstall && $this->permission->CanAdd)
 						{
-							$link = 'index.php?option='.$option.'&amp;view=types&tmpl=component&format=raw';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 0 );
+							$link = 'index.php?option='.$option.'&amp;view=item';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ) );
 						}
 						
-						if (!$this->dopostinstall && ($this->permission->CanCats || $this->permission->CanAddCats) )
+						if ($this->dopostinstall && ($this->permission->CanCats || $this->permission->CanAddCats) )
 						{
 							if ($this->permission->CanCats)
 							{
@@ -71,7 +72,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 						}
 						
-						if (!$this->dopostinstall && $this->permission->CanTypes)
+						if ($this->dopostinstall && $this->permission->CanTypes)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=types';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-types.png', JText::_( 'FLEXI_TYPES' ) );
@@ -79,7 +80,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-type-add.png', JText::_( 'FLEXI_NEW_TYPE' ) );
 						}
 						
-						if (!$this->dopostinstall && $this->permission->CanFields)
+						if ($this->dopostinstall && $this->permission->CanFields)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=fields';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-fields.png', JText::_( 'FLEXI_FIELDS' ) );
@@ -87,7 +88,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-field-add.png', JText::_( 'FLEXI_NEW_FIELD' ) );
 						}
 
-						if (!$this->dopostinstall && $this->permission->CanTags)
+						if ($this->dopostinstall && $this->permission->CanTags)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=tags';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tags.png', JText::_( 'FLEXI_TAGS' ) );
@@ -95,37 +96,37 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
 						}
 
-						if (!$this->dopostinstall && $this->permission->CanArchives)
+						if ($this->dopostinstall && $this->permission->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
 						}
 
-						if (!$this->dopostinstall && $this->permission->CanFiles)
+						if ($this->dopostinstall && $this->permission->CanFiles)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-file.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
 						
-						if (!$this->dopostinstall && $this->permission->CanTemplates)
+						if ($this->dopostinstall && $this->permission->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editcss.png', JText::_( 'FLEXI_TEMPLATES' ) );
 						}
 
-						if (!$this->dopostinstall && $this->permission->CanStats)
+						if ($this->dopostinstall && $this->permission->CanStats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=stats';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-stats.png', JText::_( 'FLEXI_STATISTICS' ) );
 						}
 
-						if (!$this->dopostinstall && $this->permission->CanPlugins)
+						if ($this->dopostinstall && $this->permission->CanPlugins)
 						{
 							$link = 'index.php?option=com_plugins&amp;filter_type=flexicontent_fields&amp;tmpl=component';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ), 1 );
 						}
 												
-						if (!$this->dopostinstall && ($this->params->get('comments') == 1) )
+						if ( $this->dopostinstall && ($this->params->get('comments') == 1) )
 						{
 							if ($this->permission->CanComments)
 							{
@@ -134,7 +135,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							}
 						}
 						
-						if (!$this->dopostinstall && $this->params->get('support_url')) {
+						
+						if ($this->dopostinstall && $this->params->get('support_url'))
+						{
 							$link = $this->params->get('support_url');
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-support.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 						}
@@ -147,30 +150,26 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 			<td valign="top" width="400px" style="padding: 0px 0 0 5px">
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			
-			if ($this->dopostinstall  || !$this->allplgpublish) {
+			if (!$this->dopostinstall || !$this->allplgpublish) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
 				echo $this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-
 			$title = JText::_( 'FLEXI_UNAPPROVED' );
 			echo $this->pane->startPanel( $title, 'unapproved' );
-				?>
+			?>
 				<table class="adminlist">
-				<?php
+			<?php
 					$k = 0;
 					$n = count($this->unapproved);
-					$user =& JFactory::getUser();
-					$check = JAccess::check($user->id, 'core.admin', 'root.1');
 					for ($i=0, $n; $i < $n; $i++) {
-						$row = $this->unapproved[$i];
+					$row = $this->unapproved[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('editall', $rights) || $check;
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || $check;
-						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
-				?>
+						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			?>
 					<tr>
 						<td>
 						<?php
@@ -194,6 +193,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				$title = JText::_( 'FLEXI_TO_WRITE' );
 				echo $this->pane->endPanel();
 				echo $this->pane->startPanel( $title, 'openquest' );
+
 				?>
 				<table class="adminlist">
 				<?php
@@ -203,9 +203,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->openquest[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -240,9 +240,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->inprogress[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -266,40 +266,123 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				<?php
 				echo $this->pane->endPanel(); ?>
                 
-			<?php
-			if($this->params->get('show_updatecheck', 1) == 1) {
-				if (@$this->check['current'] == 0 ) {
-					$title = JText::_( 'FLEXI_VERSION_OK' );
+                  <?php
+			if($this->params->get('show_updatecheck', 1) == 1) {	 
+				if($this->check['connect'] == 0) {
+					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
 				} else {
-					$title = JText::_( 'FLEXI_NEW_VERSION' );
+					if ($this->check['current'] == 0 ) {	 
+						$title = JText::_( 'FLEXI_VERSION_OK' );
+					} else {
+						$title = JText::_( 'FLEXI_NEW_VERSION' );
+					}
 				}
-				$this->document->addScriptDeclaration("
-				jQuery(document).ready(function () {
-					jQuery('#updatecomponent').click(function(e){
-						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
-							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
-								success: function(str) {
-									jQuery('#displayfversion').html(str);
-								}
-							});
-						}
-					});
-				});
-				");
-				echo $this->pane->startPane( 'stat-pane' );
-				echo $this->pane->startPanel( $title, 'updatecomponent' );
-				echo "<div id=\"displayfversion\"></div>";
-				echo $this->pane->endPanel();
-				echo $this->pane->endPane();
+			echo $this->pane->startPane( 'stat-pane' );
+			echo $this->pane->startPanel( $title, 'updatecomponent' );
+			
+			?>
+            
+            <?php
+				if($this->check['connect'] == 0) {
+				?>
+					<table class="adminlist">
+						<thead>
+								<tr>
+									<th colspan="2">
+									<?php echo JText::_( 'FLEXI_VERSION' ); ?>
+									</th>
+								</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td colspan="2">
+								<?php
+									echo '<b><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></b>';
+								?>
+							</td>
+							</tr>
+						</tbody>
+					</table>
+				<?php
+				} elseif ($this->check['enabled'] == 1) {
+				?>
+			
+			<table class="adminlist">
+		<thead>
+				<tr>
+					<th colspan="2">
+					<?php echo JText::_( 'FLEXI_UPDATE_CHECK' ); ?>
+					</th>
+				</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td width="33%">
+				<?php
+		  			if ($this->check['current'] == 0 ) {		  				
+						echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-checkin.png', NULL, 'width=32');
+		  			} elseif( $this->check['current'] == -1 ) {
+		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+		  			} else {
+		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+		  			}
+		  		?>
+			</td>
+			<td>
+				<?php
+		  			if ($this->check['current'] == 0) {
+		  				echo '<strong><font color="green">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</font></strong>';
+		  			} elseif( $this->check['current'] == -1 ) {
+		  				echo '<b><font color="red">'.JText::_( 'FLEXI_OLD_VERSION_INSTALLED' ).'</font></b>';
+		  			} else {
+		  				echo '<b><font color="orange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</font></b>';
+		  			}
+		  		?>
+			</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['version']; ?>
+				</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['current_version']; ?>
+				</td>
+			</tr>
+			<tr>
+				<td width="33%">
+					<?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?>
+				</td>
+				<td>
+					<?php echo $this->check['released']; ?>
+				</td>
+			</tr>
+            
+           
+	</tbody>
+</table>
+			<?php 
+			} 
 			?>
 			<?php
+			echo $this->pane->endPanel();
 			}
+			
 			?>
+                
+				<?php echo $this->pane->endPane();
+				?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
-					<p>Copyright &copy; 2009-2010
+					<p>Copyright &copy; 2009-2011
 					<br />
 					Emmanuel Danan<br />
 					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="Vistamedia.fr::Professional Joomla! Development and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official French support portal">www.joomla.fr</a>

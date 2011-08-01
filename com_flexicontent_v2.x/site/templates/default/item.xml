@@ -29,6 +29,7 @@
 		<group>top</group>
 		<group>description</group>
 		<group>bottom</group>
+		<group>renderonly</group>
 	</fieldgroups>	
 	<cssitem>
 		<file>css/item.css</file>

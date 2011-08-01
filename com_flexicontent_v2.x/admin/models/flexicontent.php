@@ -121,6 +121,38 @@ class FlexicontentModelFlexicontent extends JModel
 	
 	
 	/**
+	 * Method to check if default Flexi Menu Items exist
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistMenuItems()
+	{
+		$params =& JComponentHelper::getParams('com_flexicontent');
+		if ($params) {
+			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
+		} else {
+			$_component_default_menuitem_id = '';
+		}
+		
+		/*$menus	= &JApplication::getMenu('site', array());
+		$menuitem = $menus->getItem($_component_default_menuitem_id);
+		if (!$menuitem || $menuitem->component != 'com_flexicontent') {
+			return false;
+		}*/
+		
+		$flexi =& JComponentHelper::getComponent('com_flexicontent');
+		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`={$flexi->id} AND id={$_component_default_menuitem_id}";
+		$this->_db->setQuery($query);
+		$count = $this->_db->loadResult();
+			
+		if (!$count) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Method to check if there is at least one type created
 	 *
 	 * @access public
@@ -668,9 +700,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$nullDate	= $db->getNullDate();
 		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext` FROM #__content as c"
 				. " JOIN #__categories as cat ON c.catid=cat.id "
-				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."' AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
+				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";// ."AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
 
-		$db->setQuery($query);
+		$db->setQuery($query); 
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
 		//echo "<xmp>";var_dump(FLEXIUtilities::currentMissing());echo "</xmp>";
