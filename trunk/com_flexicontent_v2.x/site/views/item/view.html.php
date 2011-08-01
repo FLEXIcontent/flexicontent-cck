@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @version 1.5 stable $Id: view.html.php 351 2010-06-29 11:00:04Z emmanuel.danan $
  * @package Joomla
@@ -42,8 +42,8 @@ class FlexicontentViewItem extends JView {
 		$user		= & JFactory::getUser();
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		$dispatcher 	= & JDispatcher::getInstance();
-		$params		= & $mainframe->getParams('com_flexicontent');
+		$dispatcher = & JDispatcher::getInstance();
+		$params 	= & $mainframe->getParams('com_flexicontent');
 		$aid		= (int) $user->get('aid');
 		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
@@ -53,7 +53,7 @@ class FlexicontentViewItem extends JView {
 			$this->_displayForm($tpl);
 			return;
 		}
-
+		
 		//Set layout
 		$this->setLayout('item');
 
@@ -75,7 +75,8 @@ class FlexicontentViewItem extends JView {
 		//get item data
 		JRequest::setVar('loadcurrent', true);
 		$item = $model->getItem();
-		$iparams =& $item->parameters;
+
+		$iparams	=& $item->parameters;
 		$params->merge($iparams);
 
 		// Bind Fields
@@ -89,10 +90,12 @@ class FlexicontentViewItem extends JView {
 			$this->assignRef('pane', $pane);
 		}
 
-		if ($item->id == 0) {	
+		if ($item->id == 0)
+		{	
 			$id	= JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf( 'MANU ITEM #%d NOT FOUND', $id ) );
+			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND (item/view.html)', $id ) );
 		}
+		
 		$fields		=& $item->fields;
 
 		// Pathway need to be improved
@@ -108,11 +111,16 @@ class FlexicontentViewItem extends JView {
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 		}
 		
-		JPluginHelper::importPlugin('content');
-		$item->event = new stdClass();
-		$results = $dispatcher->trigger('onPrepareContent', array (&$item, &$params, $limitstart));
-		$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
+		// !!! The triggering of the event onPrepareContent of content plugins
+		// !!! for description field (maintext) along with all other flexicontent
+		// !!! fields is handled by flexicontent.fields.php
+		// CODE REMOVED
+		
+//		JPluginHelper::importPlugin('content');
+//		$item->event = new stdClass();
+//		$results = $dispatcher->trigger('onPrepareContent', array (&$item, &$params, $limitstart));
+//		$item->event->afterDisplayTitle = trim(implode("\n", $results));
+//
 		/*
 		 * Handle the metadata
 		 *
@@ -149,31 +157,40 @@ class FlexicontentViewItem extends JView {
 		} else {
 			$doc_title = $params->get( 'page_title' );
 		}
-
+		
 		$document->setTitle($doc_title);
-
+		
 		if ($item->metadesc) {
 			$document->setDescription( $item->metadesc );
 		}
-
+		
 		if ($item->metakey) {
 			$document->setMetadata('keywords', $item->metakey);
 		}
-
+		
 		if ($mainframe->getCfg('MetaTitle') == '1') {
 			$document->setMetaData('title', $item->title);
 		}
-
+		
 		if ($mainframe->getCfg('MetaAuthor') == '1') {
 			$document->setMetaData('author', $item->author);
 		}
 
 		$mdata = new JParameter($item->metadata);
 		$mdata = $mdata->toArray();
-		foreach ($mdata as $k => $v) {
+		foreach ($mdata as $k => $v)
+		{
 			if ($v) {
 				$document->setMetadata($k, $v);
 			}
+		}
+		
+		// @TODO check that as it seems to be dirty :(
+		$uri  			=& JFactory::getURI();
+		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		if ($params->get('add_canonical')) {
+			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
@@ -183,7 +200,7 @@ class FlexicontentViewItem extends JView {
 			$model->hit();
 		}
 
-		$themes		= flexicontent_tmpl::parseTemplates();
+		$themes		= flexicontent_tmpl::getTemplates();
 		$tmplvar	= $themes->items->{$params->get('ilayout', 'default')}->tmplvar;
 
 		if ($params->get('ilayout')) {
@@ -205,10 +222,14 @@ class FlexicontentViewItem extends JView {
 			$tmpl = '.items.default';
 		}
 
-		/*
-		 * Handle display events
-		 * No need for it currently
-		*/
+		// Just put item's text (description field) inside property 'text' in case the events modify the given text,
+		$item->text = @$item->fields['text']->display;
+		
+		// Maybe here not to import all plugins but just those for description field ?
+		JPluginHelper::importPlugin('content');
+		
+		// These events return text that could be displayed at appropriate positions by our templates
+		
 		$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
@@ -218,12 +239,21 @@ class FlexicontentViewItem extends JView {
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
+		// Put text back into the description field
+		$item->fields['text']->display = $item->text;
+				
 		$pathway 	=& $mainframe->getPathWay();
-		for($p = $depth; $p<count($parents); $p++) {
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-		}
-		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+		if (count($globaltypes) > 0) {
+			if (!in_array($item->id, $globaltypes)) {
+				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+			}
+		} else {
+			for($p = $depth; $p<count($parents); $p++) {
+				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			}
+			if ($params->get('add_item_pathway', 1)) {
+				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+			}
 		}
 
 		$print_link = JRoute::_('index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
@@ -280,28 +310,39 @@ class FlexicontentViewItem extends JView {
 		$item		=& $this->get('Item');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');
-		$params		=& $mainframe->getParams('com_flexicontent');
+		//$params		=& $mainframe->getParams('com_flexicontent');
+		//$params		=& JComponentHelper::getParams('com_flexicontent');
+		$params	=& $item->parameters;
+		
+		$Itemid		=&JRequest::getVar('Itemid', 0);
+		if($Itemid) {
+			$db = &JFactory::getDBO();
+			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
+			$db->setQuery($query);
+			$paramsstring = $db->loadResult();
+			$mparams = new JParameter($paramsstring);
+			$params->merge($mparams);
+		}
 		$tparams	=& $this->get( 'Typeparams' );
 		
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
-			$results = $dispatcher->trigger('onDisplayField', array( &$field, $item ));
+			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$item ));
 		}
+		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
+		$allowunauthorize = $params->get('allowunauthorize', 0);
 
 		// first check if the user is logged
-		if (!$user->get('id')) {
+		if (!$allowunauthorize && !$user->get('id')) {
 			$menu =& JSite::getMenu();
 			$itemid = $params->get('notauthurl');
-			if($itemid) {
-				$item = $menu->getItem($itemid);
-				if(@$item->component) {
-					$url = JRoute::_($item->link.'&Itemid='.$itemid.'&option='.$item->component, false);
-				}else{
-					$url = JRoute::_($item->link, false);
-				}
+			$item = $menu->getItem($itemid);
+			if($item->component) {
+				$url = JRoute::_($item->link.'&Itemid='.$itemid.'&option='.$item->component, false);
 			}else{
-				$url = "index.php";
+				$url = JRoute::_($item->link, false);
 			}
 			$mainframe->redirect($url, JText::_( 'FLEXI_ALERTNOTAUTH' ));
 		}
@@ -406,6 +447,24 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('tparams', 	$tparams);
 		$this->assignRef('perms', 		$perms);
 		$this->assignRef('document',	$document);
+		
+		/*
+		 * Set template paths : this procedure is issued from K2 component
+		 *
+		 * "K2" Component by JoomlaWorks for Joomla! 1.5.x - Version 2.1
+		 * Copyright (c) 2006 - 2009 JoomlaWorks Ltd. All rights reserved.
+		 * Released under the GNU/GPL license: http://www.gnu.org/copyleft/gpl.html
+		 * More info at http://www.joomlaworks.gr and http://k2.joomlaworks.gr
+		 * Designed and developed by the JoomlaWorks team
+		 */
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
+		if ($tparams->get('ilayout')) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$tparams->get('ilayout'));
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$tparams->get('ilayout'));
+		}
 
 		parent::display($tpl);
 	}

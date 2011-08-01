@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 352 2010-06-29 11:52:33Z emmanuel.danan $
+ * @version 1.5 stable $Id: items.php 682 2011-07-25 11:26:27Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -136,7 +136,19 @@ class FlexicontentModelItem extends JModel
 			$aid	= (int) $user->get('aid');
 			//$gid	= (int) $user->get('gid');
 			$cid	= JRequest::getInt('cid');
+
+			// Create the return parameter
+			$return = array (
+				'id' 	=> @$this->_item->id,
+				'cid'	=> $cid
+			);
+			$return = serialize($return); 
+			
 			$usergroups = $user->getAuthorisedGroups();
+
+			// Allow users to see their own content whatever the state is
+			if ($this->_item->created_by != $user->id && $this->_item->modified_by != $user->id) 
+			{
 
 			// Is the category published?
 			if ($cid) {
@@ -187,8 +199,8 @@ class FlexicontentModelItem extends JModel
 			{
 				if (!$aid) {
 					// Redirect to login
-					$uri		= JFactory::getURI();
-					$return		= $uri->toString();
+					//$uri		= JFactory::getURI();
+					//$return		= $uri->toString();
 	
 					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
 					$url .= '&return='.base64_encode($return);
@@ -209,8 +221,8 @@ class FlexicontentModelItem extends JModel
 				{
 					if (!$aid) {
 						// Redirect to login
-						$uri		= JFactory::getURI();
-						$return		= $uri->toString();
+						//$uri		= JFactory::getURI();
+						//$return		= $uri->toString();
 		
 						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
 						$url .= '&return='.base64_encode($return);
@@ -219,13 +231,17 @@ class FlexicontentModelItem extends JModel
 					} else {
 						// Redirect to unauthorized page or 403
 						if ($params->get('unauthorized_page', '')) {
-							$mainframe->redirect($params->get('unauthorized_page'));				
+							$url  = $params->get('unauthorized_page');
+							$url .= '&return='.base64_encode($return);
+		
+							$mainframe->redirect($url);				
 						} else {
 							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
 							return false;
 						}
 					}
 				}
+			}
 			}
 
 			//add the author email in order to display the gravatar
@@ -322,23 +338,23 @@ class FlexicontentModelItem extends JModel
 
 			$where	= $this->_buildItemWhere();
 			$query = 'SELECT i.*, ie.*, c.access AS cataccess, c.id AS catid, c.published AS catpublished,'
-				. ' u.name AS author, u.usertype, ty.name AS typename,c.lft,c.rgt,'
-				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-				. $where
+			. ' u.name AS author, u.usertype, ty.name AS typename,c.lft,c.rgt,'
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. $where
 			;
 			$this->_db->setQuery($query);
 			$item = $this->_db->loadObject();
 			if(!$item) {
 				return false;
 			}
-
+			
 			$isnew = (($this->_id <= 0) || !$this->_id);
 			$current_version = isset($item->version)?$item->version:0;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
@@ -430,8 +446,10 @@ class FlexicontentModelItem extends JModel
 					$this->_db->query();
 				}
 				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					
+				    // process field mambots onBeforeSaveField
+					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
 					// add the new values to the database 
 					$obj = new stdClass();
@@ -530,14 +548,15 @@ class FlexicontentModelItem extends JModel
 	function _loadItemParams() {
 		$mainframe = &JFactory::getApplication();
 		jimport('joomla.html.parameter');
+
 		// Get the page/component configuration
 		$params = clone($mainframe->getParams('com_flexicontent'));
 
 		$query = 'SELECT t.attribs'
-			. ' FROM #__flexicontent_types AS t'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-			. ' WHERE ie.item_id = ' . (int)$this->_id
-			;
+				. ' FROM #__flexicontent_types AS t'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+				. ' WHERE ie.item_id = ' . (int)$this->_id
+				;
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		
@@ -561,6 +580,7 @@ class FlexicontentModelItem extends JModel
 			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
 		}
 */
+
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;
 	}
@@ -738,6 +758,7 @@ class FlexicontentModelItem extends JModel
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$mainframe = &JFactory::getApplication();
+		$dispatcher = & JDispatcher::getInstance();
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
 		
@@ -746,7 +767,7 @@ class FlexicontentModelItem extends JModel
 		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$post['vstate'] = (int)$post['vstate'];
+		$post['vstate'] = @(int)$post['vstate'];
 		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
 		// bind it to the table
@@ -796,13 +817,15 @@ class FlexicontentModelItem extends JModel
 				$item->created = $date->toMySQL();
 			}
 
-			// Append time if not added to publish date
-			if (strlen(trim($item->publish_up)) <= 10) {
-				$item->publish_up .= ' 00:00:00';
+			if ($item->publish_up) {
+				// Append time if not added to publish date
+				if (strlen(trim($item->publish_up)) <= 10) {
+					$item->publish_up .= ' 00:00:00';
+				}
+			} else {
+				$date =& JFactory::getDate($item->created, $tzoffset);
+				$item->publish_up = $date->toMySQL();
 			}
-
-			$date =& JFactory::getDate($item->publish_up, $tzoffset);
-			$item->publish_up = $date->toMySQL();
 
 			// Handle never unpublish date
 			if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
@@ -825,11 +848,11 @@ class FlexicontentModelItem extends JModel
 			}
 			
 			// auto assign the section
-			$item->sectionid 	= 0;
+			//$item->sectionid 	= 0;
 
 			// set type and language
  			$item->type_id 		= (int)$typeid;
- 			$item->language		= flexicontent_html::getSiteDefaultLang();			
+ 			$item->language		= $item->language ? $item->language : flexicontent_html::getSiteDefaultLang();			
 			
 			// Get a state and parameter variables from the request
 			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
@@ -893,6 +916,9 @@ class FlexicontentModelItem extends JModel
 			}else{
 				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
 			}
+			// process field mambots onBeforeSaveItem
+			$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
+			if((count($result)>0) && in_array(false, $result)) return false;
 			// Store it in the db
 			if (!$item->store()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -984,10 +1010,9 @@ class FlexicontentModelItem extends JModel
 		// get the field object
 		$this->_id 	= $item->id;	
 		$fields		= $this->getExtrafields();
-		$dispatcher = & JDispatcher::getInstance();
 		
-		// NOTE: This event isn't used yet but may be useful in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
+		// NOTE: This event is used by 'flexinotify' plugin, and possibly others in a near future
+		$results = $dispatcher->trigger('onAfterSaveItem', array( $item, &$post ));
 		
 		// versioning backup procedure
 		// first see if versioning feature is enabled
@@ -1009,9 +1034,11 @@ class FlexicontentModelItem extends JModel
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$searchindex = '';
 			$jcorefields = flexicontent_html::getJCoreFields();
-			foreach($fields as $field) {
+			foreach($fields as $key=>$field) {
+			    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			    
 				// process field mambots onBeforeSaveField
-				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
+				$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
 				if (is_array($post[$field->name])) {
@@ -1029,6 +1056,7 @@ class FlexicontentModelItem extends JModel
 						} else {
 							$obj->value			= $postvalue;
 						}
+						$fields[$key]->value[] = $obj->value;
 						if ($use_versioning)
 							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						if(
@@ -1043,7 +1071,7 @@ class FlexicontentModelItem extends JModel
 						}
 						$i++;
 					}
-				} else if ($post[$field->name]) {
+				} else if (isset($post[$field->name])) {
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
 					$obj->item_id 		= $item->id;
@@ -1055,6 +1083,7 @@ class FlexicontentModelItem extends JModel
 					} else {
 						$obj->value			= $post[$field->name];
 					}
+					$fields[$key]->value[] = $obj->value;
 					if($use_versioning)
 						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 					if(
@@ -1125,6 +1154,8 @@ class FlexicontentModelItem extends JModel
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
+		// process field mambots onCompleteSaveItem
+		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		return true;
 	}
 
@@ -1396,6 +1427,35 @@ class FlexicontentModelItem extends JModel
 			$field->item_id		= (int)$this->_id;
 			$field->value 		= $this->getExtrafieldvalue($field->id, $version);
 			$field->parameters 	= new JParameter($field->attribs);
+		}
+		return $fields;
+	}
+	
+	/**
+	 * Method to get advanced search fields which belongs to the item type
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getAdvSearchFields($typeid) {
+		$typeid = intval(@$typeid);
+		$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
+		$query = 'SELECT fi.*'
+			.' FROM #__flexicontent_fields AS fi'
+			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+			//.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+			.$where
+			.' AND fi.published = 1'
+			.' GROUP BY fi.id'
+			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+			;
+		$this->_db->setQuery($query);
+		$fields = $this->_db->loadObjectList('name');
+		foreach ($fields as $field) {
+			$field->item_id		= 0;
+			$field->value 		= $this->getExtrafieldvalue($field->id, 0);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.$field->field_type.'.xml';
+			$field->parameters 	= new JParameter($field->attribs, $path);
 		}
 		return $fields;
 	}
