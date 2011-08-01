@@ -317,6 +317,7 @@ class FlexicontentModelItem extends JModel
 			$item->type_id				= JRequest::getVar('typeid', 0, '', 'int');
 			$item->typename				= null;
 			$item->search_index			= '';
+			$item->parameters = new JParameter('');
 			$this->_item				= $item;
 		}
 		return $this->_item;
