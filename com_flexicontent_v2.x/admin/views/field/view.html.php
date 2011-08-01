@@ -83,7 +83,7 @@ class FlexicontentViewField extends JView {
 								update:$('fieldspecificproperties')
 							};
 							new Request.HTML({
-								url: 'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&tmpl=component',
+								url: 'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&format=raw',
 								method: 'get',
 								update: $('fieldspecificproperties'),
 								evalScripts: false,
