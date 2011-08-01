@@ -175,7 +175,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<h3 id="standard-page" class="title jpane-toggler-down"><span><?php echo JText::_( 'FLEXI_STANDARD_FIELDS_PROPERTIES' ); ?></span></h3>
 					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 0px; padding-bottom: 0px;">
 					<?php
-					foreach($this->form->getFieldset('standard') as $field) :
+					foreach($this->form->getFieldset('basic') as $field) :
 						//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
 						?>
 						<fieldset class="panelform">
@@ -191,8 +191,9 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<h3 id="group-page" class="title jpane-toggler-down"><span><?php echo JText::_( 'FLEXI_THIS_FIELDTYPE_PROPERTIES' ); ?></span></h3>
 					<div id="fieldspecificproperties" class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 0px; padding-bottom: 0px;">
 					<?php
-					if ($this->form->getValue("field_type")) {
-						foreach($this->form->getFieldset('group-' . $this->form->getValue("field_type")) as $field) :
+					$field_type = $this->form->getValue("field_type", NULL, "text");
+					if ($field_type) {
+						foreach($this->form->getFieldset('group-' . $field_type) as $field) :
 							//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
 							?>
 							<fieldset class="panelform">
@@ -202,7 +203,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php
 						endforeach;
 					} else {
-						global $global_field_types;
+						/*global $global_field_types;
 						if(isset($global_field_types[0])) {
 							// Create the form
 							foreach($this->form->getFieldset('group-' . $global_field_types[0]->value) as $field) :
@@ -214,7 +215,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 								</fieldset>
 								<?php
 							endforeach;
-						}else
+						}else*/
 						echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 					}
 					?>
