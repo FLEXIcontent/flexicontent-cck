@@ -380,6 +380,7 @@ class FlexicontentControllerFields extends FlexicontentController{
 	function getfieldspecificproperties() {
 		//$id		= JRequest::getVar( 'id', 0 );
 		JRequest::setVar( 'view', 'field' );
+		JRequest::setVar( 'format', 'raw' );
 		//JRequest::setVar( 'hidemainmenu', 1 );
 		
 		// Import field to execute its constructor, e.g. needed for loading language file etc
