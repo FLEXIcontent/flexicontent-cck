@@ -41,8 +41,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		if($field->field_type != 'fcpagenav') return;
 
 		global $mainframe;
-		$view = JRequest::getString('view', 'items');
-		if ($view != 'items') return;
+		$view = JRequest::getString('view', 'item');
+		if ($view != 'item') return;
 		
 		// parameters shortcuts
 		$load_css 			= $field->parameters->get('load_css', 1);
@@ -61,7 +61,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$cid		= JRequest::getInt('cid');
 		$id			= JRequest::getInt('id');
 	
-		if (($view == 'items') && ($option == 'com_flexicontent'))
+		if (($view == 'item') && ($option == 'com_flexicontent'))
 		{
 
 			$html 		= '';
