@@ -97,14 +97,14 @@ class FlexicontentFields
 				}
 			}
 
-			//if ($items[$i]->fields)
-			//{
-			//	foreach ($items[$i]->fields as $field)
-			//	{
-			//		$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-			//		$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
-			//	}
-			//}
+			if ($items[$i]->fields)
+			{
+				foreach ($items[$i]->fields as $field)
+				{
+					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+				}
+			}
 		}
 		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
