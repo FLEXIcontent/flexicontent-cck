@@ -92,7 +92,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
 			break;
 
-			case 'title': // hits
+			case 'title': // title
 			$field->value[] = $item->title;
 			$field->display = $pretext.$item->title.$posttext;
 			break;
@@ -140,6 +140,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			if ( !is_array($globalnoroute) ) $globalnoroute = array();
 			$display = '';
 			if ($categories) :
+				$field->display = array();
 				foreach ($categories as $category) {
 					if (!in_array($category->id, @$globalnoroute)) :
 						$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
