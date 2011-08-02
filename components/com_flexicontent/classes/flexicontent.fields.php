@@ -39,6 +39,9 @@ class FlexicontentFields
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
+		$mainframe	= &JFactory::getApplication();
+		$cparams	=& $mainframe->getParams('com_flexicontent');
+		
 		$itemcache 	=& JFactory::getCache('com_flexicontent_items');
 		$itemcache->setCaching(FLEXI_CACHE); 		//force cache
 		$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	//set expiry to one hour
@@ -97,12 +100,18 @@ class FlexicontentFields
 				}
 			}
 
-			if ($items[$i]->fields)
-			{
-				foreach ($items[$i]->fields as $field)
+			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
+			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
+			$flexiview = JRequest::getVar('view', false);
+			// 0: never, 1: always, 2: only in item view 
+			if ($always_create_fields_display==1 || ($always_create_fields_display=2 && $flexiview=='items') ) {
+				if ($items[$i]->fields)
 				{
-					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					foreach ($items[$i]->fields as $field)
+					{
+						$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+						$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					}
 				}
 			}
 		}
@@ -187,6 +196,13 @@ class FlexicontentFields
 	 */
 	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display')
 	{
+	  if (!isset($item->fieldsretrieved)) {
+	  	// This if will succeed once per item ... because getFields will retrieve all values
+	  	// getFields() will not render the display of fields because we passed no params variable ...
+		FlexicontentFields::getFields(array(&$item));
+		$item->fieldsretrieved = true;
+	  }
+
 	  // Check if we have already created the display and return it
 	  if ( isset($item->onDemandFields[$fieldname]->{$method}) ) {
 	    return $item->onDemandFields[$fieldname]->{$method};
@@ -207,7 +223,7 @@ class FlexicontentFields
 	  
 	  // Get field's values
 	  if ($values===null) {
-	  	$values = isset($items->fieldvalues[$field->id]) ? $items->fieldvalues[$field->id] : array();
+	  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 	  }
 	  
 	  // Set other field data like label

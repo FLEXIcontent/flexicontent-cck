@@ -143,6 +143,7 @@ class FlexicontentModelCategories extends JModel
    		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$cat->config);
    		$cat->config = new stdClass();
    		foreach($config_arr as $config_var) {
+				if(!$config_var) continue;
    			list($varname,$varval) = explode('=',$config_var);
    			if(!empty($varname)) $cat->config->{$varname} = $varval;
    		}
