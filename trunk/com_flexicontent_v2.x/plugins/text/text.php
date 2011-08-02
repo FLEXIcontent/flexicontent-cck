@@ -44,9 +44,10 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
 		$required 	= $required ? ' required' : '';
-		
+		$version = $item->getValue('version', NULL, 0);
+
 		// initialise property
-		if($item->version < 2 && $default_value) {
+		if($version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
@@ -57,7 +58,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );			
 			}
 		}
-		
+
 		if ($multiple) // handle multiple records
 		{
 			$document	= & JFactory::getDocument();

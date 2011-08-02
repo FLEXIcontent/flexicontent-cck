@@ -66,6 +66,6 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 		if($field->field_type != 'textselect') return;
 		
 		$field->field_type = 'text';
-		plgFlexicontent_fieldsText::onBeforeSaveField($field, $item, $values, $prop);
+		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);
 	}
 }
