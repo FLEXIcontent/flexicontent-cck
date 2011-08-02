@@ -407,7 +407,7 @@ class flexicontent_html
 	 */
  	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
 	{
-        $live_path = JURI::base();
+		$live_path = JURI::base();
 
 		$document =& JFactory::getDocument();
 		
@@ -415,13 +415,13 @@ class flexicontent_html
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim		= $field->parameters->get( 'dimension', 25 );    	
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
-     	$class 		= $field->name;
+		$class 		= $field->name;
 		$img_path	= $live_path . $image;
 	
 		$percent = 0;
 		$stars = '';
 		
-     	global $VoteAddScript;
+		global $VoteAddScript;
 		
 	 	if (!$VoteAddScript)
 	 	{ 
@@ -454,7 +454,7 @@ class flexicontent_html
 			';
 			$document->addStyleDeclaration($css);
 
-     		$VoteAddScript = 1;
+			$VoteAddScript = 1;
 	 	}
 		
 		if ($rating_count != 0) {
@@ -510,7 +510,7 @@ class flexicontent_html
 	 */
 	function favicon($field, $favoured)
 	{
-        $live_path 	= JURI::base();
+		$live_path 	= JURI::base();
 		$user		= & JFactory::getUser();
 		$document 	= & JFactory::getDocument();
 		$js			= $live_path.'components/com_flexicontent/assets/js/fcfav.js';
@@ -1263,7 +1263,7 @@ class flexicontent_tmpl
 					}
 				}
 			}
-			$tmplxml = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$tmpl.DS.'category.xml';
+			$tmplxml = $tmpldir.DS.$tmpl.DS.'category.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->category->{$tmpl}->name 		= $tmpl;
 				$themes->category->{$tmpl}->view 		= 'category';
@@ -1271,7 +1271,7 @@ class flexicontent_tmpl
 				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';	
 				$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
 				foreach ($themes->category as $clay) {
-					$parser =& JFactory::getXMLParser('Simple');		
+					$parser =& JFactory::getXMLParser('Simple');
 					$parser->loadFile($tmplxml);
 					$document 	=& $parser->document;
 
@@ -1456,6 +1456,7 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
+		if(!$id && $justvalue) {$v=0;return $v;}
 		if($id) {
 			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
 			return $return;

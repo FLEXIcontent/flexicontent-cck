@@ -118,21 +118,22 @@ class flexicontent_cats
 		$db->setQuery($query);
 
 		$rows = $db->loadObjectList();
+		$rows = is_array($rows)?$rows:array();
 		
 		//set depth limit
 		$levellimit = 10;
 		
 		//get children
-    	$children = array();  	
-    	foreach ($rows as $child) {
-        	$parent = $child->parent_id;
-       		$list = @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
-
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
+		$children = array();
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list = @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		
+		//get list of the items
+		$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
 
 		return $list;
 	}
@@ -144,12 +145,12 @@ class flexicontent_cats
     * @access public
     * @return array
     */
-	function treerecurse( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
 	{
 		if (!$ancestors) $ancestors = array();
 		
-		if (@$children[$id] && $level <= $maxlevel) {
-			foreach ($children[$id] as $v) {
+		if (@$children[$parent_id] && $level <= $maxlevel) {
+			foreach ($children[$parent_id] as $v) {
 				$id = $v->id;
 				
 				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
@@ -232,10 +233,12 @@ class flexicontent_cats
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					} else {
+						$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 						// FLEXIaccess rule $viewtree enables tree view
 						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}
 				} else {
+					$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 				}
 			}
