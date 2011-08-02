@@ -162,6 +162,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'tags': // assigned tags
 			$display = '';
 			if ($tags) {
+				$field->display = array();
 				foreach ($tags as $tag) {
 					$field->value[] = $tag->name; 
 					$field->display[]  = '<a class="fc_tags link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug)) . '">' . $tag->name . '</a>';
