@@ -304,7 +304,6 @@ class FlexicontentViewItems extends JView
 		$used 		=& $this->get('Usedtags');
 		//$params		=& $mainframe->getParams('com_flexicontent');
 		//$params		=& JComponentHelper::getParams('com_flexicontent');
-		$params	=& $item->parameters;
 		
 		$Itemid		=&JRequest::getVar('Itemid', 0);
 		if($Itemid) {
@@ -312,8 +311,7 @@ class FlexicontentViewItems extends JView
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
-			$mparams = new JParameter($paramsstring);
-			$params->merge($mparams);
+			$params = new JParameter($paramsstring);
 		}
 		$tparams	=& $this->get( 'Typeparams' );
 		
