@@ -304,7 +304,8 @@ class FlexicontentFields
 		}
 		else
 		{
-			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			// NOT core field but just in case code is updated ... we check for core
+			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {

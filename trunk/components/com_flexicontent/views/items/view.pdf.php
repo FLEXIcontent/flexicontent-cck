@@ -63,11 +63,12 @@ class FlexicontentViewItems extends JView
 		foreach ($fields as $field) {
 			if ($field->iscore == 1 || $field->field_type == ('image' || 'file')) {
 /*
-				JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
+				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 				$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
 */
 			} else {
-				JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+				// NOT core field but just in case code is updated ... we check for core
+				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				echo $field->label . ': ';
 				echo $field->display . '<br />';

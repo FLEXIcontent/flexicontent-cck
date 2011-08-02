@@ -401,7 +401,7 @@ class FlexicontentModelItems extends JModel
 					$this->_db->query();
 				}
 				foreach($fields as $field) {
-					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 					
 				    // process field mambots onBeforeSaveField
 					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
@@ -990,7 +990,7 @@ class FlexicontentModelItems extends JModel
 			$searchindex = '';
 			$jcorefields = flexicontent_html::getJCoreFields();
 			foreach($fields as $key=>$field) {
-			    JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			    
 				// process field mambots onBeforeSaveField
 				$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));

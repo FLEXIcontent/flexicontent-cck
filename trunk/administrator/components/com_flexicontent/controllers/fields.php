@@ -402,6 +402,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		// Import field to execute its constructor, e.g. needed for loading language file etc
 		JPluginHelper::importPlugin('flexicontent_fields', JRequest::getVar('field_type'));
+		// Just in case it is need in future ...
+		JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
 		
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
