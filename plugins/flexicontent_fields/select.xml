@@ -58,5 +58,6 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_select.ini</language>
 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_select.ini</language>
+		<language tag="ru-RU">ru-RU.plg_flexicontent_fields_select.ini</language>
 	</languages>
 </install>
