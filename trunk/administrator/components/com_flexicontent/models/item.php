@@ -735,7 +735,6 @@ class FlexicontentModelItem extends JModel {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$searchindex = '';
 			$jcorefields = flexicontent_html::getJCoreFields();
-			JPluginHelper::importPlugin('flexicontent_fields', 'core');
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
 				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
