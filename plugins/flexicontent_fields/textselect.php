@@ -23,6 +23,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
         	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
         	JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
         	JPlugin::loadLanguage('plg_flexicontent_fields_textselect', JPATH_ADMINISTRATOR);
+        	JPluginHelper::importPlugin('flexicontent_fields', 'text' );
+        	JPluginHelper::importPlugin('flexicontent_fields', 'select' );
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
 		if($field->field_type != 'textselect') return;
