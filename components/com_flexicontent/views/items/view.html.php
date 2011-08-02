@@ -320,7 +320,7 @@ class FlexicontentViewItems extends JView
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
-			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$item ));
 		}
 		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');

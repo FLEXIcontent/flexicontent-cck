@@ -19,379 +19,292 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
-
 /**
- * View class for the FLEXIcontent categories screen
+ * View class for the FLEXIcontent item screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItems extends JView {
+class FlexicontentViewItem extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
 
+		//Load pane behavior
+		jimport('joomla.html.pane');
+		//Get the route helper for the preview function
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		
 		//initialise variables
+		$mainframe	= & JFactory::getApplication();
+		$editor 	= & JFactory::getEditor();
+		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$option		= JRequest::getCmd( 'option' );
-		$context	= 'com_flexicontent';
-		$task		= JRequest::getVar('task', '');
-		$cid		= JRequest::getVar('cid', array());
-		$extlimit	= JRequest::getInt('extlimit', 100);
-		
-		if($task == 'copy') {
-			$this->setLayout('copy');
-			$this->_displayCopyMove($tpl, $cid);
-			return;
-		}
+		$pane 		= & JPane::getInstance('sliders');
+		$dispatcher = & JDispatcher::getInstance();
+		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
+		$bar 		= & JToolBar::getInstance('toolbar');
 
 		JHTML::_('behavior.tooltip');
-		JHTML::_('behavior.calendar');
+
+		$nullDate 		= $db->getNullDate();
 
 		//get vars
-		$filter_cats 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_cats', 		'filter_cats', 		0, 				'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $context.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
+		$cid 		= JRequest::getVar( 'cid' );
+		$cid		= is_array($cid)?$cid[0]:$cid;
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
-		if ($filter_cats && $filter_order == 'i.ordering') {
-			$filter_order	= $mainframe->setUserState( $context.'.items.filter_order', 'catsordering' );
-		} else if (!$filter_cats && $filter_order == 'catsordering') {
-			$filter_order	= $mainframe->setUserState( $context.'.items.filter_order', 'i.ordering' );
-		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'ASC', 			'word' );
-
-		$filter_type 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
-		$filter_authors		= $mainframe->getUserStateFromRequest( $context.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		if (FLEXI_FISH) {
-			$filter_lang	 = $mainframe->getUserStateFromRequest( $context.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
-		}
-		$scope	 			= $mainframe->getUserStateFromRequest( $context.'.items.scope', 			'scope', 			1, 				'int' );
-		$date	 			= $mainframe->getUserStateFromRequest( $context.'.items.date', 				'date', 			1, 				'int' );
-		$startdate	 		= $mainframe->getUserStateFromRequest( $context.'.items.startdate', 		'startdate', 		'', 			'cmd' );
-		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $context.'.items.startdate', '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( $context.'.items.enddate', 			'enddate', 			'', 			'cmd' );
-		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $context.'.items.enddate', '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.filter_id', 		'filter_id', 		'', 			'int' );
-		$search 			= $mainframe->getUserStateFromRequest( $context.'.items.search', 			'search', 			'', 			'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		//add css and submenu to document
+		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
-
-		$js = "window.addEvent('domready', function(){";
-		if ($filter_cats) {
-			$js .= "$$('.col_cats').each(function(el){ el.addClass('yellow'); });";
-		}		
-		if ($filter_type) {
-			$js .= "$$('.col_type').each(function(el){ el.addClass('yellow'); });";
-		}
-		if ($filter_authors) {
-			$js .= "$$('.col_authors').each(function(el){ el.addClass('yellow'); });";
-		}
-		if ($filter_state) {
-			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
-		}
-		if (FLEXI_FISH) {
-			if ($filter_lang) {
-				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
-			}
-		}
-		if ($filter_id) {
-			$js .= "$$('.col_id').each(function(el){ el.addClass('yellow'); });";
-		}
-		if ($startdate || $enddate) {
-			if ($date == 1) {
-				$js .= "$$('.col_created').each(function(el){ el.addClass('yellow'); });";
-			} else if ($date == 2) {
-				$js .= "$$('.col_revised').each(function(el){ el.addClass('yellow'); });";
-			}
-		}
-		if ($search) {
-			$js .= "$$('.col_title').each(function(el){ el.addClass('yellow'); });";
-		} else {
-			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
-		}
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
-			$CanEdit 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) : 1;
-			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
-			$CanDelete 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-			$CanCopy	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid) : 1;
-		} else {
-			$CanAdd 		= 1;
-			$CanEdit		= 1;
-			$CanPublish		= 1;
-			$CanDelete		= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanTemplates	= 1;
-			$CanRights		= 1;
-			$CanOrder		= 1;
-			$CanCopy		= 1;
-		}
-		FLEXISubmenu('notvariable');
-
-		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
-		if ($CanAdd) {
-			JToolBarHelper::addNew();
-			if ($CanCopy) {
-				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
-			}
-		}
-		if ($CanEdit) {
-			JToolBarHelper::editList();
-		}
-		if ($CanDelete) {
-			JToolBarHelper::deleteList();
-		}
-		if (FLEXI_ACCESS && !$CanPublish) {
-			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
-		}
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/itemscreen.js' );
+		//add js function to overload the joomla submitform
+		$document->addScript('components/com_flexicontent/assets/js/admin.js');
+		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
-		$rows      		= & $this->get( 'Data');
-		$pageNav 		= & $this->get( 'Pagination' );
+		$model			= & $this->getModel();
+		$row     		= & $this->get( 'Item' );
+		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );
+		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
+		if($version==0)
+			JRequest::setVar( 'version', $version = $lastversion);
+		if(!$cparams->get('use_versioning', 1))
+			JRequest::setVar( 'version', 0);
+		$subscribers 	= & $this->get( 'SubscribersCount' );
+		$selectedcats	= & $this->get( 'Catsselected' );
+		$fields			= & $this->get( 'Extrafields' );
 		$types			= & $this->get( 'Typeslist' );
-		$authors		= & $this->get( 'Authorslist' );
-		$unassociated	= & $this->get( 'UnassociatedItems' );
-		$status      	= & $this->get( 'ExtdataStatus');
-		
-		if (FLEXI_FISH) {
-			$langs	= & $this->get( 'Languages' );
-		}
-		$categories = $globalcats?$globalcats:array();
-		
-		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
-		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-
-		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-		
-		// build the include subcats boolean list
-		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox"', $filter_subcats );
-		
-		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', true);
-
-		//build type select list
-		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"');
-
-		//build authors select list
-		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="inputbox" size="1" onchange="submitform( );"');
-
-		//search filter
-		$scopes = array();
-		$scopes[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_TITLE' ) );
-		$scopes[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_INTROTEXT' ) );
-		$scopes[] = JHTML::_('select.option', '4', JText::_( 'FLEXI_INDEXED_CONTENT' ) );
-		$lists['scope'] = JHTML::_('select.radiolist', $scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-
-		// build dates option list
-		$dates = array();
-		$dates[] = JHTML::_('select.option',  '1', JText::_( 'FLEXI_CREATED' ) );
-		$dates[] = JHTML::_('select.option',  '2', JText::_( 'FLEXI_REVISED' ) );
-		$lists['date'] = JHTML::_('select.radiolist', $dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
-
-		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'9',  'maxlength'=>'20'));
-		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'9',  'maxlength'=>'20'));
-
-		// search filter
-		$extdata = array();
-		$extdata[] = JHTML::_('select.option', 5, 	'5 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 30, 	'30 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 50, 	'50 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 100, '100 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 200, '200 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 300, '300 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 3000,'3000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 4000,'4000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 5000,'5000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['extdata'] = JHTML::_('select.genericlist', $extdata, 'extdata', 'size="1" class="inputbox"', 'value', 'text', $extlimit );
-
-		// search filter
-		$lists['search'] = $search;
-		// search id
-		$lists['filter_id'] = $filter_id;
-
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-
-		// filter ordering
-		if ($filter_cats == '' || $filter_cats == 0)
-		{
-			$ordering = ($lists['order'] == 'i.ordering');
-		} else {
-			$ordering = ($lists['order'] == 'catsordering');
+		$typesselected	= & $this->get( 'Typesselected' );
+		$versioncount	= & $this->get( 'VersionCount' );
+		$versionsperpage = $cparams->get('versionsperpage', 10);
+		$pagecount	= (int)ceil($versioncount/$versionsperpage);
+		$allversions		= & $model->getVersionList();//get all versions.
+		$current_page = 1;
+		$k=1;
+		foreach($allversions as $v) {
+			if( $k && (($k%$versionsperpage)==0) ) 
+				$current_page++;
+			if($v->nr==$version) break;
+			$k++;
 		}
 
-		if (FLEXI_FISH) {
-		//build languages filter
-		$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
-		}
-		
-		//assign data to template
-		$this->assignRef('db'  			, $db);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		if (FLEXI_FISH) {
-			$this->assignRef('langs'    , $langs);
-		}
-		$this->assignRef('cid'      	, $cid);
-		$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('user'			, $user);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
-		$this->assignRef('unassociated'	, $unassociated);
-		// filters
-		$this->assignRef('filter_id'		, $filter_id);
-		$this->assignRef('filter_state'		, $filter_state);
-		$this->assignRef('filter_authors'	, $filter_authors);
-		$this->assignRef('filter_type'		, $filter_type);
-		$this->assignRef('filter_cats'		, $filter_cats);
-		$this->assignRef('filter_subcats'	, $filter_subcats);
-		$this->assignRef('filter_lang'		, $filter_lang);
-		$this->assignRef('scope'			, $scope);
-		$this->assignRef('search'			, $search);
-		$this->assignRef('date'				, $date);
-		$this->assignRef('startdate'		, $startdate);
-		$this->assignRef('enddate'			, $enddate);
-
-		parent::display($tpl);
-	}
-
-	function _displayCopyMove($tpl = null, $cid)
-	{
-		global $mainframe, $globalcats;
-
-		//initialise variables
-		$user 		= & JFactory::getUser();
-		$document	= & JFactory::getDocument();
-		$context	= 'com_flexicontent';
-		
-		JHTML::_('behavior.tooltip');
-
-		//add css and submenu to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-
-		//add js functions
-		$document->addScript('components/com_flexicontent/assets/js/copymove.js');
-
-		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
-			$CanEdit 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)) : 1;
-			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
-			$CanDelete 		= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-		} else {
-			$CanAdd 		= 1;
-			$CanEdit		= 1;
-			$CanPublish		= 1;
-			$CanDelete		= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanOrder		= 1;
-		}
-
-		//Create Submenu
-		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent');
-		JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', true);
-		if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types');
-		if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories');
-		if ($CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields');
-		if ($CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags');
-		if ($CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive');
-		if ($CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager');
-		if ($CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats');
+		$versions		= & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
+		$tparams		= & $this->get( 'Typeparams' );
+		$languages		= & $this->get( 'Languages' );
+		$categories 	= $globalcats;
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );
-		JToolBarHelper::save('copymove');
+		if ( $cid ) 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );
+			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$base 			= str_replace('administrator/', '', JURI::base());
+			$previewlink 	= $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) . $autologin;
+			// Add a preview button
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+		} 
+		else 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
+		}
+		JToolBarHelper::apply();
+		JToolBarHelper::save();
+		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
 
-		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$categories = $globalcats;
+		$usedtags = array();
+		if ($cid) {
+			//$usedtags 	= $model->getusedtags($cid);
+			$usedtagsA 	= & $this->get( 'UsedtagsArray' );
+			$usedtags 	= $model->getUsedtags($usedtagsA);
+		}
+		// Add html to field object trought plugins
+		foreach ($fields as $field)
+		{
+			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
+			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$row ));
+		}
 		
-		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
-		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+		if (FLEXI_ACCESS) {
+			$CanParams	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
+			$CanVersion	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'versioning', 'users', $user->gmid) : 1;
+			$CanUseTags	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+		} else {
+			$CanParams	= 1;
+			$CanVersion	= 1;
+			$CanUseTags = 1;
+		}
+		if (!$CanParams) 	$document->addStyleDeclaration('#det-pane {display:none;}');
 
-		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', 'class="inputbox" size="1"', 'value', 'text', $state );
+		// set default values
+		$canPublish 	= 1;
+		$canPublishOwn	= 1;
+		$canRight 		= 1;
+
+		if ($row->id) {
+			// fail if checked out not by 'me'	
+			if ($model->isCheckedOut( $user->get('id') )) {
+				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+				$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
+			}
+			if (FLEXI_ACCESS && ($user->gid < 25)) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+				$canEdit 		= in_array('edit', $rights);
+				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
+				$canPublish 	= in_array('publish', $rights);
+				$canPublishOwn	= (in_array('publishown', $rights) && ($row->created_by == $user->id));
+				$canRight 		= in_array('right', $rights);
+
+				// check if the user can really edit the item
+				if ($canEdit || $canEditOwn || ($lastversion < 3)) {
+				} else {
+					$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS' ));
+				}
+			}
+		}
+
+		//clean data
+		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+
+		//build selectlists
+		$lists = array();
+		if (FLEXI_ACCESS && ($user->gid < 25)) {
+			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all'))) {
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true, false);
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true, false);
+			} else {
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
+				$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
+			}
+		} else {
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'multiple="multiple" size="20" class="required mcat"', true);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, 'class="scat"', true);
+		}
+
+		//buid types selectlist
+		$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', true );
+	
+		// build granular access list
+		if (FLEXI_ACCESS) {
+			if (isset($user->level)) {
+			$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+			} else {
+				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+			}
+		}
 		
-		// build the main category select list
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
-		// build the secondary categories select list
-		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
+		// Create the type parameters
+		$tparams = new JParameter($tparams);
+		// Create the form
+		if (FLEXI_ACCESS) {
+			$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item2.xml');
+		} else {
+			$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item.xml');
+		}
 
+		// Details Group
+		$active = (intval($row->created_by) ? intval($row->created_by) : $user->get('id'));
+		if (!FLEXI_ACCESS) {
+			$form->set('access', $row->access);
+		}
+		$form->set('created_by', $active);
+		$form->set('created_by_alias', $row->created_by_alias);
+		$form->set('created', JHTML::_('date', $row->created, '%Y-%m-%d %H:%M:%S'));
+		$form->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
+		$form->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
+		if (JHTML::_('date', $row->publish_down, '%Y') <= 1969 || $row->publish_down == $db->getNullDate()) {
+			$form->set('publish_down', JText::_( 'FLEXI_NEVER' ));
+		} else {
+			$form->set('publish_down', JHTML::_('date', $row->publish_down, '%Y-%m-%d %H:%M:%S'));
+		}
+
+		// Advanced Group
+		$form->loadINI($row->attribs);
+
+		// Metadata Group
+		$form->set('description', $row->metadesc);
+		$form->set('keywords', $row->metakey);
+		$form->loadINI($row->metadata);
+
+		// Handle item templates parameters
+		$themes		= flexicontent_tmpl::getTemplates();
+		$tmpls		= $themes->items;
+		foreach ($tmpls as $tmpl) {
+			$tmpl->params->loadINI($row->attribs);
+		}
+
+		//build state list
+		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) ); 
+		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
+		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
+		if(!$canPublish)
+			$row->state = $row->state ? $row->state : -4;
+		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $row->state );
+		
+		//build version state list
+		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
+		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
+		if (FLEXI_FISH) {
+		//build languages list
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
+		} else {
+			$row->language = flexicontent_html::getSiteDefaultLang();
+		}
+		
+		switch ($row->state) {
+			case 0:
+			$published = JText::_( 'FLEXI_UNPUBLISHED' );
+			break;
+			case 1:
+			$published = JText::_( 'FLEXI_PUBLISHED' );
+			break;
+			case -1:
+			$published = JText::_( 'FLEXI_ARCHIVED' );
+			break;
+			case -3:
+			$published = JText::_( 'FLEXI_PENDING' );
+			break;
+			case -5:
+			$published = JText::_( 'FLEXI_IN_PROGRESS' );
+			break;
+			case -4:
+			default:
+			$published = JText::_( 'FLEXI_TO_WRITE' );
+			break;
+		}
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('cid'      	, $cid);
-		$this->assignRef('user'			, $user);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
+		$this->assignRef('document'     	, $document);
+		$this->assignRef('lists'      		, $lists);
+		$this->assignRef('row'      		, $row);
+		$this->assignRef('canPublish'   	, $canPublish);
+		$this->assignRef('canPublishOwn'	, $canPublishOwn);
+		$this->assignRef('canRight'			, $canRight);
+		$this->assignRef('published'		, $published);
+		$this->assignRef('editor'			, $editor);
+		$this->assignRef('pane'				, $pane);
+		$this->assignRef('nullDate'			, $nullDate);
+		$this->assignRef('form'				, $form);
+		$this->assignRef('subscribers'		, $subscribers);
+		$this->assignRef('fields'			, $fields);
+		$this->assignRef('versions'			, $versions);
+		$this->assignRef('pagecount'		, $pagecount);
+		$this->assignRef('version'			, $version);
+		$this->assignRef('lastversion'		, $lastversion);
+		$this->assignRef('cparams'			, $cparams);
+		$this->assignRef('tparams'			, $tparams);
+		$this->assignRef('tmpls'			, $tmpls);
+		$this->assignRef('usedtags'			, $usedtags);
+		$this->assignRef('CanVersion'		, $CanVersion);
+		$this->assignRef('CanUseTags'		, $CanUseTags);
+		$this->assignRef('current_page'		, $current_page);
 
 		parent::display($tpl);
 	}
-
 }
 ?>

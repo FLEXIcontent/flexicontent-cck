@@ -256,7 +256,7 @@ class FlexicontentModelItem extends JModel {
 						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
 					// process field mambots onAfterSaveField
-					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 					//$searchindex 	.= @$field->search;
 				}
@@ -738,7 +738,7 @@ class FlexicontentModelItem extends JModel {
 			JPluginHelper::importPlugin('flexicontent_fields', 'core');
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
-				JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 				$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
@@ -798,8 +798,7 @@ class FlexicontentModelItem extends JModel {
 						if (!empty($post[$field->name])) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 					}
 				}
-				// process field mambots onAfterSaveField
-				JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+				// process field mambots onAfterSaveField, JPluginHelper::importPlugin() was called above
 				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 				$searchindex 	.= @$field->search;
 			}

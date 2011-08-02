@@ -596,7 +596,7 @@ VALUES
 					$db->query();
 				}*/
 				foreach($fields as $field) {
-					//JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 					
 					// process field mambots onBeforeSaveField
 					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
