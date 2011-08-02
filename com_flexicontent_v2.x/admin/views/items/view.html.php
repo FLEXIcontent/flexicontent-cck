@@ -118,7 +118,7 @@ class FlexicontentViewItems extends JView {
 		}
 		
 		$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
-		$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&tmpl=component&tmpl=component');\n";
+		$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		
