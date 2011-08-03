@@ -188,7 +188,7 @@ class FlexicontentFields
 	}
 
 	/**
-	 * Method to render (display method) a field on demand and return thedisplay
+	 * Method to render (display method) a field on demand and return the display
 	 * 
 	 * @access public
 	 * @return object
@@ -199,8 +199,8 @@ class FlexicontentFields
 	  if (!isset($item->fieldsretrieved)) {
 	  	// This if will succeed once per item ... because getFields will retrieve all values
 	  	// getFields() will not render the display of fields because we passed no params variable ...
-		FlexicontentFields::getFields(array(&$item));
-		$item->fieldsretrieved = true;
+	  	FlexicontentFields::getFields(array(&$item));
+	  	$item->fieldsretrieved = true;
 	  }
 
 	  // Check if we have already created the display and return it
@@ -215,12 +215,14 @@ class FlexicontentFields
 	    if ($field->name==$fieldname) break;
 	  }
 	  
-	  // If not found return error message so that user can correct the field name
+	  // Field not found, this is either due to no access or wrong name ...
+	  $item->onDemandFields[$fieldname]->noaccess = false;
 	  if ($field->name!=$fieldname) {
-	  	$item->onDemandFields[$fieldname]->{$method} = "Field: $fieldname was not found";
+	  	$item->onDemandFields[$fieldname]->noaccess = true;
+	  	$item->onDemandFields[$fieldname]->{$method} = "not found or no access";
 	  	return $item->onDemandFields[$fieldname]->{$method};
 	  }
-	  
+	  	  
 	  // Get field's values
 	  if ($values===null) {
 	  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
