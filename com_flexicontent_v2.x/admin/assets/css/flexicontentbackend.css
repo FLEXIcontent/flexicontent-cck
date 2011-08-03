@@ -559,12 +559,76 @@ div#tags {
 	width: 235px;
 }
 
-div#result table.versionlist{
+div#result table.versionlist {
 	border: 1px dashed silver;
 	padding: 5px;
 	margin-bottom: 5px;
 }
-div#result table.versionlist th{
+div#result table.versionlist th {
 	border-bottom: 1px dotted silver;
 	padding: 2px 0 6px 0;
 }
+
+fieldset label.radiobtn {
+	display:inline;
+	float:none;
+	padding-right:12px;
+}
+
+div fieldset.adminform fieldset.radio label,
+div fieldset.panelform fieldset.radio label {
+	float:none;
+}
+
+div fieldset.panelform {
+	padding:0px;
+	margin: 4px;
+	border-bottom:1px solid black;
+}
+
+div fieldset label {
+	margin:2px;
+}
+div fieldset input, div fieldset textarea,
+div fieldset select, div fieldset img, div fieldset button {
+	margin:0px;
+	display:inline;
+	float:none;
+}
+fieldset.panelform label, fieldset.panelform input, fieldset.panelform textarea,
+fieldset.panelform select, fieldset.panelform img, fieldset.panelform button {
+	margin:1px;
+}
+
+div fieldset.panelform label {
+	min-width:116px;
+}
+
+div.button2-left {
+	margin-left:8px;
+	margin-top:-2px;
+}
+
+div fieldset.panelform td {
+	border:1px solid #e0e0e0;
+	background-color: #efefef;
+}
+
+div fieldset.panelform table {
+	width:100%;
+}
+
+div #jform_params_target { width: 170px; }
+
+div #jform_params_image { width: 60px; }
+
+div #jform_params_show_print_icon,
+div #jform_params_show_email_icon {	width:140px; }
+
+div #jformtid {	scroll: visible;	height:60px;	width:60%;  }
+
+div #jform_params_filters { display:block; width:100%; float:none; clear:both}
+
+#jform_attribs_separator1-lbl, #jform_attribs_separator2-lbl, #jform_attribs_separator3-lbl, #jform_attribs_separator4-lbl, #jform_attribs_separator5-lbl,
+#jform_attribs_separator6-lbl, #jform_attribs_separator7-lbl, #jform_attribs_separator8-lbl, #jform_attribs_separator9-lbl, #jform_attribs_separator10-lbl, 
+#jform_attribs_separator11-lbl, #jform_attribs_separator12-lbl { font-weight:bold;}
