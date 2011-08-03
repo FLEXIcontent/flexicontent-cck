@@ -22,15 +22,13 @@
 
 		<field name="state" type="list" label="JGLOBAL_STATE"
 			description="JFIELD_PUBLISHED_DESC" class="inputbox"
-			filter="intval" size="1" default="1">
-			<option value="1">
-				JPUBLISHED</option>
-			<option value="0">
-				JUNPUBLISHED</option>
-			<option value="2">
-				JARCHIVED</option>
-			<option value="-2">
-				JTRASHED</option>
+			filter="intval" size="1" default="-4">
+			<option value="-4">FLEXI_TO_WRITE</option>
+			<option value="-3">FLEXI_PENDING</option>
+			<option value="-5">FLEXI_IN_PROGRESS</option>
+			<option value="1">FLEXI_PUBLISHED</option>
+			<option value="0">FLEXI_UNPUBLISHED</option>
+			<option value="-1">FLEXI_ARCHIVED</option>
 		</field>
 
 		<field name="cid" type="categorytree"
@@ -38,7 +36,7 @@
 			class="required mcat" required="true" multiple="true" />
 		<field name="catid" type="categorytree"
 			label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC"
-			class="scat" top="2" required="true" />
+			class="scat" top="2" />
 		<field
 			name="buttonspacer"
 			description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION"

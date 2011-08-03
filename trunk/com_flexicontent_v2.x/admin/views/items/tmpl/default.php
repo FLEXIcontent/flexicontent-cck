@@ -32,14 +32,14 @@ function dostate(state, id) {
 }
 
 function fetchcounter() {
-	var url = "index.php?option=com_flexicontent&task=items.getorphans&tmpl=component";
+	var url = "index.php?option=com_flexicontent&task=items.getorphans&templ=component&format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
 			method: 'get',
 			update: $('count'),
-			onComplete:function(v) {
-				if(v==0)
+			onSuccess:function(responseTree, responseElements, responseHTML, responseJavaScript) {
+				if(responseHTML==0)
 					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
 						location.href = 'index.php?option=com_flexicontent&view=items';
 			}
@@ -155,8 +155,7 @@ window.addEvent('domready', function(){
 </script>
 <?php if ($this->unassociated) : ?>
 <script type="text/javascript">
-window.addEvent('domready', function(){
-	var count = fetchcounter();
+window.addEvent('domready', function() {
 	$('bindForm').addEvent('submit', function(e) {
 		if(MooTools.version>="1.2.4") {
 			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
