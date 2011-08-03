@@ -23,9 +23,11 @@ require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
 require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
 if(!function_exists('FLEXIcontentSubmenu')) {
-	function FLEXIcontentSubmenu() {
+	function FLEXIcontentSubmenu($cando) {
 		$permission = FlexicontentHelperPerm::getPerm();
-
+		if (isset($permission->$cando) && !$permission->$cando) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
 		$session  =& JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$view = JRequest::getVar('view');
@@ -40,6 +42,7 @@ if(!function_exists('FLEXIcontentSubmenu')) {
 			if ($permission->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', ($view=='tags'));
 			if ($permission->CanArchives) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', ($view=='archive'));
 			if ($permission->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', ($view=='filemanager'));
+			JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEX' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
 			if ($permission->CanTemplates) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', ($view=='templates'));
 			if ($permission->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', ($view=='stats'));
 		}

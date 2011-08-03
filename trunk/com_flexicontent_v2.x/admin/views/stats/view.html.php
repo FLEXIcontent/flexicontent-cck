@@ -69,7 +69,7 @@ class FlexicontentViewStats extends JView{
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('CanStats');
 
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('genstats'		, $genstats);

@@ -142,7 +142,7 @@ class FlexicontentViewFlexicontent extends JView{
 		}
 		$permission = FlexicontentHelperPerm::getPerm();
 		//Create Submenu
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('notvariable');
 
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('unapproved'	, $unapproved);
