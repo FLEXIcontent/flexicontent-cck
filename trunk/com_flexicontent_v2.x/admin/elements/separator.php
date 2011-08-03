@@ -40,12 +40,13 @@ class JFormFieldSeparator extends JFormField{
 	function getInput() {
 		$level = $this->element->getAttribute('level');
 		if ($level == 'level2') {
-			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
+			$style = 'padding-top: 1px; margin:10px 0px 0px -0px; background-color: #ccc; display: block; color: #000; font-weight: bold;';
 		} else if ($level == 'level3') {
-			$style = 'padding: 5px 4px 5px 5px; font-weight: bold;';
+			$style = 'padding-top: 2px;  margin:10px 0px 0px 0px; font-weight: bold; background-color: #aaa;';
 		} else {
-			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
+			$style = 'padding-top: 2px;  margin:10px 0px 0px 0px; background-color: #777; display: block; color: #fff; font-weight: bold;';
 		}
-		return '<fieldset style="float:left;width:100%;"><div style="'.$style.'">'.JText::_($this->value).'</div></fieldset>';
+		//return '<fieldset style="float:left;width:100%;"><div style="'.$style.'">'.JText::_($this->value).'</div></fieldset>';
+		return '<div style="display:block:float:none; height:2px;width:auto:border-width:0px"></div>';
 	}
 }
