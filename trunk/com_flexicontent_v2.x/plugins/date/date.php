@@ -195,8 +195,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
-		$dateformat			= $field->parameters->get( 'date_format', '%Y-%m-%d' ) ;
-		$customdate			= $field->parameters->get( 'custom_date', '' ) ; 
+		$customdate			= $field->parameters->get( 'custom_date', '%Y-%m-%d' ) ; 
+		$dateformat			= $field->parameters->get( 'date_format', $customdate ) ;
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
 
 		switch($separatorf)
@@ -224,7 +224,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 								
 		// initialise property
 		$field->{$prop} 	= array();
-		$dateformat = $dateformat ? $dateformat : $customdate;
 
 		$n=0;
 		foreach ($values as $value) {
