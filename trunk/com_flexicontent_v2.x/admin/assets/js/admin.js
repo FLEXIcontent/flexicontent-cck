@@ -23,7 +23,7 @@ Joomla.submitform = function (pressbutton){
 	form = document.adminForm;
 
 	// If formvalidator activated
-	if( document.formvalidator && pressbutton != 'cancel' ) {
+	if( document.formvalidator && pressbutton != 'items.cancel' ) {
 		// Check the form is valid
 		if(document.formvalidator.isValid(form)) {
 			// Store the button task into the form
