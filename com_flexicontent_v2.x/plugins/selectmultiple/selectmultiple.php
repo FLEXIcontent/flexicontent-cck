@@ -63,7 +63,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			} else {
 			
-				$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
+				$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 			}
 
 		} else { // Elements mode
@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					}
 				}
 			}			
-			$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
+			$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 		}
 	}
 

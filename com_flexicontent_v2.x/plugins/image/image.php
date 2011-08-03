@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// if an image exists it display the existing image
 		if ($field->value  && $field->value[0] != '')
-		{				
+		{
 			foreach ($field->value as $value) {
 				$value = unserialize($value);
 				$image = $value['originalname'];
@@ -76,30 +76,30 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<div style="float:left; margin-right: 5px;">
 					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver;" />
 					<br />
-					<input type="checkbox" name="'.$field->name.'[remove]" value="1"'.$remove.'>'.JText::_( 'FLEXI_FIELD_REMOVE' ).'
-					<input type="checkbox" name="'.$field->name.'[delete]" value="1"'.$delete.'>'.JText::_( 'FLEXI_FIELD_DELETE' ).'
-					<input name="'.$field->name.'[originalname]" type="hidden" value="'.$value['originalname'].'" />
+					<input type="checkbox" name="custom['.$field->name.'][remove]" value="1"'.$remove.'>'.JText::_( 'FLEXI_FIELD_REMOVE' ).'
+					<input type="checkbox" name="custom['.$field->name.'][delete]" value="1"'.$delete.'>'.JText::_( 'FLEXI_FIELD_DELETE' ).'
+					<input name="custom['.$field->name.'][originalname]" type="hidden" value="'.$value['originalname'].'" />
 				</div>
 				<div style="float:left;">
 					<table class="admintable">'.
 					($linkto_url ? '
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-							<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+							<td><input name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 						</tr>'
 						:
 						'').'
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-							<td><input name="'.$field->name.'[alt]" value="'.$value['alt'].'" type="text" /></td>
+							<td><input name="custom['.$field->name.'][alt]" value="'.$value['alt'].'" type="text" /></td>
 						</tr>
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-							<td><input name="'.$field->name.'[title]" value="'.$value['title'].'" type="text" /></td>
+							<td><input name="custom['.$field->name.'][title]" value="'.$value['title'].'" type="text" /></td>
 						</tr>
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
-							<td><textarea name="'.$field->name.'[desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
+							<td><textarea name="custom['.$field->name.'][desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 						</tr>
 					</table>
 				</div>';
@@ -130,7 +130,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
+						<td><input name="custom['.$field->name.']" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).':</td>
@@ -139,17 +139,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					($linkto_url ? '
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-						<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+						<td><input name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 					</tr>'
 					:
 					'').'
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-						<td><input name="'.$field->name.'[alt]" type="text" /></td>
+						<td><input name="custom['.$field->name.'][alt]" type="text" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-						<td><input name="'.$field->name.'[title]" type="text" /></td>
+						<td><input name="custom['.$field->name.'][title]" type="text" /></td>
 					</tr>
 				</table>
 			</div>

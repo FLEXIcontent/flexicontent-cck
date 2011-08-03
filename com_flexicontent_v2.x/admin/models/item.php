@@ -633,7 +633,7 @@ class FlexicontentModelItem extends JModelAdmin {
 		///////////////////////////////
 		// store extra fields values //
 		///////////////////////////////
-		
+
 		// get the field object
 		//$this->_id 	= $item->id;
 		$fields		= $this->getExtrafields();
@@ -658,11 +658,19 @@ class FlexicontentModelItem extends JModelAdmin {
 					foreach ($postvalues as $postvalue) {
 						$this->saveFieldItem($item->id, $field->id, $postvalue, $isnew, $field->iscore, ($data['vstate']==2), $i++);
 					}
-				} else if ($data['jform'][$field->name]) {
+				} else if (isset($data['jform'][$field->name])) {
 					//not versionning hits field => Fix this issue 18 http://code.google.com/p/flexicontent/issues/detail?id=18
 					if ($field->id != 7) {
 						$this->saveFieldItem($item->id, $field->id, $data['jform'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 					}
+				}elseif (is_array($data['custom'][$field->name])) {
+					$postvalues = $data['custom'][$field->name];
+					$i = 1;
+					foreach ($postvalues as $postvalue) {
+						$this->saveFieldItem($item->id, $field->id, $postvalue, $isnew, $field->iscore, ($data['vstate']==2), $i++);
+					}
+				}elseif(isset($data['custom'][$field->name])) {
+					$this->saveFieldItem($item->id, $field->id, $data[$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 				}
 				// process field mambots onAfterSaveField
 				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));

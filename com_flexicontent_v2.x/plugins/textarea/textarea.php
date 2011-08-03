@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->value[0] = htmlspecialchars( $field->value[0], ENT_NOQUOTES, 'UTF-8' );
 			$field->html	 = $editor->display( $field->name, $field->value[0], '100%', $height, $cols, $rows, array('pagebreak', 'readmore') );
 		} else {
-			$field->html	 = '<textarea name="' . $field->name . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">';
+			$field->html	 = '<textarea name="custom['.$field->name.']" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">';
 			$field->html	.= $field->value[0];
 			$field->html	.= '</textarea>';
 		}

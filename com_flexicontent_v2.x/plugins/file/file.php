@@ -111,7 +111,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		  
 			var field	= $(el);
 			var row		= field.getParent();
-			var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+			var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 			
 			fx.start({
 				'height': 0,
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-	  $field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
+		$field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
 		$field->html .= '<ul id="sortables_'.$field->id.'">';
 		if($field->value) {
@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
 				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
-				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"".$field->name."[]\" value=\"".$file."\" />";
+				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"custom[".$field->name."][]\" value=\"".$file."\" />";
 				$field->html .= "<input class=\"inputbox fcbutton\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
 				$field->html .= "<span class=\"drag".$field->id."\">".$move."</span>";
 				$field->html .= '</li>';

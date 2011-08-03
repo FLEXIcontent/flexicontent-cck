@@ -198,7 +198,8 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									<td>
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
-										echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
+										//echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
+										echo $this->form->getInput('state');
 											if (!$this->cparams->get('auto_approve', 1)) :
 												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
 											else :
@@ -206,7 +207,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 											endif;
 									else :
 										echo $this->published;
-										echo '<input type="hidden" name="state" value="'.$this->form->getValue("state").'" />';
+										echo '<input type="hidden" name="jform[state]" value="'.$this->form->getValue("state").'" />';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												echo '<input type="hidden" name="vstate" value="1" />';
 											else :
@@ -658,7 +659,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
-<input type="hidden" name="hits" value="<?php echo $this->form->getValue('hits'); ?>" />
+<?php echo $this->form->getInput('hits'); ?>
 <input type="hidden" name="oldtitle" value="<?php echo $this->form->getValue('title'); ?>" />
 <input type="hidden" name="oldtext" value="<?php //echo $this->form->getValue('text'); ?>" />
 <input type="hidden" name="oldstate" value="<?php echo $this->form->getValue('state'); ?>" />
