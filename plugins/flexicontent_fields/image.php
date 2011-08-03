@@ -31,6 +31,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function onDisplayField(&$field, $item)
 	{
+		if($field->field_type != 'image') return;
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 1);

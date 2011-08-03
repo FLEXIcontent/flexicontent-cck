@@ -111,6 +111,35 @@ class flexicontent_fields extends JTable{
 	}
 	
 	/**
+	 * Overloaded bind function.
+	 *
+	 * @param   array   $array   named array
+	 * @param   string  $ignore  An optional array or space separated list of properties
+	 *                           to ignore while binding.
+	 *
+	 * @return  mixed   Null if operation was satisfactory, otherwise returns an error
+	 *
+	 * @see     JTable:bind
+	 * @since   11.1
+	 */
+	public function bind($array, $ignore = '')
+	{
+		if (isset($array['attribs']) && is_array($array['attribs'])) {
+			$registry = new JRegistry;
+			$registry->loadArray($array['attribs']);
+			$array['attribs'] = (string)$registry;
+		}
+
+		// Bind the rules.
+		if (isset($array['rules']) && is_array($array['rules'])) {
+			$rules = new JRules($array['rules']);
+			$this->setRules($rules);
+		}
+
+		return parent::bind($array, $ignore);
+	}
+	
+	/**
 	 * Method to store a row in the database from the JTable instance properties.
 	 * If a primary key value is set the row with that primary key value will be
 	 * updated with the instance property values.  If no primary key value is set
