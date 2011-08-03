@@ -31,6 +31,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function onDisplayField(&$field, $item)
 	{
+		if($field->field_type != 'image') return;
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 1);
@@ -255,6 +256,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				  case 1: $src = $srcs; break;
 				  case 2: $src = $srcm; break;
 				  case 3: $src = $srcb; $popuptype = 0; break;
+				  default: $src = $srcs; break;
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
@@ -655,7 +657,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		foreach ($values as $value) {
 			$options[] = JHTML::_('select.option', $value, $value); 
 		}
-		$list	= JHTML::_('select.genericlist', $options, $field->name.'[originalname]', $onchange, 'value', 'text', '');
+		$list	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][originalname]', $onchange, 'value', 'text', '');
 
 		return $list;
 	}
