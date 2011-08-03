@@ -659,18 +659,6 @@ class FlexicontentControllerItems extends JController {
 			exit;
 		}
 	}
-	/**
-	 * Method to fetch the tags form
-	 * 
-	 * @since 1.5
-	 */
-	function getorphans()
-	{
-		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtdataStatus();
-
-		echo count($status['no']);
-	}
 
 	/**
 	 * Method to get hits

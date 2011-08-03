@@ -510,7 +510,7 @@ class FlexicontentModelItem extends JModelAdmin {
 		}
 		
 		// Get a state and parameter variables from the request
-		$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
+		//$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 		$oldstate	= JRequest::getVar( 'oldstate', 0, '', 'int' );
 		//$params		= JRequest::getVar( 'params', null, 'post', 'array' );
 		/*$params		= $data['jform']['attribs'];
@@ -574,7 +574,7 @@ class FlexicontentModelItem extends JModelAdmin {
 		}
 		$this->_id = $item->id;
 
-		//$this->_item	=& $item;
+		$this->_item	=& $item;
 
 		if($data['vstate']==2) {
 			//store tag relation
@@ -663,7 +663,7 @@ class FlexicontentModelItem extends JModelAdmin {
 					if ($field->id != 7) {
 						$this->saveFieldItem($item->id, $field->id, $data['jform'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 					}
-				}elseif (is_array($data['custom'][$field->name])) {
+				}elseif (is_array(@$data['custom'][$field->name])) {
 					$postvalues = $data['custom'][$field->name];
 					$i = 1;
 					foreach ($postvalues as $postvalue) {
@@ -676,7 +676,7 @@ class FlexicontentModelItem extends JModelAdmin {
 				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
 				$searchindex 	.= @$field->search;
 			}
-	
+
 			// store the extended data if the version is approved
 			if( $isnew || ($data['vstate']==2) ) {
 				$item->search_index = $searchindex;
@@ -969,7 +969,8 @@ class FlexicontentModelItem extends JModelAdmin {
 		return $used;
 	}
 	function getCoreFieldValue(&$field) {
-		$item = $this->getItem();
+		if(isset($this->_item)) $item=&$this->_item;
+		else $item = $this->getItem();
 		switch ($field->field_type) {
 			case 'created': // created
 			$field->value = array($item->created);

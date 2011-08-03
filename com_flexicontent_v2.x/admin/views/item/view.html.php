@@ -166,7 +166,7 @@ class FlexicontentViewItem extends JView {
 		$tmpls		= $themes->items;
 
 		//build state list
-		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		/*$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
 		$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) ); 
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
 		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
@@ -175,6 +175,7 @@ class FlexicontentViewItem extends JView {
 		//if(!$canPublish)
 		//	$row->state = $row->state ? $row->state : -4;
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'state', '', 'value', 'text', $form->getValue("state") );
+		*/
 		
 		//build version state list
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
