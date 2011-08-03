@@ -33,7 +33,7 @@ class FLEXIcontentViewSearch extends JView
 		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
+		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
 
 		FLEXIcontentSubmenu('notvariable');
 		
@@ -76,6 +76,9 @@ class FLEXIcontentViewSearch extends JView
 		$toolbar->appendButton('Popup', 'config', 'FINDER_OPTIONS', 'index.php?option=com_finder&view=config&tmpl=component', 570, 500);
 		$toolbar->appendButton('Popup', 'help', 'FINDER_ABOUT', 'index.php?option=com_finder&view=about&tmpl=component', 550, 500);
 		*/
+		$user = &JFactory::getUser();
+		$permission = FlexicontentHelperPerm::getPerm();
+		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 	}
 	
 	function indexer($tpl) {

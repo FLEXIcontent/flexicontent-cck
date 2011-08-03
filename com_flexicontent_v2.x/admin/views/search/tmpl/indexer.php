@@ -40,7 +40,7 @@ jQuery(document).ready(function() {
 		});
 	}
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&controller=search&task=countrows",
+		url: "index.php?option=com_flexicontent&task=search.countrows",
 		success: function(response, status, xhr) {
 			var arr = response.split('|');
 			if(arr[0]=='fail') {
