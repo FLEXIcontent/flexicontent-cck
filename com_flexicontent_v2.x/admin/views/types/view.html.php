@@ -55,7 +55,7 @@ class FlexicontentViewTypes extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('CanTypes');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TYPES' ), 'types' );

@@ -123,7 +123,7 @@ class FlexicontentViewItems extends JView {
 		$document->addScriptDeclaration($js);
 		
 		$permission = FlexicontentHelperPerm::getPerm();
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('notvariable');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );

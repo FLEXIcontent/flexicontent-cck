@@ -64,7 +64,7 @@ class FlexicontentViewFields extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('CanFields');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );

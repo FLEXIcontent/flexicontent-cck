@@ -54,7 +54,7 @@ class FlexicontentViewArchive extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu();
+		FLEXIcontentSubmenu('CanArchives');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
