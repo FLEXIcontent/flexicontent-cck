@@ -1560,5 +1560,44 @@ class FlexicontentModelItems extends JModel {
 		$this->_db->query();
 		return $logs;
 	}
+	
+	/**
+	 * Method to get advanced search fields which belongs to the item type
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getAdvSearchFields($typeid, $key='name') {
+		$typeid = intval(@$typeid);
+		$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
+		$query = 'SELECT fi.*'
+			.' FROM #__flexicontent_fields AS fi'
+			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+			//.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+			.$where
+			.' AND fi.published = 1'
+			.' GROUP BY fi.id'
+			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+			;
+		$this->_db->setQuery($query);
+		$fields = $this->_db->loadObjectList($key);
+		foreach ($fields as $field) {
+			$field->item_id		= 0;
+			//$field->value 		= $this->getExtrafieldvalue($field->id, 0);
+			$field->parameters 	= new JParameter($field->attribs);
+		}
+		return $fields;
+	}
+	
+	function getFieldsItems($fields, $typeid) {
+		$fields = "'".implode("','", $fields)."'";
+		$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
+			." JOIN #__flexicontent_items_ext as ie ON firel.item_id=ie.item_id"
+			." JOIN #__content as a ON firel.item_id=a.id"
+			." WHERE firel.field_id IN ({$fields}) AND ie.type_id='{$typeid}' AND a.state IN (1, -5);"
+		;
+		$this->_db->setQuery($query);
+		return $this->_db->loadResultArray();
+	}
 }
 ?>
