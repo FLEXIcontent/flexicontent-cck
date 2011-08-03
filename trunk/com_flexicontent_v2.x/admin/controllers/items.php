@@ -74,7 +74,10 @@ class FlexicontentControllerItems extends JController {
 					break;
 
 				case 'saveandnew' :
-					$link = 'index.php?option=com_flexicontent&view=item';
+					if(isset($post['jform']['type_id']))
+						$link = 'index.php?option=com_flexicontent&view=item&typeid='.$post['jform']['type_id'];
+					else
+						$link = 'index.php?option=com_flexicontent&view=items';
 					break;
 
 				default :
