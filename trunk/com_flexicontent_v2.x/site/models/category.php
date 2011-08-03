@@ -320,7 +320,7 @@ class FlexicontentModelCategory extends JModelList{
 	 * @access public
 	 * @return mixed
 	 */
-	/*function getData()
+	function getData()
 	{
 		$format	= JRequest::getVar('format', null);
 		// Lets load the content if it doesn't already exist
@@ -335,7 +335,7 @@ class FlexicontentModelCategory extends JModelList{
 			}
 		}
 		return $this->_data;
-	}*/
+	}
 
 	/**
 	 * Total nr of Categories
@@ -343,7 +343,7 @@ class FlexicontentModelCategory extends JModelList{
 	 * @access public
 	 * @return integer
 	 */
-	/*function getTotal() {
+	function getTotal() {
 		// Lets load the total nr if it doesn't already exist
 		if (empty($this->_total)) {
 			$query = $this->_buildQuery();
@@ -351,7 +351,7 @@ class FlexicontentModelCategory extends JModelList{
 		}
 
 		return $this->_total;
-	}*/
+	}
 	
 	/**
 	 * Build the orderby for the query
@@ -527,17 +527,36 @@ class FlexicontentModelCategory extends JModelList{
 
 		// display sub-categories
 		$display_subcats = $cparams->get('display_subcategories_items', 0);
-		if($display_subcats) {
+		
+		// Display items from current category
+		$_group_cats = array($this->_id);
+		
+		// Display items from (current and) immediate sub-categories (1-level)
+		if ($display_subcats==1) {
 			if(is_array($this->_childs))
 				foreach($this->_childs as $ch)
 					$_group_cats[] = $ch->id;
 		}
+		
+		// Display items from (current and) all sub-categories (any-level)
+		if ($display_subcats==2) {
+			// descendants also includes current category
+			$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
+		}
+		
 		$_group_cats = array_unique($_group_cats);
 		$this->_group_cats = $_group_cats;
 		$_group_cats = "'".implode("','", $_group_cats)."'";
 		
-		// shortcode of the site active language (joomfish)
+		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
@@ -671,16 +690,19 @@ class FlexicontentModelCategory extends JModelList{
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
-		// shortcode of the site active language (joomfish)
+		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// content language parameter UNUSED
 		$filterlang = $cparams->get('language', '');
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
-
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
 
 		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
 		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
@@ -694,7 +716,7 @@ class FlexicontentModelCategory extends JModelList{
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 
-		$where .= ' AND rel.catid IN ('. $globalcats[$id]->descendants. ')';
+		$where .= ' AND rel.catid IN ('. (@$globalcats[$id]->descendants?$globalcats[$id]->descendants:"''"). ')';
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {

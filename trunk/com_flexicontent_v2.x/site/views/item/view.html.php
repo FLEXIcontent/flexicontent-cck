@@ -35,6 +35,7 @@ class FlexicontentViewItem extends JView {
 	 */
 	function display( $tpl = null )
 	{
+		global $globaltypes;
 		$mainframe = &JFactory::getApplication();
 
 		//initialize variables

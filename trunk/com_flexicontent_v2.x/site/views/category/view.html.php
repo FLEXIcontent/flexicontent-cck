@@ -37,6 +37,7 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
+		global $mainframe, $option, $globalnoroute, $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -55,7 +56,7 @@ class FlexicontentViewCategory extends JView
 		// Request variables
 		$limitstart		= JRequest::getInt('limitstart');
 		$format			= JRequest::getVar('format', null);
-
+		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -72,8 +73,7 @@ class FlexicontentViewCategory extends JView
 		// Get data from the model		
 		$category 	= & $this->get('Category');
 		$categories	= & $this->get('Childs');
-		//$items 		= & $this->get('Data');
-		$items 		= & $this->get('Items');
+		$items 		= & $this->get('Data');
 		$filters 	= & $this->get('Filters');
 		$alpha	 	= & $this->get('Alphaindex');
 		$model		= & $this->getModel();
@@ -81,7 +81,8 @@ class FlexicontentViewCategory extends JView
 		$cparams	=& $category->parameters;
 		$params->merge($cparams);
 
-		//$total 		= & $this->get('Total');
+		$total 		= & $this->get('Total');
+
 		// Bind Fields
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
@@ -116,7 +117,7 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$params->set('page_title',	$category->title);
 		}
-
+		
 		// pathway construction @TODO try to find and automated solution
 		for($p=$params->get('item_depth', 0); $p<count($parents); $p++) {
 			// Do not add the above and root categories when coming from a directory view
@@ -128,6 +129,7 @@ class FlexicontentViewCategory extends JView
 				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
 			}
 		}
+
 
 		$document->setTitle( $params->get( 'page_title' ) );
 
@@ -144,7 +146,7 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 		
-		$themes		= flexicontent_tmpl::parseTemplates();
+		$themes		= flexicontent_tmpl::getTemplates();
 		
 		if ($params->get('clayout')) {
 			// Add the templates css files if availables
@@ -165,25 +167,84 @@ class FlexicontentViewCategory extends JView
 			$tmpl = '.category.default';
 		}
 
-		JPluginHelper::importPlugin('content');
-		// just a try : to implement later
-		foreach ($items as $item) {
-			$item->event = new stdClass();
-			$item->params = new JParameter($item->attribs);
-			$results = $dispatcher->trigger('onPrepareContent', array (& $item, & $item->params,0));
-			$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
-			$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $item, & $item->params,0));
-			$item->event->afterDisplayTitle = trim(implode("\n", $results));
-
-			$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $item->params, 0));
-			$item->event->beforeDisplayContent = trim(implode("\n", $results));
+		// Callback function for the array filter
+		function filterCats($var)
+		{
+			global $globalnoroute;
+			if (!is_array($globalnoroute)) $globalnoroute = array();
+			
+			if (!in_array($var, $globalnoroute)) {
+				return ($var);
+			}
+			return;
+		}
+		
+		// @TODO trigger the plugin selectively
+		// and delete the plugins tags if not active
+		if ($params->get('trigger_onprepare_content_cat')) // just check if the parmeter is active
+		{
+			JPluginHelper::importPlugin('content');
 	
-			$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $item->params, 0));
-			$item->event->afterDisplayContent = trim(implode("\n", $results));
+			// Allow to trigger content plugins on category description
+			$category->text			= $category->description;
+			$results 				= $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			$category->description 	= $category->text;
 		}
 
+		foreach ($items as $item) 
+		{
+			$item->event 	= new stdClass();
+			$item->params 	= new JParameter($item->attribs);
+			
+			// !!! The triggering of the event onPrepareContent of content plugins
+			// !!! for description field (maintext) along with all other flexicontent
+			// !!! fields is handled by flexicontent.fields.php
+			// !!! Had serious performance impact
+			// CODE REMOVED
+			
+			// reappend the category slug according to the advanced routing parameters
+			if (!in_array($category->id, $globalnoroute)) {
+				$item->categoryslug = $category->slug;
+			} else {
+				if (in_array($item->catid, $globalnoroute)) {
+					$allcats = array();
+					$item->cats = $item->cats?$item->cats:array();
+					foreach ($item->cats as $cat) {
+						array_push($allcats, $cat->id);
+					}
+					$allowed = array_filter($allcats, "filterCats");
 
+					if (count($allowed) > 0)
+					{
+						foreach ($allowed as $rcat) {
+							$item->categoryslug = $globalcats[$rcat]->slug;
+							break; // Trick we don't need all $allowed only one of them
+						}
+					}
+				}
+			}
+		}
+		
+		// Just put category's description inside property 'text' in case the events modify the given text,
+		$category->text = $category->description;
+		
+		// Maybe here not to import all plugins but just those for description and make/use option which ones to trigger ?
+		JPluginHelper::importPlugin('content');
+		
+		// These events return text that could be displayed at appropriate positions by our templates
+		
+		$results = $dispatcher->trigger('onAfterDisplayTitle', array (& $category, & $params, 0));
+		$category->event->afterDisplayTitle = trim(implode("\n", $results));
+
+		$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $category, & $params, 0));
+		$category->event->beforeDisplayContent = trim(implode("\n", $results));
+
+		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $category, & $params, 0));
+		$category->event->afterDisplayContent = trim(implode("\n", $results));
+
+		// Put text back into the catgory's description
+		$category->description = $category->text;
+				
 		// remove previous alpha index filter
 		$uri->delVar('letter');
 
@@ -198,7 +259,8 @@ class FlexicontentViewCategory extends JView
 		$lists['filter']			= $filter;
 
 		// Add html to filter object
-		if ($filters) {
+		if ($filters)
+		{
 			// Make the filter compatible with Joomla standard cache
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -206,6 +268,7 @@ class FlexicontentViewCategory extends JView
 			foreach ($filters as $filtre)
 			{
 				$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
+				JPluginHelper::importPlugin('flexicontent_fields', ($filtre->iscore ? 'core' : $filtre->field_type) );
 				$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				$lists['filter_' . $filtre->id] = $value;
 			}
@@ -214,20 +277,22 @@ class FlexicontentViewCategory extends JView
 		// Create the pagination object
 		jimport('joomla.html.pagination');
 
-		//$pageNav 	= new JPagination($total, $limitstart, $limit);
-		$pageNav = $this->get('Pagination');
-		$this->assign('action', 		$uri->toString());
+		$pageNav 	= new JPagination($total, $limitstart, $limit);
+
+		$this->assign('action', 			$uri->toString());
+
 		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
+		
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , 	$categories);
-		$this->assignRef('items' , 		$items);
+		$this->assignRef('items' , 			$items);
 		$this->assignRef('category' , 		$category);
 		$this->assignRef('limitstart' , 	$limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);
 		$this->assignRef('filters' ,	 	$filters);
-		$this->assignRef('lists' ,	 	$lists);
-		$this->assignRef('alpha' ,	 	$alpha);
-		$this->assignRef('tmpl' ,		$tmpl);
+		$this->assignRef('lists' ,	 		$lists);
+		$this->assignRef('alpha' ,	 		$alpha);
+		$this->assignRef('tmpl' ,			$tmpl);
 		$this->assignRef('print_link' ,		$print_link);
 
 		/*
