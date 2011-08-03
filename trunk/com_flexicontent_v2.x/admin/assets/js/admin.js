@@ -19,9 +19,9 @@
 /**
 * Check the form is valid and if true, submit it (overload the joomla.javascript.js one)
 */
-function submitform(pressbutton){
+Joomla.submitform = function (pressbutton){
 	form = document.adminForm;
-	
+
 	// If formvalidator activated
 	if( document.formvalidator && pressbutton != 'cancel' ) {
 		// Check the form is valid

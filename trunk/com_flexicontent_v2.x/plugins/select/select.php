@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}
-				$field->html	= JHTML::_('select.genericlist', $options, $field->name, 'class="'.$required.'"', 'value', 'text', $field->value);
+				$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.']', 'class="'.$required.'"', 'value', 'text', $field->value);
 			}
 		} else { // Elements mode
 			$listelements = explode("%% ", $field_elements);
@@ -89,7 +89,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				}
 				$i++;
 			}
-			$field->html	= JHTML::_('select.genericlist', $options, $field->name, 'class="'.$required.'"', 'value', 'text', $field->value);
+			$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.']', 'class="'.$required.'"', 'value', 'text', $field->value);
 			$field->display	= $display ? $display:JText::_( 'FLEXI_NO_VALUE' );
 		}
 	}

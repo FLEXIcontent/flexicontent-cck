@@ -93,9 +93,9 @@
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL"
 			description="JFIELD_ACCESS_DESC" class="inputbox" size="1" />
 
-		<field name="hits" type="text" label="JGLOBAL_HITS"
+		<field name="hits" type="hidden" label="JGLOBAL_HITS"
 			description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6"
-			readonly="true" filter="unset" />
+			filter="unset" />
 
 		<field name="language" type="contentlanguage" label="JFIELD_LANGUAGE_LABEL"
 			description="COM_CONTENT_FIELD_LANGUAGE_DESC" class="inputbox"

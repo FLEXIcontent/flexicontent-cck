@@ -84,8 +84,8 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 				if ($field->value[$n] == $listarray[0]) {
 					$checked = ' checked="checked"';
 				}
-			} 
-			$options .= '<label><input type="checkbox" class="'.$required.'" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+			}
+			$options .= '<label><input type="custom[checkbox]" class="'.$required.'" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
 			$i++;
 		}
 		$field->html	= $options;

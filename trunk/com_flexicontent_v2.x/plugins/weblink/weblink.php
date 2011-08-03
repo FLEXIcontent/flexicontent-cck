@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
 					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
@@ -160,10 +160,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$field->html	.= '
 				<li>
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URL' ).':</span>
-					<input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
+					<input class="urllink'.$required.'" name="custom['.$field->name.']['.$n.'][link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
 					<span class="legende">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</span>
-					<input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
-					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.$value['hits'].'" />
+					<input class="urltitle'.$required.'" name="custom['.$field->name.']['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
+					<input class="urlhits" name="custom['.$field->name.']['.$n.'][hits]" type="hidden" value="'.$value['hits'].'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
 				</li>';
@@ -174,7 +174,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 		} else {
 			$field->value[0] = unserialize($field->value[0]);
-			$field->html	= '<div>Url: <input name="'.$field->name.'[0][link]" class="urllink'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['link'].'" /> Title: <input name="'.$field->name.'[0][title]" class="urltitle'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['title'].'" /><input name="'.$field->name.'[0][hits]" type="hidden" value="'.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).'" /> '.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).' '.JText::_( 'FLEXI_FIELD_HITS' ).' </div>';
+			$field->html	= '<div>Url: <input name="custom['.$field->name.'][0][link]" class="urllink'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['link'].'" /> Title: <input name="custom['.$field->name.'][0][title]" class="urltitle'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['title'].'" /><input name="custom['.$field->name.'][0][hits]" type="hidden" value="'.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).'" /> '.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).' '.JText::_( 'FLEXI_FIELD_HITS' ).' </div>';
 		}
 	}
 

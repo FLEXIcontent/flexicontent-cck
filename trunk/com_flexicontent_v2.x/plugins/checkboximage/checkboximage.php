@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				}
 			}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="custom[checkbox]" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 			$i++;
 		}			
 			

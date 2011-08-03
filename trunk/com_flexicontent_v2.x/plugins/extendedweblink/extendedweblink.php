@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -77,7 +77,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
 					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
@@ -117,7 +117,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
@@ -175,18 +175,18 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					<table class="admintable"><tbody>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-						<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+						<td><input class="urllink'.$required.'" name="custom['.$field->name.']['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 						</tr>
 						<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-						<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+						<td><input class="urltitle'.$required.'" name="custom['.$field->name.']['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 						</tr>
 						'.$linktext.'
 						'.$class.'
 						'.$id.'
 					</tbody></table>
 					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
-					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
+					<input class="urlhits" name="custom['.$field->name.']['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					
 				</li>';
@@ -212,17 +212,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				<table class="admintable"><tbody>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td>
-					<td><input class="urllink'.$required.'" name="'.$field->name.'['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
+					<td><input class="urllink'.$required.'" name="custom['.$field->name.']['.$n.'][link]" type="text" size="'.$size.'" value="'.($value['link'] ? $value['link'] : $default_value).'" /></td>
 					</tr>
 					<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</td>
-					<td><input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
+					<td><input class="urltitle'.$required.'" name="custom['.$field->name.']['.$n.'][title]" type="text" size="'.$size.'" value="'.($value['title'] ? $value['title'] : $default_value).'" /></td>
 					</tr>
 					'.$linktext.'
 					'.$class.'
 					'.$id.'
 				</tbody></table>
-				<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
+				<input class="urlhits" name="custom['.$field->name.']['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
 				<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>';
 		}
 	}

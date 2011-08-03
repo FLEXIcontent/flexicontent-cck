@@ -111,7 +111,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			function deleteField".$field->id."(el) {
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -165,7 +165,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$field->html = '<ul id="sortables_'.$field->id.'">';
 		
 		if($field->value) {
-			
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
@@ -175,7 +174,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
-				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
+				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="custom['.$field->name.']['.$i.']" value="'.$file.'" />';
 				$field->html .= '<input class="inputbox fcbutton" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
 				$field->html .= '<span class="drag'.$field->id.'">'.$move.'</span>';
 				$field->html .= '</li>';

@@ -100,7 +100,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 				$checked = ' checked="checked"';
 				}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="radio" class="'.$required.'" name="custom['.$field->name.']" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 			$i++;
 		}
 			

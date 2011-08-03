@@ -59,7 +59,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -73,7 +73,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 					thisNewField.getFirst().setProperty('value','');
 
 					thisNewField.injectAfter(thisField);
@@ -116,7 +116,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 				var field	= $(el);
 				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 				
 				fx.start({
 					'height': 0,
@@ -154,13 +154,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
-				$field->html .= '<li>' . JHTML::_('calendar', $value, $field->name.'[]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"') . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
+				$field->html .= '<li>' . JHTML::_('calendar', $value, 'custom['.$field->name.'][]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"') . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
 			}
 			$field->html 	.=	'</ul>';
 			$field->html 	.= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {
-			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], $field->name.'[]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
+			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], 'custom['.$field->name.'][]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
 		}
 	}
 
