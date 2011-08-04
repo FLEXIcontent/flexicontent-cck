@@ -23,6 +23,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
         	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
         	JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
         	JPlugin::loadLanguage('plg_flexicontent_fields_textselect', JPATH_ADMINISTRATOR);
+        	JPluginHelper::importPlugin('flexicontent_fields', 'text' );
+        	JPluginHelper::importPlugin('flexicontent_fields', 'select' );
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
 		if($field->field_type != 'textselect') return;
@@ -35,7 +37,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 			}
 		}
 		$field->parameters->set('sql_mode', 1);
-		$query = "select distinct value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}' GROUP BY `value`;";
+		$query = "select distinct value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}' AND `value` != '' GROUP BY `value`;";
 		$field->parameters->set('field_elements', $query);
 		$field->field_type = 'select';
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
