@@ -157,7 +157,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-			$title = JText::_( 'FLEXI_UNAPPROVED' );
+			$title = JText::_( 'FLEXI_PENDING_SLIDER' );
 			echo $this->pane->startPanel( $title, 'unapproved' );
 			?>
 				<table class="adminlist">
@@ -191,7 +191,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					<?php $k = 1 - $k; } ?>
 				</table>
 				<?php
-				$title = JText::_( 'FLEXI_TO_WRITE' );
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' );
 				echo $this->pane->endPanel();
 				echo $this->pane->startPanel( $title, 'openquest' );
 
@@ -228,7 +228,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					<?php $k = 1 - $k; } ?>
 				</table>
 				<?php
-				$title = JText::_( 'FLEXI_IN_PROGRESS' );
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' );
 				echo $this->pane->endPanel();
 				echo $this->pane->startPanel( $title, 'inprogress' );
 

@@ -139,7 +139,7 @@
 				<option value="-1">FLEXI_ARCHIVED</option>
 				<option value="-3">FLEXI_PENDING</option>
 				<option value="-4">FLEXI_TO_WRITE</option>
-				<option value="-5">FLEXI_UNAPPROVED</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
 			</field>
 			<field name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
