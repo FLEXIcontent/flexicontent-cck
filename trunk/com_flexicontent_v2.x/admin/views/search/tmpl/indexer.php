@@ -22,7 +22,7 @@ jQuery(document).ready(function() {
 		fieldindex = Math.floor((looper-1)/items.length)%fields.length;
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&controller=search&task=index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
+			url: "index.php?option=com_flexicontent&task=search.index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
 			success: function(response2, status2, xhr2) {
 				var arr = response2.split('|');
 				if(arr[0]=='fail') {
