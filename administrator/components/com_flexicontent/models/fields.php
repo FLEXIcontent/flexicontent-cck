@@ -159,23 +159,26 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildQuery()
 	{
+		static $query;
+		if(!isset($query)) {
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
 		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
-					. ' FROM #__flexicontent_fields AS t'
-					. ' LEFT JOIN #__plugins AS plg ON plg.element = t.field_type'
-					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
-					. ' LEFT JOIN #__groups AS g ON g.id = t.access'
-					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-					. ($where ? $where." AND plg.id IS NULL OR plg.folder='flexicontent_fields' " : " WHERE plg.id IS NULL OR plg.folder='flexicontent_fields' ")
-					. ' GROUP BY t.id'
-					. $having
-					. $orderby
-					;
-					
+			. ' FROM #__flexicontent_fields AS t'
+			. ' LEFT JOIN #__plugins AS plg ON plg.element = t.field_type'
+			. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
+			. ' LEFT JOIN #__groups AS g ON g.id = t.access'
+			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
+			//. ($where ? $where." AND plg.id IS NULL OR plg.folder='flexicontent_fields' " : " WHERE plg.id IS NULL OR plg.folder='flexicontent_fields' ")//I not sure this join is neccessary?But it make we cannot filter by field_type
+			. ($where ? $where : " WHERE 1 ")//Copied from above line and delete condition for plugin.
+			. ' GROUP BY t.id'
+			. $having
+			. $orderby
+			;
+		}//end if(!isset($query))
 		return $query;
 	}
 
@@ -213,7 +216,11 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
+		static $where;
+		if(!isset($where)) {
+		
+		global $option;
+		$mainframe = &JFactory::getApplication();
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -250,7 +257,7 @@ class FlexicontentModelFields extends JModel
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-
+		}//end if(!isset($where))
 		return $where;
 	}
 	
