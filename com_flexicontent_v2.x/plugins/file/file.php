@@ -236,7 +236,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$icon		= JHTML::image($filename->icon, $filename->ext, 'class="icon-mime"') .'&nbsp;';
 				}
 				if($usebutton) {
-					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
+					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
 						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('Download').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
 					$str .= '</form>';
 					$field->{$prop}[] = $str;

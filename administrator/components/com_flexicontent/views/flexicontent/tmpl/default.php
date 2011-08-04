@@ -162,7 +162,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-			$title = JText::_( 'FLEXI_UNAPPROVED' );
+			$title = JText::_( 'FLEXI_PENDING_SLIDER' );
 			echo $this->pane->startPanel( $title, 'unapproved' );
 			?>
 				<table class="adminlist">
@@ -202,7 +202,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<?php $k = 1 - $k; } ?>
 				</table>
 				<?php
-				$title = JText::_( 'FLEXI_TO_WRITE' );
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' );
 				echo $this->pane->endPanel();
 				echo $this->pane->startPanel( $title, 'openquest' );
 
@@ -244,7 +244,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<?php $k = 1 - $k; } ?>
 				</table>
 				<?php
-				$title = JText::_( 'FLEXI_IN_PROGRESS' );
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' );
 				echo $this->pane->endPanel();
 				echo $this->pane->startPanel( $title, 'inprogress' );
 
