@@ -240,8 +240,9 @@ class FlexicontentViewItems extends JView
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
 		} else {
-			for($p = $depth; $p<count($parents); $p++) {
-				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			//for($p = $depth; $p<count($parents); $p++) {
+			foreach($parents as $k=>$p) {
+				$pathway->addItem( $this->escape($p->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($p->categoryslug) ) );
 			}
 			if ($params->get('add_item_pathway', 1)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );

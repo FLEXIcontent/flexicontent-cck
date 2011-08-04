@@ -72,17 +72,18 @@ class flexicontent_cats
 	function buildParentCats($cid)
 	{
 		$db 		=& JFactory::getDBO();
-		
+
 		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND section = ' . FLEXI_SECTION;
 		$db->setQuery( $query );
+		$parents[$cid] = $db->loadResult();
 
-		if($cid != 0) {
+		if($parents[$cid] != 0) {
 			array_push($this->parentcats, $cid);
 		}
 
 		//if we still have results
-		if(sizeof($db->loadResult()) != 0) {
-			$this->buildParentCats($db->loadResult());
+		if(sizeof($parents[$cid]) != 0) {
+			$this->buildParentCats($parents[$cid]);
 		}
 	}
 	
