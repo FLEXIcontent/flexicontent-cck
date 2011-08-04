@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 			}
 		}
 		$field->parameters->set('sql_mode', 1);
-		$query = "select distinct value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}' GROUP BY `value`;";
+		$query = "select distinct value, value as `text` FROM `#__flexicontent_fields_item_relations` as fir WHERE field_id='{$field->id}' AND `value` != '' GROUP BY `value`;";
 		$field->parameters->set('field_elements', $query);
 		$field->field_type = 'select';
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
@@ -68,6 +68,6 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 		if($field->field_type != 'textselect') return;
 		
 		$field->field_type = 'text';
-		plgFlexicontent_fieldsText::onBeforeSaveField($field, $item, $values, $prop);
+		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);
 	}
 }
