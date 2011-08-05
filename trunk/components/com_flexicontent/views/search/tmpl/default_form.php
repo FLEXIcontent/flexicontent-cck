@@ -28,6 +28,21 @@
 		</tr>
 		<?php }?>
 		<?php
+			if($this->params->get('cantypes', 1) && (count($this->fieldtypes)>0)) {
+		?>
+			<tr>
+				<td class="key">
+					<label for="fieldtypes" class="hasTip" title="Select Types::Please select types that you want to select in.">
+						<?php echo JText::_("Field Types"); ?>
+					</label>
+				</td>
+				<td>
+					<?php echo $this->lists['fieldtypes'];?>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+		<?php
+			}
 			foreach ($this->fields as $field) {
 		?>
 			<tr>
