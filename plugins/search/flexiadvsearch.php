@@ -35,6 +35,10 @@ function &plgSearchFlexiadvsearchAreas() {
 	return $areas;
 }
 
+function &plgSearchContentAreas() {
+	static $areas = array();
+	return $areas;
+}
 /**
  * Search method
  *

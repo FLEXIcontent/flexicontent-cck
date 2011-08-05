@@ -35,33 +35,6 @@
 			<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 			<option value="0">FLEXI_DMI_ID_NO</option>
 		</param>
-		<param name="" type="separator" default="Searching" level="level1" menu="hide" />
-		<param name="typeid_for_advsearch" type="types" default="1" label="Type for ADV. Search" description="Select form(type) for advanced search." />
-		<param name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
-		<param name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="default_searchphrase" type="list" default="all" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
-			<option value="all">All words</option>
-			<option value="any">Any words</option>
-			<option value="exact">Exact phrase</option>
-		</param>
-		<param name="show_searchordering" type="radio" default="1" label="Show Search Results Ordering" description="Show search result ordering">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="default_searchordering" type="list" default="newest" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
-			<option value="newest">Newest first</option>
-			<option value="oldest">Oldest first</option>
-			<option value="popular">Most popular</option>
-			<option value="alpha">Alphabetical</option>
-			<option value="category">Section/Category</option>
-		</param>
-		<param name="show_searchareas" type="radio" default="1" label="Show Search Areas" description="Show search areas">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
 	
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" level="level1" menu="hide" />
 		

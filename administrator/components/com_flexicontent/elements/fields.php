@@ -41,8 +41,17 @@ class JElementFields extends JElement
 		$db =& JFactory::getDBO();
 		
 		$and = ($node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
-		
-		$query = 'SELECT id AS value, label AS text'
+		if ($node->attributes('fieldnameastext')) {
+			$text = 'CONCAT(label, \'(\', `name`, \')\')';
+		}else{
+			$text = 'label';
+		}
+		if ($node->attributes('fieldnameasvalue')) {
+			$ovalue = '`name`';
+		}else{
+			$ovalue = 'label';
+		}
+		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
 		. $and
@@ -52,13 +61,17 @@ class JElementFields extends JElement
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
+		$attribs = "";
 		if ($node->attributes('multiple')) {
-			$class = 'multiple="true" size="10"';
+			$attribs .= 'multiple="true" size="10"';
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
-			$class = 'class="inputbox"';
+			$attribs .= 'class="inputbox"';
+		}
+		if ($onchange = $node->attributes('onchange')) {
+			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
-		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
+		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $attribs, 'value', 'text', $value, $control_name.$name);
 	}
 }

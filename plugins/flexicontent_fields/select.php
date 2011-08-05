@@ -24,6 +24,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->field_type != 'select') return;
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
 	}
 	function onDisplayField(&$field, &$item)

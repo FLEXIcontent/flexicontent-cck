@@ -8,15 +8,35 @@
 	<state>
 		<name>Search</name>
 		<description>STANDARD SEARCH LAYOUT DESC</description>
-		<params>
-			<param name="search_areas" type="radio" default="1" label="Use Search Areas" description="Show the search areas checkboxes">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+		<params addpath="/administrator/components/com_flexicontent/elements">
+			<param name="" type="separator" default="Searching" level="level1" menu="hide" />
+			<param name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
+			<param name="listfields" type="fields" default="" label="List Fields" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="true" fieldnameasvalue="true"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
+			<param name="search_fields" type="textarea" default="" label="Fields" description="Input field name(s) that you want to display.You can separate each field by comma(,)." cols="40" rows="10" />
+			<param name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="show_date" type="radio" default="1" label="Show Created Date" description="TIPIFSETTOSHOWDATETIMECREATED">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+			<param name="default_searchphrase" type="list" default="all" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
+				<option value="all">All words</option>
+				<option value="any">Any words</option>
+				<option value="exact">Exact phrase</option>
 			</param>
+			<param name="show_searchordering" type="radio" default="1" label="Show Search Results Ordering" description="Show search result ordering">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="default_searchordering" type="list" default="newest" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
+				<option value="newest">Newest first</option>
+				<option value="oldest">Oldest first</option>
+				<option value="popular">Most popular</option>
+				<option value="alpha">Alphabetical</option>
+				<option value="category">Section/Category</option>
+			</param>
+		<param name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		</params>
 	</state>
 </metadata>
