@@ -94,7 +94,7 @@ class FlexicontentViewItems extends JView
 		}
 
 		if ($item->id == 0)
-		{	
+		{
 			$id	= JRequest::getInt('id', 0);
 			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND (items/view.html)', $id ) );
 		}
@@ -141,7 +141,7 @@ class FlexicontentViewItems extends JView
 		 * First is to check if we have a category id, if yes add it.
 		 * If we haven't one than we accessed this screen direct via the menu and don't add the parent category
 		 */
-		if($cid && $params->get('addcat_title', 1)) {
+		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
 			$parentcat = array_pop($parents);
 			$doc_title = $parentcat->title.' - '.$params->get( 'page_title' );
 		} else {
