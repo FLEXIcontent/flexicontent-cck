@@ -11,6 +11,11 @@
 		<params addpath="/administrator/components/com_flexicontent/elements">
 			<param name="" type="separator" default="Searching" level="level1" menu="hide" />
 			<param name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
+			<param name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="true" />
+			<param name="cantypes" type="radio" default="1" label="Allow users select type" description="Allow users select type">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="listfields" type="fields" default="" label="List Fields" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="true" fieldnameasvalue="true"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
 			<param name="search_fields" type="textarea" default="" label="Fields" description="Input field name(s) that you want to display.You can separate each field by comma(,)." cols="40" rows="10" />
 			<param name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">

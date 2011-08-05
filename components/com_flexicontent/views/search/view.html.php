@@ -108,6 +108,20 @@ class FLEXIcontentViewSearch extends JView
 		// Get the parameters of the active menu item
 		$params	= &$mainframe->getParams();
 		$lists = array();
+		$fieldtypes_a = $params->get('fieldtypes', array());
+		if($params->get('cantypes', 1) && (count($fieldtypes_a)>0)) {
+			$db =& JFactory::getDBO();
+			$fieldtypes = "'".implode("','", $fieldtypes_a)."'";
+			$query = 'SELECT id AS value, name AS text'
+			. ' FROM #__flexicontent_types'
+			. ' WHERE published = 1 AND id IN ('.$fieldtypes.')'
+			. ' ORDER BY name ASC, id ASC'
+			;
+			$db->setQuery($query);
+			$types = $db->loadObjectList();
+			$lists['fieldtypes'] = JHTML::_('select.genericlist', $types, 'fieldtypes[]', 'multiple="true" size="10"', 'value', 'text', $fieldtypes_a, 'fieldtypes');
+		}
+		
 		if($show_searchordering = $params->get('show_searchordering', 1)) {
 			$default_searchordering = $params->get('default_searchordering', 'newest');
 			// built select lists

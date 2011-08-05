@@ -59,7 +59,13 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$gid	= (int) $user->get('aid');
 	// Get the WHERE and ORDER BY clauses for the query
 	$params 	= & $mainframe->getParams('com_flexicontent');
-	$typeid_for_advsearch = $params->get('typeid_for_advsearch');
+	
+	if($cantypes = $params->get('cantypes', 1)) {
+		$fieldtypes = JRequest::getVar('fieldtypes', array());
+	}
+	if(!$cantypes || (count($fieldtypes)<=0)) {
+		$fieldtypes = $params->get('fieldtypes', array());
+	}
 	$dispatcher =& JDispatcher::getInstance();
 
 	// define section
@@ -166,12 +172,12 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	if (FLEXI_FISH && $filter_lang) {
 		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 	}
-
+	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id"
 		." FROM #__flexicontent_fields as f "
 		." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
 		." LEFT JOIN #__flexicontent_fields_item_relations as fir ON f.id=fir.field_id"
-		." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id='{$typeid_for_advsearch}'"
+		." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
 	;
 	$db->setQuery($query);
 	$fields = $db->loadObjectList();
