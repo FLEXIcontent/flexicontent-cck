@@ -471,16 +471,21 @@ class modFlexicontentHelper
 		}
 
 		// current language scope
-		$language =& JFactory::getLanguage();
-    $currlangcode = $language->_lang;
-  	if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
-		  $where .=  ' AND ie.language <> ' . $currlangcode;
+		$lang = JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+		if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
+			$where .= ' AND ie.language NOT LIKE ' . $db->Quote( $lang .'%' );
 		} else if ($method_curlang == 2) { // include method  ---  include items of current language ONLY
-		  $where .=  ' AND ie.language = "' . $currlangcode.'"';
+			$where .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 		} else {
 		  // Items of any language
 		}
-
+		
 		// categories scope
 		if (!$behaviour_cat) {
 			$catids		= is_array($catids) ? implode(',', $catids) : $catids;
