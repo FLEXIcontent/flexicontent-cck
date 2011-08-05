@@ -23,8 +23,8 @@ jQuery(document).ready(function() {
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
 			url: "index.php?option=com_flexicontent&controller=search&task=index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
-			success: function(response2, status2, xhr2) {
-				var arr = response2.split('|');
+			success: function(response, status2, xhr2) {
+				var arr = response.split('|');
 				if(arr[0]=='fail') {
 					jQuery('div#statuscomment').text(errorstring[arr[1]]);
 					looper = number;
@@ -34,7 +34,7 @@ jQuery(document).ready(function() {
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').text(percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').text(looper+'/'+number+' sectors '+response2);
+				jQuery('div#statuscomment').text(looper+'/'+number+' sectors '+response);
 				setTimeout(updateprogress, 100);
 			}
 		});
@@ -47,8 +47,8 @@ jQuery(document).ready(function() {
 				jQuery('div#statuscomment').text(errorstring[arr[1]]);
 				return;
 			}
-			fields = jQuery.parseJSON(arr[2]);
-			items = jQuery.parseJSON(arr[3]);
+			fields = jQuery.parseJSON(arr[1]);
+			items = jQuery.parseJSON(arr[2]);
 			number = fields.length*items.length;
 			onesector = (number==0)?300:(300/number);
 			if(number==0) {

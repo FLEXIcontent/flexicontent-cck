@@ -47,23 +47,25 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	function countrows() {
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		$params =& JComponentHelper::getParams( 'com_flexicontent' );
-		$typeid_for_advsearch = $params->get('typeid_for_advsearch');
+		//$params =& JComponentHelper::getParams( 'com_flexicontent' );
+		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 		
 		@ob_end_clean();
-		if($typeid_for_advsearch) {
+		//if($typeid_for_advsearch) {
 			$itemmodel = $this->getModel('items');
-			$fields = & $itemmodel->getAdvSearchFields($typeid_for_advsearch, 'id');
+			//$fields = & $itemmodel->getAdvSearchFields($typeid_for_advsearch, 'id');
+			$fields = & $itemmodel->getAdvSearchFields('id');
 			$keys = array_keys($fields);
-			$items	= & $itemmodel->getFieldsItems($keys, $typeid_for_advsearch);
+			//$items	= & $itemmodel->getFieldsItems($keys, $typeid_for_advsearch);
+			$items	= & $itemmodel->getFieldsItems($keys);
 			echo 'success|';
-			echo $typeid_for_advsearch.'|';
+			//echo $typeid_for_advsearch.'|';
 			//echo count($keys)*count($items).'|';
 			echo json_encode($keys).'|';
 			echo json_encode($items);
-		}else{
-			echo 'fail|0';
-		}
+		//}else{
+		//	echo 'fail|0';
+		//}
 		exit;
 	}
 	function index() {
