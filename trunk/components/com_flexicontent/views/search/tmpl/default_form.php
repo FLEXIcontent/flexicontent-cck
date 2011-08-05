@@ -69,7 +69,8 @@
 		</tr>
 		<?php }?>
 	</table>
-	<?php if ($this->params->get( 'show_searchareas', 1 )) : ?>
+
+	<?php if ($this->params->get( 'show_searchareas', 0 )) : ?>
 		<?php echo JText::_( 'Search Only' );?>:
 		<?php foreach ($this->searchareas['search'] as $val => $txt) :
 			$checked = is_array( $this->searchareas['active'] ) && in_array( $val, $this->searchareas['active'] ) ? 'checked="checked"' : '';
@@ -79,8 +80,9 @@
 				<?php echo JText::_($txt); ?>
 			</label>
 		<?php endforeach; ?>
+	<?php else:?>
+		<input type="hidden" name="areas[]" value="flexicontent" id="area_flexicontent" />
 	<?php endif; ?>
-
 
 	<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 	<tr>
