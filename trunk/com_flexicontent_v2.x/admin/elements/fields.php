@@ -38,14 +38,25 @@ class JFormFieldFields extends JFormField
 	var	$type = 'Fields';
 
 	function getInput() {
-		$value = $this->value;
-		$values = explode("|", $value);
+		$values = $this->value;
 
 		$db =& JFactory::getDBO();
+		$node = &$this->element;
+
+		$and = ($node->getAttribute('isnotcore')) ? ' AND iscore = 0' : '';
 		
-		$and = ($node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
+		if ((boolean)$node->getAttribute('fieldnameastext')) {
+			$text = 'CONCAT(label, \'(\', `name`, \')\')';
+		}else{
+			$text = 'label';
+		}
+		if ((boolean)$node->getAttribute('fieldnameasvalue')) {
+			$ovalue = '`name`';
+		}else{
+			$ovalue = 'label';
+		}
 		
-		$query = 'SELECT id AS value, label AS text'
+		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
 		. $and
@@ -55,8 +66,17 @@ class JFormFieldFields extends JFormField
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		$class = 'multiple="true" size="10"';
+		$attribs = "";
+		if ($node->getAttribute('multiple')) {
+			$attribs .= 'multiple="true" size="10"';
+		} else {
+			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			$attribs .= 'class="inputbox"';
+		}
+		if ($onchange = $node->getAttribute('onchange')) {
+			$attribs .= ' onchange="'.$onchange.'"';
+		}
 		
-		return JHTML::_('select.genericlist', $fields, $this->name.'[]', $class, 'value', 'text', $values);
+		return JHTML::_('select.genericlist', $fields, $this->name.'[]', $attribs, 'value', 'text', $values);
 	}
 }

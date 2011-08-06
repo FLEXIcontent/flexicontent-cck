@@ -18,7 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
+$mainframe = &JFactory::getApplication();
 $mainframe->registerEvent( 'onSearch', 'plgSearchFlexisearch' );
 $mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexisearchAreas' );
 
@@ -48,7 +48,7 @@ function &plgSearchFlexisearchAreas() {
  */
 function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
 {
-	global $mainframe;
+	$mainframe = &JFactory::getApplication();
 
 	$db		= & JFactory::getDBO();
 	$user	= & JFactory::getUser();
