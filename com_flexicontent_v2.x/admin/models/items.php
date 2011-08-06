@@ -1567,9 +1567,10 @@ class FlexicontentModelItems extends JModel {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getAdvSearchFields($typeid, $key='name') {
+	function getAdvSearchFields($key='name') {
 		$typeid = intval(@$typeid);
-		$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
+		//$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
+		$where = " WHERE fi.isadvsearch='1'";
 		$query = 'SELECT fi.*'
 			.' FROM #__flexicontent_fields AS fi'
 			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
@@ -1578,7 +1579,7 @@ class FlexicontentModelItems extends JModel {
 			.' AND fi.published = 1'
 			.' GROUP BY fi.id'
 			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-			;
+		;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList($key);
 		foreach ($fields as $field) {
@@ -1589,12 +1590,13 @@ class FlexicontentModelItems extends JModel {
 		return $fields;
 	}
 	
-	function getFieldsItems($fields, $typeid) {
+	function getFieldsItems($fields) {
 		$fields = "'".implode("','", $fields)."'";
 		$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
-			." JOIN #__flexicontent_items_ext as ie ON firel.item_id=ie.item_id"
+			//." JOIN #__flexicontent_items_ext as ie ON firel.item_id=ie.item_id"
 			." JOIN #__content as a ON firel.item_id=a.id"
-			." WHERE firel.field_id IN ({$fields}) AND ie.type_id='{$typeid}' AND a.state IN (1, -5);"
+			//." WHERE firel.field_id IN ({$fields}) AND ie.type_id='{$typeid}' AND a.state IN (1, -5);"
+			." WHERE firel.field_id IN ({$fields}) AND a.state IN (1, -5);"
 		;
 		$this->_db->setQuery($query);
 		return $this->_db->loadResultArray();

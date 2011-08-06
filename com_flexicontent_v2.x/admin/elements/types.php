@@ -40,6 +40,7 @@ class JFormFieldTypes extends JFormField
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		$db =& JFactory::getDBO();
+		$node = &$this->element;
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'
@@ -47,8 +48,16 @@ class JFormFieldTypes extends JFormField
 		;
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
-		$class = '';
-		return JHTML::_('select.genericlist', $types, $this->name, $class, 'value', 'text', $this->value, $this->id);
+		$attribs = "";
+		if ($node->getAttribute('multiple')) {
+			$attribs .= 'multiple="true" size="10"';
+			//$fieldname = $control_name.'['.$name.'][]';
+		} else {
+			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			$attribs .= 'class="inputbox"';
+			//$fieldname = $control_name.'['.$name.']';
+		}
+		return JHTML::_('select.genericlist', $types, $this->name.'[]', $attribs, 'value', 'text', $this->value, $this->id);
 	}
 }
 ?>
