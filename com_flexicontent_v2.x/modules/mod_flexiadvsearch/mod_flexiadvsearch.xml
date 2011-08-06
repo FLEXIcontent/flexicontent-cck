@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="module" version="1.5.0" method="upgrade">
+	<name>FLEXIadvsearch Module</name>
+	<author>Suriya Kaewmungmuang</author>
+	<creationDate>29/06/2011</creationDate>
+	<copyright>(C) 2011 flexicontent.org</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<authorEmail>enjoyman@gmail.com</authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Advanced search module for the FLEXIcontent Component</description>
+	
+	<files>
+		<filename module="mod_flexiadvsearch">mod_flexiadvsearch.php</filename>
+		<filename>index.html</filename>
+	        <folder>tmpl</folder>
+	</files>
+	
+	<languages>
+		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
+	</languages>
+	
+	<params>
+		<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="width" type="text" default="20" label="Box Width" description="Size of the search text box in characters" />
+		<param name="text" type="text" default="" label="Text" description="PARAMTEXT" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="button" type="radio" default="" label="Search Button" description="Display a Search Button">
+			<option value="">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="button_pos" type="list" default="right" label="Button Position" description="Position of the button relative to the search box">
+			<option value="right">Right</option>
+			<option value="left">Left</option>
+			<option value="top">Top</option>
+			<option value="bottom">Bottom</option>
+		</param>
+		<param name="imagebutton" type="radio" default="" label="Search button as image" description="Use an image as button">
+			<option value="">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="button_text" type="text" default="" label="Button Text" description="PARAMBUTTONTEXT" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="useitemid" type="radio" default="0" label="Use Itemid(menu id)" description="Use Itemid(menu id)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="linkadvsearch" type="radio" default="1" label="Link Advanced Search" description="Link to advanced search.">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
+		<param name="set_itemid" type="text" default="" label="Set Itemid" description="PARAMSETITEMID" />
+	</params>
+	<params group="advanced">
+		<param name="cache" type="list" default="1" label="Caching" description="Select whether to cache the content of this module">
+			<option value="1">Use global</option>
+			<option value="0">No caching</option>
+		</param>
+		<param name="cache_time" type="text" default="900" label="Cache Time" description="The time before the module is recached" />
+	</params>
+</install>
