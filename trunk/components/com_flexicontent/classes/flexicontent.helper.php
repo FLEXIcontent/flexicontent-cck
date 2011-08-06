@@ -508,6 +508,44 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
+	function favoured_userlist( &$field, &$item,  $favourites)
+	{
+		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
+		$maxusercount = $field->parameters->get('display_favoured_max', 12);
+		
+		$favuserlist = $favourites ? '['.$favourites.' '.JText::_('FLEXI_USERS') : '';
+		
+		if ( !$userlisttype ) return $favuserlist ? $favuserlist.']' : '';
+		else if ($userlisttype==1) $uname="u.username";
+		else /*if ($userlisttype==2)*/ $uname="u.name";
+		
+		$db	=& JFactory::getDBO();
+		$query = "SELECT $uname FROM #__flexicontent_favourites as ff"
+			." LEFT JOIN #__users AS u ON u.id=ff.userid "
+			." WHERE ff.itemid=" . $item->id;
+		$db->setQuery($query);
+		$favusers = $db->loadResultArray();
+		if (!is_array($favusers) || !count($favusers)) return $favuserlist.']';
+		
+		$seperator = ': ';
+		$count = 0;
+		foreach($favusers as $favuser) {
+			$favuserlist .= $seperator . $favuser;
+			$seperator = ',';
+			$count++;
+			if ($count >= $maxusercount) break;
+		}
+		if (count($favusers) > $maxusercount) $favuserlist .=" ...";
+		if (!empty($favuserlist)) $favuserlist .="]";
+		return $favuserlist;
+	}
+	
+ 	/**
+	 * Creates the favourite icons
+	 *
+	 * @param array $params
+	 * @since 1.0
+	 */
 	function favicon($field, $favoured)
 	{
 		$live_path 	= JURI::base();

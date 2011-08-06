@@ -107,6 +107,14 @@
 		<param name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 		<param name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
 	</params>
+	<params group="group-favourites"><!-- favourites -->
+		<param name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES_USERNAMES</option>
+			<option value="2">FLEXI_YES_FULLNAMES</option>
+		</param>
+		<param name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
+	</params>
 	<params group="group-categories"><!-- categories -->
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>

@@ -124,7 +124,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'favourites': // favourites button
 			$field->value[] = 'button'; // dummy value to force display
-			$favs = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS').')' : '';
+			$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
 			$field->display = '
 			<span class="fav-block">
 				'.flexicontent_html::favicon( $field, $favoured ).'
