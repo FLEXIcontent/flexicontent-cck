@@ -152,6 +152,8 @@
 	<plugin name="flexiadvsearch" folder="plugins/search">Advanced search plugin for flexicontent.</plugin>
 	<plugin name="flexisystem" folder="plugins/system">System plugin for FLEXIcontent</plugin>
 	<plugin name="flexiadvroute" folder="plugins/system">System plugin for advanced FLEXIcontent routing</plugin>
+	
+	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced search module for the FLEXIcontent Component</module>
 </additional>
 
 <installfile>install.php</installfile>
