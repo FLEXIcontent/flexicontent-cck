@@ -947,17 +947,6 @@ class FlexicontentController extends JController
 			JRequest::setVar('searchphrase', 'exact');
 			JRequest::setVar('searchword', $searchword);
 		}
-		
-		// set Itemid id for links from menu
-		$menu = &JSite::getMenu();
-		$items	= $menu->getItems('link', 'index.php?option=com_flexicontent&view=search');
-
-		if(isset($items[0])) {
-			JRequest::setVar('Itemid', $items[0]->id);
-		}
-		/*$itemmodel = &$this->getModel('items');
-		$view  = &$this->getView('search', 'html');
-		$view->_models['items'] = &$itemmodel;*/
 		JRequest::setVar('view', 'search');
 		parent::display(true);
 	}

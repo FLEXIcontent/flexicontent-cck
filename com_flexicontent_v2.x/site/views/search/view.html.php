@@ -51,8 +51,8 @@ class FLEXIcontentViewSearch extends JView
 		$state 		= &$this->get('state');
 		$searchword = $state->get('keyword');
 
-		//$params = &$mainframe->getParams();
-		$params = JComponentHelper::getParams('com_flexicontent');
+		$params = &$mainframe->getParams();
+		//$params = JComponentHelper::getParams('com_flexicontent');
 		//$params->bind($params->_raw);
 		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 
@@ -65,11 +65,14 @@ class FLEXIcontentViewSearch extends JView
 			$itemmodel = new FlexicontentModelItem();
 		}
 		//$item = &$itemmodel->getItem();
-		$item = new stdClass;
-		$item->version = 0;
+		//$item = new stdClass;
+		$item = new JForm('item');
+		//$item->version = 0;
+		$item->setValue('version', 0);
 
 		$search_fields = $params->get('search_fields', '');
-		$search_fields = "'".str_replace(",", "','", $search_fields)."'";
+		$search_fields = explode(",", $search_fields);
+		$search_fields = "'".implode("','", array_unique($search_fields))."'";
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
 		//Import fields
 		JPluginHelper::importPlugin('flexicontent_fields');
