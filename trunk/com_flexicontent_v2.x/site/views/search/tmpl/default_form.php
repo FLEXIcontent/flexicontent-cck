@@ -1,6 +1,6 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 
-<form id="searchForm" action="index.php" method="get" name="searchForm">
+<form id="flexicontent-searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="get" name="searchForm">
 	<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 		<tr>
 			<td nowrap="nowrap">
@@ -144,6 +144,4 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 ?>
 <input type="hidden" name="ordering" value="<?php echo $default_searchordering;?>" />
 <?php } ?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="task" value="search" />
 </form>

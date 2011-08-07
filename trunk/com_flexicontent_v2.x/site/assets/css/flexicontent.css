@@ -586,3 +586,8 @@ span.fc_alpha_index {
 	color: black;
 	text-decoration: none;
 }
+
+form#flexicontent-searchForm tr,form#flexicontent-searchForm tr td{
+	border:0;
+	
+}

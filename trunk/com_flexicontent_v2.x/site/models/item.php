@@ -1438,9 +1438,8 @@ class FlexicontentModelItem extends JModel
 	 * @return object
 	 * @since 1.5
 	 */
-	function getAdvSearchFields($typeid) {
-		$typeid = intval(@$typeid);
-		$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
+	function getAdvSearchFields($search_fields) {
+		$where = " WHERE `name` IN ({$search_fields}) AND fi.isadvsearch='1'";
 		$query = 'SELECT fi.*'
 			.' FROM #__flexicontent_fields AS fi'
 			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
@@ -1449,7 +1448,7 @@ class FlexicontentModelItem extends JModel
 			.' AND fi.published = 1'
 			.' GROUP BY fi.id'
 			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-			;
+		;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList('name');
 		foreach ($fields as $field) {
