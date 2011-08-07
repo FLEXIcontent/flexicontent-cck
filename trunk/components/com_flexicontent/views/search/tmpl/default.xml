@@ -16,7 +16,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="listfields" type="fields" default="" label="List Fields" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="true" fieldnameasvalue="true"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
+			<param name="listfields" type="fields" default="" label="List Fields" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
 			<param name="search_fields" type="textarea" default="" label="Fields" description="Input field name(s) that you want to display.You can separate each field by comma(,)." cols="40" rows="10" />
 			<param name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">
 				<option value="0">FLEXI_NO</option>
