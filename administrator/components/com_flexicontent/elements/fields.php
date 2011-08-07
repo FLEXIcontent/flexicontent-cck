@@ -51,6 +51,10 @@ class JElementFields extends JElement
 		}else{
 			$ovalue = 'label';
 		}
+		$isadvsearch = $node->attributes('isadvsearch');
+		if($isadvsearch!==NULL) {
+			$and .= " AND isadvsearch='{$isadvsearch}'";
+		}
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
