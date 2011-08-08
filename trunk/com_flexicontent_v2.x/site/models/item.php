@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
 
 /**
  * FLEXIcontent Component Item Model
@@ -27,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItem extends JModel
+class FlexicontentModelItem extends ParentClassItem
 {
 	/**
 	 * Details data in details array
@@ -87,7 +88,7 @@ class FlexicontentModelItem extends JModel
 	 * @return 	mixed 				The value of the property
 	 * @since	1.5
 	 */
-	function get($property, $default=null)
+	/*function get($property, $default=null)
 	{
 		if ($this->_loadItem()) {
 			if(isset($this->_item->$property)) {
@@ -95,7 +96,7 @@ class FlexicontentModelItem extends JModel
 			}
 		}
 		return $default;
-	}
+	}*/
 	
 	/**
 	 * Overridden set method to pass properties on to the item
@@ -106,7 +107,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function set( $property, $value=null )
+	/*function set( $property, $value=null )
 	{
 		if ($this->_loadItem()) {
 			$this->_item->$property = $value;
@@ -114,7 +115,7 @@ class FlexicontentModelItem extends JModel
 		} else {
 			return false;
 		}
-	}
+	}*/
 
 	/**
 	 * Method to get data for the itemview
@@ -123,12 +124,12 @@ class FlexicontentModelItem extends JModel
 	 * @return array
 	 * @since 1.0
 	 */
-	function &getItem() {
+	/*function &getItem() {
 		$mainframe = &JFactory::getApplication();
 		global $globalcats;
-		/*
-		* Load the Item data
-		*/
+		//
+		// Load the Item data
+		//
 		if ($this->_loadItem()) {
 			// Get the paramaters of the active menu item
 			$params = & $mainframe->getParams('com_flexicontent');
@@ -321,7 +322,7 @@ class FlexicontentModelItem extends JModel
 			$this->_item				= $item;
 		}
 		return $this->_item;
-	}
+	}*/
 
 	/**
 	 * Method to load required data
@@ -330,7 +331,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	array
 	 * @since	1.0
 	 */
-	function _loadItem() {
+	/*function _loadItem() {
 		$loadcurrent = JRequest::getVar('loadcurrent', false, 'request', 'boolean');
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
@@ -504,7 +505,7 @@ class FlexicontentModelItem extends JModel
 			return (boolean) $this->_item;
 		}
 		return true;
-	}
+	}*/
 	
 	/**
 	 * Method to build the WHERE clause of the query to select a content item
@@ -513,7 +514,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	string	WHERE clause
 	 * @since	1.5
 	 */
-	function _buildItemWhere()
+	/*function _buildItemWhere()
 	{
 		global $mainframe;
 
@@ -524,10 +525,10 @@ class FlexicontentModelItem extends JModel
 		$now		= $jnow->toMySQL();
 		$nullDate	= $this->_db->getNullDate();
 
-		/*
-		 * First thing we need to do is assert that the content article is the one
-		 * we are looking for and we have access to it.
-		 */
+		//
+		// First thing we need to do is assert that the content article is the one
+		// we are looking for and we have access to it.
+		//
 		$where = ' WHERE i.id = '. (int) $this->_id;
 
 		if ($aid < 2)
@@ -537,7 +538,7 @@ class FlexicontentModelItem extends JModel
 		}
 
 		return $where;
-	}
+	}*/
 
 	/**
 	 * Method to load content article parameters
@@ -546,7 +547,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadItemParams() {
+	/*function _loadItemParams() {
 		$mainframe = &JFactory::getApplication();
 		jimport('joomla.html.parameter');
 
@@ -569,23 +570,23 @@ class FlexicontentModelItem extends JModel
 		$iparams = new JParameter($this->_item->attribs);
 		$params->merge($iparams);
 
-/*
-		// Set the popup configuration option based on the request
-		$pop = JRequest::getVar('pop', 0, '', 'int');
-		$params->set('popup', $pop);
 
-		// Are we showing introtext with the article
-		if (!$params->get('show_intro') && !empty($this->_article->fulltext)) {
-			$this->_article->text = $this->_article->fulltext;
-		} else {
-			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
-		}
-*/
+//		// Set the popup configuration option based on the request
+//		$pop = JRequest::getVar('pop', 0, '', 'int');
+//		$params->set('popup', $pop);
+//
+//		// Are we showing introtext with the article
+//		if (!$params->get('show_intro') && !empty($this->_article->fulltext)) {
+//			$this->_article->text = $this->_article->fulltext;
+//		} else {
+//			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
+//		}
+
 
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;
 	}
-
+*/
 	/**
 	 * Method to get the tags
 	 *
@@ -593,7 +594,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	object
 	 * @since	1.0
 	 */
-	function getTagsX() {
+	/*function getTagsX() {
 		$query = 'SELECT DISTINCT t.name,'
 		. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 		. ' FROM #__flexicontent_tags AS t'
@@ -608,7 +609,7 @@ class FlexicontentModelItem extends JModel
 		$this->_tags = $this->_db->loadObjectList();
 
 		return $this->_tags;
-	}
+	}*/
 	
 	/**
 	 * Method to fetch tags
@@ -616,13 +617,13 @@ class FlexicontentModelItem extends JModel
 	 * @return object
 	 * @since 1.0
 	 */
-	function gettags($mask="") {
+	/*function gettags($mask="") {
 		$where = ($mask!="")?" name like '%$mask%' AND":"";
 		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
-	}
+	}*/
 
 	/**
 	 * Method to get the categories
@@ -631,7 +632,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	object
 	 * @since	1.0
 	 */
-	function getCategories()
+	/*function getCategories()
 	{
 		$query = 'SELECT DISTINCT c.id, c.title,'
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
@@ -644,7 +645,7 @@ class FlexicontentModelItem extends JModel
 
 		$this->_cats = $this->_db->loadObjectList();
 		return $this->_cats;
-	}
+	}*/
 
 	/**
 	 * Method to increment the hit counter for the item
@@ -653,7 +654,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function hit() {
+	/*function hit() {
 		global $mainframe;
 
 		if ($this->_id)
@@ -663,7 +664,7 @@ class FlexicontentModelItem extends JModel
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 	function getAlltags() {
 		$query = 'SELECT * FROM #__flexicontent_tags ORDER BY name';
@@ -677,9 +678,10 @@ class FlexicontentModelItem extends JModel
 		if(@$this->_id && !@$this->_item->tags) {
 			$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
-			$this->_item->tags = $this->_db->loadResultArray();
+			//$this->_item->tags = $this->_db->loadResultArray();
+			$this->_tags = $this->_db->loadResultArray();
 		}
-		return $this->_item->tags;
+		return $this->_tags;
 	}
 
 	/**
@@ -690,7 +692,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True if checked out
 	 * @since	1.0
 	 */
-	function isCheckedOut( $uid=0 )
+	/*function isCheckedOut( $uid=0 )
 	{
 		if ($this->_loadItem())
 		{
@@ -705,7 +707,7 @@ class FlexicontentModelItem extends JModel
 			JError::raiseWarning( 0, 'Unable to Load Data');
 			return false;
 		}
-	}
+	}*/
 
 	/**
 	 * Method to checkin/unlock the item
@@ -714,7 +716,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	/*function checkin()
 	{
 		if ($this->_id)
 		{
@@ -722,7 +724,7 @@ class FlexicontentModelItem extends JModel
 			return $item->checkin($this->_id);
 		}
 		return false;
-	}
+	}*/
 
 	/**
 	 * Method to checkout/lock the item
@@ -732,7 +734,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	/*function checkout($uid = null)
 	{
 		if ($this->_id)
 		{
@@ -746,7 +748,7 @@ class FlexicontentModelItem extends JModel
 			return $item->checkout($uid, $this->_id);
 		}
 		return false;
-	}
+	}*/
 	
 	/**
 	 * Method to store the item
@@ -754,7 +756,7 @@ class FlexicontentModelItem extends JModel
 	 * @access	public
 	 * @since	1.0
 	 */
-	function store($data) {
+	/*function store($data) {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -925,11 +927,11 @@ class FlexicontentModelItem extends JModel
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			/*if (FLEXI_ACCESS) {//commented by enjoyman, I don't understand these lines.
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
-				if ($canRight) FAccess::saveaccess( $item, 'item' );
-			}*/
+			//if (FLEXI_ACCESS) {//commented by enjoyman, I don't understand these lines.
+			//	$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			//	$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
+			//	if ($canRight) FAccess::saveaccess( $item, 'item' );
+			//}
 
 			$this->_item	=& $item;
 
@@ -1158,7 +1160,7 @@ class FlexicontentModelItem extends JModel
 		// process field mambots onCompleteSaveItem
 		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		return true;
-	}
+	}*/
 
 	/**
 	 * Method to store a vote
@@ -1168,7 +1170,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function storevote($id, $vote)
+	/*function storevote($id, $vote)
 	{
 		if ($vote == 1) {
 			$target = 'plus';
@@ -1186,7 +1188,7 @@ class FlexicontentModelItem extends JModel
 		$this->_db->query();
 
 		return true;
-	}
+	}*/
 
 	/**
 	 * Method to get the categories an item is assigned to
@@ -1195,7 +1197,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function getCatsselected()
+	/*function getCatsselected()
 	{
 		if(!@$this->_item->categories) {
 			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
@@ -1203,7 +1205,7 @@ class FlexicontentModelItem extends JModel
 			$this->_item->categories = $this->_db->loadResultArray();
 		}
 		return $this->_item->categories;
-	}
+	}*/
 
 	/**
 	 * Method to store the tag
@@ -1212,7 +1214,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function storetag($data)
+	/*function storetag($data)
 	{
 		$row  =& $this->getTable('flexicontent_tags', '');
 
@@ -1235,7 +1237,7 @@ class FlexicontentModelItem extends JModel
 		}
 		$this->_tag = &$row;
 		return $row->id;
-	}
+	}*/
 
 	/**
 	 * Method to add a tag
@@ -1244,7 +1246,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function addtag($name) {
+	/*function addtag($name) {
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
@@ -1254,7 +1256,7 @@ class FlexicontentModelItem extends JModel
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 	/**
 	 * Method to get the nr of favourites of anitem
@@ -1263,13 +1265,13 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function getFavourites()
+	/*function getFavourites()
 	{
 		$query = 'SELECT COUNT(id) AS favs FROM #__flexicontent_favourites WHERE itemid = '.(int)$this->_id;
 		$this->_db->setQuery($query);
 		$favs = $this->_db->loadResult();
 		return $favs;
-	}
+	}*/
 
 	/**
 	 * Method to get the nr of favourites of an user
@@ -1278,7 +1280,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function getFavoured()
+	/*function getFavoured()
 	{
 		$user = JFactory::getUser();
 
@@ -1286,7 +1288,7 @@ class FlexicontentModelItem extends JModel
 		$this->_db->setQuery($query);
 		$fav = $this->_db->loadResult();
 		return $fav;
-	}
+	}*/
 	
 	/**
 	 * Method to remove a favourite
@@ -1295,7 +1297,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function removefav()
+	/*function removefav()
 	{
 		$user = JFactory::getUser();
 
@@ -1303,16 +1305,16 @@ class FlexicontentModelItem extends JModel
 		$this->_db->setQuery($query);
 		$remfav = $this->_db->query();
 		return $remfav;
-	}
+	}*
 	
 	/**
 	 * Method to add a favourite
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @since	1.0/
 	 */
-	function addfav()
+	/*function addfav()
 	{
 		$user = JFactory::getUser();
 
@@ -1322,7 +1324,7 @@ class FlexicontentModelItem extends JModel
 
 		$addfav = $this->_db->insertObject('#__flexicontent_favourites', $obj);
 		return $addfav;
-	}
+	}*/
 	
 	/**
 	 * Method to change the state of an item
@@ -1331,7 +1333,7 @@ class FlexicontentModelItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function setitemstate($id, $state = 1)
+	/*function setitemstate($id, $state = 1)
 	{
 		$user 	=& JFactory::getUser();
 		
@@ -1350,7 +1352,7 @@ class FlexicontentModelItem extends JModel
 			}
 		}
 		return true;
-	}
+	}*/
 
 	/**
 	 * Method to get the type parameters of an item
@@ -1358,7 +1360,7 @@ class FlexicontentModelItem extends JModel
 	 * @return string
 	 * @since 1.5
 	 */
-	function getTypeparams ()
+	/*function getTypeparams ()
 	{
 		$query	= 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t';
@@ -1374,7 +1376,7 @@ class FlexicontentModelItem extends JModel
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		return $tparams;
-	}
+	}*/
 
 	
 	/**
@@ -1384,7 +1386,7 @@ class FlexicontentModelItem extends JModel
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
 	 */
-	function getExtrafieldvalue($fieldid, $version = 0)
+	/*function getExtrafieldvalue($fieldid, $version = 0)
 	{
 		$id = (int)$this->_id;
 		if(!$id) return array();
@@ -1400,7 +1402,7 @@ class FlexicontentModelItem extends JModel
 		$this->_db->setQuery($query);
 		$field_value = $this->_db->loadResultArray();
 		return $field_value;
-	}
+	}*/
 	
 	/**
 	 * Method to get extrafields which belongs to the item type
@@ -1408,7 +1410,7 @@ class FlexicontentModelItem extends JModel
 	 * @return object
 	 * @since 1.5
 	 */
-	function getExtrafields() {
+	/*function getExtrafields() {
 		$typeid = intval(@$this->_item->type_id);
 		$version = (int)FLEXIUtilities::getLastVersions($this->_id, true);
 		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
@@ -1430,7 +1432,7 @@ class FlexicontentModelItem extends JModel
 			$field->parameters 	= new JParameter($field->attribs);
 		}
 		return $fields;
-	}
+	}*/
 	
 	/**
 	 * Method to get advanced search fields which belongs to the item type
@@ -1438,7 +1440,7 @@ class FlexicontentModelItem extends JModel
 	 * @return object
 	 * @since 1.5
 	 */
-	function getAdvSearchFields($search_fields) {
+	/*function getAdvSearchFields($search_fields) {
 		$where = " WHERE `name` IN ({$search_fields}) AND fi.isadvsearch='1'";
 		$query = 'SELECT fi.*'
 			.' FROM #__flexicontent_fields AS fi'
@@ -1458,6 +1460,6 @@ class FlexicontentModelItem extends JModel
 			$field->parameters 	= new JParameter($field->attribs, $path);
 		}
 		return $fields;
-	}
+	}*/
 }
 ?>

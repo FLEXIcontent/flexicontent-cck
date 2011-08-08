@@ -338,7 +338,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									} else {
 										$height = $this->tparams->get('height', 400);
 										$editor = & JFactory::getEditor();
-										$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array('pagebreak'), 'jform_text' ) ;;
+										$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array('pagebreak'), 'jform_text' ) ;
 									}
 								}
 						?>
@@ -558,9 +558,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
-					<?php //echo $this->lists['cid']; ?>
 					<?php echo $this->form->getInput('cid');?>
-					
 				</td>
 			</tr>
 			<tr>
@@ -665,9 +663,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="oldstate" value="<?php echo $this->form->getValue('state'); ?>" />
 <input type="hidden" name="oldmodified" value="<?php echo $this->form->getValue('modified'); ?>" />
 <input type="hidden" name="oldmodified_by" value="<?php echo $this->form->getValue('modified_by'); ?>" />
-<?php if (!FLEXI_FISH) : ?>
-<input type="hidden" name="language" value="<?php echo $this->form->getValue('language'); ?>" />
-<?php endif; ?>
 </form>
 
 </div>
