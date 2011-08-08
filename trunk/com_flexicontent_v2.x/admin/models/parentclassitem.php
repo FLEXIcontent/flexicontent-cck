@@ -663,10 +663,11 @@ class ParentClassItem extends JModelAdmin {
 			$searchindex = '';
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
-				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
+				$fkey = $field->iscore?'jform':'custom';
+				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$data[$fkey][$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
-				if (is_array($data['jform'][$field->name])) {
+				if (is_array(@$data['jform'][$field->name])) {
 					$postvalues = $data['jform'][$field->name];
 					$i = 1;
 					foreach ($postvalues as $postvalue) {
@@ -684,7 +685,7 @@ class ParentClassItem extends JModelAdmin {
 						$this->saveFieldItem($item->id, $field->id, $postvalue, $isnew, $field->iscore, ($data['vstate']==2), $i++);
 					}
 				}elseif(isset($data['custom'][$field->name])) {
-					$this->saveFieldItem($item->id, $field->id, $data[$field->name], $isnew, $field->iscore, ($data['vstate']==2));
+					$this->saveFieldItem($item->id, $field->id, $data['custom'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 				}
 				// process field mambots onAfterSaveField
 				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
