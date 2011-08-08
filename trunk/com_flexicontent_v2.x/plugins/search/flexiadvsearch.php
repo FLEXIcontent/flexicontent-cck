@@ -18,7 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
+$mainframe = &JFactory::getApplication();
 $mainframe->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
 $mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexiadvsearchAreas' );
 
@@ -52,7 +52,9 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	$db		= & JFactory::getDBO();
 	$user	= & JFactory::getUser();
-	$gid	= (int) $user->get('aid');
+	//$gid	= (int) $user->get('aid');
+	$gid = $user->getAuthorisedGroups();
+	$gids = "'".implode("','", $gid)."'";
 	// Get the WHERE and ORDER BY clauses for the query
 	$params 	= & $mainframe->getParams('com_flexicontent');
 	$typeid_for_advsearch = $params->get('typeid_for_advsearch');
@@ -143,18 +145,10 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	
 	// Select only items user has access to if he is not allowed to show unauthorized items
-	$joinaccess	= '';
 	$andaccess	= '';
 	if (!$show_noauth) {
-		if (FLEXI_ACCESS) {
-			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-			$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')';
-			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $gid . ')';
-		} else {
-			$andaccess  .= ' AND c.access <= '.$gid;
-			$andaccess  .= ' AND a.access <= '.$gid;
-		}
+		$andaccess  .= ' AND c.access IN ('.$gids.')';
+		$andaccess  .= ' AND a.access IN ('.$gids.')';
 	}
 
 	// filter by active language
@@ -176,12 +170,10 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$OPERATOR = JRequest::getVar('operator', 'OR');
 	$items = array();
 	$resultfields = array();
+	$custom = JRequest::getVar('custom', array());
 	foreach($fields as $field) {
 		if($field->item_id) {
-			$fieldsearch = JRequest::getVar($field->name, array());
-			//var_dump($field->name, $_REQUEST[$field->name]);
-			//echo "<br />";
-			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
+			$fieldsearch = @$custom[$field->name];
 			if(isset($fieldsearch[0]) && trim($fieldsearch[0])) {
 				$fieldsearch = $fieldsearch[0];
 				$fieldsearch = explode(" ", $fieldsearch);
@@ -202,17 +194,16 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$items = "'".implode("','", $items)."'";
 		$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
 	}
-	$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
+	$query 	= 'SELECT DISTINCT a.id,a.title AS title,'
 		. ' a.created AS created,'
 		. ' ie.search_index AS text,'
-		. ' "2" AS browsernav,'
+		. ' "2" AS browsernav,c.lft,c.rgt,'
 		. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 		. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
 		. ' FROM #__content AS a'
 		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
 		. ' LEFT JOIN #__categories AS c ON c.id = a.catid'
-		. $joinaccess
 		. ' WHERE '
 		. '('
 		. '( '.$where.' )'
@@ -230,13 +221,13 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$list = $db->loadObjectList();
 	if(isset($list)) {
 		foreach($list as $key => $row) {
-			if($row->sectionid==FLEXI_SECTION) {
+			//if(($row->lft>FLEXI_LFT_CATEGORY) && ($row->rgt<FLEXI_LFT_CATEGORY)) {
 				if(isset($resultfields[$row->id]))
 					foreach($resultfields[$row->id] as $r)
 						$list[$key]->text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
 				$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
-			}else
-				$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->catslug, $row->sectionid));
+			//}else
+			//	$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->categoryslug));
 		}
 	}
 	return $list;

@@ -74,6 +74,8 @@ class FLEXIcontentViewSearch extends JView
 		$search_fields = explode(",", $search_fields);
 		$search_fields = "'".implode("','", array_unique($search_fields))."'";
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
+		
+		$custom = JRequest::getVar('custom', array());
 		//Import fields
 		JPluginHelper::importPlugin('flexicontent_fields');
 		// Add html to field object trought plugins
@@ -84,7 +86,7 @@ class FLEXIcontentViewSearch extends JView
 				$field->field_type = 'text';
 			}
 			$label = $field->label;
-			$fieldsearch = JRequest::getVar($field->name, array());
+			$fieldsearch = @$custom[$field->name];
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			$field->value = isset($fieldsearch[0])?$fieldsearch:array();
 			$results = $dispatcher->trigger('onAdvSearchDisplayField', array( &$field, &$item ));
@@ -107,6 +109,7 @@ class FLEXIcontentViewSearch extends JView
 
 		$document	= &JFactory::getDocument();
 		$document->setTitle( $params->get( 'page_title' ) );
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		// Get the parameters of the active menu item
 		$params	= &$mainframe->getParams();
