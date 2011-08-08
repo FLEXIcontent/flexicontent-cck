@@ -130,32 +130,33 @@ function submitbutton( pressbutton ) {
 		submitform( pressbutton );
 		return false;
 	}
-
 	var form = document.adminForm;
 	var validator = document.formvalidator;
-	var title = form.title.value;
+	var title = form.jform_title.value;
 	title.replace(/\s/g,'');
-
 	if ( title.length==0 ) {
 		//alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");
-		validator.handleResponse(false,form.title);
+		validator.handleResponse(false,form.jform_title);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
-			//form.title.focus();
-			return false;
+		//form.title.focus();
+		return false;
 	}<?php if(!$cids) {?> else if ( form.cid.selectedIndex == -1 ) {
 		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
+		
+		return false;
 		validator.handleResponse(false,form.cid);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
 		return false;
 	} <?php } ?>else {
-	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) echo $this->editor->save( 'text' ); ?>
+	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) {$editor = & JFactory::getEditor();echo $editor->save( 'jform_text' );} ?>
 	submitform(pressbutton);
 	return true;
 	}
+	return false;
 }
 
 function deleteTag(obj) {
@@ -184,99 +185,115 @@ function deleteTag(obj) {
          
         <br class="clear" />
 	
-        <fieldset class="flexi_general">
-			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
-			<div class="flexi_formblock">
-				<label for="title" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
-				</label>
-				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
-			</div>
-			<div class="flexi_formblock">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+		<tr>
+			<td>
+				<?php echo $this->item->getLabel('title');?>
+			</td>
+			<td>
+				<?php /*<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" size="65" maxlength="254" />*/?>
+				<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="55" maxlength="254">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<?php echo $this->item->getLabel('alias');?>
+			</td>
+			<td>
+				<?php echo $this->item->getInput('alias');?>
+			</td>
+		</tr>
+		
 <?php
 if ($cids) :
-	global $globalcats;
-	$cats = array();
-	foreach($cids as $cid) :
-			$cats[] = $globalcats[$cid]->title;
 ?>
-			<input type="hidden" name="cid[]" value="<?php echo $cid;?>" />
-<?php
-	endforeach;
-?>
+		<tr>
+			<td>
 				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
+					<?php echo JText::_( 'FLEXI_CATEGORIES' );?>
 				</label>
+			</td>
+			<td>
+				<?php
+					global $globalcats;
+					$cats = array();
+					foreach($cids as $cid) :
+							$cats[] = $globalcats[$cid]->title;
+				?>
+							<input type="hidden" name="jform[cid][]" value="<?php echo $cid;?>" />
+				<?php
+					endforeach;
+				?>
+				<?php
+					echo implode(',', $cats);
+				?>
+			</td>
+		</tr>
 <?php
-	echo implode(',', $cats);
 else :
 ?>
-				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
-					<?php if ($this->perms['multicat']) : ?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
-					</span>
-					<?php endif; ?>
-				</label>
-          		<?php echo $this->lists['cid']; ?>
+		<tr>
+			<td>
+			<label for="cid" class="flexi_label">
+				<?php echo JText::_( 'FLEXI_CATEGORIES' );?>
+				<?php if ($this->perms['multicat']) : ?>
+				<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+					<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+				</span>
+				<?php endif; ?>
+			</label>
+			</td>
+			<td>
+          		<?php //echo $this->lists['cid']; ?>
+          		<?php echo $this->form->getInput('cid');?>
+          		</td>
+          	</tr>
 <?php
 endif;
+$autopublished = $this->params->get('autopublished', 0);
+$canpublish = $this->perms['canpublish'];
+		if (!$autopublished && $canpublish) :
 ?>
-			</div>
-
+		<tr>
+			<td>
+				<?php echo $this->item->getLabel('state').':';?>
+			</td>
+			<td>
+	  			<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
+	  			<?php
+	  			if ($this->params->get('auto_approve', 1)) :
+	  			?><input type="hidden" id="vstate" name="vstate" value="2" />
+	  			<?php
+	  			endif;?>
+			</td>
+		</tr>
 			<?php
-			if ($autopublished = $this->params->get('autopublished', 0)) : 
+			if (!$this->params->get('auto_approve', 1)) :
 			?>
-				<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
-				<input type="hidden" id="vstate" name="vstate" value="2" />
-			<?php 
-			elseif ($this->perms['canpublish']) :
-			?>
-			<div class="flexi_formblock">
-          		<label for="state" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
-				</label>
-          		<?php echo $this->lists['state']; ?>
-			</div>
-				<?php
-				if (!$this->params->get('auto_approve', 1)) :
-				?>
-			<div class="flexi_formblock">
-          		<label for="vstate" class="flexi_label">
+		<tr>
+			<td>
+	  			<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
 				</label>
-          		<?php echo $this->lists['vstate']; ?>
-			</div>
-				<?php
-				else :
-				?>
-				<input type="hidden" id="vstate" name="vstate" value="2" />
-				<?php
-				endif;
-				?>
-			<?php 
-			else :
-			?>
-			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
-			<input type="hidden" id="vstate" name="vstate" value="1" />
-			<?php 
-			endif; 
-			if (FLEXI_FISH) :
-			?>
-			<div class="flexi_formblock">
-          		<label for="languages" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_LANGUAGE' ).':';?>
-				</label>
-          		<?php echo $this->lists['languages']; ?>
-			</div>
-			<?php 
-			endif; 
-			?>
-		</fieldset>
-		
-		<?php
-		if (FLEXI_ACCESS && $this->perms['canright']) :
+			</td>
+			<td>
+		  		<?php echo $this->lists['vstate']; ?>
+			</td>
+		</tr>
+			<?php
+			endif;
+		endif; 
+		?>
+		<tr>
+			<td>
+		  		<?php echo $this->item->getLabel('language'); ?>
+			</td>
+			<td>
+		 		<?php echo $this->item->getInput('language');?>
+			</td>
+		</tr>
+		<?php 
+		if ($this->perms['canright']) :
 		$this->document->addScriptDeclaration("
 			window.addEvent('domready', function() {
 			var slideaccess = new Fx.Slide('tabacces');
@@ -288,69 +305,60 @@ endif;
 					});
 				});
 			");
-
 		?>
-		<fieldset class="flexiaccess">
+		<tr>
+			<td colspan="2">
 			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 			<table id="tabacces" class="admintable" width="100%">
-            	<tr>
-            		<td>
-                		<div id="access"><?php echo $this->lists['access']; ?></div>
-                	</td>
-            	</tr>
-        	</table>
+		    		<tr>
+		    		<td>
+		        		<div id="access"><?php echo $this->item->getInput('rules'); ?></div>
+		        	</td>
+		    	</tr>
+			</table>
 			<div id="notabacces">
 			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-        	</div>
-        </fieldset>
-        <?php endif; ?>
-
-	<fieldset class="flexi_tags">
-		<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
-		<div class="qf_tagbox" id="qf_tagbox">
-		<ul id="ultagbox">
-		<?php
-/*
-dump($this->tags,'tags');
-dump($this->used,'used');
-dump($this->perms,'perms');
-*/
-			foreach( $this->tags as $tag ) {
-				if(in_array($tag->id, $this->used)) {
-					if ($this->perms['cantags']) {
-						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-					} else {
-						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
-					}
-				}
-			}
-			?>
-		</ul>
-		<br class="clear" />
-	</div>
-		<?php if ($this->perms['cantags']) : ?>
-		<div id="tags">
-	<?php /*
-	$n = count($this->tags);
-	if ($n) {
-		echo '<div class="flexi_tagbox"><ul>';
-		for( $i = 0, $n; $i < $n; $i++ )
-		{
-				$tag = $this->tags[$i];
-				echo '<li><div><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $this->used) ? 'checked="checked"' : '') . ' /></span>'.$this->escape($tag->name).'</div></li>';	
-			}
-			echo '</ul></div>';
-		}*/
-		?>
-		<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-			<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
-		</label>
-		</div>
+			</div>
+        	</tr>
 		<?php endif; ?>
-	</fieldset>
-
+		<tr>
+			<td>
+				<label><?php echo JText::_( 'FLEXI_TAGS' ); ?></label>
+			</td>
+			<td>
+				<div class="qf_tagbox" id="qf_tagbox">
+				<ul id="ultagbox">
+				<?php
+					foreach( $this->tags as $tag ) {
+						if(in_array($tag->id, $this->used)) {
+							if ($this->perms['cantags']) {
+								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+								echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+							} else {
+								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+								echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+							}
+						}
+					}
+					?>
+					</ul>
+					<br class="clear" />
+				</div>
+			</td>
+		</tr>
+		<?php if ($this->perms['cantags']) : ?>
+		<tr>
+			<td>
+				<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?></label>
+			</td>
+			<td>
+				<div id="tags">
+					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+				</div>
+			</td>
+		</tr>
+		<?php endif; ?>
+	</table>
 	<?php
 	if ($this->fields) {
 		$this->document->addScriptDeclaration("
@@ -368,8 +376,8 @@ dump($this->perms,'perms');
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
-			$this->item->typename = $types[$this->item->type_id]['name'];
-			echo $this->item->typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->item->typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+			$typename = $types[$this->item->getValue('type_id')]['name'];
+			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
 		<table class="admintable" width="100%">
@@ -383,13 +391,14 @@ dump($this->perms,'perms');
 						$field->label = $this->tparams->get('maintext_label', $field->label);
 						$field->description = $this->tparams->get('maintext_desc', $field->description);
 						//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
-						$maintext = $this->item->text;
+						$maintext = $this->item->getValue('text');
 						if ($this->tparams->get('hide_html', 0))
 						{
-							$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
+							$field->html = '<textarea name="jform[text]" rows="20" cols="75">'.$maintext.'</textarea>';
 						} else {
 							$height = $this->tparams->get('height', 400);
-							$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20', array('pagebreak') ) ;
+							$editor = & JFactory::getEditor();
+							$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array('pagebreak'), 'jform_text' ) ;
 						}
 					}
 			?>
@@ -417,7 +426,7 @@ dump($this->perms,'perms');
 		</table>
 	</fieldset>
 	<?php
-	} else if ($this->item->id == 0) {
+	} else if ($this->item->getValue('id') == 0) {
 	?>
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 	<?php
@@ -428,38 +437,82 @@ dump($this->perms,'perms');
 	}
 	?>
 
-	<?php if ($this->perms['canparams']) : ?>
-	<?php if($this->params->get('usemetadata', 1)) {?>
-    	<fieldset class="flexi_meta">
-       	<legend><?php echo JText::_( 'FLEXI_METADATA_INFORMATION' ); ?></legend>
-
-            <div class="flexi_box_left">
-              	<label for="metadesc"><?php echo JText::_( 'FLEXI_META_DESCRIPTION' ); ?></label>
-          		<textarea class="inputbox" cols="20" rows="5" name="metadesc" id="metadesc" style="width:100%;"><?php echo $this->item->metadesc; ?></textarea>
-            </div>
-
-            <div class="flexi_box_right">
-        		<label for="metakey"><?php echo JText::_( 'FLEXI_META_KEYWORDS' ); ?></label>
-        		<textarea class="inputbox" cols="20" rows="5" name="metakey" id="metakey" style="width:100%;"><?php echo $this->item->metakey; ?></textarea>
-            </div>
-      	</fieldset>
-		<?php }else{?>
-			<input type="hidden" name="metadesc" value="<?php echo @$this->item->metadesc; ?>" />
-			<input type="hidden" name="metakey" value="<?php echo @$this->item->metakey; ?>" />
-		<?php }?>
-		<?php endif; ?>
+	<?php if ($this->perms['canparams'] && $this->params->get('usemetadata', 1)) { ?>
+	<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+	<?php
+		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
+		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+		?>
+		<fieldset class="panelform">
+			<table>
+			<tr>
+				<td>
+				<?php echo $this->item->getLabel('metadesc'); ?>
+				</td>
+				<td>
+				<?php echo $this->item->getInput('metadesc'); ?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<?php echo $this->item->getLabel('metakey'); ?>
+				</td>
+				<td>
+				<?php echo $this->item->getInput('metakey'); ?>
+				</td>
+			</tr>
+			<?php foreach($this->item->getGroup('metadata') as $field): ?>
+				<tr>
+				<?php if ($field->hidden): ?>
+					<td colspan="2">
+					<?php echo $field->input; ?>
+					</td>
+				<?php else: ?>
+					<td>
+					<?php echo $field->label; ?>
+					</td>
+					<td>
+					<?php echo $field->input; ?>
+					</td>
+				<?php endif; ?>
+				</tr>
+			<?php endforeach; ?>
+			</table>
+		</fieldset>
+		<?php echo JHtml::_('sliders.end'); ?>
+	<?php }else{?>
+		<input type="hidden" name="jform[metadata][metadesc]" value="<?php echo @$this->item->getValue('metadesc'); ?>" />
+		<input type="hidden" name="jform[metadata][metakey]" value="<?php echo @$this->item->getValue('metakey'); ?>" />
+	<?php }?>
+	<?php if($this->perms['canparams']) {?>
+		<div class="formelm">
+		<?php echo $this->item->getLabel('created_by_alias'); ?>
+		<?php echo $this->item->getInput('created_by_alias'); ?>
+		</div>
+	<?php }else{ ?>
+		<input type="hidden" name="jform[created_by_alias]" value="" />
+	<?php }?>
 
 		<br class="clear" />
-        
-		<input type="hidden" name="created" value="<?php echo $this->item->created; ?>" />
-		<input type="hidden" name="created_by" value="<?php echo $this->item->created_by; ?>" />
-		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-    	<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
-    	<?php echo JHTML::_( 'form.token' ); ?>
-    	<input type="hidden" name="task" value="" />
+		<?php echo JHTML::_( 'form.token' ); ?>
+		<input type="hidden" name="return" value="<?php echo @$this->return_page;?>" />
+		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
-		<input type="hidden" name="views" value="items" />
-
+		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
+		<?php echo $this->item->getInput('id');?>
+		<?php
+			if ($autopublished) :
+		?>
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
+				<input type="hidden" id="vstate" name="vstate" value="2" />
+		<?php
+			elseif (!$autopublished && !$canpublish) :
+		?>
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->getValue('state', -4);?>" />
+				<input type="hidden" id="vstate" name="vstate" value="1" />
+		<?php
+			endif;
+		?>
 	</form>
 </div>
 

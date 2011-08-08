@@ -163,21 +163,22 @@ class FlexicontentController extends JController
 		$model = $this->getModel('Item');
 
 		//get data from request
+		//$post = JRequest::getVar('jform', array());
 		$post = JRequest::get('post');
-		$post['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
+		$post['jform']['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
 
 		//perform access checks
-		$isNew = ((int) $post['id'] < 1);
+		$isNew = ((int) $post['jform']['id'] < 1);
 
 		// Must be logged in
 		if ($user->get('id') < 1) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
 		}
-
+		$post['jform']['catid'] = array();
 		if ($model->store($post)) {
 			if($isNew) {
-				$post['id'] = (int) $model->get('id');
+				$post['jform']['id'] = (int) $model->get('id');
 			}
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
@@ -187,14 +188,13 @@ class FlexicontentController extends JController
 		$model->checkin();
 
 		if ($isNew) {
-
 			//Get categories for information mail
 			$query 	= 'SELECT DISTINCT c.id, c.title,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-					. ' FROM #__categories AS c'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' WHERE rel.itemid = '.(int) $model->get('id')
-					;
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+				. ' FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $model->get('id')
+			;
 
 			$db->setQuery( $query );
 
@@ -236,7 +236,7 @@ class FlexicontentController extends JController
 
 				$data["user_id_to"] = $adminRow->id;
 				$data["subject"] = JText::_( 'FLEXI_NEW_ITEM' );
-				$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring);
+				$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['jform']['title'], $user->get('username'), $catstring);
 				//$message->send($user->get('id'), $adminRow->id, JText::_( 'FLEXI_NEW_ITEM' ), );
 				$message->save($data);
 			}

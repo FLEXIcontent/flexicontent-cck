@@ -308,22 +308,24 @@ class FlexicontentViewItem extends JView {
 		$menu    	= $menus->getActive();
 		$uri     	=& JFactory::getURI();
 		JRequest::setVar('loadcurrent', false);
-		$item		=& $this->get('Item');
+		//$item		=& $this->get('Item');
+		$item		= $this->get('Form');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');
 		//$params		=& $mainframe->getParams('com_flexicontent');
-		//$params		=& JComponentHelper::getParams('com_flexicontent');
-		$params	=& $item->parameters;
-		
+		$params		=& JComponentHelper::getParams('com_flexicontent');
+		//$params	=& $item->parameters;var_dump($item);
 		$Itemid		=&JRequest::getVar('Itemid', 0);
+		$db = &JFactory::getDBO();
 		if($Itemid) {
-			$db = &JFactory::getDBO();
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
 			$mparams = new JParameter($paramsstring);
 			$params->merge($mparams);
 		}
+		$nullDate 		= $db->getNullDate();
+		
 		$tparams	=& $this->get( 'Typeparams' );
 		
 		$fields			= & $this->get( 'Extrafields' );
@@ -351,7 +353,7 @@ class FlexicontentViewItem extends JView {
 		// load permission
 		$permission = FlexicontentHelperPerm::getPerm();
 		// check if it's an edit action
-		if ($item->id) {
+		if ($item->getValue('id')) {
 			// EDIT action
 			$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
 			if ( !$permission->CanEdit && !($canEditOwn && ($item->created_by == $user->get('id'))) ) {
@@ -371,7 +373,7 @@ class FlexicontentViewItem extends JView {
 		$perms['cantags'] = $permission->CanTags;
 		$perms['canparams'] = $permission->CanParams;
 
-		$itemrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+		$itemrights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
 		//$catrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $item->catid);
 		//$rights = array_merge($itemrights, $catrights);//I not sure if it will merged or not?//by enjoyman
 		$rights = $itemrights;
@@ -410,10 +412,10 @@ class FlexicontentViewItem extends JView {
 
 
 		//Load the JEditor object
-		$editor =& JFactory::getEditor();
+		//$editor =& JFactory::getEditor();
 
 		//Build the page title string
-		$title = $item->id ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
+		$title = $item->getValue('id') ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
 
 		//Set page title
 		$document->setTitle($title);
@@ -440,7 +442,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('item',		$item);
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',		$lists);
-		$this->assignRef('editor',		$editor);
+		//$this->assignRef('editor',		$editor);
 		$this->assignRef('user',		$user);
 		$this->assignRef('tags',		$tags);
 		$this->assignRef('used',		$used);
@@ -448,6 +450,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('tparams', 	$tparams);
 		$this->assignRef('perms', 		$perms);
 		$this->assignRef('document',	$document);
+		$this->assignRef('nullDate', $nullDate);
 		
 		/*
 		 * Set template paths : this procedure is issued from K2 component
@@ -490,16 +493,16 @@ class FlexicontentViewItem extends JView {
 		
 		//build selectlist
 		$lists = array();
-		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'class="inputbox required validate-cid"'.$multiple, true);
+		//$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, 'class="inputbox required validate-cid"'.$multiple, true);
 		
-		$state = array();
+		/*$state = array();
 		$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
 		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
 
-		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );
+		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );*/
 
 		$vstate = array();
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
