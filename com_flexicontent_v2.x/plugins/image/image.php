@@ -62,10 +62,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$linkto_url = $field->parameters->get('linkto_url',0);
 		
 		// if an image exists it display the existing image
-		if ($field->value  && $field->value[0] != '')
+		if ($field->value  && @$field->value[0]!='')
 		{
+			if(isset($field->value['originalname']))
+				$field->value = array($field->value);
 			foreach ($field->value as $value) {
-				$value = unserialize($value);
+				//$value = unserialize($value);
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
 				if ($always_allow_removal)
@@ -131,7 +133,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="custom['.$field->name.']" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
+						<td><input name="'.$field->name.'" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).':</td>
@@ -151,6 +153,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
 						<td><input name="custom['.$field->name.'][title]" type="text" /></td>
+					</tr>
+					<tr>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
+						<td><textarea name="custom['.$field->name.'][desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 					</tr>
 				</table>
 			</div>
@@ -316,7 +322,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if($field->field_type != 'image') return;
 		if(!$post) return;
 
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		// create the fulltext search index
 		if ($field->issearch) {
@@ -336,17 +342,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		// Upload the original file
 		$this->uploadOriginalFile($field, $post, $file);
-		
 		if ($post['originalname'])
 		{
-			if ($post['delete'] == 1)
+			if (@$post['delete'] == 1)
 			{
 				$filename = $post['originalname'];
 				$this->removeOriginalFile( $field, $filename );
 				$post = '';
 				$mainframe->enqueueMessage($field->label . ' : ' . JText::_('Images succesfully removed'));
 			}
-			elseif ($post['remove'] == 1)
+			elseif (@$post['remove'] == 1)
 			{
 				$post = '';
 			} else {
@@ -357,12 +362,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// unset $post because no file was posted
 			$post = '';
 		}
-
 	}
 	
 	function uploadOriginalFile($field, &$post, $file)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$err		= null;
@@ -386,7 +390,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
-			
 			// only handle the secure folder
 			$path = COM_FLEXICONTENT_FILEPATH.DS;
 
@@ -632,12 +635,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		$db->setQuery($query);
 		$values = $db->loadResultArray();
-		
 
 		if (!$list_all_media_files) {
-			for($n=0, $c=count($values); $n<$c; $n++)
-			{
-			  if (!$values[$n]) {  unset($values[$n]);  continue; 	}
+			for($n=0, $c=count($values); $n<$c; $n++) {
+				if (!$values[$n]) { unset($values[$n]); continue;}
 				$values[$n] = unserialize($values[$n]);
 				$values[$n] = $values[$n]['originalname'];
 			}
