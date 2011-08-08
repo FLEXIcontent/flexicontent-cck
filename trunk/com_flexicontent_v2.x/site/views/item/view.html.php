@@ -309,11 +309,14 @@ class FlexicontentViewItem extends JView {
 		$uri     	=& JFactory::getURI();
 		JRequest::setVar('loadcurrent', false);
 		//$item		=& $this->get('Item');
+		JRequest::setVar('typeid', @$menu->query['typeid'][0]);
 		$item		= $this->get('Form');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');
 		//$params		=& $mainframe->getParams('com_flexicontent');
-		$params		=& JComponentHelper::getParams('com_flexicontent');
+		//$params		=& JComponentHelper::getParams('com_flexicontent');
+		$params = &$menu->params;
+		//echo "<xmp>";var_dump($menu->params);echo "</xmp>";
 		//$params	=& $item->parameters;var_dump($item);
 		$Itemid		=&JRequest::getVar('Itemid', 0);
 		$db = &JFactory::getDBO();
@@ -493,7 +496,7 @@ class FlexicontentViewItem extends JView {
 		
 		//build selectlist
 		$lists = array();
-		//$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, 'class="inputbox required validate-cid"'.$multiple, true);
+		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, 'class="inputbox required validate-cid"'.$multiple, true);
 		
 		/*$state = array();
 		$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );

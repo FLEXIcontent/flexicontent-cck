@@ -128,7 +128,7 @@ function addtag(id, tagname) {
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
-		return false;
+		//return false;
 	}
 	var form = document.adminForm;
 	var validator = document.formvalidator;
@@ -142,11 +142,9 @@ function submitbutton( pressbutton ) {
 		invalid[0].focus();
 		//form.title.focus();
 		return false;
-	}<?php if(!$cids) {?> else if ( form.cid.selectedIndex == -1 ) {
+	}<?php if(!$cids) {?> else if ( form.jformcid.selectedIndex == -1 ) {
 		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
-		
-		return false;
-		validator.handleResponse(false,form.cid);
+		validator.handleResponse(false,form.jformcid);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
@@ -154,7 +152,7 @@ function submitbutton( pressbutton ) {
 	} <?php } ?>else {
 	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) {$editor = & JFactory::getEditor();echo $editor->save( 'jform_text' );} ?>
 	submitform(pressbutton);
-	return true;
+	//return true;
 	}
 	return false;
 }
@@ -244,8 +242,8 @@ else :
 			</label>
 			</td>
 			<td>
-          		<?php //echo $this->lists['cid']; ?>
-          		<?php echo $this->form->getInput('cid');?>
+          		<?php echo $this->lists['cid']; ?>
+          		<?php //echo $this->item->getInput('catid');?>
           		</td>
           	</tr>
 <?php

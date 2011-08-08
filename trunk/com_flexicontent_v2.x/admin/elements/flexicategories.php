@@ -42,7 +42,8 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		//var_dump($this->value);
-		$values = explode(",", $value);
+		//$values = explode(",", $value);
+		$values = $this->value;
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
@@ -56,10 +57,9 @@ class JFormFieldFlexicategories extends JFormField
 			document.getElementById('a_id').value = values;
 		}";
 		$doc->addScriptDeclaration($js);
-		//var_dump($this->value);
 		$html = flexicontent_cats::buildcatselect($tree, $this->name, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
 		//$html = flexicontent_cats::buildcatselect($tree, $this->name, $this->value, false, ' class="inputbox validate-cid" multiple="multiple" size="8"', true);
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"jform[request][".$this->element["name"]."]\" value=\"{$value}\" />";
+		//$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"jform[request][".$this->element["name"]."]\" value=\"".implode(",", $values)."\" />";
 		return $html;
 	}
 }
