@@ -372,7 +372,7 @@ class ParentClassItem extends JModelAdmin {
 		$item->setRules($data['jform']['rules']);
 		if( ($isnew = !$id) || ($data['vstate']==2) ) {//vstate = 2 is approve version then save item to #__content table.
 			// Add the primary cat to the array if it's not already in
-			if (!in_array($data['jform']['catid'], $cats)) {
+			if (!in_array($data['jform']['catid'], $cats) && $item->catid) {
 				$cats[] = $item->catid;
 			}
 			// Store categories to item relations
@@ -580,7 +580,6 @@ class ParentClassItem extends JModelAdmin {
 		}else{
 			$item->version = $isnew?1:(($data['vstate']==2)?($version+1):$current_version);
 		}
-
 		// Store it in the db
 		if (!$item->store()) {
 			$this->setError($this->_db->getErrorMsg());
@@ -640,7 +639,7 @@ class ParentClassItem extends JModelAdmin {
 	function saveFields(&$item, &$data) {
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
-		
+
 		$isnew = !$item->id;
 		$cats = $data['jform']['categories'][0];
 		$tags = $data['jform']['tags'][0];
@@ -691,7 +690,6 @@ class ParentClassItem extends JModelAdmin {
 				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
 				$searchindex 	.= @$field->search;
 			}
-
 			// store the extended data if the version is approved
 			if( $isnew || ($data['vstate']==2) ) {
 				$item->search_index = $searchindex;
@@ -705,9 +703,6 @@ class ParentClassItem extends JModelAdmin {
 					$this->setError($this->_db->getErrorMsg());
 					return false;
 				}
-
-				//dump($searchindex,'search');
-				//dump($item,'item');
 			}
 		}
 		return true;

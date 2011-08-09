@@ -165,7 +165,7 @@ class FlexicontentController extends JController
 		//get data from request
 		//$post = JRequest::getVar('jform', array());
 		$post = JRequest::get('post');
-		$post['jform']['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
+		//$post['jform']['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
 
 		//perform access checks
 		$isNew = ((int) $post['jform']['id'] < 1);
@@ -184,7 +184,6 @@ class FlexicontentController extends JController
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
 			JError::raiseError( 500, $model->getError() );
 		}
-
 		$model->checkin();
 
 		if ($isNew) {

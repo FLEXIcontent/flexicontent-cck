@@ -28,6 +28,7 @@ if ($this->params->get('form_extra_css')) {
 }
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
+
 if ($this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
@@ -498,6 +499,7 @@ $canpublish = $this->perms['canpublish'];
 		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
 		<?php echo $this->item->getInput('id');?>
+		<input type="hidden" name="jform[type_id]" value="<?php echo JRequest::setVar('typeid', 0);?>" />
 		<?php
 			if ($autopublished) :
 		?>
@@ -510,6 +512,11 @@ $canpublish = $this->perms['canpublish'];
 				<input type="hidden" id="vstate" name="vstate" value="1" />
 		<?php
 			endif;
+			/*if (!$this->perms['canright']) {
+		?>
+				<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
+		<?php
+			}*/
 		?>
 	</form>
 </div>
