@@ -1119,6 +1119,7 @@ class ParentClassItem extends JModelAdmin {
 	function getExtrafields($force = false) {
 		static $fields;
 		if(!$fields || $force) {
+			jimport('joomla.html.parameter');
 			$typeid = JRequest::getVar('typeid', 0, '', 'int');
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
