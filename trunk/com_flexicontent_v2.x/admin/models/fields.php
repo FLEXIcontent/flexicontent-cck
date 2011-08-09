@@ -146,9 +146,11 @@ class FlexicontentModelFields extends JModelList{
 			$this->getState(
 				'list.select',
 				't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering'
+				. ', ext.name as field_friendlyname'
 			)
 		);
 		$query->from('#__flexicontent_fields AS t');
+		$query->join('LEFT', '#__extensions AS ext ON (ext.element = t.field_type AND ext.`type`=\'plugin\')');
 		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
 		$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
 		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
@@ -186,9 +188,11 @@ class FlexicontentModelFields extends JModelList{
 				$query->having('COUNT(rel.type_id) > 0');
 			}
 		}
+		
+		$query->where("(ext.extension_id IS NULL OR ext.folder='flexicontent_fields')");
 
 		$query->order($filter_order.' '.$filter_order_Dir);
-		//echo str_replace("#__", "jos_", $query->__toString());	
+		//echo str_replace("#__", "jos_", $query->__toString());
 		return $query;
 	}
 
