@@ -403,7 +403,7 @@ class ParentClassItem extends JModelAdmin {
 		// NOTE: This event isn't used yet but may be useful in a near future
 		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
 
-		if(!$this->saveFields($item, $data)) return false;
+		if(!$this->saveFields($isnew, $item, $data)) return false;
 		
 		// versioning backup procedure
 		// first see if versioning feature is enabled
@@ -636,11 +636,10 @@ class ParentClassItem extends JModelAdmin {
 		return true;
 	}
 	
-	function saveFields(&$item, &$data) {
+	function saveFields($isnew, &$item, &$data) {
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 
-		$isnew = !$item->id;
 		$cats = $data['jform']['categories'][0];
 		$tags = $data['jform']['tags'][0];
 		///////////////////////////////
