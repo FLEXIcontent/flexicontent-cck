@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$linkto_url = $field->parameters->get('linkto_url',0);
 		
 		// if an image exists it display the existing image
-		if ($field->value  && @$field->value[0]!='')
+		if ($field->value  && @$field->value[0]!=='')
 		{
 			if(isset($field->value['originalname']))
 				$field->value = array($field->value);
@@ -170,7 +170,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
 
-		global $mainframe, $multiboxadded;
+		global $multiboxadded;
+		$mainframe = &JFactory::getApplication();
 		jimport('joomla.filesystem');
 
 		$values = $values ? $values : $field->value;
