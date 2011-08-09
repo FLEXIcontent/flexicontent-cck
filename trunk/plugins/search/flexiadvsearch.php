@@ -28,16 +28,19 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 /**
  * @return array An array of search areas
  */
-function &plgSearchFlexiadvsearchAreas() {
-	static $areas = array(
-	'flexicontent' => 'FLEXICONTENT'
-	);
-	return $areas;
+if(!function_exists("plgSearchFlexiadvsearchAreas")) {
+	function &plgSearchFlexiadvsearchAreas() {
+		static $areas = array(
+		'flexicontent' => 'FLEXICONTENT'
+		);
+		return $areas;
+	}
 }
-
-function &plgSearchContentAreas() {
-	static $areas = array();
-	return $areas;
+if(!function_exists("plgSearchContentAreas")) {
+	function &plgSearchContentAreas() {
+		static $areas = array();
+		return $areas;
+	}
 }
 /**
  * Search method
