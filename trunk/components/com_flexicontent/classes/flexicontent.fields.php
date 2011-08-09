@@ -101,19 +101,19 @@ class FlexicontentFields
 			}
 
 			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
-			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
+			/*$always_create_fields_display = $cparams->get('always_create_fields_display',0);
 			$flexiview = JRequest::getVar('view', false);
 			// 0: never, 1: always, 2: only in item view 
 			if ($always_create_fields_display==1 || ($always_create_fields_display=2 && $flexiview=='items') ) {
 				if ($items[$i]->fields)
 				{
 					foreach ($items[$i]->fields as $field)
-					{
+					{//trigger event '#onDisplayFieldValue' first time in same loading
 						$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 						$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					}
 				}
-			}
+			}*/
 		}
 		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
@@ -309,7 +309,6 @@ class FlexicontentFields
 			// NOT core field but just in case code is updated ... we check for core
 			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
-			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
 				$field->title = $item->title;
@@ -394,6 +393,7 @@ class FlexicontentFields
 					}
 					$field = $items[$i]->fields[$f];
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+					//trigger event '#onDisplayFieldValue' second time in same loading
 					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					if (isset($field->display) && $field->display) {
 						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
