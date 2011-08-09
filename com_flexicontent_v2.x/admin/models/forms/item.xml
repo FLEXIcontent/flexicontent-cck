@@ -46,10 +46,10 @@
 			format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 
 		<field name="created_by" type="user"
-			label="COM_CONTENT_FIELD_CREATED_BY_LABEL" description="COM_CONTENT_FIELD_CREATED_BY_DESC" />
+			label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" />
 
 		<field name="created_by_alias" type="text"
-			label="COM_CONTENT_FIELD_CREATED_BY_ALIAS_LABEL" description="COM_CONTENT_FIELD_CREATED_BY_ALIAS_DESC"
+			label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC"
 			class="inputbox" size="20" />
 
 		<field name="modified" type="calendar" class="readonly"
@@ -164,8 +164,8 @@
 	<fields name="metadata">
 		<field name="robots"
 			type="list"
-			label="JFIELD_METADATA_ROBOTS_LABEL"
-			description="JFIELD_METADATA_ROBOTS_DESC"
+			label="FLEXI_METADATA_ROBOTS_LABEL"
+			description="FLEXI_METADATA_ROBOTS_DESC"
 		>
 			<option value="">JGLOBAL_USE_GLOBAL</option>
 			<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
@@ -175,14 +175,14 @@
 		</field>
 
 		<field name="author" type="text"
-			label="JAUTHOR" description="JFIELD_METADATA_AUTHOR_DESC"
+			label="JAUTHOR" description="FLEXI_METADATA_AUTHOR_DESC"
 			size="20" />
 
-		<field name="rights" type="textarea" label="JFIELD_META_RIGHTS_LABEL"
-			description="JFIELD_META_RIGHTS_DESC" required="" filter="string"
+		<field name="rights" type="textarea" label="FLEXI_META_RIGHTS_LABEL"
+			description="FLEXI_META_RIGHTS_DESC" required="" filter="string"
 			cols="30" rows="2" />
 		<field name="xreference" type="text"
-			label="COM_CONTENT_FIELD_XREFERENCE_LABEL" description="COM_CONTENT_FIELD_XREFERENCE_DESC"
+			label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC"
 			class="inputbox" size="20" />
 	</fields>
 </form>

@@ -320,6 +320,8 @@ class FlexicontentViewItem extends JView {
 		//$params	=& $item->parameters;var_dump($item);
 		$Itemid		=&JRequest::getVar('Itemid', 0);
 		$db = &JFactory::getDBO();
+		JPlugin::loadLanguage('com_flexicontent', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
 		if($Itemid) {
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
