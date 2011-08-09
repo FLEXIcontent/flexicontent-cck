@@ -67,7 +67,8 @@ class FlexicontentModelFields extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $option;
+		global $option;
+		$mainframe = &JFactory::getApplication();
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
@@ -172,8 +173,7 @@ class FlexicontentModelFields extends JModel
 			. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
 			. ' LEFT JOIN #__groups AS g ON g.id = t.access'
 			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-			//. ($where ? $where." AND plg.id IS NULL OR plg.folder='flexicontent_fields' " : " WHERE plg.id IS NULL OR plg.folder='flexicontent_fields' ")//I not sure this join is neccessary?But it make we cannot filter by field_type
-			. ($where ? $where : " WHERE 1 ")//Copied from above line and delete condition for plugin.
+			. ($where ? $where." AND (plg.id IS NULL OR plg.folder='flexicontent_fields') " : " WHERE (plg.id IS NULL OR plg.folder='flexicontent_fields') ")
 			. ' GROUP BY t.id'
 			. $having
 			. $orderby
