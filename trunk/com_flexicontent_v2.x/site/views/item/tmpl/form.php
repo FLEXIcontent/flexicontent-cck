@@ -29,7 +29,7 @@ if ($this->params->get('form_extra_css')) {
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 
-if ($this->perms['cantags']) {
+if ($this->perms['canusetags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -311,7 +311,7 @@ $canpublish = $this->perms['canpublish'];
 			<table id="tabacces" class="admintable" width="100%">
 		    		<tr>
 		    		<td>
-		        		<div id="access"><?php echo $this->item->getInput('rules'); ?></div>
+		        		<div id="accessrules"><?php echo $this->item->getInput('rules'); ?></div>
 		        	</td>
 		    	</tr>
 			</table>
@@ -330,7 +330,7 @@ $canpublish = $this->perms['canpublish'];
 				<?php
 					foreach( $this->tags as $tag ) {
 						if(in_array($tag->id, $this->used)) {
-							if ($this->perms['cantags']) {
+							if ($this->perms['canusetags']) {
 								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 								echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 							} else {
@@ -345,7 +345,7 @@ $canpublish = $this->perms['canpublish'];
 				</div>
 			</td>
 		</tr>
-		<?php if ($this->perms['cantags']) : ?>
+		<?php if ($this->perms['canusetags']) : ?>
 		<tr>
 			<td>
 				<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?></label>
@@ -482,15 +482,84 @@ $canpublish = $this->perms['canpublish'];
 	<?php }else{?>
 		<input type="hidden" name="jform[metadata][metadesc]" value="<?php echo @$this->item->getValue('metadesc'); ?>" />
 		<input type="hidden" name="jform[metadata][metakey]" value="<?php echo @$this->item->getValue('metakey'); ?>" />
-	<?php }?>
+		<?php foreach($this->item->getGroup('metadata') as $field): ?>
+			<input type="hidden" name="<?php echo $field->name;?>" value="<?php echo @$field->value; ?>" />
+		<?php endforeach; ?>
+	<?php } ?>
 	<?php if($this->perms['canparams']) {?>
-		<div class="formelm">
-		<?php echo $this->item->getLabel('created_by_alias'); ?>
-		<?php echo $this->item->getInput('created_by_alias'); ?>
-		</div>
-	<?php }else{ ?>
-		<input type="hidden" name="jform[created_by_alias]" value="" />
-	<?php }?>
+		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+		<?php
+		echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
+		?>
+		<fieldset class="panelform">
+		<ul class="adminformlist">
+			<li><?php echo $this->item->getLabel('access');?>
+			<?php echo $this->item->getInput('access');?></li>
+			<li><?php echo $this->item->getLabel('created_by');?>
+			<?php echo $this->item->getInput('created_by');?></li>
+			<li><?php echo $this->item->getLabel('created_by_alias');?>
+			<?php echo $this->item->getInput('created_by_alias');?></li>
+			<li><?php echo $this->item->getLabel('created');?>
+			<?php echo $this->item->getInput('created');?></li>
+			<li><?php echo $this->item->getLabel('publish_up');?>
+			<?php echo $this->item->getInput('publish_up');?></li>
+			<li><?php echo $this->item->getLabel('publish_down');?>
+			<?php echo $this->item->getInput('publish_down');?></li>
+		</ul>
+		</fieldset>
+
+		<?php
+		/* echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
+		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+		?>
+		<fieldset class="panelform">
+			<?php echo $this->item->getLabel('metadesc'); ?>
+			<?php echo $this->item->getInput('metadesc'); ?>
+
+			<?php echo $this->item->getLabel('metakey'); ?>
+			<?php echo $this->item->getInput('metakey'); ?>
+			<?php foreach($this->item->getGroup('metadata') as $field): ?>
+				<?php if ($field->hidden): ?>
+					<?php echo $field->input; ?>
+				<?php else: ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</fieldset>
+		<?php */?>
+		<?php
+		$fieldSets = $this->item->getFieldsets('attribs');
+		foreach ($fieldSets as $name => $fieldSet) :
+			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+			echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+			?>
+			<fieldset class="panelform">
+				<?php foreach ($this->item->getFieldset($name) as $field) : ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
+				<?php endforeach; ?>
+			</fieldset>
+		<?php endforeach;
+		?>
+
+		<?php
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+		foreach ($this->tmpls as $tmpl) {
+			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+			echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
+			?>
+			<fieldset class="panelform">
+				<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
+					<?php echo $field->label; ?>
+					<?php echo $field->input; ?>
+				<?php endforeach; ?>
+			</fieldset>
+			<?php
+		}
+		?>
+		<?php echo JHtml::_('sliders.end'); ?>
+	<?php } ?>
 
 		<br class="clear" />
 		<?php echo JHTML::_( 'form.token' ); ?>
@@ -512,11 +581,11 @@ $canpublish = $this->perms['canpublish'];
 				<input type="hidden" id="vstate" name="vstate" value="1" />
 		<?php
 			endif;
-			/*if (!$this->perms['canright']) {
+			if (!$this->perms['canright']) {
 		?>
 				<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
 		<?php
-			}*/
+			}
 		?>
 	</form>
 </div>
