@@ -375,7 +375,7 @@ class FlexicontentViewItem extends JView {
 
 		$perms 	= array();
 		$perms['multicat'] = $permission->MultiCat;
-		$perms['cantags'] = $permission->CanTags;
+		$perms['canusetags'] = $permission->CanUseTags;
 		$perms['canparams'] = $permission->CanParams;
 
 		$itemrights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
@@ -456,6 +456,13 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('perms', 		$perms);
 		$this->assignRef('document',	$document);
 		$this->assignRef('nullDate', $nullDate);
+		
+		if($permission->CanParams) {
+			// Handle item templates parameters
+			$themes		= flexicontent_tmpl::getTemplates();
+			$tmpls		= $themes->items;
+			$this->assignRef('tmpls',		$tmpls);
+		}
 		
 		/*
 		 * Set template paths : this procedure is issued from K2 component
