@@ -106,6 +106,9 @@ class FlexicontentModelFilemanager extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 			$this->_data = $this->countImageRelations($this->_data);
@@ -174,7 +177,7 @@ class FlexicontentModelFilemanager extends JModel
 			;
 			
 		if ($filter_item) {
-			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
@@ -187,7 +190,7 @@ class FlexicontentModelFilemanager extends JModel
 				. $orderby
 				;
 		} else {
-			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where

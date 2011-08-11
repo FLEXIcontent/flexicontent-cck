@@ -114,6 +114,9 @@ class FlexicontentModelArchive extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 			
 			$k = 0;
 			$count = count($this->_data);
@@ -178,7 +181,7 @@ class FlexicontentModelArchive extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 
-		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, u.name AS editor'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'

@@ -143,8 +143,8 @@ ul.import-failed li {
 	vertical-align: top;
 	margin: 1px;
 	zoom: 1;
-	*display: inline;
-	_height: 20px;
+	display: inline;
+	height: 20px;
 }
 
 .statetoggler li ul li img {

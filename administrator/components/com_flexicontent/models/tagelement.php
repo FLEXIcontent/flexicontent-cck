@@ -75,6 +75,9 @@ class FlexicontentModelTagelement extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 
 		return $this->_data;
@@ -128,7 +131,7 @@ class FlexicontentModelTagelement extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 
-		$query = 'SELECT t.*'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*'
 					. ' FROM #__flexicontent_tags AS t'
 					. $where
 					. $orderby

@@ -106,6 +106,9 @@ class FlexicontentModelTags extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 
 		return $this->_data;
@@ -161,7 +164,7 @@ class FlexicontentModelTags extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
-		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.tid) AS nrassigned'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.tid) AS nrassigned'
 					. ' FROM #__flexicontent_tags AS t'
 					. ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid = t.id'
 					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'

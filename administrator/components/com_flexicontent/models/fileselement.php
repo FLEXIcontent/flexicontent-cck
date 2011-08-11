@@ -114,6 +114,9 @@ class FlexicontentModelFileselement extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 
@@ -182,7 +185,7 @@ class FlexicontentModelFileselement extends JModel
 			$files 		= array_unique($files);
 			$session->set('fileselement.'.$filter_item, $files);
 			$files = "'".implode("','", $files)."'";
-			$query = 'SELECT f.*, u.name AS uploader'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
 			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where
@@ -192,7 +195,7 @@ class FlexicontentModelFileselement extends JModel
 			. $orderby
 			;
 		} else {
-			$query = 'SELECT f.*, u.name AS uploader'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
 			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where

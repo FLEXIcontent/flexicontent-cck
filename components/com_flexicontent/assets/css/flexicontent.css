@@ -290,9 +290,9 @@ div#tags {
 	display: inline-block;
 	vertical-align: top;
 	margin: 2px;
-	/*zoom: 100%;
+	zoom: 1;
 	display: inline;
-	height: 20px;*/
+	height: 20px;
 }
 
 .flexi_tagbox ul li div {

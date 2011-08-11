@@ -70,6 +70,9 @@ class FLEXIcontentModelSearch extends JModel
 		if(empty($this->_data)) {
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 		return $this->_data;
 	}
@@ -91,7 +94,7 @@ class FLEXIcontentModelSearch extends JModel
 	}
 	
 	function _buildQuery() {
-		$query = "SELECT f.label,ai.*,a.title FROM #__flexicontent_advsearch_index as ai"
+		$query = "SELECT SQL_CALC_FOUND_ROWS f.label,ai.*,a.title FROM #__flexicontent_advsearch_index as ai"
 			." JOIN #__flexicontent_fields as f ON ai.field_id=f.id"
 			." JOIN #__content as a ON ai.item_id=a.id"
 		;
