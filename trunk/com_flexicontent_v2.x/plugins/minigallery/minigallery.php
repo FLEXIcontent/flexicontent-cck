@@ -86,8 +86,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
-			//hid.name = '".$field->name."['+ixid+']';
-			hid.name = '".$field->name."[]';
+			//hid.name = 'custom[".$field->name."]['+ixid+']';
+			hid.name = 'custom[".$field->name."][]';
 			hid.value = id;
 			hid.id = ixid;
 			
@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		</ul>
 		<div class=\"button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
