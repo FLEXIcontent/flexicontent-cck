@@ -45,7 +45,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							echo '</div>';
 						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_cat_extension')) {
 							echo '<div class="fc-error">';
-							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '') echo JText::_( 'FLEXI_CONFIGURATION_NOT_SAVED' ) . '<br />';
+							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '') echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', "<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='index.php?option=com_config&view=component&component=com_flexicontent&path=&tmpl=component' style='color: red;'>".JText::_("GLOBAL_CONFIGURATION")."</a>" ) . '<br />';
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';
