@@ -124,205 +124,178 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return array
 	 * @since 1.0
 	 */
-	/*function &getItem() {
-		$mainframe = &JFactory::getApplication();
-		global $globalcats;
-		//
-		// Load the Item data
-		//
-		if ($this->_loadItem()) {
-			// Get the paramaters of the active menu item
-			$params = & $mainframe->getParams('com_flexicontent');
-			$user	= & JFactory::getUser();
-			$aid	= (int) $user->get('aid');
-			//$gid	= (int) $user->get('gid');
-			$cid	= JRequest::getInt('cid');
+	function &getItem($pk=null, $isform=true) {
+		if($isform) {
+			$item = parent::getItem($pk);
+			$this->_item = &$item;
+			return $this->_item;
+		}
+		// Initialise variables.
+		$pk = (!empty($pk)) ? $pk : (int) $this->getState('article.id');
 
-			// Create the return parameter
-			$return = array (
-				'id' 	=> @$this->_item->id,
-				'cid'	=> $cid
-			);
-			$return = serialize($return); 
-			
-			$usergroups = $user->getAuthorisedGroups();
+		//if ($this->_item === null) {
+		//	$this->_item = array();
+		//}
 
-			// Allow users to see their own content whatever the state is
-			if ($this->_item->created_by != $user->id && $this->_item->modified_by != $user->id) 
-			{
+		if (!isset($this->_item[$pk])) {
 
-			// Is the category published?
-			if ($cid) {
-				if (!$globalcats[$cid]->published) {
-					JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
+			try {
+				$db = $this->getDbo();
+				$query = $db->getQuery(true);
+
+				$query->select($this->getState(
+					'item.select', 'a.id, a.asset_id, a.title, a.alias, a.title_alias, a.introtext, a.fulltext, ' .
+					// If badcats is not null, this means that the article is inside an unpublished category
+					// In this case, the state is set to 0 to indicate Unpublished (even if the article state is Published)
+					'CASE WHEN badcats.id is null THEN a.state ELSE 0 END AS state, ' .
+					'a.mask, a.catid, a.created, a.created_by, a.created_by_alias, ' .
+					'a.modified, a.modified_by, a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, ' .
+					'a.images, a.urls, a.attribs, a.version, a.parentid, a.ordering, ' .
+					'a.metakey, a.metadesc, a.access, a.hits, a.metadata, a.featured, a.language, a.xreference'
+					)
+				);
+				$query->from('#__content AS a');
+				
+				$query->select('ie.*,ty.name AS typename,c.lft,c.rgt');
+				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id');
+				$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
+				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id');
+
+				// Join on category table.
+				$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access');
+				$query->select( 'CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug');
+				$query->select( 'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
+				$query->join('LEFT', '#__categories AS c on c.id = a.catid');
+
+				// Join on user table.
+				$query->select('u.name AS author');
+				$query->join('LEFT', '#__users AS u on u.id = a.created_by');
+
+				// Join on contact table
+				$query->select('contact.id as contactid' ) ;
+				$query->join('LEFT','#__contact_details AS contact on contact.user_id = a.created_by');
+
+
+				// Join over the categories to get parent category titles
+				$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
+				$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
+
+				// Join on voting table
+				$query->select('ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count as rating_count');
+				$query->join('LEFT', '#__content_rating AS v ON a.id = v.content_id');
+
+				$query->where('a.id = ' . (int) $pk);
+
+				// Filter by start and end dates.
+				$nullDate = $db->Quote($db->getNullDate());
+				$nowDate = $db->Quote(JFactory::getDate()->toMySQL());
+
+				$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
+				$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
+
+				// Join to check for category published state in parent categories up the tree
+				// If all categories are published, badcats.id will be null, and we just use the article state
+				$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
+				$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
+				$subquery .= 'WHERE parent.extension = ' . $db->quote('com_content');
+				$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
+				$query->join('LEFT OUTER', $subquery . ' AS badcats ON badcats.id = c.id');
+
+				// Filter by published state.
+				$published = $this->getState('filter.published');
+				$archived = $this->getState('filter.archived');
+
+				if (is_numeric($published)) {
+					$query->where('(a.state = ' . (int) $published . ' OR a.state =' . (int) $archived . ')');
 				}
-			}
 
-			// Do we have access to the category?
-			if (@$this->_item->id && @$this->_item->catid) {
-				$ancestors = $globalcats[$this->_item->catid]->ancestorsarray;
-				foreach ($ancestors as $cat) {
-					if(in_array($globalcats[$cat]->access, $usergroups)) {
-						$canreadcat = true;
-					} else {
-						$canreadcat = false;
-						break;
+				$db->setQuery($query);
+
+				$data = $db->loadObject();
+
+				if ($error = $db->getErrorMsg()) {
+					throw new Exception($error);
+				}
+
+				if (empty($data)) {
+					return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
+				}
+
+				// Check for published state if filter set.
+				if (((is_numeric($published)) || (is_numeric($archived))) && (($data->state != $published) && ($data->state != $archived))) {
+					return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
+				}
+
+				// Convert parameter fields to objects.
+				$registry = new JRegistry;
+				$registry->loadString($data->attribs);
+				$data->params = clone $this->getState('params');
+				$data->params->merge($registry);
+
+				$registry = new JRegistry;
+				$registry->loadString($data->metadata);
+				$data->metadata = $registry;
+
+				// Compute selected asset permissions.
+				$user	= JFactory::getUser();
+
+				// Technically guest could edit an article, but lets not check that to improve performance a little.
+				if (!$user->get('guest')) {
+					$userId	= $user->get('id');
+					$asset	= 'com_content.article.'.$data->id;
+
+					// Check general edit permission first.
+					if ($user->authorise('core.edit', $asset)) {
+						$data->params->set('access-edit', true);
 					}
-				}
-				if (!@$canreadcat)
-				{
-					if (!$aid) {
-						// Redirect to login
-						$uri		= JFactory::getURI();
-						$return		= $uri->toString();
-		
-						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
-						$url .= '&return='.base64_encode($return);
-		
-						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
-					} else {
-						// Redirect to unauthorized page or 403
-						if ($params->get('unauthorized_page', '')) {
-							$mainframe->redirect($params->get('unauthorized_page'));				
-						} else {
-							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-							return false;
+					// Now check if edit.own is available.
+					else if (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
+						// Check for a valid user and that they are the owner.
+						if ($userId == $data->created_by) {
+							$data->params->set('access-edit', true);
 						}
 					}
 				}
-			} else if (@$this->_item->id) {
-				JError::raiseError(403, JText::_("FLEXI_ITEM_NO_CAT"));
-				return false;
+
+				// Compute view access permissions.
+				if ($access = $this->getState('filter.access')) {
+					// If the access filter has been set, we already know this user can view.
+					$data->params->set('access-view', true);
+				}
+				else {
+					// If no access filter is set, the layout takes some responsibility for display of limited information.
+					$user = JFactory::getUser();
+					$groups = $user->getAuthorisedViewLevels();
+
+					if ($data->catid == 0 || $data->category_access === null) {
+						$data->params->set('access-view', in_array($data->access, $groups));
+					}
+					else {
+						$data->params->set('access-view', in_array($data->access, $groups) && in_array($data->category_access, $groups));
+					}
+				}
+
+				//$this->_item[$pk] = $data;
+				$this->_item = $data;
+				$this->_loadItemParams();
 			}
-			
-			// Do we have access to the content itself
-			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 ) // access the workflow for editors or more
+			catch (JException $e)
 			{
-				if (!$aid) {
-					// Redirect to login
-					//$uri		= JFactory::getURI();
-					//$return		= $uri->toString();
-	
-					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
-					$url .= '&return='.base64_encode($return);
-	
-					$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
-				} else {
-					// Redirect to unauthorized page or 403
-					if ($params->get('unauthorized_page', '')) {
-						$mainframe->redirect($params->get('unauthorized_page'));				
-					} else {
-						JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-						return false;
-					}
+				if ($e->getCode() == 404) {
+					// Need to go thru the error handler to allow Redirect to work.
+					JError::raiseError(404, $e->getMessage());
 				}
-			} else if (@$this->_item->id) { // otherwise check for the standard states
-				$canreaditem = in_array($this->_item->access, $usergroups);
-				if (!@$canreaditem)
-				{
-					if (!$aid) {
-						// Redirect to login
-						//$uri		= JFactory::getURI();
-						//$return		= $uri->toString();
-		
-						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
-						$url .= '&return='.base64_encode($return);
-		
-						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
-					} else {
-						// Redirect to unauthorized page or 403
-						if ($params->get('unauthorized_page', '')) {
-							$url  = $params->get('unauthorized_page');
-							$url .= '&return='.base64_encode($return);
-		
-							$mainframe->redirect($url);				
-						} else {
-							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-							return false;
-						}
-					}
+				else {
+					$this->setError($e);
+					//$this->_item[$pk] = false;
+					$this->_item = false;
 				}
 			}
-			}
-
-			//add the author email in order to display the gravatar
-			$query = 'SELECT email'
-			. ' FROM #__users'
-			. ' WHERE id = '. (int) $this->_item->created_by
-			;
-			$this->_db->setQuery($query);
-			$this->_item->creatoremail = $this->_db->loadResult();
-			
-			//reduce unneeded query
-			if ($this->_item->created_by_alias) {
-				$this->_item->creator = $this->_item->created_by_alias;
-			} else {
-				$query = 'SELECT name'
-				. ' FROM #__users'
-				. ' WHERE id = '. (int) $this->_item->created_by
-				;
-				$this->_db->setQuery($query);
-				$this->_item->creator = $this->_db->loadResult();
-			}
-
-			//reduce unneeded query
-			if ($this->_item->created_by == $this->_item->modified_by) {
-				$this->_item->modifier = $this->_item->creator;
-			} else {
-				$query = 'SELECT name'
-				. ' FROM #__users'
-				. ' WHERE id = '. (int) $this->_item->modified_by
-				;
-				$this->_db->setQuery($query);
-				$this->_item->modifier = $this->_db->loadResult();
-			}
-
-			if ($this->_item->modified == $this->_db->getNulldate()) {
-				$this->_item->modified = null;
-			}
-
-			//check session if uservisit already recorded
-			$session 	=& JFactory::getSession();
-			$hitcheck = false;
-			if ($session->has('hit', 'flexicontent')) {
-				$hitcheck 	= $session->get('hit', 0, 'flexicontent');
-				$hitcheck 	= in_array($this->_item->id, $hitcheck);
-			}
-			if (!$hitcheck) {
-				//record hit
-				$this->hit();
-
-				$stamp = array();
-				$stamp[] = $this->_item->id;
-				$session->set('hit', $stamp, 'flexicontent');
-			}
-			//we show the introtext and fulltext (chr(13) = carriage return)
-			//$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
-
-			$this->_loadItemParams();
 		}
-		else
-		{
-			$user =& JFactory::getUser();
-			$item =& JTable::getInstance('flexicontent_items', '');
-			if ($user->authorize('com_flexicontent', 'state'))	{
-				$item->state = 1;
-			}
-			$item->id					= 0;
-			$item->author				= null;
-			$item->created_by			= $user->get('id');
-			$item->text					= '';
-			$item->title				= null;
-			$item->metadesc				= '';
-			$item->metakey				= '';
-			$item->type_id				= JRequest::getVar('typeid', 0, '', 'int');
-			$item->typename				= null;
-			$item->search_index			= '';
-			$item->parameters = new JParameter('');
-			$this->_item				= $item;
-		}
+
+		//return $this->_item[$pk];
 		return $this->_item;
-	}*/
+	}
 
 	/**
 	 * Method to load required data
@@ -547,7 +520,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	void
 	 * @since	1.5
 	 */
-	/*function _loadItemParams() {
+	function _loadItemParams() {
 		$mainframe = &JFactory::getApplication();
 		jimport('joomla.html.parameter');
 
@@ -586,7 +559,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;
 	}
-*/
+
 	/**
 	 * Method to get the tags
 	 *
@@ -654,7 +627,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	/*function hit() {
+	function hit() {
 		global $mainframe;
 
 		if ($this->_id)
@@ -664,7 +637,7 @@ class FlexicontentModelItem extends ParentClassItem
 			return true;
 		}
 		return false;
-	}*/
+	}
 
 	function getAlltags() {
 		$query = 'SELECT * FROM #__flexicontent_tags ORDER BY name';

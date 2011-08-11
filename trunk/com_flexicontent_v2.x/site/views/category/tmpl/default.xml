@@ -24,6 +24,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option> 
 			</field>
+			<field name="owneritems" type="radio" default="0" label="FLEXI_OWNER_ITEMS" description="FLEXI_OWNER_ITEMS_DESC"> 
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option> 
+			</field>
 		</fieldset>
 	</fields>
 </metadata>

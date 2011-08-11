@@ -75,14 +75,17 @@ class FlexicontentViewItem extends JView {
 		
 		//get item data
 		JRequest::setVar('loadcurrent', true);
-		$item = $model->getItem();
-
+		$item = $model->getItem($model->getId(), false);
+		//$item = $model->getForm();
 		$iparams	=& $item->parameters;
 		$params->merge($iparams);
 
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, 'item', $params, $aid);
 		$item	= $item[0];
+		
+		//$tparams	=& $this->get( 'Typeparams' );
+		//$fields			= & $this->get( 'Extrafields' );
 
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
 		if ($params->get('use_panes', 1)) {
@@ -98,6 +101,7 @@ class FlexicontentViewItem extends JView {
 		}
 		
 		$fields		=& $item->fields;
+		//$item->fields = &$fields;
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
