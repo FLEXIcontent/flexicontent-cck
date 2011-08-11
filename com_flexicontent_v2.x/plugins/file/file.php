@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		function qfSelectFile".$field->id."(id, file) {
 		  value_counter++;
-		  var req_container = $('{$field->name}_req_container');
+		  var req_container = $('req_container_{$field->id}');
 		  req_container.innerHTML = '';
 		  
 			var name 	= 'a_name'+id;
@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			txt.value	= file;
 			
 			hid.type = 'hidden';
-			hid.name = '".$field->name."[]';
+			hid.name = 'custom[".$field->name."][]';
 			hid.value = id;
 			hid.id = ixid;
 			
@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		}
 		function deleteField".$field->id."(el) {
-		  var req_container = $('{$field->name}_req_container');
+		  var req_container = $('req_container_{$field->id}');
 		  value_counter--;
 		  if (value_counter<=0)
 		    req_container.innerHTML = req_container_innerHTML;
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-		$field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
+		$field->html = "<span id='req_container_{$field->id}'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
 		$field->html .= '<ul id="sortables_'.$field->id.'">';
 		if($field->value) {
@@ -173,12 +173,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$files = implode(":", $field->value);
 		$user = & JFactory::getUser();
 		//$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;items='.$item->id.'&amp;filter_uploader='.$user->id;
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.JUtility::getToken().'=1';
+		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->getValue('id').'&amp;items=0&amp;filter_uploader='.$user->get('id').'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
@@ -272,8 +272,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	{
 		$db =& JFactory::getDBO();
 		$session = & JFactory::getSession();
-		jimport('joomla.database.table.session');
-		$sessiontable =new JTableSession( $db );
+		jimport('joomla.database.table');
+		
+		$sessiontable = JTable::getInstance('session');
 		$sessiontable->load($session->getId());
 		$and = '';
 		if(!$sessiontable->client_id) 
