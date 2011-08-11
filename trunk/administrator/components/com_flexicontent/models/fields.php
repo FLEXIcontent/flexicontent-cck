@@ -110,6 +110,9 @@ class FlexicontentModelFields extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 
 		return $this->_data;
@@ -167,7 +170,7 @@ class FlexicontentModelFields extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
-		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
 			. ' FROM #__flexicontent_fields AS t'
 			. ' LEFT JOIN #__plugins AS plg ON plg.element = t.field_type'
 			. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'

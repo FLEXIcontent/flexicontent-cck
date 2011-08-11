@@ -75,6 +75,9 @@ class FlexicontentModelItemelement extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 		return $this->_data;
 	}
@@ -127,7 +130,7 @@ class FlexicontentModelItemelement extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 
-		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, u.name AS editor'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'

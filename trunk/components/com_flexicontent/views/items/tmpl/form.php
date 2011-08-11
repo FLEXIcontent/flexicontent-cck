@@ -55,7 +55,7 @@ endif;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	JHTML::_('behavior.mootools');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
 }
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
