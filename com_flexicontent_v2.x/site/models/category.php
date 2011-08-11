@@ -521,6 +521,8 @@ class FlexicontentModelCategory extends JModelList{
 		//Get active menu parameters.
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
+		
+		$owneritems = $menu->params->get('owneritems', '0');
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -568,11 +570,13 @@ class FlexicontentModelCategory extends JModelList{
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
+		$where .= (!$owneritems)?' AND i.state IN ('.$states.')':'';
 		
 		// is the content current?
-		$where .= ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
-		$where .= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
+		if(!$owneritems) {
+			$where .= ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
+			$where .= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
+		}
 
 
 		// Filter the category view with the active active language
@@ -584,11 +588,8 @@ class FlexicontentModelCategory extends JModelList{
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
-			} else {
-				//$where .= ' AND i.access <= '.$gid;
-			}
+			$groups	= "'".implode("','", $user->getAuthorisedViewLevels())."'";
+			$where .= " AND i.access IN ($groups)";
 		}
 
 		/*
@@ -638,8 +639,12 @@ class FlexicontentModelCategory extends JModelList{
 		}		
 		elseif (!empty($alpha)) {
 			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
-		}		
+		}
 		
+		//Displa all items or owner items
+		if($owneritems) {
+			$where .= " AND i.created_by='".$user->get('id')."'";
+		}
 		return $where;
 	}
 

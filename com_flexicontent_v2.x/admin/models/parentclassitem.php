@@ -220,6 +220,7 @@ class ParentClassItem extends JModelAdmin {
 			$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
 			JArrayHelper::toInteger($cid, array(0));
 			$pk = $cid[0];
+			if(!$pk) $pk = JRequest::getVar('id', 0, '', 'int');
 		}
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $pk);
@@ -950,8 +951,8 @@ class ParentClassItem extends JModelAdmin {
 	function getTypeparams ()
 	{
 		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+				. ' FROM #__flexicontent_items_ext AS ie'
+				. ' JOIN #__flexicontent_types AS t ON ie.type_id = t.id'
 				. ' WHERE ie.item_id = ' . (int)$this->_id
 				;
 		$this->_db->setQuery($query);
