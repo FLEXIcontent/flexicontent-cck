@@ -43,11 +43,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 	 * @since 1.0
 	 */
 	function upload() {
-		$mainframe = &JFactory::getApplication();
-
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-
+		$mainframe = &JFactory::getApplication();
 		$file 		= JRequest::getVar( 'Filedata', '', 'files', 'array' );
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');

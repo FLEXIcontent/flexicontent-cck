@@ -63,8 +63,18 @@ JPluginHelper::importPlugin('flexicontent_fields');
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
+$controller = JRequest::getWord('controller');
+if(!$controller) {
+	$task = JRequest::getVar('task');
+	$tasks = explode(".", $task);
+	if(count($tasks)>=2) {
+		$controller = $controller?$controller:$tasks[0];
+		$task = $tasks[1];
+		JRequest::setVar('task', $tasks[1]);
+	}
+}
 // Require specific controller if requested
-if($controller = JRequest::getWord('controller')) {
+if($controller) {
 	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
 	if (file_exists($path)) {
 		require_once $path;
@@ -78,7 +88,7 @@ $classname	= 'FlexicontentController'.ucfirst($controller);
 $controller = new $classname( );
 
 // Perform the Request task
-$controller->execute(JRequest::getCmd('task'));
+$controller->execute($task);
 
 // Redirect if set by the controller
 $controller->redirect();
