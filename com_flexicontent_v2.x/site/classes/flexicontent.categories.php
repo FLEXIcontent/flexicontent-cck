@@ -76,7 +76,7 @@ class flexicontent_cats
 		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid;// .' AND lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND rgt<='.$db->Quote(FLEXI_RGT_CATEGORY);
 		$db->setQuery( $query );
 
-		if($cid != 0) {
+		if($cid > 1) {
 			array_push($this->parentcats, $cid);
 		}
 
