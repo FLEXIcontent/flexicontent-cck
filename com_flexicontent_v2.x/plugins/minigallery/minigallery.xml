@@ -11,13 +11,9 @@
 	<description>FLEXI_FIELD_MINIGALLERY</description>
 	<files>
 		<filename plugin="minigallery">minigallery.php</filename>
-		<filename plugin="minigallery">minigallery/ajax-loader.gif</filename>
-		<filename plugin="minigallery">minigallery/backgroundslider.js</filename>
-		<filename plugin="minigallery">minigallery/minigallery.css</filename>
-		<filename plugin="minigallery">minigallery/jquery.galleriffic.js</filename>
-		<filename plugin="minigallery">minigallery/jquery.opacityrollover.js</filename>
-		<filename plugin="minigallery">minigallery/slideshow.js</filename>
-		<filename plugin="minigallery">minigallery/index.html</filename>
+		<folder plugin="minigallery">minigallery</folder>
+		<folder plugin="minigallery">css</folder>
+		<folder plugin="minigallery">js</folder>
 	</files>
 	<config>
 	<fields name="attribs">
@@ -40,20 +36,37 @@
 			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
  			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="@spacer" type="spacer" default="" label="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
-			<field name="wait" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
+			<field name="delay" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
 			<field name="duration" type="text" default="1000" size="4" label="FLEXI_FIELD_GALLERY_DURATION" description="FLEXI_FIELD_GALLERY_DURATION_DESC" />
-			<field name="effect" type="list" default="fade" label="FLEXI_FIELD_GALLERY_EFFECT" description="FLEXI_FIELD_GALLERY_EFFECT_DESC">
-				<option value="fade">FLEXI_FIELD_GALLERY_FADE</option>
-				<option value="wipe">FLEXI_FIELD_GALLERY_WIPE</option>
-				<option value="slide">FLEXI_FIELD_GALLERY_SLIDE</option>
-				<option value="random">FLEXI_FIELD_GALLERY_RANDOM</option>
+			<field name="slideshowtype" type="list" default="slideshow" label="Slide show type" description="Slide show type">
+				<option value="slideshow">Slideshow</option>
+				<option value="Flash">Flash</option>
+				<option value="Fold">Fold</option>
+				<option value="KenBurns">KenBurns</option>
+				<option value="Push">Push</option>
 			</field>
-			<field name="direction" type="list" default="right" label="FLEXI_FIELD_GALLERY_DIRECTION" description="FLEXI_FIELD_GALLERY_DIRECTION_DESC">
-				<option value="top">FLEXI_FIELD_GALLERY_TOP</option>
-				<option value="left">FLEXI_FIELD_GALLERY_LEFT</option>
-				<option value="bottom">FLEXI_FIELD_GALLERY_BOTTOM</option>
-				<option value="right">FLEXI_FIELD_GALLERY_RIGHT</option>
-				<option value="random">FLEXI_FIELD_GALLERY_RANDOM</option>
+			<field name="transition" type="list" default="back" label="Transition" description="Transition">
+				<option value="back">back</option>
+				<option value="elastic">elastic</option>
+				<option value="bounce">bounce</option>
+			</field>
+			<field name="t_dir" type="list" default="in" label="Transition direction" description="Transition direction">
+				<option value="in">in</option>
+				<option value="out">out</option>
+				<option value="in:out">in:out</option>
+				<option value="out:in">out:in</option>
+			</field>
+			<field name="thumbnails" type="list" default="1" label="Thumbnails" description="Thumbnails">
+				<option value="1">true</option>
+				<option value="0">false</option>
+			</field>
+			<field name="controller" type="list" default="1" label="Controller" description="Controller">
+				<option value="1">true</option>
+				<option value="0">false</option>
+			</field>
+			<field name="otheroptions" type="textarea" default="" cols="40" rows="10" label="Other options" description="Other options. Example: color: ['tomato', 'palegreen', 'orangered', 'aquamarine'], overlap: false">
+				<option value="1">true</option>
+				<option value="0">false</option>
 			</field>
 		</fieldset>
 	</fields>

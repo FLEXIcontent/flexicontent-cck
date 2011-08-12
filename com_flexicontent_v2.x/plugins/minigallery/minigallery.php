@@ -202,7 +202,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
@@ -234,41 +234,47 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			break;
 		}
 
-	  static $js_and_css_added = false;
+		static $js_and_css_added = false;
+		
+		$slideshowtype = $field->parameters->get( 'slideshowtype', 'Flash' );// default is normal slideshow
+		$slideshowClass = 'Slideshow';
 	  
 		if ($values)
 		{
-			if (!$js_and_css_added) {
-			  $document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
-			  // this allows you to override the default css files
-			  $document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
-			  JHTML::_('behavior.mootools');
-			  $document->addScript('plugins/flexicontent_fields/minigallery/backgroundslider.js');
-			  $document->addScript('plugins/flexicontent_fields/minigallery/slideshow.js');
-			}
-		  $js_and_css_added = true;
-			
 			$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
 			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
+			if (!$js_and_css_added) {
+			  // this allows you to override the default css files
+			  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
+			  if(file_exists($csspath)) {
+			  	$document->addStyleSheet(JURI::base().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+			  }else{
+			  	//$document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery/minigallery.css');
+			  	//$document->addStyleSheet('plugins/flexicontent_fields/minigallery/css/minigallery.php?id='.$htmltag_id);
+			  	$document->addStyleSheet('plugins/flexicontent_fields/minigallery/css/minigallery.css');
+			  }
+			  JHTML::_('behavior.mootools');
+			  //$document->addScript('plugins/flexicontent_fields/minigallery/minigallery/backgroundslider.js');
+			  //$document->addScript('plugins/flexicontent_fields/minigallery/minigallery/slideshow.js');
+			  $document->addScript('plugins/flexicontent_fields/minigallery/js/slideshow.js');
+			  if($slideshowtype!='slideshow') {
+			  	$document->addScript('plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+			  	$slideshowClass .= '.'.$slideshowtype;
+			  }
+			}
+			$js_and_css_added = true;
 
-		  $js = "
-		  	window.addEvent('domready',function(){
-					var obj = {
-						wait: ".$field->parameters->get( 'wait', 4000 ).", 
-						effect: '".$field->parameters->get( 'effect', 'fade' )."',
-						direction: '".$field->parameters->get( 'direction', 'right' )."',
-						duration: ".$field->parameters->get( 'duration', 1000 ).", 
-						loop: ".$field->parameters->get( 'loop', 'true' ).", 
-						thumbnails: true,
-						backgroundSlider: true
-					}
-				show = new SlideShow('$htmltag_id','$slidethumb',obj);
-				show.play();
-				});
-			";
-			$document->addScriptDeclaration($js);
+			$transition = $field->parameters->get( 'transition', 'back' );
+			$t_dir = $field->parameters->get( 't_dir', 'in' );
+			//$width = $field->parameters->get( 'width', '400' );
+			//$height = $field->parameters->get( 'height', '300' );
+			$thumbnails = $field->parameters->get( 'thumbnails', '1' );
+			$thumbnails = $thumbnails ? 'true' : 'false';
+			$controller = $field->parameters->get( 'controller', '1' );
+			$controller = $controller ? 'true' : 'false';
+			$otheroptions = $field->parameters->get( 'otheroptions', '' );
 			
-			$css = "
+			/*$css = "
 			.$htmltag_id {
 				width: ".$w_l."px;
 				height: ".$h_l."px;
@@ -280,16 +286,37 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$css .= "#thumbnails { width: ".$w_l."px; }";
 			}
 			if ($thumbposition == 2 || $thumbposition == 4) {
-				$css .= ".$htmltag_id { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
+				$css .= ".$htmltag_id { float: left; } #{$htmltag_id}-thumbnails { float: left; width: ".($w_s + 10)."px; }";
 			}
 
-			$document->addStyleDeclaration($css);
+			$document->addStyleDeclaration($css);*/
+			
+			$otheroptions .= ($otheroptions?','.$otheroptions:'');
+			$js = "
+		  	window.addEvent('domready',function(){
+				var options = {
+					delay: ".$field->parameters->get( 'delay', 4000 ).",
+					hu:'{$mediapath}/',
+					transition:'{$transition}:{$t_dir}',
+					duration: ".$field->parameters->get( 'duration', 1000 ).", 
+					width: {$w_l},
+					height: {$h_l},
+					thumbnails: {$thumbnails},
+					controller: {$controller}
+					{$otheroptions}
+				}
+				show = new {$slideshowClass}('{$htmltag_id}', null, options);
+			});
+			";
+			$document->addScriptDeclaration($js);
 			
 			$display = array();
+			$thumbs = array();
 			
 			$field->{$prop}  = '';
-			$field->{$prop} .= ($thumbposition > 2) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
-			$field->{$prop} .= '<div id="thumbnails">';
+			//$field->{$prop} .= ($thumbposition > 2) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
+			$field->{$prop} .= '<div id="'.$htmltag_id.'" class="slideshow">';
+			//$field->{$prop} .= '<div id="thumbnails">';
 			$n = 0;
 			foreach ($values as $value) {
 				$filename = $this->getFileName( $value );
@@ -301,13 +328,21 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
-					$display[]	= '<a href="'.$srcb.'" class="'.$slidethumb.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
+					//$display[] = "<a href=\"".$srcb."\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'-'.$n."\" alt=\"xxx\" border=\"0\" /></a>\n";
+		$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$filename->altname}\" border=\"0\" /></a>\n";
+		$thumbs[] = "<li><a href=\"#{$htmltag_id}_{$n}\"><img src=\"{$srcs}\" border=\"0\" /></a></li>\n";
+					$n++;
 				}
-				$n++;
-				}
-			$field->{$prop} .= implode(' ', $display);
-			$field->{$prop} .= '</div>';
-			$field->{$prop} .= ($thumbposition < 3) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
+			}
+			
+			$field->{$prop} .= '<div class="slideshow-images">';
+			$field->{$prop} .= implode("\n", $display);
+			$field->{$prop} .= "</div>\n";
+			$field->{$prop} .= '<div class="slideshow-thumbnails">';
+			$field->{$prop} .= '<ul>'.implode("\n", $thumbs).'</ul>';
+			$field->{$prop} .= "</div>\n";
+			$field->{$prop} .= "</div>\n";
+			//$field->{$prop} .= ($thumbposition < 3) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
 		}
 	}
 	
