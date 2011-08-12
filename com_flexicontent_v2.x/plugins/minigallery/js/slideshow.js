@@ -396,7 +396,8 @@ Dependencies:
 	*/
 
 		_preload: function(fast){
-			var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1'),
+			//var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1'),
+			var src = this.data.images[this._slide],
 				cached = loaded = !!this.cache[src];
 			if (!cached){
 				if (!this.preloader)
@@ -411,7 +412,8 @@ Dependencies:
 				loaded = this.preloader.retrieve('loaded') && this.preloader.get('width');
 			}
 			if (loaded && Date.now() > this.timeToNextTransition && Date.now() > this.timeToTransitionComplete){
-				var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1');
+				//var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1');
+				var src = this.data.images[this._slide];
 				if (this.preloader){
 					this.cache[src] = {
 						'height': this.preloader.get('height'),
