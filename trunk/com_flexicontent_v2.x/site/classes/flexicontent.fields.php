@@ -77,16 +77,16 @@ class FlexicontentFields
 				}
 			}
 
-			if (FLEXI_ACCESS) {
-				if ((($user->gmid == '0') || ($user->gmid == '0,1')) && FLEXI_CACHE) {
-					$hits = $items[$i]->hits;
-					$items[$i]->hits = 0;
-					$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
-					$items[$i]->hits = $hits;
-				} else {
-					$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
-				}
-			} else {
+			//if (FLEXI_ACCESS) {
+			//	if ((($user->gmid == '0') || ($user->gmid == '0,1')) && FLEXI_CACHE) {
+			//		$hits = $items[$i]->hits;
+			//		$items[$i]->hits = 0;
+			//		$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
+			//		$items[$i]->hits = $hits;
+			//	} else {
+			//		$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
+			//	}
+			//} else {
 				if (FLEXI_CACHE) {
 					$hits = $items[$i]->hits;
 					$items[$i]->hits = 0;
@@ -95,7 +95,7 @@ class FlexicontentFields
 				} else {
 					$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
 				}
-			}
+			//}
 
 			//if ($items[$i]->fields)
 			//{
@@ -128,7 +128,8 @@ class FlexicontentFields
 		//if(!(($item->lft >= FLEXI_LFT_CATEGORY)&&($item->rgt <= FLEXI_RGT_CATEGORY))) return;
 
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid_a		= $user->getAuthorisedViewLevels();
+		$gids		= "'".implode("','", $gid_a)."'";
 		$dispatcher = &JDispatcher::getInstance();
 
 		$favourites	= $var['favourites'];
@@ -138,20 +139,21 @@ class FlexicontentFields
 		$typename	= $var['typenames'];
 		$vote		= $var['votes'];
 
-		$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
-		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+		//$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
+		$andaccess 	= ' AND fi.access IN ('.$gids.')' ;
+		$joinaccess	= '' ;
 
 		$query 	= 'SELECT fi.*'
-				. ' FROM #__flexicontent_fields AS fi'
-				. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-				. $joinaccess
-				. ' WHERE ie.item_id = ' . (int)$item->id
-				. ' AND fi.published = 1'
-				. $andaccess
-				. ' GROUP BY fi.id'
-				. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-				;
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+			. $joinaccess
+			. ' WHERE ie.item_id = ' . (int)$item->id
+			. ' AND fi.published = 1'
+			. $andaccess
+			. ' GROUP BY fi.id'
+			. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+			;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 
