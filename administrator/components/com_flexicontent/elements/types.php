@@ -51,12 +51,12 @@ class JElementTypes extends JElement
 		$attribs = "";
 		if ($node->attributes('multiple')) {
 			$attribs .= 'multiple="true" size="10"';
-			//$fieldname = $control_name.'['.$name.'][]';
+			$fieldname = $control_name.'['.$name.'][]';
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			//$fieldname = $control_name.'['.$name.']';
+			$fieldname = $control_name.'['.$name.']';
 		}
-		return JHTML::_('select.genericlist', $types, $control_name.'['.$name.'][]', $attribs, 'value', 'text', $value, $control_name.$name);
+		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
 	}
 }
