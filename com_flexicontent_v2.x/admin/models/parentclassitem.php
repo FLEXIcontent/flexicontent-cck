@@ -453,6 +453,7 @@ class ParentClassItem extends JModelAdmin {
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
+		$this->checkin();
 		return true;
 	}
 	

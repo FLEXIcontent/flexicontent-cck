@@ -73,17 +73,18 @@ class FlexicontentHelperPerm{
 		}
 		return $permissions[$section.$action];
 	}
-	function checkAllItemAccess($uid, $section, $id, $force=false) {
+	function checkAllItemAccess($uid, $section, $id, $force=false, $recursive = false) {
 		static $actions;
 		if(!isset($actions[$id]) || $force) {
 			$db = &JFactory::getDBO();
-			$user = &JFactory::getUser($uid);
+			//$user = &JFactory::getUser($uid);
 			$query = "SELECT rules FROM #__assets WHERE name='flexicontent.{$section}.{$id}';";
 			$db->setQuery($query);
 			$rule_string = $db->loadResult();
 			$rule = new JRules($rule_string);
 			$actions[$id] = array();
-			$groups = $user->getAuthorisedGroups();
+			//$groups = $user->getAuthorisedGroups();
+			$groups = JAccess::getGroupsByUser($uid, $recursive);
 			foreach($rule->getData() as $action=>$data) {
 				if($data->allow($groups)) $actions[$id][] = str_replace("flexicontent.", "", $action);
 			}

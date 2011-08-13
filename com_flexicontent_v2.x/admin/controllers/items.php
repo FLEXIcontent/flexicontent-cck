@@ -85,6 +85,7 @@ class FlexicontentControllerItems extends JController {
 					//$model->checkin();
 					break;
 			}
+			//$model->checkin();
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 
 			//$cache = &JFactory::getCache('com_flexicontent');
@@ -484,8 +485,9 @@ class FlexicontentControllerItems extends JController {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$item = & JTable::getInstance('flexicontent_items', '');
-		$item->bind(JRequest::get('post'));
-		$item->checkin();
+		//$item->bind(JRequest::get('post'));
+		$post = JRequest::get('post');
+		$item->checkin(@$post['jform']['id']);
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items' );
 	}
