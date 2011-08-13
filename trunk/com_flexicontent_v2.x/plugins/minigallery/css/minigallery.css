@@ -36,6 +36,7 @@ Notes:
 }
 .slideshow-thumbnails ul {
 	left: 0; position: absolute; top: 0; width: 100000px;
+	/*left: 0 !important; position: absolute !important; top: 0 !important; width: 100000px;*/ /* by enjoyman */
 }
 
 /**
@@ -73,7 +74,7 @@ Notes:
 */
 
 .slideshow {
-	height: auto; margin: 0 auto; width: 400px;
+	height: 377px; margin: 0 auto; width: 400px;
 }
 .slideshow a img {
 	border: 0;
@@ -90,7 +91,7 @@ Notes:
 */
 
 .slideshow-captions {
-	background: #000; bottom: 0; color: #FFF; font: normal 12px/22px Arial, sans-serif; left: 0; overflow: hidden; position: absolute; text-indent: 10px; width: 100%; z-index: 10000;
+	background: #000; bottom: 77px; color: #FFF; font: normal 12px/22px Arial, sans-serif; left: 0; overflow: hidden; position: absolute; text-indent: 10px; width: 100%; z-index: 10000;
 }
 .slideshow-captions-hidden {
 	height: 0; opacity: 0;
@@ -202,7 +203,7 @@ Notes:
 */
 
 .slideshow-thumbnails {
-	bottom: -55px; height: 55px; left: 0; position: absolute; width: 100%;
+	bottom: 0px; height: 80px; left: 0; position: absolute; width: 100%;
 }
 .slideshow-thumbnails * {
 	margin: 0; padding: 0;
