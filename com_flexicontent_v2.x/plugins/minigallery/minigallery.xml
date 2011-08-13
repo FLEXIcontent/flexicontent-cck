@@ -38,6 +38,12 @@
 			<field name="@spacer" type="spacer" default="" label="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
 			<field name="delay" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
 			<field name="duration" type="text" default="1000" size="4" label="FLEXI_FIELD_GALLERY_DURATION" description="FLEXI_FIELD_GALLERY_DURATION_DESC" />
+			<field name="usecaptions" type="radio" default="1" label="Use captions" description="Use captions">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+				<option value="2">Use custom captions</option>
+			</field>
+			<field name="customcaptions" type="text" default="This is a caption" label="Custom captions" description="Custom captions" />
 			<field name="slideshowtype" type="list" default="slideshow" label="Slide show type" description="Slide show type">
 				<option value="slideshow">Slideshow</option>
 				<option value="Flash">Flash</option>

@@ -948,13 +948,16 @@ Dependencies:
 				pos = props[1], 
 				length = props[2], 
 				width = props[4],
-				li = thumbnails.getElement('li:nth-child(' + (i + 1) + ')').getCoordinates();
+				//li = thumbnails.getElement('li:nth-child(' + (i + 1) + ')').getCoordinates();
+				a_link = thumbnails.getElement('a:nth-child(' + (i + 1) + ')').getCoordinates();
 			if (options.columns || options.rows){
 				thumbnails.setStyles({'height': this.height, 'width': this.width});
 				if (options.columns.toInt())
-					thumbnails.setStyle('width', li.width * options.columns.toInt());
+					//thumbnails.setStyle('width', li.width * options.columns.toInt());
+					thumbnails.setStyle('width', a_link.width * options.columns.toInt());
 				if (options.rows.toInt())
-					thumbnails.setStyle('height', li.height * options.rows.toInt());
+					//thumbnails.setStyle('height', li.height * options.rows.toInt());
+					thumbnails.setStyle('height', a_link.height * options.rows.toInt());
 			}
 			var div = thumbnails.getCoordinates();
 			if (options.position){
@@ -963,12 +966,16 @@ Dependencies:
 				if (options.position.test(/left|right/))
 					thumbnails.setStyles({'left': 'auto', 'right': 'auto'}).setStyle(options.position, -div.width);
 			}
-			var units = Math.floor(div[width] / li[width]),
+			//var units = Math.floor(div[width] / li[width]),
+			var units = Math.floor(div[width] / a_link[width]),
 				x = Math.ceil(this.data.images.length / units),
 				r = this.data.images.length % units,
-				len = x * li[length],
-				ul = thumbnails.getElement('ul').setStyle(length, len);
-			ul.getElements('li').setStyles({'height': li.height, 'width': li.width});
+				//len = x * li[length],
+				len = x * a_link[length],
+				//ul = thumbnails.getElement('ul').setStyle(length, len);
+				ul = thumbnails.getElement('ul').setStyle(length, len+10);
+			//ul.getElements('li').setStyles({'height': li.height, 'width': li.width});
+			ul.getElements('li').setStyles({'height': a_link.height, 'width': a_link.width});
 			thumbnails.store('limit', div[length] - len);
 		},
 

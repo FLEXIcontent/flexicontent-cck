@@ -313,6 +313,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$display = array();
 			$thumbs = array();
 			
+			$usecaptions = (int)$field->parameters->get( 'usecaptions', 1 );
+			$captions = '';
+			if($usecaptions===2)
+				$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
 			$field->{$prop}  = '';
 			//$field->{$prop} .= ($thumbposition > 2) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
 			$field->{$prop} .= '<div id="'.$htmltag_id.'" class="slideshow">';
@@ -329,7 +333,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
 					//$display[] = "<a href=\"".$srcb."\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'-'.$n."\" alt=\"xxx\" border=\"0\" /></a>\n";
-		$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$filename->altname}\" border=\"0\" /></a>\n";
+					if($usecaptions===1) $captions = $filename->altname;
+		$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$captions}\" border=\"0\" /></a>\n";
 		$thumbs[] = "<li><a href=\"#{$htmltag_id}_{$n}\"><img src=\"{$srcs}\" border=\"0\" /></a></li>\n";
 					$n++;
 				}
@@ -341,7 +346,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$field->{$prop} .= '<div class="slideshow-thumbnails">';
 			$field->{$prop} .= '<ul>'.implode("\n", $thumbs).'</ul>';
 			$field->{$prop} .= "</div>\n";
-			$field->{$prop} .= "</div>\n";
+			$field->{$prop} .= "</div><div class=\"clr\"></div><div class=\"clear\"></div>\n";
 			//$field->{$prop} .= ($thumbposition < 3) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
 		}
 	}

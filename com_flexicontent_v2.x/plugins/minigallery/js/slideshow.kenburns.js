@@ -61,7 +61,8 @@ Dependencies:
 			this.image.set('styles', {'bottom': 'auto', 'left': 'auto', 'right': 'auto', 'top': 'auto'});
 			var props = ['top left', 'top right', 'bottom left', 'bottom right'][this.counter % 4].split(' ');
 			this.image.setStyles([0, 0].associate(props));
-			var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1'),
+			//var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1'),
+			var src = this.data.images[this._slide],
 				cache = this.cache[src];
 			dh = this.height / cache.height;
 			dw = this.width / cache.width;
