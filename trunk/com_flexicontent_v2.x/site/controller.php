@@ -272,11 +272,16 @@ class FlexicontentController extends JController
 
 		// Get an item table object and bind post variabes to it
 		$item = & JTable::getInstance('flexicontent_items', '');
-		$item->bind(JRequest::get('post'));
-
+		//$item->bind(JRequest::get('post'));
+		$post = JRequest::get('post');
+		
+		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+		$permission = FlexicontentHelperPerm::getPerm();
+		
 		// todo: add task checks
-		if ($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_flexicontent', 'edit', 'own')) {
-			$item->checkin();
+		//if ($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_flexicontent', 'edit', 'own')) {
+		if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || $permission->CanEdit) {
+			$item->checkin($post['jform']['id']);
 		}
 
 		// If the task was edit or cancel, we go back to the item

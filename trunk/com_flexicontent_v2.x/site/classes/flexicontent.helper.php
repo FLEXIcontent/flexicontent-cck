@@ -200,12 +200,15 @@ class flexicontent_html
 	function editbutton( $item, &$params)
 	{
 		$user	= & JFactory::getUser();
-
-		if (FLEXI_ACCESS)
-		{
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			
-			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)))
+		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+		$permission = FlexicontentHelperPerm::getPerm();
+		//$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
+		//$canEdit 		= in_array('edit', $rights);
+		//$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
+		//if (FLEXI_ACCESS)
+		//{
+			//$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || $permission->CanEdit)
 			{
 				if ( $params->get('show_icons') ) {
 					$image = JHTML::_('image.site', 'edit.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
@@ -215,13 +218,13 @@ class flexicontent_html
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view=item&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?option=com_flexicontent&view=item&cid='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
 			}
-
-		} else {
+		return;
+		/*} else {
 
 			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
 			{
@@ -238,7 +241,7 @@ class flexicontent_html
 	
 				return $output;
 			}
-		}
+		}*/
 
 		return;
 	}

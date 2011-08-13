@@ -364,8 +364,9 @@ class FlexicontentViewItem extends JView {
 		// check if it's an edit action
 		if ($item->getValue('id')) {
 			// EDIT action
-			$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
-			if ( !$permission->CanEdit && !($canEditOwn && ($item->created_by == $user->get('id'))) ) {
+			//$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
+			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
+			if ( !$permission->CanEdit && !(in_array('editown', $rights) && ($item->getValue('created_by') == $user->get('id'))) ) {
 				// user isn't authorize to edit
 				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
@@ -386,8 +387,8 @@ class FlexicontentViewItem extends JView {
 		//$catrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $item->catid);
 		//$rights = array_merge($itemrights, $catrights);//I not sure if it will merged or not?//by enjoyman
 		$rights = $itemrights;
-		$perms['canedit'] = ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) );
-		$perms['canpublish'] = ( (in_array('editown.state', $rights) && $item->created_by == $user->get('id')) || (in_array('edit.state', $rights)) );
+		$perms['canedit'] = ( (in_array('editown', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit', $rights)) );
+		$perms['canpublish'] = ( (in_array('editown.state', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit.state', $rights)) );
 		$perms['candelete'] = ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) );
 		$perms['canright'] = $permission->CanRights;
 

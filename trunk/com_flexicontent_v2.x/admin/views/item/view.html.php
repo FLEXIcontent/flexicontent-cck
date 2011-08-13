@@ -137,7 +137,8 @@ class FlexicontentViewItem extends JView {
 			//	$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
 			//}
 			if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $form->getValue("catid"));
+				//$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $form->getValue("catid"));
+				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
 				$canEdit 		= in_array('edit', $rights);
 				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
 				$canPublish 	= in_array('publish', $rights);
