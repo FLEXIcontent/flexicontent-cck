@@ -87,8 +87,9 @@ class FlexicontentControllerItems extends JController {
 			}
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			//$cache = &JFactory::getCache('com_flexicontent');
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
 
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ITEM' );
@@ -191,8 +192,9 @@ class FlexicontentControllerItems extends JController {
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPY_SUCCESS', count($cid) );
 
-					$cache = &JFactory::getCache('com_flexicontent');
-					$cache->clean();
+					//$cache = &JFactory::getCache('com_flexicontent');
+					$cache = FLEXIUtilities::getCache();
+					$cache->clean('com_flexicontent_items');
 				}
 				else
 				{
@@ -212,8 +214,9 @@ class FlexicontentControllerItems extends JController {
 				}
 				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($cid) );
 				
-				$cache = &JFactory::getCache('com_flexicontent');
-				$cache->clean();
+				//$cache = &JFactory::getCache('com_flexicontent');
+				$cache = FLEXIUtilities::getCache();
+				$cache->clean('com_flexicontent_items');
 			}
 			else // copy and move
 			{
@@ -221,8 +224,9 @@ class FlexicontentControllerItems extends JController {
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPYMOVE_SUCCESS', count($cid) );
 
-					$cache = &JFactory::getCache('com_flexicontent');
-					$cache->clean();
+					//$cache = &JFactory::getCache('com_flexicontent');
+					$cache = FLEXIUtilities::getCache();
+					$cache->clean('com_flexicontent_items');
 				}
 				else
 				{
@@ -256,8 +260,10 @@ class FlexicontentControllerItems extends JController {
 		}
 		
 		$logs = $model->import();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-		$catscache->clean();
+		//$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		//$catscache->clean();
+		$catscache = FLEXIUtilities::getCache();
+		$catscache->clean('com_flexicontent_cats');
 		$msg  = JText::_( 'FLEXI_IMPORT_SUCCESSULL' );
 		$msg .= '<ul class="import-ok">';
 		//$msg .= '<li>' . $logs->sec . ' ' . JText::_( 'FLEXI_IMPORT_SECTIONS' ) . '</li>';
@@ -332,8 +338,9 @@ class FlexicontentControllerItems extends JController {
 			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
 		}
 		
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
 		$path = JURI::root().'components/com_flexicontent/assets/images/';
 		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />';
 		exit;
@@ -392,8 +399,9 @@ class FlexicontentControllerItems extends JController {
 			$msg = JText::_( 'FLEXI_APPROVAL_NO_ITEMS_SUBMITTED' ) . ' ' . $excluded;
 		}
 
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
@@ -427,8 +435,9 @@ class FlexicontentControllerItems extends JController {
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			//$cache = &JFactory::getCache('com_flexicontent');
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
 		}
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
@@ -454,8 +463,9 @@ class FlexicontentControllerItems extends JController {
 		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			//$cache = &JFactory::getCache('com_flexicontent');
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
 		}
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=items' );
@@ -555,8 +565,9 @@ class FlexicontentControllerItems extends JController {
 
 		$model->resetHits($id);
 		
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
 
 		echo 0;
 	}
@@ -573,8 +584,9 @@ class FlexicontentControllerItems extends JController {
 
 		$model->resetVotes($id);
 		
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
 
 		echo JText::_( 'FLEXI_NOT_RATED_YET' );
 	}

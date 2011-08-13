@@ -530,6 +530,10 @@ class FlexicontentModelField extends JModelAdmin{
 				$this->_db->query();
 			}
 		}
+		
+		//clean frontend cache 'com_flexicontent_items'.
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
 		return true;
 	}
 	
