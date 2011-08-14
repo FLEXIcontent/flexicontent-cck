@@ -16,32 +16,31 @@
  * GNU General Public License for more details.
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z|0,1,2,3,4,5,6,7,8,9");
+$groups = explode("|", $alphacharacters);
 ?>
 
 <div id="fc_alpha">
+	<?php
+	$flag = true;
+	foreach($groups as $group) {
+		$letters = explode(",", $group);
+	?>
 	<div class="letters">
-		<a class="fc_alpha_index" href="#" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
-		<?php 
-		$letters = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+	<?php if($flag) {?>
+	<a class="fc_alpha_index" href="#" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<?php $flag = false;}?>
+	<?php
 		foreach ($letters as $letter) :
+			$letter = trim($letter);
 			if (in_array($letter, $this->alpha)) :
 				echo "<a class=\"fc_alpha_index\" href=\"#\" onclick=\"document.getElementById('alpha_index').value='".$letter."';document.getElementById('adminForm').submit();\">".strtoupper($letter)."</a>";
 			else :
 				echo "<span class=\"fc_alpha_index\">".strtoupper($letter)."</span>";
 			endif;
 		endforeach;
-		?>
+	?>
 	</div>
-	<div class="numbers">
-		<?php 
-		$numbers = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
-		foreach ($numbers as $number) :
-			if (in_array($number, $this->alpha)) :
-				echo "<a class=\"fc_alpha_index\" href=\"".$this->action."&letter=".$number."\" onclick=\"document.getElementById('alpha_index').value='".($number ? $number : 0)."';document.getElementById('adminForm').submit();\">".$number."</a>";
-			else :
-				echo "<span class=\"fc_alpha_index\">".$number."</span>";
-			endif;
-		endforeach;
-		?>
-	</div>
+	<?php
+	}?>
 </div>
