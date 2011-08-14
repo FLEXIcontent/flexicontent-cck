@@ -390,7 +390,8 @@ $canpublish = $this->perms['canpublish'];
 						$field->label = $this->tparams->get('maintext_label', $field->label);
 						$field->description = $this->tparams->get('maintext_desc', $field->description);
 						//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
-						$maintext = $this->item->getValue('text');
+						//$maintext = $this->item->getValue('text');
+						$maintext = @$field->value[0];
 						if ($this->tparams->get('hide_html', 0))
 						{
 							$field->html = '<textarea name="jform[text]" rows="20" cols="75">'.$maintext.'</textarea>';
