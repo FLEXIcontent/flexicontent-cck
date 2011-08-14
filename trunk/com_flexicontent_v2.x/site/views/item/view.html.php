@@ -36,6 +36,9 @@ class FlexicontentViewItem extends JView {
 	function display( $tpl = null )
 	{
 		global $globaltypes;
+		// Ensure that the global vars are array
+		if (!is_array($globaltypes))	$globaltypes	= array();
+		
 		$mainframe = &JFactory::getApplication();
 
 		//initialize variables
@@ -76,7 +79,7 @@ class FlexicontentViewItem extends JView {
 		//get item data
 		JRequest::setVar('loadcurrent', true);
 		$item = $model->getItem($model->getId(), false);
-		//$item = $model->getForm();
+
 		$iparams	=& $item->parameters;
 		$params->merge($iparams);
 
@@ -95,37 +98,23 @@ class FlexicontentViewItem extends JView {
 		}
 
 		if ($item->id == 0)
-		{	
+		{
 			$id	= JRequest::getInt('id', 0);
 			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND (item/view.html)', $id ) );
 		}
 		
 		$fields		=& $item->fields;
-		//$item->fields = &$fields;
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
 		$parents	= $cats->getParentlist();
 		$depth		= $params->get('item_depth', 0);
-
-		$pathway 	=& $mainframe->getPathWay();
-		for($p = $depth; $p<count($parents); $p++) {
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-		}
-		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
-		}
 		
 		// !!! The triggering of the event onPrepareContent of content plugins
 		// !!! for description field (maintext) along with all other flexicontent
 		// !!! fields is handled by flexicontent.fields.php
 		// CODE REMOVED
 		
-//		JPluginHelper::importPlugin('content');
-//		$item->event = new stdClass();
-//		$results = $dispatcher->trigger('onPrepareContent', array (&$item, &$params, $limitstart));
-//		$item->event->afterDisplayTitle = trim(implode("\n", $results));
-//
 		/*
 		 * Handle the metadata
 		 *
@@ -156,7 +145,7 @@ class FlexicontentViewItem extends JView {
 		 * First is to check if we have a category id, if yes add it.
 		 * If we haven't one than we accessed this screen direct via the menu and don't add the parent category
 		 */
-		if($cid && $params->get('addcat_title', 1)) {
+		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
 			$parentcat = array_pop($parents);
 			$doc_title = $parentcat->title.' - '.$params->get( 'page_title' );
 		} else {
@@ -253,8 +242,8 @@ class FlexicontentViewItem extends JView {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
 		} else {
-			for($p = $depth; $p<count($parents); $p++) {
-				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			foreach($parents as $k=>$p) {
+				$pathway->addItem( $this->escape($p->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($p->categoryslug) ) );
 			}
 			if ($params->get('add_item_pathway', 1)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );

@@ -36,10 +36,12 @@ class FlexicontentViewItems extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe, $globaltypes;
-		// Insure that the global vars are array
+		global $globaltypes;
+		// Ensure that the global vars are array
 		if (!is_array($globaltypes))	$globaltypes	= array();
-
+		
+		global $mainframe;
+		
 		//initialize variables
 		$document 	= & JFactory::getDocument();
 		$user		= & JFactory::getUser();
@@ -48,7 +50,7 @@ class FlexicontentViewItems extends JView
 		$dispatcher = & JDispatcher::getInstance();
 		$params 	= & $mainframe->getParams('com_flexicontent');
 		$aid		= (int) $user->get('aid');
-		
+		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$cid		= JRequest::getInt('cid', 0);
 
@@ -186,9 +188,7 @@ class FlexicontentViewItems extends JView
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		
 		// increment the hit counter
-		if ($limitstart == 0)
-		{
-			$model =& $this->getModel();
+		if ($limitstart == 0) {
 			$model->hit();
 		}
 
@@ -240,7 +240,6 @@ class FlexicontentViewItems extends JView
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
 		} else {
-			//for($p = $depth; $p<count($parents); $p++) {
 			foreach($parents as $k=>$p) {
 				$pathway->addItem( $this->escape($p->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($p->categoryslug) ) );
 			}
@@ -313,6 +312,8 @@ class FlexicontentViewItems extends JView
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
 			$params = new JParameter($paramsstring);
+		} else {
+			$params = new JParameter("");
 		}
 		$tparams	=& $this->get( 'Typeparams' );
 		
