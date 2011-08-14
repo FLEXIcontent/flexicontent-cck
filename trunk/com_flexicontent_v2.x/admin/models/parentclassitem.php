@@ -29,9 +29,9 @@ jimport('joomla.application.component.modeladmin');
  */
 class ParentClassItem extends JModelAdmin {
 	/**
-	 * Item data
+	 * Item id
 	 *
-	 * @var object
+	 * @var int
 	 */
 	var $_id = 0;
 	
@@ -48,6 +48,13 @@ class ParentClassItem extends JModelAdmin {
 	 * @var array
 	 */
 	var $_tags = null;
+	
+	/**
+	 * Item current version
+	 *
+	 * @var object
+	 */
+	var $_currentversion = -1;
 
 	/**
 	 * Constructor
@@ -152,17 +159,25 @@ class ParentClassItem extends JModelAdmin {
 	 *
 	 * @return	mixed	Object on success, false on failure.
 	 */
-	public function getItem($pk = null) {
+	public function getItem($pk = null, $isform = true) {
 		static $item;
 		if(!$item) {
 			// Initialise variables.
 			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
 
 			if ($item = parent::getItem($pk)) {
+				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
+				//$task=JRequest::getVar('task');
+				if(!$version && $isform) {
+					$version = $version = FLEXIUtilities::getLastVersions($item->id, true);
+					JRequest::setVar( 'version', $version);
+				}
+				
 				// Convert the params field to an array.
 				$registry = new JRegistry;
 				$registry->loadJSON($item->attribs);
 				$item->attribs = $registry->toArray();
+				$this->_currentversion = $item->version;
 
 				// Convert the params field to an array.
 				$registry = new JRegistry;
@@ -170,6 +185,7 @@ class ParentClassItem extends JModelAdmin {
 				$item->metadata = $registry->toArray();
 
 				$item->text = trim($item->fulltext) != '' ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
+				$item->_currentversion = $item->version;
 				$query = 'SELECT name'
 					. ' FROM #__users'
 					. ' WHERE id = '. (int) $item->created_by
@@ -189,7 +205,6 @@ class ParentClassItem extends JModelAdmin {
 					$item->modifier = $this->_db->loadResult();
 				}
 				$fields = $this->getExtraFields();
-				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 				$this->getExtrafieldvalue($fields['categories'], $version);
 				$item->cid = $fields['categories']->value;
 			}
@@ -1003,7 +1018,7 @@ class ParentClassItem extends JModelAdmin {
 		}
 		return $used;
 	}
-	function getCoreFieldValue(&$field) {
+	function getCoreFieldValue(&$field, $version = 0) {
 		if(isset($this->_item)) $item=&$this->_item;
 		else $item = $this->getItem();
 		switch ($field->field_type) {
@@ -1086,7 +1101,7 @@ class ParentClassItem extends JModelAdmin {
 	function getExtrafieldvalue(&$field, $version = 0) {
 		if(isset($field->value)) return;
 		if(!$version && $field->iscore) {//load current version of core field
-			$this->getCoreFieldValue($field);
+			$this->getCoreFieldValue($field, $version);
 		}else{
 			$query = 'SELECT value'
 				.(($version<=0)?' FROM #__flexicontent_fields_item_relations AS fv':' FROM #__flexicontent_items_versions AS fv')
@@ -1149,7 +1164,7 @@ class ParentClassItem extends JModelAdmin {
 		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				.' WHERE item_id = ' . (int)$this->_id
+				." WHERE item_id = '{$this->_id}'"
 				.' ORDER BY version_id ASC'
 				. ($versionsperpage?' LIMIT '.$limitstart.','.$versionsperpage:'')
 				;
@@ -1161,18 +1176,22 @@ class ParentClassItem extends JModelAdmin {
 		$query 	= 'SELECT count(*) as num'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				.' WHERE item_id = ' . (int)$this->_id
+				." WHERE item_id = '{$this->_id}'"
 				;
 		$this->_db->setQuery($query);
 		return $this->_db->loadResult();
 	}
 	function getCurrentVersion() {
-		$query 	= 'SELECT version'
-				.' FROM #__content'
-				.' WHERE id = ' . (int)$this->_id
-				;
-		$this->_db->setQuery($query);
-		return $this->_db->loadResult();
+		if($item->_currentversion<0) {
+			$query 	= 'SELECT version'
+					.' FROM #__content'
+					." WHERE id = '{$this->_id}'"
+					;
+			$this->_db->setQuery($query);
+			$currentversion = $this->_db->loadResult();
+			$item->_currentversion = ($currentversion===NULL)?-1:$currentversion;
+		}
+		return $item->_currentversion;
 	}
 }
 ?>
