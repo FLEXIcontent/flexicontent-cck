@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
-			thumb.src = '".JURI::root()."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
+			thumb.src = '".JURI::root()."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
@@ -91,7 +91,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 			
-			img.src = '".JURI::root()."/administrator/components/com_flexicontent/assets/images/move3.png';
+			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move3.png';
 			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
@@ -157,7 +157,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			';
 			$document->addStyleDeclaration($css);
 
-			$move 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
+			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 
@@ -171,7 +171,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$img_path = $filename->filename;
 				if(substr($filename->filename, 0, 7)!='http://')
 					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
-				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+				$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="custom['.$field->name.']['.$i.']" value="'.$file.'" />';
@@ -182,12 +182,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 		}
 
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
+		$linkfrel = JURI::root().'administrator/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfrel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
@@ -247,18 +247,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			  // this allows you to override the default css files
 			  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
 			  if(file_exists($csspath)) {
-			  	$document->addStyleSheet(JURI::base().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+			  	$document->addStyleSheet(JURI::root().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
 			  }else{
-			  	//$document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery/minigallery.css');
-			  	//$document->addStyleSheet('plugins/flexicontent_fields/minigallery/css/minigallery.php?id='.$htmltag_id);
-			  	$document->addStyleSheet('plugins/flexicontent_fields/minigallery/css/minigallery.css');
+			  	$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/css/minigallery.css');
 			  }
 			  JHTML::_('behavior.mootools');
-			  //$document->addScript('plugins/flexicontent_fields/minigallery/minigallery/backgroundslider.js');
-			  //$document->addScript('plugins/flexicontent_fields/minigallery/minigallery/slideshow.js');
-			  $document->addScript('plugins/flexicontent_fields/minigallery/js/slideshow.js');
+			  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.js');
 			  if($slideshowtype!='slideshow') {
-			  	$document->addScript('plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+			  	$document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
 			  	$slideshowClass .= '.'.$slideshowtype;
 			  }
 			}
@@ -266,8 +262,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 			$transition = $field->parameters->get( 'transition', 'back' );
 			$t_dir = $field->parameters->get( 't_dir', 'in' );
-			//$width = $field->parameters->get( 'width', '400' );
-			//$height = $field->parameters->get( 'height', '300' );
 			$thumbnails = $field->parameters->get( 'thumbnails', '1' );
 			$thumbnails = $thumbnails ? 'true' : 'false';
 			$controller = $field->parameters->get( 'controller', '1' );
@@ -290,7 +284,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 
 			$document->addStyleDeclaration($css);*/
-			
+
 			$otheroptions .= ($otheroptions?','.$otheroptions:'');
 			$js = "
 		  	window.addEvent('domready',function(){
@@ -327,10 +321,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if ($filename) {
 					$img_path = $filename->filename;
 					if(substr($filename->filename,0,7)!='http://') {
-						$img_path = JURI::base(true) . '/' . $mediapath . '/' . $filename->filename;
+						$img_path = JURI::root(true) . '/' . $mediapath . '/' . $filename->filename;
 					}
-					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+					$srcs 		= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+					$srcb 		= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
 					//$display[] = "<a href=\"".$srcb."\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'-'.$n."\" alt=\"xxx\" border=\"0\" /></a>\n";
 					if($usecaptions===1) $captions = $filename->altname;
@@ -391,16 +385,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			case 'odg':
 			case 'bmp':
 			case 'jpeg':
-				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
+				$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
 			// Non-image document
 			default:
 				$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
 				if (file_exists($icon)) {
-					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
+					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
 				} else {
-					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
+					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 				}
 			break;
 		}
