@@ -45,9 +45,10 @@ class FlexicontentViewItem extends JView {
 		
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 			JHTML::_('behavior.mootools');
-			$document->addScript('components/com_flexicontent/assets/js/jquery-1.4.min.js');
+			$document->addScript('components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
 		}
-		$document->addCustomTag('<script>jQuery.noConflict();</script>');
+		// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+		//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 
 		JHTML::_('behavior.tooltip');
 

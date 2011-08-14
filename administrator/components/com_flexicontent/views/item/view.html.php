@@ -48,6 +48,10 @@ class FlexicontentViewItem extends JView {
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 		$bar 		= & JToolBar::getInstance('toolbar');
 
+		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			JHTML::_('behavior.mootools');
+			$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
+		}
 		JHTML::_('behavior.tooltip');
 
 		$nullDate 		= $db->getNullDate();

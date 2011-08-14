@@ -18,10 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-	JHTML::_('behavior.mootools');
-	$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
-}
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->CanUseTags || $this->CanVersion) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
