@@ -721,7 +721,7 @@ class FlexicontentControllerItems extends JController {
 	function getversionlist() {
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
+		@ob_end_clean();
 		$id 		= JRequest::getInt('id', 0);
 		$active 	= JRequest::getInt('active', 0);
 		if(!$id) return;
@@ -757,5 +757,6 @@ class FlexicontentControllerItems extends JController {
 				}
 				echo "</td></tr>";
 		}
+		exit;
 	}
 }
