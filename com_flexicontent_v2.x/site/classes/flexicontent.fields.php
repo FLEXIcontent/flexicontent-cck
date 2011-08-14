@@ -144,16 +144,16 @@ class FlexicontentFields
 		$joinaccess	= '' ;
 
 		$query 	= 'SELECT fi.*'
-			. ' FROM #__flexicontent_fields AS fi'
-			. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-			. $joinaccess
-			. ' WHERE ie.item_id = ' . (int)$item->id
-			. ' AND fi.published = 1'
-			. $andaccess
-			. ' GROUP BY fi.id'
-			. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-			;
+				. ' FROM #__flexicontent_fields AS fi'
+				. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
+				. $joinaccess
+				. ' WHERE ie.item_id = ' . (int)$item->id
+				. ' AND fi.published = 1'
+				. $andaccess
+				. ' GROUP BY fi.id'
+				. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+				;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 
