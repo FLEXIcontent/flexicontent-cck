@@ -202,24 +202,41 @@ class FlexicontentViewCategory extends JView
 			// !!! Had serious performance impact
 			// CODE REMOVED
 			
-			// reappend the category slug according to the advanced routing parameters
-			if (!in_array($category->id, $globalnoroute)) {
-				$item->categoryslug = $category->slug;
+			// We must check if the current category is in the categories of the item ..
+			$item_in_category=false;
+			if ($item->catid == $category->id) {
+				$item_in_category=true;
 			} else {
-				if (in_array($item->catid, $globalnoroute)) {
-					$allcats = array();
-					$item->cats = $item->cats?$item->cats:array();
-					foreach ($item->cats as $cat) {
-						array_push($allcats, $cat->id);
-					}
-					$allowed = array_filter($allcats, "filterCats");
-
-					if (count($allowed) > 0)
-					{
-						foreach ($allowed as $rcat) {
-							$item->categoryslug = $globalcats[$rcat]->slug;
-							break; // Trick we don't need all $allowed only one of them
-						}
+				foreach ($item->cats as $cat) {
+					if ($cat->id == $category->id) {  $item_in_category=true;  break;  }
+				}
+			}
+			
+			// ADVANCED CATEGORY ROUTING (=set the most appropriate category for the item ...)
+			// CHOOSE APPROPRIATE category-slug FOR THE ITEM !!! ( )
+			if ($item_in_category && !in_array($category->id, $globalnoroute)) {
+				// 1. CATEGORY SLUG: CURRENT category
+				// Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
+				$item->categoryslug = $category->slug;
+			} else if (!in_array($item->catid, $globalnoroute)) {
+				// 2. CATEGORY SLUG: ITEM's MAIN category   (alread SET, ... no assignment needed)
+				// Since we cannot use current category (above), we will use item's MAIN category 
+				// ALSO routing (creating links) to this category is allowed
+			} else {
+				// 3. CATEGORY SLUG: ANY ITEM's category
+				// We will use the first for which routing (creating links) to the category is allowed
+				$allcats = array();
+				$item->cats = $item->cats?$item->cats:array();
+				foreach ($item->cats as $cat) {
+					array_push($allcats, $cat->id);
+				}
+				$allowed = array_filter($allcats, "filterCats");
+				
+				if (count($allowed) > 0)
+				{
+					foreach ($allowed as $rcat) {
+						$item->categoryslug = $globalcats[$rcat]->slug;
+						break; // Trick we don't need all $allowed only one of them
 					}
 				}
 			}
