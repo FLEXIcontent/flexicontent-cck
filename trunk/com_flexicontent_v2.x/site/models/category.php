@@ -975,12 +975,17 @@ class FlexicontentModelCategory extends JModelList{
 		$lang 		= JRequest::getWord('lang', '' );
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
+		$gid_a		= $user->getAuthorisedViewLevels();
+		$gids		= "'".implode("','", $gid_a)."'";
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
+		$owneritems = $cparams->get('owneritems', '0');
 		
 		// Filter the category view with the active active language
 		$and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
-		$and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
+		$and2 = (!$owneritems)?' AND i.state IN (1, -5)':'';
+		//$and3 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
+		$and3 = $show_noauth ? '' : ' AND c.access IN ('.$gids.') AND i.access IN ('.$gids.')';
 		
 		$_group_cats = implode("','", $this->_group_cats);
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
@@ -990,9 +995,10 @@ class FlexicontentModelCategory extends JModelList{
 			. ' LEFT JOIN #__categories AS c ON c.id IN (\''. $_group_cats .'\')'
 			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
-			. ' AND i.state IN (1, -5)'
-			//. ' AND c.lft >= '.FLEXI_LFT_CATEGORY.' AND c.rgt<='.FLEXI_RGT_CATEGORY
+			//. ' AND i.state IN (1, -5)'
 			. $and2
+			//. ' AND c.lft >= '.FLEXI_LFT_CATEGORY.' AND c.rgt<='.FLEXI_RGT_CATEGORY
+			. $and3
 			. ' GROUP BY alpha'
 			. ' ORDER BY alpha ASC';
 		;

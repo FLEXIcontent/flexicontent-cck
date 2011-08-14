@@ -1619,7 +1619,7 @@ class FLEXIUtilities {
 		$conf = JFactory::getConfig();
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
-			'defaultgroup'	=> $handler,
+			'defaultgroup'	=> $group,
 			'storage' 		=> $conf->get('cache_handler', ''),
 			'caching'		=> true,
 			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
