@@ -87,31 +87,48 @@ class FlexicontentViewFlexicontent extends JView{
 		$inprogress = & $this->get( 'Inprogress' );
 		$themes		= flexicontent_tmpl::getThemes();
 		
-		// required setup check
+		$session  =& JFactory::getSession();
+		
+		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
+		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
 		$existcat 	= & $this->get( 'Existcat' );
-		//$existsec 	= & $this->get( 'Existsec' );
 		$existmenu 	= & $this->get( 'Existmenu' );
-
-		// install check
-		$existmenuitems		= & $this->get( 'ExistMenuItems' );
-		$existtype 			= & $this->get( 'ExistType' );
-		$existfields 		= & $this->get( 'ExistFields' );
-		$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
-		$existseplg 		= & $this->get( 'ExistSearchPlugin' );
-		$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
-		$allplgpublish 		= & $this->get( 'AllPluginsPublished' );
-		$existlang	 		= & $this->get( 'ExistLanguageColumn' );
-		$existversions 		= & $this->get( 'ExistVersionsTable' );
-		$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
-		$cachethumb			= & $this->get( 'CacheThumbChmod' );
-		$oldbetafiles		= & $this->get( 'OldBetaFiles' );
-		$fieldspositions	= & $this->get( 'FieldsPositions' );
-		$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
-		$model 				= $this->getModel('flexicontent');
-		$use_versioning = $params->get('use_versioning', 1);
-		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
-		$initialpermission	= $model->checkInitialPermission();
-
+		
+		// 2. OPTIONAL AUTOMATIC TASKS,
+		//  THESE ARE SEPARETELY CHECKED, AS THEY ARE NOT OBLIGATORY BUT RATHER RECOMMENDED
+		$allplgpublish = $session->get('flexicontent.allplgpublish');
+		if (($allplgpublish===NULL) || ($allplgpublish===false)) {
+			$allplgpublish 		= & $this->get( 'AllPluginsPublished' );
+		}
+		$optional_tasks = !$allplgpublish; // || ..
+		
+		// 3. OBLIGATORY AUTOMATIC TASKS, THAT WILL BLOCK COMPONENT USE UNTIL THEY ARE COMPLETED
+		$dopostinstall = $session->get('flexicontent.postinstall');
+		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
+		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
+		if(($dopostinstall===NULL) || ($dopostinstall===false) || $optional_tasks) {
+			$model 				= $this->getModel('flexicontent');
+			$use_versioning = $params->get('use_versioning', 1);
+			
+			$existmenuitems		= & $this->get( 'ExistMenuItems' );
+			$existtype 			= & $this->get( 'ExistType' );
+			$existfields 		= & $this->get( 'ExistFields' );
+			$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
+			$existseplg 		= & $this->get( 'ExistSearchPlugin' );
+			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
+			$existlang	 		= & $this->get( 'ExistLanguageColumn' );
+			$existversions 		= & $this->get( 'ExistVersionsTable' );
+			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
+			$cachethumb			= & $this->get( 'CacheThumbChmod' );
+			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
+			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
+			$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+			$initialpermission	= $model->checkInitialPermission();
+		}
+		
+		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER
+		$this->get( 'FieldsPositions' );
+		
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
 
@@ -129,7 +146,6 @@ class FlexicontentViewFlexicontent extends JView{
 		$document->addStyleDeclaration($css);
 
 		$session  =& JFactory::getSession();
-		$dopostinstall = $session->get('flexicontent.postinstall');
 		$permission = FlexicontentHelperPerm::getPerm();
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
@@ -149,7 +165,6 @@ class FlexicontentViewFlexicontent extends JView{
 		$this->assignRef('openquest'	, $openquest);
 		$this->assignRef('inprogress'	, $inprogress);
 		$this->assignRef('existcat'		, $existcat);
-		//$this->assignRef('existsec'		, $existsec);
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);
@@ -163,7 +178,6 @@ class FlexicontentViewFlexicontent extends JView{
 		$this->assignRef('existfplg'			, $existfplg);
 		$this->assignRef('existseplg'			, $existseplg);
 		$this->assignRef('existsyplg'			, $existsyplg);
-		$this->assignRef('allplgpublish'		, $allplgpublish);
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata'	, $existversionsdata);

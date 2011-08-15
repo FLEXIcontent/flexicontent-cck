@@ -215,8 +215,8 @@ class FlexicontentModelFlexicontent extends JModel
 			
 		if ($count > 13) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 	/**
@@ -540,10 +540,17 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistmenu()
 	{
 		$component =& JComponentHelper::getComponent('com_flexicontent');
-
-		$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('component_id', $component->id);
-		if (count($items) > 0) {
+		
+		// This code doesn't work as in J1.5 ...
+		/*$menus	= &JApplication::getMenu('site', array());
+		$items	= $menus->getItems('component_id', $component->id);*/
+		
+		$flexi =& JComponentHelper::getComponent('com_flexicontent');
+		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' ";
+		$this->_db->setQuery($query);
+		$count = $this->_db->loadResult();
+		
+		if ($count > 0) {
 			return true;
 		}
 		return false;

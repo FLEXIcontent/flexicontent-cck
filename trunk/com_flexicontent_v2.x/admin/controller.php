@@ -39,29 +39,41 @@ class FlexicontentController extends JController
 		}
 		$session  =& JFactory::getSession();
 		
+		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
+		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$dopostinstall =& $session->get('flexicontent.postinstall');
 		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
+			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
+			// false means it has been checked during current session, but has failed one or more tasks
+			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
 		}
 
+		// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
+		// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
+		// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
 		$allplgpublish =& $session->get('flexicontent.allplgpublish');
 		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
+			// NULL means ALLPLGPUBLISH task has not been checked YET (current PHP user session),
+			// false means it has been checked during current session but has failed
+			// In both cases we must evaluate the ALLPLGPUBLISH task,  and set the session variable
 			$model 			= $this->getModel('flexicontent');
 			$allplgpublish 		= & $model->getAllPluginsPublished();
 			$session->set('flexicontent.allplgpublish', $allplgpublish);
 		}
 		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats')) && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search')) && !$dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
 		}
-		
+				
 		// Register Extra task
 		$this->registerTask( 'apply'					, 'save' );
 		$this->registerTask( 'applyacl'					, 'saveacl' );
-		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
+		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
+		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
 		$this->registerTask( 'publishplugins'			, 'publishplugins' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
@@ -69,25 +81,40 @@ class FlexicontentController extends JController
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
-		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 	}
 
 	function getPostinstallState() {
 		$model 				= $this->getModel('flexicontent');
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$use_versioning = $params->get('use_versioning', 1);
+
+		$existmenuitems	 	= & $model->getExistMenuItems();
 		$existtype 			= & $model->getExistType();
 		$existfields 		= & $model->getExistFields();
+
+		$existfplg 			= & $model->getExistFieldsPlugins();
+		$existseplg 		= & $model->getExistSearchPlugin();
+		$existsyplg 		= & $model->getExistSystemPlugin();
+		
 		$existlang	 		= & $model->getExistLanguageColumn();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
+		$cachethumb			= & $model->getCacheThumbChmod();
+		
 		$oldbetafiles		= & $model->getOldBetaFiles();
+		
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
-		$use_versioning = $params->get('use_versioning', 1);
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
-		$existmenuitems	 	= & $model->getExistMenuItems();
-		$checkinitialpermission = $model->checkInitialPermission();
+		
+		$initialpermission	= $model->checkInitialPermission();
+		
 		$dopostinstall = true;
-		if ((!$existfields) || (!$existtype) || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) || (!$existmenuitems) || (!$checkinitialpermission)) {
+		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
+		     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||
+		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$cachethumb) ||
+		     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||
+		     (!$initialpermission)
+		   ) {
 			$dopostinstall = false;
 		}
 		return $dopostinstall;
@@ -323,7 +350,7 @@ VALUES
 		$db->setQuery($query);
 		if (!$db->query()) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&tmpl=component">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 			} else {
 				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
 				return false;
@@ -355,7 +382,7 @@ VALUES
 		$success = JPath::setPermissions($phpthumbcache, '0777', '0777');
 		if (!$success) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&tmpl=component">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 			} else {
 				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
 				return false;
