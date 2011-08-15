@@ -1238,13 +1238,13 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	/*function getFavourites()
+	function getFavourites()
 	{
 		$query = 'SELECT COUNT(id) AS favs FROM #__flexicontent_favourites WHERE itemid = '.(int)$this->_id;
 		$this->_db->setQuery($query);
 		$favs = $this->_db->loadResult();
 		return $favs;
-	}*/
+	}
 
 	/**
 	 * Method to get the nr of favourites of an user
@@ -1253,7 +1253,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	/*function getFavoured()
+	function getFavoured()
 	{
 		$user = JFactory::getUser();
 
@@ -1261,7 +1261,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$this->_db->setQuery($query);
 		$fav = $this->_db->loadResult();
 		return $fav;
-	}*/
+	}
 	
 	/**
 	 * Method to remove a favourite
@@ -1270,7 +1270,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	/*function removefav()
+	function removefav()
 	{
 		$user = JFactory::getUser();
 
@@ -1278,7 +1278,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$this->_db->setQuery($query);
 		$remfav = $this->_db->query();
 		return $remfav;
-	}*
+	}
 	
 	/**
 	 * Method to add a favourite
@@ -1287,7 +1287,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0/
 	 */
-	/*function addfav()
+	function addfav()
 	{
 		$user = JFactory::getUser();
 
@@ -1297,7 +1297,7 @@ class FlexicontentModelItem extends ParentClassItem
 
 		$addfav = $this->_db->insertObject('#__flexicontent_favourites', $obj);
 		return $addfav;
-	}*/
+	}
 	
 	/**
 	 * Method to change the state of an item
