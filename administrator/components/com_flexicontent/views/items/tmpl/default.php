@@ -319,7 +319,7 @@ window.addEvent('domready', function(){
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
 			<td class="left col_state">
-				<?php echo $this->lists['state']; ?>
+				<?php echo $this->lists['filter_state']; ?>
 			</td>
 			<td class="left"></td>
 			<td class="left"></td>

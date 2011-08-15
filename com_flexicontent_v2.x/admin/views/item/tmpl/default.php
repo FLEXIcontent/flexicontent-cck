@@ -169,8 +169,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 										<?php echo $this->form->getLabel('title');?>
 									</td>
 									<td>
-										<?php //echo $this->form->getInput('title');?>
-										<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="45" maxlength="254">
+										<?php echo $this->form->getInput('title');?>
 									</td>
 								</tr>
 								<tr>

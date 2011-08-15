@@ -38,6 +38,7 @@ class FlexicontentViewFlexicontent extends JView
 	function display( $tpl = null )
 	{
 		global $mainframe;
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -80,12 +81,13 @@ class FlexicontentViewFlexicontent extends JView
 		$document	= & JFactory::getDocument();
 		$pane   	= & JPane::getInstance('sliders');
 		$template	= $mainframe->getTemplate();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$user		= & JFactory::getUser();		
 		// Get data from the model
-		$openquest	= & $this->get( 'Openquestions' );
-		$unapproved = & $this->get( 'Pending' );
-		$inprogress = & $this->get( 'Inprogress' );
+		$db =& JFactory::getDBO();
+		$draft	= & $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
+		$pending = & $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
+		$revised = & $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
+		$inprogress = & $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
 		$themes		= flexicontent_tmpl::getThemes();
 		
 		$session  =& JFactory::getSession();
@@ -118,7 +120,7 @@ class FlexicontentViewFlexicontent extends JView
 			$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
 			$existseplg 		= & $this->get( 'ExistSearchPlugin' );
 			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
-			$existlang	 		= & $this->get( 'ExistLanguageColumn' );
+			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 		= & $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
 			//$cachethumb			= & $this->get( 'CacheThumbChmod' );  // For J1.7 ?
@@ -141,6 +143,7 @@ class FlexicontentViewFlexicontent extends JView
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
 
+		$session  =& JFactory::getSession();
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			if ($user->gid > 24) {
 				$toolbar=&JToolBar::getInstance('toolbar');
@@ -178,10 +181,9 @@ class FlexicontentViewFlexicontent extends JView
 			$CanPlugins		= 1;
 			$CanTemplates	= 1;
 		}
-		$session  =& JFactory::getSession();
+		
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
-		
 		
 		FLEXISubmenu('notvariable', $dopostinstall);
 		
@@ -195,9 +197,11 @@ class FlexicontentViewFlexicontent extends JView
 		}
 				
 		$this->assignRef('pane'			, $pane);
-		$this->assignRef('unapproved'	, $unapproved);
-		$this->assignRef('openquest'	, $openquest);
+		$this->assignRef('pending'		, $pending);
+		$this->assignRef('revised'		, $revised);
+		$this->assignRef('draft'		, $draft);
 		$this->assignRef('inprogress'	, $inprogress);
+		$this->assignRef('totalrows'	, $totalrows);
 		$this->assignRef('existcat'		, $existcat);
 		$this->assignRef('existsec'		, $existsec);
 		$this->assignRef('existmenu'	, $existmenu);
@@ -216,10 +220,11 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata'	, $existversionsdata);
-		$this->assignRef('cachethumb'			, $cachethumb);
+		//$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
+		//$this->assignRef('initialpermission'		, $initialpermission);
 
 		// assign Rights to the template
 		$this->assignRef('CanAdd'		, $CanAdd);

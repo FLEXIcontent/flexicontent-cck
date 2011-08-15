@@ -299,27 +299,32 @@ class FlexicontentModelItems extends JModel {
 	 * @since 1.0
 	 */
 	function _buildQuery() {
+		$mainframe = &JFactory::getApplication();
+		
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
+		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT i.*, level.title as access_level, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, t.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
+		$query 		= 'SELECT i.*, level.title as access_level, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
+				. 't.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
 				. ' FROM #__content AS i'
+				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
 				. ' LEFT JOIN #__usergroups AS g ON g.id = i.access'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
-				. ' JOIN #__categories AS cat ON i.catid=cat.id'
+				. ' LEFT JOIN #__categories AS cat ON i.catid=cat.id'
 				. $where. (($where=='')?" WHERE ":" AND ") . "cat.extension='".FLEXI_CAT_EXTENSION."' "
 				. ' GROUP BY i.id'
+				. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
 				. $orderby
 				;
-				//echo $query; exit();
 		return $query;
 	}
 
@@ -494,6 +499,8 @@ class FlexicontentModelItems extends JModel {
 				$where[] = 'i.state = -4';
 			} else if ($filter_state == 'IP' ) {
 				$where[] = 'i.state = -5';
+			} else if ($filter_state == 'RV' ) {
+				$where[] = 'i.state = 1 OR i.state = -5';
 			}
 		}
 		

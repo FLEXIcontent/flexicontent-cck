@@ -18,6 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+error_reporting(E_ALL);
 
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
@@ -41,7 +42,7 @@ if (!defined('FLEXI_SECTION'))	define('FLEXI_SECTION', $params->get('flexi_secti
 if (!defined('FLEXI_ACCESS')) 	define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'beta (r819)');
+define('FLEXI_RELEASE',	'beta (r820)');
 
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($variable, $dopostinstall=true) {
