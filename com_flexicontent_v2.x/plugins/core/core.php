@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 585 2011-04-22 07:04:14Z emmanuel.danan@gmail.com $
+ * @version 1.0 $Id: core.php 779 2011-08-06 01:33:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -29,7 +29,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
-		$view = JRequest::setVar('view', JRequest::getVar('view', 'items'));
+		$view = JRequest::setVar('view', JRequest::getVar('view', 'item'));
 		
 		$values = $values ? $values : $field->value;
 
@@ -92,7 +92,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
 			break;
 
-			case 'title': // hits
+			case 'title': // title
 			$field->value[] = $item->title;
 			$field->display = $pretext.$item->title.$posttext;
 			break;
@@ -124,7 +124,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'favourites': // favourites button
 			$field->value[] = 'button'; // dummy value to force display
-			$favs = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS').')' : '';
+			$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
 			$field->display = '
 			<span class="fav-block">
 				'.flexicontent_html::favicon( $field, $favoured ).'
@@ -140,6 +140,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			if ( !is_array($globalnoroute) ) $globalnoroute = array();
 			$display = '';
 			if ($categories) :
+				$field->display = array();
 				foreach ($categories as $category) {
 					if (!in_array($category->id, @$globalnoroute)) :
 						$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
@@ -161,6 +162,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'tags': // assigned tags
 			$display = '';
 			if ($tags) {
+				$field->display = array();
 				foreach ($tags as $tag) {
 					$field->value[] = $tag->name; 
 					$field->display[]  = '<a class="fc_tags link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug)) . '">' . $tag->name . '</a>';

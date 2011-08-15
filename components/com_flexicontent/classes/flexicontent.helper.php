@@ -503,7 +503,7 @@ class flexicontent_html
  	}
 
 	/**
-	 * Creates the favourite icons
+	 * Creates the favourited by user list
 	 *
 	 * @param array $params
 	 * @since 1.0
@@ -525,7 +525,7 @@ class flexicontent_html
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);
 		$favusers = $db->loadResultArray();
-		if (!is_array($favusers) || !count($favusers)) return $favuserlist.']';
+		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.']' : '';
 		
 		$seperator = ': ';
 		$count = 0;

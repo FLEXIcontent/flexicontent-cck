@@ -110,8 +110,8 @@
 	<params group="group-favourites"><!-- favourites -->
 		<param name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">
 			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES_USERNAMES</option>
-			<option value="2">FLEXI_YES_FULLNAMES</option>
+			<option value="1">FLEXI_FAVOURED_YES_USERNAMES</option>
+			<option value="2">FLEXI_FAVOURED_YES_FULLNAMES</option>
 		</param>
 		<param name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
 	</params>
