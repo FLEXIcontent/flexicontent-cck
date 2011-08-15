@@ -194,9 +194,10 @@ class FlexicontentViewItems extends JView {
 		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
 		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+		$state[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
 
-		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-		
+		$lists['filter_state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+				
 		// build the include subcats boolean list
 		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox"', $filter_subcats );
 		
@@ -366,15 +367,6 @@ class FlexicontentViewItems extends JView {
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
 		$categories = $globalcats;
-		
-		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
-		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-
-		$lists['state'] = JHTML::_('select.genericlist', $state, 'state', 'class="inputbox" size="1"', 'value', 'text', $state );
 		
 		// build the main category select list
 		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);

@@ -82,9 +82,11 @@ class FlexicontentViewFlexicontent extends JView{
 		$template	= $mainframe->getTemplate();
 		$user		= & JFactory::getUser();		
 		// Get data from the model
-		$openquest	= & $this->get( 'Openquestions' );
-		$unapproved = & $this->get( 'Pending' );
-		$inprogress = & $this->get( 'Inprogress' );
+		$db =& JFactory::getDBO();
+		$draft	= & $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
+		$pending = & $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
+		$revised = & $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
+		$inprogress = & $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
 		$themes		= flexicontent_tmpl::getThemes();
 		
 		$session  =& JFactory::getSession();
@@ -92,6 +94,7 @@ class FlexicontentViewFlexicontent extends JView{
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
 		$existcat 	= & $this->get( 'Existcat' );
+		//$existsec 	= & $this->get( 'Existsec' );
 		$existmenu 	= & $this->get( 'Existmenu' );
 		
 		// 2. OPTIONAL AUTOMATIC TASKS,
@@ -161,10 +164,13 @@ class FlexicontentViewFlexicontent extends JView{
 		FLEXIcontentSubmenu('notvariable');
 
 		$this->assignRef('pane'			, $pane);
-		$this->assignRef('unapproved'	, $unapproved);
-		$this->assignRef('openquest'	, $openquest);
+		$this->assignRef('pending'		, $pending);
+		$this->assignRef('revised'		, $revised);
+		$this->assignRef('draft'		, $draft);
 		$this->assignRef('inprogress'	, $inprogress);
+		$this->assignRef('totalrows'	, $totalrows);
 		$this->assignRef('existcat'		, $existcat);
+		//$this->assignRef('existsec'		, $existsec);
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);

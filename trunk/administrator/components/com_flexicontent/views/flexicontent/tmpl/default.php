@@ -153,7 +153,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				</tr>
 			</table>
 			</td>
-			<td valign="top" width="400px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="420px" style="padding: 7px 0 0 5px">
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			if (!$this->dopostinstall || !$this->allplgpublish) {
@@ -162,15 +162,21 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-			$title = JText::_( 'FLEXI_PENDING_SLIDER' );
-			echo $this->pane->startPanel( $title, 'unapproved' );
+			?>
+			
+			
+			<?php
+			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
+			echo $this->pane->startPanel( $title, 'pending' );
+			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
+			echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 			?>
 				<table class="adminlist">
 			<?php
 					$k = 0;
-					$n = count($this->unapproved);
+					$n = count($this->pending);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->unapproved[$i];
+					$row = $this->pending[$i];
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
@@ -190,6 +196,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -201,18 +208,21 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				$title = JText::_( 'FLEXI_DRAFT_SLIDER' );
-				echo $this->pane->endPanel();
-				echo $this->pane->startPanel( $title, 'openquest' );
-
+				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
+				echo $this->pane->startPanel( $title, 'revised' );
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=RV';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
 				<?php
 					$k = 0;
-					$n = count($this->openquest);
+					$n = count($this->revised);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->openquest[$i];
+					$row = $this->revised[$i];
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
@@ -232,6 +242,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -243,11 +254,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' );
-				echo $this->pane->endPanel();
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
 				echo $this->pane->startPanel( $title, 'inprogress' );
-
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=IP';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
 				<?php
@@ -274,6 +288,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -285,10 +300,56 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				echo $this->pane->endPanel(); ?>
-                
-                  <?php
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
+				echo $this->pane->startPanel( $title, 'draft' );
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=OQ';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
+				?>
+				<table class="adminlist">
+				<?php
+					$k = 0;
+					$n = count($this->draft);
+					for ($i=0, $n; $i < $n; $i++) {
+					$row = $this->draft[$i];
+					if (FLEXI_ACCESS) {
+						$user =& JFactory::getUser();
+						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
+						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+					} else {
+						$canEdit	= 1;
+						$canEditOwn	= 1;
+					}
+					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+				?>
+					<tr>
+						<td>
+						<?php
+						if ((!$canEdit) && (!$canEditOwn)) {
+							echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+						} else {
+						?>
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>">
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
+							</span>
+						<?php
+						}
+						?>
+						</td>
+					</tr>
+					<?php $k = 1 - $k; } ?>
+				</table>		
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
+			<?php
 			if($this->params->get('show_updatecheck', 1) == 1) {	 
 				if($this->check['connect'] == 0) {
 					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
@@ -301,10 +362,9 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				}
 			echo $this->pane->startPane( 'stat-pane' );
 			echo $this->pane->startPanel( $title, 'updatecomponent' );
-			
 			?>
             
-            <?php
+			<?php
 				if($this->check['connect'] == 0) {
 				?>
 					<table class="adminlist">

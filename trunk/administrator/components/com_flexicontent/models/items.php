@@ -314,16 +314,20 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _buildQuery()
 	{
+		global $mainframe;
+		
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
+		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
 					. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config'
 					. ' FROM #__content AS i'
+					. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
@@ -331,6 +335,7 @@ class FlexicontentModelItems extends JModel
 					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 					. $where
 					. ' GROUP BY i.id'
+					. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
 					. $orderby
 					;
 		return $query;
@@ -507,6 +512,8 @@ class FlexicontentModelItems extends JModel
 				$where[] = 'i.state = -4';
 			} else if ($filter_state == 'IP' ) {
 				$where[] = 'i.state = -5';
+			} else if ($filter_state == 'RV' ) {
+				$where[] = 'i.state = 1 OR i.state = -5';
 			}
 		}
 		

@@ -18,6 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+error_reporting(E_ALL);
 
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');

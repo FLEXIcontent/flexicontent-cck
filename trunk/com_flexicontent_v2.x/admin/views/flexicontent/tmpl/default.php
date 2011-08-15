@@ -148,7 +148,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				</tr>
 			</table>
 			</td>
-			<td valign="top" width="400px" style="padding: 0px 0 0 5px">
+			<td valign="top" width="420px" style="padding: 7px 0 0 5px">
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
 			if (!$this->dopostinstall || !$this->allplgpublish) {
@@ -157,19 +157,24 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
-			$title = JText::_( 'FLEXI_PENDING_SLIDER' );
-			echo $this->pane->startPanel( $title, 'unapproved' );
+			
+			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
+			echo $this->pane->startPanel( $title, 'pending' );
+			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
+			echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 			?>
 				<table class="adminlist">
 			<?php
 					$k = 0;
-					$n = count($this->unapproved);
+					$n = count($this->pending);
+					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->unapproved[$i];
+					$row = $this->pending[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
 						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
 						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
 						<td>
@@ -179,6 +184,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -190,22 +196,26 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				$title = JText::_( 'FLEXI_DRAFT_SLIDER' );
-				echo $this->pane->endPanel();
-				echo $this->pane->startPanel( $title, 'openquest' );
-
+				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
+				echo $this->pane->startPanel( $title, 'revised' );
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=RV';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
 				<?php
 					$k = 0;
-					$n = count($this->openquest);
+					$n = count($this->revised);
 					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
-						$row = $this->openquest[$i];
+						$row = $this->revised[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -216,6 +226,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -227,11 +238,14 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' );
-				echo $this->pane->endPanel();
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
 				echo $this->pane->startPanel( $title, 'inprogress' );
-
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=IP';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
 				<?php
@@ -241,8 +255,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->inprogress[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('flexicontent.editall', $rights) || (JAccess::check($user->id, 'core.admin', 'root.1'));
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || (JAccess::check($user->id, 'core.admin', 'root.1'));
+						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -253,6 +268,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						} else {
 						?>
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -264,10 +280,52 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
 				<?php
-				echo $this->pane->endPanel(); ?>
-                
-                  <?php
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
+				echo $this->pane->startPanel( $title, 'draft' );
+				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=OQ';
+				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
+				?>
+				<table class="adminlist">
+				<?php
+					$k = 0;
+					$n = count($this->draft);
+					$user =& JFactory::getUser();
+					for ($i=0, $n; $i < $n; $i++) {
+						$row = $this->draft[$i];
+						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
+						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+				?>
+					<tr>
+						<td>
+						<?php
+						if ((!$canEdit) && (!$canEditOwn)) {
+							echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+						} else {
+						?>
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>">
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
+							</span>
+						<?php
+						}
+						?>
+						</td>
+					</tr>
+					<?php $k = 1 - $k; } ?>
+				</table>		
+				<?php echo $this->pane->endPanel(); ?>
+				
+				
+			<?php
 			if($this->params->get('show_updatecheck', 1) == 1) {	 
 				/*if(@$this->check['connect'] == 0) {
 					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );

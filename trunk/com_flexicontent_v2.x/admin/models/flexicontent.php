@@ -41,7 +41,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	/**
-	 * Method to get waiting for approval items data
+	 * Method to get items in pending state, waiting for publication approval
 	 *
 	 * @access public
 	 * @return array
@@ -51,11 +51,11 @@ class FlexicontentModelFlexicontent extends JModel
 		$user = &JFactory::getUser();
 		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 		
-		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
-				. ' JOIN #__categories as cat ON c.id=cat.id'
+				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 				. ' WHERE state = -3'
-				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -67,21 +67,52 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	/**
-	 * Method to get open questions data
+	 * Method to get items revised, having unapproved version, waiting to be reviewed and approved
 	 *
 	 * @access public
 	 * @return array
 	 */
-	function getOpenquestions() {
+	function getRevised()
+	{
+		$permission = FlexicontentHelperPerm::getPerm();
+		$user = &JFactory::getUser();
+		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
+		
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
+				. ' FROM #__content AS c'
+				. ' LEFT JOIN #__flexicontent_versions AS fv ON c.id=fv.item_id'
+				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+				. ' WHERE c.state = -5 OR c.state = 1'
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. ' GROUP BY fv.item_id '
+				. ' HAVING c.version<>MAX(fv.version_id) '
+				. ' ORDER BY c.created DESC'
+				;
+
+		$this->_db->SetQuery($query, 0, 5);
+		$genstats = $this->_db->loadObjectList();
+		
+		return $genstats;
+	}
+	
+	/**
+	 * Method to get items in draft state, waiting to be written (and published)
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getDraft()
+	{
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user	= &JFactory::getUser();
 		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 
-		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
-				. ' JOIN #__categories as cat ON c.id=cat.id'
+				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 				. ' WHERE c.state = -4'
-				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
@@ -93,7 +124,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to get in progress items data
+	 * Method to get items in progress state, (published but) waiting to be completed
 	 *
 	 * @access public
 	 * @return array
@@ -103,11 +134,11 @@ class FlexicontentModelFlexicontent extends JModel
 		$user = &JFactory::getUser();
 		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
 
-		$query = 'SELECT c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
-				. ' JOIN #__categories as cat ON c.id=cat.id'
+				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 				. ' WHERE c.state = -5'
-				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;

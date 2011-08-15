@@ -41,7 +41,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	/**
-	 * Method to get waiting for approval items data
+	 * Method to get items in pending state, waiting for publication approval
 	 *
 	 * @access public
 	 * @return array
@@ -55,7 +55,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT id, title, catid, created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -3'
 				. ' AND sectionid = ' . (int)FLEXI_SECTION
@@ -70,12 +70,44 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	/**
-	 * Method to get open questions data
+	 * Method to get items revised, having unapproved version, waiting to be reviewed and approved
 	 *
 	 * @access public
 	 * @return array
 	 */
-	function getOpenquestions()
+	function getRevised()
+	{
+		if (FLEXI_ACCESS) {
+			$user 		=& JFactory::getUser();
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+		} else {
+			$allitems 	= 1;
+		}
+		
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
+				. ' FROM #__content AS c'
+				. ' LEFT JOIN #__flexicontent_versions AS fv ON c.id=fv.item_id'
+				. ' WHERE c.state = -5 OR c.state = 1'
+				. ' AND c.sectionid = ' . (int)FLEXI_SECTION
+				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. ' GROUP BY fv.item_id '
+				. ' HAVING c.version<>MAX(fv.version_id) '
+				. ' ORDER BY c.created DESC'
+				;
+
+		$this->_db->SetQuery($query, 0, 5);
+		$genstats = $this->_db->loadObjectList();
+		
+		return $genstats;
+	}
+	
+	/**
+	 * Method to get items in draft state, waiting to be written (and published)
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getDraft()
 	{
 		if (FLEXI_ACCESS) {
 			$user 		=& JFactory::getUser();
@@ -84,7 +116,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT id, title, catid, created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -4'
 				. ' AND sectionid = ' . (int)FLEXI_SECTION
@@ -99,7 +131,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to get in progress items data
+	 * Method to get items in progress state, (published but) waiting to be completed
 	 *
 	 * @access public
 	 * @return array
@@ -113,7 +145,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT id, title, catid, created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS id, title, catid, created_by'
 				. ' FROM #__content'
 				. ' WHERE state = -5'
 				. ' AND sectionid = ' . (int)FLEXI_SECTION
