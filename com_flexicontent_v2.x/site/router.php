@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 269 2010-06-11 09:04:21Z enjoyman $
+ * @version 1.5 stable $Id: router.php 713 2011-07-29 05:55:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,24 +18,45 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+/**
+ * Create the segments of the SEF URL (segments are SEF URL parts seperated by '/')
+ * $query variables that will not be unset will be automatically inserted into the URL
+ * as /index/value/
+ */
 function FLEXIcontentBuildRoute(&$query)
 {
 	$segments = array();
 
-	// get a menu item based on Itemid or currently active
+	// 1. Get a menu item based on Itemid or currently active
 	$menu = &JSite::getMenu();
 	if (empty($query['Itemid'])) {
-		$menuItem = &$menu->getActive();
-		$query['Itemid'] = @$menuItem->id;
+		//  USE current Active ID it is now handled in route.php and also add a global config option whether to enable this
+		//$menuItem = &$menu->getActive();
+		//$query['Itemid'] = @$menuItem->id;
 	} else {
 		$menuItem = &$menu->getItem($query['Itemid']);
 	}
-	$mView	= (empty($menuItem->query['view'])) ? null : $menuItem->query['view'];
-	$mCatid	= (empty($menuItem->query['cid'])) 	? null : $menuItem->query['cid'];
-	$mId	= (empty($menuItem->query['id'])) 	? null : $menuItem->query['id'];
-
-	if(isset($query['task']))
-	{
+	
+	// 2. Try to match the variables against the variables of the menuItem
+	$menuItem_matches = true;
+	foreach($query as $index => $value) {
+		if (!isset($menuItem->query[$index])) {
+			$menuItem_matches = false;
+			break;
+		}
+		if ($query[$index] != $menuItem->query[$index]) {
+			$menuItem_matches = false;
+			break;
+		}
+		$query_backup[$index] = $value;
+	}
+	if ($menuItem_matches) {
+		foreach($query as $index => $value) unset($query[$index]);
+		return $segments;  // $segments is empty we will get variables from menuItem (it has them)
+	}
+	
+	// 3. Handle known 'task'(s) formulating segments of SEF URL appropriately
+	if(isset($query['task']))	{
 		if($query['task'] == 'download') {
 			$segments[] = $query['task'];
 			$segments[] = $query['id'];
@@ -46,7 +67,6 @@ function FLEXIcontentBuildRoute(&$query)
 			unset($query['cid']);	// content
 			unset($query['fid']);	// field
 		}
-		
 		else if($query['task'] == 'weblink') {
 			$segments[] = $query['task'];
 			$segments[] = $query['fid'];
@@ -58,85 +78,78 @@ function FLEXIcontentBuildRoute(&$query)
 			unset($query['ord']);	// value order
 		}
 		return $segments;
-	};
-
-	// are we dealing with a content that is attached to a menu item?
-	if (($mView == 'item') and (isset($query['id'])) and ($mId == intval($query['id']))) {
-		unset($query['view']);
-		unset($query['cid']);
-		unset($query['id']);
 	}
-
-	if(isset($query['view']))
-	{
-		$view = $query['view'];
-		if(empty($query['Itemid'])) {
-			$segments[] = $query['view'];
-		}
-		
-		if($query['view'] == 'tags') {
-			$segments[] = 'tag';
-			if(isset($query['id'])) {
-				$segments[] = $query['id'];
-				unset($query['id']);
-			}
-			unset($query['view']);
-			return $segments;
-		}
-		
-		if($query['view'] == 'favourites') {
-			$segments[] = $query['view'];
-		}
-		if($query['view'] == 'fileselement') {
-			$segments[] = $query['view'];
-		}
-		unset($query['view']);
-	};
-
-	if (isset($query['cid'])) {
-		//$segments = array();
-		// if we are routing an article or category where the category id matches the menu catid, don't include the category segment
-		if (($view == 'category') and ($mView == 'category') and ($mCatid != intval($query['cid']))) {
+	
+	// 4. Handle known views formulating segments of SEF URL appropriately
+	$view = isset($query['view']) ? $query['view'] : '';
+	switch ($view) {	
+	case 'item':
+		if (isset($query['cid']))	{
+			// IMPLY view = 'item' when count($segments) == 2
 			$segments[] = $query['cid'];
-		} else if (($view == 'category') and ($mView == 'flexicontent')) {
-			$segments[] = $query['cid'];
+			$segments[] = @$query['id'];  // Required ... 
+			unset($query['cid']);
+			unset($query['id']);
+		} else {
+			// EXPLICIT view (will be contained in the url)
+			$segments[] = 'item';
+			$segments[] = @$query['id'];  // Required ...
+			unset($query['id']);
 		}
+		break;
+	case 'category':
+		// IMPLY view = 'category' when count($segments) == 1
+		$segments[] = @$query['cid'];  // Required ...
 		unset($query['cid']);
-	};
-
-
-	if(isset($query['id']))
-	{
-		$segments[] = 'item';
-		$segments[] = $query['id'];
+		break;
+	case 'tag':
+		// EXPLICIT view (will be contained in the url)
+		$segments[] = 'tag';
+		$segments[] = @$query['id'];  // Required ...
 		unset($query['id']);
-	};
-
+		break;
+	case 'flexicontent':    // (aka directory view)
+		if (isset($query['rootcat'])) {
+			$segments[] = 'catalog';
+			$segments[] = $query['rootcat'];
+			unset($query['rootcat']);
+		} else {
+			// IMPLY view = 'flexicontent' when count($segments) == 0
+		}
+		break;
+	case 'favourites': case 'fileselement': case 'search': default:
+		// EXPLICIT view (will be contained in the url)
+		if($view!=='') $segments[] = $view;
+		if (isset($query['id'])) {
+			// COMPATIBILITY with old code of router.php ...
+			$segments[] = 'id';
+			$segments[] = $query['id'];
+			unset($query['id']);
+		}
+		// We leave $query array untouched, so that its variables will be inserted in the SEF URL as /index/value/ ...
+		break;
+	}
+	unset($query['view']);
 	return $segments;
 }
 
+/**
+ * Construct a proper URL request from the SEF url, we try to reverse what FLEXIcontentBuildRoute() DID
+ */
 function FLEXIcontentParseRoute($segments)
 {
 	$vars = array();
 
-	//Get the active menu item
+	// 1. Get the active menu item
 	$menu =& JSite::getMenu();
 	$item =& $menu->getActive();
 
-	// Count route segments
+	// 2. Count route segments
 	$count = count($segments);
-
-	if($segments[0] == 'tag') {
-		$vars['view'] = 'tags';
-		$vars['id'] = $segments[$count-1];
-		return $vars;
-	}
 	
-	if($segments[0] == 'favourites') {
-		$vars['view'] = 'favourites';
-		return $vars;
-	}
-
+	// 3. TASKs (Explicitly provided)
+	
+	// 3.a 'download' task
 	if($segments[0] == 'download') {
 		$vars['task'] 	= 'download';
 		$vars['id'] 	= $segments[1];
@@ -145,6 +158,7 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 
+	// 3.b 'weblink' task
 	if($segments[0] == 'weblink') {
 		$vars['task'] 	= 'weblink';
 		$vars['fid'] 	= $segments[1];
@@ -153,32 +167,80 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 	
-	if($segments[0] == 'fileselement') {
-		$vars['view'] 	= 'fileselement';
-		return $vars;
-	}
+	// 4. *** Cases that VIEW is provided (expicitly given) ***
 	
-	if($count == 0) {
-		$vars['view'] 	= 'flexicontent';
-		return $vars;
-	}
-
-	if($count == 1) {
-		$vars['view'] 	= 'category';
-		$vars['cid'] 	= $segments[$count-1];
-		return $vars;
+	// 4.a 'item' view
+	if($segments[0] == 'item' || $segments[0] == 'item') {
+		$vars['view'] = 'item';
+		if ($count==2) {  // no cid provided
+			$vars['id'] = $segments[1];
+		} else if ($count==3) {  // also cid provided
+			$vars['cid'] = $segments[1];
+			$vars['id'] = $segments[2];
 		}
-
-	if($count == 2) {
-		$vars['view'] 	= 'item';
-		$vars['cid'] 	= $segments[$count-2];
-		$vars['id'] 	= $segments[$count-1];
 		return $vars;
 	}
 	
-	if($count == 3) {
+	// 4.b 'category' view
+	if($segments[0] == 'category') {
+		$vars['view'] 	= 'category';
+		$vars['cid'] 	= $segments[1];
+		return $vars;
+	}
+	
+	// 4.c 'tags' view
+	if($segments[0] == 'tag' || $segments[0] == 'tags') {
+		$vars['view'] = 'tags';
+		$vars['id'] = $segments[1];
+		return $vars;
+	}
+	
+	// 4.d 'search' view
+	if($segments[0] == 'search') {
+		$vars['view'] = 'search';
+		return $vars;
+	}
+	
+	// 4.e 'flexicontent' view (aka directory view)
+	if($segments[0] == 'catalog') {
+		$vars['view'] = 'flexicontent';
+		$vars['rootcat'] = $segments[1];
+		return $vars;
+	}
+	
+	// 4.f 'favourites' & 'fileselement' view
+	if($segments[0] == 'favourites' || $segments[0] == 'fileselement') {
+		$vars['view'] = $segments[0];
+		return $vars;
+	}
+	
+	// 5. *** Cases that VIEW is not provided (implied by length of segments) ***
+	
+	// 5.a Segments Length 0 is 'flexicontent' view (aka directory view)
+	if($count == 0) {
+		$vars['view'] = 'flexicontent';
+		return $vars;
+	}
+
+	// 5.b Segments Length 1 is 'category' view
+	if($count == 1) {
+		$vars['view'] = 'category';
+		$vars['cid'] 	= $segments[0];
+		return $vars;
+	}
+
+	// 5.c Segments Length 2 is 'item' view
+	if($count == 2) {
+		$vars['view'] = 'item';
+		$vars['cid'] 	= $segments[0];
+		$vars['id'] 	= $segments[1];
+		return $vars;
+	}
+	
+	// 6. *** OTHER explicit view, when Segments Length GREATER that 2 ***
+	if($count > 2) { // COMPATIBILITY with old code of router.php
 		$vars['view'] 	= $segments[0];
-		//$vars['cid'] 	= $segments[$count-2];
+		// $segments[1] is id with new code, with old bookmaked SEF URLs is ??? ...
 		$vars['id'] 	= $segments[2];
 		return $vars;
 	}

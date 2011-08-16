@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id$
+ * @version 1.5 stable $Id: com_flexicontent.php 713 2011-07-29 05:55:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -21,7 +21,12 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $globalcats;
+global $sh_LANG, $globalcats, $globaltypes, $globalitems, $globalnoroute;
+
+// Insure that the global vars are array
+if (!is_array($globaltypes))	$globaltypes	= array();
+if (!is_array($globalitems))	$globalitems	= array();
+if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 $sefConfig 		= & shRouter::shGetConfig();
 $shLangName 	= '';
@@ -31,6 +36,8 @@ $shItemidString = '';
 $dosef	 		= shInitializePlugin ( $lang, $shLangName, $shLangIso, $option );
 $layout 		= JRequest::getVar('layout', null);
 $typeid	 		= JRequest::getInt('typeid', null);
+$fcu	 		= JRequest::getVar('fcu', null);
+$fcp	 		= JRequest::getInt('fcp', null);
 
 if ($dosef == false) {
 	return;
@@ -44,6 +51,7 @@ if ($dosef == false) {
 $shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
 
 // ------------------  /load language file - adjust as needed ----------------------------------------
+
 
 // do something about that Itemid thing
 if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
@@ -68,16 +76,42 @@ if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
 $view 		= isset ($view) ? @$view : null;
 $Itemid		= isset ($Itemid) ? @$Itemid : null;
 $task 		= isset($task) ? @$task : null;
+$format		= isset($format) ? @$format : null;
+$return 	= isset ($return) ? @$return : null;
+
+// V 1.2.4.m
+shRemoveFromGETVarsList('option');
+shRemoveFromGETVarsList('lang');
+if (!empty($Itemid))
+shRemoveFromGETVarsList('Itemid');
+if (!empty($limit))
+shRemoveFromGETVarsList('limit');
+if (isset($limitstart))
+shRemoveFromGETVarsList('limitstart');
+
+// Added for the preview feature in FLEXIcontent 1.5.5 
+if (!empty($fcu)) {
+	shRemoveFromGETVarsList('fcu');
+	$dosef = false;
+} else if (!empty($fcp)) {
+	shRemoveFromGETVarsList('fcp');
+	$dosef = false;
+}
+
+// Do not convert to SEF urls, the urls for vote and favourites
+if($format == 'raw') {
+	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
+}
 
 switch ($view) {
 	
-	case 'item' :
+	case 'items' :
 
 		if (!empty($id)) {
 		
 			if (!$task) {
 			
-				$query	= 'SELECT i.id, i.title, c.title AS cattitle, ty.alias AS typealias'
+				$query	= 'SELECT i.id, i.title, i.catid, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
@@ -88,34 +122,50 @@ switch ($view) {
 
 				// Do not translate the items url
 				$row = $database->loadObject ( null, false );
-/*
-				if (shTranslateURL ( $option, $shLangName )) {
-					$row = $database->loadObject ();
-				} else {
-					$row = $database->loadObject ( null, false );
-				}
-*/
 				
 				if ($database->getErrorNum ()) {
 					die ( $database->stderr () );
 				} elseif ($row) {
 					
-					if ($row->title && !empty($cid)) {
-						if ($globalcats[$cid]->ancestorsarray) {
-							$ancestors = $globalcats[$cid]->ancestorsarray;
+					if ($row->title) {
+						// force using the default category if none is specified in the query string
+						$catid = @$cid ? $cid : $row->catid;
+						
+						if (@$globalcats[$catid]->ancestorsarray) {
+							$ancestors = $globalcats[$catid]->ancestorsarray;
 							foreach ($ancestors as $ancestor) {
-								if (shTranslateURL ( $option, $shLangName )) {
-									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
-									$database->setQuery ( $query );
-									$row_cat = $database->loadObject ();
-									$title[] = $row_cat->title . '/';
-								} else {
-									$title[] = $globalcats[$ancestor]->title . '/';
+								if (!in_array($ancestor, $globalnoroute)) {
+									if (shTranslateURL ( $option, $shLangName )) {
+										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
+										$database->setQuery ( $query );
+										$row_cat = $database->loadObject ();
+										$title[] = $row_cat->title . '/';
+									} else {
+										$title[] = $globalcats[$ancestor]->title . '/';
+									}
 								}
 							}		
 						}
-						
+						if (!in_array($row->id, $globaltypes)) {
 						$title [] = $row->title;
+					}
+						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
+						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->id, $globaltypes)) {					
+							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
+							$database->setQuery($q);
+							if (shTranslateUrl($option, $shLangName)) // V 1.2.4.m
+								$contentElement = $database->loadObject( );
+							else 
+								$contentElement = $database->loadObject(false);
+							if ($contentElement) {
+								$foundCat = array_search($contentElement->catid, $sefConfig->shInsertNumericalIdCatList);
+								if (($foundCat !== null && $foundCat !== false) || ($sefConfig->shInsertNumericalIdCatList[0] == ''))  { // test both in case PHP < 4.2.0
+									$shTemp = explode(' ', $contentElement->created);
+									$title[] = str_replace('-','', $shTemp[0]).$contentElement->id;
+								}
+							}
+						}
+          				shMustCreatePageId( 'set', true);
 					}
 				}	
 			
@@ -146,7 +196,7 @@ switch ($view) {
 
 		if (!empty($cid) && empty($id)) {
 
-			if ($globalcats[$cid]->ancestorsarray) {
+			if (@$globalcats[$cid]->ancestorsarray) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				foreach ($ancestors as $ancestor) {
 					if (shTranslateURL ( $option, $shLangName )) {
@@ -161,6 +211,7 @@ switch ($view) {
 			} else {
 				$title [] = '/';
 			}
+          	shMustCreatePageId( 'set', true);
 		}
 
 		// Remove the vars from the url
@@ -199,6 +250,10 @@ switch ($view) {
 
 	break;
 	
+	case 'search' :
+		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_SEARCH'] . '/';
+	break;
+	
 	case 'favourites' :
 		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_FAVOURITES'] .  '/';
 	break;
@@ -207,7 +262,10 @@ switch ($view) {
 		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . '/';
 	break;
 
-	
+	case 'fileselement' :
+		$dosef = false;
+	break;
+		
 	default :
 		$title [] = '/';
 	break;
@@ -242,6 +300,11 @@ if (!empty($limit))
 
 if (isset($limitstart))
 	shRemoveFromGETVarsList ( 'limitstart' ); // limitstart can be zero
+	
+//if (!empty($return))
+//	shRemoveFromGETVarsList ( 'return' );
+
+
 	
 // ------------------  standard plugin finalize function - don't change ---------------------------  
 

@@ -57,7 +57,7 @@ class JFormFieldTypes extends JFormField
 			$attribs .= 'class="inputbox"';
 			$fieldname = $this->name;
 		}
-		return JHTML::_('select.genericlist', $types, $this->name.'[]', $attribs, 'value', 'text', $this->value, $this->id);
+		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $this->value, $this->id);
 	}
 }
 ?>

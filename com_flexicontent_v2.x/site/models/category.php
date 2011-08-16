@@ -522,10 +522,10 @@ class FlexicontentModelCategory extends JModelList{
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
 		
-		$owneritems = $menu->params->get('owneritems', '0');
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
+		$owneritems = $cparams->get('owneritems', '0');
 
 		// display sub-categories
 		$display_subcats = $cparams->get('display_subcategories_items', 0);

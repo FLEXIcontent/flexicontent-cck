@@ -25,6 +25,7 @@ $cols	= $this->params->get('columns_count');
 $c1		= $this->params->get('column1');
 $c2		= $this->params->get('column2');
 $c3		= $this->params->get('column3');
+$condition1	= $condition2	= $condition3	= $style = '';
 $i = 0;
 switch ($cols) 
 {
