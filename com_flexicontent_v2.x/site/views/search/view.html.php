@@ -34,7 +34,7 @@ class FLEXIcontentViewSearch extends JView
 	function display($tpl = null)
 	{
 		$mainframe = &JFactory::getApplication();
-
+		jimport( 'joomla.html.parameter' );
 		require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
 		// Initialize some variables
