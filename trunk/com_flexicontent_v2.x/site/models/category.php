@@ -635,13 +635,13 @@ class FlexicontentModelCategory extends JModelList{
 			$session->set($option.'.category.letter', $alpha);
 		}
 		if ($alpha == '0') {
-			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
+			$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
 		}		
 		elseif (!empty($alpha)) {
-			$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( $this->_db->getEscaped( $alpha, true ).'%', false );
-		}
+			$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
+		}		
 		
-		//Displa all items or owner items
+		//Display all items or owner items
 		if($owneritems) {
 			$where .= " AND i.created_by='".$user->get('id')."'";
 		}

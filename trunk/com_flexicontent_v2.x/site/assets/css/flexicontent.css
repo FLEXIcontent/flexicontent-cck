@@ -528,6 +528,7 @@ div.current dd {
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
+	clear: both;
 }
 
 #fc_alpha .numbers {
@@ -538,6 +539,7 @@ div.current dd {
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
+	clear: both;
 }
 
 .fc_alpha_index {

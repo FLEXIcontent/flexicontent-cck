@@ -83,6 +83,9 @@ function FLEXIcontentBuildRoute(&$query)
 	// 4. Handle known views formulating segments of SEF URL appropriately
 	$view = isset($query['view']) ? $query['view'] : '';
 	switch ($view) {	
+	/*case 'search':
+		//TODO something if needed
+		break;*/
 	case 'item':
 		if (isset($query['cid']))	{
 			// IMPLY view = 'item' when count($segments) == 2

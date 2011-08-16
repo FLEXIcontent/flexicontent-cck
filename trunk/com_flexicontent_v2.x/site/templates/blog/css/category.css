@@ -241,6 +241,7 @@ div.image.left {
 	float: left;
 	left: 50%;
 	position: relative;
+	clear: both;
 }
 #fc_alpha .numbers {
 	margin-bottom: 5px;
@@ -249,7 +250,7 @@ div.image.left {
 	float: left;
 	left: 50%;
 	position: relative;
-	clear: both
+	clear: both;
 }
 .fc_alpha_index {
 	padding: 1px 2px;
@@ -264,6 +265,18 @@ div.image.left {
 span.fc_alpha_index {
 	color: silver;
 }
+
+.fc_alpha_index_sep {
+	padding: 1px 2px;
+	border: 0px solid silver;
+	background: none;
+	text-decoration: none;
+	margin-right: 2px;
+	float: left;
+	position: relative;
+	right: 50%;
+}
+
 
 /* lines */
 .lineinfo {
