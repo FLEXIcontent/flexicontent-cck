@@ -1413,7 +1413,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return object
 	 * @since 1.5
 	 */
-	/*function getAdvSearchFields($search_fields) {
+	function getAdvSearchFields($search_fields) {
 		$where = " WHERE `name` IN ({$search_fields}) AND fi.isadvsearch='1'";
 		$query = 'SELECT fi.*'
 			.' FROM #__flexicontent_fields AS fi'
@@ -1433,6 +1433,6 @@ class FlexicontentModelItem extends ParentClassItem
 			$field->parameters 	= new JParameter($field->attribs, $path);
 		}
 		return $fields;
-	}*/
+	}
 }
 ?>
