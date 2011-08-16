@@ -417,25 +417,26 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _buildQuery()
 	{
-		// Get the WHERE and ORDER BY clauses for the query
-		$where			= $this->_buildItemWhere();
-		$orderby		= $this->_buildItemOrderBy();
+		static $query;
+		if(!$query) {
+			// Get the WHERE and ORDER BY clauses for the query
+			$where			= $this->_buildItemWhere();
+			$orderby		= $this->_buildItemOrderBy();
 
-		$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-		$query = 'SELECT DISTINCT i.*, ie.*,c.lft,c.rgt,u.name as author, ty.name AS typename,'
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		. $joinaccess
-		. $where
-		. $orderby
-		;
-		//echo $query."<br />";exit;
+			//$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
+			$query = 'SELECT DISTINCT i.*, ie.*,c.lft,c.rgt,u.name as author, ty.name AS typename,'
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. $where
+			. $orderby
+			;
+		}
 		return $query;
 	}
 
@@ -983,9 +984,16 @@ class FlexicontentModelCategory extends JModelList{
 		
 		// Filter the category view with the active active language
 		$and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
-		$and2 = (!$owneritems)?' AND i.state IN (1, -5)':'';
-		//$and3 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
-		$and3 = $show_noauth ? '' : ' AND c.access IN ('.$gids.') AND i.access IN ('.$gids.')';
+		//Display all items or owner items
+		$and2 = '';
+		$and3 = '';
+		if($owneritems) {
+			$and2 .= " AND i.created_by='".$user->get('id')."'";
+		}else{
+			$and3 = ' AND i.state IN (1, -5)';
+		}
+		
+		$and4 = $show_noauth ? '' : ' AND c.access IN ('.$gids.') AND i.access IN ('.$gids.')';
 		
 		$_group_cats = implode("','", $this->_group_cats);
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
@@ -993,12 +1001,14 @@ class FlexicontentModelCategory extends JModelList{
 			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' LEFT JOIN #__categories AS c ON c.id IN (\''. $_group_cats .'\')'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
 			. $and
 			//. ' AND i.state IN (1, -5)'
 			. $and2
 			//. ' AND c.lft >= '.FLEXI_LFT_CATEGORY.' AND c.rgt<='.FLEXI_RGT_CATEGORY
 			. $and3
+			. $and4
 			. ' GROUP BY alpha'
 			. ' ORDER BY alpha ASC';
 		;
