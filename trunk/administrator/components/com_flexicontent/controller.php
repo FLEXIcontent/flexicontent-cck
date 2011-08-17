@@ -111,7 +111,7 @@ class FlexicontentController extends JController
 		
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
-		     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||
+		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
 		     (!$existlang) || (!$existversions) || (!$existversionsdata) || 
 		     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)
 		   ) {
