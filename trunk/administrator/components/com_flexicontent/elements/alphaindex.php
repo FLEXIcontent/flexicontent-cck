@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: types.php 806 2011-08-12 16:50:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,16 +18,56 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+
 /**
- * Renders a types element
+ * Renders a fields element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldAlphaindex extends JFormField
+class JElementTypes extends JElement
+{
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	var	$_name = 'Types';
+
+	function fetchElement($name, $value, &$node, $control_name)
+	{
+		$db =& JFactory::getDBO();
+		
+		$query = 'SELECT id AS value, name AS text'
+		. ' FROM #__flexicontent_types'
+		. ' WHERE published = 1'
+		. ' ORDER BY name ASC, id ASC'
+		;
+		
+		$db->setQuery($query);
+		$types = $db->loadObjectList();
+
+		$attribs = "";
+		if ($node->attributes('multiple')) {
+			$attribs .= 'multiple="true" size="10"';
+			$fieldname = $control_name.'['.$name.'][]';
+		} else {
+			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			$attribs .= 'class="inputbox"';
+			$fieldname = $control_name.'['.$name.']';
+		}
+		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
+	}
+}
+/**
+ * Renders an alphaindex element
+ *
+ * @package 	Joomla
+ * @subpackage	FLEXIcontent
+ * @since		1.5
+ */
+class JElementAlphaindex extends JElement
 {
 /**
 	* Element name
@@ -35,12 +75,13 @@ class JFormFieldAlphaindex extends JFormField
 	* @access	protected
 	* @var		string
 	*/
-	var	$type = 'Alphaindex';
+	var	$_name = 'Alphaindex';
 
-	function getInput() {
-		$doc 		=& JFactory::getDocument();
+	function fetchElement($name, $value, &$node, $control_name)
+	{
 		$db =& JFactory::getDBO();
-		$node = &$this->element;
+		
+		$doc 		=& JFactory::getDocument();
 		$options = array();
 		$options[0] = new stdClass();  $options[1] = new stdClass();  $options[2] = new stdClass();
 		$options[0]->text=JTEXT::_("FLEXI_HIDE"); $options[0]->value=0;
@@ -52,13 +93,13 @@ class JFormFieldAlphaindex extends JFormField
 		$js = "
 		window.addEvent( 'domready', function()
 		{
-			updatealphafields(".$this->value.");
+			updatealphafields(".$value.");
 		});
 
 		function updatealphafields(val) {
-			var aichars=document.getElementById('jform_params_alphacharacters');
-			var aicharclasses=document.getElementById('jform_params_alphagrpcssclasses');
-			//var aicharseparator=document.getElementById('jform_params_alphacharseparator');
+			var aichars=document.getElementById('paramsalphacharacters');
+			var aicharclasses=document.getElementById('paramsalphagrpcssclasses');
+			//var aicharseparator=document.getElementById('paramsalphacharseparator');
 			if(val!=2) {
 				aichars.disabled=1;          aichars.style.backgroundColor='#D4D0C8';
 				aicharclasses.disabled=1;    aicharclasses.style.backgroundColor='#D4D0C88';
@@ -72,7 +113,9 @@ class JFormFieldAlphaindex extends JFormField
 
 		$doc->addScriptDeclaration($js);
 		
-		return JHTML::_('select.genericlist', $options, $this->name, $attribs, 'value', 'text', $this->value, $this->id);
+		$fieldname = $control_name.'['.$name.']';
+		
+		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
 	}
 }
 ?>

@@ -1668,6 +1668,135 @@ class FLEXIUtilities {
 		return $cache;
 	}
 }
+
+class flexicontent_utility {
+	
+	/**
+	 * Return unicode char by its code
+	 * Credits: ?
+	 *
+	 * @param int $dec
+	 * @return utf8 char
+	 */
+	function unichr($dec) {
+	  if ($dec < 128) {
+	    $utf = chr($dec);
+	  } else if ($dec < 2048) {
+	    $utf = chr(192 + (($dec - ($dec % 64)) / 64));
+	    $utf .= chr(128 + ($dec % 64));
+	  } else {
+	    $utf = chr(224 + (($dec - ($dec % 4096)) / 4096));
+	    $utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64));
+	    $utf .= chr(128 + ($dec % 64));
+	  }
+	  return $utf;
+	}
+	
+	/**
+	 * Return unicode code of a utf8 char
+	 * Credits: ?
+	 *
+	 * @param int $c
+	 * @return utf8 ord
+	 */
+	function uniord($c) {
+		$h = ord($c{0});
+		if ($h <= 0x7F) {
+			return $h;
+		} else if ($h < 0xC2) {
+			return false;
+		} else if ($h <= 0xDF) {
+			return ($h & 0x1F) << 6 | (ord($c{1}) & 0x3F);
+		} else if ($h <= 0xEF) {
+			return ($h & 0x0F) << 12 | (ord($c{1}) & 0x3F) << 6
+			| (ord($c{2}) & 0x3F);
+		} else if ($h <= 0xF4) {
+			return ($h & 0x0F) << 18 | (ord($c{1}) & 0x3F) << 12
+			| (ord($c{2}) & 0x3F) << 6
+			| (ord($c{3}) & 0x3F);
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Return unicode string when giving an array of utf8 ords
+	 * Credits: Darien Hager
+	 *
+	 * @param  $ords   utf8 ord arrray
+	 * @return $str    utf8 string
+	 */
+	function ords_to_unistr($ords, $encoding = 'UTF-8'){
+		// Turns an array of ordinal values into a string of unicode characters
+		$str = '';
+		for($i = 0; $i < sizeof($ords); $i++){
+			// Pack this number into a 4-byte string
+			// (Or multiple one-byte strings, depending on context.)
+			$v = $ords[$i];
+			$str .= pack("N",$v);
+		}
+		$str = mb_convert_encoding($str,$encoding,"UCS-4BE");
+		return($str);
+	}
+	
+	/**
+	 * Return unicode string when giving an array of utf8 ords
+	 * Credits: Darien Hager
+	 *
+	 * @param  $str    utf8 string
+	 * @return $ords   utf8 ord arrray
+	 */
+	function unistr_to_ords($str, $encoding = 'UTF-8'){
+		// Turns a string of unicode characters into an array of ordinal values,
+		// Even if some of those characters are multibyte.
+		$str = mb_convert_encoding($str,"UCS-4BE",$encoding);
+		$ords = array();
+	
+		// Visit each unicode character
+		for($i = 0; $i < mb_strlen($str,"UCS-4BE"); $i++){
+			// Now we have 4 bytes. Find their total
+			// numeric value.
+			$s2 = mb_substr($str,$i,1,"UCS-4BE");
+			$val = unpack("N",$s2);
+			$ords[] = $val[1];
+		}
+		return($ords);
+	}
+
+	/**
+	 * Return unicode char by its code
+	 *
+	 * @param int $u
+	 * @return utf8 char
+	 */
+	/*function unichrB($u) {
+		return mb_convert_encoding('&#' . intval($u) . ';', 'UTF-8', 'HTML-ENTITIES');
+	}*/
+	
+	/**
+	 * Return unicode char by its code
+	 *
+	 * @param int $u (ord)
+	 * @return utf8 char
+	 */
+	/*function unichrC($u) {
+		return mb_convert_encoding(pack("N",$u), mb_internal_encoding(), 'UCS-4BE');
+	}*/
+	
+	/**
+	 * Return unicode string when giving an array of utf8 ords
+	 *
+	 * @param int $codes
+	 * @return utf8 str
+	 */
+	/*function ords_to_unistrB ($codes) {
+    if (is_scalar($codes)) $codes= func_get_args();
+    $str= '';
+    foreach ($codes as $code) $str.= html_entity_decode('&#'.$code.';',ENT_NOQUOTES,'UTF-8');
+    return $str;
+	}*/
+}
+
 if(!function_exists('diff_version')) {
 	function diff_version(&$array1, &$array2) {
 		$difference = $array1;
