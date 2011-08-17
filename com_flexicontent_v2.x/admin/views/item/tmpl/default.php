@@ -376,7 +376,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				}
 				?>
 			</td>
-			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="340px" style="padding: 7px 0 0 5px">
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		if ( !$this->form->getValue("hits") ) {
