@@ -528,6 +528,7 @@ div.current dd {
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
+	clear:both;
 }
 
 #fc_alpha .numbers {
@@ -538,6 +539,7 @@ div.current dd {
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
+	clear:both;
 }
 
 .fc_alpha_index {
@@ -553,6 +555,17 @@ div.current dd {
 
 span.fc_alpha_index {
 	color: #c0c0c0;
+}
+
+.fc_alpha_index_sep {
+	padding: 1px 2px;
+	border: 0px solid silver;
+	background: none;
+	text-decoration: none;
+	margin-right: 2px;
+	float: left;
+	position: relative;
+	right: 50%;
 }
 
 /* File Field Plugin */

@@ -628,24 +628,83 @@ class FlexicontentModelCategory extends JModelList{
 				}
 			}
 		}
-		$session  =& JFactory::getSession();
-		$alpha = JRequest::getVar('letter');
-		if($alpha===NULL) {
-			$alpha =  $session->get($option.'.category.letter');
-		}else{
-			$session->set($option.'.category.letter', $alpha);
-		}
-		if ($alpha == '0') {
-			$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
-		}		
-		elseif (!empty($alpha)) {
-			$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
-		}		
 		
 		//Display all items or owner items
 		if($owneritems) {
 			$where .= " AND i.created_by='".$user->get('id')."'";
 		}
+		
+		$session  =& JFactory::getSession();
+		$alpha = JRequest::getVar('letter');
+		if($alpha===NULL) {
+			$alpha =  $session->get($option.'.category.letter');
+		} else {
+			$session->set($option.'.category.letter', $alpha);
+		}
+		
+		// WARNING DO THIS because utf8 is multibyte and MySQL regexp doesnot support so we cannot use [] with utf8
+		$range = explode("-", $alpha);
+		
+		$regexp='';
+		if (mb_strlen($alpha)==0) {
+			// nothing to do
+		} else if (count($range) > 2) {
+			echo "Error in Alpha Index please correct letter range: ".$alpha."<br>";
+		} else if (count($range) == 1) {
+			
+			$regexp = '"^('.mb_substr($alpha,0,1);
+			for($i=1; $i<mb_strlen($alpha); $i++) :
+				$regexp .= '|'.mb_substr($alpha,$i,1);
+			endfor;
+			$regexp .= ')"';
+			
+		} else if (count($range) == 2) {
+			
+			// Get range characters
+			$startletter = $range[0];  $endletter = $range[1];
+			
+			// ERROR CHECK: Range START and END are single character strings
+			if (mb_strlen($startletter) != 1 || mb_strlen($endletter) != 1) {
+				echo "Error in Alpha Index<br>letter range: ".$alpha." start and end must be one character<br>";
+				return $where;
+			}
+			
+			// Get ord of characters and their rangle length
+			$startord=flexicontent_utility::uniord($startletter);
+			$endord=flexicontent_utility::uniord($endletter);
+			$range_length = $endord - $startord;
+			
+			// ERROR CHECK: Character range has at least one character
+			if ($range_length > 200 || $range_length < 1) {
+				// A sanity check that the range is something logical and that 
+				echo "Error in Alpha Index<br>letter range: ".$alpha.", is incorrect or contains more that 200 characters<br>";
+				return $where;
+			}
+			
+			// Check if any character out of the range characters exists
+			// Meaning (There is at least on item title starting with one of the range characters)
+			$regexp = '"^('.$startletter;
+			for($uord=$startord+1; $uord<=$endord; $uord++) :
+				$regexp .= '|'.flexicontent_utility::unichr($uord);
+			endfor;
+			$regexp .= ')"';
+			
+		} else {
+			echo "Error in Alpha Index<br>incorrect letter range: ".$alpha."<br>";
+		}
+		
+		if ($regexp) {
+			
+			if ($alpha == '0') {
+				$where .= ' AND ( CONVERT (( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
+				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
+			}		
+			elseif (!empty($alpha)) {
+				$where .= ' AND ( CONVERT (LOWER( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
+				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
+			}
+		}
+		
 		return $where;
 	}
 

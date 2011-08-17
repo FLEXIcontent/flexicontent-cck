@@ -31,16 +31,15 @@ $show_alpha = $this->params->get('show_alpha',1);
 if ($show_alpha == 1) {
 	// Language Default
 	$alphacharacters = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
-	$groups = explode("|", $alphacharacters);
-	$groupcssclasses = explode("|", JTEXT::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
-	$alphacharsep = JTEXT::_("FLEXI_ALPHA_INDEX_SEPARATOR");
+	$groups = explode("!!", $alphacharacters);
+	$groupcssclasses = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
 } else {  // $show_alpha == 2
 	// Custom setting
 	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z|0,1,2,3,4,5,6,7,8,9");
-	$groups = explode("|", $alphacharacters);
-	$groupcssclasses = explode("|", $this->params->get('alphagrpcssclasses'));
-	$alphacharsep = $this->params->get('alphacharseparator','');
+	$groups = explode("!!", $alphacharacters);
+	$groupcssclasses = explode("!!", $this->params->get('alphagrpcssclasses'));
 }
+$alphacharsep = $this->params->get('alphacharseparator',false);
 $alphaskipempty = $this->params->get('alphaskipempty',0);
 
 // a. Trim classes names
@@ -82,18 +81,23 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 			$range = explode("-", $letter);
 			
 			// d. Check if character exists 
+			$has_item = false;
 			if(count($range)==1) {
-				// ERROR CHECK: String has single character
-				if (mb_strlen($letter) > 1) {
-					echo "Error in Alpha Index please correct letter: ".$letter." must have only one character<br>";
-					continue;
+				
+				// Check if any character out of the all subgroup characters exists
+				// Meaning (There is at least on item title starting with one of the group letters)
+				$i = 0;
+				while ($i < mb_strlen($letter)) {
+					$uchar = mb_substr($letter,$i++,1);
+					if (in_array($uchar, $this->alpha)) {
+						$has_item = true;
+						break;
+					}
 				}
-				// Check Single character exists
-				$has_item = in_array($letter, $this->alpha);
 			} else {
 				// ERROR CHECK: Character range has only one minus(-)
 				if (count($range) != 2) {
-					echo "Error in Alpha Index please correct letter range: ".$letter."<br>";
+					echo "Error in Alpha Index<br>incorrect letter range: ".$letter."<br>";
 					continue;
 				}
 				
@@ -101,22 +105,28 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				$startletter = $range[0];  $endletter = $range[1];
 				
 				// ERROR CHECK: Range START and END are single character strings
-				if (mb_strlen($startletter) > 1 || mb_strlen($endletter) > 1) {
-					echo "Error in Alpha Index please correct letter range: ".$letter." start and end must be one character<br>";
+				if (mb_strlen($startletter) != 1 || mb_strlen($endletter) != 1) {
+					echo "Error in Alpha Index<br>letter range: ".$letter." start and end must be one character<br>";
 					continue;
 				}
 				
-				// Get rangle length
-				$range_length = utf8ord($endletter) - utf8ord($startletter);
+				// Get ord of characters and their rangle length
+				$startord=flexicontent_utility::uniord($startletter);
+				$endord=flexicontent_utility::uniord($endletter);
+				$range_length = $endord - $startord;
 				
 				// ERROR CHECK: Character range has at least one character
-				if ($range_length > 200 || $range_length < 0) {
+				if ($range_length > 200 || $range_length < 1) {
 					// A sanity check that the range is something logical and that 
-					echo "Error in Alpha Index, letter range: ".$letter.", is incorrect or contains more that 200 characters<br>";
+					echo "Error in Alpha Index<br>letter range: ".$letter.", is incorrect or contains more that 200 characters<br>";
+					continue;
 				}
-				// Check at that range has at least on character
-				for($ch=$startletter; $ch<=$endletter; $ch++) :
-					if (in_array($ch, $this->alpha)) {
+				
+				// Check if any character out of the range characters exists
+				// Meaning (There is at least on item title starting with one of the range characters)
+				for($uord=$startord; $uord<=$endord; $uord++) :
+					$uchar = flexicontent_utility::unichr($uord);
+					if (in_array($uchar, $this->alpha)) {
 						$has_item = true;
 						break;
 					}

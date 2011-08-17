@@ -30,6 +30,7 @@ if(!$c2) $c2 = $this->params->get('column2',200);
 $c3 = $this->params->get('column3',false);
 if(!$c3) $c3 = $this->params->get('column3',200);
 $i = 0;
+$condition1	= $condition2	= $condition3	= $style = '';
 switch ($cols) 
 {
 	case 1 :
