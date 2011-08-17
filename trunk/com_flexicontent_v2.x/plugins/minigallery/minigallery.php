@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			
 			var filelist = document.getElementById('sortables_".$field->id."');
 			if(file.substring(0,7)!='http://')
-				file = '".str_replace('\\','/', JPATH_ROOT)."/components/com_flexicontent/medias/'+file;
+				file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
 			$(li).addClass('minigallery');
 			$(thumb).addClass('thumbs');
 			$(span).addClass('drag".$field->id."');
