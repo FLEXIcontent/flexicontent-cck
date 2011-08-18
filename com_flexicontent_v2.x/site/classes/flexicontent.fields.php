@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 707 2011-07-28 17:51:28Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 792 2011-08-09 07:41:10Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,6 +39,9 @@ class FlexicontentFields
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
+		$mainframe	= &JFactory::getApplication();
+		$cparams	=& $mainframe->getParams('com_flexicontent');
+		
 		$itemcache 	=& JFactory::getCache('com_flexicontent_items');
 		$itemcache->setCaching(FLEXI_CACHE); 		//force cache
 		$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	//set expiry to one hour
@@ -97,14 +100,20 @@ class FlexicontentFields
 				}
 			//}
 
-			//if ($items[$i]->fields)
-			//{
-			//	foreach ($items[$i]->fields as $field)
-			//	{
-			//		$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-			//		$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
-			//	}
-			//}
+			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
+			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
+			$flexiview = JRequest::getVar('view', false);
+			// 0: never, 1: always, 2: only in item view 
+			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview=='items') ) {
+				if ($items[$i]->fields)
+				{
+					foreach ($items[$i]->fields as $field)
+					{
+						$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+						$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					}
+				}
+			}
 		}
 		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
@@ -125,7 +134,6 @@ class FlexicontentFields
 
 		$mainframe = &JFactory::getApplication();
 		if (!$item) return;
-		//if(!(($item->lft >= FLEXI_LFT_CATEGORY)&&($item->rgt <= FLEXI_RGT_CATEGORY))) return;
 
 		$user 		= &JFactory::getUser();
 		$gid_a		= $user->getAuthorisedViewLevels();
@@ -237,8 +245,12 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderField($item, $field, $values, $method='display')
+	function renderField(&$item, &$field, &$values, $method='display')
 	{
+		// If $method (e.g. display method) is already created,
+		// then return the $field without recreating the $method
+		if (isset($field->{$method})) return $field;
+		
 		$dispatcher = &JDispatcher::getInstance();
 
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
@@ -298,7 +310,8 @@ class FlexicontentFields
 		}
 		else
 		{
-			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			// NOT core field but just in case code is updated ... we check for core
+			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
@@ -369,7 +382,7 @@ class FlexicontentFields
 		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
-		  // 'text' item field is implicitely used by category (its description text), render it
+		  // 'text' item field is implicitly used by category (its description text), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
 		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
