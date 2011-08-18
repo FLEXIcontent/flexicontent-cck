@@ -135,7 +135,7 @@ dump($this->row);
 					</tr>
 				</table>
 			</td>
-			<td valign="top" width="340px" style="padding: 0px 0 0 5px;vertical-align:top;">
+			<td valign="top" width="380px" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
 				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');

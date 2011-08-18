@@ -368,7 +368,7 @@ class FlexicontentModelCategory extends JModel{
 		 * If we have a filter, and this is enabled... lets tack the AND clause
 		 * for the filter onto the WHERE clause of the item query.
 		 */
-		if ($cparams->get('use_filters'))
+		if ( $cparams->get('use_filters') || $cparams->get('use_search') )
 		{
 			$filter 		= JRequest::getString('filter', '', 'request');
 
