@@ -70,7 +70,8 @@ class FlexicontentHelperRoute
 		}
 		
 		// 2. Try to use current menu item if pointing to Flexicontent, (if so configure in global options)
-		if ($default_menuitem_preference==1) {
+		$app =& JFactory::getApplication();
+		if ($default_menuitem_preference==1  &&  !$app->isAdmin()) {
 			$menu = &JSite::getMenu();
 			$activemenuItem = &$menu->getActive();
 			$activemenuItemId = $activemenuItem->id;

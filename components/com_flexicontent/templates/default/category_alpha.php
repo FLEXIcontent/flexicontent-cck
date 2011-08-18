@@ -36,7 +36,31 @@ if ($show_alpha == 1) {
 } else {  // $show_alpha == 2
 	// Custom setting
 	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z|0,1,2,3,4,5,6,7,8,9");
-	$groups = explode("!!", $alphacharacters);
+	
+	$lang = JRequest::getWord('lang', '' );
+	if(empty($lang)){
+		$langFactory= JFactory::getLanguage();
+		$tagLang = $langFactory->getTag();
+		//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+		$lang = substr($tagLang ,0,2);
+	}
+	
+	// a. Try to get for current language
+	$result = preg_match("/(\[$lang\])=([^[]+)/i", $alphacharacters, $matches);
+	if ($result) {
+		$custom_lang_alpha_index = $matches[2];
+	} else {
+		// b. Try to get default for all languages
+		$result = preg_match("/(\[default\])=([^[]+)/i", $alphacharacters, $matches);
+		if ($result) {
+			$custom_lang_alpha_index = $matches[2];
+		} else {
+			// c. Use default language string from language file
+			$custom_lang_alpha_index = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
+		}
+	}
+	
+	$groups = explode("!!", $custom_lang_alpha_index);
 	$groupcssclasses = explode("!!", $this->params->get('alphagrpcssclasses'));
 }
 $alphacharsep = $this->params->get('alphacharseparator',false);
