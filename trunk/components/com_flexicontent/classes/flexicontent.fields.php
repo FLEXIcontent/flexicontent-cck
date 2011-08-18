@@ -101,19 +101,19 @@ class FlexicontentFields
 			}
 
 			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
-			/*$always_create_fields_display = $cparams->get('always_create_fields_display',0);
+			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
 			$flexiview = JRequest::getVar('view', false);
 			// 0: never, 1: always, 2: only in item view 
-			if ($always_create_fields_display==1 || ($always_create_fields_display=2 && $flexiview=='items') ) {
+			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview=='items') ) {
 				if ($items[$i]->fields)
 				{
 					foreach ($items[$i]->fields as $field)
-					{//trigger event '#onDisplayFieldValue' first time in same loading
+					{
 						$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 						$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					}
 				}
-			}*/
+			}
 		}
 		
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
@@ -244,8 +244,12 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderField($item, $field, $values, $method='display')
+	function renderField(&$item, &$field, &$values, $method='display')
 	{
+		// If $method (e.g. display method) is already created,
+		// then return the $field without recreating the $method
+		if (isset($field->{$method})) return $field;
+		
 		$dispatcher = &JDispatcher::getInstance();
 
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
@@ -309,6 +313,7 @@ class FlexicontentFields
 			// NOT core field but just in case code is updated ... we check for core
 			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
 				$field->title = $item->title;
@@ -378,7 +383,7 @@ class FlexicontentFields
 		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
-		  // 'text' item field is implicitely used by category (its description text), render it
+		  // 'text' item field is implicitly used by category (its description text), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
 		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
@@ -393,7 +398,6 @@ class FlexicontentFields
 					}
 					$field = $items[$i]->fields[$f];
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-					//trigger event '#onDisplayFieldValue' second time in same loading
 					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					if (isset($field->display) && $field->display) {
 						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
@@ -453,7 +457,7 @@ class FlexicontentFields
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
-				. ' WHERE i.itemid IN (' . implode(',', $cids) . ')'
+				. " WHERE i.itemid IN ('" . implode("','", $cids) . "')"
 				. ' AND t.published = 1'
 				. ' ORDER BY i.itemid, t.name'
 				;
@@ -480,7 +484,7 @@ class FlexicontentFields
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid IN (' . implode(',', $cids) . ')'
+				. " WHERE rel.itemid IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery( $query );
 		$cats = $db->loadObjectList();
@@ -502,7 +506,7 @@ class FlexicontentFields
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
 		$query 	= 'SELECT itemid, COUNT(id) AS favs FROM #__flexicontent_favourites'
-				. ' WHERE itemid IN (' . implode(',', $cids) . ')'
+				. " WHERE itemid IN ('" . implode("','", $cids) . "')"
 				. ' GROUP BY itemid'
 				;
 		$db->setQuery($query);
@@ -527,8 +531,8 @@ class FlexicontentFields
 		$user = JFactory::getUser();
 
 		$query 	= 'SELECT itemid, COUNT(id) AS fav FROM #__flexicontent_favourites'
-				. ' WHERE itemid IN (' . implode(',', $cids) . ')'
-				. ' AND userid = ' . (int)$user->id
+				. " WHERE itemid IN ('" . implode("','", $cids) . "')"
+				. " AND userid = '" . ((int)$user->id) ."'"
 				. ' GROUP BY itemid'
 				;
 		$db->setQuery($query);
@@ -552,7 +556,7 @@ class FlexicontentFields
 
 		$query 	= 'SELECT i.id, u.name, u.username, u.email FROM #__content AS i'
 				. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
-				. ' WHERE i.id IN (' . implode(',', $cids) . ')'
+				. " WHERE i.id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
 		$modifiers = $db->loadObjectList('id');
@@ -575,7 +579,7 @@ class FlexicontentFields
 
 		$query 	= 'SELECT i.id, u.name, i.created_by_alias as alias, u.username, u.email FROM #__content AS i'
 				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-				. ' WHERE i.id IN (' . implode(',', $cids) . ')'
+				. " WHERE i.id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
 		$authors = $db->loadObjectList('id');
@@ -598,7 +602,7 @@ class FlexicontentFields
 
 		$query 	= 'SELECT ie.item_id, t.name FROM #__flexicontent_items_ext AS ie'
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-				. ' WHERE ie.item_id IN (' . implode(',', $cids) . ')'
+				. " WHERE ie.item_id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
 		$types = $db->loadObjectList('item_id');
@@ -620,7 +624,7 @@ class FlexicontentFields
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
 		$query 	= 'SELECT * FROM #__content_rating'
-				. ' WHERE content_id IN (' . implode(',', $cids) . ')'
+				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
 		$votes = $db->loadObjectList('content_id');

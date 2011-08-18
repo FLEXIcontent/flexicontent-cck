@@ -2,7 +2,7 @@
 <config>
 	<fields addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="component" label="Options" description="FLEXI_GENERAL_CONF">
-			<field name="separator1" label="" type="separator" default="FLEXI_GENERAL_CONF" level="level1" menu="hide" />
+			<field name="separator0" type="separator" default="FLEXI_GENERAL_CONF" level="level1" menu="hide" />
 
 			<field name="flexi_cat_extension" type="list" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide">
 				<option value="com_content">com_content Categories</option>
@@ -25,6 +25,12 @@
 			<field name="show_updatecheck" type="radio" default="1" label="FLEXI_CHECK_UPDATE" description="FLEXI_CHECK_UPDATE_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="separator1" type="separator" default="Performance Options" level="level1" menu="hide" />
+			<field name="always_create_fields_display" type="list" default="0" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
+				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
+				<option value="1">FLEXI_ALWAYS</option>
+				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 			</field>
 			<field name="separator2" type="separator" default="SEF Options" level="level1" menu="hide" />
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
