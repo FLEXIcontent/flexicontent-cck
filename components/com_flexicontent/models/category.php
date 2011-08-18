@@ -331,11 +331,11 @@ class FlexicontentModelCategory extends JModel{
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 		// is the content current?
-		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
-		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		if ($cparams->get('orderbycustomfieldid', 0) != 0)
@@ -355,12 +355,12 @@ class FlexicontentModelCategory extends JModel{
 			if (FLEXI_ACCESS) {
 				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
 				if (isset($readperms['item'])) {
-					$where .= ' AND ( ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' ) )';
+					$where .= ' AND ( ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) ) )';
 			} else {
-					$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+					$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 				}
 			} else {
-				$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR i.modified_by = '.$user->id.' )';
+				$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			}
 		}
 
