@@ -289,20 +289,20 @@ class FlexicontentFields
 				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'article');
-				  JRequest::setVar('option', 'com_content');
-				}
+				//if ($flexiview == 'item') {
+				//  JRequest::setVar('view', 'article');
+				//  JRequest::setVar('option', 'com_content');
+				//}
 				
 				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
 				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) 
 					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 				
 				// Set the view and option back to items and com_flexicontent
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'item');
-				  JRequest::setVar('option', 'com_flexicontent');
-				}
+				//if ($flexiview == 'item') {
+				//  JRequest::setVar('view', 'item');
+				//  JRequest::setVar('option', 'com_flexicontent');
+				//}
 				
 				$field->id = $field->fieldid;
 				$field->display = $field->text;
@@ -335,16 +335,16 @@ class FlexicontentFields
 				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'article');
-				  JRequest::setVar('option', 'com_content');
-				}
+				//if ($flexiview == 'item') {
+				//  JRequest::setVar('view', 'article');
+				//  JRequest::setVar('option', 'com_content');
+				//}
 				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 				// Set the view and option back to items and com_flexicontent
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'item');
-				  JRequest::setVar('option', 'com_flexicontent');
-				}
+				//if ($flexiview == 'item') {
+				//  JRequest::setVar('view', 'item');
+				//  JRequest::setVar('option', 'com_flexicontent');
+				//}
 				
 				$field->id = $field->fieldid;
 				$field->display = $field->text;
