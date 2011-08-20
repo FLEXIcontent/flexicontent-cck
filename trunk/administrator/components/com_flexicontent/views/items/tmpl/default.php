@@ -566,7 +566,7 @@ window.addEvent('domready', function(){
 			</td>
 			
 			<td align="center">
-				<?php echo (@$row->config->ilayout ? $row->config->ilayout : "default<sup>[1]</sup>") ?>
+				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
 			</td>
 			
 			<?php if ($this->CanOrder) : ?>
@@ -675,7 +675,7 @@ window.addEvent('domready', function(){
 		</tr>
 	</table>
 	
-	<sup>[1]</sup> Not Set. The default template will be used.
+	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.
 	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

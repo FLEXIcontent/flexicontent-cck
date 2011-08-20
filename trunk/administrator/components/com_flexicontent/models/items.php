@@ -104,6 +104,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function getData()
 	{
+		static $tconfig = array();
+		
 		// Lets load the Items if it doesn't already exist
 		if (empty($this->_data))
 		{
@@ -120,14 +122,16 @@ class FlexicontentModelItems extends JModel
 				$item =& $this->_data[$i];
 				$item->categories = $this->getCategories($item->id);
 				
-				// Parse configuration for every row
-	   		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$item->config);
-	   		$item->config = new stdClass();
-	   		foreach($config_arr as $config_var) {
-	   			if(!$config_var) continue;
-	   			list($varname,$varval) = explode('=', $config_var);
-	   			if(!empty($varname)) $item->config->{$varname} = $varval;
-	   		}
+				// Parse item configuration for every row
+	   		$item->config = new JParameter($item->config);
+	   		
+				// Parse item's TYPE configuration if not already parsed
+				if ( isset($tconfig[$item->type_name]) ) {
+		   		$item->tconfig = &$tconfig[$item->type_name];
+					continue;
+				}
+				$tconfig[$item->type_name] = new JParameter($item->tconfig);
+	   		$item->tconfig = &$tconfig[$item->type_name];
 			}
 			$k = 1 - $k;
 		}
@@ -325,7 +329,7 @@ class FlexicontentModelItems extends JModel
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
-					. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config'
+					. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 					. ' FROM #__content AS i'
 					. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'

@@ -100,6 +100,8 @@ class FlexicontentModelItems extends JModel {
 	 * @return object
 	 */
 	function getData() {
+		static $tconfig = array();
+		
 		// Lets load the Items if it doesn't already exist
 		if (empty($this->_data)) {
 			$query = $this->_buildQuery();
@@ -111,10 +113,21 @@ class FlexicontentModelItems extends JModel {
 			{
 				$item =& $this->_data[$i];
 				$item->categories = $this->getCategories($item->id);
+				
+				// Parse item configuration for every row
+	   		$item->config = new JParameter($item->config);
+	   		
+				// Parse item's TYPE configuration if not already parsed
+				if ( isset($tconfig[$item->type_name]) ) {
+		   		$item->tconfig = &$tconfig[$item->type_name];
+					continue;
 				}
-				$k = 1 - $k;
+				$tconfig[$item->type_name] = new JParameter($item->tconfig);
+	   		$item->tconfig = &$tconfig[$item->type_name];
 			}
-			return $this->_data;
+			$k = 1 - $k;
+		}
+		return $this->_data;
 	}
 	/**
 	 * Method to set the default site language to an item with no language
@@ -310,7 +323,7 @@ class FlexicontentModelItems extends JModel {
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		$query 		= 'SELECT i.*, level.title as access_level, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
-				. 't.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author'
+				. 't.name AS type_name, g.title AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				. ' FROM #__content AS i'
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
