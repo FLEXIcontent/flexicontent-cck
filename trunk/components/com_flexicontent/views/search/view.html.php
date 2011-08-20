@@ -236,6 +236,8 @@ class FLEXIcontentViewSearch extends JView
 		$this->assign('action', 	    $uri->toString());
 		
 		$this->assign('searchkeywordlabel', 	    $searchkeywordlabel);
+		
+		$this->assignRef('fieldtypes', $fieldtypes_a);
 
 		parent::display($tpl);
 	}
