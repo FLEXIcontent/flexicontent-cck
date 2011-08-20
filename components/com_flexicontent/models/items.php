@@ -767,10 +767,8 @@ class FlexicontentModelItems extends JModel
 				$item->created 	.= ' 00:00:00';
 			}
 
-			if ($isnew) {
-				$date =& JFactory::getDate($item->created, $tzoffset);
-				$item->created = $date->toMySQL();
-			}
+			$date =& JFactory::getDate($item->created, $tzoffset);
+			$item->created = $date->toMySQL();
 
 			if ($item->publish_up) {
 				// Append time if not added to publish date
@@ -778,7 +776,9 @@ class FlexicontentModelItems extends JModel
 					$item->publish_up .= ' 00:00:00';
 				}
 			} else {
-				$date =& JFactory::getDate($item->created, $tzoffset);
+				// DO NOT REAPPLY  $tzoffset, as it already has been applied on $item->created
+				// Reapplying $tzoffset, will make publish date to go to the future for negative GMT zones !!!
+				$date =& JFactory::getDate($item->created/*, $tzoffset*/);
 				$item->publish_up = $date->toMySQL();
 			}
 
