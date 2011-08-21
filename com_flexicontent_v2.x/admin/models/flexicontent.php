@@ -873,6 +873,11 @@ class FlexicontentModelFlexicontent extends JModel
 	function checkInitialPermission() {
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
+		
+		$query = "UPDATE `#__flexicontent_fields` SET `access`=1 WHERE `access`=0";
+		$db->setQuery($query);
+		$db->query();
+		
 		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
 		$db->setQuery($query);
 		$rules = $db->loadResult();
