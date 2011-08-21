@@ -39,8 +39,6 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
-UPDATE `#__flexicontent_fields` SET `access`=1;
-
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   `field_id` int(11) NOT NULL default '0',
   `item_id` int(11) NOT NULL default '0',
