@@ -109,6 +109,7 @@ class FLEXIcontentViewSearch extends JView
 		$params	= &$mainframe->getParams();
 		$lists = array();
 		$fieldtypes_a = $params->get('fieldtypes', array());
+		if((count($fieldtypes_a)>0) && !is_array($fieldtypes_a)) $fieldtypes_a = array($fieldtypes_a);
 		if($params->get('cantypes', 1) && (count($fieldtypes_a)>0)) {
 			$db =& JFactory::getDBO();
 			$fieldtypes = "'".implode("','", $fieldtypes_a)."'";

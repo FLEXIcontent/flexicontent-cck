@@ -36,12 +36,12 @@ if(!function_exists("plgSearchFlexiadvsearchAreas")) {
 		return $areas;
 	}
 }
-if(!function_exists("plgSearchContentAreas")) {
+/*if(!function_exists("plgSearchContentAreas")) {
 	function &plgSearchContentAreas() {
 		static $areas = array();
 		return $areas;
 	}
-}
+}*/
 /**
  * Search method
  *
@@ -69,6 +69,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	if(!$cantypes || (count($fieldtypes)<=0)) {
 		$fieldtypes = $params->get('fieldtypes', array());
 	}
+	if((count($fieldtypes)>0) && !is_array($fieldtypes)) $fieldtypes = array($fieldtypes);
 	$dispatcher =& JDispatcher::getInstance();
 
 	// define section
