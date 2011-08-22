@@ -730,5 +730,9 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
+	
+	function doPlgAct() {
+		FLEXIUtilities::doPlgAct();
+	}
 }
 ?>
