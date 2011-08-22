@@ -1667,9 +1667,6 @@ class FLEXIUtilities {
 		$cache = JCache::getInstance('', $options);
 		return $cache;
 	}
-}
-
-class flexicontent_utility {
 	
 	/**
 	 * Return unicode char by its code

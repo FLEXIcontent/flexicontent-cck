@@ -1603,10 +1603,6 @@ class FLEXIUtilities {
 			}
 		}
 	}
-}
-
-
-class flexicontent_utility {
 	
 	/**
 	 * Return unicode char by its code
