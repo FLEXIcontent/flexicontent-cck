@@ -1587,19 +1587,19 @@ class FLEXIUtilities {
 		
 		return $versionscount;
 	}
-	function parseTask($origTask, &$outTask) {
+	/*function parseTask($origTask, &$outTask) {
 		$outTask = explode(':', $origTask);
 		if(isset($outTask[1])) JRequest::setVar('doPlgAct', $outTask[1]);
-	}
+	}*/
 	function doPlgAct() {
-		$plg = JRequest::getVar('doPlgAct');
+		$plg = JRequest::getVar('plg');
 		$act = JRequest::getVar('act');
 		if($plg && $act) {
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($plg).'.php';
 			if(file_exists($path)) require_once($path);
 			$class = "plgFlexicontent_fields{$plg}";
 			if(class_exists($class) && in_array($act, get_class_methods($class))) {
-				$class::$act();
+				call_user_func("$class::$act");
 			}
 		}
 	}
