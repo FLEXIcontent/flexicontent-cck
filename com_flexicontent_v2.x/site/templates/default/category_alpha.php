@@ -135,8 +135,8 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				}
 				
 				// Get ord of characters and their rangle length
-				$startord=flexicontent_utility::uniord($startletter);
-				$endord=flexicontent_utility::uniord($endletter);
+				$startord=FLEXIUtilities::uniord($startletter);
+				$endord=FLEXIUtilities::uniord($endletter);
 				$range_length = $endord - $startord;
 				
 				// ERROR CHECK: Character range has at least one character
@@ -149,7 +149,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				// Check if any character out of the range characters exists
 				// Meaning (There is at least on item title starting with one of the range characters)
 				for($uord=$startord; $uord<=$endord; $uord++) :
-					$uchar = flexicontent_utility::unichr($uord);
+					$uchar = FLEXIUtilities::unichr($uord);
 					if (in_array($uchar, $this->alpha)) {
 						$has_item = true;
 						break;

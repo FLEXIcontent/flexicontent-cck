@@ -440,8 +440,8 @@ class FlexicontentModelCategory extends JModel{
 			}
 			
 			// Get ord of characters and their rangle length
-			$startord=flexicontent_utility::uniord($startletter);
-			$endord=flexicontent_utility::uniord($endletter);
+			$startord=FLEXIUtilities::uniord($startletter);
+			$endord=FLEXIUtilities::uniord($endletter);
 			$range_length = $endord - $startord;
 			
 			// ERROR CHECK: Character range has at least one character
@@ -455,7 +455,7 @@ class FlexicontentModelCategory extends JModel{
 			// Meaning (There is at least on item title starting with one of the range characters)
 			$regexp = '"^('.$startletter;
 			for($uord=$startord+1; $uord<=$endord; $uord++) :
-				$regexp .= '|'.flexicontent_utility::unichr($uord);
+				$regexp .= '|'.FLEXIUtilities::unichr($uord);
 			endfor;
 			$regexp .= ')"';
 			
