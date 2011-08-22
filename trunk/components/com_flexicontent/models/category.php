@@ -416,15 +416,15 @@ class FlexicontentModelCategory extends JModel{
 		$range = explode("-", $alpha);
 		
 		$regexp='';
-		if (utf8_strlen($alpha)==0) {
+		if (JString::strlen($alpha)==0) {
 			// nothing to do
 		} else if (count($range) > 2) {
 			echo "Error in Alpha Index please correct letter range: ".$alpha."<br>";
 		} else if (count($range) == 1) {
 			
-			$regexp = '"^('.utf8_substr($alpha,0,1);
-			for($i=1; $i<utf8_strlen($alpha); $i++) :
-				$regexp .= '|'.utf8_substr($alpha,$i,1);
+			$regexp = '"^('.JString::substr($alpha,0,1);
+			for($i=1; $i<JString::strlen($alpha); $i++) :
+				$regexp .= '|'.JString::substr($alpha,$i,1);
 			endfor;
 			$regexp .= ')"';
 			
@@ -434,7 +434,7 @@ class FlexicontentModelCategory extends JModel{
 			$startletter = $range[0];  $endletter = $range[1];
 			
 			// ERROR CHECK: Range START and END are single character strings
-			if (utf8_strlen($startletter) != 1 || utf8_strlen($endletter) != 1) {
+			if (JString::strlen($startletter) != 1 || JString::strlen($endletter) != 1) {
 				echo "Error in Alpha Index<br>letter range: ".$alpha." start and end must be one character<br>";
 				return $where;
 			}
