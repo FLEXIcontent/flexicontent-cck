@@ -35,7 +35,7 @@ if ($show_alpha == 1) {
 	$groupcssclasses = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
 } else {  // $show_alpha == 2
 	// Custom setting
-	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z|0,1,2,3,4,5,6,7,8,9");
+	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
 	
 	$lang = JRequest::getWord('lang', '' );
 	if(empty($lang)){
@@ -111,8 +111,8 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				// Check if any character out of the all subgroup characters exists
 				// Meaning (There is at least on item title starting with one of the group letters)
 				$i = 0;
-				while ($i < mb_strlen($letter)) {
-					$uchar = mb_substr($letter,$i++,1);
+				while ($i < utf8_strlen($letter)) {
+					$uchar = utf8_substr($letter,$i++,1);
 					if (in_array($uchar, $this->alpha)) {
 						$has_item = true;
 						break;
@@ -129,7 +129,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				$startletter = $range[0];  $endletter = $range[1];
 				
 				// ERROR CHECK: Range START and END are single character strings
-				if (mb_strlen($startletter) != 1 || mb_strlen($endletter) != 1) {
+				if (utf8_strlen($startletter) != 1 || utf8_strlen($endletter) != 1) {
 					echo "Error in Alpha Index<br>letter range: ".$letter." start and end must be one character<br>";
 					continue;
 				}

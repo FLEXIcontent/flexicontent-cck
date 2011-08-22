@@ -1686,10 +1686,12 @@ class FLEXIUtilities {
 		$ords = array();
 	
 		// Visit each unicode character
-		for($i = 0; $i < mb_strlen($str,"UCS-4BE"); $i++){
+		//for($i = 0; $i < mb_strlen($str,"UCS-4BE"); $i++){
+		//for($i = 0; $i < utf8_strlen($str); $i++){
+		for($i = 0; $i < utf8_strlen($str,"UCS-4BE"); $i++){
 			// Now we have 4 bytes. Find their total
 			// numeric value.
-			$s2 = mb_substr($str,$i,1,"UCS-4BE");
+			$s2 = utf8_substr($str,$i,1,"UCS-4BE");
 			$val = unpack("N",$s2);
 			$ords[] = $val[1];
 		}
