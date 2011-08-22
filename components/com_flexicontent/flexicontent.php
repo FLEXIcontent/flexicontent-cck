@@ -66,9 +66,10 @@ if($controller = JRequest::getWord('controller')) {
 // Create the controller
 $classname	= 'FlexicontentController'.ucfirst($controller);
 $controller = new $classname( );
-
+$task = null;
+FLEXIUtilities::parseTask(JRequest::getVar('task'), $task);
 // Perform the Request task
-$controller->execute(JRequest::getCmd('task'));
+$controller->execute( @$tas[0] );
 
 // Redirect if set by the controller
 $controller->redirect();
