@@ -31,7 +31,7 @@ class FlexicontentViewItems extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$dispatcher	=& JDispatcher::getInstance();
 

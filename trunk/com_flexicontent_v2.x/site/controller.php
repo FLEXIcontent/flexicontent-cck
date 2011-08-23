@@ -298,7 +298,7 @@ class FlexicontentController extends JController
 	 */
 	function vote()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$id 		= JRequest::getInt('id', 0);
 		$cid 		= JRequest::getInt('cid', 0);
@@ -348,7 +348,7 @@ class FlexicontentController extends JController
 	 */
 	function ajaxfav()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$user 	=& JFactory::getUser();
 		$id 	=  JRequest::getInt('id', 0);
 		$db  	=& JFactory::getDBO();
@@ -394,7 +394,7 @@ class FlexicontentController extends JController
 	 */
 	function ajaxvote()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$user = &JFactory::getUser();
 
 		/*
@@ -839,7 +839,7 @@ class FlexicontentController extends JController
 	 */
 	function weblink()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');

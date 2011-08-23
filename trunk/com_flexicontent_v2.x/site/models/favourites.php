@@ -53,7 +53,7 @@ class FlexicontentModelFavourites extends JModel
 	{
 		parent::__construct();
 		
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// Get the paramaters of the active menu item
 		$params = & JComponentHelper::getParams('com_flexicontent');
@@ -113,7 +113,7 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildQuery()
 	{   	
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
@@ -182,7 +182,7 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');

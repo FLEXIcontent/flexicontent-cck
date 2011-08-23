@@ -36,7 +36,7 @@ class FlexicontentViewFavourites extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();

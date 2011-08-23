@@ -352,7 +352,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if($field->field_type != 'minigallery') return;
 		if(!$post) return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$post = array_unique($post);
 	}

@@ -40,7 +40,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'fcpagenav') return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$view = JRequest::getString('view', 'item');
 		if ($view != 'item') return;
 		

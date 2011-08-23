@@ -20,7 +20,7 @@ class FLEXIUtilities {
 		return $j15;
 	}
 	function getMainFrame() {
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		if(!isset($mainframe)) {
 			$mainframe =& JFactory::getApplication();
 		}

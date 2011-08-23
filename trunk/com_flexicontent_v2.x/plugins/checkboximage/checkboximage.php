@@ -33,7 +33,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkboximage') return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
 		jimport('joomla.filesystem.file');
@@ -71,7 +71,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		}
 		
 		// initialise property
-		if($item->getValue('version') < 2 && $default_values) {
+		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();
@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				}
 			}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="custom[checkbox]" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="custom['.$field->name.'][]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;
 			$i++;
 		}			
 			
@@ -152,7 +152,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 
 		$values = $values ? $values : $field->value;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;

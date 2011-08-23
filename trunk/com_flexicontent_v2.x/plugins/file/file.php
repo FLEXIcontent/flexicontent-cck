@@ -192,7 +192,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
 		$separatorf			= $field->parameters->get( 'separatorf', 3 ) ;
@@ -255,7 +255,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($field->field_type != 'file') return;
 		if(!$post) return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$newpost = array();
 		

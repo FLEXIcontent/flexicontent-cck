@@ -35,7 +35,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
 		jimport('joomla.filesystem.file');
@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 		
 		// initialise property
-		if ($item->getValue('version') < 2 && $default_value) {
+		if ($item->getValue('version', NULL, 0) < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} elseif (!$field->value[0]) {
@@ -148,7 +148,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
 		
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$values = $values ? $values : $field->value ;
 
