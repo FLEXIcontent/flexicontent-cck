@@ -40,6 +40,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
+		<field name="autodisplayextrafields" type="radio" default="1" label="Auto display extra fields" description="Auto display extra fields.If yes, the extra fields will displayed on search view, if no, the 'Advanced Search' link text will displayed.You can set 'Advanced Search' link text on below.">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
 	</fieldset>
 	</fields>
 </metadata>

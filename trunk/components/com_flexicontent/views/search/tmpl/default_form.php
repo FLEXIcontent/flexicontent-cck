@@ -1,4 +1,31 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
+<?php defined('_JEXEC') or die('Restricted access');
+$autodisplayextrafields = $this->params->get('autodisplayextrafields', 1);
+if(!$autodisplayextrafields) {
+$this->document->addScriptDeclaration('
+window.addEvent("domready", function() {
+  var status = {
+    "true": "open",
+    "false": "close"
+  };
+
+  // -- vertical
+
+  var myVerticalSlide = new Fx.Slide("extrafields").hide();
+
+  /*$("advancedsearchtext").addEvent("click", function(event){
+    event.stop();
+    myVerticalSlide.slideIn();
+  });*/
+
+  $("advancedsearchtext").addEvent("click", function(event){
+    //event.stop();
+    //myVerticalSlide.slideOut();
+    myVerticalSlide.toggle();
+  });
+});
+');
+}
+?>
 
 <form id="searchForm" action="index.php" method="get" name="searchForm">
 	<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
@@ -43,6 +70,17 @@
 			</tr>
 		<?php
 			}
+		?>
+		<?php if(!$autodisplayextrafields) {?>
+		<tr>
+			<td colspan="3">
+				<a href="javascript:;" id="advancedsearchtext"><?php echo $this->params->get('linkadvsearch_txt', 'Advanced Search');?></a>
+			</td>
+		</tr>
+		<?php }?>
+		</table>
+		<table id="extrafields" class="extrafields contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+		<?php
 			foreach ($this->fields as $field) {
 		?>
 			<tr>
@@ -73,6 +111,8 @@
 				//}
 			}
 			?>
+		</table>
+		<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 		<?php if($show_searchordering = $this->params->get('show_searchordering', 1)) {?>
 		<tr>
 			<td colspan="3">
