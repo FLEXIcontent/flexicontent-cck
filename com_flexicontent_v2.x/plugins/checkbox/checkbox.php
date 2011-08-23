@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		}
 
 		// initialise property
-		if($item->getValue('version') < 2 && $default_values) {
+		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();
@@ -85,7 +85,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 					$checked = ' checked="checked"';
 				}
 			}
-			$options .= '<label><input type="custom[checkbox]" class="'.$required.'" name="'.$field->name.'[]" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;			 
+			$options .= '<label><input type="checkbox" name="custom['.$field->name.'][]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.JText::_($listarray[1]).'</label>'.$separator;
 			$i++;
 		}
 		$field->html	= $options;

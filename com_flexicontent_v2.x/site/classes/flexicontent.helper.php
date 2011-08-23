@@ -742,7 +742,7 @@ class flexicontent_html
 	 */
 	function buildlanguageslist($name, $class, $selected, $type = 1)
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 
 		$query = 'SELECT *'

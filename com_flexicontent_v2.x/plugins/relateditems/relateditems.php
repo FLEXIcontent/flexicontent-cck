@@ -44,7 +44,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 		
 		// initialise property
-		if($item->getValue('version') < 2 && $default_values) {
+		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();
@@ -129,7 +129,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		foreach($items_arr as $itemdata) {
 			$itemtitle = (mb_strlen($itemdata->title) > $maxtitlechars) ? mb_substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
 			$statestr = "[". @$state_shortname[$itemdata->state]."] ";
-			$itemtitle = $statestr.$itemtitle." ".$itemdata->catlist;
+			$itemtitle = $statestr.$itemtitle." ";//.$itemdata->catlist;
 			$itemcat_arr = explode(",", $itemdata->catlist);
 			$classes_str = "";
 			$itemid = $itemdata->id;
@@ -144,7 +144,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" style="min-width:140px;display:inline;" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" style="min-width:140px;display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		

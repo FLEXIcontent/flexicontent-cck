@@ -489,7 +489,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	/*function _buildItemWhere()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$user		=& JFactory::getUser();
 		$aid		= (int) $user->get('aid', 0);
@@ -628,7 +628,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @since	1.0
 	 */
 	function hit() {
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		if ($this->_id)
 		{

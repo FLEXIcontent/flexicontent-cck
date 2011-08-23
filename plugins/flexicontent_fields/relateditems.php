@@ -128,7 +128,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		foreach($items_arr as $itemdata) {
 			$itemtitle = (mb_strlen($itemdata->title) > $maxtitlechars) ? mb_substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
 			$statestr = "[". @$state_shortname[$itemdata->state]."] ";
-			$itemtitle = $statestr.$itemtitle." ".$itemdata->catlist;
+			$itemtitle = $statestr.$itemtitle." ";//.$itemdata->catlist;
 			$itemcat_arr = explode(",", $itemdata->catlist);
 			$classes_str = "";
 			$itemid = $itemdata->id;
