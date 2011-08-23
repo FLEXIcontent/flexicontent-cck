@@ -584,22 +584,22 @@ class FlexicontentModelItems extends JModel
 				$curversion = (int)$item->version;
 				
 				//Save target item
-      			$row  				=& JTable::getInstance('flexicontent_items', '');
-      			$row 				= $item;
-      			$row->id 			= null;
-      			$row->item_id 		= null;
-      			$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
-      			$row->hits 			= 0;
-      			$row->version 		= 1;
-      			$datenow 			=& JFactory::getDate();
-      			$row->created 		= $datenow->toMySQL();
-      			$row->publish_up	= $datenow->toMySQL();
-      			$row->modified 		= $nullDate;
+				$row  				=& JTable::getInstance('flexicontent_items', '');
+				$row 					= $item;
+				$row->id 				= null;
+				$row->item_id 	= null;
+				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
+				$row->hits 			= 0;
+				$row->version 	= 1;
+				$datenow 				=& JFactory::getDate();
+				$row->created 		= $datenow->toMySQL();
+				$row->publish_up	= $datenow->toMySQL();
+				$row->modified 		= $nullDate = $this->_db->getNullDate();
 				$row->state			= $state ? $state : $row->state;
-				$row->language		= $lang ? $lang : $row->language;
-    			$row->store();
-    		
-    			$copyid = (int)$row->id;
+				$row->language	= $lang ? $lang : $row->language;
+				
+				$row->store();
+				$copyid = (int)$row->id;
 
 				// get the item fields
 				$query 	= 'SELECT *'
