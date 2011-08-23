@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Related Items</name>
+	<author>ggppdk</author>
+	<creationDate>Aug 2011</creationDate>
+	<copyright>Copyright (C) 2011 ggppdk</copyright>
+	<license>GNU/GPL v3</license>
+	<authorEmail>ggppdk</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_RELATEDITEMS</description>
+	<files>
+		<filename plugin="relateditems">relateditems.php</filename>
+	</files>
+	<config>
+	<fields name="attribs">
+		<fieldset name="basic">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		<fieldset name="group-relateditems" addpath="/administrator/components/com_flexicontent/elements">
+		<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+		<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<field name="size" type="text" default="12" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+		<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+			<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
+		</field>
+		<field name="maxtitlechars" type="text" default="40" label="Maximum Title Chars" description="Maximum character Length for title, title longer than this will be trimmend" />
+		<field name="samelangonly" type="radio" default="1" label="List Same Language Items Only" description="When this is enabled only items that have the same language as the item will be listed">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+		<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
+		<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</field>
+		</fieldset>
+	</fields>
+	</config>
+	<languages>
+	</languages>
+</install>

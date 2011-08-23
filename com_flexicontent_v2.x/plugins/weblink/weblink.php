@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$required 	= $required ? ' required' : '';
 		
 		// initialise property
-		if($item->version < 2 && $default_link) {
+		if($item->getValue('version') < 2 && $default_link) {
 			$field->value = array();
 			$field->value[0]['link'] = $default_link;
 			$field->value[0]['title'] = $default_title;

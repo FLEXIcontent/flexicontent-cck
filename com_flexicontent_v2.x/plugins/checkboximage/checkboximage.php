@@ -71,7 +71,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		}
 		
 		// initialise property
-		if($item->version < 2 && $default_values) {
+		if($item->getValue('version') < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();

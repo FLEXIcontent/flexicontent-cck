@@ -108,8 +108,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 
 			case 'version': // version
-			$field->value[] = $item->version;
-			$field->display = $pretext.$item->version.$posttext;
+			$field->value[] = $item->getValue('version');
+			$field->display = $pretext.$item->getValue('version').$posttext;
 			break;
 
 			case 'state': // state

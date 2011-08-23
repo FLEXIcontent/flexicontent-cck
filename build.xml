@@ -222,6 +222,9 @@
 			</fileset>
 		</copy>
 
+		<copy file="plugins/flexicontent_fields/relateditems.php" tofile="flexipack/plugins/relateditems/relateditems.php" />
+		<copy file="plugins/flexicontent_fields/relateditems.xml" tofile="flexipack/plugins/relateditems/relateditems.xml" />
+		
 		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
 		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexinotify/en-GB.plg_flexicontent_flexinotify.ini" />

@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 		
 		// initialise property
-		if ($item->version < 2 && $default_value) {
+		if ($item->getValue('version') < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} elseif (!$field->value[0]) {
