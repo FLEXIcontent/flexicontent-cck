@@ -111,8 +111,8 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				// Check if any character out of the all subgroup characters exists
 				// Meaning (There is at least on item title starting with one of the group letters)
 				$i = 0;
-				while ($i < mb_strlen($letter)) {
-					$uchar = mb_substr($letter,$i++,1);
+				while ($i < JString::strlen($letter)) {
+					$uchar = JString::substr($letter,$i++,1);
 					if (in_array($uchar, $this->alpha)) {
 						$has_item = true;
 						break;
@@ -129,7 +129,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 				$startletter = $range[0];  $endletter = $range[1];
 				
 				// ERROR CHECK: Range START and END are single character strings
-				if (mb_strlen($startletter) != 1 || mb_strlen($endletter) != 1) {
+				if (JString::strlen($startletter) != 1 || JString::strlen($endletter) != 1) {
 					echo "Error in Alpha Index<br>letter range: ".$letter." start and end must be one character<br>";
 					continue;
 				}
