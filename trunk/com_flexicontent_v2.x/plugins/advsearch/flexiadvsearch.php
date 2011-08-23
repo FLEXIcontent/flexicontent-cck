@@ -19,22 +19,20 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $mainframe = &JFactory::getApplication();
-$mainframe->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
-$mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexiadvsearchAreas' );
-
 //Load the Plugin language file out of the administration
 JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 
 /**
  * @return array An array of search areas
  */
-function &plgSearchFlexiadvsearchAreas() {
-	static $areas = array(
-	'flexicontent' => 'FLEXICONTENT'
-	);
-	return $areas;
+if(!function_exists("plgSearchFlexiContentAreas")) {
+	function &plgSearchFlexiContentAreas() {
+		static $areas = array(
+		'flexicontent' => 'FLEXICONTENT'
+		);
+		return $areas;
+	}
 }
-
 /**
  * Search method
  *
@@ -171,6 +169,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$items = array();
 	$resultfields = array();
 	$custom = JRequest::getVar('custom', array());
+	JPluginHelper::importPlugin( 'flexicontent_fields');
 	foreach($fields as $field) {
 		if($field->item_id) {
 			$fieldsearch = @$custom[$field->name];
@@ -232,4 +231,6 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	return $list;
 }
+$mainframe->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
+$mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexiContentAreas' );
 ?>
