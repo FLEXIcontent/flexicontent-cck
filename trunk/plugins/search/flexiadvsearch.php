@@ -168,11 +168,15 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 	}
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
+	$search_fields = $params->get('search_fields', '');
+	$search_fields = "'".str_replace(",", "','", $search_fields)."'";
 	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id"
 		." FROM #__flexicontent_fields as f "
-		." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
+		//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
 		." LEFT JOIN #__flexicontent_fields_item_relations as fir ON f.id=fir.field_id"
-		." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
+		//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
+		." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
+		." GROUP BY fir.field_id,fir.item_id"
 	;
 	$db->setQuery($query);
 	$fields = $db->loadObjectList();
@@ -185,6 +189,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	foreach($fields as $field) {
 		if($field->item_id) {
 			$fieldsearch = JRequest::getVar($field->name, array());
+			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array($fieldsearch);
 			//var_dump($field->name, $_REQUEST[$field->name]);
 			//echo "<br />";
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
@@ -230,6 +235,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
 		. $andaccess
 		. $andlang
+		. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
 		. ' ORDER BY '. $order
 	;
 	$db->setQuery( $query, 0, $limit );
