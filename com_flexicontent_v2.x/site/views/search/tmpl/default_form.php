@@ -184,4 +184,6 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 ?>
 <input type="hidden" name="ordering" value="<?php echo $default_searchordering;?>" />
 <?php } ?>
+
+<input type="hidden" name="Itemid" value="<?php echo JRequest::getVar("Itemid");?>" />
 </form>

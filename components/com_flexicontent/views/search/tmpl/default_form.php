@@ -186,4 +186,5 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 <?php } ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="task" value="search" />
+<input type="hidden" name="Itemid" value="<?php echo JRequest::getVar("Itemid");?>" />
 </form>
