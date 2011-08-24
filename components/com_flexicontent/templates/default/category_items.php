@@ -47,7 +47,7 @@ $tmpl = $this->tmpl;
 	<?php
 	foreach ($this->filters as $filt) :
 		echo '<span class="filter">';
-		echo $filt->html;
+		echo @$filt->html;
 		echo '</span>';
 	endforeach;
 	?>
