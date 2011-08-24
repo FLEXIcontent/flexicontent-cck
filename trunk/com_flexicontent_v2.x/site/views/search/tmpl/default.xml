@@ -9,6 +9,15 @@
 	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="" type="separator" default="Searching" level="level1" menu="hide" />
 		<field name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
+		<field name="show_operator" type="radio" default="1" label="Show Operator" description="Show Operator">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="default_operator" type="radio" default="OR" label="Default Operator" description="Default Operator">
+			<option value="OR">FLEXI_OR</option>
+			<option value="AND">FLEXI_AND</option>
+		</field>
+		<field name="operator_desc" type="textarea" cols="40" rows="10" default="FLEXI_OPERATOR_DESC" label="Operator description" description="Operator description" />
 		<field name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="1" />
 		<field name="cantypes" type="radio" default="1" label="Allow users select type" description="Allow users select type">
 			<option value="0">FLEXI_NO</option>
