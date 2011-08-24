@@ -93,7 +93,7 @@ window.addEvent("domready", function() {
 		<?php
 			foreach ($this->fields as $field) {
 		?>
-			<tr>
+			<tr class="adv_search_f_<?php echo $field->name;?>">
 				<td class="key">
 				<?php if ($field->description) : ?>
 					<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">

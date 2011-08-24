@@ -55,7 +55,14 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$gids = "'".implode("','", $gid)."'";
 	// Get the WHERE and ORDER BY clauses for the query
 	$params 	= & $mainframe->getParams('com_flexicontent');
-	$typeid_for_advsearch = $params->get('typeid_for_advsearch');
+	
+	if($cantypes = $params->get('cantypes', 1)) {
+		$fieldtypes = JRequest::getVar('fieldtypes', array());
+	}
+	if(!$cantypes || (count($fieldtypes)<=0)) {
+		$fieldtypes = $params->get('fieldtypes', array());
+	}
+	if((count($fieldtypes)>0) && !is_array($fieldtypes)) $fieldtypes = array($fieldtypes);
 	$dispatcher =& JDispatcher::getInstance();
 
 	// define section
@@ -154,12 +161,16 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	if (FLEXI_FISH && $filter_lang) {
 		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 	}
-
+	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
+	$search_fields = $params->get('search_fields', '');
+	$search_fields = "'".str_replace(",", "','", $search_fields)."'";
 	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id"
 		." FROM #__flexicontent_fields as f "
-		." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
+		//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
 		." LEFT JOIN #__flexicontent_fields_item_relations as fir ON f.id=fir.field_id"
-		." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id='{$typeid_for_advsearch}'"
+		//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
+		." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
+		." GROUP BY fir.field_id,fir.item_id"
 	;
 	$db->setQuery($query);
 	$fields = $db->loadObjectList();
@@ -172,7 +183,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	JPluginHelper::importPlugin( 'flexicontent_fields');
 	foreach($fields as $field) {
 		if($field->item_id) {
-			$fieldsearch = @$custom[$field->name];
+			$fieldsearch = JRequest::getVar($field->name, array());
+			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array($fieldsearch);
 			if(isset($fieldsearch[0]) && trim($fieldsearch[0])) {
 				$fieldsearch = $fieldsearch[0];
 				$fieldsearch = explode(" ", $fieldsearch);
@@ -214,6 +226,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
 		. $andaccess
 		. $andlang
+		. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
 		. ' ORDER BY '. $order
 	;
 	$db->setQuery( $query, 0, $limit );
