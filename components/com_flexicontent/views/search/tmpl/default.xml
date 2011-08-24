@@ -11,6 +11,15 @@
 		<params addpath="/administrator/components/com_flexicontent/elements">
 			<param name="" type="separator" default="Searching" level="level1" menu="hide" />
 			<param name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
+			<param name="show_operator" type="radio" default="1" label="Show Operator" description="Show Operator">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="default_operator" type="radio" default="OR" label="Default Operator" description="Default Operator">
+				<option value="OR">FLEXI_OR</option>
+				<option value="AND">FLEXI_AND</option>
+			</param>
+			<param name="operator_desc" type="textarea" cols="40" rows="10" default="FLEXI_OPERATOR_DESC" label="Operator description" description="Operator description" />
 			<param name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="true" />
 			<param name="cantypes" type="radio" default="1" label="Allow users select type" description="Allow users select type">
 				<option value="0">FLEXI_NO</option>

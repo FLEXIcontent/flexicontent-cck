@@ -153,7 +153,7 @@ class FLEXIcontentViewSearch extends JView
 			$operators 		= array();
 			$operators[] 	= JHTML::_('select.option',  'OR', JText::_( 'OR' ) );
 			$operators[] 	= JHTML::_('select.option',  'AND', JText::_( 'AND' ) );
-			$lists['operator']= JHTML::_('select.genericlist',  $operators, 'operator', '', 'value', 'text', $operator );
+			$lists['operator']= JHTML::_('select.radiolist',  $operators, 'operator', '', 'value', 'text', $operator );
 		}
 		// log the search
 		FLEXIadvsearchHelper::logSearch( $searchword);

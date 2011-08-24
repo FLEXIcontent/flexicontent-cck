@@ -38,11 +38,6 @@ window.addEvent("domready", function() {
 			<td nowrap="nowrap">
 				<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
 			</td>
-			<?php if($show_operator = $this->params->get('show_operator', 1)) {?>
-			<td nowrap="nowrap">
-				<?php echo $this->lists['operator']; ?>
-			</td>
-			<?php }?>
 			<td width="100%" nowrap="nowrap">
 				<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
 			</td>
@@ -80,6 +75,21 @@ window.addEvent("domready", function() {
 		<?php }?>
 		</table>
 		<table id="extrafields" class="extrafields contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+		<?php if($show_operator = $this->params->get('show_operator', 1)) {
+			$operator_desc = $this->params->get('operator_desc', 'FLEXI_OPERATOR_DESC');
+			$operator_desc = ($operator_desc=='FLEXI_OPERATOR_DESC')?JText::_('FLEXI_OPERATOR_DESC'):$operator_desc;
+		?>
+		<tr>
+			<td>
+				<label for="operator" class="hasTip" title="<?php echo $operator_desc;?>">
+					<?php echo JText::_("FLEXI_OPERATOR"); ?>
+				</label>
+			</td>
+			<td colspan="2">
+				<?php echo $this->lists['operator']; ?>
+			</td>
+		</tr>
+		<?php }?>
 		<?php
 			foreach ($this->fields as $field) {
 		?>
