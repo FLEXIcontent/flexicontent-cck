@@ -525,17 +525,12 @@ class FlexicontentModelItem extends JModel {
 			$date =& JFactory::getDate($item->created, $tzoffset);
 			$item->created = $date->toMySQL();
 
-			if ($item->publish_up) {
-				// Append time if not added to publish date
-				if (strlen(trim($item->publish_up)) <= 10) {
-					$item->publish_up .= ' 00:00:00';
-				}
-			} else {
-				// DO NOT REAPPLY  $tzoffset, as it already has been applied on $item->created
-				// Reapplying $tzoffset, will make publish date to go to the future for negative GMT zones !!!
-				$date =& JFactory::getDate($item->created/*, $tzoffset*/);
-				$item->publish_up = $date->toMySQL();
+			if ($item->publish_up && strlen(trim( $item->publish_up )) <= 10) {
+				$item->publish_up 	.= ' 00:00:00';
 			}
+
+			$date =& JFactory::getDate($item->publish_up, $tzoffset);
+			$item->publish_up = $date->toMySQL();
 
 			// Handle never unpublish date
 			if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
