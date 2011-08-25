@@ -91,25 +91,30 @@ window.addEvent("domready", function() {
 		</tr>
 		<?php }?>
 		<?php
-			foreach ($this->fields as $field) {
+			//params[search_fields]
+			$search_fields = $this->params->get('search_fields', '');
+			$search_fields = explode(",", $search_fields);
+			$fields = &$this->fields;
+			foreach($search_fields as $f) {
+				if(!isset($fields[$f])) continue;
 		?>
-			<tr class="adv_search_f_<?php echo $field->name;?>">
+			<tr class="adv_search_f_<?php echo $fields[$f]->name;?>">
 				<td class="key">
-				<?php if ($field->description) : ?>
-					<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-						<?php echo $field->label; ?>
+				<?php if ($fields[$f]->description) : ?>
+					<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo $fields[$f]->label; ?>::<?php echo $fields[$f]->description; ?>">
+						<?php echo $fields[$f]->label; ?>
 					</label>
 				<?php else : ?>
-					<label for="<?php echo $field->name; ?>">
-						<?php echo $field->label; ?>
+					<label for="<?php echo $fields[$f]->name; ?>">
+						<?php echo $fields[$f]->label; ?>
 					</label>
 				<?php endif; ?>
 				</td>
 				<td>
 					<?php
 					$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-					if(isset($field->html)) {
-						echo $field->html;
+					if(isset($fields[$f]->html)) {
+						echo $fields[$f]->html;
 					} else {
 						echo $noplugin;
 					}
