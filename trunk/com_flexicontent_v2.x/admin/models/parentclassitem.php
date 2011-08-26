@@ -205,8 +205,8 @@ class ParentClassItem extends JModelAdmin {
 					$item->modifier = $this->_db->loadResult();
 				}
 				$fields = $this->getExtraFields();
-				$this->getExtrafieldvalue($fields['categories'], $version);
-				$item->cid = $fields['categories']->value;
+				
+				$item->cid = @$fields['categories']->value;
 			}
 			if($pk <= 0) {
 				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
@@ -369,44 +369,65 @@ class ParentClassItem extends JModelAdmin {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$mainframe = &JFactory::getApplication();
+		
+		// Get an empty item model (with default values), and the current user too
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
-
-		$tags			= isset($data['tag'])?$data['tag']:array();
+		
+		// tags and cats will need some manipulation so we retieve them 
+		$tags			= isset($data['jform']['tag'])?$data['jform']['tag']:array();
 		$cats			= isset($data['jform']['cid'])?$data['jform']['cid']:array();
+		
+		// Set the item id to the now empty item model
 		$id			= (int)$data['jform']['id'];
-		$data['vstate']		= (int)$data['vstate'];
 		$item->id = $id;
-		$nullDate	= $this->_db->getNullDate();
+		
+		// Make tags unique
+		$tags = array_unique($tags);
+		
+		// Get version and current version, and some global params too
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$isnew = false;
-		$tags = array_unique($tags);
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
+		
+		// Item Rules ?
 		$item->setRules($data['jform']['rules']);
-		if( ($isnew = !$id) || ($data['vstate']==2) ) {//vstate = 2 is approve version then save item to #__content table.
+		
+		// A zero id indicate new item
+		$isnew = !$id;
+		
+		// vstate = 2 is approve version then save item to #__content table.
+		$data['vstate']		= (int)$data['vstate'];
+		
+		if( $isnew || ($data['vstate']==2) ) {
 			// Add the primary cat to the array if it's not already in
-			if (!in_array($data['jform']['catid'], $cats) && $item->catid) {
-				$cats[] = $item->catid;
+			if (!in_array($data['jform']['catid'], $cats) &&  $data['jform']['catid']) {
+				$cats[] =  $data['jform']['catid'];
 			}
-			// Store categories to item relations
-			$data['jform']['categories'] = $cats;
+			
+			// Set back the altered categories and tags to the form data
+			$data['jform']['cid'] = $cats;
 			$data['jform']['tags'] = $tags;
+			
 			if(!$this->applyCurrentVersion($item, $data)) return false;
+			//echo "<pre>"; var_dump($data); exit();
 		} else {
+			// Not new and not approving version, load item data
 			$item->load($id);
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
 			$item->modified_by 		= $user->get('id');
+			
 			// Add the primary cat to the array if it's not already in
 			if (!in_array($item->catid, $cats)) {
 				$cats[] = $item->catid;
 			}
-			// Store categories to item relations
-			$data['jform']['categories'][0] = $cats;
-			$data['jform']['tags'][0] = $tags;
+			
+			// Set back the altered categories and tags to the form data
+			$data['jform']['cid'] = $cats;
+			$data['jform']['tags'] = $tags;
 
 			//At least one category needs to be assigned
 			if (!is_array( $cats ) || count( $cats ) < 1) {
@@ -432,7 +453,7 @@ class ParentClassItem extends JModelAdmin {
 			$v->created 		= $item->created;
 			$v->created_by 		= $item->created_by;
 
-			if ($v->modified != $nullDate) {
+			if ($v->modified != $this->_db->getNullDate() ) {
 				$v->created 	= $v->modified;
 				$v->created_by 	= $v->modified_by;
 			}
@@ -481,9 +502,7 @@ class ParentClassItem extends JModelAdmin {
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$user	=& JFactory::getUser();
-		//$cats = $data['jform']['cid'][0];
 		$cats = $data['jform']['cid'];
-		//$tags = $data['jform']['tags'][0];
 		$tags = $data['jform']['tags'];
 
 		// bind it to the table
@@ -494,6 +513,7 @@ class ParentClassItem extends JModelAdmin {
 		// sanitise id field
 		$item->id = (int) $item->id;
 		
+		// if main catid not selected then set the first selected category as main category
 		if(!$item->catid && (count($cats)>0)) {
 			$item->catid = $cats[0];
 		}
@@ -656,8 +676,8 @@ class ParentClassItem extends JModelAdmin {
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 
-		$cats = $data['jform']['categories'][0];
-		$tags = $data['jform']['tags'][0];
+		$cats = $data['jform']['cid'];
+		$tags = $data['jform']['tags'];
 		///////////////////////////////
 		// store extra fields values //
 		///////////////////////////////
@@ -675,6 +695,10 @@ class ParentClassItem extends JModelAdmin {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			//$files		= $data['jform']['files'];
 			$searchindex = '';
+			
+			// SET THE real name of categories. The name is categories not cid
+			$data['jform']['categories'] = & $data['jform']['cid'];
+			
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
 				$fkey = $field->iscore?'jform':'custom';
@@ -692,19 +716,20 @@ class ParentClassItem extends JModelAdmin {
 					if ($field->id != 7) {
 						$this->saveFieldItem($item->id, $field->id, $data['jform'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 					}
-				}elseif (is_array(@$data['custom'][$field->name])) {
+				} else if (is_array(@$data['custom'][$field->name])) {
 					$postvalues = $data['custom'][$field->name];
 					$i = 1;
 					foreach ($postvalues as $postvalue) {
 						$this->saveFieldItem($item->id, $field->id, $postvalue, $isnew, $field->iscore, ($data['vstate']==2), $i++);
 					}
-				}elseif(isset($data['custom'][$field->name])) {
+				} else if (isset($data['custom'][$field->name])) {
 					$this->saveFieldItem($item->id, $field->id, $data['custom'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 				}
 				// process field mambots onAfterSaveField
 				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
 				$searchindex 	.= @$field->search;
 			}
+			
 			// store the extended data if the version is approved
 			if( $isnew || ($data['vstate']==2) ) {
 				$item->search_index = $searchindex;
@@ -754,7 +779,8 @@ class ParentClassItem extends JModelAdmin {
 	 * @return int
 	 * @since 1.5
 	 */
-	function restore($version, $id) {
+	function restore($version, $id)
+	{
 		// delete current field values
 		$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.(int)$id;
 		$this->_db->setQuery($query);
@@ -859,11 +885,34 @@ class ParentClassItem extends JModelAdmin {
 	 * @return object
 	 * @since 1.0
 	 */
-	function gettags($mask="") {
+	function gettags($mask="")
+	{
 		$where = ($mask!="")?" name like '%$mask%' AND":"";
 		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
+		return $tags;
+	}
+	
+	/**
+	 * Method to fetch used tags when performing an edit action
+	 * 
+	 * @param int id
+	 * @return array
+	 * @since 1.0
+	 */
+	function getUsedtagsArray($id=0)
+	{
+			static $tags = array();
+			if (count($tags)>0) return $tags;
+			if(!$id) $tags = array();
+			else {
+				$query 	= 'SELECT tid FROM #__flexicontent_tags_item_relations'
+					. " WHERE itemid ='$id'"
+					;
+				$this->_db->setQuery($query);
+				$tags = $this->_db->loadResultArray();
+			}
 		return $tags;
 	}
 
@@ -966,8 +1015,8 @@ class ParentClassItem extends JModelAdmin {
 	function getTypeparams ()
 	{
 		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_items_ext AS ie'
-				. ' JOIN #__flexicontent_types AS t ON ie.type_id = t.id'
+				. ' FROM #__flexicontent_types AS t'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
 				. ' WHERE ie.item_id = ' . (int)$this->_id
 				;
 		$this->_db->setQuery($query);
@@ -981,7 +1030,8 @@ class ParentClassItem extends JModelAdmin {
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist () {
+	function getTypeslist ()
+	{
 		$query = 'SELECT id, name'
 				. ' FROM #__flexicontent_types'
 				. ' WHERE published = 1'
@@ -1097,27 +1147,25 @@ class ParentClassItem extends JModelAdmin {
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
 	 */
-	function getExtrafieldvalue(&$field, $version = 0) {
-		if(isset($field->value)) return;
-		if(!$version && $field->iscore) {//load current version of core field
-			$this->getCoreFieldValue($field, $version);
-		}else{
-			$query = 'SELECT value'
+	function getExtrafieldvalue($fieldid, $version = 0)
+	{
+		$query = 'SELECT value'
 				.(($version<=0)?' FROM #__flexicontent_fields_item_relations AS fv':' FROM #__flexicontent_items_versions AS fv')
 				.' WHERE fv.item_id = ' . (int)$this->_id
-				.' AND fv.field_id = ' . (int)$field->id
+				.' AND fv.field_id = ' . (int)$fieldid
 				.(($version>0)?' AND fv.version='.((int)$version):'')
 				.' ORDER BY valueorder'
 				;
-			$this->_db->setQuery($query);
-			$field_value = $this->_db->loadResultArray();
-			foreach($field_value as $k=>$value) {
-				if($field->value = @unserialize($value))
-					return;
-					
+		$this->_db->setQuery($query);
+		$field_value = $this->_db->loadResultArray();
+		foreach($field_value as $k=>$value) {
+			if($unserialized_value = @unserialize($value)) {
+				return $unserialized_value;
+			} else {
+				break;
 			}
-			$field->value = $field_value;
 		}
+		return $field_value;
 	}
 	
 	/**
@@ -1146,7 +1194,13 @@ class ParentClassItem extends JModelAdmin {
 			$fields = $this->_db->loadObjectList('name');
 			foreach ($fields as $field) {
 				$field->item_id		= (int)$this->_id;
-				$this->getExtrafieldvalue($field, $version);
+				if (!$version && $field->iscore) {
+					//load current version of core field
+					$this->getCoreFieldValue($field, $version);
+				} else {
+					$field->value 		= $this->getExtrafieldvalue($field->id, $version);
+				}
+				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br>";
 				$field->parameters 	= new JParameter($field->attribs);
 			}
 		}
@@ -1159,11 +1213,12 @@ class ParentClassItem extends JModelAdmin {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getVersionList($limitstart=0, $versionsperpage=0) {
+	function getVersionList($limitstart=0, $versionsperpage=0)
+	{
 		$query 	= 'SELECT v.version_id AS nr, v.created AS date, u.name AS modifier, v.comment AS comment'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				." WHERE item_id = '{$this->_id}'"
+				.' WHERE item_id = ' . (int)$this->_id
 				.' ORDER BY version_id ASC'
 				. ($versionsperpage?' LIMIT '.$limitstart.','.$versionsperpage:'')
 				;
@@ -1175,7 +1230,7 @@ class ParentClassItem extends JModelAdmin {
 		$query 	= 'SELECT count(*) as num'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS u ON v.created_by = u.id'
-				." WHERE item_id = '{$this->_id}'"
+				.' WHERE item_id = ' . (int)$this->_id
 				;
 		$this->_db->setQuery($query);
 		return $this->_db->loadResult();

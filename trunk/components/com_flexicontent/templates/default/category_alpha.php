@@ -87,7 +87,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	?>
 	<div class="<?php echo $groupcssclasses[$i]; ?>">
 	<?php if($flag) {?>
-	<a class="fc_alpha_index" href="#" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :
@@ -161,7 +161,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 			else $aiclass = "fc_alpha_index";
 			if ($has_item) :
 				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
-				echo "<a class=\"$aiclass\" href=\"#\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; document.getElementById('adminForm').submit();\">".strtoupper($letter_label)."</a>";
+				echo "<a class=\"$aiclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; document.getElementById('adminForm').submit();\">".strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<span class=\"$aiclass\">".strtoupper($letter_label)."</span>";

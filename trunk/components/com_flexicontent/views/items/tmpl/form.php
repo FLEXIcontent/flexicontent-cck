@@ -55,7 +55,7 @@ endif;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	JHTML::_('behavior.mootools');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 }
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
@@ -145,7 +145,7 @@ Window.onDomReady(function(){
 });
 function addToList(id, name) {
 	obj = $('ultagbox');
-	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
 }
 function addtag(id, tagname) {
 	if(id==null) {

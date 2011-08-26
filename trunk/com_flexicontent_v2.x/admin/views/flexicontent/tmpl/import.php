@@ -31,7 +31,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('import-log')
 				}).send();
 			}else{
-				$('import-log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+				$('import-log').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('import-log')

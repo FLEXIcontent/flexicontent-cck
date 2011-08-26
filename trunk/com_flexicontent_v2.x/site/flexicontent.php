@@ -17,7 +17,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-error_reporting(E_ALL);
 
 //include the route helper
 require_once (JPATH_COMPONENT.DS.'helpers'.DS.'route.php');

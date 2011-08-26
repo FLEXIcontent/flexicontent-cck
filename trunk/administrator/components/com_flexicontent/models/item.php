@@ -973,7 +973,7 @@ class FlexicontentModelItem extends JModel {
 					. " WHERE itemid ='$id'"
 					;
 				$this->_db->setQuery($query);
-				$this->_item->tags = $this->_db->loadResultArray;
+				$this->_item->tags = $this->_db->loadResultArray();
 			}
 		}
 		return $this->_item->tags;
@@ -1149,7 +1149,7 @@ class FlexicontentModelItem extends JModel {
 	function getExtrafields()
 	{
 		$typeid = JRequest::getVar('typeid', 0, '', 'int');
-		$version = JRequest::getVar( 'version', '', 'request', 'int' );
+		$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
 		$query = 'SELECT fi.*'
 				.' FROM #__flexicontent_fields AS fi'

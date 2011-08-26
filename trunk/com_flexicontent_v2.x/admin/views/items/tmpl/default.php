@@ -161,7 +161,7 @@ window.addEvent('domready', function() {
 			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = e.stop();
 		}else{
-			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = new Event(e).stop();
 		}
 		if(MooTools.version>="1.2.4") {

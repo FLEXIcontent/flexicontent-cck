@@ -111,7 +111,7 @@ window.addEvent( "domready", function() {
 });
 function addToList(id, name) {
 	obj = $('ultagbox');
-	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='jform[tag][]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
 }
 function addtag(id, tagname) {
 	if(id==null) {
@@ -160,7 +160,7 @@ function submitbutton( pressbutton ) {
 
 function deleteTag(obj) {
 	parent = $($(obj).getParent());
-	parent.remove();
+	jQuery(parent).remove();
 }
 </script>
 
@@ -190,8 +190,8 @@ function deleteTag(obj) {
 				<?php echo $this->item->getLabel('title');?>
 			</td>
 			<td>
-				<?php /*<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" size="65" maxlength="254" />*/?>
-				<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="55" maxlength="254">
+				<?php /*<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" size="65" maxlength="254" />*/ ?>
+				<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="55" maxlength="254" />
 			</td>
 		</tr>
 		<tr>
@@ -332,10 +332,10 @@ $canpublish = $this->perms['canpublish'];
 						if(in_array($tag->id, $this->used)) {
 							if ($this->perms['canusetags']) {
 								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 							} else {
 								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
 							}
 						}
 					}

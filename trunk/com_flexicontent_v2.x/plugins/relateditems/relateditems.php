@@ -211,7 +211,7 @@ window.addEvent( 'domready', function() {
 		if($field->field_type != 'relateditems') return;
 		if(!$post) return;
 		
-		$post = serialize($post);
+		//$post = serialize($post);
 	}
 
 
@@ -227,7 +227,7 @@ window.addEvent( 'domready', function() {
 		
 		$values = $values ? $values : $field->value ;
 		if (isset($values[0])) {
-			$values = unserialize($values[0]);
+			//$values = unserialize($values[0]);
 		}
 
 		// some parameter shortcuts

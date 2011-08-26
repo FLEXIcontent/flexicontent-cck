@@ -131,7 +131,8 @@ class FlexicontentModelItem extends ParentClassItem
 			return $this->_item;
 		}
 		// Initialise variables.
-		$pk = (!empty($pk)) ? $pk : (int) $this->getState('article.id');
+		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
+		//$pk = (!empty($pk)) ? $pk : (int) $this->getState('article.id');
 
 		//if ($this->_item === null) {
 		//	$this->_item = array();

@@ -119,6 +119,7 @@ class FlexicontentViewItems extends JView {
 		
 		$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
 		$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
+		$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		
@@ -137,7 +138,7 @@ class FlexicontentViewItems extends JView {
 			JToolBarHelper::editList('items.edit');
 		}
 		if ($permission->CanDelete) {
-			JToolBarHelper::deleteList('items.remove');
+			JToolBarHelper::deleteList('Are you sure?', 'items.remove');
 		}
 		if (!$permission->CanPublish) {
 			JToolBarHelper::customX( 'items.approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
