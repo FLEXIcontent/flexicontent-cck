@@ -88,8 +88,12 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	// shortcode of the site active language (joomfish)
 	$lang 		= JRequest::getWord('lang', '' );
 
-	$limit 			= $pluginParams->def( 'search_limit', 50 );
-	$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
+	//$limit 			= $pluginParams->def( 'search_limit', 50 );
+	$limit 			= $pluginParams->get( 'search_limit', 50 );
+	//$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
+	$filter_lang 	= $pluginParams->get( 'filter_lang', 1 );
+	//$browsernav 	= (int)$pluginParams->def( 'browsernav', 2 );
+	$browsernav 	= (int)$pluginParams->get( 'browsernav', 2 );
 
 	// Dates for publish up & down items
 	$nullDate = $db->getNullDate();
@@ -208,7 +212,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$query 	= 'SELECT DISTINCT a.id,a.title AS title,'
 		. ' a.created AS created,'
 		. ' ie.search_index AS text,'
-		. ' "2" AS browsernav,c.lft,c.rgt,'
+		. ' "'.$browsernav.'" AS browsernav,c.lft,c.rgt,'
 		. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 		. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
