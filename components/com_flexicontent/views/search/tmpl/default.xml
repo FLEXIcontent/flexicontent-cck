@@ -52,10 +52,22 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
-		<param name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+			<param name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="show_section" type="radio" default="1" label="Show section" description="Show section in results">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="show_text" type="radio" default="1" label="Show description text" description="Show description text in results">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="show_date" type="radio" default="1" label="Show created date" description="Show created date in results">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 		</params>
 	</state>
 </metadata>

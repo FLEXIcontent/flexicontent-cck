@@ -54,6 +54,14 @@
 			<option value="1">FLEXI_YES</option>
 		</field>
 		<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
+		<field name="show_text" type="radio" default="1" label="Show description text" description="Show description text in results">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="show_date" type="radio" default="1" label="Show created date" description="Show created date in results">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
 	</fieldset>
 	</fields>
 </metadata>

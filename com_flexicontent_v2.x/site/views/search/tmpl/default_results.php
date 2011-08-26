@@ -22,7 +22,7 @@
 						if ( $result->href ) : ?>
 							</a>
 						<?php endif;
-						if ( $result->section ) : ?>
+						if ($this->params->get( 'show_section', 0 ) && $result->section ) : ?>
 							<br />
 							<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 								(<?php echo $this->escape($result->section); ?>)
@@ -30,11 +30,13 @@
 						<?php endif; ?>
 					<?php endif; ?>
 				</div>
+				<?php if ( $this->params->get( 'show_text', 1 )) : ?>
 				<div>
 					<?php echo $result->text; ?>
 				</div>
+				<?php endif;?>
 				<?php
-					if ( $this->params->get( 'show_date' )) : ?>
+					if ( $this->params->get( 'show_date', 1 )) : ?>
 				<div class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 					<?php echo $result->created; ?>
 				</div>

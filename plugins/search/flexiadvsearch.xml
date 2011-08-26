@@ -23,6 +23,10 @@
 			<option value="1">Yes</option>
 		</param>
 		<param name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+		<param name="browsernav" type="radio" default="2" label="Browser Navigator" description="Browser Navigator">
+			<option value="1">Open New Window</option>
+			<option value="2">Open Same Window</option>
+		</param>
 	</params>
 
 </install>
