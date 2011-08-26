@@ -319,11 +319,11 @@ class FlexicontentModelItems extends JModel
 				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
 			if($use_versioning) {
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
-					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
+					." JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
 			}else{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_fields_item_relations as iv "
-					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id "
+					." JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.item_id='".$this->_id."';";
 			}
 			$this->_db->setQuery($query);
@@ -334,7 +334,7 @@ class FlexicontentModelItems extends JModel
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
 					$item->$fieldname = unserialize($f->value);
-				}else{
+				}elseif($fieldname) {
 					$item->$fieldname = $f->value;
 				}
 			}
