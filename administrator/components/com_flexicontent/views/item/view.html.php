@@ -50,7 +50,7 @@ class FlexicontentViewItem extends JView {
 
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 			JHTML::_('behavior.mootools');
-			$document->addScript('components/com_flexicontent/assets/js/jquery-1.5.2.min.js');
+			$document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 		}
 		JHTML::_('behavior.tooltip');
 

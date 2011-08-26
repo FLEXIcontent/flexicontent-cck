@@ -70,7 +70,7 @@ class FLEXIcontentViewSearch extends JView
 
 		JToolBarHelper::publishList('index.publish', 'Publish');
 		JToolBarHelper::unpublishList('index.unpublish', 'Unpublish');
-		JToolBarHelper::deleteList('delete', 'index.delete', 'Delete');
+		JToolBarHelper::deleteList('Are you sure?', 'index.delete', 'Delete');
 
 		$toolbar->appendButton('Separator', 'divider');
 		$toolbar->appendButton('Popup', 'config', 'FINDER_OPTIONS', 'index.php?option=com_finder&view=config&tmpl=component', 570, 500);

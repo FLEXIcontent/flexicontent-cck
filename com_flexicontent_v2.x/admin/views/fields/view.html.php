@@ -68,12 +68,12 @@ class FlexicontentViewFields extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
-		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		JToolBarHelper::customX( 'fields.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolBarHelper::publishList('fields.publish');
 		JToolBarHelper::unpublishList('fields.unpublish');
 		JToolBarHelper::addNew('fields.add');
 		JToolBarHelper::editList('fields.edit');
-		JToolBarHelper::deleteList('fields.remove');
+		JToolBarHelper::deleteList('Are you sure?', 'fields.remove');
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model

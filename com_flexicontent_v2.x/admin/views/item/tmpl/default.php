@@ -103,7 +103,7 @@ window.addEvent( "domready", function() {
 });
 function addToList(id, name) {
 	obj = $('ultagbox');
-	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"#\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='jform[tag][]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
 }
 function addtag(id, tagname) {
 	if(id==null) {
@@ -137,7 +137,7 @@ function clickRestore(link) {
 }
 function deleteTag(obj) {
 	parent = $($(obj).getParent());
-	parent.remove();
+	parent.dispose();
 }
 jQuery(document).ready(function($){
 //autogrow
@@ -246,10 +246,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 										$tag = $this->usedtags[$i];
 										if ($this->permission->CanUseTags) {
 											echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+											echo '<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" /><a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 										} else {
 											echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-											echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" align="right"></a></li>';
+											echo '<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
 										}
 									}
 ?>
@@ -524,7 +524,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->form->getValue('creator'), 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
 				if((int)$version->nr==(int)$this->form->getValue('version')) {//is current version? ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->form->getValue('id');?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->form->getValue('id');?>&version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
 					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="javascript:;" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>

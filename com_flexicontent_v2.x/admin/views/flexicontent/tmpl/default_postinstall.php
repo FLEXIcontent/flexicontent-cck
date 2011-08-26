@@ -33,7 +33,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existfields-log')
 				}).send();
 			}else{
-				$('existfields-log').setHTML(ajaxloader);
+				$('existfields-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existfields-log')
@@ -54,7 +54,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existmenuitems-log')
 				}).send();
 			}else{
-				$('existmenuitems-log').setHTML(ajaxloader);
+				$('existmenuitems-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existmenuitems-log')
@@ -75,7 +75,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existtype-log')
 				}).send();
 			}else{
-				$('existtype-log').setHTML(ajaxloader);
+				$('existtype-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existtype-log')
@@ -96,7 +96,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('publishplugins-log')
 				}).send();
 			}else{
-				$('publishplugins-log').setHTML(ajaxloader);
+				$('publishplugins-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('publishplugins-log')
@@ -117,7 +117,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existlang-log')
 				}).send();
 			}else{
-				$('existlang-log').setHTML(ajaxloader);
+				$('existlang-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existlang-log')
@@ -138,7 +138,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existversions-log')
 				}).send();
 			}else{
-				$('existversions-log').setHTML(ajaxloader);
+				$('existversions-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existversions-log')
@@ -159,7 +159,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('existversionsdata-log')
 				}).send();
 			}else{
-				$('existversionsdata-log').setHTML(ajaxloader);
+				$('existversionsdata-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('existversionsdata-log')
@@ -180,7 +180,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('cachethumb-log')
 				}).send();
 			}else{
-				$('cachethumb-log').setHTML(ajaxloader);
+				$('cachethumb-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('cachethumb-log')
@@ -201,7 +201,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('oldbetafiles-log')
 				}).send();
 			}else{
-				$('oldbetafiles-log').setHTML(ajaxloader);
+				$('oldbetafiles-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('oldbetafiles-log')
@@ -222,7 +222,7 @@ $('oldfieldsdata').addEvent('click', function(e) {
 					update: $('oldfieldsdata-log')
 				}).send();
 			}else{
-				$('oldfieldsdata-log').setHTML(ajaxloader);
+				$('oldfieldsdata-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('oldfieldsdata-log')
@@ -243,7 +243,7 @@ $('missingversion').addEvent('click', function(e) {
 					update: $('missingversion-log')
 				}).send();
 			}else{
-				$('missingversion-log').setHTML(ajaxloader);
+				$('missingversion-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('missingversion-log')
@@ -264,7 +264,7 @@ $('missingversion').addEvent('click', function(e) {
 					update: $('initialpermission-log')
 				}).send();
 			}else{
-				$('initialpermission-log').setHTML(ajaxloader);
+				$('initialpermission-log').set('html',ajaxloader);
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('initialpermission-log')

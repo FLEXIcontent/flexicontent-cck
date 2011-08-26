@@ -59,7 +59,7 @@ class FlexicontentViewCategories extends JView {
 		JToolBarHelper::unpublishList('categories.unpublish');
 		JToolBarHelper::addNew('category.add');
 		JToolBarHelper::editList('category.edit');
-		JToolBarHelper::deleteList('categories.remove');
+		JToolBarHelper::deleteList('Are you sure?', 'categories.remove');
 		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
