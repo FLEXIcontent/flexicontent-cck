@@ -24,6 +24,10 @@
 					<option value="0">NO</option>
 					<option value="1">YES</option>
 				</field>
+				<field name="allowunauthorize" type="radio" default="0" label="Allow unauthorized users" description="Allow unauthorized users to add article.">
+					<option value="0">NO</option>
+					<option value="1">YES</option>
+				</field>
 				<field name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" />
 			</fieldset>
 		</fields>
