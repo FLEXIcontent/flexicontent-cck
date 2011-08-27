@@ -227,8 +227,15 @@ function FLEXIcontentParseRoute($segments)
 
 	// 5.b Segments Length 1 is 'category' view
 	if($count == 1) {
-		$vars['view'] = 'category';
 		$vars['cid'] 	= $segments[0];
+		if(is_numeric($vars['cid'])) {
+			$vars['view'] = 'category';
+		}else{
+			$vars['view'] = 'item';
+			$vars['layout'] = 'form';
+			unset($vars['cid']);
+		}
+		
 		return $vars;
 	}
 
