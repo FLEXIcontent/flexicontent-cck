@@ -77,7 +77,7 @@ class FlexicontentHelperRoute
 			$activemenuItemId = $activemenuItem->id;
 			
 			$db 	=& JFactory::getDBO();
-			$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+			$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
 			$flexi_comp_id = $db->loadResult();	
 			
 			$query 	= 'SELECT COUNT( m.id )'
