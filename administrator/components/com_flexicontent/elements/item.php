@@ -52,9 +52,21 @@ class JElementItem extends JElement
 		}
 
 		$js = "
+		window.addEvent( 'domready', function()
+		{
+			$('remove').addEvent('click', function(){
+				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ITEM' )."');
+				$('a_id').setProperty('value', '0');
+			});
+		});
+		
 		function qfSelectItem(id, cid, title) {
 			document.getElementById('a_id').value = id;
-			document.getElementById('urlparamscid').value = cid;
+			
+			var cid_field =	document.getElementById('urlparamscid');
+			if (cid_field) obj.value = cid;
+			/*else document.getElementById('a_id').value += ':'+cid; */
+			
 			document.getElementById('a_name').value = title;
 			document.getElementById('sbox-window').close();
 		}";
@@ -67,6 +79,7 @@ class JElementItem extends JElement
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"$item->title\" disabled=\"disabled\" /></div>";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
 		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
+		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
 
 		return $html;
 	}

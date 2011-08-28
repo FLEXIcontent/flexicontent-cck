@@ -145,6 +145,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
+<?php if (!$this->existauthors) : ?>
+<script type="text/javascript">
+	window.addEvent('domready', function(){
+		$('existauthors').addEvent('click', function(e) {
+			$('existauthors-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&task=createauthorstable&<?php echo JUtility::getToken();?>=1&format=raw";
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existauthors-log')
+			});
+			ajax.request.delay(500, ajax);
+		});
+	});
+</script>
+<?php endif; ?>
 <?php // if (!$this->cachethumb) : ?>
 <!--
 <script type="text/javascript">
@@ -276,6 +294,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				</td>
 				<td id="existversionsdata-log">
 					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="key">
+					<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
+				</td>
+				<td id="existauthors-log">
+					<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</td>
 			</tr>
 <!--

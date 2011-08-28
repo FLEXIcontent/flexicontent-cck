@@ -323,7 +323,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->assigned; ?></td>
 			<td align="center">
-				<a href="<?php echo 'index.php?option=com_users&amp;task=edit&amp;hidemainmenu=1&amp;cid[]='.$row->uploaded_by; ?>">
+				<a href="<?php echo 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;task=edit&amp;hidemainmenu=1&amp;cid[]='.$row->uploaded_by; ?>">
 					<?php echo $row->uploader; ?>
 				</a>
 			</td>

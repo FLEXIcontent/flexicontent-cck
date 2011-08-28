@@ -111,7 +111,6 @@ class FlexicontentViewCategory extends JView {
 	    	
 		// Create the form
 		$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');
-//		$form->loadINI($row->params);
 		foreach ($tmpls as $tmpl) {
 			$tmpl->params->loadINI($row->params);
 		}

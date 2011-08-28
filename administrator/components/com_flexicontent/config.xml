@@ -22,6 +22,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+<!--		<param name="authordetails_itemscat" type="flexicategories" default="" label="FLEXI_AUTHORS_DETAILS_CATEGORY" description="FLEXI_AUTHORS_DETAILS_CATEGORY_DESC" menu="hide" /> -->
 		<param name="" type="separator" default="Performance Options" level="level1" menu="hide" />
 		<param name="always_create_fields_display" type="list" default="0" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
 			<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>

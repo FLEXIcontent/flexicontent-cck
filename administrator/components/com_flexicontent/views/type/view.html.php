@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport( 'joomla.application.component.view');
 
 /**
- * View class for the FLEXIcontent category screen
+ * View class for the FLEXIcontent type screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent

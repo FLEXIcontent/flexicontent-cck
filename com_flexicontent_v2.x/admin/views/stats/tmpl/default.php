@@ -283,7 +283,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 			$k = 0;
 			for ($i=0, $n=count($this->creators); $i < $n; $i++) {
 			$row = $this->creators[$i];
-			$link 		= 'index.php?option=com_users&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -320,7 +320,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 			$k = 0;
 			for ($i=0, $n=count($this->editors); $i < $n; $i++) {
 			$row = $this->editors[$i];
-			$link 		= 'index.php?option=com_users&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>

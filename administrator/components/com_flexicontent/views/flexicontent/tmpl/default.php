@@ -94,6 +94,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
 						}
 
+						if ($this->dopostinstall && $this->CanAuthors)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'person2_f2.png', "<br>".JText::_( 'FLEXI_ADD_AUTHOR' ) );
+							$link = 'index.php?option='.$option.'&amp;view=users';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-user.png', JText::_( 'FLEXI_AUTHORS' ) );
+						}
+
 						if ($this->dopostinstall && $this->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';

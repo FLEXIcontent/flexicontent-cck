@@ -155,18 +155,18 @@ function FLEXIcontentParseRoute($segments)
 	// 3.a 'download' task
 	if($segments[0] == 'download') {
 		$vars['task'] 	= 'download';
-		$vars['id'] 	= $segments[1];
-		$vars['cid']	= $segments[2];
-		$vars['fid'] 	= $segments[3];
+		$vars['id'] 	= @$segments[1];
+		$vars['cid']	= @$segments[2];
+		$vars['fid'] 	= @$segments[3];
 		return $vars;
 	}
 
 	// 3.b 'weblink' task
 	if($segments[0] == 'weblink') {
 		$vars['task'] 	= 'weblink';
-		$vars['fid'] 	= $segments[1];
-		$vars['cid']	= $segments[2];
-		$vars['ord'] 	= $segments[3];
+		$vars['fid'] 	= @$segments[1];
+		$vars['cid']	= @$segments[2];
+		$vars['ord'] 	= @$segments[3];
 		return $vars;
 	}
 	

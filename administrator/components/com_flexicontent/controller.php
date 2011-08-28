@@ -80,6 +80,7 @@ class FlexicontentController extends JController
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
+		$this->registerTask( 'createauthorstable'		, 'createauthorstable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
@@ -101,6 +102,7 @@ class FlexicontentController extends JController
 		$existlang	 		= & $model->getExistLanguageColumn();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
+		$existauthors 		= & $model->getExistAuthorsTable();
 		//$cachethumb			= & $model->getCacheThumbChmod();  // For J1.7 ?
 		
 		$oldbetafiles		= & $model->getOldBetaFiles();
@@ -112,7 +114,7 @@ class FlexicontentController extends JController
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
-		     (!$existlang) || (!$existversions) || (!$existversionsdata) || 
+		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) ||
 		     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)
 		   ) {
 			$dopostinstall = false;
@@ -473,7 +475,38 @@ VALUES
 			echo '<span class="install-ok"></span>';
 		}
 	}
+	
+	/**
+	 * Method to create the authors table
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createAuthorsTable()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$db 		=& JFactory::getDBO();
+		$nullDate	= $db->getNullDate();
+
+		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
+  				`user_id` int(11) unsigned NOT NULL,
+  				`author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  				`author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+					PRIMARY KEY  (`user_id`)
+					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`"
+					;
+		$db->setQuery($query);
+		
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+	
 	/**
 	 * Method to handle the versions data and to populate the new beta4 versions table
 	 * From #__flexicontent_items_versions to #__flexicontent_versions

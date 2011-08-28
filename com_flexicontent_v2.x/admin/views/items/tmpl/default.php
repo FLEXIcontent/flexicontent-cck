@@ -353,6 +353,7 @@ window.addEvent('domready', function() {
 			</td>
 			<td class="left"></td>
 			<td class="left"></td>
+			<td class="left"></td>
 			<td class="left col_cats">
 			<?php $checked = @$this->filter_subcats ? ' checked="checked"' : ''; ?>
 				<span class="radio"><label for="filter_subcats"><input type="checkbox" name="filter_subcats" value="1" id="filter_subcats" class="inputbox"<?php echo $checked; ?> /><?php echo ' '.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label></span>
@@ -372,7 +373,7 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '14' : '13'; ?>" class="filterbuttons">
+			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo FLEXI_FISH ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
@@ -389,7 +390,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '14' : '13'; ?>">
+			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>

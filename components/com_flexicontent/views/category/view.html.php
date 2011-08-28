@@ -82,7 +82,14 @@ class FlexicontentViewCategory extends JView
 		$params->merge($cparams);
 
 		$total 		= & $this->get('Total');
-
+		
+		$authorid = JRequest::getInt('authorid', 0);
+		$authordescr_item = false;
+		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
+			$authordescr_item = & $this->get('AuthorDescrItem');
+			list($authordescr_item) = FlexicontentFields::getFields($authordescr_item, 'items', $params, $aid);
+		}
+		
 		// Bind Fields
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
@@ -147,6 +154,43 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		$themes		= flexicontent_tmpl::getTemplates();
+		
+		$authordescr_item_html = false;
+		if ($authordescr_item) {
+			
+			//echo "<pre>"; print_r($authordescr_item);exit();
+			$ilayout = $authordescr_item->params->get('ilayout', '');
+			if ($ilayout==='') {
+				$type = & JTable::getInstance('flexicontent_types', '');
+				$type->id = $authordescr_item->type_id;
+				$type->load();
+				$type->params = new JParameter($type->attribs);
+				$ilayout = $type->params->get('ilayout', 'default');
+				//echo "<pre>"; print_r($type);exit();
+			}
+			
+			// start capturing output into a buffer
+			$this->item = & $authordescr_item; 
+			$this->params = & $authordescr_item->params;
+			$this->tmpl = '.item.'.$ilayout;
+			$this->print_link = JRoute::_('index.php?view=items&id='.$authordescr_item->slug.'&pop=1&tmpl=component');
+			
+			ob_start();
+			// include the requested template filename in the local scope
+			// (this will execute the view logic).
+			if ( file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
+				include JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
+			else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
+				include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
+			else
+				include JPATH_COMPONENT.DS.'templates'.DS.'default'.DS.'item.php';
+			
+			// done with the requested template; get the buffer and
+			// clear it.
+			$authordescr_item_html = ob_get_contents();
+			ob_end_clean();
+		}
+		//echo $authordescr_item_html; exit();
 		
 		if ($params->get('clayout')) {
 			// Add the templates css files if availables
@@ -298,11 +342,12 @@ class FlexicontentViewCategory extends JView
 
 		$this->assign('action', 			$uri->toString());
 
-		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
+		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , 	$categories);
 		$this->assignRef('items' , 			$items);
+		$this->assignRef('authordescr_item_html' , $authordescr_item_html);
 		$this->assignRef('category' , 		$category);
 		$this->assignRef('limitstart' , 	$limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);

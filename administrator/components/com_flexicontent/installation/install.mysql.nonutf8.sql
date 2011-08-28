@@ -160,3 +160,11 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `fields` text NOT NULL,
   PRIMARY KEY  (`template`,`layout`,`position`)
 ) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
+  `user_id` int(11) unsigned NOT NULL,
+  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY  (`item_id`),
+) ENGINE=MyISAM;
+
