@@ -72,6 +72,13 @@ class FlexicontentModelCategory extends JModel{
 	var $_group_cats = array();
 
 	/**
+	 * Category author (used for author pseudo-view)
+	 *
+	 * @var string
+	 */
+	var $_authorid = 0;
+
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -83,6 +90,7 @@ class FlexicontentModelCategory extends JModel{
 		global $mainframe;
 
 		$cid			= JRequest::getInt('cid', 0);
+		$this->_authorid = JRequest::getInt('authorid', 0);
 		
 		// we need to merge parameters here to get the correct page limit value
 		$params = $this->_loadCategoryParams($cid);
@@ -192,6 +200,36 @@ class FlexicontentModelCategory extends JModel{
 		
 		return $query;
 	}
+
+	/**
+	 * Retrieve author item
+	 *
+	 * @access public
+	 * @return string
+	 */
+	function getAuthorDescrItem() {
+		$params = $this->_category->parameters;
+		$authordescr_itemid = $params->get('authordescr_itemid', 0);
+		if (!$authordescr_itemid) return false;
+		
+		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
+		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+		. ' FROM #__content AS i'
+		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+		.  ' WHERE i.id='. $authordescr_itemid
+		;
+		
+		$this->_db->setQuery($query);
+		$authorItem = $this->_db->loadObject();
+		
+		return $authorItem;
+	}
+
 
 	/**
 	 * Build the order clause
@@ -729,17 +767,46 @@ class FlexicontentModelCategory extends JModel{
 	function _loadCategoryParams($cid)
 	{
 		global $mainframe;
-
+		
+		// Retrieve author parameters if using displaying AUTHOR pseudo-view
+		$author_basicparams = '';
+		$author_catparams = '';
+		if ($this->_authorid!=0) {
+			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
+			$this->_db->setQuery($query);
+			$author_extdata = $this->_db->loadObject();
+			if ($author_extdata) {
+				$author_basicparams = $author_extdata->author_basicparams;
+				$author_catparams =  $author_extdata->author_catparams;
+				
+				$authorparams = new JParameter($author_basicparams);
+				if (!$authorparams->get('override_currcatconf',0)) {
+					$author_catparams = '';
+				}
+			}
+		}
+		
+		// Retrieve category parameters
 		$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
 		$this->_db->setQuery($query);
 		$catparams = $this->_db->loadResult();
 
-		// Get the page/component configuration
+		// a. Get the PAGE/COMPONENT parameters
 		$params = clone($mainframe->getParams('com_flexicontent'));
 
-		// Merge category parameters into the page configuration
+		// b. Merge category parameters
 		$cparams = new JParameter($catparams);
 		$params->merge($cparams);
+		
+		// c. Merge author basic parameters
+		if ($author_basicparams!=='') {
+			$params->merge( new JParameter($author_basicparams) );
+		}
+
+		// d. Merge author OVERRIDDEN category parameters
+		if ($author_catparams!=='') {
+			$params->merge( new JParameter($author_catparams) );
+		}
 
 		return $params;
 	}

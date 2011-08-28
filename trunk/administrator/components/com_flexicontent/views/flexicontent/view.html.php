@@ -123,6 +123,7 @@ class FlexicontentViewFlexicontent extends JView
 			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 		= & $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
+			$existauthors			= & $this->get( 'ExistAuthorsTable' );
 			//$cachethumb			= & $this->get( 'CacheThumbChmod' );  // For J1.7 ?
 			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
@@ -160,6 +161,7 @@ class FlexicontentViewFlexicontent extends JView
 			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
 			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
 			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
+			$CanAuthors = ($user->gid < 25) ? FAccess::checkComponentAccess('com_users', 'manage', 'users', $user->gmid) : 1;
 			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
 			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
@@ -174,6 +176,7 @@ class FlexicontentViewFlexicontent extends JView
 			$CanTypes 		= 1;
 			$CanFields		= 1;
 			$CanTags 		= 1;
+			$CanAuthors	= 1;
 			$CanArchives	= 1;
 			$CanFiles		= 1;
 			$CanStats		= 1;
@@ -220,6 +223,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata'	, $existversionsdata);
+		$this->assignRef('existauthors'		, $existauthors);
 		//$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
@@ -233,6 +237,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('CanTypes'		, $CanTypes);
 		$this->assignRef('CanFields'	, $CanFields);
 		$this->assignRef('CanTags'		, $CanTags);
+		$this->assignRef('CanAuthors'		, $CanAuthors);
 		$this->assignRef('CanArchives'	, $CanArchives);
 		$this->assignRef('CanFiles'		, $CanFiles);
 		$this->assignRef('CanTemplates'	, $CanTemplates);

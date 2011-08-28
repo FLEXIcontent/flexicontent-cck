@@ -97,9 +97,9 @@ class JElementAlphaindex extends JElement
 		});
 
 		function updatealphafields(val) {
-			var aichars=document.getElementById('paramsalphacharacters');
-			var aicharclasses=document.getElementById('paramsalphagrpcssclasses');
-			//var aicharseparator=document.getElementById('paramsalphacharseparator');
+			var aichars=document.getElementById('".$control_name."alphacharacters');
+			var aicharclasses=document.getElementById('".$control_name."alphagrpcssclasses');
+			//var aicharseparator=document.getElementById('".$control_name."alphacharseparator');
 			if(val!=2) {
 				aichars.disabled=1;          aichars.style.backgroundColor='#D4D0C8';
 				aicharclasses.disabled=1;    aicharclasses.style.backgroundColor='#D4D0C88';

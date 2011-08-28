@@ -97,7 +97,7 @@ window.addEvent('domready', function(){
 		$doc->addScriptDeclaration($js);
 
 		if ($tmpls !== false) {
-			if ($view != 'category') {
+			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
 			}
 			foreach ($tmpls as $tmpl) {

@@ -35,6 +35,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<?php endif; ?>
 <!-- EOF page title -->
 
+<!-- BOF author description -->
+	<?php
+	if ($this->authordescr_item_html) :
+		echo $this->authordescr_item_html;
+	endif;
+	?>
+<!-- EOF author description -->
+
 <!-- BOF category description -->
 	<?php
 	if (($this->category->id > 0) && ((!empty($this->category->image) && $this->params->get('show_description_image', 1)) || ($this->params->get('show_description', 1)) || ($this->params->get('show_cat_title', 1)))) :
