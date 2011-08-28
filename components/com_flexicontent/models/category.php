@@ -365,7 +365,10 @@ class FlexicontentModelCategory extends JModel{
 		$show_noauth = $cparams->get('show_noauth', 0);
 		
 		// First thing we need to do is to select only the requested items
-		$where = ' WHERE rel.catid IN ('.$_group_cats.')';
+		$where = ' WHERE 1=1';
+		if ($this->_authorid)
+			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
+		$where .= ' AND rel.catid IN ('.$_group_cats.')';
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
