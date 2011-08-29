@@ -576,6 +576,8 @@ VALUES
 		jimport('joomla.filesystem.file');
 
 		$files 	= array (
+			'author.xml',
+			'author.php',
 			'default.xml',
 			'default.php',
 			'index.html',

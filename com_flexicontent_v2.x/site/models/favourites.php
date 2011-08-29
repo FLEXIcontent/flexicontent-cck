@@ -123,6 +123,7 @@ class FlexicontentModelFavourites extends JModel
 		$show_noauth = $params->get('show_noauth', 0);
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
+		$joinaccess = $andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
@@ -130,8 +131,8 @@ class FlexicontentModelFavourites extends JModel
 				$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $gid . ')';
 				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
 			} else {
-				$andaccess   = ' AND mc.access <= '.$gid;
-				$andaccess  .= ' AND i.access <= '.$gid;
+				//$andaccess   = ' AND mc.access <= '.$gid;
+				//$andaccess  .= ' AND i.access <= '.$gid;
 			}
 		}
 
@@ -154,8 +155,8 @@ class FlexicontentModelFavourites extends JModel
 				. ' GROUP BY i.id'
 				. $orderby
 				;
-         
-         return $query;
+
+		return $query;
 	}
 
 	/**

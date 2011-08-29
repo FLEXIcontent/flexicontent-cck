@@ -59,7 +59,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						{
 							//$link = 'index.php?option='.$option.'&amp;view=item';
 							$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 0 );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1 );
 						}
 						
 						if ($this->dopostinstall && ($this->permission->CanCats || $this->permission->CanAddCats) )
