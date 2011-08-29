@@ -230,7 +230,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			// We must use timezone offset ZERO, because the date(-time) value is stored in its final value
 			// AND NOT as GMT-0 which would need to be converted to localtime, if not specified the JHTML-date
 			// will convert to local time using a timezone offset, giving erroneous output
-			$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat), $timezone_offset=0 ) : JText::_( 'FLEXI_NO_VALUE' );
+			// J1.6+  CANNOT USE 0 as $timezone_offset, removed it ...
+			$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat)/*, $timezone_offset=0*/ ) : JText::_( 'FLEXI_NO_VALUE' );
 			$n++;
 		}
 		$field->{$prop} = implode($separatorf, $field->{$prop});	
