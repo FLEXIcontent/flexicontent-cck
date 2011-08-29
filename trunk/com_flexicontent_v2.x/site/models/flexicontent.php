@@ -119,11 +119,11 @@ class FlexicontentModelFlexicontent extends JModel
 		if ($menu = JSite::getMenu()->getActive()) {
 			$menuParams->loadJSON($menu->params);
 		}
-
-	$params->merge($menuParams);
+		
+		$params->merge($menuParams);
 
 		// Get the root category from this directory
-		$rootcat	= $params->get('rootcat');
+		$rootcat	= JRequest::getInt('rootcat',0);
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		// Do we filter the categories

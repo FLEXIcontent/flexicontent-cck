@@ -191,7 +191,7 @@ echo $this->pane->endPane();
 				?>
 			</td>
 			<td align="center"><?php
-				//$published = JHTML::_('grid.published', $row, $i );
+				//$published = JHTML::_('jgrid.published', $row->published, $i, 'fileselement.' );
 				//echo $published;
 				echo JHTML::image('administrator/images/tick.png', '');
 				?></td>
