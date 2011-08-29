@@ -326,28 +326,30 @@ class FlexicontentModelCategory extends JModel{
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
 
-		// display sub-categories
-		$display_subcats = $cparams->get('display_subcategories_items', 0);
-		
-		// Display items from current category
-		$_group_cats = array($this->_id);
-		
-		// Display items from (current and) immediate sub-categories (1-level)
-		if ($display_subcats==1) {
-			if(is_array($this->_childs))
-				foreach($this->_childs as $ch)
-					$_group_cats[] = $ch->id;
+		if (!$this->_authorid || $this->_id) {
+			// display sub-categories
+			$display_subcats = $cparams->get('display_subcategories_items', 0);
+			
+			// Display items from current category
+			$_group_cats = array($this->_id);
+			
+			// Display items from (current and) immediate sub-categories (1-level)
+			if ($display_subcats==1) {
+				if(is_array($this->_childs))
+					foreach($this->_childs as $ch)
+						$_group_cats[] = $ch->id;
+			}
+			
+			// Display items from (current and) all sub-categories (any-level)
+			if ($display_subcats==2) {
+				// descendants also includes current category
+				$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
+			}
+			
+			$_group_cats = array_unique($_group_cats);
+			$this->_group_cats = $_group_cats;
+			$_group_cats = "'".implode("','", $_group_cats)."'";
 		}
-		
-		// Display items from (current and) all sub-categories (any-level)
-		if ($display_subcats==2) {
-			// descendants also includes current category
-			$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
-		}
-		
-		$_group_cats = array_unique($_group_cats);
-		$this->_group_cats = $_group_cats;
-		$_group_cats = "'".implode("','", $_group_cats)."'";
 		
 		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
@@ -368,7 +370,9 @@ class FlexicontentModelCategory extends JModel{
 		$where = ' WHERE 1=1';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
-		$where .= ' AND rel.catid IN ('.$_group_cats.')';
+		if (!$this->_authorid || $this->_id) {
+			$where .= ' AND rel.catid IN ('.$_group_cats.')';
+		} 
 
 		// Second is to only select items the user has access to
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
@@ -712,17 +716,26 @@ class FlexicontentModelCategory extends JModel{
 		//initialize some vars
 		$user		= & JFactory::getUser();
 		$aid		= (int) $user->get('aid');
-
-		//get categories
-		$query 	= 'SELECT c.*,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-				. ' FROM #__categories AS c'
-				. ' WHERE c.id = '.$this->_id
-				. ' AND c.published = 1'
-				;
-
-		$this->_db->setQuery($query);
-		$this->_category = $this->_db->loadObject();
+		
+		if (!$this->_authorid || $this->_id) {
+			//get categories
+			$query 	= 'SELECT c.*,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+					. ' FROM #__categories AS c'
+					. ' WHERE c.id = '.$this->_id
+					. ' AND c.published = 1'
+					;
+	
+			$this->_db->setQuery($query);
+			$this->_category = $this->_db->loadObject();
+		} else {
+			$this->_category = new stdClass;
+			$this->_category->published = 1;
+			$this->_category->id = 0;
+			$this->_category->title = '';
+			$this->_category->description = '';
+			$this->_category->slug = '';
+		}
 		
 		//Make sure the category is published
 		if (!$this->_category->published)
@@ -736,7 +749,7 @@ class FlexicontentModelCategory extends JModel{
 
 		//check whether category access level allows access
 		$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
-		if (!$canread)
+		if (!$canread && $this->_id!=0)
 		{
 			if (!$aid) {
 				// Redirect to login
@@ -789,11 +802,14 @@ class FlexicontentModelCategory extends JModel{
 			}
 		}
 		
-		// Retrieve category parameters
-		$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
-		$this->_db->setQuery($query);
-		$catparams = $this->_db->loadResult();
-
+		$catparams = "";
+		if ($cid) {
+			// Retrieve category parameters
+			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+		}
+		
 		// a. Get the PAGE/COMPONENT parameters
 		$params = clone($mainframe->getParams('com_flexicontent'));
 
