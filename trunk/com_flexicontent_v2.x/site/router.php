@@ -194,7 +194,7 @@ function FLEXIcontentParseRoute($segments)
 	// 4.c 'tags' view
 	if($segments[0] == 'tag' || $segments[0] == 'tags') {
 		$vars['view'] = 'tags';
-		$vars['id'] = $segments[1];
+		$vars['id'] = $segments[2];
 		return $vars;
 	}
 	
