@@ -416,6 +416,8 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return===NULL) {
 			$files 	= array (
+				'author.xml',
+				'author.php',
 				'default.xml',
 				'default.php',
 				'index.html',
