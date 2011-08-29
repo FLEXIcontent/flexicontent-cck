@@ -86,6 +86,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 		$values = $db->loadResultArray();
 		$values = is_array($values)?$values:array();
 		$dispatcher =& JDispatcher::getInstance();
+		JPluginHelper::importPlugin('flexicontent_fields');
 		if(count($values)==1)
 			$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
 		elseif(count($values)>1)
