@@ -83,7 +83,7 @@ defined('_JEXEC') or die('Restricted access');
 		foreach($this->rows as $row) {
 			$link 		= 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;cid[]='. $row->id;
 			if ($row->id > 6) {
-				$published 	= JHTML::_('grid.published', $row, $i );
+				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'fields.' );
 			} else {
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			}

@@ -320,7 +320,7 @@ table#filemanager-zone label{
 				?>
 			</td>
 			<td align="center"><?php
-				$published 	= JHTML::_('grid.published', $row, $i );
+				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'filemanager.' );
 				echo $published;
 				?></td>
 			<td align="center"><?php echo $row->size; ?></td>

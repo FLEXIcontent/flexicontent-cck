@@ -65,7 +65,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		$i=0;
 		foreach($this->rows as $row) {
 			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
-			$published 	= JHTML::_('grid.published', $row, $i );
+			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
 			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;

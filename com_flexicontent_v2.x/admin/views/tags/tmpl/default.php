@@ -63,7 +63,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			$row = $this->rows[$i];
 
 			$link 		= 'index.php?option=com_flexicontent&amp;task=tags.edit&amp;cid[]='. $row->id;
-			$published 	= JHTML::_('grid.published', $row, $i );
+			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
