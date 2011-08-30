@@ -53,7 +53,7 @@ class JFormFieldFields extends JFormField
 		if ((boolean)$node->getAttribute('fieldnameasvalue')) {
 			$ovalue = '`name`';
 		}else{
-			$ovalue = 'label';
+			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
 		
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'

@@ -49,7 +49,7 @@ class JElementFields extends JElement
 		if ($node->attributes('fieldnameasvalue')) {
 			$ovalue = '`name`';
 		}else{
-			$ovalue = 'label';
+			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
 		$isadvsearch = $node->attributes('isadvsearch');
 		if($isadvsearch!==NULL) {
