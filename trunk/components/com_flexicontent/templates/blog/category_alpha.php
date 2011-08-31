@@ -69,7 +69,6 @@ if ($show_alpha == 1) {
 	$alphaaliases = explode("!!", $this->params->get('alphaaliases'));
 }
 foreach ($alphaaliases as $alphaalias) {
-	echo $alphaalias." ";
 	$alias_data = explode("~", $alphaalias);
 	if (count($alias_data)!=2) continue;
 	$alphaalias_arr[$alias_data[0]] = $alias_data[1];
