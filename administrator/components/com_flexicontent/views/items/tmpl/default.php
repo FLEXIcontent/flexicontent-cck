@@ -482,7 +482,9 @@ window.addEvent('domready', function(){
 				if( isset($row->lang) && @$row->lang ) :
 				?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
-				<?php if ($this->langs->{$row->lang}->image) : ?>
+				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
+				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
+				<?php elseif ($this->langs->{$row->lang}->image) : ?>
 				<img src="../images/<?php echo $this->langs->{$row->lang}->image; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php else : ?>
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
