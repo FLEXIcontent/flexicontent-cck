@@ -743,10 +743,20 @@ class flexicontent_html
 		$query = 'SELECT *'
 				.' FROM #__languages'
 //				.' WHERE active = 1'
-				.' ORDER BY ordering ASC'
+//				.' ORDER BY ordering ASC'
 				;
 		$db->setQuery($query);
 		$languages = $db->loadObjectList();
+		
+		if (isset($languages[0]->sef)) {
+			foreach ($languages as $lang) {
+				$lang->code = $lang->lang_code;
+				$lang->name = $lang->title;
+				$lang->shortcode = $lang->sef;
+				$lang->id = $lang->lang_id;
+			}
+			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+		}
 		
 		switch ($type)
 		{
@@ -773,7 +783,11 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
+					if (isset($lang->sef)) {
+						$img = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+					} else {
+						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
+					}
 					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
 					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
@@ -792,7 +806,11 @@ class flexicontent_html
 				$list 	.= '</label><br />';
 
 				foreach ($languages as $lang) {
-					$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
+					if (isset($lang->sef)) {
+						$img = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+					} else {
+						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
+					}
 					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
 					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';

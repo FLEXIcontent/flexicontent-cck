@@ -1424,15 +1424,27 @@ class FlexicontentModelItems extends JModel {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getLanguages() {
+	function getLanguages()
+	{
 		$query = 'SELECT *'
 				.' FROM #__languages'
-				.' ORDER BY ordering ASC'
+//				.' ORDER BY ordering ASC'
 				;
 		$this->_db->setQuery($query);
 		$languages = $this->_db->loadObjectList();
 		
 		$langs = new stdClass();
+		if (isset($languages[0]->sef)) {
+			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+			foreach ($languages as $lang) {
+				$lang->code = $lang->lang_code;
+				$lang->name = $lang->title;
+				$lang->shortcode = $lang->sef;
+				$lang->id = $lang->lang_id;
+				$lang->imageurl = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+				$langs->{$lang->code} = $lang;
+			}
+		}
 		foreach ($languages as $language) {
 			$name		 	= $language->code;
 			$langs->$name 	= $language;			
