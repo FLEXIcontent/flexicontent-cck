@@ -71,6 +71,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			$filepath 	= JPath::clean($path.strtolower($filename));
 			$params = null;
 			if (!flexicontent_upload::check( $file, $err, $params )) {
+				$filename 	= flexicontent_upload::sanitize($path, $file['name']);
+				$filepath 	= JPath::clean($path.strtolower($filename));
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance('com_flexicontent.error.php');
@@ -86,9 +88,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					return;
 				}
 			}
+			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
+			$filepath 	= JPath::clean($path.strtolower($filename));
 			
 			//get the extension to record it in the DB
-			$ext		= strtolower(JFile::getExt($filename));
+			$ext		= strtolower(flexicontent_upload::getExt($filename));
 
 			if (!JFile::upload($file['tmp_name'], $filepath)) {
 				if ($format == 'json') {
@@ -120,7 +124,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 
 					$obj = new stdClass();
 					$obj->filename 			= $filename;
-					$obj->altname 			= $file['name'];
+					$obj->altname 			= $file['altname'];
 					$obj->url				= 0;
 					$obj->secure			= $secure;
 					$obj->ext				= $ext;
@@ -155,7 +159,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 
 					$obj = new stdClass();
 					$obj->filename 			= $filename;
-					$obj->altname 			= $file['name'];
+					$obj->altname 			= $file['altname'];
 					$obj->url				= 0;
 					$obj->secure			= $secure;
 					$obj->ext				= $ext;
