@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_alpha.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: category_alpha.php 863 2011-08-26 03:39:14Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,15 +27,19 @@ function utf8ord($char) {
 	return $number;
 }
 
+$config =& JFactory::getConfig();
+$caching = $config->getValue( 'config.caching' );
+
 $show_alpha = $this->params->get('show_alpha',1);
 if ($show_alpha == 1) {
 	// Language Default
 	$alphacharacters = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
 	$groups = explode("!!", $alphacharacters);
 	$groupcssclasses = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
+	$alphaaliases = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_ALIASES"));
 } else {  // $show_alpha == 2
 	// Custom setting
-	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z|0,1,2,3,4,5,6,7,8,9");
+	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
 	
 	$lang = JRequest::getWord('lang', '' );
 	if(empty($lang)){
@@ -62,7 +66,15 @@ if ($show_alpha == 1) {
 	
 	$groups = explode("!!", $custom_lang_alpha_index);
 	$groupcssclasses = explode("!!", $this->params->get('alphagrpcssclasses'));
+	$alphaaliases = explode("!!", $this->params->get('alphaaliases'));
 }
+foreach ($alphaaliases as $alphaalias) {
+	echo $alphaalias." ";
+	$alias_data = explode("~", $alphaalias);
+	if (count($alias_data)!=2) continue;
+	$alphaalias_arr[$alias_data[0]] = $alias_data[1];
+}
+
 $alphacharsep = $this->params->get('alphacharseparator',false);
 $alphaskipempty = $this->params->get('alphaskipempty',0);
 
@@ -99,6 +111,9 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 			$letter_label = $letter;
 			if ($letter==='#' ) {
 				$letter = "0-9";
+			}
+			if (isset($alphaalias_arr[$letter])) {
+				$letter = $alphaalias_arr[$letter];
 			}
 			
 			// c. Try to get range of characters
@@ -161,7 +176,9 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 			else $aiclass = "fc_alpha_index";
 			if ($has_item) :
 				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
-				echo "<a class=\"$aiclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; document.getElementById('adminForm').submit();\">".strtoupper($letter_label)."</a>";
+				echo "<a class=\"$aiclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
+				if ($caching) echo " document.getElementById('adminForm').action+='&letter=".$letter."'; ";
+				echo " document.getElementById('adminForm').submit();\">".strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<span class=\"$aiclass\">".strtoupper($letter_label)."</span>";
