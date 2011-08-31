@@ -1069,7 +1069,32 @@ class flexicontent_upload
 		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
 		return preg_replace($regex, '', $file);
 	}
-	function check($file, &$err, &$params)
+	/**
+	 * Gets the extension of a file name
+	 *
+	 * @param string $file The file name
+	 * @return string The file extension
+	 * @since 1.5
+	 */
+	function getExt($file) {
+		$len = strlen($file);
+		$params = &JComponentHelper::getParams( 'com_flexicontent' );
+		$exts = $params->get('upload_extensions');
+		$exts = str_replace(' ', '', $exts);
+		$exts = explode(",", $exts);
+		//$exts = array('pdf', 'odt', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'tar.gz');
+		$ext = '';
+		for($i=$len-1;$i>=0;$i--) {
+			$c = $file[$i];
+			if($c=='.' && in_array($ext, $exts)) {
+				return $ext;
+			}
+			$ext = $c . $ext;
+		}
+		$dot = strpos($file, '.') + 1;
+		return substr($file, $dot);
+	}
+	function check(&$file, &$err, &$params)
 	{
 		if (!$params) {
 			$params = &JComponentHelper::getParams( 'com_flexicontent' );
@@ -1081,13 +1106,15 @@ class flexicontent_upload
 		}
 
 		jimport('joomla.filesystem.file');
+		$file['altname'] = $file['name'];
 		if ($file['name'] !== JFile::makesafe($file['name'])) {
-			$err = 'FLEXI_WARNFILENAME';
-			return false;
+			//$err = JText::_('FLEXI_WARNFILENAME').','.$file['name'].'|'.JFile::makesafe($file['name'])."<br />";
+			//return false;
+			$file['name'] = date('Y-m-d-H-i-s').".".flexicontent_upload::getExt($file['name']);
 		}
 
 		//check if the imagefiletype is valid
-		$format 	= strtolower(JFile::getExt($file['name']));
+		$format 	= strtolower(flexicontent_upload::getExt($file['name']));
 
 		$allowable = explode( ',', $params->get( 'upload_extensions' ));
 		$ignored = explode(',', $params->get( 'ignore_extensions' ));
