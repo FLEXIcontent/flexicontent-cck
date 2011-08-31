@@ -143,6 +143,10 @@ class FlexicontentModelCategory extends JModel{
 			} else {
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
 			}
+			
+			// TODO CHECK THIS
+			//$this->_db->setQuery("SELECT FOUND_ROWS()");
+			//$this->_total = $this->_db->loadResult();
 		}
 
 		return $this->_data;
