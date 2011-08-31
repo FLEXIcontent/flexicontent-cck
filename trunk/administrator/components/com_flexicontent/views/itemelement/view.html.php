@@ -52,9 +52,9 @@ class FlexicontentViewItemelement extends JView {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet('templates/'.$template.'/css/general.css');
+		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.'/css/general.css');
 
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
