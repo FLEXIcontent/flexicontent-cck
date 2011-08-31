@@ -65,7 +65,7 @@ class JElementItem extends JElement
 			
 			var cid_field =	document.getElementById('urlparamscid');
 			if (cid_field) cid_field.value = cid;
-			else document.getElementById('a_id').value += ':'+cid;
+			/*else document.getElementById('a_id').value += ':'+cid; */
 			
 			document.getElementById('a_name').value = title;
 			document.getElementById('sbox-window').close();
