@@ -78,3 +78,9 @@
 .mod_flexicontent_standard_wrapper:hover .image_standard img, .mod_flexicontent_standard_wrapper:hover .image_featured img {
   border:1px solid black;
 }
+
+.mod_flexicontent_order_group_title {
+	margin-top:6px;
+	color: darkred;
+	font-weight:bold
+}
