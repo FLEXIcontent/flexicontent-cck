@@ -279,7 +279,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$and = '';
 		if(!$sessiontable->client_id) 
 			$and = ' AND published = 1';
-		$query = 'SELECT filename, altname, ext'
+		$query = 'SELECT filename, altname, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id = '. (int) $value . $and
 				;
