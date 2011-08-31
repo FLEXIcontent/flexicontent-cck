@@ -28,6 +28,7 @@ $caching 	= $config->getValue('config.caching', 0);
 
 // get module ordering parameters
 $ordering 				= $params->get('ordering');
+$ordering_addtitle 	= $params->get('ordering_addtitle',1);
 if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
 $count 					= (int)$params->get('count', 5);
 $featured				= (int)$params->get('count_feat', 1);

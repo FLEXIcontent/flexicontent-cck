@@ -71,13 +71,27 @@ if ($add_ccs && $caching && !${$layout}) {
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
 	<?php
+	$ord_titles = array(
+		'popular'=>JText::_( 'FLEXI_MOST_POPULAR'),
+		'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
+		'rated'=>JText::_( 'FLEXI_BEST_RATED' ),
+		'added'=>	JText::_( 'FLEXI_RECENTLY_ADDED'),
+		'updated'=>JText::_( 'FLEXI_RECENTLY_UPDATED'),
+		'alpha'=>	JText::_( 'FLEXI_ALPHABETICAL'),
+		'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
+		'catorder'=>JText::_( 'FLEXI_CAT_ORDER'),
+		'random'=>JText::_( 'FLEXI_RANDOM' ) );
+	
 	$separator = "";
 	foreach ($ordering as $ord) :
   	echo $separator;
-	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard']))
+	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
   	  $separator = "<div class='mod_flexicontent_ordering_seperator' ></div>";
-    else
+    } else {
   	  $separator = "";
+  	}
+  	
+		if ($ordering_addtitle && $ord) echo "<div class='mod_flexicontent_order_group_title'> ".$ord_titles[$ord]." </div>";
 	?>
 	<div id="<?php echo $ord.$module->id; ?>" class="mod_flexicontent<?php echo (isset($list[$ord]['featured'])) ? ' twocol' : ''; ?>">
 		

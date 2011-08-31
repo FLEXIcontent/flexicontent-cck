@@ -5,7 +5,29 @@ if ($add_tooltips)
 ?>
 
 <?php
+$ord_titles = array(
+	'popular'=>JText::_( 'FLEXI_MOST_POPULAR'),
+	'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
+	'rated'=>JText::_( 'FLEXI_BEST_RATED' ),
+	'added'=>	JText::_( 'FLEXI_RECENTLY_ADDED'),
+	'updated'=>JText::_( 'FLEXI_RECENTLY_UPDATED'),
+	'alpha'=>	JText::_( 'FLEXI_ALPHABETICAL'),
+	'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
+	'catorder'=>JText::_( 'FLEXI_CAT_ORDER'),
+	'random'=>JText::_( 'FLEXI_RANDOM' ) );
+
+$separator = "";
+	
 foreach ($ordering as $ord) :
+	echo $separator;
+  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
+	  $separator = "<hr>";
+  } else {
+	  $separator = "";
+	}
+	
+	if ($ordering_addtitle && $ord) echo "<div class='mod_flexicontent_order_group_title'> ".$ord_titles[$ord]." </div>";
+		
 	if (isset($list[$ord]['featured'])) :
 ?>
 <ul class="mod_flexicontent<?php echo $params->get('moduleclass_sfx'); ?> mod_flexicontent_featured">

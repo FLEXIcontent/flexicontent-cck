@@ -440,12 +440,13 @@ class modFlexicontentHelper
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
 			
-			$q 	 		= 'SELECT c.*, ie.type_id FROM #__content as c'
+			$q 	 		= 'SELECT c.*, ie.type_id, CONCAT_WS(",",ci.catid) as itemcats FROM #__content as c'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
+						. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
 						. ' WHERE c.id = ' . $id
 						;
 			$db->setQuery($q);
-			$curitem	= $db->loadObject();
+			$curitem	= $db->loadObject() or die($db->getErrorMsg());
 
 			// Get item dates
 			if ($date_type == 1) {
@@ -457,6 +458,7 @@ class modFlexicontentHelper
 			}
 			$idate 	= explode(' ', $idate);
 			$cdate 	= $idate[0] . ' 00:00:00';
+			$curritemcats = $idate 	= explode(',', $curitem->itemcats);
 		}
 
 
@@ -532,6 +534,13 @@ class modFlexicontentHelper
 							$where .= ' AND c.id IN (' . implode(',', $relatedcats) . ')';
 						} else {
 							$where .= ' AND c.id NOT IN (' . implode(',', $relatedcats) . ')';
+						}
+					break;
+					case 4: // all item's categories
+						if ($behaviour_cat == 1) {
+							$where .= ' AND c.id IN (' . implode(',', $curritemcats) . ')';
+						} else {
+							$where .= ' AND c.id NOT IN (' . implode(',', $curritemcats) . ')';
 						}
 					break;
 				}

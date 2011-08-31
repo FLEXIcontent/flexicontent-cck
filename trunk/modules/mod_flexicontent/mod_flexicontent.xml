@@ -32,7 +32,11 @@
 		<param name="" type="separator" default="FLEXI_FETCHING" level="level1" menu="hide" />
 		<param name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
-		<param name="ordering" type="fcordering" default="0" label="FLEXI_ORDERING" description="FLEXI_ORDERING_DESC" />
+		<param name="ordering" type="fcordering" default="0" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
+		<param name="ordering_addtitle" type="radio" default="1" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 
 		<param name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" menu="hide" />
 		<param name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
@@ -78,7 +82,8 @@
 			<option value="0">FLEXI_NONE</option>
 			<option value="1">FLEXI_CHILDREN</option>
 			<option value="2">FLEXI_PARENTS</option>
-			<option value="3">FLEXI_BOTH</option>
+			<option value="3">FLEXI_CHILDREN_PARENTS</option>
+			<option value="4">FLEXI_OTHER_CATS_OF_ITEM</option>
 		</param>
 
 		<param name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level1" menu="hide" />
