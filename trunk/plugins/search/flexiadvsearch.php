@@ -174,10 +174,10 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$search_fields = $params->get('search_fields', '');
 	$search_fields = "'".str_replace(",", "','", $search_fields)."'";
-	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id"
-		." FROM #__flexicontent_fields as f "
+	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id,f.attribs"
+		." FROM #__flexicontent_fields_item_relations as fir "
 		//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
-		." LEFT JOIN #__flexicontent_fields_item_relations as fir ON f.id=fir.field_id"
+		." LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id"
 		//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
 		." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
 		." GROUP BY fir.field_id,fir.item_id"
@@ -187,17 +187,22 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$fields = is_array($fields)?$fields:array();
 	$CONDITION = '';
 	$OPERATOR = JRequest::getVar('operator', 'OR');
+	$FOPERATOR = JRequest::getVar('foperator', 'OR');
 	$items = array();
 	$resultfields = array();
 	JPluginHelper::importPlugin( 'flexicontent_fields');
+	$foundfields = array();
 	foreach($fields as $field) {
-		if($field->item_id) {
+		if($field->item_id) {//echo "fieldid={$field->id},itemid={$field->item_id}<br />";
+			if(!isset($field->parameters)) {
+				$field->parameters = new JParameter($field->attribs);
+			}
 			$fieldsearch = JRequest::getVar($field->name, array());
 			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array($fieldsearch);
-			//var_dump($field->name, $_REQUEST[$field->name]);
-			//echo "<br />";
-			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			if(isset($fieldsearch[0]) && trim($fieldsearch[0])) {
+				if(!isset($foundfields[$field->id])) {
+					$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
+				}
 				$fieldsearch = $fieldsearch[0];
 				$fieldsearch = explode(" ", $fieldsearch);
 				$results = $dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $field->item_id, $fieldsearch));
@@ -205,6 +210,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 					foreach($results as $r) {
 						if($r) {
 							$items[] = $field->item_id;
+							$foundfields[$field->id][] = $field->item_id;
 							$resultfields[$field->item_id] = $r;
 						}
 					}
@@ -213,9 +219,28 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		}
 	}
 	if(count($items)) {
-		$items = array_unique($items);
-		$items = "'".implode("','", $items)."'";
-		$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
+		if($FOPERATOR=='OR') {
+			$items = array_unique($items);
+			$items = "'".implode("','", $items)."'";
+			$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
+		}else{
+			$codestr = "\$items = array_intersect(";
+			$codestr_a = array();
+			foreach($foundfields as $k=>$a) {
+				$codestr_a[] = "\$foundfields[{$k}]";
+			}
+			$codestr .= implode(", ", $codestr_a);
+			$codestr .= ");";
+			$items = array();
+			if(count($codestr_a)==1) {
+				$items = $foundfields[$k];
+				$items = "'".implode("','", $foundfields[$k])."'";
+			}elseif(count($codestr_a)>1) {
+				eval($codestr);
+				$items = "'".implode("','", $items)."'";
+			}
+			$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
+		}
 	}
 	$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
 		. ' a.created AS created,'
