@@ -154,9 +154,10 @@ class FLEXIcontentViewSearch extends JView
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
 		//limit searchword
-
-		if(FLEXIadvsearchHelper::limitSearchWord($searchword)) {
-			$error = JText::_( 'SEARCH_MESSAGE' );
+		$min = $params->get('minchars', 3);
+		$max = $params->get('maxchars', 20);
+		if(FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max)) {
+			$error = JText::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
 		}
 
 		//sanatise searchword
