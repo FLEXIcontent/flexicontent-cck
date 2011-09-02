@@ -68,6 +68,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="minchars" type="text" default="3" label="Minimum characters" description="Minimum characters" />
+			<param name="maxchars" type="text" default="20" label="Maximum characters" description="Maximum characters" />
 		</params>
 	</state>
 </metadata>

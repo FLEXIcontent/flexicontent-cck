@@ -115,6 +115,7 @@ class FLEXIcontentViewSearch extends JView
 		$params	= &$mainframe->getParams();
 		$lists = array();
 		$fieldtypes_a = $params->get('fieldtypes', array());
+		if((count($fieldtypes_a)>0) && !is_array($fieldtypes_a)) $fieldtypes_a = array($fieldtypes_a);
 		if($params->get('cantypes', 1) && (count($fieldtypes_a)>0)) {
 			$db =& JFactory::getDBO();
 			$fieldtypes = "'".implode("','", $fieldtypes_a)."'";
@@ -159,9 +160,10 @@ class FLEXIcontentViewSearch extends JView
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
 		//limit searchword
-
-		if(FLEXIadvsearchHelper::limitSearchWord($searchword)) {
-			$error = JText::_( 'SEARCH_MESSAGE' );
+		$min = $params->get('minchars', 3);
+		$max = $params->get('maxchars', 20);
+		if(FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max)) {
+			$error = JText::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
 		}
 
 		//sanatise searchword

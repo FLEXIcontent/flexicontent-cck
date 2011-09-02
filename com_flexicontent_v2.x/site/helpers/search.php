@@ -58,18 +58,18 @@ class FLEXIadvsearchHelper
 		return $ignored;
 	}
 
-	function limitSearchWord(&$searchword)
+	function limitSearchWord(&$searchword, $min=3, $max=20)
 	{
 		$restriction = false;
 
 		// limit searchword to 20 characters
-		if ( JString::strlen( $searchword ) > 20 ) {
-			$searchword 	= JString::substr( $searchword, 0, 19 );
+		if ( JString::strlen( $searchword ) > $max ) {
+			$searchword 	= JString::substr( $searchword, 0, $max );
 			$restriction 	= true;
 		}
 
 		// searchword must contain a minimum of 3 characters
-		if ( $searchword && JString::strlen( $searchword ) < 3 ) {
+		if ( $searchword && JString::strlen( $searchword ) < $min ) {
 			$searchword 	= '';
 			$restriction 	= true;
 		}
