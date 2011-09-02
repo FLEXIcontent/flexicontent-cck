@@ -44,6 +44,18 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$view = JRequest::getString('view', 'items');
 		if ($view != 'items') return;
 		
+		// Global parameters
+		$gparams 	=& $mainframe->getParams('com_flexicontent');
+		$filtercat  = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
+		
+		// Get the site default language in case no language is set in the url
+		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			$lang = substr($tagLang ,0,2);
+		}
+		
 		// parameters shortcuts
 		$load_css 			= $field->parameters->get('load_css', 1);
 		$use_tooltip		= $field->parameters->get('use_tooltip', 1);
@@ -99,13 +111,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			}
 
 			// Determine sort order
+			$orderby = "";
 			$order_method = $cparams->get('orderby', '');
-			
-			
-			
 			switch ($order_method)
 			{
-
 				case 'date' :
 					$orderby = 'a.created';
 					break;
@@ -137,11 +146,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				default :
 					$orderby = 'a.ordering';
 					break;
-					
 			}
 			
-			
-	
 			$types		= is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
 
 			$xwhere	=	' AND ( a.state = 1 OR a.state = -5 )' .
@@ -153,26 +159,26 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$field_item = '';
 			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
-			if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
-			$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id';
-			$xwhere .= ' AND f.field_id = '.$cparams->get('orderbycustomfieldid');
+				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
+				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id';
+				$xwhere .= ' AND f.field_id = '.$cparams->get('orderbycustomfieldid');
 			}
-			
 			
 			// array of articles in same category correctly ordered
 			$query 	= 'SELECT a.id, a.title,'
 					. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as catslug'
 					. ' FROM #__content AS a'
-					. ' LEFT JOIN #__categories AS cc ON cc.id = a.catid'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id'
+					. ' LEFT JOIN #__categories AS cc ON cc.id = '. ($cid ? $cid : (int) $item->catid)
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
 					. $field_item
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
-					. ' WHERE a.catid = ' . ($cid ? $cid : (int) $item->catid)
+					. ' WHERE rel.catid = ' . ($cid ? $cid : (int) $item->catid)
+					. ( (FLEXI_FISH && $filtercat) ? ' AND ie.language LIKE ' . $db->Quote( $lang .'%' ) : "" )  // FILTER FOR CURRENT LAGNUAGE
 					. $andaccess
 					. $xwhere
-					. ' GROUP BY a.id'
+					//. ' GROUP BY a.id'  // NOT NEEDED and may mask errors, commented out
 					. ' ORDER BY '. $orderby
 					;
 			$db->setQuery($query);
