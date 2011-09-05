@@ -440,10 +440,11 @@ class modFlexicontentHelper
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
 			
-			$q 	 		= 'SELECT c.*, ie.type_id, CONCAT_WS(",",ci.catid) as itemcats FROM #__content as c'
+			$q 	 		= 'SELECT c.*, ie.type_id, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
 						. ' WHERE c.id = ' . $id
+						. ' GROUP BY ci.itemid'
 						;
 			$db->setQuery($q);
 			$curitem	= $db->loadObject() or die($db->getErrorMsg());
