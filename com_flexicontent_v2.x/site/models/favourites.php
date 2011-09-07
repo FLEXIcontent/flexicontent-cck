@@ -43,7 +43,14 @@ class FlexicontentModelFavourites extends JModel
 	 * @var integer
 	 */
 	var $_total = null;
-
+	
+	/**
+	 * parameters
+	 *
+	 * @var object
+	 */
+	var $_params = null;
+	
 	/**
 	 * Constructor
 	 *
@@ -57,6 +64,14 @@ class FlexicontentModelFavourites extends JModel
 
 		// Get the paramaters of the active menu item
 		$params = & JComponentHelper::getParams('com_flexicontent');
+		$menus		= & JSite::getMenu();
+		$menu    	= $menus->getActive();
+		if (is_object( $menu )) {
+			jimport( 'joomla.html.parameter' );
+			$menu_params = new JParameter( $menu->params );
+			$params->merge($menu_params);
+		}
+		$this->_params = $params;
 
 		//get the number of events from database
 		$limit			= JRequest::getInt('limit', $params->get('limit'));
@@ -118,7 +133,7 @@ class FlexicontentModelFavourites extends JModel
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
         // Get the WHERE and ORDER BY clauses for the query
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$params 	=  $this->_params;
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
@@ -187,7 +202,7 @@ class FlexicontentModelFavourites extends JModel
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$params 	=  $this->_params;
 
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE f.userid = '.(int)$user->get('id');

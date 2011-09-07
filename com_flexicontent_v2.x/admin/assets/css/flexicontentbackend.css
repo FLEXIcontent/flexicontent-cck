@@ -616,6 +616,7 @@ div fieldset.panelform textarea {
 
 fieldset.panelform label, fieldset.panelform input, fieldset.panelform textarea,
 fieldset.panelform select, fieldset.panelform img, fieldset.panelform button {
+	float: left;
 	margin:1px;
 }
 

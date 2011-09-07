@@ -62,6 +62,7 @@ class FlexicontentViewFavourites extends JView
 		// right from the menu item itself
 		if (is_object( $menu )) {
 			$menu_params = new JParameter( $menu->params );		
+			$params->merge($menu_params);
 			
 			if (!$menu_params->get( 'page_title')) {
 				$params->set('page_title',	JText::_( 'FLEXI_MY_FAVOURITES' ));

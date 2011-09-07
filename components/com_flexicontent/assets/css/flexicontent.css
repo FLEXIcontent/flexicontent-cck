@@ -599,3 +599,9 @@ span.fc_alpha_index {
 	color: black;
 	text-decoration: none;
 }
+
+.fc_alpha_index.current {
+	margin-left:12px;
+	margin-right:12px;
+	color: darkred;
+}

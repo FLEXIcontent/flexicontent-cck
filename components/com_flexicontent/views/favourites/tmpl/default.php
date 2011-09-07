@@ -20,7 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $usedate		= $this->params->get( 'show_modify_date', 1 ) ;
 $dateformat		= $this->params->get( 'date_format', 'DATE_FORMAT_LC2' ) ;
 $customdate		= $this->params->get( 'custom_date', '' ) ;
-$dateformat 	= $dateformat ? $dateformat : $customdate;
+$dateformat 	= ($dateformat != "DATE_FORMAT_CUSTOM") ? $dateformat : $customdate;
 ?>
 
 <div id="flexicontent" class="flexicontent">

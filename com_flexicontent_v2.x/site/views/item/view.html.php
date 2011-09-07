@@ -28,6 +28,8 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewItem extends JView {
+	var $_type='';
+	
 	/**
 	 * Creates the item page
 	 *
@@ -301,16 +303,13 @@ class FlexicontentViewItem extends JView {
 		$menu    	= $menus->getActive();
 		$uri     	=& JFactory::getURI();
 		JRequest::setVar('loadcurrent', false);
-		//$item		=& $this->get('Item');
 		JRequest::setVar('typeid', @$menu->query['typeid'][0]);
 		$item		= $this->get('Form');
 		$tags 		=& $this->get('Alltags');
 		$used 		=& $this->get('Usedtags');
 		//$params		=& $mainframe->getParams('com_flexicontent');
 		//$params		=& JComponentHelper::getParams('com_flexicontent');
-		$params = &$menu->params;
-		//echo "<xmp>";var_dump($menu->params);echo "</xmp>";
-		//$params	=& $item->parameters;var_dump($item);
+		
 		$Itemid		=&JRequest::getVar('Itemid', 0);
 		$db = &JFactory::getDBO();
 		JPlugin::loadLanguage('com_flexicontent', JPATH_ADMINISTRATOR);
@@ -319,8 +318,7 @@ class FlexicontentViewItem extends JView {
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
-			$mparams = new JParameter($paramsstring);
-			$params->merge($mparams);
+			$params = new JParameter($paramsstring);
 		} else {
 			$params = new JParameter("");
 		}
@@ -331,7 +329,7 @@ class FlexicontentViewItem extends JView {
 		$fields			= & $this->get( 'Extrafields' );
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
-			JPluginHelper::importPlugin('flexicontent_fields', $field->field_type);
+			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
 			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$item ));
 		}
 		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
