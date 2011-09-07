@@ -25,7 +25,7 @@
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
 				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-				<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+				<option value="DATE_FORMAT_CUSTOM">FLEXI_FIELD_CUSTOM_FORMAT</option>
 			</field>
 			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />

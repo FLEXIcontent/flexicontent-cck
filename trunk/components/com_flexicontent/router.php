@@ -223,9 +223,16 @@ function FLEXIcontentParseRoute($segments)
 	}
 
 	// 5.b Segments Length 1 is 'category' view
+	// OR A --MENU ITEM LINK-- (NOTE:) THIS CODE IS NOT REACHABLE FOR J1.5 ??
 	if($count == 1) {
-		$vars['view'] = 'category';
-		$vars['cid'] 	= $segments[0];
+		$value = (int)$segments[0];
+		if( $value != 0 ) {
+			$vars['view'] = 'category';
+			$vars['cid'] = $value;
+		} else {
+			// Nothing MORE to do this is a menu item link, so joomla should
+			// get the menu itemid from the menu alias ... and do the rest
+		}
 		return $vars;
 	}
 

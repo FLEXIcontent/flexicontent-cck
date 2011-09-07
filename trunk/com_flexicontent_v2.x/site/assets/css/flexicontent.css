@@ -85,6 +85,18 @@ div.pageslinks {
 	float: left;
 	overflow: hidden;
 	width: 100%;
+	text-align: center;
+}
+
+div.pageslinks ul li {
+	display: inline-block;
+}
+
+div.pageslinks ul li span, div.pageslinks ul li a {
+	margin-right: 12px;
+	padding: 2px 16px 2px 16px;
+	border: 1px solid #dddddd;
+	border-radius: 6px;
 }
 
 div#flexicontent .pagescounter {
@@ -603,4 +615,10 @@ span.fc_alpha_index {
 form#flexicontent-searchForm tr,form#flexicontent-searchForm tr td{
 	border:0;
 	
+}
+
+.fc_alpha_index.current {
+	margin-left:12px;
+	margin-right:12px;
+	color: darkred;
 }

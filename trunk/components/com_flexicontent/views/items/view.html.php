@@ -145,7 +145,7 @@ class FlexicontentViewItems extends JView
 		 */
 		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
 			$parentcat = array_pop($parents);
-			$doc_title = $parentcat->title.' - '.$params->get( 'page_title' );
+			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ':"") .$params->get( 'page_title' );
 		} else {
 			$doc_title = $params->get( 'page_title' );
 		}
