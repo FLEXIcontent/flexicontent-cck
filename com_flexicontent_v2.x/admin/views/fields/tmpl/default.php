@@ -54,12 +54,12 @@ defined('_JEXEC') or die('Restricted access');
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
 			<th width="90">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
 			</th>
 		<?php else : ?>
 			<th width="90">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
 			</th>
 		<?php endif; ?>
