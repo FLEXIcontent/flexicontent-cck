@@ -743,7 +743,15 @@ class FlexicontentModelFlexicontent extends JModel
 		$db->setQuery($query); 
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
-		//echo "<xmp>";var_dump(FLEXIUtilities::currentMissing());echo "</xmp>";
+		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
+			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+			" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL;";
+		$db->setQuery($query);
+		$newrows = $db->loadAssocList();
+		foreach($newrows as $r) {
+			$newrows[$r["id"]] = $r;
+		}
+		$diff_arrays = array_merge_recursive($diff_arrays, $newrows);
 		foreach($diff_arrays as $row) {
 			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "

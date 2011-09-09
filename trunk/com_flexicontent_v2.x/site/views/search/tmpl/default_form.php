@@ -192,7 +192,7 @@ $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 <?php if(!$show_operator) {
 $default_operator = $this->params->get('default_operator', 'OR');
 ?>
-<input type="hidden" name="logic" value="<?php echo $default_logic;?>" />
+<input type="hidden" name="operator" value="<?php echo $default_operator;?>" />
 <?php } ?>
 <?php if(!$show_searchordering) {
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
