@@ -36,6 +36,10 @@
 			<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 			<option value="0">FLEXI_DMI_ID_NO</option>
 		</param>
+		<param name="default_menuitem_nopathway" type="list" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
+		</param>
 	
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" level="level1" menu="hide" />
 		
