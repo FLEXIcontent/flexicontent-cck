@@ -73,4 +73,17 @@ $controller->execute( JRequest::getCmd('task') );
 // Redirect if set by the controller
 $controller->redirect();
 
+// TO BE MOVED TO HELPER FILE ...
+// Remove (thus prevent) the default menu item from showing in the pathway
+if ( $params->get('default_menuitem_nopathway',1) ) {
+	$pathway 	= & $mainframe->getPathWay();
+	$default_menu_itemid = $params->get('default_menu_itemid', 0);
+	if ( preg_match("/Itemid=([0-9]+)/",$pathway->_pathway[0]->link, $matches) ) {
+		if ($matches[1] == $default_menu_itemid) {
+			array_shift ($pathway->_pathway);
+			$pathway->_count--;
+		}
+	}
+}
+
 ?>
