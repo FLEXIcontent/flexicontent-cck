@@ -329,8 +329,9 @@ class FlexicontentViewCategory extends JView
 			foreach ($filters as $filtre)
 			{
 				$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
-				JPluginHelper::importPlugin('flexicontent_fields', ($filtre->iscore ? 'core' : $filtre->field_type) );
-				$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
+				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
+				$fieldname = $filtre->iscore ? 'core' : $filtre->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filtre, $value ) );
 				$lists['filter_' . $filtre->id] = $value;
 			}
 		}

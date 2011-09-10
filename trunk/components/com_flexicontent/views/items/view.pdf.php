@@ -63,13 +63,17 @@ class FlexicontentViewItems extends JView
 		foreach ($fields as $field) {
 			if ($field->iscore == 1 || $field->field_type == ('image' || 'file')) {
 /*
-				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-				$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+				if ($field->iscore) {
+					//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+				} else {
+					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+				}
 */
 			} else {
-				// NOT core field but just in case code is updated ... we check for core
-				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
 				echo $field->label . ': ';
 				echo $field->display . '<br />';
 			}

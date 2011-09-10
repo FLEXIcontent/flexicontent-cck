@@ -659,11 +659,6 @@ VALUES
 					$db->query();
 				}*/
 				foreach($fields as $field) {
-					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-					
-					// process field mambots onBeforeSaveField
-					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -690,8 +685,6 @@ VALUES
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
-					// process field mambots onAfterSaveField
-					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 					//$searchindex 	.= @$field->search;
 				}
 				if(!$catflag) {

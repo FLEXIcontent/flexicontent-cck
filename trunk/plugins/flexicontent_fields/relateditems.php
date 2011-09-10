@@ -299,9 +299,15 @@ window.addEvent( 'domready', function() {
 		
 		$db->setQuery($query);
 		if (count($values))
-			$results = $db->loadObjectList()  or die($db->getErrorMsg());
+			$results = $db->loadObjectList();
 		else
 			$results = array();
+			
+		if($this->_db->getErrorNum()) {
+			$this->setError($db->getErrorMsg());
+			$field->{$prop} = '';
+			return false;
+		}
 		
 		if (!$results) {
 			$field->{$prop} = '';
