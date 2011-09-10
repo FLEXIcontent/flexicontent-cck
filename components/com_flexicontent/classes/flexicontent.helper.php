@@ -1649,6 +1649,40 @@ class FLEXIUtilities {
 		}
 	}
 	
+	
+	function call_FC_Field_Func( $fieldname, $func, $args=null ) {
+		static $fc_plgs;
+		
+		if ( !isset( $fc_plgs[$fieldname] ) ) {
+			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($fieldname).'.php';
+			if(file_exists($path)) require_once($path);
+			else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br('Cannot load FC Field: $fieldname\n Please correct field name'),'error');
+				return;
+			}
+			
+			// 2. Create plugin instance
+			$class = "plgFlexicontent_fields{$fieldname}";
+			if( class_exists($class) ) {
+				$className = 'plg'.'flexicontent_fields'.$fieldname;
+				$dispatcher = &JDispatcher::getInstance();
+				$fc_plgs[$fieldname] =  new $className($dispatcher, array());
+			} else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br('Could not find class: $className in file: $path\n Please correct field name'),'error');
+				return;
+			}
+		}
+		
+		// 3. Execute only if it exists
+		$class = "plgFlexicontent_fields{$fieldname}";
+		if(in_array($func, get_class_methods($class))) {
+			call_user_func_array(array($fc_plgs[$fieldname], $func), $args);
+		}
+	}
+	
 	/**
 	 * Return unicode char by its code
 	 * Credits: ?

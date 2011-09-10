@@ -63,14 +63,16 @@ class FlexicontentViewItemcompare extends JView {
 		foreach ($fields as $field)
 		{
 			if ($field->value) {
-				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row ));
 			} else {
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 			if ($field->version) {
-				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
 			} else {
 				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}

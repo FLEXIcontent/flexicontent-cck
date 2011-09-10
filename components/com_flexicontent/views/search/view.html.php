@@ -71,8 +71,10 @@ class FLEXIcontentViewSearch extends JView
 		$search_fields = $params->get('search_fields', '');
 		$search_fields = "'".str_replace(",", "','", $search_fields)."'";
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
+		
 		//Import fields
-		JPluginHelper::importPlugin('flexicontent_fields');
+		//JPluginHelper::importPlugin('flexicontent_fields');
+		
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
 			$field->parameters->set( 'use_html', 0 );
@@ -84,7 +86,11 @@ class FLEXIcontentViewSearch extends JView
 			$fieldsearch = JRequest::getVar($field->name, array());
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			$field->value = isset($fieldsearch[0])?$fieldsearch:array();
-			$results = $dispatcher->trigger('onAdvSearchDisplayField', array( &$field, &$item ));
+			
+			//$results = $dispatcher->trigger('onAdvSearchDisplayField', array( &$field, &$item ));
+			$fieldname = $field->iscore ? 'core' : $field->field_type;
+			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAdvSearchDisplayField', array( &$field, &$item ));
+			
 			$field->label = $label;
 		}
 		//FlexicontentFields::getItemFields();

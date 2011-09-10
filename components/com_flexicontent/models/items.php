@@ -401,11 +401,6 @@ class FlexicontentModelItems extends JModel
 					$this->_db->query();
 				}
 				foreach($fields as $field) {
-					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-					
-				    // process field mambots onBeforeSaveField
-					//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -425,8 +420,6 @@ class FlexicontentModelItems extends JModel
 						unset($obj->version);
 						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 					}
-					// process field mambots onAfterSaveField
-					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 					//$searchindex 	.= @$field->search;
 				}
 				if(!$catflag) {
@@ -985,10 +978,10 @@ class FlexicontentModelItems extends JModel
 			$searchindex = '';
 			$jcorefields = flexicontent_html::getJCoreFields();
 			foreach($fields as $key=>$field) {
-				JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-			    
 				// process field mambots onBeforeSaveField
-				$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
+				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ) );
 
 				// add the new values to the database 
 				if (is_array($post[$field->name])) {
@@ -1048,7 +1041,9 @@ class FlexicontentModelItems extends JModel
 					}
 				}
 				// process field mambots onAfterSaveField
-				$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+				//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ) );
 				$searchindex 	.= @$field->search;
 			}
 	

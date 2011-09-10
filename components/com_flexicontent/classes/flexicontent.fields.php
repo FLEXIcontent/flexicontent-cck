@@ -35,7 +35,6 @@ class FlexicontentFields
 		}
 		if (!$items) return $items;
 
-		//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
 		$user 		= &JFactory::getUser();
 		$gid		= (int) $user->get('aid');
 
@@ -264,8 +263,8 @@ class FlexicontentFields
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
 		{
-			JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
-			$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
+			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
+			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ) );
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
@@ -311,9 +310,8 @@ class FlexicontentFields
 		}
 		else
 		{
-			// NOT core field but just in case code is updated ... we check for core
-			JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+			//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item) );
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
 				$field->text = isset($field->display) ? $field->display : '';
