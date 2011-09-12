@@ -73,7 +73,7 @@ class FLEXIcontentViewSearch extends JView
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
 		
 		//Import fields
-		//JPluginHelper::importPlugin('flexicontent_fields');
+		JPluginHelper::importPlugin('flexicontent_fields');
 		
 		// Add html to field object trought plugins
 		foreach ($fields as $field) {
