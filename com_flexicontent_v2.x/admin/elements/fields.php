@@ -55,7 +55,10 @@ class JFormFieldFields extends JFormField
 		}else{
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
-		
+		$isadvsearch = $node->getAttribute('isadvsearch');
+		if($isadvsearch!==NULL) {
+			$and .= " AND isadvsearch='{$isadvsearch}'";
+		}
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
