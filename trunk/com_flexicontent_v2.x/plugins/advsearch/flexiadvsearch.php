@@ -193,8 +193,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 				$field->parameters = new JParameter($field->attribs);
 			}
 			$fieldsearch = JRequest::getVar($field->name, array());
-			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array($fieldsearch);
-			if(isset($fieldsearch[0]) && (trim($fieldsearch[0])!=="")) {
+			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
+			if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
 				if(!isset($foundfields[$field->id])) {
 					$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
 				}
