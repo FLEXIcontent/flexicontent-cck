@@ -56,8 +56,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 
@@ -117,8 +125,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
@@ -201,8 +217,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
@@ -260,8 +284,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
