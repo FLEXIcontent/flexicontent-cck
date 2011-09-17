@@ -16,6 +16,185 @@
  */
 
 -----------------------------------------------------
+- FLEXIcontent 1.5.6 beta1 - build 902 - Changelog -
+-----------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+
+# Bug fixes
+--------------------------------------------------------------------------------------------------
+# Fix (issue 134 ): broken javascript validation in IE8 browser when (applying/saving) an item
+# Fix : improvements of postinstall process
+# Fix : support for php 5.3.5+ during installation (changed from TYPE=MyISAM to be ENGINE=MyISAM)
+# Fix : passing bad parameter object to content plugins when triggering them on the category description
+# Fix : for image field (issue ...) :
+ (a) a bug of the signature of function onDisplayField not to have reference for the second parameter
+ (b) field not working properly when configuration unsaved, this can only occur after an upgrade to new Flexicontent version ...
+ (c) some other minor bugs of the field
+# Fix (issue 148) : the Pagination of version control is not displayed properly in all cases
+# Fix (issue 135) : "invalid token" in fields using the filemanager in a modal window
+# Fix : bugs in minigallery field :
+ (a) wrong path on windows servers causing a message "error messages disabled" when choosing an image to add to the gallery
+ (b) adding of javascript and css to the header multiple times
+ (c) error image when selecting an image (occured when medias folder was changed in the Global Configuration to anything other than the default value)
+# Fix : some css errors and some cosmetic spacing
+# Fix (issue 141) : article choosing for some non-flexicontent aware modules, we redirect the com_content article choosing element to the corresponding com_flexicontent item choosing element
+# Fix : corrected the JRequest 'view' variable, not restored properly after content plugin triggering.
+# Fix (issue 155) about Frontend editing, the reported bug plus one more, were because of 2 non-initialized variables (frontend items view files).
+# Fix : Article Page Navigation Field (fcpagenav plugin) to
+ (a) display iterate through all items of current category
+ (b) it will always stay inside current category
+ (c) respect the Global configuration parameter of filtering language (display only current language items)
+ (d) an other issue related to SEF links, was fixed by new SEF code
+# Fix : some bug about checking query command in sql_mode with select and selectmultiple fields
+# Fix : removed warning if a field doesnot exist for an item but it exists in the template, this is normal behaviour as different TYPEs may have different fields but use the same Template
+# Fix (issue ...) : category slug for items that have 'unrouted' (hidden) category, (unrouted categories are defined in the flexiadvroute.php SYSTEM PLUGIN)
+# Fix (issue ...) : for filters not appearing always in category view ...
+# Fix : SEF handling for AJAX voting / favourites, advanced search view, flexicontent (directory) view for with and without SH404_SEF
+# Fix : prevent unnecessary inserting of records with empty value in table __flexicontent_fields_item_relations
+# Fix : bugs of file field :
+ (a) not linking to flexicontent component properly in all cases
+ (b) compatibility with joomfish translation of the file label
+# Fix : bug about parent category in 'items' view
+# Fix : item state strings, a lot of user confusion and problems, because of one language string wrong in Global configuration.
+# Fix (issue ...) : custom date FORMAT ignored, in date field
+# Fix (issue 200) : tracked down long lasting publish_up bug, timezone offset was applied twice to the publish_up date, resulting in publish date going to the future for negative GMT zones
+# Fix (issue 138) : search box is not working unless "Use Filters" is enabled
+# Fix (issue 173) : Any item in unpublished state is always showed in frontend, if it had never been modified
+# Fix (issue ...) : bug in archive manager, redirect to items manager on any user action
+# Fix (issue ...) : JSite class not found bug , occuring in the backend
+# Fix (issue 179) : an error occurs in frontend when editing item not assigned to a menu item
+# Fix (issue 180) : bug that the current category is set as item's category-slug but current category is not in the item's categories
+# Fix : custom date format to work for My-Favourites
+# Fix : mod_flexicontent module to respect "read more" parameter for non-featured items
+# Fix : Filemanager : Allow upload to server of files with invalid filenames (having local language characters) by changing their name to be date("Y-m-d-H-i-s")
+# Fix : a bug when install current versions of items
+
+
++ New features
+--------------------------------------------------------------------------------------------------
++ Add : NEW!!! Advanced Search Feature: (a) a module, (b) a plugin, (c) a view
+ Features include:
+ -- Very fast results because of precalculated SEARCH INDEX
+ -- Allow to search various flexicontent fields, NOT just the title and description
+ -- Allow to select which flexicontent fields are displayed in the results, NOT just the title and description
+ -- Allow to form more complex AND-OR searches that standard joomla search
+ -- A lot of other customizations options to shape the search to fit your needs
+
++ Add : NEW!!! a new ultra powerful Alpha Index
+ 1. support for default AlphaIndex per Language in language file
+ 2. supports character 'entities' (ranges, aggregations, aliases), a hardcoded alias is # for  0-9 numbers
+ 3. support utf8 characters in the MySQL query for all in (2) (above)
+ 4. allow custom per category AlphaIndex ( (a)Hide, (b)Show & use language default, (c)Show & use custom characters )
+ 5. option to skip (no display) unused characters
+ 6. new category option to allow a custom separator to be used, instead of boxes around characters
+ 7. option to skip disabled characters / ranges / aliases
+ 8. wrote clear description For ALPHA-INDEX usage
+ 9. enhanced the alphaindex to work even with joomla cache enabled
+ 10. Some css fixes and classes added, like highlighting for current alpha index character (entity)
+
++ Add : NEW!!! an Author Manager (backend) and an Author Category Layout.
+	It is now possible to create author category LAYOUTs by creating a new menu item link a Category THAT uses the author layout
+	When a category is display in author layout the category params are taken from the author configuration.
+	Additionally for the presentation of the author, a description item can defined per author, that is displayed at the top of the author category layout.
+
++ Add : NEW!!! to Flexicontent Universal (items) module:
+	1. 2 scopes : (a) current item scope, (b) current language scope
+  2. An mechanism for skipping items that have specific fields empty
+  3. Made module configuration easy by (a) adding TAB sliders, (b) reorder parameters (c) rewroting some parameter descriptions
+  4. Added option for all item's categories in category scope
+  5. Added option to add a Title to each ordering group of items (module usually display on group e.g. recently added, e.g. recently modified etc)
+  6. Wrote clear descriptions for ordering group (e.g. if you display 2 groups "most popular" and "Recently Added" at once)
+  7. Added current category information: title, description, and (scaled/cropped) image
+  8. a language file for the module
+
++ Add : NEW!!! a --Related Items-- Field:
+ used to display a list of items related to the item in some way, note: it allows multiple instances
+
++ Add : NEW!!! field 'textselect', this field uses input text field when input data but displays a drop down( select) field at search view
+
++ Add : a new task 'doPlgAct' to controller.php both frontend and backend to calling plugin(field) function by URL.
+  This is important for developers of flexicontent fields (plugins) as it allow them to call plugins function by URL !!!
+ 
++ Add : (BIG PERFORMANCE IMPOVEMENT (particularly for category view):
+  new option for description field (maintext) of items, not to trigger (for it) the content plugins in category view
+
++ Add : support for joomfish v2.2.x
++ Add : to select & selectmultiple fields ability for replacements of item data, e.g. replacements like: {item->created_by} {item->catid} (first is item's owner and second is item's main category)
++ Add : altering the JRequest 'view' variable to 'article' during content plugin triggering for all (core and custom) flexicontent fields for better compatibility with some content plugins
++ Add : altering the JRequest 'option' variable to 'com_content' during content plugin triggering for all (core and custom) flexicontent fields for better compatibility with some content plugins
++ Add : options & code not to display empty categories or subcategories in the flexicontent ('directory') view
++ Add : option in the BACKEND items view to --bind-- joomla articles to --any-- Flexicontent item Type
++ Add : implemented the "required" configuration attribute for Flexicontent "File" Field
++ Add : allowed multiple minigallery fields to work properly
++ Add : For Templates:
+ (a) added a 'renderonly' position, this will allow fields placed there to be rendered (created) but not displayed
+ (b) added Method getFieldDisplay() to render a field on demand and return the display
++ Add : implemented option for category view: To show subcategories items from any sublevel not just the 1st sublevel. Category option was change to "No, 1st sublevel, All sublevel"
++ Add : "Display Resizing Controls" option that was missing in the XML file of the article toolbar field
++ Add : image field enhancements: 
+ (a) allow linking to a URL that opens in (a) Same Win/Tab (b) New Win/Tab (c) Modal pop-up window
+ (b) implemented the 'Required' behaviour (except when deleting existing image)
+ (c) can now choose which size is displayed in item and in category
+ (d) new display variables: $field->{'display_small'}, $field->{'display_medium'}, $field->{'display_big'}
+ (e) new option to allow to only drop image from image field without deleting it, also added 3 options to change image field behaviour
++ Add : a new postinstall task to create menu 2 menu links automatically in a hidden Menu (not displayed in a module), so that it is not needed to be done by user. This is useful for SEF URLs
++ Add : a new Global configuration option for a default menu item id to be added to SEF urls in the cases a more appropriate cannot be found
++ Add : a new 'Template' column to categories and items manager (LISTINGS)
++ Add : a new 'Field Type' column to fields manager (LISTINGS)
++ Add : allow to create urls to 'flexicontent' view (directory-like view) that have the variables rootcat,columns_count,etc IN their URL
++ Add : Global (performance) Option to create fields html display (a) only when really used, (b) always in items view, (c) always in any case
++ Add : WORKFLOW improvements: 
+ (a) added a fake state in items view to allow the user to LIST items that have VERSIONS that require REVIEWAL-APPROVAL !!!
+ (b) a new slider for items with Versions-to-be-Reviews and added links to the items view ... to view all items in each state
+ (c) wrote clear names for states and more clear name for quick access sliders in the Flexicontent dashboard (home)
++ Add : new option to favourites field to list usernames or fullnames favouring the item
++ Add : new option (in Global Config) to prevent the default menu item from showing in the pathway
+
+
+- Removed features
+--------------------------------------------------------------------------------------------------
+- Remove : (BIG PERFORMANCE IMPOVEMENT (particularly for category view):
+  delete code of unnecessary triggering of all content plugins on the fulltext of all displayed category items (same of item views),
+  code was forgotten there when content plugin triggering was moved to the helper fileflexicontent.fields.php
+
+
+^ Changed features
+--------------------------------------------------------------------------------------------------
+^ Change : from jquery v1.4.2 to jquery v1.6.3
+^ Change : (NOTICABLE PERFORMANCE IMPOVEMENT (particularly for category view):
+  new efficient (and fast) way to call Flexicontent plugin functions, avoiding the inapproproate joomla way that calls ALL plugins (it is appropriate for other use)
+^ Change : (BIG PERFORMANCE IMPOVEMENT (particularly for category view):
+  implementation of creating Flexicontent Fields displayed html on DEMAND (only if they are actually used in a template position or in a module)
+^ Change : REWROTE!!! route.php (produces and recognizes SEF URLs) so that:
+  (a) to fix some bugs, where not all flexicontent urls were always properly routed.
+  (b) Make code easy to read, and easy to extend in the future !!!
+  (c) Maintain compatibility with existing bookmarked SEF URLs and google indexed content (please test !!!)
+^ Change : improved backend models not to call listing query twice (second was for pagination), now we use SQL_CALC_FOUND_ROWS to avoid second query.
+  Performance improved about 20% in backend listings (noticable only on long items listings)
+^ Change : altered (and cleaned) POSTINSTALL code not to check postinstall tasks, if they are not to be displayed, (this depends on saved SESSION variables)
+^ Change : Field manager listing, changed name of ORDERING column to indicate clearly the contents of the column (Global ordering OR Item Type ordering)
+
+
+! Notes
+--------------------------------------------------------------------------------------------------
+! Notes : made flexicontent submenu code to be generated by a function, thus removed repeated code, that is difficult to update / prone to errors
+
+
+$ Language
+--------------------------------------------------------------------------------------------------
+$ Language (issue 133) : added language missing strings 
+
+
+
+-----------------------------------------------------
 - FLEXIcontent 1.5.5 stable - build 608 - Changelog -
 -----------------------------------------------------
 Legend:
