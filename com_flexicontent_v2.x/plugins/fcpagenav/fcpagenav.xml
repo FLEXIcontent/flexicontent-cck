@@ -51,5 +51,6 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcpagenav.ini</language>
 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_fcpagenav.ini</language>
+		<language tag="de-DE">de-DE.plg_flexicontent_fields_fcpagenav.ini</language>
 	</languages>
 </install>

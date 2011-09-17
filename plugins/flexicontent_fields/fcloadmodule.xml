@@ -31,5 +31,6 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcloadmodule.ini</language>
 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_fcloadmodule.ini</language>
+		<language tag="de-DE">de-DE.plg_flexicontent_fields_fcloadmodule.ini</language>
 	</languages>
 </install>
