@@ -5,6 +5,35 @@ if ($add_tooltips)
 ?>
 
 <?php
+	
+	if ($catdata) {
+		echo "<div class='currcatdata' style='clear:both; float:left;'>\n";
+		if (isset($catdata->title)) {
+			if (isset($catdata->titlelink)) {
+				echo "<a href='{$catdata->titlelink}'>";
+			}
+			echo "<div class='currcattitle'>". $catdata->title ."</div>\n";
+			if (isset($catdata->titlelink)) {
+				echo "</a>";
+			}
+		}
+		if (isset($catdata->image)) {
+			echo "<div class='image_currcat'>";
+			if (isset($catdata->imagelink)) {
+				echo "<a href='{$catdata->imagelink}'>";
+			}
+			echo "<img src='{$catdata->image}' alt='".flexicontent_html::striptagsandcut($catdata->title, 60)."' />\n";
+			if (isset($catdata->imagelink)) {
+				echo "</a>";
+			}
+			echo "</div>\n";
+		}
+		if (isset($catdata->description)) {
+			echo "<div class='currcatdescr'>". $catdata->description ."</div>\n";
+		}
+		echo "</div>\n";
+	}
+
 $ord_titles = array(
 	'popular'=>JText::_( 'FLEXI_MOST_POPULAR'),
 	'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
