@@ -80,6 +80,7 @@ $custom5 				= $params->get('custom5');
 require_once (dirname(__FILE__).DS.'helper.php');
 
 $list = modFlexicontentHelper::getList($params);
+$catdata = modFlexicontentHelper::getCategoryData($params);
 
 /*
 $c = 0;

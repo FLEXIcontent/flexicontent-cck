@@ -145,14 +145,14 @@ class modFlexicontentHelper
 		  	if ($order_count[$item->fetching] >= $count)   // Check if enough encountered for this ordering 
 		  		continue;
 		  	
-		  	// Construct display values array
-		  	$field_val = array();
-		  	foreach($skiponempty_fields as $skipfieldname) {
-		  		$field_val[$skipfieldname] = $item->fields[$skipfieldname]->display;
-		  	}
-		    
 		    // Now check for empty values on field that when empty, the item must be skipped
 		    if ($skip_items) {
+			  	// Construct display values array
+			  	$field_val = array();
+			  	foreach($skiponempty_fields as $skipfieldname) {
+			  		$field_val[$skipfieldname] = $item->fields[$skipfieldname]->display;
+			  	}
+			    
   		    if ($onempty_fields_combination == 'any')
   		      $skip_item = 0;
   		    else //if ($skip_items && $onempty_fields_combination == 'all')
@@ -840,5 +840,88 @@ class modFlexicontentHelper
 		return $rows;
 	}
 
+	function getCategoryData(&$params) {
+		$cid  = JRequest::getInt('cid', 0);
+		$view = JRequest::getVar('view');
+		$currcat_showtitle  = $params->get('currcat_showtitle', 0);
+		$currcat_showdescr  = $params->get('currcat_showdescr', 0);
+		$currcat_cuttitle   = (int)$params->get('currcat_cuttitle', 20);
+		$currcat_cutdescr   = (int)$params->get('currcat_cutdescr', 100);
+		$currcat_link_title	= $params->get('currcat_link_title');
+		
+		$currcat_use_image 		= $params->get('currcat_use_image');
+		$currcat_link_image		= $params->get('currcat_link_image');
+		$currcat_width 				= (int)$params->get('currcat_width', 80);
+		$currcat_height 			= (int)$params->get('currcat_height', 80);
+		$currcat_method 			= (int)$params->get('mod_method', 1);
+		
+				
+		$db =& JFactory::getDBO();
+				
+		$currcatdata = null;
+		if ( ($currcat_showtitle || $currcat_showdescr) && $cid && $view=='items' ) {
+			// initialize variables
+			$q = 'SELECT c.id, c.title, c.description, '
+						.( ($currcat_link_title || $currcat_link_image) ? ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug' : '' )
+						. ' FROM #__categories AS c'
+						. ' WHERE c.id = ' . $cid
+						;
+			$db->setQuery($q);
+			$currcatdata = $db->loadObject() or die($db->getErrorMsg());
+			
+			if (!$currcat_showtitle) {
+				unset($currcatdata->title);
+			} else {
+				$currcatdata->title = flexicontent_html::striptagsandcut($currcatdata->title, $currcat_cuttitle);
+			}
+			
+			if (!$currcat_showdescr) {
+				unset($currcatdata->description);
+			} else {
+				$row = new StdClass();
+				$text = &$currcatdata->description;
+				
+				// Search for the {readmore} tag and split the text up accordingly.
+				$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
+				$tagPos	= preg_match($pattern, $text);
+	
+				if ($tagPos == 0)	{
+					$row->introtext	= $text;
+					$row->fulltext = '';
+				} else 	{
+					list($row->introtext, $row->fulltext) = preg_split($pattern, $text, 2);
+				}
+				
+				if ($currcat_use_image) {
+					// Get Image if it exists
+					$catdescrimage = flexicontent_html::extractimagesrc($row);
+					if ($catdescrimage) {
+					  $src	= JURI::base(true) . '/' . $catdescrimage;
+					  
+	  				$h		= '&h=' . $currcat_height;
+	 					$w		= '&w=' . $currcat_width;
+	  				$aoe	= '&aoe=1';
+	  				$q		= '&q=95';
+	  				$zc		= $currcat_method ? '&zc=' . $currcat_method : '';
+	  				$conf	= $w . $h . $aoe . $q . $zc;
+	  				
+	    			$currcatdata->image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+	    		}
+	    		
+	    	}
+	    	
+				$currcatdata->description = flexicontent_html::striptagsandcut($currcatdata->description, $currcat_cutdescr);
+			}
+			
+			// Create links to category 
+			if ($currcat_link_title || $currcat_link_image) {
+				$catlink = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($currcatdata->categoryslug));
+				if ($currcat_link_title) $currcatdata->titlelink = $catlink;
+				if ($currcat_link_image) $currcatdata->imagelink = $catlink;
+			}			
+		}
+		
+		return $currcatdata;
+	}
 }
 

@@ -23,8 +23,9 @@
 .mod_flexicontent_featured_wrapper {
 }
 
-.image_featured,
-.image_standard {
+.mod_flexicontent_wrapper .image_currcat,
+.mod_flexicontent_wrapper .image_featured,
+.mod_flexicontent_wrapper .image_standard {
 	float: left;
 	margin: 0 5px 5px 0;
 }
@@ -62,7 +63,7 @@
 }
 
 
-.mod_flexicontent_ordering_seperator {
+.mod_flexicontent_wrapper ordering_seperator {
   border-width:0px;
   border-top:1px dashed #dddddd;
   height:0px;
@@ -71,16 +72,35 @@
   float:none;
 }
 
-.image_featured img, .image_standard img {
+.mod_flexicontent_wrapper .image_currcat img,
+.mod_flexicontent_wrapper .image_featured img,
+.mod_flexicontent_wrapper .image_standard img {
   padding:1px; border:1px solid #dddddd;  
 }
 
-.mod_flexicontent_standard_wrapper:hover .image_standard img, .mod_flexicontent_standard_wrapper:hover .image_featured img {
+.mod_flexicontent_standard_wrapper:hover .image_standard img,
+.mod_flexicontent_standard_wrapper:hover .image_featured img {
   border:1px solid black;
 }
 
-.mod_flexicontent_order_group_title {
+.mod_flexicontent_wrapper .order_group_title {
 	margin-top:6px;
 	color: darkred;
 	font-weight:bold
+}
+
+.mod_flexicontent_wrapper .currcattitle {
+	font-weight: bold;
+	font-size: 12px;
+	text-align:center;
+	background-color: darkgray;
+}
+
+.mod_flexicontent_wrapper .currcattitle a {
+}
+	
+.mod_flexicontent_wrapper .currcatdescr {
+	font-size: 11px;
+	font-weight: normal;
+	text-align: justify;
 }
