@@ -16,7 +16,7 @@
  */
 
 -----------------------------------------------------
-- FLEXIcontent 1.5.6 beta1 - build 902 - Changelog -
+- FLEXIcontent 1.5.6 beta1 - build 905 - Changelog -
 -----------------------------------------------------
 Legend:
 * -> Security Fix

@@ -274,8 +274,19 @@ if ($this->limitstart == 0) :
 <?php
 	endif;
 	if ($count > $leadnum || $this->limitstart != 0) :
+    //added to intercept more columns (see also css changes)
+    $classnum = '';
+    if ($this->params->get('intro_cols', 2) == 1) :
+       $classnum = 'one';
+    elseif ($this->params->get('intro_cols', 2) == 2) :
+       $classnum = 'two';
+    elseif ($this->params->get('intro_cols', 2) == 3) :
+       $classnum = 'three';
+    elseif ($this->params->get('intro_cols', 2) == 4) :
+       $classnum = 'four';
+    endif;
 ?>
-	<ul class="introblock <?php echo ($this->params->get('intro_cols', 2) == 1) ? 'one' : 'two'; ?>">
+	<ul class="introblock <?php echo $classnum; ?>">	
 		<?php for ($i=($this->limitstart == 0 ? $leadnum : 0 ); $i<$count; $i++) : ?>
 		<li class="<?php echo (($this->limitstart == 0) ? ($i+$leadnum)%2 : $i%2) ? 'even' : 'odd'; ?>">
 			<div style="overflow: hidden;">

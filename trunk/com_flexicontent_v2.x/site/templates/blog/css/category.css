@@ -216,6 +216,19 @@ div.comments {
 #flexicontent ul.introblock.two li.even {
 	margin-left: 3%
 }
+#flexicontent ul.introblock.three li {
+   width: 30%;
+}
+#flexicontent ul.introblock.three li.even {
+   margin-left: 1%
+}
+#flexicontent ul.introblock.four li {
+   width: 23%;
+}
+#flexicontent ul.introblock.four li.even {
+   margin-left: 1%
+}
+
 div.image.right {
 	float: right;
 	margin-left: 10px;
@@ -267,11 +280,11 @@ span.fc_alpha_index {
 }
 
 .fc_alpha_index_sep {
-	padding: 1px 2px;
+	padding: 1px 0px;
 	border: 0px solid silver;
 	background: none;
 	text-decoration: none;
-	margin-right: 2px;
+	margin-right: 0px;
 	float: left;
 	position: relative;
 	right: 50%;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 283 2010-06-12 08:40:34Z emmanuel.danan $
+ * @version 1.5 stable $Id: category_items.php 858 2011-08-24 05:22:31Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -47,7 +47,7 @@ $tmpl = $this->tmpl;
 	<?php
 	foreach ($this->filters as $filt) :
 		echo '<span class="filter">';
-		echo $filt->html;
+		echo @$filt->html;
 		echo '</span>';
 	endforeach;
 	?>

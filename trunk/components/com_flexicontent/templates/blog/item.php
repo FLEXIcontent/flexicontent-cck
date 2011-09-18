@@ -69,7 +69,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 		<?php if (intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) : ?>
 		<span class="modified">
-			<?php echo JText::sprintf('LAST_UPDATED2', JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2'))); ?>
+			<?php echo JText::sprintf('FLEXI_LAST_UPDATED', JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2'))); ?>
 			<?php if (($this->params->get('show_modifier')) && ($this->item->modifier != "")) : ?>
 			<?php echo JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
 			<?php endif; ?>

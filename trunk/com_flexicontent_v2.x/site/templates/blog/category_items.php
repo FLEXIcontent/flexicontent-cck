@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 481 2011-03-01 07:14:56Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: category_items.php 858 2011-08-24 05:22:31Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,7 +42,7 @@ $tmpl = $this->tmpl;
 */	
 	foreach ($this->filters as $filt) :
 		echo '<span class="filter">';
-		echo $filt->html;
+		echo @$filt->html;
 		echo '</span>';
 	endforeach;
 	?>
@@ -274,8 +274,19 @@ if ($this->limitstart == 0) :
 <?php
 	endif;
 	if ($count > $leadnum || $this->limitstart != 0) :
+    //added to intercept more columns (see also css changes)
+    $classnum = '';
+    if ($this->params->get('intro_cols', 2) == 1) :
+       $classnum = 'one';
+    elseif ($this->params->get('intro_cols', 2) == 2) :
+       $classnum = 'two';
+    elseif ($this->params->get('intro_cols', 2) == 3) :
+       $classnum = 'three';
+    elseif ($this->params->get('intro_cols', 2) == 4) :
+       $classnum = 'four';
+    endif;
 ?>
-	<ul class="introblock <?php echo ($this->params->get('intro_cols', 2) == 1) ? 'one' : 'two'; ?>">
+	<ul class="introblock <?php echo $classnum; ?>">	
 		<?php for ($i=($this->limitstart == 0 ? $leadnum : 0 ); $i<$count; $i++) : ?>
 		<li class="<?php echo (($this->limitstart == 0) ? ($i+$leadnum)%2 : $i%2) ? 'even' : 'odd'; ?>">
 			<div style="overflow: hidden;">
