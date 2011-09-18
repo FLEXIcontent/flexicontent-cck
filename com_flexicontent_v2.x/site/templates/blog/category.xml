@@ -13,6 +13,8 @@
 		<field name="intro_cols" type="list" default="2" label="FLEXI_INTRO_COLS" description="FLEXI_INTRO_COLS_DESC">
 			<option value="1">FLEXI_1_COL</option>
 			<option value="2">FLEXI_2_COLS</option>
+			<option value="3">FLEXI_3_COLS</option>
+			<option value="4">FLEXI_4_COLS</option>
 		</field>
 		<field name="separator1" type="separator" default="" label="" description="" />
 		<field name="separator2" type="separator" default="" label="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" />

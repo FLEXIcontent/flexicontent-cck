@@ -97,6 +97,7 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 	$flag = true;
 	$i=0;
 	foreach($groups as $group) {
+		$group_start = true;
 		$letters = explode(",", $group);
 	?>
 	<div class="<?php echo $groupcssclasses[$i]; ?>">
@@ -181,14 +182,15 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 				$currentclass = 'current';
 			}
 			if ($has_item) :
-				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
+				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
 				if ($caching) echo " document.getElementById('adminForm').action+='&letter=".$letter."'; ";
 				echo " document.getElementById('adminForm').submit();\">".mb_strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
-				if ($alphacharsep) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
+				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<span class=\"$aiclass\">".mb_strtoupper($letter_label)."</span>";
 			endif;
+			$group_start = false;
 		endforeach;
 	?>
 	</div>
