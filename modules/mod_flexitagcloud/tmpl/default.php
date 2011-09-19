@@ -1,12 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access'); 
 
-// Only when caching is active !!!
-if ($add_ccs && $caching) {
-	// active layout css
-	echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css">';
-}
-
 ?>
 <ul id="flexicloud" class="mod_flexitagcloud<?php echo $params->get('moduleclass_sfx'); ?>">
 <?php foreach ($list as $item) : ?>

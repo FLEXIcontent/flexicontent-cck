@@ -27,10 +27,16 @@ $config 	=& JFactory::getConfig();
 $caching 	= $config->getValue('config.caching', 0);
 $add_ccs 	= $params->get('add_ccs', 1);
 
+// Only when caching not active, we can be xhtml compliant by inserting css file at the html head
 if ($add_ccs && !$caching) {
 	$document->addStyleSheet(JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css');
 }
 
+// Only when caching is active, we insert somewhere inside body, which is not xhtml compliant, but this is ok for all browsers
+if ($add_ccs && $caching) {
+	// active layout css
+	echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css">';
+}
 
 $list = modFlexiTagCloudHelper::getTags($params);
 require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));

@@ -37,7 +37,7 @@ class FlexicontentFields
 
 		//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 
 		$mainframe	= &JFactory::getApplication();
 		$cparams	=& $mainframe->getParams('com_flexicontent');
@@ -274,16 +274,16 @@ class FlexicontentFields
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
-				} else if (!is_array($field->parameters->get('plugins'))) {
+				/*} else if (!is_array($field->parameters->get('plugins'))) {
 					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
-				} else {
-					foreach ($field->parameters->get('plugins') as $plg) {
+				*/} else {
+					foreach (explode('|',$field->parameters->get('plugins')) as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
 				$field->slug = $item->slug;
 				$field->catid = $item->catid;
-				$field->catslug = $item->categoryslug;
+				$field->catslug = @$item->categoryslug;
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
 				$field->state = $item->state;
@@ -297,7 +297,7 @@ class FlexicontentFields
 				
 				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
 				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) 
-					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+					$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 				
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == 'item') {
@@ -321,9 +321,9 @@ class FlexicontentFields
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
-				} else if (!is_array($field->parameters->get('plugins'))) {
+				/*} else if (!is_array($field->parameters->get('plugins'))) {
 					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
-				} else {
+				*/} else {
 					foreach ($field->parameters->get('plugins') as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
@@ -341,7 +341,7 @@ class FlexicontentFields
 				  JRequest::setVar('option', 'com_content');
 				}
 				JRequest::setVar("isflexicontent", "yes");
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == 'item') {
 				  JRequest::setVar('view', 'item');

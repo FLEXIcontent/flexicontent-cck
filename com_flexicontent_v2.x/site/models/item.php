@@ -493,7 +493,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$mainframe =& JFactory::getApplication();
 
 		$user		=& JFactory::getUser();
-		$aid		= (int) $user->get('aid', 0);
+		$aid		= max ($user->getAuthorisedViewLevels());
 
 		$jnow		=& JFactory::getDate();
 		$now		= $jnow->toMySQL();

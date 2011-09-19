@@ -95,13 +95,19 @@ if (!$c) {
 }
 */
 
-global ${$layout};
-
-if ($add_ccs && !$caching && !${$layout}) {
+// Only when caching not active, we can be xhtml compliant by inserting css file at the html head
+if ($add_ccs && !$caching && $layout) {
 	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 		// active layout css
 		$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
-		${$layout} = 1;
+	}
+}
+
+// Only when caching is active, we insert somewhere inside body, which is not xhtml compliant, but this is ok for all browsers
+if ($add_ccs && $caching && $layout) {
+	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+		// active layout css
+		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
 	}
 }
 

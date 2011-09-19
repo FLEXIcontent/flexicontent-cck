@@ -85,12 +85,13 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$date		=& JFactory::getDate();
 			$config 	= & JFactory::getConfig();
 			$now 		= $date->toMySQL();
-			$gid		= (int) $user->get('aid', 0);
+			$gid		= max ($user->getAuthorisedViewLevels());
+			
 	
 			if ($use_tooltip)
 				JHTML::_('behavior.tooltip');
 			if ($load_css)
-				$document->addStyleSheet('plugins/flexicontent_fields/fcpagenav/fcpagenav.css');	
+				$document->addStyleSheet('plugins/flexicontent_fields/fcpagenav/fcpagenav/fcpagenav.css');	
 
 			// get active category ordering
 			$query 	= 'SELECT params FROM #__categories WHERE id = ' . ($cid ? $cid : $item->catid);

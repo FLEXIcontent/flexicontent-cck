@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// define a global variable to be sure the script is loaded only once
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
-		if ($load_css) $document->addStyleSheet('plugins/flexicontent_fields/toolbar/toolbar.css');
+		if ($load_css) $document->addStyleSheet('plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		
 		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
 
@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$display .= "
 			<div class=\"flexi-voice toolbar-element\">";
 			if($lang=='th') {//may be la=laos,and Bhutan languages in the future(NECTEC support these languges).
-			$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar/th.js');
+			$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar/toolbar/th.js');
 			$display .="
 				<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 			";

@@ -51,7 +51,7 @@ class FlexicontentViewCategory extends JView
 		$uri 		= & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
 		$user		= & JFactory::getUser();
-		$aid		= (int) $user->get('aid');
+		$aid		= max ($user->getAuthorisedViewLevels());
 
 		// Request variables
 		$limitstart		= JRequest::getInt('limitstart');
