@@ -50,7 +50,7 @@ class FlexicontentViewItem extends JView {
 		$menu    	= $menus->getActive();
 		$dispatcher = & JDispatcher::getInstance();
 		$params 	= & $mainframe->getParams('com_flexicontent');
-		$aid		= (int) $user->get('aid');
+		$aid		= max ($user->getAuthorisedViewLevels());
 		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$cid		= JRequest::getInt('cid', 0);

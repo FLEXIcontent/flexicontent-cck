@@ -514,7 +514,7 @@ class FlexicontentModelCategory extends JModelList{
 		$option = JRequest::getVar('option');
 
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
@@ -717,7 +717,7 @@ class FlexicontentModelCategory extends JModelList{
 	function _buildChildsquery()
 	{
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$ordering	= 'lft ASC';
 
 		// Get the category parameters
@@ -751,7 +751,7 @@ class FlexicontentModelCategory extends JModelList{
 		global $mainframe, $globalcats;
 
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -819,7 +819,7 @@ class FlexicontentModelCategory extends JModelList{
 	function _getsubs($id)
 	{
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$ordering	= 'ordering ASC';
 
 		if (FLEXI_ACCESS) {
@@ -889,7 +889,7 @@ class FlexicontentModelCategory extends JModelList{
 		
 		//initialize some vars
 		$user		= & JFactory::getUser();
-		$aid		= (int) $user->get('aid');
+		$aid		= max ($user->getAuthorisedViewLevels());
 
 		//get categories
 		$query 	= 'SELECT c.*,'
@@ -976,7 +976,7 @@ class FlexicontentModelCategory extends JModelList{
 		$mainframe = &JFactory::getApplication();
 		
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$params 	= $this->_loadCategoryParams($this->_id);
 		$scope		= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
 		$filters	= null;
@@ -1031,7 +1031,7 @@ class FlexicontentModelCategory extends JModelList{
 	 */
  	function getAlphaindex() {
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$lang 		= JRequest::getWord('lang', '' );
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;

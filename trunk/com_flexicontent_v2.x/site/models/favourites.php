@@ -131,7 +131,7 @@ class FlexicontentModelFavourites extends JModel
 		$mainframe =& JFactory::getApplication();
 
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
         // Get the WHERE and ORDER BY clauses for the query
 		$params 	=  $this->_params;
 		// show unauthorized items
@@ -201,7 +201,7 @@ class FlexicontentModelFavourites extends JModel
 		$mainframe =& JFactory::getApplication();
 
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$params 	=  $this->_params;
 
 		// First thing we need to do is to select only the requested items

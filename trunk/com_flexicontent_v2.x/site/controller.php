@@ -707,7 +707,7 @@ class FlexicontentController extends JController
 		$contentid 	= JRequest::getInt( 'cid', 0 );
 		$db			= &JFactory::getDBO();
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 
 		// is the field available
 		$andaccess 		= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
@@ -842,7 +842,7 @@ class FlexicontentController extends JController
 		$mainframe =& JFactory::getApplication();
 		
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$gid		= max ($user->getAuthorisedViewLevels());
 		$db			= &JFactory::getDBO();
 
 		$fieldid 	= JRequest::getInt( 'fid', 0 );

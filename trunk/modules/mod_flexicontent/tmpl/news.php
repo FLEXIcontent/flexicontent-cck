@@ -57,16 +57,6 @@ global ${$layout};
 
 if ($add_tooltips)
 	JHTML::_('behavior.tooltip');
-
-// Only when caching is active !!!
-if ($add_ccs && $caching && !${$layout}) {
-	if (file_exists(dirname(__FILE__).DS.$layout.DS.$layout.'.css')) {
-		// active layout css
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
-	}
-	${$layout} = 1;
-}
-
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
