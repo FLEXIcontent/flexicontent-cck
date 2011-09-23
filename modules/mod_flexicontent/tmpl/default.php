@@ -5,6 +5,11 @@ if ($add_tooltips)
 ?>
 
 <?php
+$show_more		= (int)$params->get('show_more', 1);
+$more_link		= $params->get('more_link');
+$more_what		= $params->get('more_what');
+$more_css		= $params->get('more_css');
+
 	
 	if ($catdata) {
 		echo "<div class='currcatdata' style='clear:both; float:left;'>\n";
@@ -93,3 +98,8 @@ foreach ($ordering as $ord) :
 	endif;
 endforeach;
 ?>
+<?php if ($show_more == 1) : ?>
+<div class="news_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
+	<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo $more_what; ?></span></a>
+</div>
+<?php endif;?>
