@@ -246,6 +246,14 @@ class modFlexicontentHelper
 		    		}
 					}
 				}
+				//date
+				if ($params->get('date_display', 1) == 1) {
+					if ($params->get('date_type', 1) == 1) {
+						$lists[$ord]['featured'][$i]->date = JHTML::_('date', $row->created, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+					} else {
+						$lists[$ord]['featured'][$i]->date = JHTML::_('date', $row->modified, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+					}
+				}
 				$lists[$ord]['featured'][$i]->image 	= $thumb;
 				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
 				$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
@@ -302,6 +310,14 @@ class modFlexicontentHelper
 		    		} else {
 		    		  $thumb = '';
 		    		}
+					}
+				}
+				//date
+				if ($params->get('date_display', 1) == 1) {
+					if ($params->get('date_type', 1) == 1) {
+						$lists[$ord]['standard'][$i]->date = JHTML::_('date', $row->created, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+					} else {
+						$lists[$ord]['standard'][$i]->date = JHTML::_('date', $row->modified, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
 					}
 				}
 				$lists[$ord]['standard'][$i]->image 	= $thumb;

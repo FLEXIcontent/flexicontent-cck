@@ -254,8 +254,37 @@
 		</param>		
 		<param name="mod_width_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 		<param name="mod_height_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-
-		<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level2" menu="hide" />
+		<param name="" type="separator" default="Dates parameters" level="level2" menu="hide" />
+		<param name="date_display" type="radio" default="1" label="Display Date" >
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="date_type" type="list" default="1" label="Display Date Type" >
+			<option value="0">Modified</option>
+			<option value="1">Created</option>
+		</param>
+		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="What date" >
+			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
+			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+		</param>
+		
+		<param name="" type="separator" default="More parameters" level="level2" menu="hide" />
+		<param name="show_more" type="radio" default="1" label="Show More" description="Show a Link at the bottom of the module that links to the category page - or whatever page you want.">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="more_what" type="text" default="Select a custom link to display here in the backend" label="More Title" description="The string to be displayed at the bottom. Defalt: More from this category." />
+		<param name="more_link" type="text" default="index.php" label="More Link" description="The link to the page you want the user to be redirected when clicking the" />
+		<param name="more_blank" type="radio" default="0" label="Open in new window" description="Open the 'Other Articles' link in a new window or tab.">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="more_css" type="textarea" cols="30" rows="3" default="" label="CSS - More..." description="CSS code to apply on the 'More Articles...' link at the bottom of the module." />
+		
+		<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 		<param name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
