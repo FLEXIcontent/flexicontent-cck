@@ -29,6 +29,10 @@
              	directory="/modules/mod_flexicontent/tmpl" 
              	default="default" hide_default="1" hide_none="1" 
              	stripext="1" filter="\.php$" exclude="^_" /> 
+		<param name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="" type="separator" default="FLEXI_FETCHING" level="level1" menu="hide" />
 		<param name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
