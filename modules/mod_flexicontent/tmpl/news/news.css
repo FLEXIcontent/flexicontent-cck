@@ -104,3 +104,38 @@
 	font-weight: normal;
 	text-align: justify;
 }
+
+.mod_flexicontent_wrapper .date_label,
+.mod_flexicontent_wrapper .date_label_feat {
+	color: black;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.mod_flexicontent_wrapper .date_value,
+.mod_flexicontent_wrapper .date_value_feat {
+	color: black;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.mod_flexicontent_wrapper .news_readon_module {
+	display:block;
+	text-align:center;
+	margin:2px;
+}
+
+.mod_flexicontent_wrapper .news_readon_module .news_readon {
+	display:inline;
+	padding:1px 0px 2px 0px;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+}
+
+.mod_flexicontent_wrapper .news_readon_module .news_readon a {
+	text-decoration:none;
+}
