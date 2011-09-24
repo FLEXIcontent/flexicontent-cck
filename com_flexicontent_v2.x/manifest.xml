@@ -2,13 +2,13 @@
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <install type="component" version="1.6.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>19 September 2011</creationDate>
+	<creationDate>24 September 2011</creationDate>
 	<author>Emmanuel Danan</author>
 	<copyright>(C) 2009-2011 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.0 Beta3 r907</version>
+	<version>2.0 Beta3 r911</version>
 	<description>A flexible content management system for Joomla! 1.6/1.7</description>
 
 	<languages folder="site/language">
