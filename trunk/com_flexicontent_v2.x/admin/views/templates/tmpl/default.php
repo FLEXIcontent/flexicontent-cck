@@ -25,7 +25,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="40"></th>
+			<th width="42"></th>
 			<th class="title" align="left"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_ITEM' ); ?></th>
 			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_CAT' ); ?></th>
@@ -62,11 +62,11 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		
 					var url = "index.php?option=com_flexicontent&task=templates.remove&tmpl=component&dir=<?php echo $row->name ?>&<?php echo JUtility::getToken();?>=1";
 		 
-					var ajax = new Ajax(url, {
+					var ajax = new Request.HTML({
 						method: 'get',
+						url: url,
 						update: $('<?php echo 'up-'.$row->name ?>')
-					});
-					ajax.request.delay(500, ajax);
+					}).send();
 				});
 			});
 		</script>

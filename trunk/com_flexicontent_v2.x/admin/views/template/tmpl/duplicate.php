@@ -23,23 +23,28 @@ window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
 		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
+
+		new Request.HTML({
+			 url: this.get('action'),
+		   evalScripts: true,
+		   update: $('log-bind'),
+		   data: $('adminForm')
+		}).send();
 		
-		this.send({
-			update: 	$('log-bind')
-		});
 	});
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&task=templates.duplicate&layout=duplicate&tmpl=component" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=templates.duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend>
-			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
+			<?php echo trim(JText::_( 'FLEXI_DUPLICATE_TEMPLATE' )); ?>
 			<span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC' ); ?>" style="text-decoration: none; color: #333;">
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
-		</legend>
+			</legend>
+			<br />
 		<input type="text" id="dest" name="dest" value="<?php echo $this->dest; ?>" size="52" />
 		<input type="hidden" id="source" name="source" value="<?php echo $this->source; ?>" />
 	</fieldset>
@@ -57,7 +62,7 @@ window.addEvent('domready', function(){
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="controller" value="templates" />
-<input type="hidden" name="view" value="templates" />
-<input type="hidden" name="task" value="duplicate" />
+<input type="hidden" name="task" value="templates.duplicate" />
+<input type="hidden" name="layout" value="templates.duplicate" />
+<input type="hidden" name="format" value="raw" />
 </form>
