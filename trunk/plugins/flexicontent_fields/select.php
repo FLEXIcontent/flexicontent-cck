@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField( $field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'select') return;
@@ -288,10 +288,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			preg_match_all("/{item->[^}]+}/", $query, $matches);
-			foreach ($matches[0] as $replacement_tag) {
-				$replacement_value = '$'.substr($replacement_tag, 1, -1);
-				eval ("\$replacement_value = \" $replacement_value\";");
-				$query = str_replace($replacement_tag, $replacement_value, $query);
+			if (count($matches[0])) {
+				$filter->html = sprintf( JText::_('FLEXI_WARNING_ITEM_SPECIFIC_AS_CATEGORY_FILTER'), $filter->label );
+				return;
 			}
 			
 			$db->setQuery($query);
