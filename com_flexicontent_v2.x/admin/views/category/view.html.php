@@ -38,6 +38,8 @@ class FlexicontentViewCategory extends JView {
 		}
 		
 		$iform		= $this->get('Form');
+		$formid		= $iform->getValue('id');
+		$isNew		= ($formid == 0);
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -68,7 +70,10 @@ class FlexicontentViewCategory extends JView {
 
 		JToolBarHelper::apply('category.apply');
 		JToolBarHelper::save('category.save');
-		JToolBarHelper::custom( 'category.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::custom('category.save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		if (!$isNew) {
+			JToolBarHelper::custom('category.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+		}
 		JToolBarHelper::cancel('category.cancel');
 
 		//Get data from the model

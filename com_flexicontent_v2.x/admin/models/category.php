@@ -258,7 +258,9 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 
 		// Alter the title for save as copy
-		if (!$isNew && $data['id'] == 0 && $category->parent_id == $data['parent_id']) {
+		//if (!$isNew && $data['id'] == 0 && $category->parent_id == $data['parent_id']) {
+		if (JRequest::getVar('task') == 'save2copy') {
+
 			$m = null;
 			$data['alias'] = '';
 			if (preg_match('#\((\d+)\)$#', $table->title, $m)) {

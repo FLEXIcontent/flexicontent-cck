@@ -44,6 +44,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	public function __construct($config = array())
 	{
+		
 		$this->extension = 'com_content';
 		parent::__construct($config);
 
@@ -51,6 +52,11 @@ class FlexicontentControllerCategory extends JControllerForm
 		if (empty($this->extension)) {
 			$this->extension = JRequest::getCmd('extension', 'com_content');
 		}
+		
+		$this->registerTask( 'add'  ,		'add' );
+		$this->registerTask( 'apply'  ,		'save' );
+		$this->registerTask( 'save2new',	'save' );
+		$this->registerTask( 'save2copy', 'save' );
 	}
 
 	/**
@@ -74,6 +80,22 @@ class FlexicontentControllerCategory extends JControllerForm
 		parent::edit();
 	}
 
+	function add() {
+		parent::add();
+	}
+	
+	function save() {
+		parent::save();
+	}
+	
+	function save2new() {
+		parent::save2new();
+	}
+	
+	function save2copy() {
+		parent::save2copy();
+	}
+	
 	/**
 	 * Method to check if you can edit a record.
 	 *
