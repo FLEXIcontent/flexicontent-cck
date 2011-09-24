@@ -246,12 +246,15 @@ class modFlexicontentHelper
 		    		}
 					}
 				}
+				$lists[$ord]['featured'][$i]->id = $row->id;
 				//date
 				if ($params->get('date_display', 1) == 1) {
-					if ($params->get('date_type', 1) == 1) {
-						$lists[$ord]['featured'][$i]->date = JHTML::_('date', $row->created, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+					if ($params->get('date_type_feat', 1) == 1) {
+						$lists[$ord]['featured'][$i]->date = $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
+						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->created, JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'))) . '</span>';
 					} else {
-						$lists[$ord]['featured'][$i]->date = JHTML::_('date', $row->modified, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+						$lists[$ord]['featured'][$i]->date = $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_MODIFIED').':</span> ' : '';
+						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->modified, JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'))) . '</span>';
 					}
 				}
 				$lists[$ord]['featured'][$i]->image 	= $thumb;
@@ -312,12 +315,15 @@ class modFlexicontentHelper
 		    		}
 					}
 				}
+				$lists[$ord]['standard'][$i]->id = $row->id;
 				//date
 				if ($params->get('date_display', 1) == 1) {
 					if ($params->get('date_type', 1) == 1) {
-						$lists[$ord]['standard'][$i]->date = JHTML::_('date', $row->created, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+						$lists[$ord]['standard'][$i]->date = $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
+						$lists[$ord]['standard'][$i]->date .= '<span class="date_value">' . JHTML::_('date', $row->created, JText::_($params->get('date_format', 'DATE_FORMAT_LC3'))) . '</span>';
 					} else {
-						$lists[$ord]['standard'][$i]->date = JHTML::_('date', $row->modified, JText::_($params->get('date_format', 'DATE_FORMAT_LC3')));
+						$lists[$ord]['standard'][$i]->date = $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_MODIFIED').':</span> ' : '';
+						$lists[$ord]['standard'][$i]->date .= '<span class="date_value">' . JHTML::_('date', $row->modified, JText::_($params->get('date_format', 'DATE_FORMAT_LC3'))) . '</span>';
 					}
 				}
 				$lists[$ord]['standard'][$i]->image 	= $thumb;
@@ -859,6 +865,7 @@ class modFlexicontentHelper
 	function getCategoryData(&$params) {
 		$cid  = JRequest::getInt('cid', 0);
 		$view = JRequest::getVar('view');
+		$config 	=& JFactory::getConfig();
 		$currcat_showtitle  = $params->get('currcat_showtitle', 0);
 		$currcat_showdescr  = $params->get('currcat_showdescr', 0);
 		$currcat_cuttitle   = (int)$params->get('currcat_cuttitle', 20);
@@ -875,9 +882,9 @@ class modFlexicontentHelper
 		$db =& JFactory::getDBO();
 				
 		$currcatdata = null;
-		if ( ($currcat_showtitle || $currcat_showdescr) && $cid && $view=='items' ) {
+		if ( ($currcat_showtitle || $currcat_showdescr || $currcat_use_image) && $cid && $view=='items' ) {
 			// initialize variables
-			$q = 'SELECT c.id, c.title, c.description, '
+			$q = 'SELECT c.id, c.title, c.description, c.image, '
 						.( ($currcat_link_title || $currcat_link_image) ? ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug' : '' )
 						. ' FROM #__categories AS c'
 						. ' WHERE c.id = ' . $cid
@@ -885,15 +892,19 @@ class modFlexicontentHelper
 			$db->setQuery($q);
 			$currcatdata = $db->loadObject() or die($db->getErrorMsg());
 			
-			if (!$currcat_showtitle) {
-				unset($currcatdata->title);
-			} else {
-				$currcatdata->title = flexicontent_html::striptagsandcut($currcatdata->title, $currcat_cuttitle);
-			}
 			
-			if (!$currcat_showdescr) {
-				unset($currcatdata->description);
-			} else {
+			// Try to retrieve the category image source path
+			$catimagesrc = '';
+			if ($currcat_use_image==2) {
+				// We will use category image as defined in category params (if it defined)
+				
+				if (!empty($currcatdata->image)) {
+					$joomla_image_path 	= $config->getValue('config.image_path', 'images/stories');
+				  $catimagesrc	= JURI::base(true) .DS. $joomla_image_path .DS. $currcatdata->image;
+    		}
+    	} else if ($currcat_use_image==1) {
+    		// We will extract category image for the category text for image (if it exists)
+    		
 				$row = new StdClass();
 				$text = &$currcatdata->description;
 				
@@ -906,30 +917,49 @@ class modFlexicontentHelper
 					$row->fulltext = '';
 				} else 	{
 					list($row->introtext, $row->fulltext) = preg_split($pattern, $text, 2);
-				}
+				}				
 				
-				if ($currcat_use_image) {
-					// Get Image if it exists
-					$catdescrimage = flexicontent_html::extractimagesrc($row);
-					if ($catdescrimage) {
-					  $src	= JURI::base(true) . '/' . $catdescrimage;
-					  
-	  				$h		= '&h=' . $currcat_height;
-	 					$w		= '&w=' . $currcat_width;
-	  				$aoe	= '&aoe=1';
-	  				$q		= '&q=95';
-	  				$zc		= $currcat_method ? '&zc=' . $currcat_method : '';
-	  				$conf	= $w . $h . $aoe . $q . $zc;
-	  				
-	    			$currcatdata->image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-	    		}
-	    		
-	    	}
-	    	
+				// Try to get image from category text
+				$catdescrimage = flexicontent_html::extractimagesrc($row);
+				
+				if ($catdescrimage) {
+				  $catimagesrc	= JURI::base(true) . '/' . $catdescrimage;
+    		}
+    	}
+			
+			
+			// Category Title
+			if (!$currcat_showtitle) {
+				unset($currcatdata->title);
+			} else {
+				$currcatdata->title = flexicontent_html::striptagsandcut($currcatdata->title, $currcat_cuttitle);
+			}
+			
+			
+			// Category Image
+			if (empty($catimagesrc)) {
+  			unset($currcatdata->image);
+  		} else {
+				$h		= '&h=' . $currcat_height;
+				$w		= '&w=' . $currcat_width;
+				$aoe	= '&aoe=1';
+				$q		= '&q=95';
+				$zc		= $currcat_method ? '&zc=' . $currcat_method : '';
+				$conf	= $w . $h . $aoe . $q . $zc;
+				
+  			$currcatdata->image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$catimagesrc.$conf;
+  		}
+  		
+  		
+			// Category Description
+			if (!$currcat_showdescr) {
+				unset($currcatdata->description);
+			} else {
 				$currcatdata->description = flexicontent_html::striptagsandcut($currcatdata->description, $currcat_cutdescr);
 			}
 			
-			// Create links to category 
+			
+			// Category Links (title and image links)
 			if ($currcat_link_title || $currcat_link_image) {
 				$catlink = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($currcatdata->categoryslug));
 				if ($currcat_link_title) $currcatdata->titlelink = $catlink;

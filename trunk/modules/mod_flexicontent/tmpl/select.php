@@ -32,3 +32,11 @@ endforeach;
 echo JHTML::_('select.genericlist', $options, 'select_list_'.$module->id, $js, 'value', 'text', null);
 ?>
 </form>
+
+<?php if ($show_more == 1) : ?>
+<div class="news_readon_module">
+  <div class="news_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
+	  <a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
+ </div>
+</div>
+<?php endif;?>

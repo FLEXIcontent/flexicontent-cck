@@ -129,8 +129,9 @@ if ($add_tooltips)
 					<?php endif; ?>
 				</div>
 				<?php endif; ?>
-				<?php if ($display_title_feat || $display_text_feat || $mod_readmore_feat || ($use_fields && @$item->fields && $fields_feat)) : ?>
+				<?php if ($display_title_feat || $display_date || $display_text_feat || $mod_readmore_feat || ($use_fields && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured">
+					
 					<?php if ($display_title_feat) : ?>
 					<div class="news_title">
 						<?php if ($link_title_feat) : ?>
@@ -140,6 +141,13 @@ if ($add_tooltips)
 						<?php endif; ?>
 					</div>
 					<?php endif; ?>
+					
+					<?php if ($date_display) : ?>
+					<div class="news_date">
+						<?php echo $item->date; ?>
+					</div>
+					<?php endif; ?>
+					
 					<?php if ($display_text_feat && $item->text) : ?>
 					<div class="news_text">
 						<?php echo $item->text; ?>
@@ -185,8 +193,9 @@ if ($add_tooltips)
 					<?php endif; ?>
 				</div>
 				<?php endif; ?>
-				<?php if ($display_title || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<?php if ($display_title || $date_display || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard">
+					
 					<?php if ($display_title) : ?>
 					<div class="news_title">
 						<?php if ($link_title) : ?>
@@ -196,6 +205,13 @@ if ($add_tooltips)
 						<?php endif; ?>
 					</div>
 					<?php endif; ?>
+					
+					<?php if ($date_display) : ?>
+					<div class="news_date">
+						<?php echo $item->date; ?>
+					</div>
+					<?php endif; ?>
+					
 					<?php if ($display_text && $item->text) : ?>
 					<div class="news_text">
 						<?php echo $item->text; ?>
@@ -230,4 +246,13 @@ if ($add_tooltips)
 
 	</div>
 	<?php endforeach; ?>
+
+	<?php if ($show_more == 1) : ?>
+	<div class="news_readon_module">
+	  <div class="news_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
+		  <a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
+	 </div>
+	</div>
+	<?php endif;?>
+
 </div>

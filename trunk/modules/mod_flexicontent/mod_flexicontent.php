@@ -39,6 +39,7 @@ $add_ccs 				= $params->get('add_ccs', 1);
 $add_tooltips 			= $params->get('add_tooltips', 1);
 $width 					= $params->get('width');
 $height 				= $params->get('height');
+
 // standard
 $display_title 			= $params->get('display_title');
 $link_title 			= $params->get('link_title');
@@ -61,6 +62,9 @@ $mod_width_feat 		= $params->get('mod_width_feat');
 $mod_height_feat 		= $params->get('mod_height_feat');
 $mod_method_feat 		= $params->get('mod_method_feat');
 
+// get module date field parameters
+$date_display = $params->get('date_display');
+
 // get module fields parameters
 $use_fields 			= $params->get('use_fields');
 $display_label 			= $params->get('display_label');
@@ -68,6 +72,12 @@ $fields 				= $params->get('fields');
 // featured
 $display_label_feat 	= $params->get('display_label_feat');
 $fields_feat 			= $params->get('fields_feat');
+
+// module display params
+$show_more		= (int)$params->get('show_more', 1);
+$more_link		= $params->get('more_link');
+$more_title		= $params->get('more_title', 'FLEXI_READ_MORE_FROM_CATEGORY');
+$more_css		= $params->get('more_css');
 
 // custom parameters
 $custom1 				= $params->get('custom1');
