@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 278 2010-06-12 06:31:06Z emmanuel.danan $
+ * @version 1.5 stable $Id: fields.php 798 2011-08-11 04:03:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,8 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFields extends JModelList{
+class FlexicontentModelFields extends JModelList
+{
 	/**
 	 * Field data
 	 *
@@ -62,11 +63,12 @@ class FlexicontentModelFields extends JModelList{
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
-		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$mainframe = &JFactory::getApplication();
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
@@ -119,80 +121,36 @@ class FlexicontentModelFields extends JModelList{
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getListQuery() {
-		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$db = &JFactory::getDBO();
-		$query = $db->getQuery(true);
-
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
-		if ($filter_type && $filter_order == 't.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 'typeordering' );
-		} else if (!$filter_type && $filter_order == 'typeordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 't.ordering' );
-		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
+	function getListQuery()
+	{
+		static $query;
 		
-		// Select the required fields from the table.
-		$query->select(
-			$this->getState(
-				'list.select',
-				't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering'
-				. ', ext.name as field_friendlyname'
-			)
-		);
-		$query->from('#__flexicontent_fields AS t');
-		$query->join('LEFT', '#__extensions AS ext ON (ext.element = t.field_type AND ext.`type`=\'plugin\')');
-		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
-		$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
-		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
-		if ( $filter_iscore ) {
-			if ( $filter_iscore == 'C' ) {
-				$query->where('t.iscore = 1');
-			} else if ($filter_iscore == 'NC' ) {
-				$query->where('t.iscore = 0');
-			} else if ($filter_iscore == 'BV' ) {
-				$query->where('(t.iscore = 0 OR t.id = 1)');
-			}
-		}
-
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$query->where('t.published = 1');
-			} else if ($filter_state == 'U' ) {
-				$query->where('t.published = 0');
-			}
-		}
-
-		if ( $filter_type ) {
-			$query->where('rel.type_id = ' . $filter_type);
-		}
-
-		if ($search) {
-			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
-		}
+		if(!isset($query)) {
+			$db = &JFactory::getDBO();
+			$query = $db->getQuery(true);
+			
+			// Get the WHERE, HAVING and ORDER BY clauses for the query
+			$where		= trim($this->_buildContentWhere());
+			$orderby	= trim($this->_buildContentOrderBy());
+			$having		= trim($this->_buildContentHaving());
+	
+			$query->select(
+				$this->getState( 'list.select',
+					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
+				)
+			);
+			$query->from('#__flexicontent_fields AS t');
+			$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\')');
+			$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
+			$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
+			$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
+			if ($where) $query->where($where);
+			$query->group('t.id');
+			if ($having) $query->having($having);
+			if ($orderby) $query->order($orderby);
+			
+		}//end if(!isset($query))
 		
-		$query->group('t.id');
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$query->having('COUNT(rel.type_id) = 0');
-			} else if ($filter_assigned == 'A' ) {
-				$query->having('COUNT(rel.type_id) > 0');
-			}
-		}
-		
-		$query->where("(ext.extension_id IS NULL OR ext.folder='flexicontent_fields')");
-
-		$query->order($filter_order.' '.$filter_order_Dir);
-		//echo str_replace("#__", "jos_", $query->__toString());
 		return $query;
 	}
 
@@ -217,7 +175,7 @@ class FlexicontentModelFields extends JModelList{
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+		$orderby 	= ' '.$filter_order.' '.$filter_order_Dir;
 
 		return $orderby;
 	}
@@ -229,46 +187,52 @@ class FlexicontentModelFields extends JModelList{
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere() {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		$where = array();
-
-		if ( $filter_iscore ) {
-			if ( $filter_iscore == 'C' ) {
-				$where[] = 't.iscore = 1';
-			} else if ($filter_iscore == 'NC' ) {
-				$where[] = 't.iscore = 0';
-			} else if ($filter_iscore == 'BV' ) {
-				$where[] = '(t.iscore = 0 OR t.id = 1)';
+	function _buildContentWhere()
+	{
+		static $where;
+		if(!isset($where)) {
+			$option = JRequest::getVar('option');
+			$mainframe = &JFactory::getApplication();
+	
+			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
+			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+			$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
+			$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
+			$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+	
+			$where = array();
+	
+			if ( $filter_iscore ) {
+				if ( $filter_iscore == 'C' ) {
+					$where[] = 't.iscore = 1';
+				} else if ($filter_iscore == 'NC' ) {
+					$where[] = 't.iscore = 0';
+				} else if ($filter_iscore == 'BV' ) {
+					$where[] = '(t.iscore = 0 OR t.id = 1)';
+				}
 			}
-		}
-
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$where[] = 't.published = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 't.published = 0';
+	
+			if ( $filter_state ) {
+				if ( $filter_state == 'P' ) {
+					$where[] = 't.published = 1';
+				} else if ($filter_state == 'U' ) {
+					$where[] = 't.published = 0';
+				}
 			}
-		}
-
-		if ( $filter_type ) {
-			$where[] = 'rel.type_id = ' . $filter_type;
+	
+			if ( $filter_type ) {
+				$where[] = 'rel.type_id = ' . $filter_type;
+				}
+	
+			if ($search) {
+				$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 			}
-
-		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
-		}
-
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-
+			
+			$where[] = ' (plg.extension_id IS NULL OR plg.folder="flexicontent_fields") ';
+			
+			$where 		= ( count( $where ) ? implode( ' AND ', $where ) : '' );
+		}//end if(!isset($where))
+		
 		return $where;
 	}
 	
@@ -290,9 +254,9 @@ class FlexicontentModelFields extends JModelList{
 		
 		if ( $filter_assigned ) {
 			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.type_id) = 0';
+				$having = ' COUNT(rel.type_id) = 0';
 			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.type_id) > 0';
+				$having = ' COUNT(rel.type_id) > 0';
 			}
 		}
 		

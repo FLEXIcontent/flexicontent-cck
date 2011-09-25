@@ -303,7 +303,7 @@ window.addEvent( 'domready', function() {
 		else
 			$results = array();
 			
-		if($this->_db->getErrorNum()) {
+		if($db->getErrorNum()) {
 			$this->setError($db->getErrorMsg());
 			$field->{$prop} = '';
 			return false;

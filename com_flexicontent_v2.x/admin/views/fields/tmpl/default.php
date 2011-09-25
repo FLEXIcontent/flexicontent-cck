@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 893 2011-09-08 23:50:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -45,22 +45,23 @@ defined('_JEXEC') or die('Restricted access');
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+<!--			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
 			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+<!--			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
 			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
 			<th width="90">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
+				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : ''; ?>
 			</th>
 		<?php else : ?>
 			<th width="90">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
+				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : ''; ?>
 			</th>
 		<?php endif; ?>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -70,7 +71,7 @@ defined('_JEXEC') or die('Restricted access');
 	<tfoot>
 		<tr>
 			<td colspan="14">
-				<?php echo $this->pagination->getListFooter(); ?>
+				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -110,7 +111,7 @@ defined('_JEXEC') or die('Restricted access');
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
@@ -129,6 +130,10 @@ defined('_JEXEC') or die('Restricted access');
 			<td align="left">
 				<?php echo $row->name; ?>
 			</td>
+			<td align="left">
+				<?php $row->field_friendlyname = str_ireplace("FLEXIcontent - ","",$row->field_friendlyname); ?>
+				<?php echo ($row->iscore?"[Core] "/*.$row->type*/ : "{$row->field_friendlyname}"/*." [{$row->type}]"*/); ?>
+			</td>
 			<td>
 				<?php
 				if (JString::strlen($row->description) > 50) {
@@ -138,9 +143,9 @@ defined('_JEXEC') or die('Restricted access');
 				}
 				?>
 			</td>
-			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+<!--			<td align="center"><img src="components/com_flexicontent/assets/images/<?php // echo $isfilter;?>" width="16" height="16" border="0" alt="<?php // echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td> -->
 			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+<!--			<td align="center"><img src="components/com_flexicontent/assets/images/<?php // echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php // echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td> -->
 			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
 			<td align="center">
 				<?php echo $access; ?>
@@ -149,9 +154,9 @@ defined('_JEXEC') or die('Restricted access');
 				<?php echo $published; ?>
 			</td>
 			<td class="order">
-				<span><?php echo $this->pagination->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'fields.orderup', 'Move Up', $this->ordering ); ?></span>
 
-				<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'fields.orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 633 2011-07-08 03:23:13Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,9 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewFields extends JView {
-	function display($tpl = null) {
+
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -36,7 +38,7 @@ class FlexicontentViewFields extends JView {
 		$db  		= & JFactory::getDBO();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
-
+		
 		JHTML::_('behavior.tooltip');
 
 		//get vars
@@ -78,7 +80,7 @@ class FlexicontentViewFields extends JView {
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Items');
-		$this->pagination 	= & $this->get( 'Pagination' );
+		$pageNav 	= & $this->get( 'Pagination' );
 		$types		= & $this->get( 'Typeslist' );
 
 		$lists = array();
@@ -122,12 +124,12 @@ class FlexicontentViewFields extends JView {
 		}
 
 		//assign data to template
-		$this->assignRef('filter_type'		, $filter_type);
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'			, $rows);
-		$this->assignRef('user'			, $user);
+		$this->assignRef('filter_type'  , $filter_type);
+		$this->assignRef('lists'      	, $lists);
+		$this->assignRef('rows'      	, $rows);
+		$this->assignRef('user'      	, $user);
 		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('pageNav'		, $pageNav);
+		$this->assignRef('pageNav' 		, $pageNav);
 
 		parent::display($tpl);
 	}
