@@ -81,7 +81,6 @@ class FlexicontentModelFields extends JModel
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
 		$this->setId((int)$array[0]);
-
 	}
 
 	/**
@@ -164,24 +163,26 @@ class FlexicontentModelFields extends JModel
 	function _buildQuery()
 	{
 		static $query;
+		
 		if(!isset($query)) {
-		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where		= $this->_buildContentWhere();
-		$orderby	= $this->_buildContentOrderBy();
-		$having		= $this->_buildContentHaving();
-
-		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
-			. ' FROM #__flexicontent_fields AS t'
-			. ' LEFT JOIN #__plugins AS plg ON plg.element = t.field_type'
-			. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
-			. ' LEFT JOIN #__groups AS g ON g.id = t.access'
-			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-			. ($where ? $where." AND (plg.id IS NULL OR plg.folder='flexicontent_fields') " : " WHERE (plg.id IS NULL OR plg.folder='flexicontent_fields') ")
-			. ' GROUP BY t.id'
-			. $having
-			. $orderby
-			;
+			// Get the WHERE, HAVING and ORDER BY clauses for the query
+			$where		= $this->_buildContentWhere();
+			$orderby	= $this->_buildContentOrderBy();
+			$having		= $this->_buildContentHaving();
+	
+			$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.name AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
+				. ' FROM #__flexicontent_fields AS t'
+				. ' LEFT JOIN #__plugins AS plg ON plg.element = t.field_type'
+				. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id'
+				. ' LEFT JOIN #__groups AS g ON g.id = t.access'
+				. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
+				. $where
+				. ' GROUP BY t.id'
+				. $having
+				. $orderby
+				;
 		}//end if(!isset($query))
+		
 		return $query;
 	}
 
@@ -221,46 +222,48 @@ class FlexicontentModelFields extends JModel
 	{
 		static $where;
 		if(!isset($where)) {
-		
-		global $option;
-		$mainframe = &JFactory::getApplication();
-
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		$where = array();
-
-		if ( $filter_iscore ) {
-			if ( $filter_iscore == 'C' ) {
-				$where[] = 't.iscore = 1';
-			} else if ($filter_iscore == 'NC' ) {
-				$where[] = 't.iscore = 0';
-			} else if ($filter_iscore == 'BV' ) {
-				$where[] = '(t.iscore = 0 OR t.id = 1)';
+			global $option;
+			$mainframe = &JFactory::getApplication();
+	
+			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
+			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+			$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
+			$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
+			$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+	
+			$where = array();
+	
+			if ( $filter_iscore ) {
+				if ( $filter_iscore == 'C' ) {
+					$where[] = 't.iscore = 1';
+				} else if ($filter_iscore == 'NC' ) {
+					$where[] = 't.iscore = 0';
+				} else if ($filter_iscore == 'BV' ) {
+					$where[] = '(t.iscore = 0 OR t.id = 1)';
+				}
 			}
-		}
-
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$where[] = 't.published = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 't.published = 0';
+	
+			if ( $filter_state ) {
+				if ( $filter_state == 'P' ) {
+					$where[] = 't.published = 1';
+				} else if ($filter_state == 'U' ) {
+					$where[] = 't.published = 0';
+				}
 			}
-		}
-
-		if ( $filter_type ) {
-			$where[] = 'rel.type_id = ' . $filter_type;
+	
+			if ( $filter_type ) {
+				$where[] = 'rel.type_id = ' . $filter_type;
+				}
+	
+			if ($search) {
+				$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 			}
-
-		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
-		}
-
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+			
+			$where[] = ' (plg.id IS NULL OR plg.folder="flexicontent_fields" ) ';
+			
+			$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		}//end if(!isset($where))
+		
 		return $where;
 	}
 	
