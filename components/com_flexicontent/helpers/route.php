@@ -74,23 +74,25 @@ class FlexicontentHelperRoute
 		if ($default_menuitem_preference==1  &&  !$app->isAdmin()) {
 			$menu = &JSite::getMenu();
 			$activemenuItem = &$menu->getActive();
-			$activemenuItemId = $activemenuItem->id;
-			
-			$db 	=& JFactory::getDBO();
-			$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
-			$flexi_comp_id = $db->loadResult();	
-			
-			$query 	= 'SELECT COUNT( m.id )'
-				. ' FROM #__menu as m'
-				. ' WHERE m.published=1 AND m.id="'.$activemenuItemId.'" AND m.componentid="'.$flexi_comp_id.'"'
-				;
-			$db->setQuery( $query );
-			$count = $db->loadResult();
-
-			// Use currently active ... it is pointing to FC
-			if ($count) {
-				//  USE current Active ID it maybe irrelevant
-				return  $_component_default_menuitem_id = $activemenuItem->id;
+			if ($activemenuItem) {
+				$activemenuItemId = $activemenuItem->id;
+				
+				$db 	=& JFactory::getDBO();
+				$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+				$flexi_comp_id = $db->loadResult();	
+				
+				$query 	= 'SELECT COUNT( m.id )'
+					. ' FROM #__menu as m'
+					. ' WHERE m.published=1 AND m.id="'.$activemenuItemId.'" AND m.componentid="'.$flexi_comp_id.'"'
+					;
+				$db->setQuery( $query );
+				$count = $db->loadResult();
+	
+				// Use currently active ... it is pointing to FC
+				if ($count) {
+					//  USE current Active ID it maybe irrelevant
+					return  $_component_default_menuitem_id = $activemenuItem->id;
+				}
 			}
 		}
 		

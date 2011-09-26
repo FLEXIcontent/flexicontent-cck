@@ -19,6 +19,65 @@
 		</param>
 	</params>
 	<params group="group-relateditems" addpath="/administrator/components/com_flexicontent/elements">
+		
+		<param name="" type="separator" default="FLEXI_SCOPE" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_CAT_SCOPE" level="level2" menu="hide" />
+		<param name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
+		<param name="catids" type="flexicategories" required="false" size="10" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
+		<param name="usesubcats" type="radio" default="0" label="FLEXI_INCLUDE_SUBCATS" description="FLEXI_INCLUDE_SUBCATS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+
+		<param name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level2" menu="hide" />
+		<param name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
+		
+		<param name="types" type="types" multiple="multiple" size="3" label="FLEXI_FCTYPES" description="FLEXI_FCTYPES_DESC" />
+		
+		<param name="" type="separator" default="FLEXI_OTHER_SCOPE_LIMITS" level="level2" menu="hide" />
+		
+		<param name="samelangonly" type="radio" default="1" label="FLEXI_SAME_LANGUAGE_ONLY" description="FLEXI_SAME_LANGUAGE_ONLY_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="onlypublished" type="radio" default="1" label="FLEXI_ONLY_PLUBLISHED_ITEMS" description="FLEXI_ONLY_PLUBLISHED_ITEMS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+			
+		<param name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" menu="hide" />
+		<param name="orderby" type="list" default="alpha" label="FLEXI_ITEM_ORDERING" description="FLEXI_ITEM_ORDERING_DESC">
+			<option value="">Default (ID)</option>
+			<option value="date">Oldest first</option>
+			<option value="rdate">Recent first</option>
+			<option value="alpha">Title Alphabetical</option>
+			<option value="ralpha">Title Reverse-Alphabetical</option>
+			<option value="hits">Most Hits</option>
+			<option value="rhits">Least Hits</option>
+			<option value="order">Ordering (Item manager)</option>
+		</param>
+		
+		<field name="size" type="text" default="12" size="2" label="FLEXI_FIELD_SELECTBOX_LINES" description="FLEXI_FIELD_SELECTBOX_LINES_DESC" />
+		
+		<param name="prepend_item_state" type="radio" default="1" label="FLEXI_PREPEND_ITEM_STATE" description="FLEXI_PREPEND_ITEM_STATE_DESC" >
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="maxtitlechars" type="text" default="40" label="Maximum Title Chars" description="Maximum character Length for title, title longer than this will be trimmend" />
+		
+		<param name="title_filter" type="radio" default="1" label="FLEXI_TITLE_FILTER" description="FLEXI_TITLE_FILTER_DESC" >	
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
+		
+		<param name="" type="separator" default="FLEXI_FORMATING_THE_FIELD" level="level2" menu="hide" />
+		
 		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -30,7 +89,8 @@
 		</param>
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
-		<param name="size" type="text" default="12" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+		
+		<param name="" type="separator" default="FLEXI_SEPARATING_ITEMS" level="level2" menu="hide" />
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
 			<option value="1">FLEXI_LINE_BREAK</option>
@@ -38,18 +98,10 @@
 			<option value="3">FLEXI_COMMA</option>
 			<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
 		</param>
-		<param name="maxtitlechars" type="text" default="40" label="Maximum Title Chars" description="Maximum character Length for title, title longer than this will be trimmend" />
-		<param name="samelangonly" type="radio" default="1" label="List Same Language Items Only" description="When this is enabled only items that have the same language as the item will be listed">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
 		<param name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
 		<param name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
-		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
 	</params>
 	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems.ini</language>
 	</languages>
 </install>
