@@ -244,6 +244,7 @@
 
 		<copy file="plugins/flexicontent_fields/relateditems.php" tofile="flexipack/plugins/relateditems/relateditems.php" />
 		<copy file="plugins/flexicontent_fields/relateditems.xml" tofile="flexipack/plugins/relateditems/relateditems.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relateditems.ini" tofile="flexipack/plugins/relateditems/en-GB.plg_flexicontent_fields_relateditems.ini" />
 		
 		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
 		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />

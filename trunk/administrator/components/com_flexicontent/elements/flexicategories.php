@@ -55,7 +55,20 @@ class JElementFlexicategories extends JElement
 			document.getElementById('a_id').value = values;
 		}";
 		$doc->addScriptDeclaration($js);
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox required validate-cid" multiple="multiple" size="8"', true);
+		
+		$attribs = '';
+		if ($node->attributes('size')) {
+			$attribs .= ' size="'.$node->attributes('size').'" ';
+		} else {
+			$attribs .= ' size="8" ';
+		}
+		
+		$required='required';
+		if ( $node->attributes('required') && $node->attributes('required')=='false' ) {
+			$required='';
+		}
+		
+		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox '.$required.' validate-cid" multiple="multiple" '.$attribs, true);
 		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
 		return $html;
 	}

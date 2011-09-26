@@ -50,7 +50,12 @@ class JElementTypes extends JElement
 
 		$attribs = "";
 		if ($node->attributes('multiple')) {
-			$attribs .= 'multiple="true" size="10"';
+			$attribs .= ' multiple="true" ';
+			if ($node->attributes('size')) {
+				$attribs .= ' size="'.$node->attributes('size').'" ';
+			} else {
+				$attribs .= ' size="6" ';
+			}
 			$fieldname = $control_name.'['.$name.'][]';
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
