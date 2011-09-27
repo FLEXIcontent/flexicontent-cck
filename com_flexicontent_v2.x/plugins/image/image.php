@@ -88,21 +88,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					($linkto_url ? '
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-							<td><input name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+							<td><input size="40" name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 						</tr>'
 						:
 						'').'
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-							<td><input name="custom['.$field->name.'][alt]" value="'.$value['alt'].'" type="text" /></td>
+							<td><input size="40" name="custom['.$field->name.'][alt]" value="'.$value['alt'].'" type="text" /></td>
 						</tr>
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-							<td><input name="custom['.$field->name.'][title]" value="'.$value['title'].'" type="text" /></td>
+							<td><input size="40" name="custom['.$field->name.'][title]" value="'.$value['title'].'" type="text" /></td>
 						</tr>
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
-							<td><textarea name="custom['.$field->name.'][desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
+							<td><textarea name="custom['.$field->name.'][desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 						</tr>
 					</table>
 				</div>';
@@ -142,17 +142,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					($linkto_url ? '
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-						<td><input name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+						<td><input size="40" name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 					</tr>'
 					:
 					'').'
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-						<td><input name="custom['.$field->name.'][alt]" type="text" /></td>
+						<td><input size="40" name="custom['.$field->name.'][alt]" type="text" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-						<td><input name="custom['.$field->name.'][title]" type="text" /></td>
+						<td><input size="40" name="custom['.$field->name.'][title]" type="text" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
@@ -180,6 +180,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
 		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
+		
+		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
+		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
 		
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
@@ -246,18 +249,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$urllink = @$value['urllink'] ? $value['urllink'] : '';
 				if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 				
-				$tip	= JText::_( 'FLEXI_FIELD_LEGEND' ) . '::' . $title;
+				$tip	= $title . '::' . $desc;
 				$id		= $field->item_id . '_' . $field->id . '_' . $i;
-				$legend = ($uselegend && !empty($title))? ' class="hasTip" title="'.$tip.'"' : '' ;
+				$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
 				
 				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'item'));
 				
 				$thumb_size = 0;
 				if ($view == 'category')
-				  $thumb_size =  $field->parameters->get('thumbincatview',0);
+				  $thumb_size =  $field->parameters->get('thumbincatview',2);
 				if($view == 'item')
-				  $thumb_size =  $field->parameters->get('thumbinitemview',0);
+				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
 				switch ($thumb_size)
 				{
 				  case 1: $src = $srcs; break;
@@ -310,7 +313,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}
 			}
-
+			if ($showtitle || $showdesc) $field->{$prop} = '<div class="fcimg_tooltip_data">'.$field->{$prop};
+			if ($showtitle) $field->{$prop} .= '<div class="fcimg_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
+			if ($showdesc) $field->{$prop} .= '<div class="fcimg_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
+			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
 		} else {
 			$field->{$prop} = '';
 		}
@@ -639,7 +645,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		if (!$list_all_media_files) {
 			for($n=0, $c=count($values); $n<$c; $n++) {
-				if (!$values[$n]) { unset($values[$n]); continue;}
+				if (!$values[$n]) { unset($values[$n]); continue; }
 				$values[$n] = unserialize($values[$n]);
 				$values[$n] = $values[$n]['originalname'];
 			}

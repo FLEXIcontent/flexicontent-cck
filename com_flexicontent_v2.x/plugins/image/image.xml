@@ -80,16 +80,13 @@
 				<option value="1">Yes</option>
 			</field>
 			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" menu="hide" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
 			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
-			</field>
-			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
@@ -108,7 +105,15 @@
 				<option value="2">Medium</option>
 				<option value="3">Large</option>
 			</field>
-			<field name="" type="separator" default="Behaviour Parameters" level="level1" menu="hide" />
+			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" menu="hide" />
 			<field name="linkto_url" type="radio" default="0" label="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
@@ -118,19 +123,23 @@
 				<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
 				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
 			</field>
-			<field name="list_all_media_files" type="radio" default="0" label="List All Media Files" description="When selecting an image file all media files will be listed, not just the ones used for image field">
+			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="always_allow_removal" type="radio" default="0" label="Always allow image removal" description="Even when image file is not used by other items allow to remove it instead of only allowing to deleting it">
+			<field name="list_all_media_files" type="radio" default="0" label="FLEXI_LIST_ALL_MEDIA_FILES" description="FLEXI_LIST_ALL_MEDIA_FILES_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="limit_by_uploader" type="radio" default="0" label="Limit to the uploader" description="Do not show pictures uploaded by other users">
+			<field name="always_allow_removal" type="radio" default="0" label="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL" description="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="required" type="radio" default="0" label="Required" description="Required">
+			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_LIMIT_BY_UPLOADER" description="FLEXI_LIMIT_BY_UPLOADER_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
@@ -140,7 +149,7 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_image.ini</language>
 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_image.ini</language>
-		<language tag="de-DE">de-DE.plg_flexicontent_fields_image.ini</language>
 		<language tag="ru-RU">ru-RU.plg_flexicontent_fields_image.ini</language>
+		<language tag="de-DE">de-DE.plg_flexicontent_fields_image.ini</language>
 	</languages>
 </install>

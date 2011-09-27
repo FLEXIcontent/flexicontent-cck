@@ -219,7 +219,8 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 
 				if (empty($data)) {
-					return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
+					//return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
+					return JError::raiseError(404,JText::_('Article not found or it is is currently being changed by an editor'));
 				}
 
 				// Check for published state if filter set.
