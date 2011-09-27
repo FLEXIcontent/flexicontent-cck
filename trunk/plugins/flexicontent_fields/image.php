@@ -62,8 +62,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$linkto_url = $field->parameters->get('linkto_url',0);
 		
 		// if an image exists it display the existing image
-		if ($field->value  && $field->value[0] != '')
-		{				
+		if ($field->value  && @$field->value[0]!=='')
+		{
 			foreach ($field->value as $value) {
 				$value = unserialize($value);
 				$image = $value['originalname'];
@@ -86,21 +86,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					($linkto_url ? '
 						<tr>
 							<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-							<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+							<td><input size="40" name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 						</tr>'
 						:
 						'').'
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-							<td><input name="'.$field->name.'[alt]" value="'.$value['alt'].'" type="text" /></td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
+							<td><input size="40" name="'.$field->name.'[alt]" value="'.$value['alt'].'" type="text" /></td>
 						</tr>
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-							<td><input name="'.$field->name.'[title]" value="'.$value['title'].'" type="text" /></td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+							<td><input size="40" name="'.$field->name.'[title]" value="'.$value['title'].'" type="text" /></td>
 						</tr>
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
-							<td><textarea name="'.$field->name.'[desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+							<td><textarea name="'.$field->name.'[desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 						</tr>
 					</table>
 				</div>';
@@ -140,17 +140,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					($linkto_url ? '
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-						<td><input name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+						<td><input size="40" name="'.$field->name.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 					</tr>'
 					:
 					'').'
 					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
-						<td><input name="'.$field->name.'[alt]" type="text" /></td>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
+						<td><input size="40" name="'.$field->name.'[alt]" type="text" /></td>
 					</tr>
 					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
-						<td><input name="'.$field->name.'[title]" type="text" /></td>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+						<td><input size="40" name="'.$field->name.'[title]" type="text" /></td>
+					</tr>
+					<tr>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+						<td><textarea name="'.$field->name.'[desc]" rows="1" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 					</tr>
 				</table>
 			</div>
@@ -173,6 +177,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
 		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
+		
+		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
+		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
 		
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
@@ -239,9 +246,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$urllink = @$value['urllink'] ? $value['urllink'] : '';
 				if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 				
-				$tip	= JText::_( 'FLEXI_FIELD_LEGEND' ) . '::' . $title;
+				$tip	= $title . '::' . $desc;
 				$id		= $field->item_id . '_' . $field->id . '_' . $i;
-				$legend = ($uselegend && !empty($title))? ' class="hasTip" title="'.$tip.'"' : '' ;
+				$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
 				
 				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'items'));
@@ -303,7 +310,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}
 			}
-
+			if ($showtitle || $showdesc) $field->{$prop} = '<div class="fcimg_tooltip_data">'.$field->{$prop};
+			if ($showtitle) $field->{$prop} .= '<div class="fcimg_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
+			if ($showdesc) $field->{$prop} .= '<div class="fcimg_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
+			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
 		} else {
 			$field->{$prop} = '';
 		}
@@ -336,7 +346,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		// Upload the original file
 		$this->uploadOriginalFile($field, $post, $file);
-		
 		if ($post['originalname'])
 		{
 			if ($post['delete'] == 1)
@@ -357,7 +366,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// unset $post because no file was posted
 			$post = '';
 		}
-
 	}
 	
 	function uploadOriginalFile($field, &$post, $file)
@@ -386,7 +394,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
-			
 			// only handle the secure folder
 			$path = COM_FLEXICONTENT_FILEPATH.DS;
 
@@ -632,12 +639,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		$db->setQuery($query);
 		$values = $db->loadResultArray();
-		
 
 		if (!$list_all_media_files) {
-			for($n=0, $c=count($values); $n<$c; $n++)
-			{
-			  if (!$values[$n]) {  unset($values[$n]);  continue; 	}
+			for($n=0, $c=count($values); $n<$c; $n++) {
+				if (!$values[$n]) { unset($values[$n]); continue; }
 				$values[$n] = unserialize($values[$n]);
 				$values[$n] = $values[$n]['originalname'];
 			}

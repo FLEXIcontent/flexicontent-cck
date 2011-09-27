@@ -605,3 +605,11 @@ span.fc_alpha_index {
 	margin-right:12px;
 	color: darkred;
 }
+
+.fcimg_tooltip_title {
+	line-height:1em;
+	font-weight:bold;
+}
+.fcimg_tooltip_desc {
+	line-height:1em;
+}

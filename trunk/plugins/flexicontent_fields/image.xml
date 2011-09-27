@@ -78,16 +78,13 @@
 			<option value="1">Yes</option>
 		</param>
 		<param name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
-		<param name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" menu="hide" />
+
+		<param name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
 		<param name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
 		<param name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
-		<param name="autoupload" type="radio" default="1" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
@@ -106,7 +103,15 @@
 			<option value="2">Medium</option>
 			<option value="3">Large</option>
 		</param>
-		<param name="" type="separator" default="Behaviour Parameters" level="level1" menu="hide" />
+		<param name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" menu="hide" />
 		<param name="linkto_url" type="radio" default="0" label="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -115,6 +120,10 @@
 			<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
 			<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
 			<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
+		</param>
+		<param name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
 		</param>
 		<param name="list_all_media_files" type="radio" default="0" label="FLEXI_LIST_ALL_MEDIA_FILES" description="FLEXI_LIST_ALL_MEDIA_FILES_DESC">
 			<option value="0">No</option>
