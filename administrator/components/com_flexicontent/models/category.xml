@@ -126,7 +126,8 @@
 -->
 		<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
 	 		<option value="0">Hide</option>
-	 		<option value="1">Show</option>
+	 		<option value="2">1st sublevel</option> 
+	 		<option value="1">All sublevels</option>
 		</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">

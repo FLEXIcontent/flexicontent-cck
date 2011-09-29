@@ -37,6 +37,7 @@ class JElementCategorylayout extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
+		require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
 		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';

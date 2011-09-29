@@ -67,16 +67,24 @@ class FlexicontentModelCategory extends JModel{
 	/**
 	 * Group Categories
 	 *
-	 * @var integer
+	 * @var array
 	 */
 	var $_group_cats = array();
 
 	/**
 	 * Category author (used for author pseudo-view)
 	 *
-	 * @var string
+	 * @var integer
 	 */
 	var $_authorid = 0;
+	
+	/**
+	 * Category layout
+	 *
+	 * @var string
+	 */
+	var $_layout = 'category';
+	
 
 	/**
 	 * Constructor
@@ -90,7 +98,17 @@ class FlexicontentModelCategory extends JModel{
 		global $mainframe;
 
 		$cid			= JRequest::getInt('cid', 0);
-		$this->_authorid = JRequest::getInt('authorid', 0);
+		$this->_layout = JRequest::getVar('layout', 'category');
+		
+		if ($this->_layout=='author') {
+			$this->_authorid = JRequest::getInt('authorid', 0);
+		} else if ($this->_layout=='myitems') {
+			$user =& JFactory::getUser();
+			if ($user->guest) {
+				JError::raiseError(404, JText::sprintf( 'USER NOT LOGGED, Please set MY ITEMs link to be displayed on logged users only', $this->_id ));
+			}
+			$this->_authorid = $user->id;
+		}
 		
 		// we need to merge parameters here to get the correct page limit value
 		$params = $this->_loadCategoryParams($cid);
@@ -598,7 +616,11 @@ class FlexicontentModelCategory extends JModel{
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
-
+		
+		$show_itemcount  = $cparams->get('show_itemcount', 0);
+		// This should not cause problems, category parameters says not to display itemcount for subcategories
+		if ($show_itemcount==0) return null;
+		
 		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
 		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
 		$where 			= ' WHERE cc.published = 1';
@@ -610,8 +632,13 @@ class FlexicontentModelCategory extends JModel{
 
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
-
-		$where .= ' AND rel.catid IN ('. (@$globalcats[$id]->descendants?$globalcats[$id]->descendants:"''"). ')';
+		
+		if ($show_itemcount==2) {
+			$where .= ' AND rel.catid = '. $id;
+		} else { // ($show_itemcount==1)
+			$where .= ' AND rel.catid IN ('. (@$globalcats[$id]->descendants?$globalcats[$id]->descendants:"''"). ')';
+		}
+		
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
@@ -744,7 +771,7 @@ class FlexicontentModelCategory extends JModel{
 		//Make sure the category is published
 		if (!$this->_category->published)
 		{
-			JError::raiseError(404, JText::sprintf( 'CATEGORY #%d NOT FOUND', $this->_id ));
+			JError::raiseError(404, JText::sprintf( 'CATEGORY #%d NOT FOUND or NOT PUBLISHED', $this->_id ));
 			return false;
 		}
 		
@@ -831,6 +858,11 @@ class FlexicontentModelCategory extends JModel{
 			$params->merge( new JParameter($author_catparams) );
 		}
 
+		if ($this->_layout=='myitems') {
+			$clayout = JRequest::getVar('clayout', 'default');
+			 $params->set('clayout', $clayout);
+		}
+		
 		return $params;
 	}
 
