@@ -25,7 +25,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage	Users
  * @since 1.0
  */
-class FlexicontentViewusers extends JView
+class FlexicontentViewUsers extends JView
 {
 	function display($tpl = null)
 	{
@@ -41,8 +41,17 @@ class FlexicontentViewusers extends JView
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( "$option.authors.filter_order",		'filter_order',		'a.name',	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( "$option.authors.filter_order_Dir",	'filter_order_Dir',	'',			'word' );
-		$filter_type		= $mainframe->getUserStateFromRequest( "$option.authors.filter_type",		'filter_type', 		0,			'string' );
-		$filter_logged		= $mainframe->getUserStateFromRequest( "$option.authors.filter_logged",		'filter_logged', 	0,			'int' );
+		
+		$filter_itemscount		= $mainframe->getUserStateFromRequest( "$option.authors.filter_itemscount",		'filter_itemscount', 		'',			'int' );
+		
+		$filter_type		= $mainframe->getUserStateFromRequest( "$option.authors.filter_type",		'filter_type', 		'',			'string' );
+		$filter_logged		= $mainframe->getUserStateFromRequest( "$option.authors.filter_logged",		'filter_logged', 	'',			'int' );
+		$date	 			= $mainframe->getUserStateFromRequest( "$option.authors.date", 				'date', 			1, 				'int' );
+		$startdate	 		= $mainframe->getUserStateFromRequest( "$option.authors.startdate", 		'startdate', 		'', 			'cmd' );
+		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( "$option.authors.startdate", '' ); }
+		$enddate	 		= $mainframe->getUserStateFromRequest( "$option.authors.enddate", 			'enddate', 			'', 			'cmd' );
+		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( "$option.authors.enddate", '' ); }
+		$filter_id 			= $mainframe->getUserStateFromRequest( "$option.authors.filter_id", 		'filter_id', 		'', 			'int' );
 		$search				= $mainframe->getUserStateFromRequest( "$option.authors.search",			'search', 			'',			'string' );
 		if (strpos($search, '"') !== false) {
 			$search = str_replace(array('=', '<'), '', $search);
@@ -51,6 +60,34 @@ class FlexicontentViewusers extends JView
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+
+
+		$js = "window.addEvent('domready', function(){";
+		if ($filter_type) {
+			$js .= "$$('.col_type').each(function(el){ el.addClass('yellow'); });";
+		}
+		if ($filter_logged) {
+			$js .= "$$('.col_logged').each(function(el){ el.addClass('yellow'); });";
+		}
+		if ($filter_id) {
+			$js .= "$$('.col_id').each(function(el){ el.addClass('yellow'); });";
+		}
+		if ($startdate || $enddate) {
+			if ($date == 1) {
+				$js .= "$$('.col_registered').each(function(el){ el.addClass('yellow'); });";
+			} else if ($date == 2) {
+				$js .= "$$('.col_visited').each(function(el){ el.addClass('yellow'); });";
+			}
+		}
+		if ($search || $filter_itemscount) {
+			$js .= "$$('.col_title').each(function(el){ el.addClass('yellow'); });";
+		} else {
+			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
+		}
+		$js .= "});";
+		$document->addScriptDeclaration($js);
+
+
 
 		FLEXISubmenu('CanAuthors');
 
@@ -66,12 +103,43 @@ class FlexicontentViewusers extends JView
 		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
 
-		$where = array();
+		$where = array(); $having = array();
 		if (isset( $search ) && $search!= '')
 		{
 			$searchEscaped = $db->Quote( '%'.$db->getEscaped( $search, true ).'%', false );
 			$where[] = 'a.username LIKE '.$searchEscaped.' OR a.email LIKE '.$searchEscaped.' OR a.name LIKE '.$searchEscaped;
 		}
+
+		// visited date filtering
+		if ($date == 1) {
+			if ($startdate && !$enddate) {  // from only
+				$where[] = ' a.registerDate >= ' . $db->Quote($startdate);
+			}
+			if (!$startdate && $enddate) { // to only
+				$where[] = ' a.registerDate <= ' . $db->Quote($enddate);
+			}
+			if ($startdate && $enddate) { // date range
+				$where[] = '( a.registerDate >= ' . $db->Quote($startdate) . ' AND a.registerDate <= ' . $db->Quote($enddate) . ' )';
+			}
+		}
+		if ($date == 2) {
+			if ($startdate && !$enddate) {  // from only
+				$where[] = ' a.lastvisitDate >= ' . $db->Quote($startdate);
+			}
+			if (!$startdate && $enddate) { // to only
+				$where[] = ' a.lastvisitDate <= ' . $db->Quote($enddate);
+			}
+			if ($startdate && $enddate) { // date range
+				$where[] = '( a.lastvisitDate >= ' . $db->Quote($startdate) . ' AND a.lastvisitDate <= ' . $db->Quote($enddate) . ' )';
+			}
+		}
+		
+		
+		if ($filter_id)
+		{
+			$where[] = 'a.id = '.$filter_id;
+		}
+		
 		if ( $filter_type )
 		{
 			if ( $filter_type == 'Public Frontend' )
@@ -94,6 +162,14 @@ class FlexicontentViewusers extends JView
 		else if ($filter_logged == 2)
 		{
 			$where[] = 's.userid IS NULL';
+		}
+
+		if ( !$filter_itemscount )
+		{
+			$having[] = ' itemscount > 0 ';
+		} else if ( $filter_itemscount==1 )
+		{
+			$having[] = ' itemscount = 0 ';
 		}
 
 		// exclude any child group id's for this user
@@ -121,32 +197,34 @@ class FlexicontentViewusers extends JView
 
 		$orderby = ' ORDER BY '. $filter_order .' '. $filter_order_Dir;
 		$where = ( count( $where ) ? ' WHERE (' . implode( ') AND (', $where ) . ')' : '' );
-
-		$query = 'SELECT COUNT(a.id)'
-		. ' FROM #__users AS a'
-		. $filter
-		. $where
-		;
-		$db->setQuery( $query );
-		$total = $db->loadResult();
-
-		jimport('joomla.html.pagination');
-		$pagination = new JPagination( $total, $limitstart, $limit );
-
-		$query = 'SELECT a.*, g.name AS groupname'
+		$having = ( count( $having ) ? ' HAVING (' . implode( ') AND (', $having ) . ')' : '' );
+		
+		// Do main query to get the authors
+		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*, g.name AS groupname, COUNT(i.id) as itemscount '
 			. ' FROM #__users AS a'
 			. ' INNER JOIN #__core_acl_aro AS aro ON aro.value = a.id'
 			. ' INNER JOIN #__core_acl_groups_aro_map AS gm ON gm.aro_id = aro.id'
 			. ' INNER JOIN #__core_acl_aro_groups AS g ON g.id = gm.group_id'
 			. ' LEFT JOIN #__flexicontent_authors_ext AS ue ON g.id = ue.user_id'
+			. ' LEFT JOIN #__content AS i ON i.created_by = a.id '
 			. $filter
 			. $where
 			. ' GROUP BY a.id'
+			. $having
 			. $orderby
 		;
-		$db->setQuery( $query, $pagination->limitstart, $pagination->limit );
+		$db->setQuery( $query, $limitstart, $limit );
 		$rows = $db->loadObjectList();
-
+		
+		// Get total and create pagination controls
+		$db->setQuery("SELECT FOUND_ROWS()");
+		$total = $db->loadResult();
+		if (!$total) echo $db->getErrorMsg();
+		
+		jimport('joomla.html.pagination');
+		$pagination = new JPagination( $total, $limitstart, $limit );
+		
+		// Set loggedin property for all authors
 		$n = count( $rows );
 		$template = 'SELECT COUNT(s.userid)'
 			. ' FROM #__session AS s'
@@ -167,30 +245,58 @@ class FlexicontentViewusers extends JView
 			. ' AND name != "USERS"'
 		;
 		$db->setQuery( $query );
-		$types[] 		= JHTML::_('select.option',  '0', '- '. JText::_( 'Select Group' ) .' -' );
+		$types[] 		= JHTML::_('select.option',  '', '- '. JText::_( 'Select Group' ) .' -' );
 		foreach( $db->loadObjectList() as $obj )
 		{
 			$types[] = JHTML::_('select.option',  $obj->value, JText::_( $obj->text ) );
 		}
-		$lists['type'] 	= JHTML::_('select.genericlist',   $types, 'filter_type', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_type" );
+		
+		$itemscount_options[] = JHTML::_('select.option',  '', '- '. JText::_( 'One or more' ) .' -');
+		$itemscount_options[] = JHTML::_('select.option',  1, JText::_( 'None' ) );
+		$itemscount_options[] = JHTML::_('select.option',  2, JText::_( 'Any number' ) );
+		$lists['filter_itemscount'] = JHTML::_('select.genericlist',   $itemscount_options, 'filter_itemscount', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_itemscount" );
+		
+		$lists['filter_type'] 	= JHTML::_('select.genericlist',   $types, 'filter_type', 'class="inputbox" style="width:auto;" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_type" );
 
 		// get list of Log Status for dropdown filter
-		$logged[] = JHTML::_('select.option',  0, '- '. JText::_( 'Select Log Status' ) .' -');
+		$logged[] = JHTML::_('select.option',  '', '- '. JText::_( 'Select Log Status' ) .' -');
 		$logged[] = JHTML::_('select.option',  1, JText::_( 'Logged In' ) );
-		$lists['logged'] = JHTML::_('select.genericlist',   $logged, 'filter_logged', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_logged" );
+		$lists['filter_logged'] = JHTML::_('select.genericlist',   $logged, 'filter_logged', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_logged" );
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
 		$lists['order']		= $filter_order;
 
+		// build dates option list
+		$dates = array();
+		$dates[] = JHTML::_('select.option',  '1', JText::_( 'Registered' ) );
+		$dates[] = JHTML::_('select.option',  '2', JText::_( 'Last Visit' ) );
+		$lists['date'] = JHTML::_('select.radiolist', $dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
+		
+		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
+		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
+		
 		// search filter
 		$lists['search']= $search;
+		// search id
+		$lists['filter_id'] = $filter_id;
 
 		$this->assignRef('user',		JFactory::getUser());
 		$this->assignRef('lists',		$lists);
 		$this->assignRef('items',		$rows);
 		$this->assignRef('pagination',	$pagination);
 
+		// filters
+		$this->assignRef('filter_id'		, $filter_id);
+		$this->assignRef('filter_itemscount'		, $filter_itemscount);
+		$this->assignRef('filter_type'		, $filter_type);
+		$this->assignRef('filter_logged'	, $filter_logged);
+		$this->assignRef('search'			, $search);
+		$this->assignRef('filter_id'			, $filter_id);
+		$this->assignRef('date'				, $date);
+		$this->assignRef('startdate'		, $startdate);
+		$this->assignRef('enddate'			, $enddate);
+		
 		parent::display($tpl);
 	}
 }

@@ -669,7 +669,7 @@ window.addEvent('domready', function(){
 		</tr>
 		<tr>
 			<td><img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_NEED_TO BE APROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 			<td><img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
 			<td><img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>

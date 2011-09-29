@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="FLEXICONTENT_AUTHOR">
+	<layout title="FLEXICONTENT_MYITEMS">
 		<message>
-			<![CDATA[FLEXICONTENT_AUTHOR_TIP]]>
+			<![CDATA[FLEXICONTENT_MYITEMS_TIP]]>
 		</message>
 	</layout>
 	<state>
-		<name>FLEXICONTENT_AUTHOR</name>
-		<description>FLEXICONTENT_AUTHOR_DESC</description>
+		<name>FLEXICONTENT_MYITEMS</name>
+		<description>FLEXICONTENT_MYITEMS_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-			<param name="authorid" type="author" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC" />
-			<param name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
+			<param name="clayout" type="categorylayout" label="FLEXI_CHOOSE_MY_ITEMS_LAYOUT" description="FLEXI_CHOOSE_MY_ITEMS_LAYOUT_DESC" />
 		</url>
 		<params addpath="/administrator/components/com_flexicontent/elements">
             <param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
