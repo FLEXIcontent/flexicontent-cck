@@ -51,9 +51,17 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 $error = false;
 $extensions = array();
 
-//clear a cache
+// clear a cache
 $cache = & JFactory::getCache();
-$cache->clean( null, 'com_flexicontent' );
+$cache->clean( 'com_flexicontent' );
+$cache->clean( 'com_flexicontent_tmpl' );
+$cache->clean( 'com_flexicontent_cats' );
+$cache->clean( 'com_flexicontent_items' );
+
+// reseting post installation session variables
+$session  =& JFactory::getSession();
+$session->set('flexicontent.postinstall', false);
+$session->set('flexicontent.allplgpublish', false);
 
 // fix joomla 1.5 bug
 $this->parent->getDBO =& $this->parent->getDBO();
