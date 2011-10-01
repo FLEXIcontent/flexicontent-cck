@@ -39,8 +39,6 @@ class FlexicontentController extends JController
 		}
 		$session  =& JFactory::getSession();
 		
-		$session  =& JFactory::getSession();
-		
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$dopostinstall =& $session->get('flexicontent.postinstall');
