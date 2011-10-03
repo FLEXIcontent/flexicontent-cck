@@ -50,12 +50,12 @@ $separator = "";
 foreach ($ordering as $ord) :
 	echo $separator;
   if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
-	  $separator = "<hr>";
+	  $separator = "<hr />";
   } else {
 	  $separator = "";
 	}
 	
-	if ($ordering_addtitle && $ord) echo "<div class='mod_flexicontent_order_group_title'> ".$ord_titles[$ord]." </div>";
+	if ($ordering_addtitle && $ord) echo "<div class='mod_flexicontent_order_group_title'> ".$ord_titles[$ord]." </div>\n";
 		
 	if (isset($list[$ord]['featured'])) :
 ?>

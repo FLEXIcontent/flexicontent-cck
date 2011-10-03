@@ -379,15 +379,23 @@ class FlexicontentFields
 		  $fbypos[0]->fields = explode(',', $params->get('fields'));
 		  $fbypos[0]->position = $view;
 		}
-				
+		
 		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
-		  // 'text' item field is implicitly used by category (its description text), render it
+		  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 		  if ($view == 'category') {
 		    $field = $items[$i]->fields['text'];
 		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
 		  }
+			// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
+			else if ($view == 'items') {
+				foreach ($items[$i]->fields as $field) {
+					if ($field->iscore) {
+						$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+					}
+				}
+			}
 		  
 		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {

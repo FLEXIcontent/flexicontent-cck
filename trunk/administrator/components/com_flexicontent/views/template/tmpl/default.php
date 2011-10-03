@@ -173,8 +173,16 @@ defined('_JEXEC') or die('Restricted access'); ?>
 					<legend><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
 					<?php
 					if (isset($this->layout->positions)) :
+						$count=-1;
 						foreach ($this->layout->positions as $pos) : ?>
 						<div class="postitle"><?php echo $pos; ?></div>
+						<?php
+						$count++;
+						if ( isset($this->layout->attributes[$count]) && isset($this->layout->attributes[$count]['readonly']) ) {
+							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize use TEMPLATE parameters for <b>".$this->layout->view." Layout</b></div>";
+							continue;
+						}
+						?>
 						<ul id="sortable-<?php echo $pos; ?>" class="positions">
 						<?php
 						if (isset($this->fbypos[$pos])) :

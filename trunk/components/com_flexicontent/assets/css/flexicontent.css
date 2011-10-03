@@ -606,10 +606,10 @@ span.fc_alpha_index {
 	color: darkred;
 }
 
-.fcimg_tooltip_title {
+.fc_img_tooltip_title {
 	line-height:1em;
 	font-weight:bold;
 }
-.fcimg_tooltip_desc {
+.fc_img_tooltip_desc {
 	line-height:1em;
 }

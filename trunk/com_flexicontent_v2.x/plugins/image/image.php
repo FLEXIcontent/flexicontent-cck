@@ -314,8 +314,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 			if ($showtitle || $showdesc) $field->{$prop} = '<div class="fcimg_tooltip_data">'.$field->{$prop};
-			if ($showtitle) $field->{$prop} .= '<div class="fcimg_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
-			if ($showdesc) $field->{$prop} .= '<div class="fcimg_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
+			if ($showtitle) $field->{$prop} .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
+			if ($showdesc) $field->{$prop} .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
 			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
 		} else {
 			$field->{$prop} = '';
