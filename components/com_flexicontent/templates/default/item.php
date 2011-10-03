@@ -43,7 +43,13 @@ $tmpl = $this->tmpl;
 <!-- BOF item title -->
 <?php if ($this->params->get('show_title', 1)) : ?>
 <h2 class="contentheading flexicontent">
-	<?php echo $this->escape($this->item->title); ?>
+	<?php
+	if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
+		echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
+	else :
+		echo $this->item->title;
+	endif;
+	?>
 </h2>
 <?php endif; ?>
 <!-- EOF item title -->

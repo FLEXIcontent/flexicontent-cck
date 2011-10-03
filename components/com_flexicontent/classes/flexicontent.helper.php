@@ -1327,7 +1327,8 @@ class flexicontent_tmpl
 					$pos	 	=& $groups->group;
 					if ($pos) {
 						for ($n=0; $n<count($pos); $n++) {
-							$themes->items->{$tmpl}->positions->$n = $pos[$n]->data();
+							$themes->items->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
+							$themes->items->{$tmpl}->positions[$n] = $pos[$n]->data();
 						}
 					}
 					$css 		=& $document->getElementByPath('cssitem');
@@ -1370,7 +1371,8 @@ class flexicontent_tmpl
 					$pos	 	=& $groups->group;
 					if ($pos) {
 						for ($n=0; $n<count($pos); $n++) {
-							$themes->category->{$tmpl}->positions->$n = $pos[$n]->data();
+							$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
+							$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
 						}
 					}
 					$css 		=& $document->getElementByPath('csscategory');

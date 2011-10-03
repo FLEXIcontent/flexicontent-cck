@@ -74,7 +74,12 @@ class FlexicontentViewTemplate extends JView {
 			$sort[0] = 'sortablecorefields';
 			$sort[1] = 'sortableuserfields';
 			$i = 2;
+			$count=-1;
 			foreach ($layout->positions as $pos) {
+				$count++;
+				if ( isset($layout->attributes[$count]) && isset($layout->attributes[$count]['readonly']) ) {
+					continue;
+				}
 				$sort[$i] 	= 'sortable-'.$pos;
 				$idsort[$i] = $pos;
 				$i++;

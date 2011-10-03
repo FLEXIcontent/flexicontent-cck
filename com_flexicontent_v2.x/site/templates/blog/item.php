@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 558 2011-03-30 12:18:10Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: item.php 906 2011-09-18 19:29:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -43,7 +43,13 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title')) : ?>
 	<h2 class="contentheading<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-		<?php echo $this->escape($this->fields['title']->display); ?>
+		<?php
+		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
+			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
+		else :
+			echo $this->item->title;
+		endif;
+		?>
 	</h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
@@ -52,29 +58,35 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php if ((intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($this->item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($this->item->modified) !=0))) : ?>
 	<p class="iteminfo">
 		<?php if (($this->params->get('show_author')) && ($this->item->creator != "")) : ?>
-		<span class="created">
+		<span class="createdby">
 			<?php echo JText::sprintf('FLEXI_WRITTEN_BY', $this->fields['created_by']->display); ?>
 		</span>
 		<?php endif; ?>
 		
 		<?php if (($this->params->get('show_author')) && ($this->item->creator != "") && ($this->params->get('show_create_date'))) : ?>
-		|
+		::
 		<?php endif; ?>
 
 		<?php if ($this->params->get('show_create_date')) : ?>
 		<span class="created">
-			<?php echo JHTML::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')); ?>		
+			<?php echo '['.JHTML::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>		
+		</span>
+		<?php endif; ?>
+		
+		<?php if (($this->params->get('show_modifier')) && ($this->item->modifier != "")) : ?>
+		<span class="modifiedby">
+			<?php echo JText::_('FLEXI_LAST_UPDATED').' '.JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
 		</span>
 		<?php endif; ?>
 
+		<?php if (($this->params->get('show_modifier')) && ($this->item->modifier != "") && ($this->params->get('show_modify_date'))) : ?>
+		::
+		<?php endif; ?>
+		
 		<?php if (intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) : ?>
-		<span class="modified">
-			<?php echo JText::sprintf('FLEXI_LAST_UPDATED', JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2'))); ?>
-			<?php if (($this->params->get('show_modifier')) && ($this->item->modifier != "")) : ?>
-			<?php echo JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
-			<?php endif; ?>
-		</span>
-
+			<span class="modified">
+			<?php echo '['.JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
+			</span>
 		<?php endif; ?>
 	</p>
 	<?php endif; ?>
@@ -115,9 +127,41 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- EOF TOC -->
 	<?php endif; ?>
 
+<!-- BOF beforedescription block -->
+<?php if (isset($this->item->positions['beforedescription'])) : ?>
+<div class="customblock beforedescription">
+	<?php foreach ($this->item->positions['beforedescription'] as $field) : ?>
+	<span class="element">
+		<?php if ($field->label) : ?>
+		<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+		<?php endif; ?>
+		<span class="fcvalue field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+	</span>
+	<?php endforeach; ?>
+</div>
+<?php endif; ?>
+<!-- EOF beforedescription block -->
+
+	<?php if ($this->params->get('show_intro', 1)) : ?>
 	<div class="description">
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
+	<?php endif; ?>
+
+<!-- BOF afterdescription block -->
+<?php if (isset($this->item->positions['afterdescription'])) : ?>
+<div class="customblock afterdescription">
+	<?php foreach ($this->item->positions['afterdescription'] as $field) : ?>
+	<span class="element">
+		<?php if ($field->label) : ?>
+		<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+		<?php endif; ?>
+		<span class="fcvalue field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+	</span>
+	<?php endforeach; ?>
+</div>
+<?php endif; ?>
+<!-- EOF afterdescription block -->
 	
 	<!-- BOF event afterDisplayContent -->
 	<?php echo $this->item->event->afterDisplayContent; ?>

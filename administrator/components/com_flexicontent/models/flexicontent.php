@@ -418,6 +418,8 @@ class FlexicontentModelFlexicontent extends JModel
 			$files 	= array (
 				'author.xml',
 				'author.php',
+				'myitems.php',
+				'myitems.xml',
 				'default.xml',
 				'default.php',
 				'index.html',

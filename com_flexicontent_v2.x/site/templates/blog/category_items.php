@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 858 2011-08-24 05:22:31Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: category_items.php 906 2011-09-18 19:29:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -83,10 +83,10 @@ if ($this->limitstart == 0) :
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
    				<?php if ($this->params->get('link_titles', 0)) : ?>
-    			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
+    			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
     			<?php
     			else :
-   				echo $this->escape($items[$i]->title);
+   				echo $items[$i]->title;
     			endif;
     			?>
     			</h2>
@@ -123,11 +123,11 @@ if ($this->limitstart == 0) :
     			?>
 				<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
     				<?php if ($this->params->get('lead_link_image', 1)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
-						<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($items[$i]->title); ?>">
+						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 					</a>
 					<?php else : ?>
-					<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
+					<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 					<?php endif; ?>
 					<div class="clear"></div>
 				</div>
@@ -293,10 +293,10 @@ if ($this->limitstart == 0) :
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
     				<?php if ($this->params->get('link_titles', 0)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $this->escape($items[$i]->title); ?></a>
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
     				<?php
     				else :
-    				echo $this->escape($items[$i]->title);
+    				echo $items[$i]->title;
     				endif;
     				?>
     			</h2>
@@ -333,11 +333,11 @@ if ($this->limitstart == 0) :
     			?>
 				<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
     				<?php if ($this->params->get('intro_link_image', 1)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($items[$i]->title); ?>">
-						<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($items[$i]->title); ?>">
+						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 					</a>
 					<?php else : ?>
-					<img src="<?php echo $thumb; ?>" alt="<?php echo $this->escape($items[$i]->title); ?>" />
+					<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 					<?php endif; ?>
 					<div class="clear"></div>
 				</div>

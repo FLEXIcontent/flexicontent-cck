@@ -32,7 +32,7 @@ $tmpl = $this->tmpl;
 </script>
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
-<form action="<?php echo $this->action; ?>" method="post" id="adminForm">
+<form action="<?php echo htmlentities($this->action); ?>" method="post" id="adminForm">
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
 <div id="fc_filter" class="floattext">
 	<?php if ($this->params->get('use_search')) : ?>
@@ -86,46 +86,64 @@ if ($this->items) :
 		endif;
 	endforeach;
 ?>
-<table id="flexitable" class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo $this->category->name; ?>">
-	<thead>
-			<tr>
-				<th id="flexi_title" scope="col"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
 
-				<?php foreach ($columns as $name => $label) : ?>
-				<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
-				<?php endforeach; ?>
+<?php
+	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
+		echo "<span style='font-weight:bold; color:red;'>No columns selected forcing the display of item title. Please:<br>\n
+		1. enable display of item title in category parameters<br>\n
+		2. OR add fields to the category Layout of the template assigned to this category<br>\n
+		3. OR set category category parameters to display 0 items per page</span>";
+		$this->params->set('show_title', 1);
+	endif;
+?>
 
-			</tr>
-	</thead>
+	<?php if ($this->params->get('show_title', 1) || count($columns)) : ?>
+	<table id="flexitable" class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo $this->category->name; ?>">
+		<thead>
+				<tr>
+	   			<?php if ($this->params->get('show_title', 1)) : ?>
+					<th id="flexi_title" scope="col"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
+					<?php endif; ?>
 	
-	<tbody>
+					<?php foreach ($columns as $name => $label) : ?>
+					<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
+					<?php endforeach; ?>
 	
-	<?php foreach ($this->items as $item) : ?>
-  			<tr class="sectiontableentry">
-
-				<!-- BOF item title -->
-    			<th scope="row" class="table-titles">
-    				<?php if ($this->params->get('link_titles', 0)) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $this->escape($item->title); ?></a>
-    				<?php
-    				else :
-    				echo $this->escape($item->title);
-    				endif;
-    				?>
-				</th>
-				<!-- BOF item title -->
-
-				<!-- BOF fields -->
-				<?php foreach ($columns as $name => $label) : ?>
-				<td><?php echo isset($item->positions['table']->{$name}->display) ? $item->positions['table']->{$name}->display : ''; ?></td>
-				<?php endforeach; ?>
-				<!-- EOF fields -->
+				</tr>
+		</thead>
+		
+		<tbody>
+		
+		<?php foreach ($this->items as $item) : ?>
+	  			<tr class="sectiontableentry">
+	
+					<!-- BOF item title -->
+	   			<?php if ($this->params->get('show_title', 1)) : ?>
+	   			<th scope="row" class="table-titles">
+	   				<?php if ($this->params->get('link_titles', 0)) : ?>
+	   				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+	   				<?php
+	   				else :
+	   				echo $item->title;
+	   				endif;
+	    				?>
+					</th>
+					<?php endif; ?>
+					<!-- BOF item title -->
+	
+					<!-- BOF fields -->
+					<?php foreach ($columns as $name => $label) : ?>
+					<td><?php echo isset($item->positions['table']->{$name}->display) ? $item->positions['table']->{$name}->display : ''; ?></td>
+					<?php endforeach; ?>
+					<!-- EOF fields -->
+					
+				</tr>
+		<?php endforeach; ?>
 				
-			</tr>
-	<?php endforeach; ?>
-			
-	</tbody>
-</table>
+		</tbody>
+	</table>
+	<?php endif; ?>
+
 <?php else : ?>
 <div class="noitems"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
 <?php endif; ?>

@@ -99,7 +99,7 @@ if ($add_tooltips)
 		'alpha'=>	JText::_( 'FLEXI_ALPHABETICAL'),
 		'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
 		'catorder'=>JText::_( 'FLEXI_CAT_ORDER'),
-		'random'=>JText::_( 'FLEXI_RANDOM' ) );
+		'random'=>JText::_( 'FLEXI_RANDOM' ), 0=>'Default' );
 	
 	$separator = "";
 	foreach ($ordering as $ord) :
@@ -111,8 +111,9 @@ if ($add_tooltips)
   	}
   	
 		if ($ordering_addtitle && $ord) echo "<div class='order_group_title'> ".$ord_titles[$ord]." </div>";
+			if ($ord==0) $grpname='default';
 	?>
-	<div id="<?php echo $ord.$module->id; ?>" class="mod_flexicontent<?php echo (isset($list[$ord]['featured'])) ? ' twocol' : ''; ?>">
+	<div id="<?php echo $grpname.$module->id; ?>" class="mod_flexicontent<?php echo (isset($list[$ord]['featured'])) ? ' twocol' : ''; ?>">
 		
 		<?php
 		if (isset($list[$ord]['featured'])) :

@@ -622,3 +622,12 @@ form#flexicontent-searchForm tr,form#flexicontent-searchForm tr td{
 	margin-right:12px;
 	color: darkred;
 }
+
+
+.fc_img_tooltip_title {
+	line-height:1em;
+	font-weight:bold;
+}
+.fc_img_tooltip_desc {
+	line-height:1em;
+}

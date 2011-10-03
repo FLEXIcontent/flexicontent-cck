@@ -402,7 +402,7 @@ span.editlinktip.hasTip.tags img {
 	font-weight: bold;
 }
 
-.positions {
+.positions_readonly, .positions {
 	list-style: none;
 	padding: 0;
 	margin: 0;

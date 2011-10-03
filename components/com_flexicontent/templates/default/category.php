@@ -37,7 +37,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 <!-- BOF author description -->
 	<?php
-	if ($this->authordescr_item_html) :
+	if (@$this->authordescr_item_html) :
 		echo $this->authordescr_item_html;
 	endif;
 	?>
