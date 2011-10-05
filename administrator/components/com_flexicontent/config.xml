@@ -24,14 +24,14 @@
 		</param>
 <!--		<param name="authordetails_itemscat" type="flexicategories" default="" label="FLEXI_AUTHORS_DETAILS_CATEGORY" description="FLEXI_AUTHORS_DETAILS_CATEGORY_DESC" menu="hide" /> -->
 		<param name="" type="separator" default="Performance Options" level="level1" menu="hide" />
-		<param name="always_create_fields_display" type="list" default="0" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
+		<param name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
 			<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
 			<option value="1">FLEXI_ALWAYS</option>
 			<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 		</param>
 		<param name="" type="separator" default="SEF Options" level="level1" menu="hide" />
 		<param name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
-		<param name="default_menuitem_preference" type="list" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
+		<param name="default_menuitem_preference" type="list" default="1" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
 			<option value="2">FLEXI_DMI_ID_YES</option>
 			<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 			<option value="0">FLEXI_DMI_ID_NO</option>

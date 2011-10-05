@@ -16,6 +16,59 @@
  */
 
 -----------------------------------------------------
+- FLEXIcontent 1.5.6 beta2 - build 922 - Changelog -
+-----------------------------------------------------
+Legend:
+* -> Security Fix
+# -> Bug Fix
+$ -> Language fix or change
++ -> Addition
+^ -> Change
+- -> Removed
+! -> Note
+
+
+# Bug fixes
+--------------------------------------------------------------------------------------------------
+# Fixed the recently added (new) replacement tags for select and selectmultiple, these are like {item->created_by}
+# Fixed item Layout for blog template to display fields and also added field positions to it
+# Minor template fixes/changes/additions for default and blog templates and for universal module templates.
+# Fixed Url creation to select (activate) menu items pointing to the category of items
+
++ New features
+--------------------------------------------------------------------------------------------------
++ Add : Enhanced BLOG template to supports up to 4 columns, also a cosmetix fix the alphaindex seperator
++ Add : FC Universal module updates:
+ (a) Added to news/select templates a new MODULE readmore link (and appropriate module parameters)
+ (b) Added a new (item) date field parameter for standard/featured items and also a date label on-off paramater
+ (c) Added to news template the new (item) date field with appropriate css classes
+ (d) Seperated the Global Display parameters (current category & (new) module read more), from the Item List Display parameters
++ Add : to Relateditems field:
+ (a) Added 2 Scopes (category and type), ability for subcategories for category scope
+ (b) Added more editing options including: Ordering and a Filter mechanism based on filterlist.js
+ (c) Cleaned up and reordered the layout of the parameters
++ Add : to Image Field:
+ (a) Characterized Title and Description options as used for Tooltips
+ (b) Added 2 new options "Show Title" and "Show Description" to display them after image thubmnail
++ Add : to Author Management:
+ (a) several filters to backend Author Manager to shape the Author List in all obvious ways
+ (b) Added a new menu item "My Items" that displays the items of the currently logged user
++ Add : Templates:  
+ (a) Added a new template called 'faq'
+ (b) Allowed the use of readonly positions for templates (e.g. blog and faq)
+
+
+^ Changed features
+--------------------------------------------------------------------------------------------------
+^ Change : Moved all the css loading code with/without caching in the entry point of the modules (mod_flexicontent.php and mod_flexitagcloud.php) so that it is no longer needed to handle css loading at the template
+^ Changed installation script to clear postinstall session variables and all flexicontent caching groups, so that no logout-login and cache clearing is needed after installation
+
+$ Language fix or change
+--------------------------------------------------------------------------------------------------
+$ Added some missed language files
+
+
+-----------------------------------------------------
 - FLEXIcontent 1.5.6 beta1 - build 905 - Changelog -
 -----------------------------------------------------
 Legend:
