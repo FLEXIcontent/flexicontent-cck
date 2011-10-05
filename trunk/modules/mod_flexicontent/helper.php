@@ -38,8 +38,8 @@ class modFlexicontentHelper
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
 		}
-		$force_curr_itemid = (int)$params->get('force_curr_itemid', 1);
-		$forced_itemid = ($force_curr_itemid) ? $Itemid	: 0;
+		//$force_curr_itemid = (int)$params->get('force_curr_itemid', 1);
+		//$forced_itemid = ($force_curr_itemid) ? $Itemid	: 0;
 
 		// get the component parameters
 		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
@@ -260,7 +260,7 @@ class modFlexicontentHelper
 					}
 				}
 				$lists[$ord]['featured'][$i]->image 	= $thumb;
-				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid));
+				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
 				$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
 				$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 				$lists[$ord]['featured'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat);
@@ -329,7 +329,7 @@ class modFlexicontentHelper
 					}
 				}
 				$lists[$ord]['standard'][$i]->image 	= $thumb;
-				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid));
+				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
 				$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
 				$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 				$lists[$ord]['standard'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text);

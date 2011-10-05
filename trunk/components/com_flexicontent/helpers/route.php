@@ -212,7 +212,7 @@ class FlexicontentHelperRoute
 		}
 		
 		// Use the one with higher priority
-		for ($priority=0; $priority<3; $priority++) {
+		for ($priority=1; $priority<=3; $priority++) {
 			if (isset($matches[$priority])) {
 				$match = $matches[$priority];
 				break;
