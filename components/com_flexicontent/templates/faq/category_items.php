@@ -72,25 +72,94 @@ endif;
 
 <?php
 if ($this->items) :
+	$currcatid = $this->category->id;
+	$cat_items[$currcatid] = array();
+	$sub_cats[$currcatid] = & $this->category;
+	foreach ($this->categories as $subindex => $sub) :
+		$cat_items[$sub->id] = array();
+		$sub_cats[$sub->id] = & $this->categories[$subindex];
+	endforeach;
+	
+	$items = & $this->items;
+	for ($i=0; $i<count($items); $i++) :
+		foreach ($items[$i]->cats as $cat) :
+			if (isset($cat_items[$cat->id])) :
+				$cat_items[$cat->id][] = & $items[$i];
+			endif;
+		endforeach;
+	endfor;
+
 	// routine to determine all used columns for this table
 	$layout = $this->params->get('clayout', 'default');
 	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
-	$columns = array();
+	$columns['aftertitle'] = array();
 	foreach ($this->items as $item) :
-		if (isset($item->positions['table'])) :
-			foreach ($fbypos['table']->fields as $f) :
-				if (!in_array($f, $columns)) :
-					$columns[$f] = @$item->fields[$f]->label;
+		if (isset($item->positions['aftertitle'])) :
+			foreach ($fbypos['aftertitle']->fields as $f) :
+				if (!in_array($f, $columns['aftertitle'])) :
+					$columns['aftertitle'][$f] = @$item->fields[$f]->label;
 				endif;
 			endforeach;
 		endif;
 	endforeach;
+
+$classnum = '';
+if ($this->params->get('tmpl_cols', 2) == 1) :
+   $classnum = 'one';
+elseif ($this->params->get('tmpl_cols', 2) == 2) :
+   $classnum = 'two';
+elseif ($this->params->get('tmpl_cols', 2) == 3) :
+   $classnum = 'three';
+elseif ($this->params->get('tmpl_cols', 2) == 4) :
+   $classnum = 'four';
+endif;
 ?>
 
-<?php $items = & $this->items; ?>
+<ul class="faqblock <?php echo $classnum; ?>">	
 
 <?php
-	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
+global $globalcats;
+$count_cat = -1;
+foreach ($cat_items as $catid => $items) :
+	$sub = & $sub_cats[$catid];
+	if (count($items)==0) continue;
+	if ($catid!=$currcatid) $count_cat++;
+?>
+
+		<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?>">
+			
+		<!-- BOF subcategory title -->
+		<div class="flexi-cat">
+			<a href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>">
+				<?php if (!empty($sub->image) && $this->params->get('show_description_image', 1)) : ?>
+				<div class="catimg">
+					<img src='images/stories/<?php echo $sub->image ?>' alt='<?php echo $this->escape($sub->title) ?>' height='24' />
+				</div>
+				<?php endif; ?>				
+				<?php
+					echo $sub->title;
+					if ($catid!=$currcatid) {
+						$subsubcount = count($sub->subcats);
+						if ($this->params->get('show_itemcount', 1)) echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
+					}
+				?>
+			</a>
+		</div>
+		<!-- EOF subcategory title -->
+
+		<!-- BOF subcategory description  -->
+		<?php if ($this->params->get('show_description', 1)) : ?>
+		<div class="catdescription">
+			<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get('description_cut_text', 120) ); ?>
+		</div>
+		<?php endif; ?>
+		<!-- EOF subcategory description -->
+
+
+		<!-- BOF subcategory items -->
+			
+<?php
+	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns['aftertitle'])) :
 		echo "<span style='font-weight:bold; color:red;'>No columns selected forcing the display of item title. Please:<br>\n
 		1. enable display of item title in category parameters<br>\n
 		2. OR add fields to the category Layout of the template assigned to this category<br>\n
@@ -99,30 +168,16 @@ if ($this->items) :
 	endif;
 ?>
 
-		<?php if ($this->params->get('show_title', 1) || count($columns)) : ?>
-		<table id="flexitable" class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo $this->category->name; ?>">
-   		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
-			<thead>
-				<tr>
-		   		<?php if ($this->params->get('show_title', 1)) : ?>
-					<th id="flexi_title" scope="col"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
-					<?php endif; ?>
-					
-					<?php foreach ($columns as $name => $label) : ?>
-					<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
-					<?php endforeach; ?>
-				</tr>
-			</thead>
-			<?php endif; ?>
-			
-			<tbody>
-			
+		<?php if ( $this->params->get('show_title', 1) || count($columns['aftertitle']) ) : ?>
+		
+			<ul class='flexi-itemlist'>
 			<?php foreach ($items as $item) : ?>
-				<tr class="sectiontableentry">
+				<li class='flexi-item'>
 				
 				<!-- BOF item title -->
+				<ul class='flexi-fieldlist'>
 				<?php if ($this->params->get('show_title', 1)) : ?>
-		   		<th scope="row" class="table-titles">
+		   		<li class='flexi-field flexi-title'>
 		   			<?php if ($this->params->get('link_titles', 0)) : ?>
 		   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
 		   			<?php
@@ -130,22 +185,36 @@ if ($this->items) :
 		   			echo $item->title;
 		   			endif;
 		    			?>
-					</th>
+					</li>
 				<?php endif; ?>
 				<!-- BOF item title -->
 				
-				<!-- BOF item fields -->
-				<?php foreach ($columns as $name => $label) : ?>
-					<td><?php echo isset($item->positions['table']->{$name}->display) ? $item->positions['table']->{$name}->display : ''; ?></td>
+				<!-- BOF item fields block aftertitle -->
+				<?php
+				foreach ($columns['aftertitle'] as $name => $label) :
+					$label_str = '';
+					if ($item->fields[$name]->parameters->get('display_label', 0)) :
+						$label_str = $label.': ';
+					endif; ?>
+					<li class='flexi-field'>
+					<?php echo $label_str.( isset($item->positions['aftertitle']->{$name}->display) ? $item->positions['aftertitle']->{$name}->display : ''); ?>
+					</li>
 				<?php endforeach; ?>
-				<!-- EOF item fields -->
+				</ul>
+				<!-- EOF item fields block aftertitle -->
 					
-				</tr>
+				</li>
 			<?php endforeach; ?>
+			</ul>
 			
-			</tbody>
-		</table>
 		<?php endif; ?>
+			
+		</li>
+		<!-- EOF subcategory items -->
+		
+<?php endforeach; ?>
+
+</ul>
 
 <?php else : ?>
 <div class="noitems"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>

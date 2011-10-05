@@ -1,0 +1,106 @@
+#flexicontent ul.faqblock {
+	margin: 0;
+	padding: 0;
+}
+
+#flexicontent ul.faqblock li {
+	margin: 0px 0px 8px 0px;
+	padding: 0;
+	background: none;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+	line-height: inherit;
+}
+
+#flexicontent ul.faqblock.two   li.full,
+#flexicontent ul.faqblock.three li.full,
+#flexicontent ul.faqblock.four  li.full {
+	width: 100%;
+}
+
+#flexicontent ul.faqblock.two li {
+	width: 48%;
+}
+#flexicontent ul.faqblock.two li.even {
+	margin-left: 3%
+}
+#flexicontent ul.faqblock.three li {
+   width: 30%;
+}
+#flexicontent ul.faqblock.three li.even {
+   margin-left: 1%
+}
+#flexicontent ul.faqblock.four li {
+   width: 23%;
+}
+#flexicontent ul.faqblock.four li.even {
+   margin-left: 1%
+}
+
+#flexicontent .flexi-cat a {
+	background-color: #F1F1F1;
+	border: 1px solid #CCCCCC;
+	border-radius: 6px;
+	display: block;
+	padding: 8px;
+	margin:0px 8px 0px 0px;
+	color: darkred;
+}
+
+#flexicontent .flexi-cat a:hover, .flexi-cat a:focus {
+	background-color: #D6D6D6;
+	border-color: #BBBBBB;
+	text-decoration: none;
+}
+
+#flexicontent .flexi-cat a .catimg {
+	margin-top: -3px;
+}
+
+
+#flexicontent ul.flexi-fieldlist li.flexi-field.flexi-title {
+	background: url(../../../assets/images/readon.gif) no-repeat;
+}
+
+#flexicontent ul.flexi-itemlist,
+#flexicontent ul.flexi-fieldlist {
+	margin: 1px;
+	padding: 0;
+}
+
+#flexicontent ul.flexi-itemlist li.flexi-item {
+	margin: 0;
+	padding: 0;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+	line-height: inherit;
+
+}
+
+#flexicontent ul.flexi-fieldlist li.flexi-field {
+	margin: 0;
+	padding:0px 0px 0px 16px;
+	background: none;
+	width: 100%;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+	line-height: inherit;
+
+}
