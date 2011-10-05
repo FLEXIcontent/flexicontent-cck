@@ -8,6 +8,11 @@
 	<release>25 november 2009</release>
 	<description>This layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
 	<params addpath="/administrator/components/com_flexicontent/elements">
+		<param name="show_field_labels_row" type="list" default="1" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC">
+			<option value="">Use Global</option>
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
 	</params>
 	<fieldgroups>
 		<group>table</group>

@@ -18,6 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access'); ?>
 
+<?php
+ $basetemplates = array('default', 'blog', 'faq');
+?>
 
 <form action="index.php" method="post" name="adminForm">
 
@@ -44,7 +47,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;task=duplicate&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
 			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
-			if (($row->name != 'blog') && ($row->name != 'default')) {			
+			if (!in_array($row->name, $basetemplates)) {
 				$dellink 	= '#';
 		?>
 		<script type="text/javascript">
@@ -74,7 +77,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
 			<td align="right"><span style="padding-right: 5px">
-			<a id="<?php echo 'del-' . $row->name ?>" href="<?php echo @$dellink; ?>"><?php if (($row->name != 'blog') && ($row->name != 'default')) echo $deltmpl; ?></a></span><a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a></span>
+			<a id="<?php echo 'del-' . $row->name ?>" href="<?php echo @$dellink; ?>"><?php if (!in_array($row->name, $basetemplates)) echo $deltmpl; ?></a></span><a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a></span>
 			<td align="left">
 			<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
 			</td>

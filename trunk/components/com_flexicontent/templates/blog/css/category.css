@@ -185,6 +185,7 @@ div.comments {
 	padding: 0;
 }
 #flexicontent ul.leadingblock li {
+	margin: 0px 0px 12px 0px;
 	padding: 0;
 	background: none;
 	width: 100%;
@@ -198,6 +199,7 @@ div.comments {
 	line-height: inherit;
 }
 #flexicontent ul.introblock li {
+	margin: 0px 0px 12px 0px;
 	padding: 0;
 	background: none;
 	width: 100%;
