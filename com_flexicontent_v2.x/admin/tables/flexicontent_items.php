@@ -131,19 +131,19 @@ class flexicontent_items extends JTable{
      * @access protected
      */
     var $_join_prop    		= array('item_id',
-					'type_id',
-					'language',
-					'sub_items',
-					'sub_categories',
-					'related_items',
-					'search_index');
+    								'type_id',
+    								'language',
+    								'sub_items',
+    								'sub_categories',
+    								'related_items',
+    								'search_index');
 	/**
 	* @param database A database connector object
 	*/
 	function flexicontent_items(& $db) {
 		parent::__construct('#__content', 'id', $db);
 	}
-	
+
 	/**
 	 * Method to compute the default name of the asset.
 	 * The default name is in the form `table_name.id`
@@ -164,7 +164,8 @@ class flexicontent_items extends JTable{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function load( $oid=null ) {
+	function load( $oid=null )
+	{
 		$k = $this->_tbl_key;
 
 		if ($oid !== null) {
@@ -240,7 +241,8 @@ class flexicontent_items extends JTable{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function store( $updateNulls=false ) {
+	function store( $updateNulls=false )
+	{
 		$k             = $this->_tbl_key;
 		$frn_key       = $this->_frn_key;
 
@@ -284,7 +286,8 @@ class flexicontent_items extends JTable{
 		else
 		{
 			// check for foreign key
-			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key)) {
+			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key))
+			{
 				// update #__flexicontent_items_ext table
 				$ret = $this->_db->updateObject( $this->_tbl_join, $type_ext, $this->_frn_key, $updateNulls );
 			} else {

@@ -77,7 +77,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// create the fulltext search index
 		$searchindex = flexicontent_html::striptagsandcut($post) . ' | ';		
 		$field->search = $field->issearch ? $searchindex : '';
-		if($field->isadvsearch) {
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
 			$this->onIndexAdvSearch($field, $post);
 		}
 	}

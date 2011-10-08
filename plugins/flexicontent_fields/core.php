@@ -25,6 +25,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 	}
 
+	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->iscore != 1) return;
+		plgFlexicontent_fieldsCore::onDisplayCoreFieldValue($field, $item, $item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote);
+	}
+	
 	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
 	{
 		// this function is a mess and need complete refactoring
@@ -228,8 +233,30 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 		}
 
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
+			plgFlexicontent_fieldsCore::onIndexAdvSearch($field, $post);
+		}
 	}
-
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->iscore != 1) return;
+		
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='{$field->field_type}';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','{$field->field_type}','{$i}', ".$db->Quote(strip_tags($v)).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
+	}
+	
 	function onDisplayFilter(&$filter, $value='')
 	{
 		if($filter->iscore != 1) return; // performance check

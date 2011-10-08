@@ -26,7 +26,8 @@ jimport('joomla.access.rules');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class flexicontent_fields extends JTable{
+class flexicontent_fields extends JTable
+{
 	/**
 	 * Primary Key
 	 * @var int
@@ -69,7 +70,8 @@ class flexicontent_fields extends JTable{
 	}
 	
 	// overloaded check function
-	function check() {
+	function check()
+	{
 		// Not typed in a label?
 		if (trim( $this->label ) == '') {
 			$this->_error = JText::_( 'FLEXI_ADD_LABEL' );
@@ -77,16 +79,17 @@ class flexicontent_fields extends JTable{
 			return false;
 		}
 
-		if((empty($this->name) || trim($this->name) === '') && $this->iscore != 1 ) {
-			$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
+		$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
+
+		if((empty($this->name) || $this->name === $name) && $this->iscore != 1 ) {
 			$this->name = $newname;
 		}
 
 		/** check for existing name */
 		$query = 'SELECT id'
-			.' FROM #__flexicontent_fields'
-			.' WHERE name = '.$this->_db->Quote($this->name)
-			;
+				.' FROM #__flexicontent_fields'
+				.' WHERE name = '.$this->_db->Quote($this->name)
+				;
 		$this->_db->setQuery($query);
 
 		$xid = intval($this->_db->loadResult());
@@ -94,6 +97,7 @@ class flexicontent_fields extends JTable{
 			JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('FLEXI_THIS_FIELD_NAME_ALREADY_EXIST', $this->name));
 			return false;
 		}
+	
 		return true;
 	}
 	

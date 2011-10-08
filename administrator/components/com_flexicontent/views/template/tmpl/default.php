@@ -179,7 +179,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						<?php
 						$count++;
 						if ( isset($this->layout->attributes[$count]) && isset($this->layout->attributes[$count]['readonly']) ) {
-							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize use TEMPLATE parameters for <b>".$this->layout->view." Layout</b></div>";
+							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize use TEMPLATE parameters by editing each <b>".$this->layout->view."</b></div>";
 							continue;
 						}
 						?>

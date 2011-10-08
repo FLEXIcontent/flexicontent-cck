@@ -22,9 +22,10 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	Table
  * @since		1.0
  */jimport('joomla.database.tablenested');
-class flexicontent_categories extends JTableNested{
+class flexicontent_categories extends JTableNested
+{
 	/** @var int Primary key */
-	var $id				= null;
+	var $id					= null;
 	/** @var int */
 	var $asset_id			= null;
 	var $parent_id			= null;
@@ -35,9 +36,9 @@ class flexicontent_categories extends JTableNested{
 	var $path			= null;
 	var $extension=null;
 	/** @var string The menu title for the category (a short name)*/
-	var $title			= null;
+	var $title				= null;
 	/** @var string The the alias for the category*/
-	var $alias			= null;
+	var $alias				= null;
 	var $note			= null;
 	/** @var string */
 	var $description		= null;
@@ -50,9 +51,9 @@ class flexicontent_categories extends JTableNested{
 	/** @var int */
 	//var $ordering			= null;
 	/** @var int */
-	var $access			= null;
+	var $access				= null;
 	/** @var string */
-	var $params			= null;
+	var $params				= null;
 	var $metadesc			= null;
 	var $metakey			= null;
 	var $metadata			= null;
@@ -91,22 +92,24 @@ class flexicontent_categories extends JTableNested{
 	 * @see JTable::check
 	 * @since 1.5
 	 */
-	function check() {
+	function check()
+	{
 		// check for valid name
 		if (trim( $this->title ) == '') {
 			$this->setError(JText::sprintf( 'must contain a title', JText::_( 'FLEXI_Category' ) ));
 			return false;
 		}
 
-		/*// check for existing name
-		$query = 'SELECT id'
-			. ' FROM #__categories c'
-			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND title = '.$this->_db->Quote($this->title)
-			. ' AND lft>=' . FLEXI_LFT_CATEGORY . ' AND rgt<=' . FLEXI_RGT_CATEGORY
-			;
+		// check for existing name
+		/*$query = 'SELECT id'
+		. ' FROM #__categories c'
+		. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND title = '.$this->_db->Quote($this->title)
+		. ' AND lft>=' . FLEXI_LFT_CATEGORY . ' AND rgt<=' . FLEXI_RGT_CATEGORY
+		;
 		$this->_db->setQuery( $query );
+
 		$xid = intval( $this->_db->loadResult() );
-		if ($xid && ($xid != intval( $this->id )) ) {
+		if ($xid && $xid != intval( $this->id )) {
 			$this->_error = JText::sprintf( 'WARNNAMETRYAGAIN', JText::_( 'FLEXI_Category' ) );
 			return false;
 		}*/
@@ -119,6 +122,7 @@ class flexicontent_categories extends JTableNested{
 			$datenow =& JFactory::getDate();
 			$this->alias = $datenow->toFormat("%Y-%m-%d-%H-%M-%S");
 		}
+
 		return true;
 	}
 	

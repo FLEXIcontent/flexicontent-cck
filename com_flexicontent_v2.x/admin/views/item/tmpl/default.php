@@ -301,8 +301,8 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					</table>
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-                			</div>
-               			</fieldset>
+					</div>
+				</fieldset>
 				<?php endif; ?>
 
 				<?php
