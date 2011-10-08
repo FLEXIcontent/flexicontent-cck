@@ -2,6 +2,7 @@
 <div style="heading">Indexer Running</div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
+	var items_per_call = 50;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
@@ -12,17 +13,19 @@ jQuery(document).ready(function() {
 	errorstring[0] = 'Not yet select article type for advance search.';
 	errorstring[1] = 'Cannot index because no flexicontent field(s) use advance search mode.';
 	function updateprogress() {
-		looper=looper+1;
+		//looper=looper+1;
 		if(looper>number) {
-			if(looper==(number+1)) {
-				jQuery('div#statuscomment').text('Completed!');
-			}
+			jQuery('div#statuscomment').text(number+'/'+number+' items , INDEXING FINISHED!');
+			//if(looper==(number+1)) {
+				//jQuery('div#statuscomment').text('Completed!');
+			//}
 			return;
 		}
 		fieldindex = Math.floor((looper-1)/items.length)%fields.length;
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&controller=search&task=index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
+			//url: "index.php?option=com_flexicontent&controller=search&task=index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
+			url: "index.php?option=com_flexicontent&controller=search&task=index&items_per_call="+items_per_call+"&itemcnt="+looper,
 			success: function(response, status2, xhr2) {
 				var arr = response.split('|');
 				if(arr[0]=='fail') {
@@ -31,13 +34,15 @@ jQuery(document).ready(function() {
 					return;
 				}
 				width = onesector*looper;
+				if (width>300) width = 300
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').text(percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').text(looper+'/'+number+' sectors '+response);
+				jQuery('div#statuscomment').text(looper+'/'+number+' items '+response);
 				setTimeout(updateprogress, 100);
 			}
 		});
+		looper=looper+items_per_call;
 	}
 	jQuery.ajax({
 		url: "index.php?option=com_flexicontent&controller=search&task=countrows",

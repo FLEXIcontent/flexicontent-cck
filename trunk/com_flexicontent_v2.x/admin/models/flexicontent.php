@@ -744,8 +744,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
 		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-			" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL;";
+			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
+				. " JOIN #__categories as cat ON c.catid=cat.id "
+				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."' AND c.version > '1' AND iv.version IS NULL;";
 		$db->setQuery($query);
 		$newrows = $db->loadAssocList();
 		foreach($newrows as $r) {

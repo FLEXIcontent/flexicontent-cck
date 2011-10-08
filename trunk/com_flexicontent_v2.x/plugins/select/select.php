@@ -154,7 +154,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$searchindex .= ' | ';
 			$field->search = $field->issearch ? $searchindex : '';
 		}
-		if($field->isadvsearch) {
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
 			plgFlexicontent_fieldsSelect::onIndexAdvSearch($field, $searchindex2);
 		}
 	}

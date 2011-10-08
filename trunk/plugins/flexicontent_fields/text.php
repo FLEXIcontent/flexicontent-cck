@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 		$field->search = $field->issearch ? $searchindex : '';
 
-		if($field->isadvsearch) {
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
 			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
 		}
 	}

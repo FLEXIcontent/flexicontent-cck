@@ -52,7 +52,8 @@ class flexicontent_types extends JTable
 	}
 	
 	// overloaded check function
-	function check() {
+	function check()
+	{
 		// Not typed in a name?
 		if (trim( $this->name ) == '') {
 			$this->_error = JText::_( 'FLEXI_ADD_NAME' );
@@ -68,12 +69,12 @@ class flexicontent_types extends JTable
 		
 		/** check for existing name */
 		$query = 'SELECT id'
-			.' FROM #__flexicontent_types'
-			.' WHERE name = '.$this->_db->Quote($this->name)
-			;
+				.' FROM #__flexicontent_types'
+				.' WHERE name = '.$this->_db->Quote($this->name)
+				;
 		$this->_db->setQuery($query);
-		$xid = intval($this->_db->loadResult());
 
+		$xid = intval($this->_db->loadResult());
 		if ($xid && $xid != intval($this->id)) {
 			JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('FLEXI_TYPE_NAME_ALREADY_EXIST', $this->name));
 			return false;

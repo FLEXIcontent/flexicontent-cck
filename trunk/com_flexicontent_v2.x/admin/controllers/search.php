@@ -70,26 +70,44 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	}
 	function index() {
 		@ob_end_clean();
-		$fieldid = JRequest::getVar('fieldid', 0);
-		$itemid = JRequest::getVar('itemid', 0);
-		$db = &JFactory::getDBO();
-		$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
-		$db->setQuery($query);
-		if(!$field = $db->loadObject()) {
-			echo "fail|1";
-			exit;
+		//$fieldid = JRequest::getVar('fieldid', 0);
+		//$itemid = JRequest::getVar('itemid', 0);
+
+		$items_per_call = JRequest::getVar('items_per_call', 50);
+		$itemcnt = JRequest::getVar('itemcnt', 0);
+		$itemmodel = $this->getModel('items');
+		$fields = & $itemmodel->getAdvSearchFields('id');
+		$fieldid_arr = array_keys($fields);
+		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);
+		
+		
+		for($cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++) {
+			if ($cnt >= count($itemid_arr)) break;
+			$itemid = $itemid_arr[$cnt];
+			foreach($fieldid_arr as $fieldid) {
+				$db = &JFactory::getDBO();
+				$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
+				$db->setQuery($query);
+				if(!$field = $db->loadObject()) {
+					echo "fail|1";
+					exit;
+				}
+				$field->item_id = $itemid;
+				$field->parameters = new JParameter($field->attribs);
+				$query = "SELECT `value` FROM #__flexicontent_items_versions as iv "
+					." JOIN #__content as i ON i.id=iv.item_id AND i.version=iv.version "
+					." WHERE iv.field_id='{$fieldid}' AND iv.item_id='{$itemid}';";
+				$db->setQuery($query);
+				$values = $db->loadResultArray();
+				$values = is_array($values)?$values:array();
+				$dispatcher =& JDispatcher::getInstance();
+				JPluginHelper::importPlugin('flexicontent_fields');
+				if(count($values)==1)
+					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
+				elseif(count($values)>1)
+					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values));
+			}
 		}
-		$field->item_id = $itemid;
-		$field->parameters = new JParameter($field->attribs);
-		$query = "SELECT `value` FROM #__flexicontent_fields_item_relations WHERE field_id='{$fieldid}' AND item_id='{$itemid}';";
-		$db->setQuery($query);
-		$values = $db->loadResultArray();
-		$values = is_array($values)?$values:array();
-		$dispatcher =& JDispatcher::getInstance();
-		if(count($values)==1)
-			$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
-		elseif(count($values)>1)
-			$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values));
 		echo "success";
 		exit;
 	}

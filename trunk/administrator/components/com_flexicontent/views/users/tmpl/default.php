@@ -189,7 +189,7 @@ window.addEvent('domready', function(){
 					endif;
 					?>
 				</th>
-				<th width="1%" class="title" nowrap="nowrap">
+				<th width="2%" class="title" nowrap="nowrap">
 					<?php echo JHTML::_('grid.sort',   'ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_id) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -215,6 +215,7 @@ window.addEvent('domready', function(){
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
 			<td class="left"></td>
+			<td class="left"></td>
 			<td class="left col_registered col_visited" colspan="2">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>
 				<?php echo $this->lists['startdate']; ?>&nbsp;&nbsp;<?php echo $this->lists['enddate']; ?>
@@ -226,7 +227,7 @@ window.addEvent('domready', function(){
 
 
 		<tr>
-			<td colspan="<?php echo '11'; ?>" class="filterbuttons">
+			<td colspan="<?php echo '12'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
@@ -244,7 +245,7 @@ window.addEvent('domready', function(){
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="11">
+				<td colspan="12">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>
