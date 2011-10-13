@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id$
+ * @version 1.2 $Id: helper.php 922 2011-10-05 17:42:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -355,27 +355,30 @@ class modFlexicontentHelper
 
 	function getItems(&$params, $ordering)
 	{
-		global $mainframe, $dump, $globalcats;
+		global $dump, $globalcats;
+
+		$mainframe = &JFactory::getApplication();
+		JPluginHelper::importPlugin('system', 'flexisystem');
 
 		// For specific cache issues
 		if (!$globalcats) {
-			if (FLEXI_SECTION) {
-				if (FLEXI_CACHE) {
-				// add the category tree to categories cache
-				$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-				$catscache->setCaching(1); 		//force cache
-				$catscache->setLifeTime(84600); //set expiry to one day
-			    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
-				} else {
+
+//				if (FLEXI_CACHE) { //TODO cache not work
+//				// add the category tree to categories cache
+//				$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+//				$catscache->setCaching(1); 		//force cache
+//				$catscache->setLifeTime(84600); //set expiry to one day
+//			    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+//				} else {
 					$globalcats = plgSystemFlexisystem::getCategoriesTree();
-				}
-			}
+//				}
+
 		}
 
 		// Initialize variables
 		$db				=& JFactory::getDBO();
 		$user			=& JFactory::getUser();
-		$gid			= (int) $user->get('aid');
+		$gid		    = max ($user->getAuthorisedViewLevels());
 		$now			= $mainframe->get('requestTime');
 		$nullDate 		= $db->getNullDate();
 		$view			= JRequest::getVar('view');
@@ -438,15 +441,15 @@ class modFlexicontentHelper
 		// get module display parameters
 		$mod_image 			= $params->get('mod_image');
 		
-		$where 	= ' WHERE i.sectionid = ' . FLEXI_SECTION;
-		$where .= ' AND c.published = 1';
+
+		$where  = ' WHERE c.published = 1';
 		$where .= ' AND i.state IN ( 1, -5 )';
 		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
 
 		// filter by permissions
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
+			if (FLEXI_ACCESS && class_exists('FAccess')) {
 				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
 				if (isset($readperms['item'])) {
 					$where .= ' AND ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
@@ -458,7 +461,7 @@ class modFlexicontentHelper
 			}
 		}
 
-		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && ((($option == 'com_flexicontent') && ($view == 'items')) || (($option == 'com_nutrition') && ($view == 'frAliment'))) )  {
+		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && ((($option == 'com_flexicontent') && ($view == 'item')) || (($option == 'com_nutrition') && ($view == 'frAliment'))) )  {
 			// initialize variables
 			$cid 		= JRequest::getInt('cid');
 			$id			= JRequest::getInt('id');
@@ -522,7 +525,7 @@ class modFlexicontentHelper
 				$where .= ' AND c.id IN (' . $catids . ')';		
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != 'items')) {
+			if (($option != 'com_flexicontent') || ($view != 'item')) {
 				return;
 			} else {							
 				$menus		=& JApplication::getMenu('site', array());
@@ -581,7 +584,7 @@ class modFlexicontentHelper
 				$where .= ' AND ie.type_id IN (' . $types . ')';		
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != 'items')) {
+			if (($option != 'com_flexicontent') || ($view != 'item')) {
 				return;
 			} else {
 				if ($behaviour_types == 1) {
@@ -600,7 +603,7 @@ class modFlexicontentHelper
 				$where .= ' AND i.created_by IN (' . $authors . ')';		
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != 'items')) {
+			if (($option != 'com_flexicontent') || ($view != 'item')) {
 				return;
 			} else {			
 				if ($behaviour_types == 1) {
@@ -619,7 +622,7 @@ class modFlexicontentHelper
 				$where .= ' AND i.id IN (' . $items . ')';		
 			}
 		} else {
-			if (($option == 'com_flexicontent') && ($view == 'items')) {
+			if (($option == 'com_flexicontent') && ($view == 'item')) {
 				// select the tags associated to the item
 				$query2 = 'SELECT tid' .
 						' FROM #__flexicontent_tags_item_relations' .
@@ -689,7 +692,7 @@ class modFlexicontentHelper
 			if ($bdate)
 				$where .= ' AND ( i.'.$comp.' = '.$db->Quote($nullDate).' OR i.'.$comp.' >= '.$db->Quote($bdate).' )';
 		} else {
-			if ( (($option != 'com_flexicontent') || ($view != 'items')) && ($date_compare == 1) ) {
+			if ( (($option != 'com_flexicontent') || ($view != 'item')) && ($date_compare == 1) ) {
 				return;
 			} else {
 				switch ($behaviour_dates) 
@@ -777,6 +780,9 @@ class modFlexicontentHelper
 			break;
 				
 			case 'commented':
+				// TODO more here
+				echo "Most commented ordering not implemented, please choose different ordering.\n";
+				break;
 				$query 	= 'SELECT i.*, ie.type_id, count(com.object_id) AS nr, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
@@ -884,9 +890,9 @@ class modFlexicontentHelper
 		$db =& JFactory::getDBO();
 				
 		$currcatdata = null;
-		if ( ($currcat_showtitle || $currcat_showdescr || $currcat_use_image) && $cid && $view=='items' ) {
+		if ( ($currcat_showtitle || $currcat_showdescr || $currcat_use_image) && $cid && $view=='item' ) {
 			// initialize variables
-			$q = 'SELECT c.id, c.title, c.description, c.image '
+			$q = 'SELECT c.id, c.title, c.description'//, c.image ' // NO image in J1.6 and higher
 						.( ($currcat_link_title || $currcat_link_image) ? ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug' : '' )
 						. ' FROM #__categories AS c'
 						. ' WHERE c.id = ' . $cid
@@ -898,6 +904,8 @@ class modFlexicontentHelper
 			// Try to retrieve the category image source path
 			$catimagesrc = '';
 			if ($currcat_use_image==2) {
+				// TODO more here
+				echo "no image parameter for category of J1.6 and higher, please reconfigure module and select for image of current category to extract it from description text<br>\n";
 				// We will use category image as defined in category params (if it defined)
 				
 				if (!empty($currcatdata->image)) {
