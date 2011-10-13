@@ -159,6 +159,7 @@
 	<plugin name="flexiadvroute" folder="plugins/advroute">System plugin for advanced FLEXIcontent routing</plugin>
 	
 	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced search module for the FLEXIcontent Component</module>
+	<module name="mod_flexicontent" folder="modules/mod_flexicontent">Universal content module for the FLEXIcontent Component</module>
 </additional>
 
 <installfile>install.php</installfile>

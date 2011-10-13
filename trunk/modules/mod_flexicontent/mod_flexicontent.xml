@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.2</version>
+	<version>1.3</version>
 	<description>Universal content module for the FLEXIcontent Component</description>
 	
 	<files>
@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexicontent.ini</language>
+		<language tag="ru-RU">languages/ru-RU.mod_flexicontent.ini</language>
 	</languages>
 	
 	<params addpath="/modules/mod_flexicontent/elements">
@@ -149,7 +150,6 @@
 		</param>
 
   <param name="" type="jparamstab" description="FLEXI_ITEMLIST_DISPLAY_PARAMS" />
-  
 		<param name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
 		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_title" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">
@@ -229,7 +229,7 @@
 		
 		<param name="" type="separator" default="Dates parameters" level="level1" menu="hide" />
 		
-		<param name="date_display" type="radio" default="1" label="Display Date" >
+		<param name="display_date" type="radio" default="1" label="Display Date" >
 			<option value="0">No</option>
 			<option value="1">Yes</option>
 		</param>
@@ -287,7 +287,6 @@
 		<param name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
   <param name="" type="jparamstab" description="FLEXI_MODULE_DISPLAY_PARAMS" />
-  	
 		<param name="" type="separator" default="FLEXI_CURRCAT" level="level1" menu="hide" />
 		<param name="" type="separator" default="FLEXI_CURRCAT_INFO" level="level2" menu="hide" />
 		<param name="currcat_showtitle" type="list" default="0" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
@@ -306,7 +305,7 @@
 		</param>
 		
 		<param name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level2" menu="hide" />
-		<param name="currcat_use_image" type="list" default="1" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
+		<param name="currcat_use_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_EXTRACT_IMAGE_FROM_CATTEXT</option>
 			<option value="2">FLEXI_USE_IMAGE_FROM_PARAMS</option>
@@ -323,20 +322,19 @@
 		<param name="currcat_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 		
 		<param name="" type="separator" default="More parameters" level="level1" menu="hide" />
-		<param name="show_more" type="radio" default="1" label="Show More" description="Show a Link at the bottom of the module that links to the category page - or whatever page you want.">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+		<param name="show_more" type="radio" default="0" label="Show More" description="Show a Link at the bottom of the module that links to the category page - or whatever page you want.">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="more_title" type="text" default="" label="More Title" description="The text of the link. &lt;br/&gt; &lt;b&gt; Leave blank for language default:&lt;/b&gt; More from this category" size="40" />
 		<param name="more_link" type="text" default="index.php" label="More Link" description="The link to the page you want the user to be redirected when clicking the" />
 		<param name="more_blank" type="radio" default="0" label="Open in new window" description="Open the 'Other Articles' link in a new window or tab.">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="more_css" type="textarea" cols="30" rows="3" default="" label="CSS - More..." description="CSS code to apply on the 'More Articles...' link at the bottom of the module." />
 		
   <param name="" type="jparamstab" description="FLEXI_CUSTOM_PARAMS" />
-  	
 		<param name="custom1" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM1" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom2" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM2" description="FLEXI_CUSTOM_DESC" />
 		<param name="custom3" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM3" description="FLEXI_CUSTOM_DESC" />
@@ -344,7 +342,6 @@
 		<param name="custom5" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM5" description="FLEXI_CUSTOM_DESC" />
 
   <param name="" type="jparamstab" description="FLEXI_MOD_ADVANCED" />
-  	
 		<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
 		<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
 		<param name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
@@ -358,7 +355,7 @@
 		<param name="width" type="text" size="4" default="" label="FLEXI_MODULE_WIDTH" description="FLEXI_MODULE_WIDTH_DESC" />
 		<param name="height" type="text" size="4" default="" label="FLEXI_MODULE_HEIGHT" description="FLEXI_MODULE_HEIGHT_DESC" />
 		
-		<param name="" type="separator" default="Caching" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_CACHING" level="level1" menu="hide" />
 		<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 			<option value="2">FLEXI_FORCE_CACHE</option>
 			<option value="1">FLEXI_USE_GLOBAL</option>
