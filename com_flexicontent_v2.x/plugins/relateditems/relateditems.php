@@ -29,19 +29,39 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 	}
 	function onDisplayField(&$field, &$item)
 	{
+		global $globalcats;
+		
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'relateditems') return;
-
-		// some parameter shortcuts
-		$size				= $field->parameters->get( 'size', 12 ) ;
-		$default_values		= '';
 		
+		// SCOPE OPTIONS
+		// categories scope parameters
+		$method_cat 		= $field->parameters->get('method_cat', 1);
+		$catids 			= $field->parameters->get('catids', '');
+		$catids  = explode("|", $catids);
+		$usesubcats 			= $field->parameters->get('usesubcats', 0 );
+				
+		// types scope parameters
+		$method_types 		= $field->parameters->get('method_types', 1);
+		$types				= $field->parameters->get('types', '' );
+		$types  = explode("|", $types);
+		
+		// other limits of scope parameters
+		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
+		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
+		
+		// EDITING OPTIONS
+		// Ordering
+		$order = $field->parameters->get( 'orderby', 'alpha' );
+		// Field height
+		$size				= $field->parameters->get( 'size', 12 ) ;
+		$size	 	= $size ? ' size="'.$size.'"' : '';
+		$prepend_item_state = $field->parameters->get( 'prepend_item_state', 1 ) ;
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
-		$samelangonly = $field->parameters->get( 'samelangonly', 1 ) ;
+		$title_filter = $field->parameters->get( 'title_filter', 1 ) ;
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
-		$size	 	= $size ? ' size="'.$size.'"' : '';
 		
 		// initialise property
 		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
@@ -51,7 +71,6 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		} else {
 			//$field->value = unserialize($field->value[0]);
 		}
-		
 		$fieldval = array();
 		foreach($field->value as $i=>$val) {
 			list ($itemid,$catid) = explode(":", $val);
@@ -79,34 +98,129 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		}
     //ob_start();		print_r($field->value);		$field->html = ob_get_contents();    ob_end_clean();
     
+		// CATEGORY SCOPE
     $where = "";
-		if (!$viewallcats) {
-			$where .= ($where=="") ? "" : " AND ";
-			$where .= " catid IN (".implode(',',$usercats ).") ";
+    $allowed_cats = $disallowed_cats = false;
+    
+ 		if(!is_array($catids)) $catids = explode(",", $catids);
+		if ($usesubcats) {
+			// Find descendants of the categories
+			$subcats = array();
+			foreach ($catids as $catid) {
+				$subcats = array_merge($subcats, array_map('trim',explode(",",$globalcats[$catid]->descendants)) );
+			}
+			$catids = array_unique($subcats);
 		}
+		
+    if ( $method_cat == 3 ) {  // include method
+    	$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
+    } else if ( $method_cat == 2 ) {  // exclude method
+    	$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
+    } else if (!$viewallcats) {
+    	$allowed_cats = $usercats;
+    }
+    
+		if ( $allowed_cats ) {
+			$where .= ($where=="") ? "" : " AND ";
+			$where .= " c.catid IN (".implode(',',$allowed_cats ).") ";
+		}
+		if ( $disallowed_cats ) {
+			$where .= ($where=="") ? "" : " AND ";
+			$where .= " c.catid NOT IN (".implode(',',$disallowed_cats ).") ";
+		}
+		
+		// TYPE SCOPE
+		$types	= is_array($types) ? implode(',', $types) : $types;
+		if ($method_types == 2) { // exclude method
+			$where .= ($where=="") ? "" : " AND ";
+			$where .= ' ie.type_id NOT IN (' . $types . ')';		
+		} else if ($method_types == 3) { // include method
+			$where .= ($where=="") ? "" : " AND ";
+			$where .= ' ie.type_id IN (' . $types . ')';		
+		}
+		
+		// OTHER SCOPE LIMITS
 		if ($samelangonly) {
 			$where .= ($where=="") ? "" : " AND ";
-			$where .= " ie.language='{$item->getValue('language')}' ";
+			$where .= " (ie.language='{$item->getValue('language')}' OR ie.language='*') ";
 		}
+		if ($onlypublished) {
+			$where .= ($where=="") ? "" : " AND ";
+			$where .= " c.state IN (1, -5) ";
+		}
+		
     if ($where!="") $where = " WHERE " . $where;
     
-		$query = "SELECT c.title, c.id, c.catid, c.state, GROUP_CONCAT(cir.catid SEPARATOR ',') as catlist, c.alias FROM #__content AS c ".
-			(($samelangonly) ? " LEFT JOIN #__flexicontent_items_ext AS ie on c.id=ie.item_id " : "") .
-			" LEFT JOIN #__flexicontent_cats_item_relations AS cir on c.id=cir.itemid ".
-			$where .
-			" GROUP BY cir.itemid ".
-			" ORDER BY title";
+		switch ($order) {
+		case 'date':
+			$filter_order		= 'c.created';
+			$filter_order_dir	= 'ASC';
+			break;
+		case 'rdate':
+			$filter_order		= 'c.created';
+			$filter_order_dir	= 'DESC';
+			break;
+		case 'alpha':
+			$filter_order		= 'c.title';
+			$filter_order_dir	= 'ASC';
+			break;
+		case 'ralpha':
+			$filter_order		= 'c.title';
+			$filter_order_dir	= 'DESC';
+			break;
+		case 'hits':
+			$filter_order		= 'c.hits';
+			$filter_order_dir	= 'ASC';
+			break;
+		case 'rhits':
+			$filter_order		= 'c.hits';
+			$filter_order_dir	= 'DESC';
+			break;
+		case 'order':
+			$filter_order		= 'rel.ordering';
+			$filter_order_dir	= 'ASC';
+			break;
+		default:
+			$filter_order		= 'c.id';
+			$filter_order_dir	= 'ASC';
+			break;
+		}
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', c.title';
+    
+		$query = "SELECT c.title, c.id, c.catid, c.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, c.alias FROM #__content AS c "
+			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on c.id=ie.item_id " : "")
+			. " LEFT JOIN #__flexicontent_cats_item_relations AS rel on c.id=rel.itemid "
+			. $where
+			. " GROUP BY rel.itemid "
+			. $orderby
 			;
 		$db->setQuery($query);
-		//echo $query; exit();
+		//echo $query; //exit();
 		$items_arr = $db->loadObjectList();
 		if (!$items_arr) $items_arr = array();
 		
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
+		if ($allowed_cats) {
+			foreach ($allowed_cats as $catid) {
+				$allowedtree[$catid] = $tree[$catid];
+			}
+		}
+		if ($disallowed_cats) {
+			foreach ($disallowed_cats as $catid) {
+				unset($tree[$catid]);
+			}
+			$allowedtree = & $tree;
+		}
+		if (!$allowed_cats && !$disallowed_cats) {
+			$allowedtree = & $tree;
+		}
+		
+		//echo "<pre>"; foreach ($tree as $index => $cat) echo "$index\n";
+		//exit();
 
 		$field->html .= "<div style='float:left;margin-right:16px;'>Select Category:<br>\n";
-		$field->html .= flexicontent_cats::buildcatselect($tree, $field->name.'_fccats', $catvals="", false, ' class="inputbox" '.$size, true);
+		$field->html .= flexicontent_cats::buildcatselect($allowedtree, $field->name.'_fccats', $catvals="", false, ' class="inputbox" '.$size, true);
 		$field->html .= "</div>\n";
 		
 		$field->html  .= "&nbsp;&nbsp;&nbsp;";
@@ -118,7 +232,26 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'><br>\n";
 		$field->html .= '<a href="JavaScript:void(0);" id="btn-add">Add &raquo;</a><br>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove">&laquo; Remove</a>'."\n";
+    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove">&laquo; Remove</a><br>'."\n";
+    
+    if ($title_filter) {
+			$document = &JFactory::getDocument();
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/filterlist.js' );
+
+			$field->html.=	'
+				<br /><input id="'.$field->name.'_regexp" name="'.$field->name.'_regexp" onKeyUp="'.$field->name.'_titlefilter.set(this.value)" size="20" />
+				<br /><input type="button" onClick="'.$field->name.'_titlefilter.set(this.form.'.$field->name.'_regexp.value)" value="'.JText::_('FLEXI_FIELD_FILTER').'" style="margin-top:6px;" />
+				<input type="button" onClick="'.$field->name.'_titlefilter.reset();this.form.'.$field->name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_FIELD_RESET').'" style="margin-top:6px;" />
+				
+				<script type="text/javascript">
+				<!--
+				var filteredfield = document.getElementById("'.$field->name.'_visitems");
+				var '.$field->name.'_titlefilter = new filterlist( filteredfield );
+				//-->
+				</script>
+				';
+    }
+    
 		$field->html .= "</div>\n";
     
     // The split up the items
@@ -128,8 +261,10 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
 		foreach($items_arr as $itemdata) {
 			$itemtitle = (mb_strlen($itemdata->title) > $maxtitlechars) ? mb_substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
-			$statestr = "[". @$state_shortname[$itemdata->state]."] ";
-			$itemtitle = $statestr.$itemtitle." ";//.$itemdata->catlist;
+			if ($prepend_item_state) {
+				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
+				$itemtitle = $statestr.$itemtitle." ";//.$itemdata->catlist;
+			}
 			$itemcat_arr = explode(",", $itemdata->catlist);
 			$classes_str = "";
 			$itemid = $itemdata->id;
@@ -144,11 +279,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" style="min-width:140px;display:none;" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" style="min-width:140px;display:none;"  '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
-		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" style="min-width:140px;" class="'.$required.'" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" class="'.$required.'" style="min-width:140px;" '.$size.' >';
 		$field->html .= $items_options;
 		$field->html .= '</select>'."\n";
 		
@@ -183,6 +318,8 @@ window.addEvent( 'domready', function() {
 window.addEvent( 'domready', function() {
 	$('".$field->name."_fccats').addEvent( 'change', function() {
 		
+		".$field->name."_titlefilter.reset(); this.form.".$field->name."_regexp.value='';
+		
 	  jQuery('#".$field->name."_visitems option').each( function() {
 	  	var data = jQuery(this).val().split(':'); 
 	  	var itemid = data[0];
@@ -196,6 +333,8 @@ window.addEvent( 'domready', function() {
 				jQuery(this).remove();
 	  	}
 		});
+		
+		".$field->name."_titlefilter.init();
 		
 	});
 });";
@@ -242,7 +381,7 @@ window.addEvent( 'domready', function() {
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = '&nbsp;';
+			$separatorf = ' ';
 			break;
 
 			case 1:
@@ -250,11 +389,11 @@ window.addEvent( 'domready', function() {
 			break;
 
 			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
+			$separatorf = ' | ';
 			break;
 
 			case 3:
-			$separatorf = ',&nbsp;';
+			$separatorf = ', ';
 			break;
 
 			case 4:
@@ -262,7 +401,7 @@ window.addEvent( 'domready', function() {
 			break;
 
 			default:
-			$separatorf = '&nbsp;';
+			$separatorf = ' ';
 			break;
 		}
 		
@@ -282,12 +421,20 @@ window.addEvent( 'domready', function() {
 		}
 		
 		// Get data like aliases and published state
+		$publish_where = '';
+		if ($field->parameters->get('use_publish_dates', 1 )) {
+			$nullDate	= $db->getNullDate();
+			$mainframe =& JFactory::getApplication();
+			$now		= $mainframe->get('requestTime');
+			$publish_where  = ' AND ( c.publish_up = '.$db->Quote($nullDate).' OR c.publish_up <= '.$db->Quote($now).' )'; 
+			$publish_where .= ' AND ( c.publish_down = '.$db->Quote($nullDate).' OR c.publish_down >= '.$db->Quote($now).' )';
+		}
 		$query = "SELECT c.title, c.id, c.alias, c.state, c.catid as maincatid, ".
 			" GROUP_CONCAT(cat.id SEPARATOR  ',') AS catidlist, ".
 			" GROUP_CONCAT(cat.alias SEPARATOR  ',') AS  cataliaslist ".
 			" FROM #__content AS c ".
-			" LEFT JOIN #__flexicontent_cats_item_relations AS ci ON c.id=ci.itemid ".
-			" LEFT JOIN #__categories AS cat ON ci.catid=cat.id ";
+			" LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.itemid ".
+			" LEFT JOIN #__categories AS cat ON rel.catid=cat.id ";
 		$where = " WHERE c.id IN (";
 		$sep = '';
 		foreach($fieldval as $itemid => $itemdata) {
@@ -296,6 +443,7 @@ window.addEvent( 'domready', function() {
 		}
 		$where .= ")";
 		$query .= $where;
+		$query .= $publish_where;
 		$query .= " GROUP BY c.id ";
 		
 		$db->setQuery($query);
@@ -305,7 +453,7 @@ window.addEvent( 'domready', function() {
 			$results = array();
 			
 		if($db->getErrorNum()) {
-			$this->setError($db->getErrorMsg());
+			echo $db->getErrorMsg();
 			$field->{$prop} = '';
 			return false;
 		}
@@ -344,7 +492,7 @@ window.addEvent( 'domready', function() {
 				$itemslug = $result->id.":".$result->alias;
 				$itemtitle = (mb_strlen($result->title) > $maxtitlechars) ? mb_substr($result->title,0,$maxtitlechars) . "..." : $result->title;
 				$link= "<a href='". JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $catslug)) ."' class='hasTip relateditem' title='". JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($result->title) ."'>".$itemtitle."</a>\n";
-				$display[] = $pretext . $link . $posttext;
+				$display[] = trim($pretext . $link . $posttext);
 			}
 			if ($values) {
 				$field->{$prop} = implode($separatorf, $display);

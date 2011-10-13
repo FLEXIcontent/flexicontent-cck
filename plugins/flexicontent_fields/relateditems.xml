@@ -3,7 +3,7 @@
 	<name>FLEXIcontent - Related Items</name>
 	<author>ggppdk</author>
 	<creationDate>Aug 2011</creationDate>
-	<copyright>Copyright (C) 2009 ggppdk</copyright>
+	<copyright>Copyright (C) 2011 ggppdk</copyright>
 	<license>GNU/GPL v2</license>
 	<authorEmail>ggppdk</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
@@ -40,6 +40,10 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="use_publish_dates" type="radio" default="1" label="Use publish up/down dates" description="Will skip selected items when their publication dates expire" >	
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="onlypublished" type="radio" default="1" label="FLEXI_ONLY_PLUBLISHED_ITEMS" description="FLEXI_ONLY_PLUBLISHED_ITEMS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -47,14 +51,14 @@
 			
 		<param name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" menu="hide" />
 		<param name="orderby" type="list" default="alpha" label="FLEXI_ITEM_ORDERING" description="FLEXI_ITEM_ORDERING_DESC">
-			<option value="">Default (ID)</option>
-			<option value="date">Oldest first</option>
-			<option value="rdate">Recent first</option>
-			<option value="alpha">Title Alphabetical</option>
-			<option value="ralpha">Title Reverse-Alphabetical</option>
-			<option value="hits">Most Hits</option>
-			<option value="rhits">Least Hits</option>
-			<option value="order">Ordering (Item manager)</option>
+			<option value="">FLEXI_DEFAULT_ID</option>
+			<option value="date">FLEXI_OLDEST_FIRST</option>
+			<option value="rdate">FLEXI_RECENT_FIRST</option>
+			<option value="alpha">FLEXI_TITLE_ALPHABETICAL</option>
+			<option value="ralpha">FLEXI_TITLE_REVERSE_ALPHABETICAL</option>
+			<option value="hits">FLEXI_MOST_HITS</option>
+			<option value="rhits">FLEXI_LEAST_HITS</option>
+			<option value="order">FLEXI_ORDERING_ITEM_MANAGER</option>
 		</param>
 		
 		<field name="size" type="text" default="12" size="2" label="FLEXI_FIELD_SELECTBOX_LINES" description="FLEXI_FIELD_SELECTBOX_LINES_DESC" />

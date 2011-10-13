@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: separator.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 beta 5 $Id: separator.php 567 2011-04-13 11:06:52Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,8 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+
 /**
  * Renders a fields element
  *
@@ -27,26 +26,34 @@ jimport('joomla.form.formfield');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- 
-class JFormFieldSeparator extends JFormField{
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('spacer');
+
+class JFormFieldSeparator extends JFormFieldSpacer
+{
 	/**
 	 * Element name
-	 *
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$type = 'Separator';
+	var	$_name = 'separator';
+	
+	function getLabel()
+	{
+		$document 	=& JFactory::getDocument();
+		//$document->addStyleSheet('../tmpl/params.css');
+		
+		$value = $this->element['default'];
 
-	function getInput() {
-		$level = $this->element->getAttribute('level');
+		$level = $this->element['level'];
 		if ($level == 'level2') {
-			$style = 'padding-top: 1px; margin:10px 0px 0px -0px; background-color: #ccc; display: block; color: #000; font-weight: bold;';
+			$style = 'padding: 4px 4px 4px 10px; display: block; background-color: #ccc; color: #000; font-weight: bold; margin-left:10px;';
 		} else if ($level == 'level3') {
-			$style = 'padding-top: 2px;  margin:10px 0px 0px 0px; font-weight: bold; background-color: #aaa;';
+			$style = 'padding: 5px 4px 5px 5px; font-weight: bold;';
 		} else {
-			$style = 'padding-top: 2px;  margin:10px 0px 0px 0px; background-color: #777; display: block; color: #fff; font-weight: bold;';
+			$style = 'padding: 5px 4px 5px 10px; display: block; background-color: #777; color: #fff; font-weight: bold;';
 		}
-		//return '<fieldset style="float:left;width:100%;"><div style="'.$style.'">'.JText::_($this->value).'</div></fieldset>';
-		return '<div style="display:block:float:none; height:2px;width:auto:border-width:0px"></div>';
+		
+		return '<br style="clear: both;" /><span style="'.$style.'">'.JText::_($value).'</span>';
 	}
 }
