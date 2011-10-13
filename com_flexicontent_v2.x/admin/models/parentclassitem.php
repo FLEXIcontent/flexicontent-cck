@@ -347,7 +347,7 @@ class ParentClassItem extends JModelAdmin {
 				$permission = FlexicontentHelperPerm::getPerm();
 				$id = $this->getState($this->getName().'.id');
 				if ($id) {
-					$rights 	= $permission->checkAllItemAccess($uid, 'item', $id);
+					$rights 	= FlexicontentHelperPerm::checkAllItemAccess($uid, 'item', $id);
 					$canEdit 	= in_array('flexicontent.editall', $rights) || $permission->CanEdit;
 					$canEditOwn	= (in_array('flexicontent.editown', $rights) && ($item->created_by == $user->id));
 					if ($canEdit || $canEditOwn) return true;
