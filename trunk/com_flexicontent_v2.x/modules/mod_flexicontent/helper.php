@@ -780,9 +780,12 @@ class modFlexicontentHelper
 			break;
 				
 			case 'commented':
-				// TODO more here
-				echo "Most commented ordering not implemented, please choose different ordering.\n";
-				break;
+				// handle jcomments integration
+				if (!JPluginHelper::isEnabled('system', 'jcomments.system') && !JPluginHelper::isEnabled('system', 'jcomments')) {
+					echo "jcomments not detected, you need jcomments to use 'Most commented ordering.<br>\n";
+					break;
+				}
+				
 				$query 	= 'SELECT i.*, ie.type_id, count(com.object_id) AS nr, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'

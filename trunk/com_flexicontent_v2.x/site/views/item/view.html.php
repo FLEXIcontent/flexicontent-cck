@@ -85,6 +85,12 @@ class FlexicontentViewItem extends JView {
 		$iparams	=& $item->parameters;
 		$params->merge($iparams);
 
+		// Check the view access to the article (the model has already computed the values).
+		if ($params->get('access-view') != true && (($params->get('show_noauth') != true &&  $user->get('guest') ))) {
+						JError::raiseWarning(403, JText::_('JERROR_ALERTNOAUTHOR'));
+				return;
+		}
+
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, 'item', $params, $aid);
 		$item	= $item[0];
