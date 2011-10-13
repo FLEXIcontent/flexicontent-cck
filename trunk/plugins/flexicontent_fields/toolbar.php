@@ -125,7 +125,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		if ($display_email)
 		{
 			$link		 = JURI::base().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
-			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.base64_encode( $link );
+			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
 			$display	.= '
 			<div class="flexi-email toolbar-element">

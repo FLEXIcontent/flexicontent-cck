@@ -42,7 +42,7 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		//var_dump($this->value);
-		//$values = explode(",", $value);
+		//$values = explode("|", $this->value);
 		$values = $this->value;
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");

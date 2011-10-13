@@ -277,11 +277,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$field->name.'" name="'.$field->name.'[]" multiple="multiple" style="min-width:140px;display:none;" class="'.$required.'" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'" name="'.$field->name.'[]" multiple="multiple" style="min-width:140px;display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
-		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" style="min-width:140px;" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" class="'.$required.'" style="min-width:140px;" '.$size.' >';
 		$field->html .= $items_options;
 		$field->html .= '</select>'."\n";
 		
@@ -419,6 +419,14 @@ window.addEvent( 'domready', function() {
 		}
 		
 		// Get data like aliases and published state
+		$publish_where = '';
+		if ($field->parameters->get('use_publish_dates', 1 )) {
+			$nullDate	= $db->getNullDate();
+			$mainframe =& JFactory::getApplication();
+			$now		= $mainframe->get('requestTime');
+			$publish_where  = ' AND ( c.publish_up = '.$db->Quote($nullDate).' OR c.publish_up <= '.$db->Quote($now).' )'; 
+			$publish_where .= ' AND ( c.publish_down = '.$db->Quote($nullDate).' OR c.publish_down >= '.$db->Quote($now).' )';
+		}
 		$query = "SELECT c.title, c.id, c.alias, c.state, c.catid as maincatid, ".
 			" GROUP_CONCAT(cat.id SEPARATOR  ',') AS catidlist, ".
 			" GROUP_CONCAT(cat.alias SEPARATOR  ',') AS  cataliaslist ".
@@ -433,6 +441,7 @@ window.addEvent( 'domready', function() {
 		}
 		$where .= ")";
 		$query .= $where;
+		$query .= $publish_where;
 		$query .= " GROUP BY c.id ";
 		
 		$db->setQuery($query);
@@ -442,7 +451,7 @@ window.addEvent( 'domready', function() {
 			$results = array();
 			
 		if($db->getErrorNum()) {
-			$this->setError($db->getErrorMsg());
+			echo $db->getErrorMsg();
 			$field->{$prop} = '';
 			return false;
 		}

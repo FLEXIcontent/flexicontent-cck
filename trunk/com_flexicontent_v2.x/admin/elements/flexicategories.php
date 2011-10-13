@@ -42,8 +42,8 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		//var_dump($this->value);
-		//$values = explode(",", $value);
-		$values = $this->value;
+		$values = explode("|", $this->value);
+		//$values = $this->value;
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
@@ -54,7 +54,7 @@ class JFormFieldFlexicategories extends JFormField
 					values[j++] = obj.options[i].value;
 			}
 			values = values.concat();
-			document.getElementById('a_id').value = values;
+			//document.getElementById('a_id').value = values;
 		}";
 		$doc->addScriptDeclaration($js);
 		$html = flexicontent_cats::buildcatselect($tree, $this->name, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
