@@ -54,7 +54,7 @@ $mod_method 			= $params->get('mod_method');
 // featured
 $display_title_feat 	= $params->get('display_title_feat');
 $link_title_feat 		= $params->get('link_title_feat');
-$display_text_feat 		= $params->get('display_text');
+$display_text_feat 		= $params->get('display_text_feat');
 $mod_readmore_feat		= $params->get('mod_readmore_feat');
 $mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
