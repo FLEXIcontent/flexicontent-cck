@@ -16,8 +16,7 @@
 			<option value="3">FLEXI_3_COLS</option>
 			<option value="4">FLEXI_4_COLS</option>
 		</field>
-		<field name="separator1" type="separator" default="" label="" description="" />
-		<field name="separator2" type="separator" default="" label="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" />
+		<field name="FLEXI_LEADING_ITEMS" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level2" menu="hide" />
 		<field name="lead_strip_html" type="list" default="1" label="FLEXI_STRIP_HTML" description="FLEXI_STRIP_HTML_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -48,8 +47,7 @@
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
 		</field>		
- 		<field name="separator3" type="separator" default="" label="" description="" />
-		<field name="separator4" type="separator" default="" label="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" />
+		<field name="FLEXI_INTRO_ITEMS" type="separator" hr="false" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level2" menu="hide" />
 		<field name="intro_strip_html" type="list" default="1" label="FLEXI_STRIP_HTML" description="FLEXI_STRIP_HTML_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>

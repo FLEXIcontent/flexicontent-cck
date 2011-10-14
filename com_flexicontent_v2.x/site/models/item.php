@@ -227,55 +227,11 @@ class FlexicontentModelItem extends ParentClassItem
 				if (((is_numeric($published)) || (is_numeric($archived))) && (($data->state != $published) && ($data->state != $archived))) {
 					return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
 				}
-
-				// Convert parameter fields to objects.
-				$registry = new JRegistry;
-				$registry->loadString($data->attribs);
-				$data->params = clone $this->getState('params');
-				$data->params->merge($registry);
-
+				
+				// Convert metadata string to parameters (object)
 				$registry = new JRegistry;
 				$registry->loadString($data->metadata);
 				$data->metadata = $registry;
-
-				// Compute selected asset permissions.
-				$user	= JFactory::getUser();
-
-				// Technically guest could edit an article, but lets not check that to improve performance a little.
-				if (!$user->get('guest')) {
-					$userId	= $user->get('id');
-					$asset	= 'com_content.article.'.$data->id;
-
-					// Check general edit permission first.
-					if ($user->authorise('core.edit', $asset)) {
-						$data->params->set('access-edit', true);
-					}
-					// Now check if edit.own is available.
-					else if (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
-						// Check for a valid user and that they are the owner.
-						if ($userId == $data->created_by) {
-							$data->params->set('access-edit', true);
-						}
-					}
-				}
-
-				// Compute view access permissions.
-				if ($access = $this->getState('filter.access')) {
-					// If the access filter has been set, we already know this user can view.
-					$data->params->set('access-view', true);
-				}
-				else {
-					// If no access filter is set, the layout takes some responsibility for display of limited information.
-					$user = JFactory::getUser();
-					$groups = $user->getAuthorisedViewLevels();
-
-					if ($data->catid == 0 || $data->category_access === null) {
-						$data->params->set('access-view', in_array($data->access, $groups));
-					}
-					else {
-						$data->params->set('access-view', in_array($data->access, $groups) && in_array($data->category_access, $groups));
-					}
-				}
 
 				//$this->_item[$pk] = $data;
 				$this->_item = $data;
@@ -515,6 +471,64 @@ class FlexicontentModelItem extends ParentClassItem
 		return $where;
 	}*/
 
+
+	/**
+	 * Method to calculate Item Access Permissions
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _getItemAccess() {
+		// Convert parameter fields to objects.
+		/*$registry = new JRegistry;
+		$registry->loadString($this->_item->attribs);
+		$iparams_extra = clone $this->getState('params');
+		$iparams_extra->merge($registry);*/
+		$iparams_extra = new JRegistry;
+		
+		// Compute selected asset permissions.
+		$user	= JFactory::getUser();
+		
+		// Technically guest could edit an article, but lets not check that to improve performance a little.
+		if (!$user->get('guest')) {
+			$userId	= $user->get('id');
+			$asset	= 'com_content.article.'.$this->_item->id;
+		
+			// Check general edit permission first.
+			if ($user->authorise('core.edit', $asset)) {
+				$iparams_extra->set('access-edit', true);
+			}
+			// Now check if edit.own is available.
+			else if (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
+				// Check for a valid user and that they are the owner.
+				if ($userId == $this->_item->created_by) {
+					$iparams_extra->set('access-edit', true);
+				}
+			}
+		}
+		
+		// Compute view access permissions.
+		if ($access = $this->getState('filter.access')) {
+			// If the access filter has been set, we already know this user can view.
+			$iparams_extra->set('access-view', true);
+		}
+		else {
+			// If no access filter is set, the layout takes some responsibility for display of limited information.
+			$user = JFactory::getUser();
+			$groups = $user->getAuthorisedViewLevels();
+		
+			if ($this->_item->catid == 0 || $this->_item->category_access === null) {
+				$iparams_extra->set('access-view', in_array($this->_item->access, $groups));
+			}
+			else {
+				$iparams_extra->set('access-view', in_array($this->_item->access, $groups) && in_array($this->_item->category_access, $groups));
+			}
+		}
+		
+		return $iparams_extra;
+	}
+
 	/**
 	 * Method to load content article parameters
 	 *
@@ -535,16 +549,19 @@ class FlexicontentModelItem extends ParentClassItem
 				. ' WHERE ie.item_id = ' . (int)$this->_id
 				;
 		$this->_db->setQuery($query);
-		$tparams = $this->_db->loadResult();
+		$typeparams = $this->_db->loadResult();
 		
-		// Merge type parameters into the page configuration
-		$tparams = new JParameter($tparams);
-		$params->merge($tparams);
+		// Merge TYPE parameters into the page configuration
+		$typeparams = new JParameter($typeparams);
+		$params->merge($typeparams);
 
-		// Merge item parameters into the page configuration
-		$iparams = new JParameter($this->_item->attribs);
-		$params->merge($iparams);
+		// Merge ITEM parameters into the page configuration
+		$itemparams = new JParameter($this->_item->attribs);
+		$params->merge($itemparams);
 
+		// Merge ACCESS permissions into the page configuration
+		$accessperms = $this->_getItemAccess();
+		$params->merge($accessperms);
 
 //		// Set the popup configuration option based on the request
 //		$pop = JRequest::getVar('pop', 0, '', 'int');

@@ -232,10 +232,13 @@ class ParentClassItem extends JModelAdmin {
 		$data = JRequest::get( 'post' );
 		$pk = @$data['jform']['id'];
 		if(!$pk) {
-			$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-			if(!$pk) $pk = JRequest::getVar('id', 0, '', 'int');
+			if ($app->isAdmin()) {
+				$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
+				JArrayHelper::toInteger($cid, array(0));
+				$pk = $cid[0];
+			} else {  // $app->isSite()
+				$pk = JRequest::getVar('id', 0, '', 'int');
+			}
 		}
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $pk);

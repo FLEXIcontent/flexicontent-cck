@@ -141,8 +141,10 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// OTHER SCOPE LIMITS
 		if ($samelangonly) {
-			$where .= ($where=="") ? "" : " AND ";
-			$where .= " (ie.language='{$item->getValue('language')}' OR ie.language='*') ";
+			if ($item->getValue('language')!='*') {
+				$where .= ($where=="") ? "" : " AND ";
+				$where .= " (ie.language='{$item->getValue('language')}' OR ie.language='*') ";
+			}
 		}
 		if ($onlypublished) {
 			$where .= ($where=="") ? "" : " AND ";
@@ -279,11 +281,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" style="min-width:140px;display:none;"  '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;"  '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
-		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" class="'.$required.'" style="min-width:140px;" '.$size.' >';
+		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" style="min-width:140px;" '.$size.' >';
 		$field->html .= $items_options;
 		$field->html .= '</select>'."\n";
 		
