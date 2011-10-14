@@ -21,7 +21,7 @@ defined('_JEXEC') or die( 'Restricted access' );
  */
 class FLEXIadvsearchHelper
 {
-	function santiseSearchWord(&$searchword, $searchphrase)
+	function santiseSearchWord(&$searchword, $searchphrase, $min=3)
 	{
 		$ignored = false;
 
@@ -44,7 +44,7 @@ class FLEXIadvsearchHelper
 
 		// filter out search terms that are too small
 		foreach( $aterms AS $aterm ) {
-			if (JString::strlen( $aterm ) < 3) {
+			if (JString::strlen( $aterm ) < $min) {
 				$search_ignore[] = $aterm;
 			}
 		}

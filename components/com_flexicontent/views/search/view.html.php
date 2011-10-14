@@ -167,7 +167,7 @@ class FLEXIcontentViewSearch extends JView
 		}
 
 		//sanatise searchword
-		if(FLEXIadvsearchHelper::santiseSearchWord($searchword, $state->get('match'))) {
+		if(FLEXIadvsearchHelper::santiseSearchWord($searchword, $state->get('match'), $min)) {
 			$error = JText::_( 'IGNOREKEYWORD' );
 		}
 
