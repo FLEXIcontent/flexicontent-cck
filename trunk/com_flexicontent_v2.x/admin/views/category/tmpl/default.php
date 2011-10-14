@@ -213,17 +213,13 @@ dump($this->row);
 						endif;
 				?>
 						<fieldset class="panelform">
-							<table>
 							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
 							?>
-							<tr>
-								<td><?php echo $tmpl->params->getLabel($fieldname, $name); ?></td>
-								<td><?php echo $tmpl->params->getInput($fieldname, $name, $value); ?></td>
-							</tr>
+								<?php echo $tmpl->params->getLabel($fieldname, $name); ?>
+								<?php echo $tmpl->params->getInput($fieldname, $name, $value); ?>
 							<?php endforeach; ?>
-							</table>
 						</fieldset>
 				<?php
 					endforeach;
