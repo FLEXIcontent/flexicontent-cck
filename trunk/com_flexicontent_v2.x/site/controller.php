@@ -71,13 +71,14 @@ class FlexicontentController extends JController
 
 		// Get/Create the model
 		$model = & $this->getModel('item');
+		$model->_item = $model->getItem();
 
 		// first verify it's an edit action
-		if ($model->get('id') > 1)
+		if ($model->_item->id > 1)
 		{
 			$canEdit	= $user->authorize('flexicontent.editall', 'com_flexicontent');
 			$canEditOwn	= $user->authorize('flexicontent.editown', 'com_flexicontent');
-			if ( !($canEdit || ($canEditOwn && ($model->get('created_by') == $user->get('id')))) )
+			if ( !($canEdit || ($canEditOwn && ($model->_item->created_by == $user->get('id')))) )
 			{
 				// user isn't authorize to edit
 				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
@@ -87,8 +88,8 @@ class FlexicontentController extends JController
 		//checked out?
 		if ( $model->isCheckedOut($user->get('id')))
 		{
-			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-			$this->setRedirect(JRoute::_('index.php?view=item&id='.$model->get('id'), false), $msg);
+			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->_item->title);
+			$this->setRedirect(JRoute::_('index.php?view=item&cid='.$model->_item->catid.'&id='.$model->_item->id, false), $msg);
 			return;
 		}
 
@@ -178,7 +179,7 @@ class FlexicontentController extends JController
 		$post['jform']['catid'] = array();
 		if ($model->store($post)) {
 			if($isNew) {
-				$post['jform']['id'] = (int) $model->get('id');
+				$post['jform']['id'] = (int) $model->_item->id;
 			}
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
@@ -192,13 +193,13 @@ class FlexicontentController extends JController
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid = '.(int) $model->get('id')
+				. ' WHERE rel.itemid = '.(int) $model->_item->id
 			;
 
 			$db->setQuery( $query );
 
 			$categories = $db->loadObjectList();
-
+			
 			//loop through the categories to create a string
 			$n = count($categories);
 			$i = 0;
@@ -510,8 +511,7 @@ class FlexicontentController extends JController
 		$used = null;
 
 		if ($id) {
-			//$used 	= $model->getUsedtags($id);
-			$used 	= $model->getUsedtags();
+			$used 	= $model->getUsedtagsIds($id);
 		}
 		if(!is_array($used)){
 			$used = array();
@@ -579,8 +579,8 @@ class FlexicontentController extends JController
 			if($result)
 				echo $model->_tag->id."|".$model->_tag->name;
 		} else {
-			$id = $model->get('id');
-			$name = $model->get('name');
+			$id = $model->_item->id;
+			$name = $model->_item->name;
 			echo $id."|".$name;
 		}
 		exit;

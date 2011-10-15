@@ -190,8 +190,8 @@ function deleteTag(obj) {
 				<?php echo $this->item->getLabel('title');?>
 			</td>
 			<td>
-				<?php /*<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" size="65" maxlength="254" />*/ ?>
-				<input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->fields['title']->value[0];?>" class="inputbox required" size="55" maxlength="254" />
+				<?php echo $this->item->getInput('title');?>
+				<!-- <input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" class="inputbox required" size="55" maxlength="254" /> -->
 			</td>
 		</tr>
 		<tr>
@@ -328,15 +328,13 @@ $canpublish = $this->perms['canpublish'];
 				<div class="qf_tagbox" id="qf_tagbox">
 				<ul id="ultagbox">
 				<?php
-					foreach( $this->tags as $tag ) {
-						if(in_array($tag->id, $this->used)) {
-							if ($this->perms['canusetags']) {
-								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-							} else {
-								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
-							}
+					foreach($this->usedtags as $tag) {
+						if ($this->perms['canusetags']) {
+							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+						} else {
+							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
 						}
 					}
 					?>

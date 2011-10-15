@@ -226,20 +226,24 @@ class ParentClassItem extends JModelAdmin {
 	 * @since	1.6
 	 */
 	protected function populateState() {
-		$app = JFactory::getApplication('administrator');
-
-		// Get the pk of the record from the request.
+		// Try to get ITEM primary key (pk) 
+		
+		// a. from edit form
 		$data = JRequest::get( 'post' );
 		$pk = @$data['jform']['id'];
+		
+		// b. from variable 'id' of the http request (e.g. item view)
 		if(!$pk) {
-			if ($app->isAdmin()) {
-				$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-				JArrayHelper::toInteger($cid, array(0));
-				$pk = $cid[0];
-			} else {  // $app->isSite()
-				$pk = JRequest::getVar('id', 0, '', 'int');
-			}
+			$pk = JRequest::getVar('id', 0, '', 'int');
 		}
+		
+		// c. from variable 'cid[]' of the http request (e.g. edit item TASK)
+		if(!$pk) {
+			$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = $cid[0];
+		}
+		
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $pk);
 		$this->setId($pk);
@@ -898,20 +902,20 @@ class ParentClassItem extends JModelAdmin {
 	}
 	
 	/**
-	 * Method to fetch used tags when performing an edit action
+	 * Method to fetch used tags IDs as an array when performing an edit action
 	 * 
 	 * @param int id
 	 * @return array
 	 * @since 1.0
 	 */
-	function getUsedtagsArray($id=0)
+	function getUsedtagsIds($item_id=0)
 	{
 			static $tags = array();
 			if (count($tags)>0) return $tags;
-			if(!$id) $tags = array();
+			if(!$item_id) $tags = array();
 			else {
 				$query 	= 'SELECT tid FROM #__flexicontent_tags_item_relations'
-					. " WHERE itemid ='$id'"
+					. " WHERE itemid ='$item_id'"
 					;
 				$this->_db->setQuery($query);
 				$tags = $this->_db->loadResultArray();
@@ -926,14 +930,14 @@ class ParentClassItem extends JModelAdmin {
 	 * @return 	array
 	 * @since 	1.5.2
 	 */
-	function getUsedtags($A)
+	function getUsedtagsData($tagIds)
 	{
-		if (empty($A)) {
+		if (empty($tagIds)) {
 			return array();
 		}
 		
 		$query 	= 'SELECT *,t.id as tid FROM #__flexicontent_tags as t '
-				. ' WHERE t.id IN (\'' . implode("','", $A).'\')'
+				. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);

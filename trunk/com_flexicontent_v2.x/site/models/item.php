@@ -219,8 +219,7 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 
 				if (empty($data)) {
-					//return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
-					return JError::raiseError(404,JText::_('Article not found or it is is currently being changed by an editor'));
+					return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
 				}
 
 				// Check for published state if filter set.
@@ -665,41 +664,6 @@ class FlexicontentModelItem extends ParentClassItem
 		return $tags;
 	}
 
-	function getUsedtags() {
-		if(!@$this->_id) $this->_item->tags = array();
-		if(@$this->_id && !@$this->_item->tags) {
-			$query = 'SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
-			$this->_db->setQuery($query);
-			//$this->_item->tags = $this->_db->loadResultArray();
-			$this->_tags = $this->_db->loadResultArray();
-		}
-		return $this->_tags;
-	}
-
-	/**
-	 * Tests if item is checked out
-	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
-	 */
-	/*function isCheckedOut( $uid=0 )
-	{
-		if ($this->_loadItem())
-		{
-			if ($uid) {
-				return ($this->_item->checked_out && $this->_item->checked_out != $uid);
-			} else {
-				return $this->_item->checked_out;
-			}
-		} elseif ($this->_id < 1) {
-			return false;
-		} else {
-			JError::raiseWarning( 0, 'Unable to Load Data');
-			return false;
-		}
-	}*/
 
 	/**
 	 * Method to checkin/unlock the item
@@ -1370,62 +1334,7 @@ class FlexicontentModelItem extends ParentClassItem
 		return $tparams;
 	}*/
 
-	
-	/**
-	 * Method to get the values of an extrafield
-	 * 
-	 * @return object
-	 * @since 1.5
-	 * @todo move in a specific class and add the parameter $itemid
-	 */
-	/*function getExtrafieldvalue($fieldid, $version = 0)
-	{
-		$id = (int)$this->_id;
-		if(!$id) return array();
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
-		$query = 'SELECT value'
-			.((($version<=0) || !$use_versioning)?' FROM #__flexicontent_fields_item_relations AS fv':' FROM #__flexicontent_items_versions AS fv')
-			.' WHERE fv.item_id = ' . (int)$this->_id
-			.' AND fv.field_id = ' . (int)$fieldid
-			.((($version>0) && $use_versioning)?' AND fv.version='.((int)$version):'')
-			.' ORDER BY valueorder'
-			;
-		$this->_db->setQuery($query);
-		$field_value = $this->_db->loadResultArray();
-		return $field_value;
-	}*/
-	
-	/**
-	 * Method to get extrafields which belongs to the item type
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	/*function getExtrafields() {
-		$typeid = intval(@$this->_item->type_id);
-		$version = (int)FLEXIUtilities::getLastVersions($this->_id, true);
-		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
-		$query = 'SELECT fi.*'
-			.' FROM #__flexicontent_fields AS fi'
-			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
-			.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-			.$where
-			.' AND fi.published = 1'
-			.' GROUP BY fi.id'
-			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-			;
-		$this->_db->setQuery($query);
-		$fields = $this->_db->loadObjectList('name');
-		jimport("joomla.html.parameter");
-		foreach ($fields as $field) {
-			$field->item_id		= (int)$this->_id;
-			$field->value 		= $this->getExtrafieldvalue($field->id, $version);
-			$field->parameters 	= new JParameter($field->attribs);
-		}
-		return $fields;
-	}*/
-	
+		
 	/**
 	 * Method to get advanced search fields which belongs to the item type
 	 * 

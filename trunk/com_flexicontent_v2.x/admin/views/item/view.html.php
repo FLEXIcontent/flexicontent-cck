@@ -113,9 +113,10 @@ class FlexicontentViewItem extends JView {
 		$categories 	= $globalcats;
 
 		$usedtags = array();
+		
 		if ($cid) {
 			$usedtagsA 	= & $fields['tags']->value;
-			$usedtags 	= $model->getUsedtags($usedtagsA);
+			$usedtags 	= $model->getUsedtagsData($usedtagsA);
 		}
 
 		// Add html to field object trought plugins

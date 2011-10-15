@@ -106,7 +106,7 @@ class flexicontent_html
 
 			if (JRequest::getInt('pop')) {
 				//button in popup
-				$output = '<a href="#" onclick="window.print();return false;">'.$image.'</a>';
+				$output = '<a href="javascript:;" onclick="window.print();return false;">'.$image.'</a>';
 			} else {
 				//button in view
 				$overlib = JText::_( 'FLEXI_PRINT_TIP' );
