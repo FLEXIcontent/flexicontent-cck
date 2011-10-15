@@ -54,6 +54,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$style = 'padding: 5px 4px 5px 10px; display: block; background-color: #777; color: #fff; font-weight: bold;';
 		}
 		
+		$class = ""; $title = "";
 		if ($this->element['description']) {
 			$class = "hasTip";
 			$title = JText::_($value)."::".JText::_($this->element['description']);

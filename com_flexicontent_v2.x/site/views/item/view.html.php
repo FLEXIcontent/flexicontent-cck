@@ -311,8 +311,12 @@ class FlexicontentViewItem extends JView {
 		JRequest::setVar('loadcurrent', false);
 		JRequest::setVar('typeid', @$menu->query['typeid'][0]);
 		$item		= $this->get('Form');
-		$tags 		=& $this->get('Alltags');
-		$used 		=& $this->get('Usedtags');
+		$model	= & $this->getModel();
+		
+		$fields = $model->getExtrafields(); 
+		$usedtagsA 	= $fields['tags']->value;
+		$usedtags 	= $model->getUsedtagsData($usedtagsA);
+		
 		//$params		=& $mainframe->getParams('com_flexicontent');
 		//$params		=& JComponentHelper::getParams('com_flexicontent');
 		
@@ -395,11 +399,6 @@ class FlexicontentViewItem extends JView {
 		jimport( 'joomla.html.parameter' );
 		$tparams = new JParameter($tparams);
 
-		//ensure $used is an array
-		if(!is_array($used)){
-			$used = array();
-		}
-		
 		//add css file
 		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 		//$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
@@ -449,8 +448,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('lists',		$lists);
 		//$this->assignRef('editor',		$editor);
 		$this->assignRef('user',		$user);
-		$this->assignRef('tags',		$tags);
-		$this->assignRef('used',		$used);
+		$this->assignRef('usedtags',		$usedtags);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('tparams', 	$tparams);
 		$this->assignRef('perms', 		$perms);

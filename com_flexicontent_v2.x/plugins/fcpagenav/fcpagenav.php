@@ -251,6 +251,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				if ($use_category_link)
 					{
 					$limit = $cparams->get('limit', 4);
+					$limit = $limit ? $limit : 4;
 					$start = floor($location / $limit)*$limit;
 					$html .= '
 					<span class="return_category">

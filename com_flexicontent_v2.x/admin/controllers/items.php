@@ -608,7 +608,7 @@ class FlexicontentControllerItems extends JController {
 		$used = null;
 
 		if ($id) {
-			$used 	= $model->getUsedtagsArray($id);
+			$used 	= $model->getUsedtagsIds($id);
 		}
 		if(!is_array($used)){
 			$used = array();
