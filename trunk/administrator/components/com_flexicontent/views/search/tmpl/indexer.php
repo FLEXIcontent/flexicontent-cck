@@ -54,7 +54,8 @@ jQuery(document).ready(function() {
 			}
 			fields = jQuery.parseJSON(arr[1]);
 			items = jQuery.parseJSON(arr[2]);
-			number = fields.length*items.length;
+			//number = fields.length*items.length;
+			number = items.length;
 			onesector = (number==0)?300:(300/number);
 			if(number==0) {
 				jQuery('div#statuscomment').text(errorstring[1]);

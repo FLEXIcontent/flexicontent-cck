@@ -28,68 +28,69 @@ window.addEvent("domready", function() {
 ?>
 
 <form id="searchForm" action="index.php" method="get" name="searchForm">
-	<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-		<tr>
-			<td nowrap="nowrap">
-				<label for="search_searchword">
-					<?php echo JText::_( $this->searchkeywordlabel ); ?>:
-				</label>
-			</td>
-			<td nowrap="nowrap">
-				<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
-			</td>
-			<td width="100%" nowrap="nowrap">
-				<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
-			</td>
-		</tr>
-		<?php if($show_searchphrase = $this->params->get('show_searchphrase', 1)) {?>
-		<tr>
-			<td colspan="3">
-				<?php echo $this->lists['searchphrase']; ?>
-			</td>
-		</tr>
-		<?php }?>
-		<?php
-			if($this->params->get('cantypes', 1) && (count($this->fieldtypes)>0)) {
-		?>
-			<tr>
-				<td class="key">
-					<label for="fieldtypes" class="hasTip" title="Select Types::Please select types that you want to select in.">
-						<?php echo JText::_("Field Types"); ?>
+	
+	<fieldset id='fc_search_set_advsearch' class='fc_search_set'>
+		<legend><?php echo JText::_('FLEXI_BASIC_SEARCH'); ?></legend>
+		
+		<table id="basicfields" class="basicfields <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+			
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td nowrap="nowrap" class='fc_search_label_cell'>
+					<label for="search_searchword" class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_KEYWORD'); ?>::<?php echo JText::_('FLEXI_SEARCH_KEYWORD_TIP'); ?>'>
+						<?php echo JText::_('FLEXI_SEARCH_KEYWORD'); ?>:
 					</label>
 				</td>
-				<td>
+				<td nowrap="nowrap" class="fc_search_option_cell">
+					<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
+				</td>
+				<td width="100%" nowrap="nowrap">
+					<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
+				</td>
+			</tr>
+			
+			<?php if ($show_searchphrase = $this->params->get('show_searchphrase', 1)) : ?>
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td nowrap="nowrap" class='fc_search_label_cell'>
+					<label class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT'); ?>::<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT_TIP'); ?>'>
+						<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT'); ?>:
+					</label>
+				</td>
+				<td colspan="2" class="fc_search_option_cell">
+					<?php echo $this->lists['searchphrase']; ?>
+				</td>
+			</tr>
+			<?php endif; ?>
+			
+			<?php if ($this->params->get('cantypes', 1) && (count($this->fieldtypes)>0)) : ?>
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td nowrap="nowrap" class='fc_search_label_cell' valign='top'>
+					<label for="fieldtypes" class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>::<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'); ?>'>
+						<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>:
+					</label>
+				</td>
+				<td colspan="2" class="fc_search_option_cell">
 					<?php echo $this->lists['fieldtypes'];?>
 				</td>
-				<td>&nbsp;</td>
 			</tr>
-		<?php
-			}
-		?>
-		<?php if(!$autodisplayextrafields) {?>
-		<tr>
-			<td colspan="3">
-				<a href="javascript:;" id="advancedsearchtext"><?php echo $this->params->get('linkadvsearch_txt', 'Advanced Search');?></a>
-			</td>
-		</tr>
-		<?php }?>
+			<?php endif; ?>
+			
+			<?php if (!$autodisplayextrafields) : ?>
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td colspan="3" class="fc_search_option_cell">
+					<a href="javascript:;" id="advancedsearchtext"><?php echo $this->params->get('linkadvsearch_txt', 'Advanced Search');?></a>
+				</td>
+			</tr>
+			<?php endif; ?>
+			
 		</table>
-		<table id="extrafields" class="extrafields contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-		<?php if($show_operator = $this->params->get('show_operator', 1)) {
-			$operator_desc = $this->params->get('operator_desc', 'FLEXI_OPERATOR_DESC');
-			$operator_desc = ($operator_desc=='FLEXI_OPERATOR_DESC')?JText::_('FLEXI_OPERATOR_DESC'):$operator_desc;
-		?>
-		<tr>
-			<td>
-				<label for="operator" class="hasTip" title="<?php echo $operator_desc;?>">
-					<?php echo JText::_("FLEXI_OPERATOR"); ?>
-				</label>
-			</td>
-			<td colspan="2">
-				<?php echo $this->lists['operator']; ?>
-			</td>
-		</tr>
-		<?php }?>
+	
+	</fieldset>
+			
+	<fieldset id='fc_search_set_advsearch' class='fc_search_set'>
+		<legend><?php echo JText::_('FLEXI_ADVANCED_SEARCH'); ?></legend>
+		
+		<table id="extrafields" class="extrafields <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
+		
 		<?php
 			//params[search_fields]
 			$search_fields = $this->params->get('search_fields', '');
@@ -98,19 +99,19 @@ window.addEvent("domready", function() {
 			foreach($search_fields as $f) {
 				if(!isset($fields[$f])) continue;
 		?>
-			<tr class="adv_search_f_<?php echo $fields[$f]->name;?>">
-				<td class="key">
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td class='fc_search_label_cell' valign='top'>
 				<?php if ($fields[$f]->description) : ?>
 					<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo $fields[$f]->label; ?>::<?php echo $fields[$f]->description; ?>">
-						<?php echo $fields[$f]->label; ?>
+						<?php echo $fields[$f]->label; ?>:
 					</label>
 				<?php else : ?>
-					<label for="<?php echo $fields[$f]->name; ?>">
-						<?php echo $fields[$f]->label; ?>
+					<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $fields[$f]->label ); ?>">
+						<?php echo $fields[$f]->label; ?>:
 					</label>
 				<?php endif; ?>
 				</td>
-				<td>
+				<td colspan="2" class="fc_search_option_cell">
 					<?php
 					$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 					if(isset($fields[$f]->html)) {
@@ -120,41 +121,87 @@ window.addEvent("domready", function() {
 					}
 					?>
 				</td>
-				<td>&nbsp;</td>
 			</tr>
 			<?php
 				//}
 			}
 			?>
 		</table>
-		<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-		<?php if($show_searchordering = $this->params->get('show_searchordering', 1)) {?>
-		<tr>
-			<td colspan="3">
-				<label for="ordering">
-					<?php echo JText::_( 'Ordering' );?>:
-				</label>
-				<?php echo $this->lists['ordering'];?>
-			</td>
-		</tr>
-		<?php }?>
-	</table>
+		
+	</fieldset>
+		
+	<fieldset id='fc_search_set_search_behavior' class='fc_search_set'>
+		<legend><?php echo JText::_('FLEXI_SEARCH_BEHAVIOR'); ?></legend>
+		
+		<table id="resultoptions" class="resultoptions <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+			<?php
+			if($show_operator = $this->params->get('show_operator', 1)) :
+				$operator_desc = $this->params->get('operator_desc', 'FLEXI_OPERATOR_DESC');
+				$operator_desc = ($operator_desc=='FLEXI_OPERATOR_DESC')?JText::_('FLEXI_OPERATOR_DESC'):$operator_desc;
+			?>
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td class='fc_search_label_cell' valign='top'>
+					<label for="operator" class="hasTip" title='<?php echo JText::_('FLEXI_BASIC_ADVANCED_COMBINATION'); ?>::<?php echo JText::_('FLEXI_BASIC_ADVANCED_COMBINATION_TIP'); ?>'>
+						<?php echo JText::_("FLEXI_BASIC_ADVANCED_COMBINATION"); ?>:
+					</label>
+				</td>
+				<td colspan="2" class="fc_search_option_cell">
+					<?php echo $this->lists['operator']; ?>:
+				</td>
+			</tr>
+			<?php endif; ?>
+			
+			<?php if($show_searchordering = $this->params->get('show_searchordering', 1)) : ?>
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td class='fc_search_label_cell' valign='top'>
+					<label for="ordering" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_ORDERING'); ?>::<?php echo JText::_('FLEXI_SEARCH_ORDERING_TIP'); ?>'>
+						<?php echo JText::_( 'FLEXI_SEARCH_ORDERING' );?>:
+					</label>
+				</td>
+				<td colspan="2" class="fc_search_option_cell">
+					<?php echo $this->lists['ordering'];?>
+				</td>
+			</tr>
+			<?php endif; ?>
+			
+			<?php if ($this->params->get( 'show_searchareas', 0 )) : ?>
+			
+			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td class='fc_search_label_cell' valign='top'>
+					<label class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_OTHER_CONTENT'); ?>::<?php echo JText::_('FLEXI_SEARCH_OTHER_CONTENT_TIP'); ?>'>
+						<?php echo JText::_( 'FLEXI_SEARCH_OTHER_CONTENT' );?>:
+					</label>
+				<td colspan="2" class="fc_search_option_cell">
+					
+				<?php // DISABLE search areas 'content' and old 'flexisearch' ?>
+				<?php unset($this->searchareas['search']['content']); unset($this->searchareas['search']['flexisearch']); ?>
+				
+				<?php foreach ($this->searchareas['search'] as $val => $txt) :
+					$checked = is_array( $this->searchareas['active'] ) && in_array( $val, $this->searchareas['active'] ) ? 'checked="checked"' : '';
+				?>
+					<input type="checkbox" name="areas[]" value="<?php echo $val;?>" id="area_<?php echo $val;?>" <?php echo $checked;?> />
+					<label for="area_<?php echo $val;?>">
+						<?php echo JText::_($txt); ?>
+					</label>
+				<?php endforeach; ?>
+				</td>
+			</tr>	
+			
+			<?php else:?>
+		
+			<tr>
+				<td colspan="3">>
+				<input type="hidden" name="areas[]" value="flexicontent" id="area_flexicontent" />
+				</td>
+			</tr>	
+		
+		<?php endif; ?>
 
-	<?php if ($this->params->get( 'show_searchareas', 0 )) : ?>
-		<?php echo JText::_( 'Search Only' );?>:
-		<?php foreach ($this->searchareas['search'] as $val => $txt) :
-			$checked = is_array( $this->searchareas['active'] ) && in_array( $val, $this->searchareas['active'] ) ? 'checked="checked"' : '';
-		?>
-		<input type="checkbox" name="areas[]" value="<?php echo $val;?>" id="area_<?php echo $val;?>" <?php echo $checked;?> />
-			<label for="area_<?php echo $val;?>">
-				<?php echo JText::_($txt); ?>
-			</label>
-		<?php endforeach; ?>
-	<?php else:?>
-		<input type="hidden" name="areas[]" value="flexicontent" id="area_flexicontent" />
-	<?php endif; ?>
-
-	<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+		</table>
+		
+	</fieldset>
+	
+	<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
 	<tr>
 		<td colspan="3" >
 			<br />

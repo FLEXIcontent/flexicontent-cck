@@ -7,8 +7,10 @@
 	</layout>
 	<fields name="params">
 	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="" type="separator" default="Searching" level="level1" menu="hide" />
-		<field name="searchkeywordlabel" type="text" default="Search Keyword" label="Search Keyword Label" description="Search Keyword Label" />
+		<field name="" type="separator" default="This feature is still under development, it supports searching key-words in title and description and also supports searching custom fields: select, textarea, text, other non-core fields are supported as raw values only. Core fields are supported but incompletely, as row values only, DO NOT enable for title &amp; description since they are already search automatically. Other fields maybe supported later. After enabling advanced search mode for a field, go to search index and then click purge and index to rerender fields display and thus update the index" level="level1" menu="field" />
+	</fieldset>
+	
+	<fieldset name="Search Form Display">
 		<field name="show_operator" type="radio" default="1" label="Show Operator" description="Show Operator">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -17,8 +19,7 @@
 			<option value="OR">FLEXI_OR</option>
 			<option value="AND">FLEXI_AND</option>
 		</field>
-		<field name="operator_desc" type="textarea" cols="40" rows="3" default="FLEXI_OPERATOR_DESC" label="Operator description" description="Operator description" />
-		<field name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="1" />
+		<field name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="true" />
 		<field name="cantypes" type="radio" default="1" label="Allow users select type" description="Allow users select type">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -34,6 +35,26 @@
 			<option value="any">Any words</option>
 			<option value="exact">Exact phrase</option>
 		</field>
+		<field name="autodisplayextrafields" type="radio" default="1" label="Auto display extra fields" description="Auto display extra fields.If yes, the extra fields will displayed on search view, if no, the 'Advanced Search' link text will displayed.You can set 'Advanced Search' link text on below.">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
+		<field name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="show_text" type="radio" default="1" label="Show description text" description="Show description text in results">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="show_date" type="radio" default="1" label="Show created date" description="Show created date in results">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+	</fieldset>
+	
+	<fieldset name="Search Form Behaviour">
 		<field name="show_searchordering" type="radio" default="1" label="Show Search Results Ordering" description="Show search result ordering">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -44,23 +65,6 @@
 			<option value="popular">Most popular</option>
 			<option value="alpha">Alphabetical</option>
 			<option value="category">Section/Category</option>
-		</field>
-		<field name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="autodisplayextrafields" type="radio" default="1" label="Auto display extra fields" description="Auto display extra fields.If yes, the extra fields will displayed on search view, if no, the 'Advanced Search' link text will displayed.You can set 'Advanced Search' link text on below.">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
-		<field name="show_text" type="radio" default="1" label="Show description text" description="Show description text in results">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="show_date" type="radio" default="1" label="Show created date" description="Show created date in results">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
 		</field>
 		<field name="minchars" type="text" default="3" label="Minimum characters" description="Minimum characters" />
 		<field name="maxchars" type="text" default="20" label="Maximum characters" description="Maximum characters" />

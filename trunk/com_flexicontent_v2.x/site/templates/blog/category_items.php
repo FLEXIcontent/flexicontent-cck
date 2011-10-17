@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 906 2011-09-18 19:29:26Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 919 2011-10-03 02:17:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -70,6 +70,15 @@ $count 	= count($items);
 if ($count) :
 ?>
 <div class="content">
+
+		<!-- BOF items total-->
+		<?php if ($this->params->get('show_item_total', 1)) : ?>
+		<div id="item_total" class="item_total">
+			<?php echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', count($this->items));?>
+		</div>
+		<?php endif; ?>
+		<!-- BOF items total-->
+
 <?php
 $leadnum		= $this->params->get('lead_num', 2);
 $leadnum		= ($leadnum >= $count) ? $count : $leadnum;

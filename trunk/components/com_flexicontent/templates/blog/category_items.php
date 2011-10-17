@@ -70,6 +70,15 @@ $count 	= count($items);
 if ($count) :
 ?>
 <div class="content">
+
+		<!-- BOF items total-->
+		<?php if ($this->params->get('show_item_total', 1)) : ?>
+		<div id="item_total" class="item_total">
+			<?php echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', count($this->items));?>
+		</div>
+		<?php endif; ?>
+		<!-- BOF items total-->
+
 <?php
 $leadnum		= $this->params->get('lead_num', 2);
 $leadnum		= ($leadnum >= $count) ? $count : $leadnum;

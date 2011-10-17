@@ -41,6 +41,7 @@ class FLEXIcontentViewSearch extends JView
 		$pathway  =& $mainframe->getPathway();
 		$uri      =& JFactory::getURI();
 		$dispatcher = & JDispatcher::getInstance();
+		$document 	= & JFactory::getDocument();
 
 		$error	= '';
 		$rows	= null;
@@ -55,6 +56,11 @@ class FLEXIcontentViewSearch extends JView
 		$params = JComponentHelper::getParams('com_flexicontent');
 		//$params->bind($params->_raw);
 		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
+
+		if (!$params->get('disablecss', '')) {
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
+			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+		}
 
 		$searchkeywordlabel = $params->get('searchkeywordlabel', 'Search Keyword');
 		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
@@ -76,6 +82,7 @@ class FLEXIcontentViewSearch extends JView
 		JPluginHelper::importPlugin('flexicontent_fields');
 		
 		// Add html to field object trought plugins
+		//$custom = JRequest::getVar('custom', array());
 		foreach ($fields as $field) {
 			$field->parameters->set( 'use_html', 0 );
 			$field->parameters->set( 'allow_multiple', 0 );
@@ -126,7 +133,7 @@ class FLEXIcontentViewSearch extends JView
 			;
 			$db->setQuery($query);
 			$types = $db->loadObjectList();
-			$lists['fieldtypes'] = JHTML::_('select.genericlist', $types, 'fieldtypes[]', 'multiple="true" size="10"', 'value', 'text', $fieldtypes_a, 'fieldtypes');
+			$lists['fieldtypes'] = JHTML::_('select.genericlist', $types, 'fieldtypes[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $fieldtypes_a, 'fieldtypes');
 		}
 		
 		if($show_searchordering = $params->get('show_searchordering', 1)) {
@@ -152,8 +159,8 @@ class FLEXIcontentViewSearch extends JView
 			$default_operator = $params->get('default_operator', 'OR');
 			$operator = JRequest::getVar('operator', $default_operator);
 			$operators 		= array();
-			$operators[] 	= JHTML::_('select.option',  'OR', JText::_( 'OR' ) );
-			$operators[] 	= JHTML::_('select.option',  'AND', JText::_( 'AND' ) );
+			$operators[] 	= JHTML::_('select.option',  'OR', JText::_( 'FLEXI_SEARCH_COMBINATION_OR' ) );
+			$operators[] 	= JHTML::_('select.option',  'AND', JText::_( 'FLEXI_SEARCH_COMBINATION_AND' ) );
 			$lists['operator']= JHTML::_('select.radiolist',  $operators, 'operator', '', 'value', 'text', $operator );
 		}
 		// log the search
