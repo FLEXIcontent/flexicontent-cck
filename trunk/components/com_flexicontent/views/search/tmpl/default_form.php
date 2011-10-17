@@ -77,7 +77,7 @@ window.addEvent("domready", function() {
 			<?php if (!$autodisplayextrafields) : ?>
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td colspan="3" class="fc_search_option_cell">
-					<a href="javascript:;" id="advancedsearchtext"><?php echo $this->params->get('linkadvsearch_txt', 'Advanced Search');?></a>
+					<a href="javascript:;" id="advancedsearchtext"><?php echo JText::_('FLEXI_ADVANCED_SEARCH'); ?></a>
 				</td>
 			</tr>
 			<?php endif; ?>

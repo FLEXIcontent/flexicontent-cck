@@ -7,67 +7,79 @@
 	</layout>
 	<fields name="params">
 	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="" type="separator" default="This feature is still under development, it supports searching key-words in title and description and also supports searching custom fields: select, textarea, text, other non-core fields are supported as raw values only. Core fields are supported but incompletely, as row values only, DO NOT enable for title &amp; description since they are already search automatically. Other fields maybe supported later. After enabling advanced search mode for a field, go to search index and then click purge and index to rerender fields display and thus update the index" level="level1" menu="field" />
-	</fieldset>
+		<field name="" type="separator" default="This feature is still under development, it supports searching key-words in title and description. Also supports searching custom fields: select, textarea, text, other non-core fields are supported as raw values only. NOTE: DO NOT enable for title &amp; description since they are always included in the basic search. Other fields maybe supported later. After enabling advanced search mode for a field, go to search index management and click (a) purge and (b) index to rerender fields display and thus update the index" level="level1" menu="hide" />
 	
-	<fieldset name="Search Form Display">
-		<field name="show_operator" type="radio" default="1" label="Show Operator" description="Show Operator">
+	<field name="" type="separator" level="level1" default="Search Form Configuration" />
+	<field name="" type="separator" level="level2" default="Basic Search Parameters" />
+		<field name="" type="separator" level="level3" default="Search words" />
+		<field name="show_searchphrase" type="radio" default="1" label="Show combination methods" description="Display the methods of combining the search words, so that user can set his/her prefered method">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="default_operator" type="radio" default="OR" label="Default Operator" description="Default Operator">
-			<option value="OR">FLEXI_OR</option>
-			<option value="AND">FLEXI_AND</option>
-		</field>
-		<field name="fieldtypes" type="types" default="" label="Types" description="What type that you want to search in?" multiple="true" />
-		<field name="cantypes" type="radio" default="1" label="Allow users select type" description="Allow users select type">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="listfields" type="fields" default="" label="List Fields" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="1" fieldnameasvalue="1" isadvsearch="1"  onchange="javascript:f=document.getElementById('jform_params_search_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
-		<field name="search_fields" type="textarea" default="" label="Fields" description="Input field name(s) that you want to display.You can separate each field by comma(,)." cols="40" rows="10" />
-		<field name="show_searchphrase" type="radio" default="1" label="Show Search Phrase" description="Show Search Phrase radio button">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="default_searchphrase" type="list" default="all" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
+		<field name="default_searchphrase" type="list" default="all" label="Default combination method" description="Default method of combining the search words">
 			<option value="all">All words</option>
 			<option value="any">Any words</option>
 			<option value="exact">Exact phrase</option>
 		</field>
-		<field name="autodisplayextrafields" type="radio" default="1" label="Auto display extra fields" description="Auto display extra fields.If yes, the extra fields will displayed on search view, if no, the 'Advanced Search' link text will displayed.You can set 'Advanced Search' link text on below.">
+		<field name="minchars" type="text" default="3" label="Minimum length" description="Minimum character length the search words are allowed to have" />
+		<field name="maxchars" type="text" default="20" label="Maxmum length" description="Maximum characters length the search words are allowed to have" />
+	<field name="" type="separator" level="level3" default="Content types" description="Content types to search in"/>
+		<field name="cantypes" type="radio" default="1" label="Allow users to select" description="Allow users the content types they want to include in their search">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
-		<field name="show_searchareas" type="radio" default="0" label="Show Search Areas" description="Show search areas">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="show_text" type="radio" default="1" label="Show description text" description="Show description text in results">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="show_date" type="radio" default="1" label="Show created date" description="Show created date in results">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-	</fieldset>
+		<field name="fieldtypes" type="types" default="" label="Limit to types" description="What content types the search will include. NOTE: the above option will be LIMITED to display ONLY the type selected here" multiple="true" />
 	
-	<fieldset name="Search Form Behaviour">
-		<field name="show_searchordering" type="radio" default="1" label="Show Search Results Ordering" description="Show search result ordering">
+	<field name="" type="separator" level="level2" default="Advanced Search Parameters" />
+		<field name="autodisplayextrafields" type="radio" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</field>
+		<field name="listfields" type="fields" default="" label="Add Field" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="1" fieldnameasvalue="1" isadvsearch="1"  onchange="javascript:f=document.getElementById('jform_params_search_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
+		<field name="search_fields" type="textarea" default="" label="Advanced Search Fields" description="Enter extra field names, that you want to be included in the your search form. The will appear in the advanced search box. You can separate each field by comma(,)." cols="40" rows="3" />
+	<field name="" type="separator" level="level2" default="Search Form behavior" />
+		<field name="" type="separator" level="level3" default="Basic/Advanced Combination" />
+		<field name="show_operator" type="radio" default="1" label="Allow users to select" description="Allow user to select how to combine the Basic and Advanced Search Boxes. Options will be ANY (logical or) and BOTH (logical and)">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="default_searchordering" type="list" default="newest" label="Default value Search Phrase" description="Default value of Search Phrase radio button">
+		<field name="default_operator" type="radio" default="OR" label="Default value" description="Default behavior for combining the Basic and Advanced Search boxes. Select ANY (logical or) orBOTH (logical and). NOTE: this can be overriden by the user of the form.">
+			<option value="OR">ANY</option>
+			<option value="AND">BOTH</option>
+		</field>
+		<field name="" type="separator" level="level3" default="Results Ordering" />
+		<field name="show_searchordering" type="radio" default="1" label="Allow users to select" description="Allow users to select the ordering of the search results">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="show_searchareas" type="radio" default="0" label="Show ALL Search Areas" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
 			<option value="newest">Newest first</option>
 			<option value="oldest">Oldest first</option>
 			<option value="popular">Most popular</option>
 			<option value="alpha">Alphabetical</option>
 			<option value="category">Section/Category</option>
 		</field>
-		<field name="minchars" type="text" default="3" label="Minimum characters" description="Minimum characters" />
-		<field name="maxchars" type="text" default="20" label="Maximum characters" description="Maximum characters" />
+		
+	<field name="" type="separator" level="level1" default="Search Results Configuration" />
+<!--
+		<field name="show_section" type="radio" default="0" label="Show section" description="Display section for each result. Note, this usually should be disabled since all FLEXIcontent items are placed in a single section">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+-->
+		<field name="show_text" type="radio" default="1" label="Show description" description="Display for each result its description text">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+	
 	</fieldset>
 	</fields>
 </metadata>
