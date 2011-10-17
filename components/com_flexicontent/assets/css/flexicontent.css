@@ -291,8 +291,8 @@ div#tags {
 	vertical-align: top;
 	margin: 2px;
 	zoom: 1;
-	display: inline;
-	height: 20px;
+	_display: inline;
+	_height: 20px;
 }
 
 .flexi_tagbox ul li div {
@@ -613,3 +613,47 @@ span.fc_alpha_index {
 .fc_img_tooltip_desc {
 	line-height:1em;
 }
+
+.fc_search_label_cell {
+	text-align:right;
+	padding: 4px 6px 4px 4px;
+	font-weight:bold;
+	background-color:#eeeeee;
+}
+
+.fc_search_option_cell {
+	padding: 4px 4px 4px 6px;
+}
+
+.fc_search_row_0 td {	background-color:#eeeeee; }
+.fc_search_row_1 td {	background-color:#dddddd; }
+
+
+fieldset.fc_search_set {
+	border: 1px outset black;
+	padding: 8px 8px 8px 16px;
+	margin-top:12px;
+}
+
+fieldset.fc_search_set legend {
+	margin-left: 6x;
+	padding-left: 4px;
+}
+
+table#basicfields, table#extrafields, table#resultoptions {
+  border-collapse: separate!important;
+  border-spacing: 1;
+	width:auto;
+}
+
+table#basicfields td, table#extrafields td, table#resultoptions td {
+	border: 1px solid white; 
+  border-spacing: 1;
+	width:auto;
+}
+
+fieldset#fc_search_set_search_behavior legend {
+	color:darkred;
+	font-weight:bold;
+}
+

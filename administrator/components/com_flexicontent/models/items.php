@@ -1635,17 +1635,82 @@ class FlexicontentModelItems extends JModel
 		return $fields;
 	}
 	
-	function getFieldsItems($fields) {
+	function getFieldsItems_old($fields) {
 		$fields = "'".implode("','", $fields)."'";
-		//$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
-		$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_items_versions as firel"
+		$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
+		//$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_items_versions as firel"
 			//." JOIN #__flexicontent_items_ext as ie ON firel.item_id=ie.item_id"
-			." JOIN #__content as a ON firel.item_id=a.id AND firel.version=a.version"
+			." JOIN #__content as a ON firel.item_id=a.id "//AND firel.version=a.version"
 			//." WHERE firel.field_id IN ({$fields}) AND ie.type_id='{$typeid}' AND a.state IN (1, -5);"
 			." WHERE firel.field_id IN ({$fields}) AND a.state IN (1, -5)"
 		;
 		$this->_db->setQuery($query);
 		return $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
 	}
+	
+	/**
+	 * Method to get a list of items (ids) that have value for the given fields
+	 * 
+	 * @since 1.5
+	 */
+	function getFieldsItems($fields) {
+		// Get field data, so that we can identify the fields and take special action for each of them
+		$field_list = "'".implode("','", $fields)."'";
+		$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
+		$field_data = $this->_db->loadObjectList();
+		
+		// Check the type of fields
+		$check_items_for_tags = false;
+		$use_all_items = false;
+		$non_core_fields = array();
+		foreach ($field_data as $field) {
+			// tags
+			if ($field->field_type == 'tags') {
+				$get_items_with_tags = true;
+				continue;
+			}
+			// other core fields
+			if ($field->iscore) {
+				$use_all_items = true;
+				break;
+			}
+			// non core fields
+			$non_core_fields[] = $field->id;
+		}
+		
+		// Return all items, since we included a core field other than tag
+		if ($use_all_items == true) {
+			$query = "SELECT id FROM #__content";
+			$this->_db->setQuery($query);
+			return $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+		}
+		
+		// Find item having tags
+		$items_with_tags = array();
+		if ($get_items_with_tags == true) {
+			$query  = 'SELECT DISTINCT itemid FROM #__flexicontent_tags_item_relations';
+			$this->_db->setQuery($query);
+			$items_with_tags = $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+		}
+		
+		// Find items having values for non core fields
+		$items_with_noncore = array();
+		if (count($non_core_fields)) {
+			$non_core_fields_list = "'".implode("','", $non_core_fields)."'";
+			$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
+				." JOIN #__content as a ON firel.item_id=a.id "
+				." WHERE firel.field_id IN ({$non_core_fields_list}) AND a.state IN (1, -5)" // ." AND ie.type_id='{$typeid}' "
+				." AND firel.value<>'' "
+			;
+			//echo $query;
+			$this->_db->setQuery($query);
+			$items_with_noncore = $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+		}
+		
+		$item_list = array_merge($items_with_tags,$items_with_noncore);
+		//echo count($item_list);
+		return array_unique($item_list);
+	}	
+	
 }
 ?>

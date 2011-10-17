@@ -140,7 +140,7 @@ dump($this->row);
 				</table>
 			
 			</td>
-			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="360" style="padding: 7px 0 0 5px">
 				<?php
 				$title = JText::_( 'FLEXI_ACCESS' );
 				echo $this->pane->startPane( 'det-pane' );

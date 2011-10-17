@@ -99,9 +99,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$now = $date->toMySQL();
 
 	$text = trim( $text );
-	/*if ( $text == '' ) {
-		return array();
-	}*/
+	/*if ( $text == '' ) {	return array();	} */
+	
 	$searchFlexicontent = JText::_( 'FLEXICONTENT' );
 	if($text!='') {
 		$text = $db->getEscaped($text);
@@ -126,7 +125,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 				$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 				break;
 		}
-	}else $where = '0';
+	} else $where = '0';
 
 	switch ( $ordering ) {
 		case 'oldest':
@@ -174,16 +173,18 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$search_fields = $params->get('search_fields', '');
 	$search_fields = "'".str_replace(",", "','", $search_fields)."'";
-	$query = "SELECT f.id,f.field_type,f.name,f.label,fir.value,fir.item_id,f.attribs"
-		." FROM #__flexicontent_fields_item_relations as fir "
+	$query = "SELECT f.* " //f.id,f.field_type,f.name,f.label,f.attribs" // .", fir.value,fir.item_id"
+		//." FROM #__flexicontent_fields_item_relations as fir "
 		//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
-		." LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id"
+		//." LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id"
+		." FROM #__flexicontent_fields as f " //." ON f.id=fir.field_id"
 		//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
 		." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
-		." GROUP BY fir.field_id,fir.item_id"
+		//." GROUP BY fir.field_id,fir.item_id"
 	;
 	$db->setQuery($query);
 	$fields = $db->loadObjectList();
+	
 	$fields = is_array($fields)?$fields:array();
 	$CONDITION = '';
 	$OPERATOR = JRequest::getVar('operator', 'OR');
@@ -193,31 +194,29 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	JPluginHelper::importPlugin( 'flexicontent_fields');
 	$foundfields = array();
 	foreach($fields as $field) {
-		if($field->item_id) {//echo "fieldid={$field->id},itemid={$field->item_id}<br />";
-			if(!isset($field->parameters)) {
-				$field->parameters = new JParameter($field->attribs);
-			}
-			$fieldsearch = JRequest::getVar($field->name, array());
-			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
-			if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
-				if(!isset($foundfields[$field->id])) {
-					$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
-				}
-				$fieldsearch = $fieldsearch[0];
-				$fieldsearch = explode(" ", $fieldsearch);
-				$results = $dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $field->item_id, $fieldsearch));
-				if(count($results)>0) {
-					foreach($results as $r) {
-						if($r) {
-							$items[] = $field->item_id;
-							$foundfields[$field->id][] = $field->item_id;
-							$resultfields[$field->item_id] = $r;
-						}
+		// Once per (advanced searchable) field TYPE
+		$field->parameters = new JParameter($field->attribs);
+		$fieldsearch = JRequest::getVar($field->name, array());
+		$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
+		if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
+			$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
+			$fieldsearch = $fieldsearch[0];
+			//echo $fieldsearch ."<br>";
+			$fieldsearch = explode(" ", $fieldsearch);
+			$dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $fieldsearch));
+			if(count($field->results)>0) {
+				//echo "<pre>"; print_r($results);echo "</pre>"; 
+				foreach($field->results as $r) {
+					if($r) {
+						$items[] = $r->item_id;
+						$foundfields[$field->id][] = $r->item_id;
+						$resultfields[$r->item_id][] = $r;
 					}
 				}
 			}
 		}
 	}
+	
 	if(count($items)) {
 		if($FOPERATOR=='OR') {
 			$items = array_unique($items);
@@ -272,9 +271,11 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	if(isset($list)) {
 		foreach($list as $key => $row) {
 			if($row->sectionid==FLEXI_SECTION) {
-				if(isset($resultfields[$row->id]))
-					foreach($resultfields[$row->id] as $r)
+				if(isset($resultfields[$row->id])) {
+					foreach($resultfields[$row->id] as $r) {
 						$list[$key]->text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
+					}
+				}
 				$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
 			}else
 				$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->catslug, $row->sectionid));

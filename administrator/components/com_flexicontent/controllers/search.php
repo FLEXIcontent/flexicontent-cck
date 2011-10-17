@@ -94,14 +94,34 @@ class FlexicontentControllerSearch extends FlexicontentController{
 				}
 				$field->item_id = $itemid;
 				$field->parameters = new JParameter($field->attribs);
-				$query = "SELECT `value` FROM #__flexicontent_items_versions as iv "
-					." JOIN #__content as i ON i.id=iv.item_id AND i.version=iv.version "
-					." WHERE iv.field_id='{$fieldid}' AND iv.item_id='{$itemid}';";
-				$db->setQuery($query);
-				$values = $db->loadResultArray();
-				$values = is_array($values)?$values:array();
+				
+				if ($field->field_type == 'tags') {
+					$query  = 'SELECT `tid` FROM #__flexicontent_tags_item_relations as rel'
+						." WHERE rel.itemid='{$itemid}';";
+					$db->setQuery($query);
+					$values = $db->loadResultArray();
+					$values = is_array($values)?$values:array($values);
+				} else if ($field->iscore) {
+					$query  = 'SELECT * FROM #__content as c'
+						." WHERE c.id='{$itemid}';";
+					$db->setQuery($query);
+					$data = $db->loadObject();
+					if ( isset( $data->{$field->name} ) ) {
+						//echo $data->{$field->name};
+						$values = $data->{$field->name};
+						$values = is_array($values)?$values:array($values);
+					} else $values=array();
+				} else {
+					$query = "SELECT `value` FROM #__flexicontent_fields_item_relations as rel "
+						." JOIN #__content as i ON i.id=rel.item_id "
+						." WHERE rel.field_id='{$fieldid}' AND rel.item_id='{$itemid}';";
+					$db->setQuery($query);
+					$values = $db->loadResultArray();
+					$values = is_array($values)?$values:array($values);
+				}
 				$dispatcher =& JDispatcher::getInstance();
 				JPluginHelper::importPlugin('flexicontent_fields');
+				//echo $field->name;
 				if(count($values)==1)
 					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
 				elseif(count($values)>1)

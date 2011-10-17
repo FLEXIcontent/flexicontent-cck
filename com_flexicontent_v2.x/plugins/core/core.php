@@ -26,6 +26,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	}
 
 	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->iscore != 1) return;
 		$mainframe = &JFactory::getApplication();
 		$cparams = & $mainframe->getParams('com_flexicontent');
 		
@@ -266,6 +267,50 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		}
 		return true;
 	}
+	
+	function onFLEXIAdvSearch(&$field, $fieldsearch) {
+		if($field->iscore != 1) return; // performance check
+		$db = &JFactory::getDBO();
+		
+		switch ($field->field_type)
+		{
+			case 'tags': // Tags
+				$query 	= ' SELECT * '
+						. ' FROM #__flexicontent_tags'
+						. ' ORDER BY name ASC'
+						;
+				$db->setQuery($query);
+				$tag_data = $db->loadObjectList('id');
+				break;
+			default:
+				break;
+		}
+					
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='{$field->field_type}' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			//echo $query;
+			$objs = $db->loadObjectList();
+			if ($objs===false) continue;
+			//echo "<pre>"; print_r($objs);echo "</pre>"; 
+			$objs = is_array($objs)?$objs:array($objs);
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
+				$obj->label = $field->label;
+				/*if ($field->field_type=='tags' && isset() )
+					$obj->value = 'a';$tag_data[$fsearch]['name'];
+				else*/
+					$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		$field->results = $resultfields;
+		//return $resultfields;
+	}
+		
 	
 	function onDisplayFilter(&$filter, $value='', $formfieldname='')
 	{

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 691 2011-07-26 11:15:35Z enjoyman@gmail.com $
+ * @version 1.0 $Id: text.php 923 2011-10-08 18:37:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -276,32 +276,28 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		}
 	}
 	
-	function onFLEXIAdvSearch(&$field, $item_id, $fieldsearch) {
+	function onFLEXIAdvSearch(&$field, $fieldsearch) {
 		if($field->field_type!='text') return;
 		$db = &JFactory::getDBO();
 		$resultfields = array();
 		foreach($fieldsearch as $fsearch) {
-			if((stristr($field->value, $fsearch)!== FALSE)) {
-				$obj = new stdClass;
-				$obj->label = $field->label;
-				$obj->value = $field->value;
-				$resultfields[] = $obj;
-				break;
-			}
-		}
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.item_id='{$item_id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
 			$db->setQuery($query);
-			$objs = $db->loadObjectList();
-			$objs = is_array($objs)?$objs:array();
+			$objs = $db->loadObjectList(); // or die($db->getErrorMsg());
+			//echo "<pre>"; print_r($objs);echo "</pre>"; 
+			if ($objs===false) continue;
+			$objs = is_array($objs)?$objs:array($objs);
 			foreach($objs as $o) {
 				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
 				$obj->label = $field->label;
 				$obj->value = $fsearch;
 				$resultfields[] = $obj;
 			}
 		}
-		return $resultfields;
+		//echo "<pre>"; print_r($resultfields);echo "</pre>"; 
+		$field->results = $resultfields;
+		//return $resultfields;
 	}
 }

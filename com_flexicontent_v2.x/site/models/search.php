@@ -134,10 +134,11 @@ class FLEXIcontentModelSearch extends JModel
 			JPluginHelper::importPlugin( 'search');
 			$dispatcher =& JDispatcher::getInstance();
 			$results = $dispatcher->trigger( 'onSearch', array(
-			$this->getState('keyword'),
-			$this->getState('match'),
-			$this->getState('ordering'),
-			$areas['active']) );
+				$this->getState('keyword'),
+				$this->getState('match'),
+				$this->getState('ordering'),
+				$areas['active'])
+			);
 
 			$rows = array();
 			foreach($results AS $result) {

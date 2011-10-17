@@ -115,6 +115,14 @@ elseif ($this->params->get('tmpl_cols', 2) == 4) :
 endif;
 ?>
 
+		<!-- BOF items total-->
+		<?php if ($this->params->get('show_item_total', 1)) : ?>
+		<div id="item_total" class="item_total">
+			<?php echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', count($this->items));?>
+		</div>
+		<?php endif; ?>
+		<!-- BOF items total-->
+
 <ul class="faqblock <?php echo $classnum; ?>">	
 
 <?php
