@@ -161,6 +161,8 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	public function getItem($pk = null, $isform = true) {
 		static $item;
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$use_versioning = $cparams->get('use_versioning', 1);
 		if(!$item) {
 			// Initialise variables.
 			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
@@ -168,8 +170,8 @@ class ParentClassItem extends JModelAdmin {
 			if ($item = parent::getItem($pk)) {
 				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 				//$task=JRequest::getVar('task');
-				if(!$version && $isform) {
-					$version = $version = FLEXIUtilities::getLastVersions($item->id, true);
+				if(!$version && $isform && $use_versioning) {
+					$version = FLEXIUtilities::getLastVersions($item->id, true);
 					JRequest::setVar( 'version', $version);
 				}
 				
@@ -1201,10 +1203,12 @@ class ParentClassItem extends JModelAdmin {
 			$fields = $this->_db->loadObjectList('name');
 			foreach ($fields as $field) {
 				$field->item_id		= (int)$this->_id;
+				// IMPORTANT $version should be ZERO when versioning disabled
 				if (!$version && $field->iscore) {
-					//load current version of core field
+					// load (non-versioned) core field from item data, (the $version variable is ignored),
 					$this->getCoreFieldValue($field, $version);
 				} else {
+					// Load non core field (versioned or non-versioned) OR core field (versioned only)
 					$field->value 		= $this->getExtrafieldvalue($field->id, $version);
 				}
 				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br>";
