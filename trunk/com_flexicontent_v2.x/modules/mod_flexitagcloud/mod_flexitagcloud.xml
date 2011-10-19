@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="1.7" client="site" method="upgrade">
+	<name>FLEXIcontent Tag Cloud</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>09/11/2009</creationDate>
+	<copyright>(C) 2008 - 2009 Christoph Lukes</copyright>
+	<copyright>(C) 2009 - 2011 Emmanuel Danan</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>1.1</version>
+	<description>Tag Cloud Module for FLEXIcontent</description>
+
+	<files>
+		<filename module="mod_flexitagcloud">mod_flexitagcloud.php</filename>
+		<filename>index.html</filename>
+        <filename>helper.php</filename>
+        <folder>tmpl</folder>
+        <folder>elements</folder>
+	</files>
+	
+	<languages>
+		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.ini</language>
+	</languages>
+
+	<config>
+	<fields name="params" addfieldpath="/modules/mod_flexitagcloud/elements">
+		<fieldset name="basic">
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="@spacer" type="spacer" default="" label="" description="" />
+			<field name="min_size" type="text" default="1" label="FLEXI_MIN_SIZE" description="FLEXI_MIN_SIZE_DESC" />
+			<field name="max_size" type="text" default="10" label="FLEXI_MAX_SIZE" description="FLEXI_MAX_SIZE_DESC" />
+			<field name="limit" type="text" default="25" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
+			<field name="@spacer" type="spacer" default="" label="" description="" />
+			<field name="method" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
+			<field name="categories" type="flexicategories" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
+			<field name="@spacer" type="spacer" default="" label="" description="" />
+			<field name="seo_mode" type="radio" default="1" label="FLEXI_SEO_MODE" description="FLEXI_SEO_MODE_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="force_itemid" type="text" default="" label="FLEXI_FORCE_ITEMID" description="FLEXI_FORCE_ITEMID_DESC" />
+		</fieldset>
+		
+		<fieldset group="advanced">
+			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
+				<option value="1">USE GLOBAL</option>
+				<option value="0">NO CACHING</option>
+			</field>
+			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
+		</fieldset>
+	</fields>
+	</config>
+</extension>
