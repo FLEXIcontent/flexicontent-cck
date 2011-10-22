@@ -355,15 +355,20 @@ class FlexicontentModelItems extends JModel
 	function _buildContentOrderBy()
 	{
 		global $mainframe, $option;
-
+		
+		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$default_order = $cparams->get('items_manager_order', 'i.ordering');
+		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
+		
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
 		if ($filter_cats && $filter_order == 'i.ordering') {
 			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'catsordering' );
 		} else if (!$filter_cats && $filter_order == 'catsordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'i.ordering' );
+			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', $default_order );
 		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
 

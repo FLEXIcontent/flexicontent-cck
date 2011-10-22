@@ -79,8 +79,8 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="show_feed_link" type="radio" default="1" label="FLEXI_SHOW_FEED_LINK" description="FLEXI_SHOW_FEED_LINK_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="trigger_onprepare_content_cat" type="radio" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
 				<option value="">Use Global</option>
@@ -98,13 +98,13 @@
 		<fieldset name="common" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 				<option value="2">Auto</option>
 			</field>
 			<field name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="@spacer1" type="spacer" default="" label="" description="" />
 			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
@@ -124,12 +124,12 @@
 				<option value="order">Ordering</option>
 			</field>
 			<field name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="@spacer3" type="spacer" default="" label="" description="" />
 			<field name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
@@ -143,8 +143,8 @@
 			</field>
 			<field name="@spacer4" type="spacer" default="" label="" description="" />
 			<field name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 	<!--
 			<field name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
@@ -153,8 +153,8 @@
 			</field>
 	-->
 			<field name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 	<!-- 		<field name="fields" type="fields" size="10" default="0" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" /> -->
 			<field name="@spacer5" type="spacer" default="" label="" description="" />
