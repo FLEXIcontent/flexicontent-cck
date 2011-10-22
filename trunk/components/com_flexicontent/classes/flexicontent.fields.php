@@ -195,11 +195,10 @@ class FlexicontentFields
 	 */
 	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display')
 	{
-	  if (!isset($item->fieldsretrieved)) {
+	  if (!isset($item->fields)) {
 	  	// This if will succeed once per item ... because getFields will retrieve all values
 	  	// getFields() will not render the display of fields because we passed no params variable ...
 	  	FlexicontentFields::getFields(array(&$item));
-	  	$item->fieldsretrieved = true;
 	  }
 
 	  // Check if we have already created the display and return it

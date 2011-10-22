@@ -45,8 +45,8 @@
 			<option value="1">FLEXI_Show</option>
 		</param>
 		<param name="show_feed_link" type="radio" default="1" label="FLEXI_SHOW_FEED_LINK" description="FLEXI_SHOW_FEED_LINK_DESC">
-			<option value="0">Hide</option>
-			<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 		</param>
 		<param name="trigger_onprepare_content_cat" type="radio" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
 			<option value="">Use Global</option>
@@ -64,13 +64,13 @@
 	<params group="common" addpath="/administrator/components/com_flexicontent/elements">
 		<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 		<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
-			<option value="0">Hide</option>
-			<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 			<option value="2">Auto</option>
 		</param>
 		<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
-			<option value="0">Hide</option>
-			<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 		</param>
     	<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
             <option value="0">FLEXI_NO</option> 
@@ -101,12 +101,12 @@
 		</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 	 	<param name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
-	 		<option value="0">Hide</option>
-	 		<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 		</param>
 		<param name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
-	 		<option value="0">Hide</option>
-			<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 	 	</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
@@ -120,8 +120,8 @@
 		</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
-	 		<option value="0">Hide</option>
-	 		<option value="1">Show</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 	 	</param>
 <!--
 		<param name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
@@ -130,18 +130,17 @@
 	 	</param>
 -->
 		<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
-	 		<option value="0">Hide</option>
-	 		<option value="2">1st sublevel</option> 
-	 		<option value="1">All sublevels</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
 		</param>
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
-	 		<option value="0">No</option>
-	 		<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 	 	</param>
 		<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-	 		<option value="0">No</option>
-	 		<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 	 	</param>
 		<param name="filters" type="filters" size="10" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 	</params> 
