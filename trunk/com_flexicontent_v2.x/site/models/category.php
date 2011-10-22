@@ -100,13 +100,27 @@ class FlexicontentModelCategory extends JModelList{
 				'author', 'a.author'
 			);
 		}
-		$pk = JRequest::getInt('cid');
-		$this->setId((int)$pk);
 		
-		// Get the filter request variables
-		//$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
-		//$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+		// Get category id and call constrcuctor
+		$mainframe = &JFactory::getApplication();
+		$cid			= JRequest::getInt('cid', 0);
+		$this->setId((int)$cid);
 		parent::__construct($config);
+				
+		// we need to merge parameters here to get the correct page limit value
+		$params = $this->_loadCategoryParams($cid);
+
+		//get the number of entries from session
+		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');
+		$limitstart		= JRequest::getInt('limitstart');
+		
+		// set pagination limit variables
+		$this->setState('limit', $limit);
+		$this->setState('limitstart', $limitstart);
+
+		// set filter order variables
+		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'title'));
+		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
 	}
 	/**
 	 * Constructor
