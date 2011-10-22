@@ -99,6 +99,23 @@
 			
 			<field name="separator6" label="" type="separator" default="FLEXI_ITEMS_CONF" level="level1" menu="hide" />
 
+			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" menu="hide">
+				<option value="">Default - Unordered</option>
+				<option value="lang">Language</option>
+				<option value="type_name">Content type</option>
+				<option value="i.access">Access scope</option>
+				<option value="i.title">Title</option>
+				<option value="i.ordering">Item ordering field</option>
+				<option value="i.created">Creation Date</option>
+				<option value="i.modified">Modification Date</option>
+				<option value="i.hits">Most Hits</option>
+				<option value="i.id">Item id</option>
+			</field>
+			<field name="items_manager_order_dir" type="list" default="ASC" label="FLEXI_ITEMS_MANAGER_ORDER_DIR" description="FLEXI_ITEMS_MANAGER_ORDER_DIR_DESC" menu="hide">
+				<option value="ASC">Normal</option>
+				<option value="DESC">Reverse</option>
+			</field>
+			
 			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_Show/Hide_the_items_title" menu="hide">
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
