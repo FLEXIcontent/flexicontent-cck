@@ -71,9 +71,9 @@ class FlexicontentViewItems extends JView {
 		$filter_type 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
 		$filter_authors		= $mainframe->getUserStateFromRequest( $context.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			$filter_lang	 = $mainframe->getUserStateFromRequest( $context.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
-		}
+		//}
 		$scope	 			= $mainframe->getUserStateFromRequest( $context.'.items.scope', 			'scope', 			1, 				'int' );
 		$date	 			= $mainframe->getUserStateFromRequest( $context.'.items.date', 				'date', 			1, 				'int' );
 		$startdate	 		= $mainframe->getUserStateFromRequest( $context.'.items.startdate', 		'startdate', 		'', 			'cmd' );
@@ -101,11 +101,11 @@ class FlexicontentViewItems extends JView {
 		if ($filter_state) {
 			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
 		}
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			if ($filter_lang) {
 				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
 			}
-		}
+		//}
 		if ($filter_id) {
 			$js .= "$$('.col_id').each(function(el){ el.addClass('yellow'); });";
 		}
@@ -160,6 +160,9 @@ class FlexicontentViewItems extends JView {
 		
 		JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 		
+		//if (FLEXI_FISH) {
+			$langs	= & $this->get( 'Languages' );
+		//}
 		$categories = $globalcats?$globalcats:array();
 
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
@@ -230,18 +233,18 @@ class FlexicontentViewItems extends JView {
 			$ordering = ($lists['order'] == 'catsordering');
 		}
 
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			//build languages filter
 			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
-		}
+		//}
 		
 		//assign data to template
 		$this->assignRef('db'  			, $db);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			$this->assignRef('langs'    , $langs);
-		}
+		//}
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);

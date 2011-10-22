@@ -317,7 +317,7 @@ class FlexicontentModelItems extends JModel {
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
+		$lang		= /*FLEXI_FISH ?*/ 'ie.language AS lang, ' /*: ''*/;
 		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
@@ -389,9 +389,9 @@ class FlexicontentModelItems extends JModel {
 		$filter_subcats		= JRequest::getInt('filter_subcats', 0, 'post');
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
-		}
+		//}
 		$filter_authors 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'int' );
 		$scope			 	= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', '', 'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', '', 'string' );
@@ -500,11 +500,11 @@ class FlexicontentModelItems extends JModel {
 
 			}
 
-		if (FLEXI_FISH) {
+		//if (FLEXI_FISH) {
 			if ( $filter_lang ) {
 				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
 			}
-		}
+		//}
 		
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
@@ -1431,30 +1431,42 @@ class FlexicontentModelItems extends JModel {
 	 */
 	function getLanguages()
 	{
-		$query = 'SELECT *'
-				.' FROM #__languages'
+		$query = 'SELECT DISTINCT *'
+				.' FROM #__extensions'
+				.' WHERE type="language" '
+				.' GROUP BY element';
+
+//		$query = 'SELECT *'
+//				.' FROM #__languages'
 //				.' ORDER BY ordering ASC'
-				;
+//				;
 		$this->_db->setQuery($query);
 		$languages = $this->_db->loadObjectList();
 		
 		$langs = new stdClass();
-		if (isset($languages[0]->sef)) {
-			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+		
+		$lang->code = '*';
+		$lang->name = 'All';
+		$lang->shortcode = '*';
+		$lang->id = 0;
+		$lang->imageurl = '';//JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+		$langs->{$lang->code} = $lang;
+		
+		//if (isset($languages[0]->sef)) {
+			//require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
 			foreach ($languages as $lang) {
-				$lang->code = $lang->lang_code;
-				$lang->name = $lang->title;
-				$lang->shortcode = $lang->sef;
-				$lang->id = $lang->lang_id;
-				$lang->imageurl = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+				$lang->code = $lang->element;//$lang->lang_code;
+				//$lang->name = $lang->title;
+				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				$lang->id = $lang->extension_id; //$lang->lang_id;
+				$lang->imageurl = '';//JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 				$langs->{$lang->code} = $lang;
 			}
-		}
+		//}
 		foreach ($languages as $language) {
 			$name		 	= $language->code;
 			$langs->$name 	= $language;			
 		}
-		
 		return $langs;
 	}
 

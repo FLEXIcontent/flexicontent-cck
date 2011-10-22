@@ -745,23 +745,36 @@ class flexicontent_html
 		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 
-		$query = 'SELECT *'
-				.' FROM #__languages'
+		$query = 'SELECT DISTINCT *'
+				.' FROM #__extensions'
+				.' WHERE type="language" '
+				.' GROUP BY element';
+				
+//		$query = 'SELECT *'
+//				.' FROM #__languages'
 //				.' WHERE active = 1'
 //				.' ORDER BY ordering ASC'
-				;
+//				;
 		$db->setQuery($query);
 		$languages = $db->loadObjectList();
 		
-		if (isset($languages[0]->sef)) {
+		//if (isset($languages[0]->sef)) {
+		
 			foreach ($languages as $lang) {
-				$lang->code = $lang->lang_code;
-				$lang->name = $lang->title;
-				$lang->shortcode = $lang->sef;
-				$lang->id = $lang->lang_id;
+				$lang->code = $lang->element;//$lang->lang_code;
+				//$lang->name = $lang->title;
+				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				$lang->id = $lang->extension_id; //$lang->lang_id;
 			}
-			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
-		}
+			
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = 'All';
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			array_unshift($languages, $lang_all);
+			//require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+		//}
 		
 		switch ($type)
 		{

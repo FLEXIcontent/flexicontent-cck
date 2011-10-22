@@ -230,7 +230,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php if (FLEXI_FISH) : ?>
+			<?php //if (FLEXI_FISH) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -239,7 +239,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php endif; ?>
+			<?php //endif; ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -340,11 +340,11 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-			<?php if (FLEXI_FISH) : ?>
+			<?php //if (FLEXI_FISH) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
-			<?php endif; ?>
+			<?php //endif; ?>
 			<td class="left col_type">
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
@@ -373,11 +373,11 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>" class="filterbuttons">
+			<td colspan="<?php echo /*FLEXI_FISH ?*/ '15' /*: '14'*/; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo FLEXI_FISH ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo /*FLEXI_FISH ?*/ "delFilter('filter_lang');" /*: ""*/; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo FLEXI_FISH ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo /*FLEXI_FISH ?*/ "delFilter('filter_lang');" /*: ""*/; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 <!--
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
@@ -390,7 +390,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>">
+			<td colspan="<?php echo /*FLEXI_FISH ?*/ '15' /*: '14'*/; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -488,7 +488,7 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-			<?php if (FLEXI_FISH) : ?>
+			<?php //if (FLEXI_FISH) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
@@ -498,7 +498,7 @@ window.addEvent('domready', function() {
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
-			<?php endif; ?>
+			<?php //endif; ?>
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>
