@@ -159,8 +159,13 @@ class ParentClassItem extends JModelAdmin {
 	 *
 	 * @return	mixed	Object on success, false on failure.
 	 */
-	public function getItem($pk = null, $isform = true) {
+	public function getItem($pk = null, $isform = false) {
 		static $item;
+		static $unapproved_version_notice;
+		$task=JRequest::getVar('task',false);
+		$option=JRequest::getVar('option',false);
+		if ($isform===false) $isform = ($task!=false);
+		
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
 		if(!$item) {
@@ -169,10 +174,17 @@ class ParentClassItem extends JModelAdmin {
 
 			if ($item = parent::getItem($pk)) {
 				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-				//$task=JRequest::getVar('task');
-				if(!$version && $isform && $use_versioning) {
-					$version = FLEXIUtilities::getLastVersions($item->id, true);
-					JRequest::setVar( 'version', $version);
+				
+				if($isform && $use_versioning) {
+					if(!$version) {
+						$version = FLEXIUtilities::getLastVersions($item->id, true);
+						JRequest::setVar( 'version', $version);
+					}
+					
+					if($version != $item->version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+						$unapproved_version_notice = 1;  //  While we are in edit form, we catch cases such as modules loading items , or someone querying priviledges of items, etc
+						JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
+					}
 				}
 				
 				// Convert the params field to an array.
@@ -423,6 +435,12 @@ class ParentClassItem extends JModelAdmin {
 			if(!$this->applyCurrentVersion($item, $data)) return false;
 			//echo "<pre>"; var_dump($data); exit();
 		} else {
+			if( $mainframe->isAdmin() ) {
+				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
+			} else {
+				JError::raiseNotice(12, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
+			}
+			
 			// Not new and not approving version, load item data
 			$item->load($id);
 			$datenow =& JFactory::getDate();

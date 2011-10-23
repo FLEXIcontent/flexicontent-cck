@@ -132,6 +132,10 @@ class FlexicontentModelItem extends JModel {
 	 * @since	1.0
 	 */
 	function _loadItem($loadcurrent=false) {
+		static $unapproved_version_notice;
+		$task=JRequest::getVar('task',false);
+		$option=JRequest::getVar('option',false);
+		
 		// Lets load the item if it doesn't already exist
 		if(!$this->_id) return false;
 		if (empty($this->_item)) {
@@ -145,6 +149,12 @@ class FlexicontentModelItem extends JModel {
 			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
 			if($version==0) 
 				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
+			
+			if($current_version != $version && ($task=='edit' || !$task) && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;   //  While we are in edit form, we catch cases such of someone/something loading items for somereason
+				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'));
+			}
+			
 			if($use_versioning) 
 			{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
@@ -683,6 +693,8 @@ class FlexicontentModelItem extends JModel {
 		} 
 		else 
 		{
+			JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
+			
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
 			$item->modified_by 		= $user->get('id');
