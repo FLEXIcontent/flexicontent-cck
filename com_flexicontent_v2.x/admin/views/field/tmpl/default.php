@@ -126,7 +126,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				</table>
 			</fieldset>
 			<?php
-				if ($this->permission->CanRights) :
+				if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');

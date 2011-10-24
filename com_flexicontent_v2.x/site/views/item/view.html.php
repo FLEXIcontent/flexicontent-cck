@@ -365,7 +365,9 @@ class FlexicontentViewItem extends JView {
 			// EDIT action
 			//$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
 			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
-			if ( !$permission->CanEdit && !(in_array('editown', $rights) && ($item->getValue('created_by') == $user->get('id'))) ) {
+			$canEditOwn = in_array('editown', $rights);
+			$isOwner = $item->getValue('created_by') == $user->get('id');
+			if ( !$permission->CanEdit && (!$canEditOwn || !$isOwner) ) {
 				// user isn't authorize to edit
 				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
@@ -389,7 +391,7 @@ class FlexicontentViewItem extends JView {
 		$perms['canedit'] = ( (in_array('editown', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit', $rights)) );
 		$perms['canpublish'] = ( (in_array('editown.state', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit.state', $rights)) );
 		$perms['candelete'] = ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) );
-		$perms['canright'] = $permission->CanRights;
+		$perms['canconfig'] = $permission->CanConfig;
 
 		//Add the js includes to the document <head> section
 		JHTML::_('behavior.formvalidation');

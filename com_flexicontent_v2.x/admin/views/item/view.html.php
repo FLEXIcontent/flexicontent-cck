@@ -145,7 +145,6 @@ class FlexicontentViewItem extends JView {
 				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
 				$canPublish 	= in_array('publish', $rights);
 				$canPublishOwn	= (in_array('publishown', $rights) && ($row->created_by == $user->id));
-				$canRight 		= in_array('right', $rights);
 
 				// check if the user can really edit the item
 				if ($canEdit || $canEditOwn || ($lastversion < 3)) {
@@ -216,7 +215,6 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('lists'      		, $lists);
 		$this->assignRef('canPublish'   	, $canPublish);
 		$this->assignRef('canPublishOwn'	, $canPublishOwn);
-		$this->assignRef('canRight'			, $canRight);
 		$this->assignRef('published'		, $published);
 		$this->assignRef('nullDate'			, $nullDate);
 		$this->assignRef('form'				, $form);
@@ -230,7 +228,6 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'			, $tmpls);
 		$this->assignRef('usedtags'			, $usedtags);
-		$this->assignRef('permission'		, $permission);
 		$this->assignRef('current_page'		, $current_page);
 		$this->assignRef('permission'		, $permission);
 		$this->assignRef('fieldtype'		, $typesselected);

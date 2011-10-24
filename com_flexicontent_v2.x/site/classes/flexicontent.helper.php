@@ -202,7 +202,6 @@ class flexicontent_html
 		$user	= & JFactory::getUser();
 		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 		$permission = FlexicontentHelperPerm::getPerm();
-		//$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
 		//$canEdit 		= in_array('edit', $rights);
 		//$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
 		//if (FLEXI_ACCESS)

@@ -277,7 +277,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				</table>
 
 				<?php
-				if ($this->canRight) :
+				if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');

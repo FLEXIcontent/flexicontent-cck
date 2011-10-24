@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <access component="com_flexicontent">
 	<section name="component">
-		<action name="flexicontent.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
-		<action name="flexicontent.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
+		<action name="core.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
+		<action name="core.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
 
 		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
 		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />

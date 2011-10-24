@@ -18,6 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $cids = $this->params->get("cid");
+$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
 JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
@@ -249,40 +250,39 @@ else :
           	</tr>
 <?php
 endif;
-$autopublished = $this->params->get('autopublished', 0);
+
+$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
 $canpublish = $this->perms['canpublish'];
-		if (!$autopublished && $canpublish) :
 ?>
+	<?php if (!$autopublished && $canpublish) : ?>
+	
 		<tr>
 			<td>
 				<?php echo $this->item->getLabel('state').':';?>
 			</td>
 			<td>
-	  			<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
-	  			<?php
-	  			if ($this->params->get('auto_approve', 1)) :
-	  			?><input type="hidden" id="vstate" name="vstate" value="2" />
-	  			<?php
-	  			endif;?>
+	  		<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
+	  		<?php	if ($cparams->get('auto_approve', 0)) : ?>
+	  			<input type="hidden" id="vstate" name="vstate" value="2" />
+	  		<?php	endif;?>
 			</td>
 		</tr>
-			<?php
-			if (!$this->params->get('auto_approve', 1)) :
-			?>
+		
+		<?php	if (!$cparams->get('auto_approve', 0)) :	?>
 		<tr>
 			<td>
-	  			<label for="vstate" class="flexi_label">
+	 			<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
 				</label>
 			</td>
 			<td>
-		  		<?php echo $this->lists['vstate']; ?>
+	  		<?php echo $this->lists['vstate']; ?>
 			</td>
 		</tr>
-			<?php
-			endif;
-		endif; 
-		?>
+		<?php	endif; ?>
+		
+	<?php endif; ?>
+	
 		<tr>
 			<td>
 		  		<?php echo $this->item->getLabel('language'); ?>
@@ -292,7 +292,7 @@ $canpublish = $this->perms['canpublish'];
 			</td>
 		</tr>
 		<?php 
-		if ($this->perms['canright']) :
+		if ($this->perms['canconfig']) :
 		$this->document->addScriptDeclaration("
 			window.addEvent('domready', function() {
 			var slideaccess = new Fx.Slide('tabacces');
@@ -580,7 +580,7 @@ $canpublish = $this->perms['canpublish'];
 				<input type="hidden" id="vstate" name="vstate" value="1" />
 		<?php
 			endif;
-			if (!$this->perms['canright']) {
+			if (!$this->perms['canconfig']) {
 		?>
 				<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
 		<?php

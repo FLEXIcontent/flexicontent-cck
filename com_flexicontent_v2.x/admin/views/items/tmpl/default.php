@@ -421,7 +421,7 @@ window.addEvent('domready', function() {
 			$publish_down->setOffset($config->getValue('config.offset'));
 
 			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
-			if ($this->permission->CanRights) {
+			if ($this->permission->CanConfig) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			}else $access = $this->escape($row->access_level);
 
