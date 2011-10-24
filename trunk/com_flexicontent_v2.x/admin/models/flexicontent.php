@@ -915,10 +915,13 @@ class FlexicontentModelFlexicontent extends JModel
 			foreach($groups as $g) {
 				//{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":{"3":1},"core.delete":[],"core.edit":{"4":1},"core.edit.state":{"5":1},"core.edit.own":[]}
 				if(JAccess::checkGroup($g->id, 'core.admin')) {//super user
-					$rule['flexicontent.admin'][$g->id] = 1;//can config
+					$rule['core.admin'][$g->id] = 1;  //CanConfig
 				}
 				if(JAccess::checkGroup($g->id, 'core.manage')) {
-					$rule['flexicontent.manage'][$g->id] = 1;//CanRights
+					// Privilege 'core.manage', this is currently used only by joomla core !!! DO NOT RENAME !!!
+					// Joomla Backend: (a) display FLEXIcontent menu item in Components menu (b) basic use permission for FLEXIcontent component
+					$rule['core.manage'][$g->id] = 1;
+					
 					$rule['flexicontent.manageitem'][$g->id] = 1;
 					$rule['flexicontent.managetype'][$g->id] = 1;//CanTypes
 					$rule['flexicontent.createtype'][$g->id] = 1;

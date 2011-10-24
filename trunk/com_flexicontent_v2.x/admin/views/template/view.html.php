@@ -128,18 +128,7 @@ class FlexicontentViewTemplate extends JView {
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$permission = FlexicontentHelperPerm::getPerm();
 
-		$user =& JFactory::getUser();
-		$check = JAccess::check($user->id, 'core.admin', 'root.1');
-		$CanCats 		= (!$check) ? $permission->CanCats : 1;
-		$CanTypes 		= (!$check) ? $permission->Types : 1;
-		$CanFields 		= (!$check) ? $permission->CanFields : 1;
-		$CanTags 		= (!$check) ? $permission->CanTags : 1;
-		$CanArchives 	= (!$check) ? $permission->CanArchives : 1;
-		$CanFiles	 	= (!$check) ? $permission->CanFiles : 1;
-		$CanStats	 	= (!$check) ? $permission->CanStats : 1;
-		$CanRights	 	= (!$check) ? $permission->CanRights : 1;
-		$CanTemplates	= (!$check) ? 0 : 1;
-		if (!$CanTemplates) {
+		if (!$permission->CanTemplates) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		

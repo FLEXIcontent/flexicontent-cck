@@ -16,8 +16,10 @@ class FlexicontentHelperPerm{
 			$check = JAccess::check($user->id, 'core.admin', 'root.1');
 			$permission = new stdClass;
 			//component
-			$permission->CanConfig 		= ($check || JAccess::check($user->id, 'flexicontent.admin', 			'com_flexicontent'));
-			$permission->CanRights	 	= ($check || JAccess::check($user->id, 'flexicontent.manage', 			'com_flexicontent'));
+			// !!! ALLOWs USERS to ALTER component access privileges
+			$permission->CanConfig 		= ($check || JAccess::check($user->id, 'core.admin', 			'com_flexicontent'));			
+			//!!! ALLOWs USERS in JOOMLA BACKEND : (a) to view FLEXIcontent menu item in Components Menu and (b) access the FLEXIcontent component screens (whatever they can see)
+			$permission->CanUseFlexi	= ($check || JAccess::check($user->id, 'core.manage', 			'com_flexicontent'));
 			$permission->CanTypes 		= ($check || JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent'));
 			$permission->CanFields 		= ($check || JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent'));
 			$permission->CanArchives 	= ($check || JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent'));
@@ -50,8 +52,8 @@ class FlexicontentHelperPerm{
 			$permission->CanUpload	 	= ($check || JAccess::check($user->id, 'flexicontent.uploadfiles', 		'com_flexicontent'));
 			$permission->CanViewAllFiles	 = ($check || JAccess::check($user->id, 'flexicontent.viewallfiles', 		'com_flexicontent'));
 			//others
-			$permission->CanPlugins	 	= ($check || JAccess::check($user->id, 'core.manage', 				'com_plugins'));
-			$permission->CanComments 	= ($check || JAccess::check($user->id, 'core.admin', 'root.1')?$CanComments:JAccess::check($user->id, 'core.manage', 'com_jcomments'));
+			$permission->CanPlugins	 	= ($check || JAccess::check($user->id, 'core.manage', 'com_plugins'));
+			$permission->CanComments 	= ($check ? $CanComments : JAccess::check($user->id, 'core.manage', 'com_jcomments'));
 		}
 		return $permission;
 	}
