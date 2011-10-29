@@ -39,3 +39,26 @@ a:hover.slideshowThumbnail img {
 #thumbnails a {
 	float: left;
 }
+
+.mingalbutton {
+	color:white;
+	float:left;
+	margin-left: 8px;
+	/*padding: 2px 6px 2px 6px;
+	border-radius: 6px;
+	background-color:darkgray;*/
+}
+
+/*.flexi_slbutton:hover {
+	color:darkred;
+	text-decoration:none;
+}*/
+
+.mingalcontrolbox {
+	float:left;
+	clear:both;
+	z-index: 10;
+	background-color: gray;
+	border-radius: 6px;
+	padding:2px;
+}

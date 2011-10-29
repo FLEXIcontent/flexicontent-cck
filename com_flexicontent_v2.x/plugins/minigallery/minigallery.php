@@ -218,22 +218,45 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		switch ($thumbposition) {
 			case 1: // top
 			$marginpos = 'top';
+			$marginval = $h_s;
 			break;
 
 			case 2: // left
 			$marginpos = 'left';
+			$marginval = $w_s;
 			break;
 
 			case 4: // right
 			$marginpos = 'right';
+			$marginval = $w_s;
 			break;
 
 			case 3:
 			default : // bottom
 			$marginpos = 'bottom';
+			$marginval = $h_s;
 			break;
 		}
+		
+		$scroll_thumbnails = $field->parameters->get( 'scroll_thumbnails', 1 ) ;
+		switch ($thumbposition) {
+			case 1: // top
+			case 3:	default : // bottom
+			$rows = ceil( (count($values) * ($w_s+8) ) / $w_l );  // thumbnail rows
+			echo $rows;
+			$series = ($scroll_thumbnails) ? 1: $rows;
+			$series_size = ($h_s+8) * $series;
+			break;
 
+			case 2: // left
+			case 4: // right
+			$cols = ceil( (count($values) * ($h_s+8) ) / $h_l );  // thumbnail columns
+			echo $cols; 
+			$series = ($scroll_thumbnails) ? 1: $cols;
+			$series_size = ($w_s+8) * $series;
+			break;
+		}
+		
 		static $js_and_css_added = false;
 		
 		$slideshowtype = $field->parameters->get( 'slideshowtype', 'Flash' );// default is normal slideshow
@@ -268,22 +291,36 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$controller = $controller ? 'true' : 'false';
 			$otheroptions = $field->parameters->get( 'otheroptions', '' );
 			
-			/*$css = "
-			.$htmltag_id {
+			$css = "
+			#$htmltag_id {
 				width: ".$w_l."px;
 				height: ".$h_l."px;
-				margin-".$marginpos.": 5px;
+				margin-".$marginpos.": ".(($marginval+8)*$series)."px;
 			}
 			";
-	
+			
+			/*
 			if ($thumbposition == 1 || $thumbposition == 3) {
 				$css .= "#thumbnails { width: ".$w_l."px; }";
 			}
 			if ($thumbposition == 2 || $thumbposition == 4) {
 				$css .= ".$htmltag_id { float: left; } #{$htmltag_id}-thumbnails { float: left; width: ".($w_s + 10)."px; }";
+			}*/
+			
+			if ($thumbposition==2 || $thumbposition==4) {
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: 100%; width: ".($series_size+4)."px; top:0px; }";
+				$css .= "div .slideshow-thumbnails ul { width: ".$series_size."px; }";
+				$css .= "div .slideshow-thumbnails ul li {  }";
+			} else if ($thumbposition==1 || $thumbposition==3) {
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: ".$series_size."px; }";
+				if ($series > 1) $css .= "div .slideshow-thumbnails ul { width:100%!important; }";
+				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
+			} else { // inside TODO
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($marginval+8)."px; height: ".($h_s+8)."px; top:0px; z-index:100; }";
+				$css .= "div .slideshow-thumbnails ul { width: 100%!important;}";
+				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
 			}
-
-			$document->addStyleDeclaration($css);*/
+			$document->addStyleDeclaration($css);
 
 			$otheroptions .= ($otheroptions?','.$otheroptions:'');
 			$js = "

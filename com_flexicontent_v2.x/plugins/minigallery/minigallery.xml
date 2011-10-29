@@ -22,7 +22,8 @@
 				<option value="0">No</option>
 			</field>
 		</fieldset>
-		<fieldset name="group-minigallery">
+		<fieldset name="group-minigallery" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="FLEXI_FIELD_GALLERY_IMAGES" type="separator" hr="false" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" menu="hide" />
 			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
 				<option value="1">FLEXI_FIELD_GALLERY_TOP</option>
 				<option value="2">FLEXI_FIELD_GALLERY_LEFT</option>
@@ -33,8 +34,20 @@
 			<field name="h_l" type="text" default="300" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_LARGE" description="FLEXI_FIELD_GALLERY_HEIGHT_LARGE_DESC" />
 			<field name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" />
 			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
- 			<field name="@spacer" type="spacer" default="" label="" description="" />
-			<field name="@spacer" type="spacer" default="" label="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
+ 			
+			<field name="FLEXI_FIELD_GALLERY_SLIDESHOW" type="separator" hr="false" level="level1" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" menu="hide" />
+			<field name="controller" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_CONTROLS" description="FLEXI_FIELD_DISPLAY_CONTROLS_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="thumbnails" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_THUMBNAILS" description="FLEXI_FIELD_DISPLAY_THUMBNAILS_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="scroll_thumbnails" type="list" default="1" label="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS" description="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS">
+				<option value="1">Scroll one row/column</option>
+				<option value="0">Use multiple rows/columns</option>
+			</field>
 			<field name="delay" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
 			<field name="duration" type="text" default="1000" size="4" label="FLEXI_FIELD_GALLERY_DURATION" description="FLEXI_FIELD_GALLERY_DURATION_DESC" />
 			<field name="usecaptions" type="radio" default="1" label="Use captions" description="Use captions">
@@ -60,14 +73,6 @@
 				<option value="out">out</option>
 				<option value="in:out">in:out</option>
 				<option value="out:in">out:in</option>
-			</field>
-			<field name="thumbnails" type="list" default="1" label="Thumbnails" description="Thumbnails">
-				<option value="1">true</option>
-				<option value="0">false</option>
-			</field>
-			<field name="controller" type="list" default="1" label="Controller" description="Controller">
-				<option value="1">true</option>
-				<option value="0">false</option>
 			</field>
 			<field name="otheroptions" type="textarea" default="" cols="40" rows="10" label="Other options" description="Other options. Example: color: ['tomato', 'palegreen', 'orangered', 'aquamarine'], overlap: false">
 				<option value="1">true</option>
