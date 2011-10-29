@@ -208,6 +208,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
 		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		$controller = $field->parameters->get( 'controller', 1 ) ;
+		$thumbnails = $field->parameters->get( 'thumbnails', 1 ) ;
 
 		// some parameter shortcuts
 		$thumbposition		= $field->parameters->get( 'thumbposition', 3 ) ;
@@ -251,8 +253,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			
 			$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
 			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
-
+			$thumbbox_id = "slideshowThumbbox_".$field->name."_".$item->id;
+			$mingalobj = "mingalshow_".$field->name."_".$item->id;
+			
 		  $js = "
+		  	var ".$mingalobj.";
 		  	window.addEvent('domready',function(){
 					var obj = {
 						wait: ".$field->parameters->get( 'wait', 4000 ).", 
@@ -263,8 +268,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 						thumbnails: true,
 						backgroundSlider: true
 					}
-				show = new SlideShow('$htmltag_id','$slidethumb',obj);
-				show.play();
+					show = new SlideShow('$htmltag_id','$slidethumb',obj);
+					show.play();
+					".$mingalobj." = show;
 				});
 			";
 			$document->addScriptDeclaration($js);
@@ -274,6 +280,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				width: ".$w_l."px;
 				height: ".$h_l."px;
 				margin-".$marginpos.": 5px;
+			}
+			.mingalcontrolbox {
+				width: ".($w_l-4)."px;
+				".( ($thumbposition == 2) ? "margin-left:".($w_s+14) : "" )."px;
+				".( ($thumbposition != 3) ? "margin-top:".(4) : "" )."px;
 			}
 			";
 	
@@ -287,10 +298,24 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$document->addStyleDeclaration($css);
 			
 			$display = array();
+
+			if ($controller) {
+				$controls_html = '<div id="'.$thumbbox_id.'" class="mingalcontrolbox" >';
+				$icontag = '<img src="'.JURI::base(true).'/plugins/flexicontent_fields/minigallery/icons/%s" />';
+				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.play();" class="mingalbutton">'.sprintf($icontag,'playback_start.png').'</a>';
+				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.stop();" class="mingalbutton">'.sprintf($icontag,'playback_pause.png').'</a>';
+				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.previous();" class="mingalbutton">'.sprintf($icontag,'skip_backward.png').'</a>';
+				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.next();" class="mingalbutton">'.sprintf($icontag,'skip_forward.png').'</a>';
+				$controls_html .= '</div>';
+			}
 			
-			$field->{$prop}  = '';
-			$field->{$prop} .= ($thumbposition > 2) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
-			$field->{$prop} .= '<div id="thumbnails">';
+			$field->{$prop} = '';
+			if ($thumbposition > 2) {
+				$field->{$prop} .= '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>';
+			}
+			$field->{$prop} .= ($controller && $thumbposition == 3) ? $controls_html : '';;
+			$thumb_box_style = ($thumbnails) ? '' : 'display:none';
+			$field->{$prop} .= '<div id="thumbnails" style="'.$thumb_box_style.'">';
 			$n = 0;
 			foreach ($values as $value) {
 				$filename = $this->getFileName( $value );
@@ -308,7 +333,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				}
 			$field->{$prop} .= implode(' ', $display);
 			$field->{$prop} .= '</div>';
-			$field->{$prop} .= ($thumbposition < 3) ? '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>' : '';
+			if ($thumbposition < 3) {
+				$field->{$prop} .= '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>';
+			}
+			$field->{$prop} .= ($controller && $thumbposition != 3) ? $controls_html : '';
 		}
 	}
 	
