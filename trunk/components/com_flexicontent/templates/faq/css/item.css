@@ -18,6 +18,7 @@ div.subtitle3 {
 div.subtitle1 .element {
 }
 div.subtitle2 .element {
+	display:block;
 	float: left;
 	margin-right: 10px;
 }
@@ -66,13 +67,15 @@ div.infoblock {
 	*display: inline;
 	_height: 10px;
 }
-div.label {
+span.label, div.label {
+	clear: left;
 	float: left;
 	border-bottom: 1px solid silver;
 	color: #777;
 	font-size: 90%;
+	margin-right: 12px;
 }
-div.value {
+span.value, div.value {
 	float: left;
 }
 

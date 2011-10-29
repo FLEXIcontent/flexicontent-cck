@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 919 2011-10-03 02:17:05Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 935 2011-10-22 04:48:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -103,15 +103,15 @@ if ($this->limitstart == 0) :
     			<?php 
     			if ($this->params->get('lead_use_image', 1)) :
     				if ($this->params->get('lead_image')) :
-						if (isset($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
-							$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
-							$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
-							$image{$i}	= $value{$i}['originalname'];
-							$scr{$i}	= $dir{$i}.($this->params->get('lead_image_size') ? '/'.$this->params->get('lead_image_size').'_' : '/l_').$image{$i};
-						else :
-							$scr{$i}	= '';
-						endif;
-						$src = $scr{$i};
+							if (isset($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
+								$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
+								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
+								$image{$i}	= $value{$i}['originalname'];
+								$scr{$i}	= $dir{$i}.($this->params->get('lead_image_size') ? '/'.$this->params->get('lead_image_size').'_' : '/l_').$image{$i};
+							else :
+								$scr{$i}	= '';
+							endif;
+							$src = $scr{$i};
     				else :
     					$src = flexicontent_html::extractimagesrc($items[$i]);
     				endif;
@@ -313,15 +313,15 @@ if ($this->limitstart == 0) :
     			<?php 
     			if ($this->params->get('intro_use_image', 1)) :
     				if ($this->params->get('intro_image')) :
-						if (isset($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
-							$dir{$i}	= $items[$i]->fields[$this->params->get('intro_image')]->parameters->get('dir');
-							$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('intro_image')]->value[0]);
-							$image{$i}	= $value{$i}['originalname'];
-							$scr{$i}	= $dir{$i}.($this->params->get('intro_image_size') ? '/'.$this->params->get('intro_image_size').'_' : '/l_').$image{$i};
-						else :
-							$scr{$i}	= '';
-						endif;
-						$src = $scr{$i};
+							if (isset($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
+								$dir{$i}	= $items[$i]->fields[$this->params->get('intro_image')]->parameters->get('dir');
+								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('intro_image')]->value[0]);
+								$image{$i}	= $value{$i}['originalname'];
+								$scr{$i}	= $dir{$i}.($this->params->get('intro_image_size') ? '/'.$this->params->get('intro_image_size').'_' : '/l_').$image{$i};
+							else :
+								$scr{$i}	= '';
+							endif;
+							$src = $scr{$i};
     				else :
     					$src = flexicontent_html::extractimagesrc($items[$i]);
     				endif;

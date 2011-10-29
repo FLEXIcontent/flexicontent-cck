@@ -41,7 +41,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function getLabel()
 	{
 		$document 	=& JFactory::getDocument();
-		$document->addStyleSheet('../tmpl/params.css');
+		//$document->addStyleSheet('../tmpl/params.css');
 		
 		$value = $this->element['default'];
 
@@ -54,6 +54,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$style = 'padding: 5px 4px 5px 10px; display: block; background-color: #777; color: #fff; font-weight: bold;';
 		}
 		
-		return '<br style="clear: both;" /><span style="'.$style.'">'.JText::_($value).'</span>';
+		$class = ""; $title = "";
+		if ($this->element['description']) {
+			$class = "hasTip";
+			$title = JText::_($value)."::".JText::_($this->element['description']);
+		}
+		return '<br style="clear: both;" /><span style="'.$style.'"  class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>';
 	}
 }

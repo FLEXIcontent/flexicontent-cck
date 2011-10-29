@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 920 2011-10-05 02:17:09Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 931 2011-10-17 06:09:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

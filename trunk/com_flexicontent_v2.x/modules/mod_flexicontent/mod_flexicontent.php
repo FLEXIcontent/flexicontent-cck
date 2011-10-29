@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: mod_flexicontent.php 910 2011-09-24 04:07:00Z ggppdk $
+ * @version 1.2 $Id: mod_flexicontent.php 929 2011-10-14 10:48:48Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

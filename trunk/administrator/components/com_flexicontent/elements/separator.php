@@ -35,7 +35,6 @@ class JElementSeparator extends JElement
 	 */
 	var	$_name = 'separator';
 	
-
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$level = $node->attributes('level');

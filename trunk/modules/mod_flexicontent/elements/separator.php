@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 5 $Id$
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,6 +46,12 @@ class JElementSeparator extends JElement
 			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
 		}
 		
-		return '<span style="'.$style.'">'.JText::_($value).'</div>';
+		$class = ""; $title = "";
+		if ($node->attributes('description')) {
+			$class = "hasTip";
+			$title = JText::_($value)."::".JText::_($node->attributes('description'));
+		}
+		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</div>';
 	}
+
 }
