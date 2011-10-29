@@ -139,3 +139,7 @@
 .mod_flexicontent_wrapper .news_readon_module .news_readon a {
 	text-decoration:none;
 }
+
+.mod_flexicontent_wrapper .news_readon_module .field_value {
+	display: inline;
+}

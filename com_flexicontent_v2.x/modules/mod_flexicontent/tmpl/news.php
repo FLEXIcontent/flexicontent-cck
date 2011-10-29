@@ -67,13 +67,13 @@ $display_date = $params->get('display_date', 1);
 	if ($catdata) {
 		echo "<div class='currcatdata' style='clear:both; float:left;'>\n";
 		if ($params->get('currcat_showtitle', 0)) {
+			echo "<div class='currcattitle'>\n";
 			if (isset($catdata->titlelink)) {
-				echo "<a href='{$catdata->titlelink}'>";
+				echo "<a href='{$catdata->titlelink}'>".$catdata->title."</a>";
+			} else {
+				echo $catdata->title;
 			}
-			echo "<div class='currcattitle'>". $catdata->title ."</div>\n";
-			if (isset($catdata->titlelink)) {
-				echo "</a>";
-			}
+			echo "</div>\n";
 		}
 		if (isset($catdata->image)) {
 			echo "<div class='image_currcat'>";
@@ -164,7 +164,7 @@ $display_date = $params->get('display_date', 1);
 							<?php if ($display_label_feat) : ?>
 							<span class="field_label"><?php echo $field->label . ': '; ?></span>
 							<?php endif; ?>
-							<span class="field_value"><?php echo $field->display; ?></span>
+							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
 						<?php endforeach; ?>
 					</div>
@@ -228,7 +228,7 @@ $display_date = $params->get('display_date', 1);
 							<?php if ($display_label) : ?>
 							<span class="field_label"><?php echo $field->label . ': '; ?></span>
 							<?php endif; ?>
-							<span class="field_value"><?php echo $field->display; ?></span>
+							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
 						<?php endforeach; ?>
 					</div>
