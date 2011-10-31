@@ -26,6 +26,7 @@
 			</field>
 		</fieldset>
 		<fieldset name="group-image" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="default_image" type="text" default="" size="40" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
@@ -53,7 +54,7 @@
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
 			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" level="level1" menu="hide" />
 			<field name="w_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -66,7 +67,7 @@
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
 			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" level="level1" menu="hide" />
 			<field name="w_s" type="text" default="150" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -79,7 +80,7 @@
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
 			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
 			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">

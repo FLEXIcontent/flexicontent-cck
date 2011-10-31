@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 714 2011-07-29 06:27:11Z ggppdk $
+ * @version 1.0 $Id: image.php 919 2011-10-03 02:17:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -93,15 +93,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						:
 						'').'
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
 							<td><input size="40" name="custom['.$field->name.'][alt]" value="'.$value['alt'].'" type="text" /></td>
 						</tr>
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
 							<td><input size="40" name="custom['.$field->name.'][title]" value="'.$value['title'].'" type="text" /></td>
 						</tr>
 						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
+							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
 							<td><textarea name="custom['.$field->name.'][desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 						</tr>
 					</table>
@@ -147,16 +147,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					:
 					'').'
 					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).':</td>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
 						<td><input size="40" name="custom['.$field->name.'][alt]" type="text" /></td>
 					</tr>
 					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).':</td>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
 						<td><input size="40" name="custom['.$field->name.'][title]" type="text" /></td>
 					</tr>
 					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).':</td>
-						<td><textarea name="custom['.$field->name.'][desc]" rows="6" cols="18" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
+						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+						<td><textarea name="custom['.$field->name.'][desc]" rows="2" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
 					</tr>
 				</table>
 			</div>
@@ -188,7 +188,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$url_target = $field->parameters->get('url_target','_self');
 		
 		if ($values && $values[0] != '')
-		{				
+		{
 			$document	= & JFactory::getDocument();
 			
 			// load the tooltip library if redquired
@@ -202,9 +202,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					)
 			{
 				// Multibox integration 
-				$document->addStyleSheet('components/com_flexicontent/librairies/multibox/multibox.css');
-
-				$csshack = '
+				$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
+				
+				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
+					$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+				}
+				/*$csshack = '
 				<!--[if lte IE 6]>
 				<style type="text/css">
 				.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
@@ -213,17 +216,32 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				</style>
 				<![endif]-->
 				';
-				$document->addCustomTag($csshack);
+				$document->addCustomTag($csshack);*/
 
 				JHTML::_('behavior.mootools');
-				$document->addScript('components/com_flexicontent/librairies/multibox/js/overlay.js');
-				$document->addScript('components/com_flexicontent/librairies/multibox/js/multibox.js');
+				$document->addScript('components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
+				$document->addScript('components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
 
 				$box = "
-				var box = {};
-				window.addEvent('domready', function(){
-					box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true});
-				});
+					window.addEvent('domready', function(){
+						//call multiBox
+						var initMultiBox = new multiBox({
+							mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
+							container: $(document.body),//where to inject multiBox
+							descClassName: 'multiBoxDesc',//the class name of the description divs
+							path: './Files/',//path to mp3 and flv players
+							useOverlay: true,//use a semi-transparent background. default: false;
+							maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
+							addDownload: false,//do you want the files to be downloadable?
+							pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
+							addRollover: true,//add rollover fade to each multibox link
+							addOverlayIcon: true,//adds overlay icons to images within multibox links
+							addChain: true,//cycle through all images fading them out then in
+							recalcTop: true,//subtract the height of controls panel from top position
+							addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
+							autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
+						});
+					});
 				";
 				$document->addScriptDeclaration($box);
 			
@@ -234,6 +252,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			foreach ($values as $value)
 			{
 				$value	= unserialize($value);
+				
+				// Check and rebuild thumbnails if needed
+				$this->rebuildThumbs($field,$value);
+				
 				$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . 'l_' . $value['originalname']);
 				$size	= getimagesize($path);
 				$hl 	= $size[1];
@@ -292,7 +314,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					';
 				} else if ($usepopup && $popuptype == 1) {
 					$field->{$prop} = '
-					<a href="'.$srcb.'" id="mb'.$id.'" class="mb">
+					<a href="'.$srcb.'" id="mb'.$id.'" class="mb" rel="[images]" >
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					</a>
 					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
@@ -318,7 +340,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($showdesc) $field->{$prop} .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
 			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
 		} else {
-			$field->{$prop} = '';
+			$default_image = $field->parameters->get( 'default_image', '');
+			if ( $default_image !== '' ) {
+				
+				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'item'));
+				$thumb_size = 0;
+				if ($view == 'category')
+				  $thumb_size =  $field->parameters->get('thumbincatview',2);
+				if($view == 'item')
+				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
+				
+				$sizes = array('s',  's','m','l');
+				$w = $field->parameters->get('w_'.$sizes[$thumb_size]);
+				$h = $field->parameters->get('h_'.$sizes[$thumb_size]);
+				$field->{$prop} = "<img alt='' title='' src='".JURI::base().$default_image."' width='$w' height='$h' />";
+			} else {
+				$field->{$prop} = '';
+			}
 		}
 		// some parameter shortcuts
 	}
@@ -484,39 +522,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$sizes 		= array('l','m','s');
 					foreach ($sizes as $size)
 					{
-						// some parameters for phpthumb
-						$ext 		= strtolower(JFile::getExt($file['name']));
-						$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
-						$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent') . DS);
-						$prefix		= $size . '_';
-						$w			= $field->parameters->get('w_'.$size);
-						$h			= $field->parameters->get('h_'.$size);
-						$crop		= $field->parameters->get('method_'.$size);
-						$quality	= $field->parameters->get('quality');
-						$usewm		= $field->parameters->get('use_watermark_'.$size);
-						$wmfile		= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_'.$size));
-						$wmop		= $field->parameters->get('wm_opacity');
-						$wmpos		= $field->parameters->get('wm_position');
-					
-						// create the folder if it doesnt exists
-						if (!JFolder::exists($destpath)) 
-						{ 
-							if (!JFolder::create($destpath)) 
-							{ 
-								JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to create folders'));
-								return;
-							} 
-						}
-						
-						// because phpthumb is an external class we need to make the folder writable
-						if (JPath::canChmod($destpath)) 
-						{ 
-    						JPath::setPermissions($destpath, '0666', '0777'); 
-						}
-					
-						// create the thumnails using phpthumb $filename
-						$this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
-	
+						// create the thumbnail
+						$this->create_thumb( $field, $filename, $size );
 						// set the filename for posting
 						$post['originalname'] = $filename;
 					}
@@ -524,6 +531,42 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 		}
+	}
+
+
+	function create_thumb( &$field, $filename, $size ) {
+		// some parameters for phpthumb
+		$ext 		= strtolower(JFile::getExt($filename));
+		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent') . DS);
+		$prefix		= $size . '_';
+		$w			= $field->parameters->get('w_'.$size);
+		$h			= $field->parameters->get('h_'.$size);
+		$crop		= $field->parameters->get('method_'.$size);
+		$quality	= $field->parameters->get('quality');
+		$usewm		= $field->parameters->get('use_watermark_'.$size);
+		$wmfile		= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_'.$size));
+		$wmop		= $field->parameters->get('wm_opacity');
+		$wmpos		= $field->parameters->get('wm_position');
+	
+		// create the folder if it doesnt exists
+		if (!JFolder::exists($destpath)) 
+		{ 
+			if (!JFolder::create($destpath)) 
+			{ 
+				JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to create folders'));
+				return;
+			} 
+		}
+		
+		// because phpthumb is an external class we need to make the folder writable
+		if (JPath::canChmod($destpath)) 
+		{ 
+				JPath::setPermissions($destpath, '0666', '0777'); 
+		}
+		
+		// create the thumnails using phpthumb $filename
+		$this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
 	}
 
 
@@ -536,7 +579,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$phpThumb = new phpThumb();
 		
 		$filepath = $origpath . $filename;
-				 
+		
 		$phpThumb->setSourceFilename($filepath);
 		$phpThumb->setParameter('config_output_format', "$ext");
 		$phpThumb->setParameter('w', $width);
@@ -555,20 +598,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		if ($phpThumb->GenerateThumbnail())
 		{
-			//echo "generated!";
+			//echo "generated!<br />";
 			//die();
 			if ($phpThumb->RenderToFile($output_filename))
 			{
-				// echo "rendered!";
+				 //echo "rendered!<br />";
 				// die();
 			} else {
-				echo 'Failed:<pre>' . implode("\n\n", $phpThumb->debugmessages) . '</pre>';
-				die();
+				echo 'Failed:<pre>' . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
+				//die();
 			}
 		} else {
-			echo 'Failed2:<pre>' . $phpThumb->fatalerror . "\n\n" . implode("\n\n", $phpThumb->debugmessages) . '</pre>';
-			//echo 'Failed:<div class="error">Size is too big!</pre>';
-			die();
+			echo 'Failed2:<pre>' . $phpThumb->fatalerror . "\n\n" . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
+			//echo 'Failed:<div class="error">Size is too big!</pre><br />';
+			//die();
 		}
 	}
 
@@ -611,10 +654,47 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 	}
 
-	function rebuildThumbs( $field )
+
+	function rebuildThumbs( &$field, $value )
 	{
-		// @TODO implement
+		$filename = $value['originalname'];
+		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$filepath = $onlypath . $filename;
+		$filesize	= getimagesize($filepath);
+		$origsize_h = $filesize[1];
+		$origsize_w = $filesize[0];
+		
+		$sizes 		= array('l','m','s');
+		foreach ($sizes as $size)
+		{
+			$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . $size . '_' . $filename);
+			$filesize = getimagesize($path);
+			$filesize_h = $filesize[1];
+			$filesize_w = $filesize[0];
+			$param_h = $field->parameters->get('h_'.$size);
+			$param_w = $field->parameters->get('w_'.$size);
+			$crop = $field->parameters->get('method_'.$size);
+			
+			// Check if size of file is not same as parameters and recreate the thumbnail
+			if (
+					( $crop==0 && (
+													($origsize_w >= $param_w && $filesize_w != $param_w) &&  // scale width can be larger than it is currently
+													($origsize_h >= $param_h && $filesize_h != $param_h)     // scale height can be larger than it is currently
+												)
+					) ||
+					( $crop==1 && (
+													($param_w <= $origsize_w && $filesize_w != $param_w) ||  // crop width can be smaller than it is currently
+													($param_h <= $origsize_h && $filesize_h != $param_h)     // crop height can be smaller than it is currently
+												)
+					)
+				 )
+			 {
+				//echo "SIZE: $size CROP: $crop OLDSIZE(w,h): $filesize_w,$filesize_h  NEWSIZE(w,h): $param_w,$param_h <br />";
+				$this->create_thumb( $field, $filename, $size );
+			}
+		}
 	}
+
 
 	function buildSelectList( $field )
 	{
