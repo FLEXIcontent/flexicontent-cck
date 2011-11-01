@@ -1,41 +1,6 @@
-/* Module */
+
+/* MODULE STYLING EXTERNAL CONTAINER */
 .mod_flexicontent_wrapper {
-	overflow: hidden;
-	padding: 10px;
-}
-
-.mod_flexicontent.twocol {
-}
-
-.mod_flexicontent_featured {
-	display: inline;
-	float: left;
-	width: 45%;
-	margin-right: 2%; 
-	padding-right: 2%; 
-}
-
-.twocol .mod_flexicontent_standard {
-	margin-left: 49%;
-}
-
-.mod_flexicontent_standard_wrapper,
-.mod_flexicontent_featured_wrapper {
-}
-
-.mod_flexicontent_wrapper .image_currcat,
-.mod_flexicontent_wrapper .image_featured,
-.mod_flexicontent_wrapper .image_standard {
-	float: left;
-	margin: 0 5px 5px 0;
-}
-
-.field_label {
-	font-weight: bold;
-}
-
-.modclear {
-	width: 100%;
 	overflow: hidden;
 }
 
@@ -63,6 +28,88 @@
 }
 
 
+
+/* MODULE STYLING INTERNAL CONTAINER (ONE PER ORDERING GROUP) */
+.mod_flexicontent {
+	width:100%;
+	margin:0px!important;
+	padding:0px!important;
+}
+
+
+
+/* EXTERNAL ITEM CONTAINER */
+.mod_flexicontent .mod_flexicontent_standard_wrapper,
+.mod_flexicontent .mod_flexicontent_featured_wrapper {
+	float: left;
+	width: 95%;
+	margin-left:1%;
+	margin-right:1%;
+	padding: 1%;
+}
+
+
+
+/* EXTERNAL ITEM CONTAINER ONE TWO (COLUMNS) */
+.mod_flexicontent.twocol .mod_flexicontent_standard_wrapper,
+.mod_flexicontent.twocol .mod_flexicontent_featured_wrapper {
+	width:45%!important;
+	margin-left:2%!important;
+	margin-right:0%!important;
+	padding: 1%!important;
+}
+
+
+
+/* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
+.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.odd,
+.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.odd {
+	background-color: #efefef;
+	float: left;
+	margin-bottom:4px;
+	border-radius:6px;
+	border: 1px solid gray;
+}
+.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.even,
+.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.even {
+	background-color: #dddddd;
+	float: left;
+	margin-bottom:4px;
+	border-radius:6px;
+	border: 1px solid gray;
+}
+
+
+
+/* INTERNAL ITEM CONTAINER */
+.mod_flexicontent_featured,
+.mod_flexicontent_standard {
+	margin-top:2px;
+	margin-bottom:12px;
+	margin-left: 0%!important;
+	margin-right: 0%!important;
+	
+	padding-top:2px;
+	padding-bottom:6px;
+	padding-left: 0%!important;
+	padding-right: 0%!important;
+	
+	float:left;
+	width:100%;
+}
+
+
+/* ITEM (AND OTHER DATA) SEPERATOR */
+.mod_flexicontent_wrapper .modclear {
+	width: 100%;
+	overflow: hidden;
+	height:4px;
+	clear:both;
+}
+
+
+
+/* ORDERING GROUPs SEPERATOR */
 .mod_flexicontent_wrapper ordering_seperator {
   border-width:0px;
   border-top:1px dashed #dddddd;
@@ -72,7 +119,83 @@
   float:none;
 }
 
-.mod_flexicontent_wrapper .image_currcat img,
+
+/* ORDERING GROUPs TITLE */
+.mod_flexicontent_wrapper .order_group_title {
+	margin: 1%;
+	color: darkred;
+	font-weight:bold;
+	float:left;
+	width:98%;
+	text-align:left;
+	clear:both;
+}
+
+
+/* *** GLOBAL FOR MODULE *** */
+/* THE (OPTIONAL) CURRENT CATEGORY INFORMATION */
+.mod_flexicontent_wrapper .currcatdata {   /* external container */
+	border-bottom: 1px dashed darkgray;
+}
+
+.mod_flexicontent_wrapper .currcatdata .currcattitle {  /* the category title */
+	font-weight: bold;
+	font-size: 12px;
+	text-align:center;
+	background-color: transparent;
+	text-transform: uppercase;
+	border: 1px solid darkgrey;
+	padding:4px;
+	border-radius: 8px;
+	margin-bottom:8px;
+}
+
+.mod_flexicontent_wrapper .currcatdata .currcattitle a {  /* the link to category title */
+}
+
+.mod_flexicontent_wrapper .currcatdata .image_currcat {  /* the category image container */
+	float: left;
+	margin: 0 5px 5px 0;
+}
+.mod_flexicontent_wrapper .image_currcat img {  /* the category image */
+  padding:1px; border:1px solid #dddddd;  
+}
+
+.mod_flexicontent_wrapper .currcatdata .currcatdescr {  /* the category description */
+	font-size: 11px;
+	font-weight: normal;
+	text-align: justify;
+}
+
+
+
+/* ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below) */
+.mod_flexicontent_wrapper .news_title {
+	font-weight:bold;
+	color: darkred;
+	text-align:left;
+}
+.mod_flexicontent_wrapper .news_title a {
+	text-decoration:none;
+	color: blue;
+	background-color: transparent;
+}
+.mod_flexicontent_wrapper .news_date { /* for label and value (contained inside) see more below */
+	text-align:left;
+}
+.mod_flexicontent_wrapper .news_text { /* for image (not contained inside) see more below */
+	text-align:justify;
+}
+
+
+
+/* THE (OPTIONAL) IMAGE FIELD OF EACH ITEM (-- contained -- inside 'news_image', see bellow)  */
+.mod_flexicontent_wrapper .image_featured,
+.mod_flexicontent_wrapper .image_standard {
+	float: left;
+	margin: 0 5px 5px 0;
+}
+
 .mod_flexicontent_wrapper .image_featured img,
 .mod_flexicontent_wrapper .image_standard img {
   padding:1px; border:1px solid #dddddd;  
@@ -83,39 +206,21 @@
   border:1px solid black;
 }
 
-.mod_flexicontent_wrapper .order_group_title {
-	margin-top:6px;
-	color: darkred;
-	font-weight:bold
-}
 
-.mod_flexicontent_wrapper .currcattitle {
-	font-weight: bold;
-	font-size: 12px;
-	text-align:center;
-	background-color: darkgray;
-}
 
-.mod_flexicontent_wrapper .currcattitle a {
-}
-	
-.mod_flexicontent_wrapper .currcatdescr {
-	font-size: 11px;
-	font-weight: normal;
-	text-align: justify;
-}
-
+/* THE (OPTIONAL) DATE FIELD OF EACH ITEM (-- contained -- inside 'news_date', see bellow) */
 .mod_flexicontent_wrapper .date_label,
 .mod_flexicontent_wrapper .date_label_feat {
+	display:inline;
 	color: black;
   font-weight: bold;
   margin: 0;
   padding: 0;
   white-space: nowrap;
 }
-
 .mod_flexicontent_wrapper .date_value,
 .mod_flexicontent_wrapper .date_value_feat {
+	display:inline;
 	color: black;
   font-weight: normal;
   margin: 0;
@@ -123,23 +228,85 @@
   white-space: nowrap;
 }
 
-.mod_flexicontent_wrapper .news_readon_module {
+
+
+/* THE (OPTIONAL) CUSTOM SELECTED FIELDS OF EACH ITEM: styles FOR LABELS AND VALUES */
+.mod_flexicontent_wrapper .field_label {
+	font-weight: bold;
+	display:block;
+	float:left;
+	clear:left;
+	margin-right:8px;
+	border:bottom: 1px solid silver;
+	text-align: left;
+}
+
+.mod_flexicontent_wrapper .field_value {
+	font-weight: normal;
+	display:block;
+	float:left;
+	text-align: left;
+}
+
+
+
+/* THE (OPTIONAL) READ MORE ITEM LINK FOR EACH LISTED ITEM */
+.mod_flexicontent_wrapper .news_readon {
+	background-color:lightgray;
+	border:1px outset darkgray;
+	color: white;
+	border-radius: 6px;
+	float:right;
+	padding:2px 6px 2px 6px;
+	font-weight:normal;
+}
+.mod_flexicontent_wrapper .news_readon:hover {
+	border:1px inset darkgray;
+	font-weight:normal;
+}
+
+.mod_flexicontent_wrapper .news_readon a {
+	background-color:transparent;
+	text-decoration: none!important;
+	color: blue;
+}
+
+.mod_flexicontent_wrapper .news_readon a:hover {
+	background-color:transparent;
+	text-decoration: none!important;
+	color: darkred;
+}
+
+
+
+/* *** GLOBAL FOR MODULE *** */
+/* THE (OPTIONAL) LINK AT THE BOTTOM OF MODULE CLASS: news_readon_module */
+.mod_flexicontent_wrapper .news_readon_module  { /* external container of link */
+	clear:both;
+	float:left;
 	display:block;
 	text-align:center;
-	margin:2px;
+	width:50%;
+	margin:2px 25% 8px 25%;
 }
 
-.mod_flexicontent_wrapper .news_readon_module .news_readon {
+.mod_flexicontent_wrapper .news_readon_module .news_readon { /* inner container of link */
+	color: auto;
+	border-radius: 0px;
+	float:none;
+	padding:2px 6px;
 	display:inline;
-	padding:1px 0px 2px 0px;
-	border-top:1px solid gray;
-	border-bottom:1px solid gray;
+	border: solid gray;
+	border-width:1px 0px 1px 0px;
+	background-color: #8CBEFF;
 }
-
-.mod_flexicontent_wrapper .news_readon_module .news_readon a {
+.mod_flexicontent_wrapper .news_readon_module .news_readon:hover a { /* style of link when hovering inner container */
 	text-decoration:none;
+	color: darkred;
+	font-weight:normal;
 }
 
-.mod_flexicontent_wrapper .news_readon_module .field_value {
-	display: inline;
+.mod_flexicontent_wrapper .news_readon_module .news_readon a {  /* the link */
+}
+.mod_flexicontent_wrapper .news_readon_module .news_readon a:hover {  /* hovering of the link */
 }

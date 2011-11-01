@@ -44,6 +44,10 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="item_columns" type="list" default="1" label="Columns per ordering group" description="Columns per ordering group">
+			<option value="1">1</option>
+			<option value="2">2</option>
+		</param>
 
 		<param name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" menu="hide" />
 		<param name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
