@@ -59,6 +59,7 @@ if ($add_tooltips)
 	JHTML::_('behavior.tooltip');
 	
 $display_date = $params->get('display_date', 1);
+$twocols = $params->get('item_columns', 1) == 2;
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
@@ -89,7 +90,9 @@ $display_date = $params->get('display_date', 1);
 		if (isset($catdata->description)) {
 			echo "<div class='currcatdescr'>". $catdata->description ."</div>\n";
 		}
+		echo "<div class='modclear'></div>\n";
 		echo "</div>\n";
+		echo "<div class='modclear'></div>\n";
 	}
 
 	$ord_titles = array(
@@ -105,25 +108,28 @@ $display_date = $params->get('display_date', 1);
 		 0=>'Default' );
 	
 	$separator = "";
+	$rowtoggler = 1;
 	foreach ($ordering as $ord) :
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
   	  $separator = "<div class='ordering_seperator' ></div>";
     } else {
+    	//continue;
   	  $separator = "";
   	}
-  	
-		if ($ordering_addtitle && $ord) echo "<div class='order_group_title'> ".$ord_titles[$ord]." </div>";
-			if ($ord==0) $grpname='default';
 	?>
-	<div id="<?php echo $grpname.$module->id; ?>" class="mod_flexicontent<?php echo (isset($list[$ord]['featured'])) ? ' twocol' : ''; ?>">
+	<div id="<?php echo $grpname.$module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
 		
 		<?php
+		if ($ordering_addtitle && $ord) echo "<div class='order_group_title'> ".$ord_titles[$ord]." </div>";
+		if ($ord==0) $grpname='default';
+		
 		if (isset($list[$ord]['featured'])) :
 		?>
 		<div class="mod_flexicontent_featured">
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
-			<div class="mod_flexicontent_featured_wrapper">
+			<?php $rowtoggler = !$rowtoggler; ?>
+			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler)?'odd':'even'; ?>">
 				<?php if ($mod_use_image_feat && $item->image) : ?>
 				<div class="image_featured">
 					<?php if ($mod_link_image_feat) : ?>
@@ -177,7 +183,7 @@ $display_date = $params->get('display_date', 1);
 				</div>
 				<?php endif; ?>
 			</div>
-			<div class="modclear"></div>
+			<!--<div class="modclear"></div>-->
 			<?php endforeach; ?>
 		</div>
 		<?php endif; ?>
@@ -187,7 +193,8 @@ $display_date = $params->get('display_date', 1);
 		?>
 		<div class="mod_flexicontent_standard">
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
-			<div class="mod_flexicontent_standard_wrapper">
+			<?php $rowtoggler = !$rowtoggler; ?>
+			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowtoggler)?'odd':'even'; ?>">
 				<?php if ($mod_use_image && $item->image) : ?>
 				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
@@ -241,7 +248,7 @@ $display_date = $params->get('display_date', 1);
 				</div>
 				<?php endif; ?>
 			</div>
-			<div class="modclear"></div>
+			<!--<div class="modclear"></div>-->
 			<?php endforeach; ?>
 		</div>
 		<?php endif; ?>

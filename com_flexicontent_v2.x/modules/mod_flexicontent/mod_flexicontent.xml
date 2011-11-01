@@ -31,7 +31,7 @@
 			<field	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
 	             	description="FLEXI_CHOOSE_TMPL_DESC" 
 	             	directory="/modules/mod_flexicontent/tmpl" 
-	             	default="default" hide_default="1" hide_none="1" 
+	             	default="news" hide_default="1" hide_none="1" 
 	             	stripext="1" filter="\.php$" exclude="^_" />
 		<!--
 		<field name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
@@ -46,6 +46,10 @@
 			<field name="ordering_addtitle" type="radio" default="1" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="item_columns" type="list" default="1" label="Columns for standard items" description="Featured item always appear full length, standard items can appea in 1 or more columns">
+				<option value="1">1</option>
+				<option value="2">2</option>
 			</field>
 			<field name="FLEXI_EMPTY_FIELD_FILTER" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" menu="hide" />
 			<field name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
