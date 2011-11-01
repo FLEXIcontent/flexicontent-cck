@@ -63,6 +63,8 @@ if ($this->params->get('form_extra_css')) {
 }
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
+$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
+$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
 if (@$this->fields['tags'] && $this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
