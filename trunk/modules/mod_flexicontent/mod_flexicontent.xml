@@ -28,7 +28,7 @@
 		<param	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
              	description="FLEXI_CHOOSE_TMPL_DESC" 
              	directory="/modules/mod_flexicontent/tmpl" 
-             	default="default" hide_default="1" hide_none="1" 
+             	default="news" hide_default="1" hide_none="1" 
              	stripext="1" filter="\.php$" exclude="^_" /> 
 		<!--
 		<param name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
@@ -44,7 +44,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="item_columns" type="list" default="1" label="Columns per ordering group" description="Columns per ordering group">
+		<param name="item_columns" type="list" default="1" label="Columns for standard items" description="Featured items always appear full width, standard items can appear in 1 or more columns">
 			<option value="1">1</option>
 			<option value="2">2</option>
 		</param>
@@ -182,6 +182,10 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="mod_do_stripcat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="mod_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -189,6 +193,10 @@
 		<param name="mod_cut_text" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="display_text_feat" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="mod_do_stripcat_feat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>

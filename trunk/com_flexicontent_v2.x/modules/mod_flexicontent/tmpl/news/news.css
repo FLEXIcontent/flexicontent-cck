@@ -51,8 +51,7 @@
 
 
 /* EXTERNAL ITEM CONTAINER ONE TWO (COLUMNS) */
-.mod_flexicontent.twocol .mod_flexicontent_standard_wrapper,
-.mod_flexicontent.twocol .mod_flexicontent_featured_wrapper {
+.mod_flexicontent.twocol .mod_flexicontent_standard_wrapper {
 	width:45%!important;
 	margin-left:2%!important;
 	margin-right:0%!important;

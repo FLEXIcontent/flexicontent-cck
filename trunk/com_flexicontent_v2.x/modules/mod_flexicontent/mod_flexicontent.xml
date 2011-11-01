@@ -47,7 +47,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="item_columns" type="list" default="1" label="Columns for standard items" description="Featured item always appear full length, standard items can appea in 1 or more columns">
+			<field name="item_columns" type="list" default="1" label="Columns for standard items" description="Featured items always appear full width, standard items can appear in 1 or more columns">
 				<option value="1">1</option>
 				<option value="2">2</option>
 			</field>
@@ -180,8 +180,12 @@
 			<field name="cuttitle_feat" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
 			
 			<field name="FLEXI_TEXT_PARAMS" type="separator" default="FLEXI_TEXT_PARAMS" level="level1" menu="hide" />
-			<field name="FLEXI_STD" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<field name="FLEXI_STD1" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="display_text" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mod_do_stripcat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -190,8 +194,12 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="mod_cut_text" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			<field name="FLEXI_FEAT" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="FLEXI_FEAT1" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 			<field name="display_text_feat" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mod_do_stripcat_feat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -203,7 +211,7 @@
 			
 			<field name="FLEXI_IMAGE_PARAMS" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
 			<field name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-			<field name="FLEXI_STD" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<field name="FLEXI_STD2" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -218,7 +226,7 @@
 			</field>		
 			<field name="mod_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="mod_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			<field name="FLEXI_FEAT" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="FLEXI_FEAT2" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 			<field name="mod_use_image_feat" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -241,7 +249,7 @@
 				<option value="1">Yes</option>
 			</field>
 			
-			<field name="FLEXI_STD" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<field name="FLEXI_STD3" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="date_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -258,7 +266,7 @@
 				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
 			</field>
 			
-			<field name="FLEXI_FEAT" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="FLEXI_FEAT3" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 			<field name="date_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -280,13 +288,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="FLEXI_STD" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<field name="FLEXI_STD4" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
-			<field name="FLEXI_FEAT" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="FLEXI_FEAT4" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 			<field name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
