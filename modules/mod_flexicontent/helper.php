@@ -61,6 +61,7 @@ class modFlexicontentHelper
 		$display_text 			= $params->get('display_text');
 		$mod_readmore	 		= $params->get('mod_readmore');
 		$mod_cut_text 			= $params->get('mod_cut_text');
+		$mod_do_stripcat		= $params->get('mod_do_stripcat', 1);
 		$mod_use_image 			= $params->get('mod_use_image');
 		$mod_image 				= $params->get('mod_image');
 		$mod_link_image 		= $params->get('mod_link_image');
@@ -74,6 +75,7 @@ class modFlexicontentHelper
 		$display_text_feat 		= $params->get('display_text');
 		$mod_readmore_feat		= $params->get('mod_readmore_feat');
 		$mod_cut_text_feat 		= $params->get('mod_cut_text_feat');
+		$mod_do_stripcat_feat	= $params->get('mod_do_stripcat_feat', 1);
 		$mod_use_image_feat 	= $params->get('mod_use_image_feat');
 		$mod_link_image_feat 	= $params->get('mod_link_image_feat');
 		$mod_width_feat 		= (int)$params->get('mod_width_feat', 140);
@@ -263,7 +265,7 @@ class modFlexicontentHelper
 				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
 				$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
 				$lists[$ord]['featured'][$i]->fulltitle = $row->title;
-				$lists[$ord]['featured'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat);
+				$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
 				$lists[$ord]['featured'][$i]->typename 	= $row->typename;
 				$lists[$ord]['featured'][$i]->access 	= $row->access;
 				$lists[$ord]['featured'][$i]->featured 	= 1;
@@ -332,7 +334,7 @@ class modFlexicontentHelper
 				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
 				$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
 				$lists[$ord]['standard'][$i]->fulltitle = $row->title;
-				$lists[$ord]['standard'][$i]->text 		= flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text);
+				$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
 				$lists[$ord]['standard'][$i]->typename 	= $row->typename;
 				$lists[$ord]['standard'][$i]->access 	= $row->access;
 				$lists[$ord]['standard'][$i]->featured 	= 0;
