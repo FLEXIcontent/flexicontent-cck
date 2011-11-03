@@ -50,6 +50,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
+		$filedesc	= JRequest::getVar( 'file-desc', '');
 		$err		= null;
 		
 		jimport('joomla.utilities.date');
@@ -125,10 +126,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					$obj = new stdClass();
 					$obj->filename 			= $filename;
 					$obj->altname 			= $file['altname'];
-					$obj->url				= 0;
+					$obj->url			= 0;
 					$obj->secure			= $secure;
-					$obj->ext				= $ext;
-					$obj->hits				= 0;
+					$obj->ext			= $ext;
+					$obj->description		= $filedesc;
+					$obj->hits			= 0;
 					$obj->uploaded			= $date->toMySQL();
 					$obj->uploaded_by		= $user->get('id');
 
@@ -160,10 +162,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 					$obj = new stdClass();
 					$obj->filename 			= $filename;
 					$obj->altname 			= $file['altname'];
-					$obj->url				= 0;
+					$obj->url			= 0;
 					$obj->secure			= $secure;
-					$obj->ext				= $ext;
-					$obj->hits				= 0;
+					$obj->ext			= $ext;
+					$obj->hits			= 0;
+					$obj->description		= $filedesc;
 					$obj->uploaded			= $date->toMySQL();
 					$obj->uploaded_by		= $user->get('id');
 
@@ -216,6 +219,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
 		$altname	= JRequest::getVar( 'file-url-display', null, 'post', 'string' );
 		$ext		= JRequest::getVar( 'file-url-ext', null, 'post', 'alnum' );
+		$filedesc	= JRequest::getVar( 'file-url-desc', '');
 
 		jimport('joomla.utilities.date');
 
@@ -242,10 +246,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		$obj = new stdClass();
 		$obj->filename 			= $filename;
 		$obj->altname 			= $altname;
-		$obj->url				= 1;
+		$obj->url			= 1;
 		$obj->secure			= 1;
-		$obj->ext				= $ext;
-		$obj->hits				= 0;
+		$obj->ext			= $ext;
+		$obj->description		= $filedesc;
+		$obj->hits			= 0;
 		$obj->uploaded			= $date->toMySQL();
 		$obj->uploaded_by		= $user->get('id');
 
@@ -294,6 +299,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 		$user		=& JFactory::getUser();
 		$config 	=& JFactory::getConfig();
 		$tzoffset 	= $config->getValue('config.offset');
+		
+		$filedesc	=  JRequest::getVar( 'file-desc', '' );
 
 		// allowed extensions
 		$filterext	=  JRequest::getVar( 'file-filter-ext', '', 'post' );
@@ -345,10 +352,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
 							$obj->altname 			= $filename;
-							$obj->url				= 0;
+							$obj->url			= 0;
 							$obj->secure			= $secure;
-							$obj->ext				= $ext;
-							$obj->hits				= 0;
+							$obj->ext			= $ext;
+							$obj->description		= $filedesc;
+							$obj->hits			= 0;
 							$obj->uploaded			= $date->toMySQL();
 							$obj->uploaded_by		= $user->get('id');
 
@@ -366,10 +374,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
 							$obj->altname 			= $filename;
-							$obj->url				= 0;
+							$obj->url			= 0;
 							$obj->secure			= $secure;
-							$obj->ext				= $ext;
-							$obj->hits				= 0;
+							$obj->ext			= $ext;
+							$obj->description		= $filedesc;
+							$obj->hits			= 0;
 							$obj->uploaded			= $date->toMySQL();
 							$obj->uploaded_by		= $user->get('id');
 

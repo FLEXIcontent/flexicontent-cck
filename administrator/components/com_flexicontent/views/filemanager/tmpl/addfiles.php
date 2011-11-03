@@ -57,7 +57,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
                     <fieldset class="actions">
                     	<?php echo JText::_( 'FLEXI_DISPLAY_NAME' ).': '; ?><input type="text" id="file-upload-name" name="altname" />
                     	<br /><br />
-                        <input type="file" id="file-upload" name="Filedata" />                        
+                        <input type="file" id="file-upload" name="Filedata" />
+                        <textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
                         <input type="submit" id="file-upload-submit" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
                         <span id="upload-clear"></span>
                     </fieldset>

@@ -89,6 +89,16 @@ table#filemanager-zone label{
 									?>
 								</td>
 							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
+								</td>
+							</tr>
 						</table>
                         <input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
                         <span id="upload-clear"></span>
@@ -138,6 +148,16 @@ table#filemanager-zone label{
 								</td>
 								<td>
                 		        	<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />                        
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-url-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-url-desc" cols="23" rows="5" id="file-url-desc"></textarea>
 								</td>
 							</tr>
 						</table>
@@ -210,6 +230,16 @@ table#filemanager-zone label{
 									<?php
 									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) );
 									?>
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
 								</td>
 							</tr>
 						</table>

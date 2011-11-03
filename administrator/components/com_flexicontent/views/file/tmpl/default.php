@@ -83,6 +83,16 @@ function submitbutton(pressbutton) {
 			</td>
 		</tr>
 		<?php endif; ?>
+		<tr>
+			<td class="key">
+				<label for="file-desc">
+				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+				</label>
+			</td>
+			<td>
+				<textarea name="description" cols="23" rows="5" id="file-desc"><?php echo $this->row->description; ?></textarea>
+			</td>
+		</tr>
 	</table>
 
 
