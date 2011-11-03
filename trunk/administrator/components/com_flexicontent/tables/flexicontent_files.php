@@ -42,6 +42,8 @@ class flexicontent_files extends JTable
 	var $secure				= 1;
 	/** @var string */
 	var $ext				= '';
+	/** @var text */
+	var $description				= '';
 	/**
 	 * @var int 
 	 * @TODO implement

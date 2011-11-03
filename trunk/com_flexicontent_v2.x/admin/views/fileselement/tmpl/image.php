@@ -44,6 +44,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									<input type="file" id="file-upload" name="Filedata" />
 								</td>
 							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
+								</td>
+							</tr>
 						</table>
                         <input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" class="" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
                         <span id="upload-clear"></span>

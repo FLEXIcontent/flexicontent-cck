@@ -126,6 +126,12 @@ class FlexicontentViewFilemanager extends JView
 		if ($params->get('enable_flash', 1)) {
 			JHTML::_('behavior.uploader', 'file-upload', array('onAllComplete' => 'function(){ window.location.reload(); }') );
 		}
+		if (FLEXI_ACCESS) {
+			$user  		= & JFactory::getUser();
+			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanUpload			= 1;
+		}
 		
 		jimport('joomla.client.helper');
 		$ftp = !JClientHelper::hasCredentials('ftp');

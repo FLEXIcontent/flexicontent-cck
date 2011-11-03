@@ -158,3 +158,52 @@ if ($error) {
 		<?php endforeach; ?>
 	</tbody>
 </table>
+
+<?php
+$db = &JFactory::getDBO();
+$query = "SHOW COLUMNS FROM #__flexicontent_files;";
+$db->setQuery($query);
+$columns = $db->loadResultArray();
+?>
+<h3><?php echo JText::_('Actions'); ?></h3>
+<table class="adminlist">
+	<thead>
+		<tr>
+			<th class="title"><?php echo JText::_('Actions'); ?></th>
+			<th width="60%"><?php echo JText::_('Status'); ?></th>
+		</tr>
+	</thead>
+	<tfoot>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+	</tfoot>
+	<tbody>
+		<tr class="row0">
+			<td class="key">Run SQL "ALTER TABLE `jos_flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`"
+			<?php
+			$already = true;
+			$result = false;
+			if(!in_array('description', $columns)) {
+				$already = false;
+				$query = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Column 'description' is already exists.");
+				}elseif($result) {
+					echo JText::_('Success');
+				}else{
+					echo JText::_('Alter table is not success.');
+				}
+				?></span>
+			</td>
+		</tr>
+	</tbody>
+</table>

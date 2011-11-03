@@ -56,7 +56,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
             </form>
             <?php endif; ?>
 				
-			<!-- File Upload Form -->
+	    <!-- File Upload Form -->
             <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;controller=filemanager&amp;task=upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
                 <fieldset>
                     <legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
@@ -83,6 +83,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									<?php
 									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) );
 									?>
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
 								</td>
 							</tr>
 						</table>
@@ -113,7 +123,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									</label>
 								</td>
 								<td>
-									<input type="text" id="file-url-display" size="40" class="required" name="file-url-display" />
+						<input type="text" id="file-url-display" size="40" class="required" name="file-url-display" />
 								</td>
 							</tr>
 							<tr>
@@ -123,7 +133,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									</label>
 								</td>
 								<td>
-		                        	<input type="text" id="file-url-data" size="40" class="required" name="file-url-data" />                        
+		                        	<input type="text" id="file-url-data" size="40" class="required" name="file-url-data" />
 								</td>
 							</tr>
 							<tr>
@@ -133,7 +143,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									</label>
 								</td>
 								<td>
-                		        	<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />                        
+                		        	<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-url-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-url-desc" cols="23" rows="5" id="file-url-desc"></textarea>
 								</td>
 							</tr>
 						</table>
@@ -206,6 +226,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									<?php
 									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) );
 									?>
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+                		        				<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
 								</td>
 							</tr>
 						</table>
