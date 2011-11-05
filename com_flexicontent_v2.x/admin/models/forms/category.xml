@@ -27,7 +27,7 @@
 	<field name="modified_user_id" type="user" label="JGLOBAL_FIELD_MODIFIED_BY_LABEL" description="JGLOBAL_FIELD_MODIFIED_BY_DESC" class="readonly" readonly="true" filter="unset"/>
 	<field name="modified_time" type="text" label="JGLOBAL_MODIFIED" description="Modification Time" class="readonly" filter="unset" readonly="true" />
 	<field name="hits" type="hidden" filter="unset"/>
-	<field name="language" type="contentlanguage" label="JFIELD_LANGUAGE_LABEL" description="COM_CATEGORIES_FIELD_LANGUAGE_DESC" class="inputbox">
+	<field name="language" type="contentlanguage" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" class="inputbox">
 		<option value="*">JALL</option>
 	</field>
 	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_flexicontent" section="category" />
@@ -39,12 +39,17 @@
 		</fieldset>
 		<fieldset name="standard">
 			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" onchange="activatePanel(this.value);" />
-			<field name="@spacer1" type="spacer" default="" label="" description="" />
+			
+			<field name="sep_cat_extra" type="separator" hr="false" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
 				<option value="2">FLEXI_JOMCOMMENTS</option>
+			</field>
+			<field name="show_feed_link" type="radio" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 				<option value="">Use Global</option>
@@ -56,29 +61,23 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-			<field name="@spacer2" type="spacer" default="" label="" description="" />
+			<field name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
+				<option value="">Use Global</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			
+			<field name="sep_cat_info" type="separator" hr="false" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
 			<field name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
-			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_Show/Hide_the_items_title">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
 			<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
+			<field name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-			<field name="show_feed_link" type="radio" default="1" label="FLEXI_SHOW_FEED_LINK" description="FLEXI_SHOW_FEED_LINK_DESC">
+			<field name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
@@ -86,6 +85,24 @@
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="sep_items_list" type="separator" hr="false" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" menu="hide" />
+			<field name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_Show/Hide_the_items_title">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 <!--
 			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_TIPLINKS">
@@ -96,6 +113,8 @@
 		</fieldset>
 		
 		<fieldset name="common" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="sep_pagination" type="separator" hr="false" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" menu="hide" />
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
 				<option value="0">FLEXI_Hide</option>
@@ -106,11 +125,20 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
+			
+			<field name="sep_items_retrieval" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
 			<field name="@spacer1" type="spacer" default="" label="" description="" />
 			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
 				<option value="0">FLEXI_NO</option> 
 				<option value="1">FLEXI_YES</option> 
 			</field> 
+			<field name="filtercat" type="radio" default="0" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
+				<option value="">Use Global</option>
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			
+			<field name="sep_items_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 				<option value="">Default</option>
 				<option value="date">Oldest first</option>
@@ -123,15 +151,17 @@
 				<option value="rhits">Least Hits</option>
 				<option value="order">Ordering</option>
 			</field>
-			<field name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+			<field name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." >
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE" description="..." >
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INT</option>
 			</field>
-			<field name="@spacer3" type="spacer" default="" label="" description="" />
+			
+			<field name="sep_alpha_index" type="separator" hr="false" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" menu="hide" />
 			<field name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="6" cols="30" />
 			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="1" cols="30" />
@@ -141,7 +171,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="@spacer4" type="spacer" default="" label="" description="" />
+			
+			<field name="sep_subcategory_info" type="separator" hr="false" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" menu="hide" />
 			<field name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -157,7 +188,8 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 	<!-- 		<field name="fields" type="fields" size="10" default="0" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" /> -->
-			<field name="@spacer5" type="spacer" default="" label="" description="" />
+	
+			<field name="sep_search_and_filter" type="separator" hr="false" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" menu="hide" />
 			<field name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -166,7 +198,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filters" type="filters" size="5" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 		</fieldset>
 	</fields>
 	<fields name="metadata">

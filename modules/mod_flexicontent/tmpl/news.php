@@ -108,8 +108,9 @@ $twocols = $params->get('item_columns', 1) == 2;
 		 0=>'Default' );
 	
 	$separator = "";
-	$rowtoggler = 1;
+	$rowtoggler = 0;
 	foreach ($ordering as $ord) :
+			
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
   	  $separator = "<div class='ordering_seperator' ></div>";
@@ -118,11 +119,10 @@ $twocols = $params->get('item_columns', 1) == 2;
   	  $separator = "";
   	}
 	?>
-	<div id="<?php echo $grpname.$module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
+	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
 		
 		<?php
 		if ($ordering_addtitle && $ord) echo "<div class='order_group_title'> ".$ord_titles[$ord]." </div>";
-		if ($ord==0) $grpname='default';
 		
 		if (isset($list[$ord]['featured'])) :
 		?>
@@ -190,6 +190,7 @@ $twocols = $params->get('item_columns', 1) == 2;
 
 		<?php
 		if (isset($list[$ord]['standard'])) :
+			$rowtoggler = 0;
 		?>
 		<div class="mod_flexicontent_standard">
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
@@ -248,7 +249,7 @@ $twocols = $params->get('item_columns', 1) == 2;
 				</div>
 				<?php endif; ?>
 			</div>
-			<!--<div class="modclear"></div>-->
+			<?php echo (!$rowtoggler) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 		</div>
 		<?php endif; ?>

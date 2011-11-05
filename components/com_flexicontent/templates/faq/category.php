@@ -24,6 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<?php //echo flexicontent_html::addbutton( $this->params ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
+		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
 	</p>
 <!-- EOF buttons -->
 

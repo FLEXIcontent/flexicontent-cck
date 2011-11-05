@@ -208,7 +208,7 @@ if ($this->limitstart == 0) :
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
+    			<?php if ($this->params->get('show_readmore', 1) && ( (strlen(trim($items[$i]->fulltext)) >= 1) || $this->params->get('lead_strip_html', 1) ) ) : ?>
     			<span class="readmore">
     				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
     				<?php
@@ -419,7 +419,7 @@ if ($this->limitstart == 0) :
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1) && (strlen(trim($items[$i]->fulltext)) >= 1) ) : ?>
+    			<?php if ($this->params->get('show_readmore', 1) && ( (strlen(trim($items[$i]->fulltext)) >= 1) || $this->params->get('intro_strip_html', 1) ) ) : ?>
     			<span class="readmore">
     				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
     				<?php

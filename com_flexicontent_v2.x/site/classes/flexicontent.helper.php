@@ -85,6 +85,48 @@ class flexicontent_html
 	}
 
 	/**
+	 * Creates the rss feed button
+	 *
+	 * @param string $print_link
+	 * @param array $params
+	 * @since 1.0
+	 */
+	function feedbutton($view, &$params, $slug = null, $itemslug = null )
+	{
+		if ( $params->get('show_feed_icon', 1) && !JRequest::getCmd('print') ) {
+
+			$uri    =& JURI::getInstance();
+			$base  	= $uri->toString( array('scheme', 'host', 'port'));
+			
+			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
+			if($view == 'category') {
+				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
+			} elseif($view == 'items') {
+				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
+			} elseif($view == 'tags') {
+				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
+			} else {
+				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
+			}
+			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
+
+			if ($params->get('show_icons')) 	{
+				$image = JHTML::_('image.site', 'livemarks.png', 'media/system/images/', NULL, NULL, JText::_( 'FLEXI_FEED' ));
+			} else {
+				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
+			}
+
+			$overlib = JText::_( 'FLEXI_FEED_TIP' );
+			$text = JText::_( 'FLEXI_FEED' );
+
+			$output	= '<a href="'. $link .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
+			return $output;
+		}
+		return;
+	}
+	
+	/**
 	 * Creates the print button
 	 *
 	 * @param string $print_link
