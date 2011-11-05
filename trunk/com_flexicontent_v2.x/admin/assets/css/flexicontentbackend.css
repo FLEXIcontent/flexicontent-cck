@@ -648,7 +648,7 @@ div #jform_params_show_email_icon {	width:140px; }
 
 div #jformtid {	scroll: visible;	height:60px;	width:60%;  }
 
-div #jform_params_filters { display:block; width:100%; float:none; clear:both}
+div #jform_params_filters { display:block; width:50%; float:left; }
 
 #jform_attribs_separator1-lbl, #jform_attribs_separator2-lbl, #jform_attribs_separator3-lbl, #jform_attribs_separator4-lbl, #jform_attribs_separator5-lbl,
 #jform_attribs_separator6-lbl, #jform_attribs_separator7-lbl, #jform_attribs_separator8-lbl, #jform_attribs_separator9-lbl, #jform_attribs_separator10-lbl, 

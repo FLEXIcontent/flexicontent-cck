@@ -63,7 +63,7 @@ function submitform(pressbutton) {
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' ); ?>')
+		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' )); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;

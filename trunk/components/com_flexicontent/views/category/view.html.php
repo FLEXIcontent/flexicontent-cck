@@ -144,7 +144,7 @@ class FlexicontentViewCategory extends JView
 				$mainframe->addMetaTag('title', $category->title);
 		}
 		
-		if ($params->get('show_feed_link', 1) == 1) {
+		if ($params->get('add_feed_to_head', 1) == 1) {
 			//add alternate feed link
 			$link	= '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');

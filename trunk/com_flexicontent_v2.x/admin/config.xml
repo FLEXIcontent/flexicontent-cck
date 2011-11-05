@@ -160,6 +160,10 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
+			<field name="show_feed_icon" type="radio" default="1" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
 
 			<field name="separator8" label="" type="separator" default="FLEXI_CATS_CONF" level="level1" menu="hide" />
 			

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 919 2011-10-03 02:17:05Z ggppdk $
+ * @version 1.5 stable $Id: category.php 941 2011-10-29 07:30:54Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,6 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<?php //echo flexicontent_html::addbutton( $this->params ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
+		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
 	</p>
 <!-- EOF buttons -->
 
