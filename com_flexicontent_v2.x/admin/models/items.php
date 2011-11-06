@@ -414,10 +414,10 @@ class FlexicontentModelItems extends JModel {
 		$allitems	= $permission->DisplayAllItems;
 
 		if (!@$allitems) {				
-			$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.edit', 'item');
-			$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editcat', 'category');
-			$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editown', 'item');
-			$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'flexicontent.editowncat', 'category');
+			$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'item');
+			$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');
+			$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'item');
+			$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');
 
 			if (!$permission->CanEdit) { // first exclude the users allowed to edit all items
 				if (@$canEditOwn['item']) { // custom rules for users allowed to edit all their own items
@@ -1195,12 +1195,12 @@ class FlexicontentModelItems extends JModel {
 	function candelete($cid = array()) {
 		$user = JFactory::getUser();
 
+		$permission = FlexicontentHelperPerm::getPerm();
 		// return true for super administrators
-		if(JAccess::check($user->id, 'core.admin', 'root.1')) return true;
+		if($permission->CanConfig) return true;
 
 		$n		= count( $cid );
 		if ($n) {
-			$permission = FlexicontentHelperPerm::getPerm();
 			$query = 'SELECT id, catid, created_by FROM #__content'
 			. ' WHERE id IN ( '. implode(',', $cid) . ' )'
 			;

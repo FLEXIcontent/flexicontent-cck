@@ -138,7 +138,7 @@ class FlexicontentViewItem extends JView {
 			//	JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 			//	$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
 			//}
-			if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
+			if(!$permission->CanConfig) {
 				//$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $form->getValue("catid"));
 				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
 				$canEdit 		= in_array('edit', $rights);
@@ -182,7 +182,7 @@ class FlexicontentViewItem extends JView {
 		//build version state list
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
-		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
+		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
 		/*if (FLEXI_FISH) {
 		//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);

@@ -21,7 +21,8 @@ defined('_JEXEC') or die('Restricted access');
  * @package 	Joomla.Framework
  * @subpackage	Table
  * @since		1.0
- */jimport('joomla.database.tablenested');
+ */
+jimport('joomla.database.tablenested');
 class flexicontent_categories extends JTableNested
 {
 	/** @var int Primary key */
@@ -34,7 +35,7 @@ class flexicontent_categories extends JTableNested
 	var $level			= null;
 	/** @var string */
 	var $path			= null;
-	var $extension=null;
+	var $extension= null;
 	/** @var string The menu title for the category (a short name)*/
 	var $title				= null;
 	/** @var string The the alias for the category*/
@@ -68,6 +69,7 @@ class flexicontent_categories extends JTableNested
 	* @param database A database connector object
 	*/
 	function flexicontent_categories(& $db) {
+		$this->extension = 'com_content';
 		parent::__construct('#__categories', 'id', $db);
 	}
 	
@@ -79,10 +81,78 @@ class flexicontent_categories extends JTableNested
 	 * @return	string
 	 * @since	1.6
 	 */
-	protected function _getAssetName() {
+	protected function _getAssetName()
+	{
+		// we use 'com_content' inside $this->extension instead of 'com_flexicontent'
 		$k = $this->_tbl_key;
-		return 'flexicontent.category.'.(int) $this->$k;
+		return $this->extension.'.category.'.(int) $this->$k;
 	}
+
+	/**
+	 * Method to return the title to use for the asset table.
+	 *
+	 * @return  string
+	 *
+	 * @since   11.1
+	 */
+	protected function _getAssetTitle()
+	{
+		return $this->title;
+	}
+
+	/**
+	 * Get the parent asset id for the record
+	 *
+	 * @param   JTable   $table  A JTable object for the asset parent.
+	 * @param   integer  $id     The id for the asset
+	 *
+	 * @return  integer  The id of the asset's parent
+	 *
+	 * @since   11.1
+	 */
+	/*protected function _getAssetParentId($table = null, $id = null)
+	{
+		// Initialise variables.
+		$assetId = null;
+		$db		= $this->getDbo();
+
+		// This is a category under a category.
+		if ($this->parent_id > 1) {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('asset_id');
+			$query->from('#__categories');
+			$query->where('id = '.(int) $this->parent_id);
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+		// This is a category that needs to parent with the extension.
+		elseif ($assetId === null) {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('id');
+			$query->from('#__assets');
+			$query->where('name = '.$db->quote($this->extension));
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+
+		// Return the asset id.
+		if ($assetId) {
+			return $assetId;
+		} else {
+			return parent::_getAssetParentId($table, $id);
+		}
+	}*/
+	
 
 	/**
 	 * Overloaded check function

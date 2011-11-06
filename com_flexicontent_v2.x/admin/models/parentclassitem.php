@@ -56,6 +56,14 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	var $_currentversion = -1;
 
+	
+	/**
+	 * Item current version
+	 *
+	 * @var object
+	 */
+	var $_currentcatid = 0;
+
 	/**
 	 * Constructor
 	 *
@@ -71,10 +79,11 @@ class ParentClassItem extends JModelAdmin {
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function setId($id) {
+	function setId($id, $currcatid=0) {
 		// Set item id and wipe data
 		$this->_id	    = $id;
 		$this->_item		= null;
+		$this->_currentcatid = $currcatid;
 	}
 	
 	/**
@@ -245,10 +254,12 @@ class ParentClassItem extends JModelAdmin {
 		// a. from edit form
 		$data = JRequest::get( 'post' );
 		$pk = @$data['jform']['id'];
+		$curcatid = 0;
 		
 		// b. from variable 'id' of the http request (e.g. item view)
 		if(!$pk) {
 			$pk = JRequest::getVar('id', 0, '', 'int');
+			$curcatid = JRequest::getVar('cid', 0, '', 'int');
 		}
 		
 		// c. from variable 'cid[]' of the http request (e.g. edit item TASK)
@@ -260,7 +271,7 @@ class ParentClassItem extends JModelAdmin {
 		
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $pk);
-		$this->setId($pk);
+		$this->setId($pk, $curcatid);
 
 		// Load the parameters.
 		$value = JComponentHelper::getParams($this->option);
@@ -341,6 +352,87 @@ class ParentClassItem extends JModelAdmin {
 	}
 	
 	/**
+	 * Method override to check if you can add a new record.
+	 *
+	 * @param	array	An array of input data.
+	 *
+	 * @return	boolean
+	 * @since	1.6
+	 */
+	protected function allowAdd($data = array())
+	{
+		// Initialise variables.
+		$user		= JFactory::getUser();
+		
+		//$categoryId	= JArrayHelper::getValue($data, 'cid', JRequest::getInt('filter_category_id'), 'int');
+		$categoryId	= $this->_currentcatid;
+		$allow		= null;
+
+		if ($categoryId) {
+			// If the category has been passed in the data or URL check it.
+			$allow	= $user->authorise('core.create', 'com_content.category.'.$categoryId);
+		}
+
+		if ($allow === null) {
+			// In the absense of better information, revert to the component permissions.
+			return parent::allowAdd();
+		}
+		else {
+			return $allow;
+		}
+	}
+
+	/**
+	 * Method override to check if you can edit an existing record.
+	 *
+	 * @param	array	$data	An array of input data.
+	 * @param	string	$key	The name of the key for the primary key.
+	 *
+	 * @return	boolean
+	 * @since	1.6
+	 */
+	protected function allowEdit($data = array(), $key = 'id')
+	{
+		// Initialise variables.
+		$recordId	= (int) isset($data[$key]) ? $data[$key] : $this->_id;
+		$user		= JFactory::getUser();
+		$userId		= $user->get('id');
+
+		// Check general edit permission first.
+		if ($user->authorise('core.edit', 'com_content.article.'.$recordId)) {
+			return true;
+		}
+
+		// Fallback on edit.own.
+		// First test if the permission is available.
+		if ($user->authorise('core.edit.own', 'com_content.article.'.$recordId)) {
+			// Now test the owner is the user.
+			$ownerId	= (int) isset($data['created_by']) ? $data['created_by'] : 0;
+			if (empty($ownerId) && $recordId) {
+				// Need to do a lookup from the model.
+				$record		= $this->getModel()->getItem($recordId);
+
+				if (empty($record)) {
+					return false;
+				}
+
+				$ownerId = $record->created_by;
+			}
+
+			// If the owner matches 'me' then do the test.
+			if ($ownerId == $userId) {
+				return true;
+			}
+		}
+
+		// Since there is no asset tracking, revert to the component permissions.
+		return parent::allowEdit($data, $key);
+	}
+
+
+
+	
+	/**
 	 * Method to check if the user can an item anywhere
 	 *
 	 * @access	public
@@ -348,6 +440,8 @@ class ParentClassItem extends JModelAdmin {
 	 * @since	1.5
 	 */
 	function canAdd() {
+		// MAYBE possible to use allowAdd()
+		
 		$user	=& JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		if(!$permission->CanAdd) return false;
@@ -362,15 +456,16 @@ class ParentClassItem extends JModelAdmin {
 	 * @since	1.5
 	 */
 	function canEdit() {
+		// MAYBE possible to use allowEdit()
+		
 		$user	=& JFactory::getUser();
-
-		if (!JAccess::check($user->id, 'core.admin', 'root.1')) {
-				$permission = FlexicontentHelperPerm::getPerm();
+		$permission = FlexicontentHelperPerm::getPerm();
+		if (!$permission->CanConfig) {
 				$id = $this->getState($this->getName().'.id');
 				if ($id) {
 					$rights 	= FlexicontentHelperPerm::checkAllItemAccess($uid, 'item', $id);
-					$canEdit 	= in_array('flexicontent.editall', $rights) || $permission->CanEdit;
-					$canEditOwn	= (in_array('flexicontent.editown', $rights) && ($item->created_by == $user->id));
+					$canEdit 	= in_array('core.edit', $rights) || $permission->CanEdit;
+					$canEditOwn	= (in_array('core.edit.own', $rights) && ($item->created_by == $user->id));
 					if ($canEdit || $canEditOwn) return true;
 					return false;
 				}

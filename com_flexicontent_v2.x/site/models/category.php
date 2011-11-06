@@ -183,7 +183,7 @@ class FlexicontentModelCategory extends JModelList{
 		$query	= $db->getQuery(true);
 		$groups	= implode(',', $user->getAuthorisedViewLevels());
 
-		if ((!$user->authorise('core.edit.state', 'com_content')) &&  (!$user->authorise('core.edit', 'com_content'))){
+		if ((!$user->authorise('core.edit.state', 'com_flexicontent')) &&  (!$user->authorise('core.edit', 'com_flexicontent'))){
 			// limit to published for people who can't edit or edit.state.
 			$this->setState('filter.published', 1);
 			// Filter by start and end dates.

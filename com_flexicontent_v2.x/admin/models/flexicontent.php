@@ -49,7 +49,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getPending() {
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -76,7 +76,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
 				. ' FROM #__content AS c'
@@ -106,7 +106,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user	= &JFactory::getUser();
-		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -132,7 +132,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getInprogress() {
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !JAccess::check($user->id, 'core.admin', 'root.1') ? $permission->DisplayAllItems : 1;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -879,6 +879,7 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 	}
+	
 	function checkInitialPermission() {
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
@@ -887,16 +888,30 @@ class FlexicontentModelFlexicontent extends JModel
 		$db->setQuery($query);
 		$db->query();
 		
+		// Component Section Permissions
 		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
 		$db->setQuery($query);
 		$rules = $db->loadResult();
 		$rule = new JRules($rules);
+		$comp_section = count($rule->getData());
 		
-		$query = "SELECT count(asset_id) FROM #__flexicontent_fields WHERE asset_id='0';";
+		// Field section permissions, these were renamed, so must check
+		$query = "DELETE FROM #__assets WHERE name LIKE 'flexicontent.%';";
 		$db->setQuery($query);
-		$num = (int)$db->loadResult();
-		return ((count($rule->getData())>0) && ($num===0));
+		if(!$db->query()) return false;
+		
+		$query = "SELECT rules FROM #__assets AS se LEFT JOIN #__flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.name LIKE 'com_flexicontent.field.%';";
+		$db->setQuery($query);
+		$rules = $db->loadObjectList();
+		$rule = new JRules($rules);
+		$field_section = count($rule->getData());
+		
+		/*$query = "SELECT count(asset_id) FROM #__flexicontent_fields WHERE asset_id='0';";
+		$db->setQuery($query);
+		$num = (int)$db->loadResult();*/
+		return ($comp_section && $field_section /*&& ($num===0)*/);
 	}
+	
 	function initialPermission() {
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
@@ -951,30 +966,26 @@ class FlexicontentModelFlexicontent extends JModel
 					$rule['flexicontent.editown'][$g->id] = 1;
 					$rule['flexicontent.edit.state'][$g->id] = 1;
 					$rule['flexicontent.editown.state'][$g->id] = 1;
-					$rule['flexicontent.deletecat'][$g->id] = 1;
 					$rule['flexicontent.deleteowncat'][$g->id] = 1;
 					$rule['flexicontent.editcat'][$g->id] = 1;
-					$rule['flexicontent.editcat.state'][$g->id] = 1;
-					$rule['flexicontent.editowncat.state'][$g->id] = 1;
-					$rule['flexicontent.editowncat'][$g->id] = 1;
 					$rule['flexicontent.managefile'][$g->id] = 1;//CanFiles
 					$rule['flexicontent.uploadfiles'][$g->id] = 1;//CanUpload
 					$rule['flexicontent.viewallfiles'][$g->id] = 1;//CanViewAllFiles
 				}
 				if(JAccess::checkGroup($g->id, 'core.create')) {
-					$rule['flexicontent.create'][$g->id] = 1;//CanAdd
+					$rule['core.create'][$g->id] = 1;//CanAdd
 				}
 				if(JAccess::checkGroup($g->id, 'core.delete')) {
-					$rule['flexicontent.deleteall'][$g->id] = 1;//CanDelete
+					$rule['core.delete'][$g->id] = 1;//CanDelete
 				}
 				if(JAccess::checkGroup($g->id, 'core.edit')) {
-					$rule['flexicontent.editall'][$g->id] = 1;//CanEdit
+					$rule['core.edit'][$g->id] = 1;//CanEdit
 				}
 				if(JAccess::checkGroup($g->id, 'core.edit.state')) {
-					$rule['flexicontent.editall.state'][$g->id] = 1;//CanPublish
+					$rule['core.edit.state'][$g->id] = 1;//CanPublish
 				}
 				if(JAccess::checkGroup($g->id, 'core.edit.own')) {
-					$rule['flexicontent.editown'][$g->id] = 1;
+					$rule['core.edit.own'][$g->id] = 1;//CanEditOwn
 				}
 			}
 			foreach($rule as $key=>$ar) {
@@ -991,14 +1002,15 @@ class FlexicontentModelFlexicontent extends JModel
 				if(!$db->query()) return false;
 			}
 		}
-		$query = "SELECT id FROM #__flexicontent_fields WHERE asset_id='0';";
+		//$query = "SELECT id FROM #__flexicontent_fields WHERE asset_id='0';";
+		$query = "SELECT ff.id FROM jos_assets AS se RIGHT JOIN jos_flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.id is NULL";
 		$db->setQuery($query);
 		$rows = $db->loadResultArray();
 		if(count($rows)>0) {
 			$asset	= JTable::getInstance('Asset');
 			$parentId = 1;
 			foreach($rows as $id) {
-				$name = "flexicontent.field.{$id}";
+				$name = "com_flexicontent.field.{$id}";
 				$query = "SELECT id FROM #__assets WHERE name='{$name}';";
 				$db->setQuery($query);
 				$asset_id = $db->loadResult();
