@@ -407,7 +407,7 @@ window.addEvent('domready', function() {
 		$canEditOwnAll	= true;//I(enjoyman) not sure in this line.
 		$canPublishAll 		= $this->permission->CanPublish;
 		$canPublishOwnAll	= true;//I(enjoyman) not sure in this line.
-		$check = JAccess::check($user->id, 'core.admin', 'root.1');
+		$check = $this->permission->CanConfig;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);

@@ -255,7 +255,8 @@ class FlexicontentControllerItems extends JController {
 		$user	=& JFactory::getUser();
 		$model 	= $this->getModel('items');
 		
-		if(!JAccess::check($user->id, 'core.admin', 'root.1')) {
+		$permission = FlexicontentHelperPerm::getPerm();
+		if(!$permission->CanConfig) {
 			echo JText::_( 'ALERTNOTAUTH' );
 			return;
 		}
@@ -614,9 +615,8 @@ class FlexicontentControllerItems extends JController {
 			$used = array();
 		}
 		$permission = FlexicontentHelperPerm::getPerm();
-		$check = JAccess::check($user->id, 'core.admin', 'root.1');
-		$CanNewTags = (!$check) ? $permission->CanNewTag : 1;
-		$CanUseTags = (!$check) ? $permission->CanUseTags : 1;
+		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTag : 0;
+		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 0;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);
@@ -656,7 +656,7 @@ class FlexicontentControllerItems extends JController {
 
 		$user	=& JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanUseTags = (!$check) ? $permission->CanUseTags : 1;
+		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 0;
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();

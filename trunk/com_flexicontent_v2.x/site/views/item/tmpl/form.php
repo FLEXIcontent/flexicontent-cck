@@ -17,8 +17,44 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$cids = $this->params->get("cid");
 $cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+
+$cids = $this->params->get("cid");  // categories FIELD is READONLY ?
+$postcats = $this->params->get("postcats", 0);
+
+if ($cids) :
+	global $globalcats;
+	//$cids 		= explode(",", $cids);
+	$cids_kv 	= array();
+	$options 	= array();
+	foreach ($cids as $cat) {
+		$cids_kv[$cat] = $globalcats[$cat]->title;
+	}
+	
+	switch($postcats) {
+		case 0:
+		default:
+			$fixedcats = implode(', ', $cids_kv);
+			foreach ($cids_kv as $k => $v) {
+				$fixedcats .= '<input type="hidden" name="jform[cid][]" value="'.$k.'" />';
+			}
+			break;
+		case 1:
+			foreach ($cids_kv as $k => $v) {
+				$options[] = JHTML::_('select.option', $k, $v );
+			}
+			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', '', 'value', 'text', '' );
+			break;
+		case 2:
+			foreach ($cids_kv as $k => $v) {
+				$options[] = JHTML::_('select.option', $k, $v );
+			}
+			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', 'multiple="multiple" size="6"', 'value', 'text', '' );
+			break;
+	}
+endif;
+
+
 
 JHTML::_('behavior.mootools');
 $this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
@@ -146,7 +182,7 @@ function submitbutton( pressbutton ) {
 		invalid[0].focus();
 		//form.title.focus();
 		return false;
-	}<?php if(!$cids) {?> else if ( form.jformcid.selectedIndex == -1 ) {
+	}<?php if(!$cids) {?> else if ( form.jformcid.selectedIndex == -1 ) {   // categories FIELD is READONLY ?
 		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
 		validator.handleResponse(false,form.jformcid);
 		var invalid = $$('.invalid');
@@ -206,55 +242,41 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		
-<?php
-if ($cids) :
-?>
+<?php if ($cids) : ?>
 		<tr>
 			<td>
 				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' );?>
+					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
 				</label>
 			</td>
 			<td>
-				<?php
-					global $globalcats;
-					$cats = array();
-					foreach($cids as $cid) :
-							$cats[] = $globalcats[$cid]->title;
-				?>
-							<input type="hidden" name="jform[cid][]" value="<?php echo $cid;?>" />
-				<?php
-					endforeach;
-				?>
-				<?php
-					echo implode(',', $cats);
-				?>
+				<?php echo $fixedcats; ?>
 			</td>
 		</tr>
-<?php
-else :
-?>
+<?php else : ?>
 		<tr>
 			<td>
-			<label for="cid" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_CATEGORIES' );?>
-				<?php if ($this->perms['multicat']) : ?>
-				<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-					<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
-				</span>
-				<?php endif; ?>
-			</label>
+				<label for="cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
+					<?php if ($this->perms['multicat']) : ?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+					</span>
+					<?php endif; ?>
+				</label>
 			</td>
 			<td>
           		<?php echo $this->lists['cid']; ?>
-          		<?php //echo $this->item->getInput('catid');?>
-          		</td>
-          	</tr>
+			</td>
+		</tr>
+<?php endif; ?>
+
 <?php
-endif;
 
 $autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
+print_r($this->perms);
 $canpublish = $this->perms['canpublish'];
+echo "autopublished:$autopublished<br />";
 ?>
 	<?php if (!$autopublished && $canpublish) : ?>
 	
@@ -282,6 +304,20 @@ $canpublish = $this->perms['canpublish'];
 			</td>
 		</tr>
 		<?php	endif; ?>
+		
+	<?php elseif (!$autopublished && !$canpublish) : ?>
+	
+		<tr>
+			<td>
+				<?php echo $this->item->getLabel('state').':';?>
+			</td>
+			<td>
+	  		<?php //echo JText::_( 'FLEXI_NEEDS_APPROVAL' ).':';?>
+	  		<?php echo 'You cannot set state of this item, it will be reviewed by administrator'; ?>
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->getValue('state', -4);?>" />
+				<input type="hidden" id="vstate" name="vstate" value="1" />
+			</td>
+		</tr>
 		
 	<?php endif; ?>
 	
@@ -569,17 +605,12 @@ $canpublish = $this->perms['canpublish'];
 		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
 		<?php echo $this->item->getInput('id');?>
-		<input type="hidden" name="jform[type_id]" value="<?php echo JRequest::setVar('typeid', 0);?>" />
+		<input type="hidden" name="jform[type_id]" value="<?php echo $this->item->getValue('type_id'); ?>" />
 		<?php
 			if ($autopublished) :
 		?>
 				<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
 				<input type="hidden" id="vstate" name="vstate" value="2" />
-		<?php
-			elseif (!$autopublished && !$canpublish) :
-		?>
-				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->getValue('state', -4);?>" />
-				<input type="hidden" id="vstate" name="vstate" value="1" />
 		<?php
 			endif;
 			if (!$this->perms['canconfig']) {

@@ -16,6 +16,11 @@
 		<fields name="params">
 			<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 				<field name="cid" type="flexicategories" multiple="true" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
+				<field name="postcats" type="list" default="0" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
+					<option value="0">ALL_CATS</option>
+					<option value="1">ONE_CAT</option>
+					<option value="2">MULTIPLE_CATS</option>
+				</field>
 				<field name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
 					<option value="0">NO</option>
 					<option value="1">YES</option>

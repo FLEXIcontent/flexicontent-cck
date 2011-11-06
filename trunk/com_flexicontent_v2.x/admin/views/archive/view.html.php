@@ -60,7 +60,7 @@ class FlexicontentViewArchive extends JView {
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
 		JToolBarHelper::unarchiveList('archive.unarchive');
 		JToolBarHelper::deleteList('Are you sure?', 'archive.remove');
-		if(JAccess::check($user->id, 'core.admin', 'root.1') || $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');

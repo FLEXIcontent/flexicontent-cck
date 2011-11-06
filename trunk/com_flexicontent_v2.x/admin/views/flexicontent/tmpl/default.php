@@ -171,9 +171,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 					$row = $this->pending[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
-						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
+						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
@@ -213,9 +213,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->revised[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
-						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
+						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -255,9 +255,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->inprogress[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
-						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
+						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -297,9 +297,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->draft[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$check =  JAccess::check($user->id, 'core.admin', 'root.1');
-						$canEdit 		= in_array('flexicontent.editall', $rights) || $check;
-						$canEditOwn		= (in_array('flexicontent.editown', $rights) && ($row->created_by == $user->id)) || $check;
+						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
+						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
+						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
 						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
 				?>
 					<tr>

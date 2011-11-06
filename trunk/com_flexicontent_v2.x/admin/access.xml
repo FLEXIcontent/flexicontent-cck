@@ -4,6 +4,12 @@
 		<action name="core.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
 		<action name="core.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
 
+		<action name="core.create" title="Can create content" description="Can create content" />
+		<action name="core.delete" title="Can delete content" description="Can delete content" />
+		<action name="core.edit" title="Can edit content" description="Can edit content" />
+		<action name="core.edit.own" title="Can edit own content" description="Can edit own content" />
+		<action name="core.edit.state" title="Can edit state of content" description="Can edit state of content" />
+		
 		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
 		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />
 		<action name="flexicontent.archives" title="CanArchives" description="CanArchives" />
@@ -12,11 +18,7 @@
 		<action name="flexicontent.versioning" title="Can use version" description="Can use version" />
 		<action name="flexicontent.usetags" title="Can use tags" description="Can use tags" />
 		
-		<action name="flexicontent.manageitem" title="Can manage articles" description="Can manage articles" />
-		<action name="flexicontent.create" title="Can create article" description="Can create article" />
-		<action name="flexicontent.deleteall" title="Can delete article" description="Can delete article" />
-		<action name="flexicontent.editall" title="Can edit article" description="Can edit article" />
-		<action name="flexicontent.editall.state" title="Can edit state of article" description="Can edit state of article" />
+		<action name="flexicontent.manageitem" title="Can manage articles" description="Can manage articles" />		
 		<action name="flexicontent.copyitems" title="Can copy articles" description="Can copy articles" />
 		<action name="flexicontent.order" title="Can order articles" description="Can order articles" />
 		<action name="flexicontent.paramsitem" title="Can set article params" description="Can set article params" />
@@ -36,30 +38,29 @@
 		<action name="flexicontent.editallcat" title="Can edit category" description="Can edit category" />
 		<action name="flexicontent.editallcat.state" title="Can edit state of category" description="Can edit state of category" />
 		<action name="flexicontent.multicat" title="Use multiple Categories" description="Use multiple Categories" />
+		<action name="flexicontent.deleteowncat" title="Delete own category" description="Delete own category" />
 		
 		<action name="flexicontent.managefile" title="Can manage files" description="Can manage files" />
 		<action name="flexicontent.uploadfiles" title="Upload file" description="Upload file" />
 		<action name="flexicontent.viewallfiles" title="View All files" description="View All files" />
 	</section>
 
-	<section name="article">
-		<action name="flexicontent.delete" title="Delete this item" description="Delete this item" />
-		<action name="flexicontent.deleteown" title="Delete own item" description="Delete own item" />
-		<action name="flexicontent.edit" title="Edit this item" description="Edit this item" />
-		<action name="flexicontent.editown" title="Edit own item" description="Edit own item" />
-		<action name="flexicontent.edit.state" title="Publish this item" description="Publish this item" />
-		<action name="flexicontent.editown.state" title="Publish own item" description="Publish own item" />
+	<section name="category">
+		<action name="core.create" title="Can create content" description="Can create content" />
+		<action name="core.delete" title="Can delete content" description="Can delete content" />
+		<action name="core.edit" title="Can edit content" description="Can edit content" />
+		<action name="core.edit.own" title="Can edit own content" description="Can edit own content" />
+		<action name="core.edit.state" title="Can edit state of content" description="Can edit state of content" />
 	</section>
+
+	<section name="article">
+		<action name="core.delete" title="Delete this item" description="Delete this item" />
+		<action name="core.edit" title="Edit this item" description="Edit this item" />
+		<action name="core.edit.state" title="Publish this item" description="Publish this item" />
+	</section>
+	
 	<section name="fields">
 		<action name="flexicontent.readfield" title="Can read fields" description="Can read fields" />
 	</section>
 	
-	<section name="category">
-		<action name="flexicontent.deletecat" title="Delete this category" description="Delete this category" />
-		<action name="flexicontent.deleteowncat" title="Delete own category" description="Delete own category" />
-		<action name="flexicontent.edit.category" title="Edit this category" description="Edit this category" />
-		<action name="flexicontent.editowncat" title="Edit own category" description="Edit own category" />
-		<action name="flexicontent.editcat.state" title="Publish this category" description="Publish this category" />
-		<action name="flexicontent.editowncat.state" title="Publish own category" description="Publish own category" />
-	</section>
 </access>

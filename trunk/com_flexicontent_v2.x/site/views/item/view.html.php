@@ -363,11 +363,9 @@ class FlexicontentViewItem extends JView {
 		// check if it's an edit action
 		if ($item->getValue('id')) {
 			// EDIT action
-			//$canEditOwn	= $user->authorise('flexicontent.editown', 'com_flexicontent');
-			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
-			$canEditOwn = in_array('editown', $rights);
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
 			$isOwner = $item->getValue('created_by') == $user->get('id');
-			if ( !$permission->CanEdit && (!$canEditOwn || !$isOwner) ) {
+			if ( !$permission->CanEdit && (!$permission->CanEditOwn || !$isOwner) ) {
 				// user isn't authorize to edit
 				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			}
@@ -383,14 +381,17 @@ class FlexicontentViewItem extends JView {
 		$perms['multicat'] = $permission->MultiCat;
 		$perms['canusetags'] = $permission->CanUseTags;
 		$perms['canparams'] = $permission->CanParams;
+		
 
 		$itemrights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
 		//$catrights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $item->catid);
 		//$rights = array_merge($itemrights, $catrights);//I not sure if it will merged or not?//by enjoyman
 		$rights = $itemrights;
-		$perms['canedit'] = ( (in_array('editown', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit', $rights)) );
-		$perms['canpublish'] = ( (in_array('editown.state', $rights) && $item->getValue('created_by') == $user->get('id')) || (in_array('edit.state', $rights)) );
-		$perms['candelete'] = ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) );
+		
+		$isOwner = $item->getValue('created_by') == $user->get('id');
+		$perms['canedit'] = $permission->CanEdit || ($permission->CanEditOwn && $isOwner) || in_array('edit', $rights);
+		$perms['canpublish'] = $permission->CanPublish || in_array('edit.state', $rights);
+		$perms['candelete'] = $permission->CanDelete  || in_array('delete', $rights);
 		$perms['canconfig'] = $permission->CanConfig;
 
 		//Add the js includes to the document <head> section

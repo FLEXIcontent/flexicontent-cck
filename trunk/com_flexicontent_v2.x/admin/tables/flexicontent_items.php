@@ -154,7 +154,20 @@ class flexicontent_items extends JTable{
 	 */
 	protected function _getAssetName() {
 		$k = $this->_tbl_key;
-		return 'flexicontent.item.'.(int) $this->$k;
+		return 'com_content.article.'.(int) $this->$k;
+	}
+	
+	
+	/**
+	 * Method to return the title to use for the asset table.
+	 *
+	 * @return  string
+	 *
+	 * @since   11.1
+	 */
+	protected function _getAssetTitle()
+	{
+		return $this->title;
 	}
 
 	/**
@@ -331,6 +344,8 @@ class flexicontent_items extends JTable{
 		$asset->parent_id	= $parentId;
 		$asset->name		= $name;
 		$asset->title		= $title;
+		
+		//print_r ($this->_rules); exit();
 		if ($this->_rules instanceof JRules) {
 			$asset->rules = (string) $this->_rules;
 		}

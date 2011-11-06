@@ -50,7 +50,7 @@ class FlexicontentControllerCategory extends JControllerForm
 
 		// Guess the JText message prefix. Defaults to the option.
 		if (empty($this->extension)) {
-			$this->extension = JRequest::getCmd('extension', 'com_content');
+			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
 		
 		$this->registerTask( 'add'  ,		'add' );
@@ -119,7 +119,7 @@ class FlexicontentControllerCategory extends JControllerForm
 			return true;
 		}
 
-		// Check specific edit permission.
+		// Check specific edit permission of specific category
 		if ($user->authorise('core.edit', $this->extension.'.category.'.$recordId)) {
 			return true;
 		}

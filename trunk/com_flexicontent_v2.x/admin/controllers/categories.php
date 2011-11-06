@@ -308,9 +308,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 		
 		// define the rights for correct redirecting the save task
 		$permission = FlexicontentHelperPerm::getPerm();
-		$check = JAccess::check($user->id, 'core.admin', 'root.1');
 		$user =& JFactory::getUser();
-		$CanCats	= (!$check) ? $permission->CanCats : 1;
+		$CanCats	= (!$permission->CanConfig) ? $permission->CanCats : 0;
 		$category = & JTable::getInstance('flexicontent_categories','');
 		$category->bind(JRequest::get('post'));
 		$category->checkin();

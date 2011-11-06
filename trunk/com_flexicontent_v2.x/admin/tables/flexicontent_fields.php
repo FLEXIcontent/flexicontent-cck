@@ -111,7 +111,7 @@ class flexicontent_fields extends JTable
 	 */
 	protected function _getAssetName() {
 		$k = $this->_tbl_key;
-		return 'flexicontent.field.'.(int) $this->$k;
+		return 'com_flexicontent.field.'.(int) $this->$k;
 	}
 	
 	/**

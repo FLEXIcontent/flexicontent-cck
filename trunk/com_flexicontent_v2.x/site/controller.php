@@ -76,8 +76,8 @@ class FlexicontentController extends JController
 		// first verify it's an edit action
 		if ($model->_item->id > 1)
 		{
-			$canEdit	= $user->authorize('flexicontent.editall', 'com_flexicontent');
-			$canEditOwn	= $user->authorize('flexicontent.editown', 'com_flexicontent');
+			$canEdit	= $user->authorize('core.edit', 'com_flexicontent');
+			$canEditOwn	= $user->authorize('core.edit.own', 'com_flexicontent');
 			if ( !($canEdit || ($canEditOwn && ($model->_item->created_by == $user->get('id')))) )
 			{
 				// user isn't authorize to edit
@@ -124,7 +124,7 @@ class FlexicontentController extends JController
 		$view = & $this->getView('item', 'html');
 
 		//general access check
-		$canAdd	= $user->authorize('flexicontent.create', 'com_flexicontent');
+		$canAdd	= $user->authorize('core.create', 'com_flexicontent');
 		$canAddCat = $user->authorize('flexicontent.createcat', 'com_flexicontent');
 		if (!$canAdd && !$canAddCat)
 		{
@@ -187,7 +187,7 @@ class FlexicontentController extends JController
 		}
 		$model->checkin();
 
-		if ($isNew) {
+		if ($isNew || $post['vstate']!=2) {
 			//Get categories for information mail
 			$query 	= 'SELECT DISTINCT c.id, c.title,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
@@ -235,13 +235,19 @@ class FlexicontentController extends JController
 				//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
 
 				$data["user_id_to"] = $adminRow->id;
-				$data["subject"] = JText::_( 'FLEXI_NEW_ITEM' );
-				$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['jform']['title'], $user->get('username'), $catstring);
+				$data["subject"] = ($isNew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
+				if ($isNew) {
+					$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['jform']['title'], $user->get('username'), $catstring);
+				} else {
+					$data["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $post['jform']['title'], $catstring, $user->get('username'));
+				}
+				
 				//$message->send($user->get('id'), $adminRow->id, JText::_( 'FLEXI_NEW_ITEM' ), );
 				$message->save($data);
 			}
-
-		} else {
+		}
+		
+		if (!$isNew) {
 			// If the item isn't new, then we need to clean the cache so that our changes appear realtime
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -279,9 +285,8 @@ class FlexicontentController extends JController
 		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 		$permission = FlexicontentHelperPerm::getPerm();
 		
-		// todo: add task checks
-		//if ($user->authorize('com_flexicontent', 'edit') || $user->authorize('com_flexicontent', 'edit', 'own')) {
-		if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || $permission->CanEdit) {
+		// TODO: correct individual item access check
+		if ( $permission->CanEdit || ( $permission->CanEditOwn && $item->created_by == $user->get('id') ) || in_array('edit', $rights) ) {
 			$item->checkin($post['jform']['id']);
 		}
 
@@ -915,12 +920,8 @@ class FlexicontentController extends JController
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		$user	=& JFactory::getUser();
-		if (FLEXI_ACCESS) {
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanUseTags = 1;
-		}
-		if($CanUseTags) {
+		$permission = FlexicontentHelperPerm::getPerm();
+		if($permission->CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
