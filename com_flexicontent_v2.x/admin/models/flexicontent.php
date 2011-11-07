@@ -1003,7 +1003,7 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 		//$query = "SELECT id FROM #__flexicontent_fields WHERE asset_id='0';";
-		$query = "SELECT ff.id FROM jos_assets AS se RIGHT JOIN jos_flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.id is NULL";
+		$query = "SELECT ff.id FROM #__assets AS se RIGHT JOIN #__flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.id is NULL";
 		$db->setQuery($query);
 		$rows = $db->loadResultArray();
 		if(count($rows)>0) {

@@ -524,7 +524,8 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _buildItemWhere( )
 	{
-		$mainframe = &JFactory::getApplication();
+		global $mainframe, $globalcats;
+		
 		$option = JRequest::getVar('option');
 
 		$user		= & JFactory::getUser();
