@@ -175,7 +175,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
-				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'['.$i.']" value="'.$file.'" />';
+				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'[]" value="'.$file.'" />';
 				$field->html .= '<input class="inputbox fcbutton" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
 				$field->html .= '<span class="drag'.$field->id.'">'.$move.'</span>';
 				$field->html .= '</li>';
