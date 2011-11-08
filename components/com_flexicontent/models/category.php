@@ -421,9 +421,9 @@ class FlexicontentModelCategory extends JModel{
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['item'])) {
+				if ( isset($readperms['item']) && count($readperms['item']) ) {
 					$where .= ' AND ( ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) ) )';
-			} else {
+				} else {
 					$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 				}
 			} else {
@@ -567,7 +567,7 @@ class FlexicontentModelCategory extends JModel{
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS) {
 				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['category'])) {
+				if (isset($readperms['category']) && count($readperms['category']) ) {
 					$andaccess = ' AND ( c.access <= '.$gid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
 				} else {
 					$andaccess = ' AND c.access <= '.$gid;
@@ -885,7 +885,7 @@ class FlexicontentModelCategory extends JModel{
 		
 		if (FLEXI_ACCESS) {
 			$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-			if (isset($readperms['field'])) {
+			if (isset($readperms['field']) && count($readperms['field']) ) {
 				$where = ' AND ( fi.access <= '.$gid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
 			} else {
 				$where = ' AND fi.access <= '.$gid;
