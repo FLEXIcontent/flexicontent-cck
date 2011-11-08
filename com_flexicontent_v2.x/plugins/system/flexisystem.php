@@ -180,6 +180,7 @@ class plgSystemFlexisystem extends JPlugin
 					$id 		= JRequest::getInt('id');
 					$itemslug 	= JRequest::getVar('id');
 					$catslug	= JRequest::getVar('catid');
+					// Warning current menu item id must not be passed to the routing functions since it points to com_content , and thus it will break FC SEF URLs
 					$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
 					
 					$query 	= 'SELECT sectionid FROM #__content'

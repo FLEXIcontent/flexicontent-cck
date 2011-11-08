@@ -339,7 +339,50 @@ class FlexicontentModelItems extends JModel
 			$fields = $this->_db->loadObjectList();
 			$fields = $fields?$fields:array();
 
+			// Create the description field called 'text' by appending introtext + readmore + fulltext
+			$item->text = $item->introtext;
+			if (JString::strlen($item->fulltext) > 1) {
+				$item->text .= '<hr id="system-readmore" />' . $item->fulltext;
+			}
+			
+			if (FLEXI_FISH) {
+				// 1. Get current language (Fix for issue 261)
+				$currlang = JRequest::getWord('lang', '' );
+				if(empty($currlang)){
+					$langFactory= JFactory::getLanguage();
+					$tagLang = $langFactory->getTag();
+					// This more compatible than using the full lenght language tag since its second part maybe some non-standard country
+					$currlang = substr($tagLang ,0,2);
+				}
+				$itemlang = substr($item->language ,0,2);
+				$langdiffers = ( $currlang != $itemlang );
+				
+				// 2. Find if item language is different than current language (Fix for issue 261)
+				if ($langdiffers) {
+					$query = "SELECT jfc.* FROM #__jf_content as jfc "
+							." LEFT JOIN #__languages as jfl ON jfc.language_id = jfl.id"
+							." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} "
+							." AND jfc.published=1 AND jfl.shortcode=".$this->_db->Quote($currlang);
+					$this->_db->setQuery($query);
+					$jf_data = $this->_db->loadObjectList('reference_field') or die($this->_db->getErrorMsg());
+				}
+			}
+			
+			// Overwrite item fields with the requested version, we try to be compatibile with joomfish
 			foreach($fields as $f) {
+				
+				// Skip versioned data for fields that must be translated. (Fix for issue 261)
+				// (a) item title not translated in item view but (IT SHOULD) and
+				// (b) text field translated by joomfish in edit form (IT SHOULD NOT)
+				if (FLEXI_FISH) {
+					$jf_translated_fields = array('title', 'text', 'introtext', 'fulltext' );
+					if ( $task != 'edit' && $langdiffers && in_array($f->name, $jf_translated_fields) ) {
+						// if joomfish translation exists for this field, then skip the versioned value and use joomfish value
+						if ( !isset($jf_data->{$f->name}) ) continue;
+					}
+				}
+				
+				// Use versioned data
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
 					$item->$fieldname = unserialize($f->value);
@@ -385,11 +428,7 @@ class FlexicontentModelItems extends JModel
 				$item->publish_down = JText::_( 'FLEXI_NEVER' );
 				$item->state 		= -4;
 			}
-
-			if($version == $current_version) {
-				//$item->text = $item->introtext;
-				$item->text = $item->introtext . '<hr id="system-readmore" />' . $item->fulltext;
-			}
+			
 			$this->_item = &$item;
 			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
 				$mainframe = &JFactory::getApplication();
