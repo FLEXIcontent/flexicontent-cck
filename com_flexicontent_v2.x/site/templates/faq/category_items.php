@@ -42,7 +42,7 @@ $tmpl = $this->tmpl;
 		<button onclick="document.getElementById('filter').value='';document.getElementById('adminForm').submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 	</div>
 	<?php endif; ?>
-	<?php if ($this->filters) : ?>
+	<?php if ($this->params->get('use_filters', 0) && $this->filters) : ?>
 	<div class="fc_fright">
 	<?php
 	foreach ($this->filters as $filt) :
