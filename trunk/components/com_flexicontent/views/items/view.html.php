@@ -463,12 +463,6 @@ class FlexicontentViewItems extends JView
 		$pathway =& $mainframe->getPathWay();
 		$pathway->addItem($title, '');
 
-		// Unify the introtext and fulltext fields and separated the fields by the {readmore} tag
-		if (JString::strlen($item->fulltext) > 1) {
-			$item->text = $item->introtext."<hr id=\"system-readmore\" />".$item->fulltext;
-		} else {
-			$item->text = $item->introtext;
-		}
 
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
