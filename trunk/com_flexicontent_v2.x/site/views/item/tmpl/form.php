@@ -287,7 +287,7 @@ echo "autopublished:$autopublished<br />";
 			<td>
 	  		<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
 	  		<?php	if ($cparams->get('auto_approve', 0)) : ?>
-	  			<input type="hidden" id="vstate" name="vstate" value="2" />
+	  			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 	  		<?php	endif;?>
 			</td>
 		</tr>
@@ -315,7 +315,7 @@ echo "autopublished:$autopublished<br />";
 	  		<?php //echo JText::_( 'FLEXI_NEEDS_APPROVAL' ).':';?>
 	  		<?php echo 'You cannot set state of this item, it will be reviewed by administrator'; ?>
 				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->getValue('state', -4);?>" />
-				<input type="hidden" id="vstate" name="vstate" value="1" />
+				<input type="hidden" id="vstate" name="jform[vstate]" value="1" />
 			</td>
 		</tr>
 		
@@ -610,7 +610,7 @@ echo "autopublished:$autopublished<br />";
 			if ($autopublished) :
 		?>
 				<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
-				<input type="hidden" id="vstate" name="vstate" value="2" />
+				<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 		<?php
 			endif;
 			if (!$this->perms['canconfig']) {

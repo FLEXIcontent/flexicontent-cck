@@ -161,25 +161,28 @@ class FlexicontentController extends JController
 		$user		= & JFactory::getUser();
 
 		//get model
-		$model = $this->getModel('Item');
-
+		$model 	= $this->getModel('item');
+		
 		//get data from request
-		//$post = JRequest::getVar('jform', array());
-		$post = JRequest::get('post');
+		//$post = JRequest::get('post');
 		//$post['jform']['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
 
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+		$form 	= $model->getForm($data, false);
+		$validData = $model->validate($form, $data);
+		
 		//perform access checks
-		$isNew = ((int) $post['jform']['id'] < 1);
+		$isNew = ((int) $validData['id'] < 1);
 
 		// Must be logged in
 		if ($user->get('id') < 1) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
 		}
-		$post['jform']['catid'] = array();
-		if ($model->store($post)) {
+		$validData['catid'] = array();
+		if ($model->store($validData)) {
 			if($isNew) {
-				$post['jform']['id'] = (int) $model->_item->id;
+				$validData['id'] = (int) $model->_item->id;
 			}
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
@@ -187,7 +190,7 @@ class FlexicontentController extends JController
 		}
 		$model->checkin();
 
-		if ($isNew || $post['vstate']!=2) {
+		if ($isNew || $validData['vstate']!=2) {
 			//Get categories for information mail
 			$query 	= 'SELECT DISTINCT c.id, c.title,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
@@ -232,18 +235,18 @@ class FlexicontentController extends JController
 			foreach ($adminRows as $adminRow) {
 
 				//Not really  needed cause in com_message you can set to be notified about new messages by email
-				//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
+				//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $validData['title'], $user->get('username'), JURI::base());
 
-				$data["user_id_to"] = $adminRow->id;
-				$data["subject"] = ($isNew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
+				$msgdata["user_id_to"] = $adminRow->id;
+				$msgdata["subject"] = ($isNew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
 				if ($isNew) {
-					$data["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['jform']['title'], $user->get('username'), $catstring);
+					$msgdata["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $validData['title'], $user->get('username'), $catstring);
 				} else {
-					$data["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $post['jform']['title'], $catstring, $user->get('username'));
+					$msgdata["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $validData['title'], $catstring, $user->get('username'));
 				}
 				
 				//$message->send($user->get('id'), $adminRow->id, JText::_( 'FLEXI_NEW_ITEM' ), );
-				$message->save($data);
+				$message->save($msgdata);
 			}
 		}
 		
@@ -279,15 +282,14 @@ class FlexicontentController extends JController
 
 		// Get an item table object and bind post variabes to it
 		$item = & JTable::getInstance('flexicontent_items', '');
-		//$item->bind(JRequest::get('post'));
-		$post = JRequest::get('post');
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
 		
 		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 		$permission = FlexicontentHelperPerm::getPerm();
 		
 		// TODO: correct individual item access check
 		if ( $permission->CanEdit || ( $permission->CanEditOwn && $item->created_by == $user->get('id') ) || in_array('edit', $rights) ) {
-			$item->checkin($post['jform']['id']);
+			$item->checkin($data['id']);
 		}
 
 		// If the task was edit or cancel, we go back to the item
@@ -398,11 +400,13 @@ class FlexicontentController extends JController
 	 * @access public
 	 * @since 1.5
 	 */
-	function ajaxvote()
+	public function ajaxvote()
 	{
-		$mainframe =& JFactory::getApplication();
-		$user = &JFactory::getUser();
-
+		$app 	=& JFactory::getApplication();
+		$user 	= &JFactory::getUser();
+		$db  	= &JFactory::getDBO();
+		$query	= $db->getQuery(true);
+		
 		/*
 		$plugin = &JPluginHelper::getPlugin('content', 'extravote');
 		$params = new JParameter($plugin->params);
@@ -414,82 +418,66 @@ class FlexicontentController extends JController
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
 		$xid 			= JRequest::getVar('xid');
-		$db  			= &JFactory::getDBO();
-	
+
+		$result	= new JObject;
+
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
 			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-		
-			if ( !(int)$xid )
+
+			$query->clear();
+			$query->select('*')
+				->from((!(int)$xid ? '#__content_rating' : '#__content_extravote').' AS a')
+				->where('content_id = ' . (int)$cid);
+			if ( (int)$xid ) 
+				$query->where('extra_id = ' . (int)$xid);
+			
+			$db->setQuery( $query );
+			$votesdb = $db->loadObject();
+
+			if ( !$votesdb )
 			{
-				$query 	= 'SELECT * FROM #__content_rating'
-						. ' WHERE content_id = ' . $cid
-						;
+				$query->clear();
+				$query->insert((!(int)$xid ? '#__content_rating' : '#__content_extravote'))
+					->set('content_id = ' . (int)$cid)
+					->set('lastip = ' . $db->Quote( $currip ))
+					->set('rating_sum = ' . (int)$user_rating)
+					->set('rating_count = 1');
+				if ( (int)$xid ) 
+					$query->set('extra_id = ' . (int)$xid);
 				$db->setQuery( $query );
-				$votesdb = $db->loadObject();
-			
-				if ( !$votesdb )
+				$db->query() or die( $db->stderr() );
+				$result->ratingcount = 1;
+				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
+			} 
+			else 
+			{
+				if ($currip != ($votesdb->lastip))
 				{
-					$query 	= 'INSERT INTO #__content_rating ( content_id, lastip, rating_sum, rating_count )'
-							. ' VALUES ( ' . $cid . ', ' . $db->Quote( $currip ) . ', ' . $user_rating . ', 1 )'
-							;
-					$db->setQuery( $query );
-					$db->query() or die( $db->stderr() );;
-			
-				} else {
-			
-					if ($currip != ($votesdb->lastip))
-					{
-						$query	= 'UPDATE #__content_rating'
-								. ' SET rating_count = rating_count + 1, rating_sum = rating_sum + ' .   $user_rating . ', lastip = ' . $db->Quote( $currip )
-								. ' WHERE content_id = ' . $cid
-								;
-						$db->setQuery( $query );
-						$db->query() or die( $db->stderr() );
-				
-					} else {
-				
-					echo 'voted';
-					exit();
-				}
-			}
-			
-			} else {
-			
-				$query 	= 'SELECT * FROM #__content_extravote'
-						. ' WHERE content_id='.$cid.' AND extra_id='.$xid
-						;
-				$db->setQuery( $query );
-				$votesdb = $db->loadObject();
-				
-				if ( !$votesdb )
-				{
-					$query	= 'INSERT INTO #__content_extravote  (content_id, extra_id, lastip, rating_sum, rating_count)'
-							. ' VALUES ('.$cid.', '.$xid.', '.$db->Quote($currip).', '.$user_rating.', 1)'
-							;
+					$query->clear();
+					$query->update((!(int)$xid ? '#__content_rating' : '#__content_extravote'))
+						->set('rating_count = rating_count + 1')
+						->set('rating_sum = rating_sum + ' . (int)$user_rating)
+						->set('lastip = '. $db->Quote($currip))
+						->where('content_id = ' . (int)$cid);
+					if ( (int)$xid ) 
+						$query->where('extra_id = ' . (int)$xid);
 					$db->setQuery( $query );
 					$db->query() or die( $db->stderr() );
-				
-				} else {
-				
-					if ($currip != ($votesdb->lastip))
-					{
-						$query	= 'UPDATE #__content_extravote'
-								. ' SET rating_count = rating_count + 1, rating_sum = rating_sum + ' .  $user_rating . ', lastip = ' . $db->Quote( $currip )
-								. ' WHERE content_id='.$cid
-								. ' AND extra_id='.$xid
-								;
-						$db->setQuery( $query );
-						$db->query() or die( $db->stderr() );
-				
-					} else {
-				
-					echo 'voted';
+					$result->ratingcount = $votesdb->rating_count + 1;
+					$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+				} 
+				else 
+				{
+					$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+					$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
+					echo json_encode($result);
 					exit();
-					}
 				}
 			}
-		echo 'thanks';
+			$result->percentage = ( ((isset($votesdb->rating_sum) ? $votesdb->rating_sum : 0) + (int)$user_rating) / $result->ratingcount ) * 20;
+			$result->html 		= JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+			echo json_encode($result);
 		}
 	}
 

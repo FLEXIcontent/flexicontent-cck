@@ -105,6 +105,7 @@ class FlexicontentModelCategory extends JModelList{
 		$mainframe = &JFactory::getApplication();
 		$cid			= JRequest::getInt('cid', 0);
 		$this->setId((int)$cid);
+
 		parent::__construct($config);
 				
 		// we need to merge parameters here to get the correct page limit value
@@ -524,7 +525,8 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 		
 		$option = JRequest::getVar('option');
 
@@ -835,7 +837,7 @@ class FlexicontentModelCategory extends JModelList{
 	{
 		$user 		= &JFactory::getUser();
 		$gid		= max ($user->getAuthorisedViewLevels());
-		$ordering	= 'ordering ASC';
+		$ordering	= 'lft ASC';
 
 		if (FLEXI_ACCESS) {
 			$query = 'SELECT DISTINCTROW sc.*,'

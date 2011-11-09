@@ -171,6 +171,45 @@ class flexicontent_items extends JTable{
 	}
 
 	/**
+	 * Method to get the parent asset id for the record
+	 *
+	 * @param   JTable   $table  A JTable object for the asset parent
+	 * @param   integer  $id
+	 *
+	 * @return  integer
+	 *
+	 * @since   11.1
+	 */
+	protected function _getAssetParentId($table = null, $id = null)
+	{
+		// Initialise variables.
+		$assetId = null;
+		$db = $this->getDbo();
+	
+		// This is a article under a category.
+		if ($this->catid) {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('asset_id');
+			$query->from('#__categories');
+			$query->where('id = '.(int) $this->catid);
+
+			// Get the asset id from the database.
+			$this->_db->setQuery($query);
+			if ($result = $this->_db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+
+		// Return the asset id.
+		if ($assetId) {
+			return $assetId;
+		} else {
+			return parent::_getAssetParentId($table, $id);
+		}
+	}
+
+	/**
 	 * Overloaded load function
 	 *
 	 * @access public

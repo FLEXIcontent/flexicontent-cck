@@ -59,23 +59,23 @@ class FlexicontentControllerItems extends JController {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$task		= JRequest::getVar('task');
+		$task	= JRequest::getVar('task');
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
 
-		//Sanitize
-		$post = JRequest::get( 'post' );
-		//$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW );
+		$model 	= $this->getModel('item');
+		$form 	= $model->getForm($data, false);
 
-		$model = $this->getModel('item');
+		$validData = $model->validate($form, $data);
 
-		if ( $model->store($post) ) {
+		if ( $model->store($validData) ) {
 			switch ($task) {
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=item&cid='.(int) $model->getId();
 					break;
 
 				case 'saveandnew' :
-					if(isset($post['jform']['type_id']))
-						$link = 'index.php?option=com_flexicontent&view=item&typeid='.$post['jform']['type_id'];
+					if(isset($validData['type_id']))
+						$link = 'index.php?option=com_flexicontent&view=item&typeid='.$validData['type_id'];
 					else
 						$link = 'index.php?option=com_flexicontent&view=items';
 					break;

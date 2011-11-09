@@ -18,7 +18,7 @@
 
 		<field name="text" type="editor" class="inputbox"
 			label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC"
-			filter="ContentHelper::filterText" buttons="true" />
+			filter="raw" buttons="true" />
 
 		<field name="state" type="list" label="JGLOBAL_STATE"
 			description="JFIELD_PUBLISHED_DESC" class="inputbox"
@@ -29,6 +29,12 @@
 			<option value="1">FLEXI_PUBLISHED</option>
 			<option value="0">FLEXI_UNPUBLISHED</option>
 			<option value="-1">FLEXI_ARCHIVED</option>
+		</field>
+
+		<field name="vstate" type="list" label="FLEXI_APPROVE_VERSION"
+			default="2">
+			<option value="1">JNO</option>
+			<option value="2">JYES</option>
 		</field>
 
 		<field name="cid" type="categorytree"
@@ -112,7 +118,7 @@
 
 		<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_LABEL"
 			description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules"
-			component="com_flexicontent" section="article" />
+			component="com_content" section="article" />
 
 	</fieldset>
 	<fields name="attribs">

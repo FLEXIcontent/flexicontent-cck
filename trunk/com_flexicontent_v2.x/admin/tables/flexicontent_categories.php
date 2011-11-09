@@ -110,7 +110,7 @@ class flexicontent_categories extends JTableNested
 	 *
 	 * @since   11.1
 	 */
-	/*protected function _getAssetParentId($table = null, $id = null)
+	protected function _getAssetParentId($table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -130,20 +130,6 @@ class flexicontent_categories extends JTableNested
 				$assetId = (int) $result;
 			}
 		}
-		// This is a category that needs to parent with the extension.
-		elseif ($assetId === null) {
-			// Build the query to get the asset id for the parent category.
-			$query	= $db->getQuery(true);
-			$query->select('id');
-			$query->from('#__assets');
-			$query->where('name = '.$db->quote($this->extension));
-
-			// Get the asset id from the database.
-			$db->setQuery($query);
-			if ($result = $db->loadResult()) {
-				$assetId = (int) $result;
-			}
-		}
 
 		// Return the asset id.
 		if ($assetId) {
@@ -151,7 +137,7 @@ class flexicontent_categories extends JTableNested
 		} else {
 			return parent::_getAssetParentId($table, $id);
 		}
-	}*/
+	}
 	
 
 	/**
@@ -261,6 +247,27 @@ class flexicontent_categories extends JTableNested
 			$this->setError(JText::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
 			return false;
 		}
+		
+		if (isset($this->asset_id)) {
+			$asset	= JTable::getInstance('Asset');
+			if (!$asset->load($this->asset_id)) {
+				$name = $this->_getAssetName();
+				$asset->loadByName($name);
+			
+				$query = $this->_db->getQuery(true);
+				$query->update($this->_db->quoteName($this->_tbl));
+				$query->set('asset_id = '.(int)$asset->id);
+				$query->where('id = '.(int) $this->id);
+				$this->_db->setQuery($query);
+				
+				if (!$this->_db->query()) {
+					$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
+					$this->setError($e);
+					return false;
+				}
+			}
+		}
+		
 		return parent::store($updateNulls);
 	}
 }

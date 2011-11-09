@@ -56,7 +56,8 @@ class JFormFieldFieldtypes extends JFormFieldList{
 		$attr .= $this->element['size'] ? ' size="'.(int) $this->element['size'].'"' : '';
 		$attr .= $this->multiple ? ' multiple="multiple"' : '';
 		$options = (array) $this->getOptions();
-		return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
+		return JHtml::_('select.genericlist', $options, $name, trim($attr), 'value', 'text', $value, $name);
+		//return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
 	}
 	protected function getOptions() {
 		$db =& JFactory::getDBO();

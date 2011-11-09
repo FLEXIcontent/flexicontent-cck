@@ -11,6 +11,8 @@
 		<action name="core.edit.state" title="Can edit state of content" description="Can edit state of content" />
 		
 		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
+		<action name="flexicontent.readfield" title="Can read fields" description="Can read fields" />
+		
 		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />
 		<action name="flexicontent.archives" title="CanArchives" description="CanArchives" />
 		<action name="flexicontent.stats" title="Can manage stats" description="Can manage stats" />

@@ -520,7 +520,7 @@ class FlexicontentViewItem extends JView {
 		$vstate = array();
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
+		$lists['vstate'] = JHTML::_('select.genericlist', $vstate, 'jform[vstate]', '', 'value', 'text', 2 );
 
 		// build granular access list
 		if (FLEXI_ACCESS) {

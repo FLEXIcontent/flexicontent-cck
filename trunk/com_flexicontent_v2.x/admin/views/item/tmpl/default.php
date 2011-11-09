@@ -199,18 +199,27 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
 										//echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
 										echo $this->form->getInput('state');
-											if (!$this->cparams->get('auto_approve', 1)) :
-												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
-											else :
-												echo '<input type="hidden" name="vstate" value="2" />';
-											endif;
+										if (!$this->cparams->get('auto_approve', 1)) : ?>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<?php echo $this->form->getLabel('vstate'); ?>
+									</td>
+									<td>
+										<?php echo $this->form->getInput('vstate'); ?>
+									</td>
+								</tr>
+										<?php else :
+											echo '<input type="hidden" name="jform[vstate]" value="2" />';
+										endif;
 									else :
 										echo $this->published;
 										echo '<input type="hidden" name="jform[state]" value="'.$this->form->getValue("state").'" />';
 											if (!$this->cparams->get('auto_approve', 1)) :
-												echo '<input type="hidden" name="vstate" value="1" />';
+												echo '<input type="hidden" name="jform[vstate]" value="1" />';
 											else :
-												echo '<input type="hidden" name="vstate" value="2" />';
+												echo '<input type="hidden" name="jform[vstate]" value="2" />';
 											endif;
 									endif;
 									?>

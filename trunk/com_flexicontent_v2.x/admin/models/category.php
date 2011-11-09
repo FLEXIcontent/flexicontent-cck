@@ -269,7 +269,8 @@ class FlexicontentModelCategory extends JModelAdmin
 				$data['title'] .= ' (2)';
 			}
 		}
-		$category->setRules($data['rules']);
+
+		//$category->setRules($data['rules']);
 		
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		//$params			= $data["params"];

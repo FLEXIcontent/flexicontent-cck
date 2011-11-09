@@ -884,165 +884,294 @@ class FlexicontentModelFlexicontent extends JModel
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
 		
-		$query = "UPDATE `#__flexicontent_fields` SET `access`=1 WHERE `access`=0";
+		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		$db->query();
 		
 		// Component Section Permissions
-		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
+		$query = $db->getQuery(true)
+			->select('rules')
+			->from('#__assets')
+			->where('name = ' . $db->quote(JRequest::getCmd('option')));
 		$db->setQuery($query);
 		$rules = $db->loadResult();
 		$rule = new JRules($rules);
-		$comp_section = count($rule->getData());
+		$comp_section = count($rule->getData()) == count(JAccess::getActions('com_flexicontent', 'component')) ? 1 : 0;
 		
 		// Field section permissions, these were renamed, so must check
-		$query = "DELETE FROM #__assets WHERE name LIKE 'flexicontent.%';";
+		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
 		$db->setQuery($query);
 		if(!$db->query()) return false;
-		
-		$query = "SELECT rules FROM #__assets AS se LEFT JOIN #__flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.name LIKE 'com_flexicontent.field.%';";
+
+		$query = $db->getQuery(true)
+			->select('c.id')
+			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
+			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
+		$db->setQuery($query);
+		$result = $db->loadObjectList();
+		$category_section = count($result) == 0 ? 1 : 0;
+
+		$query = $db->getQuery(true)
+			->select('rules')
+			->from('#__assets AS se')->join('LEFT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id')
+			->where('se.name LIKE ' . $db->quote('com_flexicontent.field.%'));
 		$db->setQuery($query);
 		$rules = $db->loadObjectList();
 		$rule = new JRules($rules);
 		$field_section = count($rule->getData());
 		
-		/*$query = "SELECT count(asset_id) FROM #__flexicontent_fields WHERE asset_id='0';";
-		$db->setQuery($query);
-		$num = (int)$db->loadResult();*/
-		return ($comp_section && $field_section /*&& ($num===0)*/);
+		return ($comp_section && $field_section && $category_section);
 	}
 	
 	function initialPermission() {
 		jimport('joomla.access.rules');
-		$db = &JFactory::getDBO();
+		$component	= JRequest::getCmd('option');
+		$db 		= JFactory::getDBO();
 
-		$query = "SELECT rules FROM #__assets WHERE name='com_flexicontent';";
-		$db->setQuery($query);
-		$rules = $db->loadResult();
-		$rule = new JRules($rules);
-		$query = "SELECT * FROM #__usergroups";
-		$db->setQuery($query);
-		$groups = $db->loadObjectList();
-		if(count($rule->getData())<=0) {
+		$asset	= JTable::getInstance('asset');
+
+		if (!$asset->loadByName($component)) {
+			$root = JTable::getInstance('asset');
+			$root->loadByName('root.1');
+			$asset->name = $component;
+			$asset->title = $component;
+			$asset->setLocation($root->id,'last-child');
+						
+			$groups 	= $this->_getUserGroups();
+			$actions	= JAccess::getActions($component, 'component');
+			$rules 		= $this->_initRules($component);
 			
-			$rules = array();
-			$rule = array();
-			foreach($groups as $g) {
-				//{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":{"3":1},"core.delete":[],"core.edit":{"4":1},"core.edit.state":{"5":1},"core.edit.own":[]}
-				if(JAccess::checkGroup($g->id, 'core.admin')) {//super user
-					$rule['core.admin'][$g->id] = 1;  //CanConfig
-				}
-				if(JAccess::checkGroup($g->id, 'core.manage')) {
-					// Privilege 'core.manage', this is currently used only by joomla core !!! DO NOT RENAME !!!
-					// Joomla Backend: (a) display FLEXIcontent menu item in Components menu (b) basic use permission for FLEXIcontent component
-					$rule['core.manage'][$g->id] = 1;
-					
-					$rule['flexicontent.manageitem'][$g->id] = 1;
-					$rule['flexicontent.managetype'][$g->id] = 1;//CanTypes
-					$rule['flexicontent.createtype'][$g->id] = 1;
-					$rule['flexicontent.deletetype'][$g->id] = 1;
-					$rule['flexicontent.edittype'][$g->id] = 1;
-					$rule['flexicontent.edittype.state'][$g->id] = 1;
-					$rule['flexicontent.fields'][$g->id] = 1;//CanFields
-					$rule['flexicontent.archives'][$g->id] = 1;//CanArchives
-					$rule['flexicontent.stats'][$g->id] = 1;//CanStats
-					$rule['flexicontent.templates'][$g->id] = 1;//CanTemplates
-					$rule['flexicontent.versioning'][$g->id] = 1;//CanVersion
-					$rule['flexicontent.tags'][$g->id] = 1;//CanTags
-					$rule['flexicontent.usetags'][$g->id] = 1;//CanUseTags
-					$rule['flexicontent.newtag'][$g->id] = 1;//CanNewTag
-					$rule['flexicontent.order'][$g->id] = 1;//CanOrder
-					$rule['flexicontent.copyitems'][$g->id] = 1;//CanCopy
-					$rule['flexicontent.paramsitem'][$g->id] = 1;//CanParams
-					$rule['flexicontent.displayallitems'][$g->id] = 1;//DisplayAllItems
-					$rule['flexicontent.managecat'][$g->id] = 1;//CanCats
-					$rule['flexicontent.usercats'][$g->id] = 1;//CanUserCats
-					$rule['flexicontent.viewtree'][$g->id] = 1;//CanViewTree
-					$rule['flexicontent.createcat'][$g->id] = 1;//CanAddCats
-					$rule['flexicontent.editallcat'][$g->id] = 1;//CanEditAllCats
-					$rule['flexicontent.deleteallcat'][$g->id] = 1;
-					$rule['flexicontent.deleteown'][$g->id] = 1;
-					$rule['flexicontent.editallcat.state'][$g->id] = 1;//CanPublishAllCats
-					$rule['flexicontent.editown'][$g->id] = 1;
-					$rule['flexicontent.edit.state'][$g->id] = 1;
-					$rule['flexicontent.editown.state'][$g->id] = 1;
-					$rule['flexicontent.deleteowncat'][$g->id] = 1;
-					$rule['flexicontent.editcat'][$g->id] = 1;
-					$rule['flexicontent.managefile'][$g->id] = 1;//CanFiles
-					$rule['flexicontent.uploadfiles'][$g->id] = 1;//CanUpload
-					$rule['flexicontent.viewallfiles'][$g->id] = 1;//CanViewAllFiles
-				}
-				if(JAccess::checkGroup($g->id, 'core.create')) {
-					$rule['core.create'][$g->id] = 1;//CanAdd
-				}
-				if(JAccess::checkGroup($g->id, 'core.delete')) {
-					$rule['core.delete'][$g->id] = 1;//CanDelete
-				}
-				if(JAccess::checkGroup($g->id, 'core.edit')) {
-					$rule['core.edit'][$g->id] = 1;//CanEdit
-				}
-				if(JAccess::checkGroup($g->id, 'core.edit.state')) {
-					$rule['core.edit.state'][$g->id] = 1;//CanPublish
-				}
-				if(JAccess::checkGroup($g->id, 'core.edit.own')) {
-					$rule['core.edit.own'][$g->id] = 1;//CanEditOwn
-				}
+			$rules = new JRules(json_encode($rules));
+			$asset->rules = $rules->__toString();
+
+			if (!$asset->check() || !$asset->store()) {
+				$this->setError($asset->getError());
+				return false;
 			}
-			foreach($rule as $key=>$ar) {
-				$rules[$key] = new JRule($ar);
-			}
-			$jrules = new JRules($rules);
-		
-			$query = "SELECT id FROM #__assets WHERE name='com_flexicontent';";
-			$db->setQuery($query);
-			$id = $db->loadResult();
-			if($id) {
-				$query = "UPDATE #__assets SET rules='".$jrules->__toString()."' WHERE id='{$id}';";
-				$db->setQuery($query);
-				if(!$db->query()) return false;
+		} else {
+			$rules = new JRules($asset->rules);
+			if (count($rules->getData()) != count(JAccess::getActions('com_flexicontent', 'component'))) {
+				$initerules = $this->_initRules($component);
+				$initerules = new JRules(json_encode($initerules));
+				
+				$rules->merge($initerules);
+						
+				$asset->rules = $rules->__toString();
+
+				if (!$asset->check() || !$asset->store()) {
+					$this->setError($asset->getError());
+					return false;
+				}
 			}
 		}
-		//$query = "SELECT id FROM #__flexicontent_fields WHERE asset_id='0';";
-		$query = "SELECT ff.id FROM #__assets AS se RIGHT JOIN #__flexicontent_fields AS ff ON se.id=ff.asset_id WHERE se.id is NULL";
+
+		$root = JTable::getInstance('asset');
+		$root->loadByName($component);
+
+		//Fix category acl
+		$query = $db->getQuery(true)
+			->select('c.id, c.parent_id, c.title')
+			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
+			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'))
+			->order('c.lft ASC');
 		$db->setQuery($query);
-		$rows = $db->loadResultArray();
-		if(count($rows)>0) {
-			$asset	= JTable::getInstance('Asset');
-			$parentId = 1;
-			foreach($rows as $id) {
-				$name = "com_flexicontent.field.{$id}";
-				$query = "SELECT id FROM #__assets WHERE name='{$name}';";
-				$db->setQuery($query);
-				$asset_id = $db->loadResult();
-				if(!$asset_id) {
-					$asset->loadByName($name);
-					$asset->id = null;
-					if ($asset->parent_id != $parentId) {
-						$asset->setLocation($parentId, 'last-child');
+		$results = $db->loadObjectList();
+
+		if(count($results)>0) {
+			foreach($results as $category) {
+				$parentId = $this->_getAssetParentId(null, $category);
+				$name = "com_content.category.{$category->id}";
+				
+				$asset->id 		= null;
+				$asset->setLocation($parentId, 'last-child');
+				$asset->name	= $name;
+				$asset->title	= $category->title;
+
+				if ($parentId == $root->id) {				
+					$actions	= JAccess::getActions($component, 'category');
+					$rules 		= json_decode($root->rules);		
+					foreach ($actions as $action) {
+						$catrules[$action->name] = $rules->{$action->name};
 					}
-					// Prepare the asset to be stored.
-					$asset->parent_id	= $parentId;
-					$asset->name		= $name;
-					$asset->title		= $name;
-					$rules = array();
-					$rule = array();
-					foreach($groups as $g) {
-						$rule['flexicontent.readfield'][$g->id] = 1;
-					}
-					$rules['flexicontent.readfield'] = new JRule($rule['flexicontent.readfield']);
-					$jrules = new JRules($rules);
-					$asset->rules = $jrules->__toString();
-					if (!$asset->check() || !$asset->store(false)) {
-						return false;
-					}
-					$asset_id = $asset->id;
+					$rules = new JRules(json_encode($catrules));
+					$asset->rules = $rules->__toString();
+				} else {
+					$parent = JTable::getInstance('asset');
+					$parent->load($parentId);
+					$asset->rules = $parent->rules;
 				}
-				$query = "UPDATE #__flexicontent_fields SET asset_id='{$asset_id}' WHERE id='{$id}';";
+				
+				if (!$asset->check() || !$asset->store(false)) {
+					$this->setError($asset->getError());
+					return false;
+				}
+				$asset_id = $asset->id;
+
+				$query = $db->getQuery(true)
+					->update('#__categories')
+					->set('asset_id = ' . (int)$asset_id)
+					->where('id = ' . (int)$category->id);
 				$db->setQuery($query);
-				$db->query();
+				
+				if (!$db->query()) {
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
+				}
 			}
 		}
+
+		//fix fields acl
+		$query = $db->getQuery(true)
+			->select('ff.id, ff.name')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id')
+			->where('se.id is NULL');
+		$db->setQuery($query);
+		$results = $db->loadObjectList();
+
+		if(count($results)>0) {
+			foreach($results as $field) {
+				$name = "com_flexicontent.field.{$field->id}";
+
+				$asset->id = null;
+				$asset->setLocation($root->id, 'last-child');
+				$asset->name		= $name;
+				$asset->title		= $field->name;
+				
+				$actions	= JAccess::getActions($component, 'fields');
+				$rules 		= json_decode($root->rules);		
+				foreach ($actions as $action) {
+					$fieldrules[$action->name] = $rules->{$action->name};
+				}
+				$rules = new JRules(json_encode($fieldrules));
+				$asset->rules = $rules->__toString();
+				
+				if (!$asset->check() || !$asset->store(false)) {
+					return false;
+				}
+				$asset_id = $asset->id;
+
+				$query = $db->getQuery(true)
+					->update('#__flexicontent_fields')
+					->set('asset_id = ' . (int)$asset_id)
+					->where('id = ' . (int)$field->id);
+				$db->setQuery($query);
+				
+				if (!$db->query()) {
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
+				}
+			}
+		}
+
 		return true;
+	}
+
+	protected function _initRules($component) {
+		$groups 	= $this->_getUserGroups();
+		$actions	= JAccess::getActions($component, 'component');
+		$rules 		= array();
+
+		foreach($groups as $group) {
+			if(JAccess::checkGroup($group->id, 'core.admin')) {//super user
+				$rules['core.admin'][$group->id] = 1;  //CanConfig
+			}
+			if(JAccess::checkGroup($group->id, 'core.manage')) {
+				foreach($actions as $action) {
+					if($action->name == 'core.admin') continue;
+					$rules[$action->name][$group->id] = 1;
+				}
+			}
+			if(JAccess::checkGroup($group->id, 'core.create')) {
+				$rules['core.create'][$group->id] = 1;//CanAdd
+			}
+			if(JAccess::checkGroup($group->id, 'core.delete')) {
+				$rules['core.delete'][$group->id] = 1;//CanDelete
+			}
+			if(JAccess::checkGroup($group->id, 'core.edit')) {
+				$rules['core.edit'][$group->id] = 1;//CanEdit
+			}
+			if(JAccess::checkGroup($group->id, 'core.edit.state')) {
+				$rules['core.edit.state'][$group->id] = 1;//CanPublish
+			}
+			if(JAccess::checkGroup($group->id, 'core.edit.own')) {
+				$rules['core.edit.own'][$group->id] = 1;//CanEditOwn
+			}
+			$rules['flexicontent.readfield'][$group->id] = 1;//CanEditOwn
+		}
+		
+		return $rules;
+	}
+	
+	/**
+	 * Get a list of the user groups.
+	 *
+	 * @return  array
+	 * @since   11.1
+	 */
+	protected function _getUserGroups()
+	{
+		// Initialise variables.
+		$db		= JFactory::getDBO();
+		$query	= $db->getQuery(true);
+		$query->select('a.id, a.title, COUNT(DISTINCT b.id) AS level, a.parent_id')
+			->from('#__usergroups AS a')
+			->leftJoin($query->qn('#__usergroups').' AS b ON a.lft > b.lft AND a.rgt < b.rgt')
+			->group('a.id')
+			->order('a.lft ASC');
+
+		$db->setQuery($query);
+		$options = $db->loadObjectList();
+
+		return $options;
+	}
+
+	/**
+	 * Get the parent asset id for the record
+	 *
+	 * @param   JTable   $table  A JTable object for the asset parent.
+	 * @param   object  $data     
+	 * 
+	 * @return  integer  The id of the asset's parent
+	 */
+	protected function _getAssetParentId($table = null, $data = null)
+	{
+		// Initialise variables.
+		$assetId 	= null;
+		$db			= JFactory::getDbo();
+
+		// This is a category under a category.
+		if ($data->parent_id > 1) {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('asset_id');
+			$query->from('#__categories');
+			$query->where('id = '.(int) $data->parent_id);
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+		// This is a category that needs to parent with the extension.
+		elseif ($assetId === null) {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true)
+				->select('id')
+				->from('#__assets')
+				->where('name = '.$db->quote(JRequest::getCmd('option')));
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+
+		// Return the asset id.
+		if ($assetId) {
+			return $assetId;
+		} else {
+			return parent::_getAssetParentId($table, $id);
+		}
 	}
 }
 ?>
