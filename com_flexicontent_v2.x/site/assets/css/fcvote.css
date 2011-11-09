@@ -32,6 +32,7 @@
 	overflow: hidden;
 	padding: 0pt;
 	position: relative;
+	float: left;
 }
 
 .fcvote ul li {
@@ -99,7 +100,8 @@
 }
 
 .fcvote-count{
-	vertical-align: middle;
+	float: left;
+	padding: 0 0 0 4px;
 }
 
 /* fcvote variable css */
@@ -122,4 +124,10 @@
 .fcvote ul li.current-rating {
 	height: 25px;
 	line-height: 25px;
+}
+
+.fcvote .ajax-loader {
+    background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
+    height: 16px;
+    padding: 0 0 0 20px;
 }

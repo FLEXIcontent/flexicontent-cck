@@ -112,7 +112,8 @@ class ParentClassItem extends JModelAdmin {
 		}
 
 		// Determine correct permissions to check.
-		if ($id = (int) $this->getState('item.id')) {
+		$id = @$data['id'] ? $data['id'] : (int) $this->getState($this->getName().'.id');
+		if ($id) {
 			// Existing record. Can only edit in selected categories.
 			$form->setFieldAttribute('catid', 'action', 'core.edit');
 			// Existing record. Can only edit own articles in selected categories.
@@ -179,6 +180,7 @@ class ParentClassItem extends JModelAdmin {
 		$use_versioning = $cparams->get('use_versioning', 1);
 		if(!$item) {
 			// Initialise variables.
+			$pk		= (!empty($pk)) ? $pk : $this->_id;
 			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
 
 			if ($item = parent::getItem($pk)) {
@@ -253,7 +255,7 @@ class ParentClassItem extends JModelAdmin {
 		
 		// a. from edit form
 		$data = JRequest::get( 'post' );
-		$pk = @$data['jform']['id'];
+		$pk = @$data['id'];
 		$curcatid = 0;
 		
 		// b. from variable 'id' of the http request (e.g. item view)
@@ -461,8 +463,7 @@ class ParentClassItem extends JModelAdmin {
 		$user	=& JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		if (!$permission->CanConfig) {
-				$id = $this->getState($this->getName().'.id');
-				if ($id) {
+				if ($this->_id) {
 					$rights 	= FlexicontentHelperPerm::checkAllItemAccess($uid, 'item', $id);
 					$canEdit 	= in_array('core.edit', $rights) || $permission->CanEdit;
 					$canEditOwn	= (in_array('core.edit.own', $rights) && ($item->created_by == $user->id));
@@ -491,11 +492,11 @@ class ParentClassItem extends JModelAdmin {
 		$user	=& JFactory::getUser();
 		
 		// tags and cats will need some manipulation so we retieve them 
-		$tags			= isset($data['jform']['tag'])?$data['jform']['tag']:array();
-		$cats			= isset($data['jform']['cid'])?$data['jform']['cid']:array();
+		$tags			= isset($data['tag'])?$data['tag']:array();
+		$cats			= isset($data['cid'])?$data['cid']:array();
 		
 		// Set the item id to the now empty item model
-		$id			= (int)$data['jform']['id'];
+		$id			= (int)$data['id'];
 		$item->id = $id;
 		
 		// Make tags unique
@@ -509,7 +510,7 @@ class ParentClassItem extends JModelAdmin {
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		// Item Rules ?
-		$item->setRules($data['jform']['rules']);
+		//$item->setRules($data['rules']);
 		
 		// A zero id indicate new item
 		$isnew = !$id;
@@ -519,13 +520,13 @@ class ParentClassItem extends JModelAdmin {
 		
 		if( $isnew || ($data['vstate']==2) ) {
 			// Add the primary cat to the array if it's not already in
-			if (!in_array($data['jform']['catid'], $cats) &&  $data['jform']['catid']) {
-				$cats[] =  $data['jform']['catid'];
+			if (!in_array($data['catid'], $cats) &&  $data['catid']) {
+				$cats[] =  $data['catid'];
 			}
 			
 			// Set back the altered categories and tags to the form data
-			$data['jform']['cid'] = $cats;
-			$data['jform']['tags'] = $tags;
+			$data['cid'] = $cats;
+			$data['tags'] = $tags;
 			
 			if(!$this->applyCurrentVersion($item, $data)) return false;
 			//echo "<pre>"; var_dump($data); exit();
@@ -548,8 +549,8 @@ class ParentClassItem extends JModelAdmin {
 			}
 			
 			// Set back the altered categories and tags to the form data
-			$data['jform']['cid'] = $cats;
-			$data['jform']['tags'] = $tags;
+			$data['cid'] = $cats;
+			$data['tags'] = $tags;
 
 			//At least one category needs to be assigned
 			if (!is_array( $cats ) || count( $cats ) < 1) {
@@ -580,7 +581,7 @@ class ParentClassItem extends JModelAdmin {
 				$v->created_by 	= $v->modified_by;
 			}
 			
-			$v->comment		= isset($data['jform']['versioncomment'])?htmlspecialchars($data['jform']['versioncomment'], ENT_QUOTES):'';
+			$v->comment		= isset($data['versioncomment'])?htmlspecialchars($data['versioncomment'], ENT_QUOTES):'';
 			unset($v->modified);
 			unset($v->modified_by);
 			$this->_db->insertObject('#__flexicontent_versions', $v);
@@ -624,11 +625,11 @@ class ParentClassItem extends JModelAdmin {
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$user	=& JFactory::getUser();
-		$cats = $data['jform']['cid'];
-		$tags = $data['jform']['tags'];
+		$cats = $data['cid'];
+		$tags = $data['tags'];
 
 		// bind it to the table
-		if (!$item->bind($data['jform'])) {
+		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -685,7 +686,7 @@ class ParentClassItem extends JModelAdmin {
 		//$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
 		$oldstate	= JRequest::getVar( 'oldstate', 0, '', 'int' );
 		//$params		= JRequest::getVar( 'params', null, 'post', 'array' );
-		/*$params		= $data['jform']['attribs'];
+		/*$params		= $data['attribs'];
 
 		// Build parameter INI string
 		if (is_array($params)) {
@@ -701,7 +702,7 @@ class ParentClassItem extends JModelAdmin {
 
 		// Get metadata string
 		//$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
-		$metadata = $data['jform']['metadata'];
+		$metadata = $data['metadata'];
 
 		if (is_array($metadata)) {
 			$txt = array();
@@ -712,7 +713,7 @@ class ParentClassItem extends JModelAdmin {
 		}
 		
 		// Clean text for xhtml transitional compliance
-		$text = str_replace('<br>', '<br />', $data['jform']['text']);
+		$text = str_replace('<br>', '<br />', $data['text']);
 		
 		// Search for the {readmore} tag and split the text up accordingly.
 		$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
@@ -798,8 +799,8 @@ class ParentClassItem extends JModelAdmin {
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 
-		$cats = $data['jform']['cid'];
-		$tags = $data['jform']['tags'];
+		$cats = $data['cid'];
+		$tags = $data['tags'];
 		///////////////////////////////
 		// store extra fields values //
 		///////////////////////////////
@@ -815,11 +816,13 @@ class ParentClassItem extends JModelAdmin {
 		}
 		if ($fields) {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
-			//$files		= $data['jform']['files'];
+			//$files		= $data['files'];
 			$searchindex = '';
 			
 			// SET THE real name of categories. The name is categories not cid
-			$data['jform']['categories'] = & $data['jform']['cid'];
+			$data['categories'] = & $data['cid'];
+			
+			$data['custom'] = JRequest::getVar('custom', array(), 'post', 'array');
 			
 			foreach($fields as $field) {
 				// process field mambots onBeforeSaveField
@@ -827,16 +830,16 @@ class ParentClassItem extends JModelAdmin {
 				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$data[$fkey][$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
-				if (is_array(@$data['jform'][$field->name])) {
-					$postvalues = $data['jform'][$field->name];
+				if (is_array(@$data[$field->name])) {
+					$postvalues = $data[$field->name];
 					$i = 1;
 					foreach ($postvalues as $postvalue) {
 						$this->saveFieldItem($item->id, $field->id, $postvalue, $isnew, $field->iscore, ($data['vstate']==2), $i++);
 					}
-				} else if (isset($data['jform'][$field->name])) {
+				} else if (isset($data[$field->name])) {
 					//not versionning hits field => Fix this issue 18 http://code.google.com/p/flexicontent/issues/detail?id=18
 					if ($field->id != 7) {
-						$this->saveFieldItem($item->id, $field->id, $data['jform'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
+						$this->saveFieldItem($item->id, $field->id, $data[$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 					}
 				} else if (is_array(@$data['custom'][$field->name])) {
 					$postvalues = $data['custom'][$field->name];
@@ -848,7 +851,7 @@ class ParentClassItem extends JModelAdmin {
 					$this->saveFieldItem($item->id, $field->id, $data['custom'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 				}
 				// process field mambots onAfterSaveField
-				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data['jform'][$field->name], &$files['jform'][$field->name] ));
+				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data[$field->name], &$files['jform'][$field->name] ));
 				$searchindex 	.= @$field->search;
 			}
 			

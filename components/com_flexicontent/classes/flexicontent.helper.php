@@ -1703,7 +1703,7 @@ class FLEXIUtilities {
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br('Cannot load FC Field: $fieldname\n Please correct field name'),'error');
+				$jAp->enqueueMessage(nl2br("Cannot load FC Field: $fieldname\n Please correct field name"),'error');
 				return;
 			}
 			
@@ -1715,7 +1715,7 @@ class FLEXIUtilities {
 				$fc_plgs[$fieldname] =  new $className($dispatcher, array());
 			} else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br('Could not find class: $className in file: $path\n Please correct field name'),'error');
+				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
 				return;
 			}
 		}

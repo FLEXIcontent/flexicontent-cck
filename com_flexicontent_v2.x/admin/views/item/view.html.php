@@ -180,9 +180,9 @@ class FlexicontentViewItem extends JView {
 		*/
 		
 		//build version state list
-		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
-		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
+		//$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		//$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
+		//$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
 		/*if (FLEXI_FISH) {
 		//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);

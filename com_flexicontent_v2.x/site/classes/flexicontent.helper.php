@@ -449,16 +449,15 @@ class flexicontent_html
 	 */
  	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
 	{
-		$live_path = JURI::base();
-
-		$document =& JFactory::getDocument();
+		$document 	=& JFactory::getDocument();
+		$uri 		= JFactory::getURI();
 		
 		$counter 	= $field->parameters->get( 'counter', 1 );
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim		= $field->parameters->get( 'dimension', 25 );    	
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
 		$class 		= $field->name;
-		$img_path	= $live_path . $image;
+		$img_path	= $uri->base(true) .'/'. $image;
 	
 		$percent = 0;
 		$stars = '';
@@ -467,27 +466,13 @@ class flexicontent_html
 		
 	 	if (!$VoteAddScript)
 	 	{ 
-			$css 	= $live_path.'components/com_flexicontent/assets/css/fcvote.css';
-			$js		= $live_path.'components/com_flexicontent/assets/js/fcvote.js';
+			$css 	= $uri->base(true) . '/components/com_flexicontent/assets/css/fcvote.css';
+			$js		= $uri->base(true) . '/components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
 			$document->addScript($js);
-		
-         	echo "
-			<script type=\"text/javascript\" language=\"javascript\">
-			<!--
-			var sfolder = '".JURI::base(true)."';
-			var fcvote_text=Array(
-				'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX' )."',
-				'".JText::_( 'FLEXI_LOADING' )."',
-				'".JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' )."',
-				'".JText::_( 'FLEXI_YOU_NEED_TO_LOGIN' )."',
-				'".JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' )."',
-				'".JText::_( 'FLEXI_VOTES' )."',
-				'".JText::_( 'FLEXI_VOTE' )."'
-				);
-			-->
-			</script>";
-
+			
+			$document->addScriptDeclaration('var sfolder = "'.JURI::base(true).'";');
+			
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
 			.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
@@ -511,35 +496,34 @@ class flexicontent_html
 			if ( $counter == 3 ) $counter = 0;
 		}
 								
-	 	$html="
-		<div class=\"".$class."\">
-			<div class=\"fcvote\">
+	 	$html='
+		<div class="'.$class.'">
+			<div class="fcvote">
 				<ul>
-    				<li id=\"rating_".$id."_".$xid."\" class=\"current-rating\" style=\"width:".(int)$percent."%;\"></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",1,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_VERY_POOR' )."\" class=\"one\">1</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",2,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_POOR' )."\" class=\"two\">2</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",3,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_REGULAR' )."\" class=\"three\">3</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",4,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_GOOD' )."\" class=\"four\">4</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",5,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_VERY_GOOD' )."\" class=\"five\">5</a></li>
+    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'">1</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'">2</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'">3</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'">4</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'">5</a></li>
 				</ul>
-			</div>
-  			<span id=\"fcvote_".$id."_".$xid."\" class=\"fcvote-count\">
-  				<small>";
-	  		if ( $counter != -1 ) {
-  				if ( $counter != 0 ) {
-					$html .= "(";
-				 		if($rating_count!=1) {
-					 		$html .= $rating_count." ".JText::_( 'FLEXI_VOTES' );
-				 		} else { 
-			 				$html .= $rating_count." ".JText::_( 'FLEXI_VOTE' );
-     					}
- 	 				$html .=")";
+	  			<div id="fcvote_'.$id.'_'.$xid.'" class="fcvote-count">';
+		  		if ( $counter != -1 ) {
+	  				if ( $counter != 0 ) {
+						$html .= "(";
+					 		if($rating_count!=1) {
+						 		$html .= $rating_count." ".JText::_( 'FLEXI_VOTES' );
+					 		} else { 
+				 				$html .= $rating_count." ".JText::_( 'FLEXI_VOTE' );
+	     					}
+	 	 				$html .=")";
+					}
 				}
-			}
- 	 	$html .="
- 	 			</small>
- 	 		</span>
- 	 	</div>";
+	 	 	$html .='
+	 	 		</div>
+ 	 			<div class="clear"></div>
+ 	 		</div>
+ 	 	</div>';
 		
 	 	return $html;
  	}
