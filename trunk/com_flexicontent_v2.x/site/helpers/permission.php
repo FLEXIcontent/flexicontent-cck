@@ -16,10 +16,12 @@ class FlexicontentHelperPerm{
 			$check = JAccess::check($user->id, 'core.admin', 'root.1');
 			$permission = new stdClass;
 			//component
-			// !!! ALLOWs USERS to ALTER component access privileges
+			// !!! This is the Super User Privelege (can do anything, all other permissions are ignored)
 			$permission->CanConfig 		= ($check || JAccess::check($user->id, 'core.admin', 			'com_flexicontent'));			
-			//!!! ALLOWs USERS in JOOMLA BACKEND : (a) to view FLEXIcontent menu item in Components Menu and (b) access the FLEXIcontent component screens (whatever they can see)
-			$permission->CanUseFlexi	= ($check || JAccess::check($user->id, 'core.manage', 			'com_flexicontent'));
+			//!!! ALLOWs USERS in JOOMLA BACKEND :
+			//    (a) to view the FLEXIcontent menu item in Components Menu and
+			//    (b) to access the FLEXIcontent component screens (whatever they are allowed to see be individual FLEXIcontent area permissions)
+			$permission->CanBackend	= ($check || JAccess::check($user->id, 'core.manage', 			'com_flexicontent'));
 			$permission->CanTypes 		= ($check || JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent'));
 			$permission->CanFields 		= ($check || JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent'));
 			$permission->CanArchives 	= ($check || JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent'));

@@ -4,14 +4,14 @@
 		<action name="core.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
 		<action name="core.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
 
-		<action name="core.create" title="Can create content" description="Can create content" />
-		<action name="core.delete" title="Can delete content" description="Can delete content" />
-		<action name="core.edit" title="Can edit content" description="Can edit content" />
-		<action name="core.edit.own" title="Can edit own content" description="Can edit own content" />
-		<action name="core.edit.state" title="Can edit state of content" description="Can edit state of content" />
+		<action name="core.create" title="Can create content" description="Allow this group users to CREATE new items in any category. NOTE: You can explicitely deny per category. but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.delete" title="Can delete content" description="Allow this group users to DELETE items (any item) in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit" title="Can edit content" description="Allow this group users to EDIT (all) items in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit.own" title="Can edit own content" description="Allow this group users to EDIT their (owned) items in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit.state" title="Can edit state of content" description="Allow this group users to ALTER the PUBLICATION STATE of items in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
 		
 		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
-		<action name="flexicontent.readfield" title="Can read fields" description="Can read fields" />
+		<action name="flexicontent.readfield" title="Can view fields" description="Can view fields" />
 		
 		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />
 		<action name="flexicontent.archives" title="CanArchives" description="CanArchives" />
@@ -48,21 +48,21 @@
 	</section>
 
 	<section name="category">
-		<action name="core.create" title="Can create content" description="Can create content" />
-		<action name="core.delete" title="Can delete content" description="Can delete content" />
-		<action name="core.edit" title="Can edit content" description="Can edit content" />
-		<action name="core.edit.own" title="Can edit own content" description="Can edit own content" />
-		<action name="core.edit.state" title="Can edit state of content" description="Can edit state of content" />
+		<action name="core.create" title="Can create items" description="Allow this group users to create new items in this category. Note item must have this category as main category." />
+		<action name="core.delete" title="Can delete items" description="Allow this group users to delete items (any item) in this category. Note item must have this category as main category." />
+		<action name="core.edit" title="Can edit items" description="Allow this group users to edit (all) items in this category. Note item must have this category as main category." />
+		<action name="core.edit.own" title="Can edit own items" description="Allow this group users to edit their (owned) items in this category. Note item must have this category as main category." />
+		<action name="core.edit.state" title="Can edit state of items" description="Allow this group users to alter the publication state of items in this category. Note item must have this category as main category." />
 	</section>
 
 	<section name="article">
-		<action name="core.delete" title="Delete this item" description="Delete this item" />
-		<action name="core.edit" title="Edit this item" description="Edit this item" />
-		<action name="core.edit.state" title="Publish this item" description="Publish this item" />
+		<action name="core.delete" title="Delete this item" description="This item can be deleted by members of this group" />
+		<action name="core.edit" title="Edit this item" description="This item can be edited by members of this group" />
+		<action name="core.edit.state" title="Publish this item" description="This item can have its publication state altered by members of this group" />
 	</section>
 	
 	<section name="fields">
-		<action name="flexicontent.readfield" title="Can read fields" description="Can read fields" />
+		<action name="flexicontent.readfield" title="Can view field" description="Allow this group users to view this field in the website frontend" />
 	</section>
 	
 </access>

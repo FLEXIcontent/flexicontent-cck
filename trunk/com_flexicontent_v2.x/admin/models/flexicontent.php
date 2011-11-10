@@ -884,11 +884,17 @@ class FlexicontentModelFlexicontent extends JModel
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
 		
+		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
+		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
+		$db->setQuery($query);
+		if(!$db->query()) return false;
+		
+		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		$db->query();
 		
-		// Component Section Permissions
+		// COUNT Component Section Actions, to check if we have in assets DB table the same number of actions as in access.xml file
 		$query = $db->getQuery(true)
 			->select('rules')
 			->from('#__assets')
@@ -898,11 +904,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$rule = new JRules($rules);
 		$comp_section = count($rule->getData()) == count(JAccess::getActions('com_flexicontent', 'component')) ? 1 : 0;
 		
-		// Field section permissions, these were renamed, so must check
-		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
-		$db->setQuery($query);
-		if(!$db->query()) return false;
-
+		// CHECK if some categories don't have permissions set
 		$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
@@ -911,26 +913,28 @@ class FlexicontentModelFlexicontent extends JModel
 		$result = $db->loadObjectList();
 		$category_section = count($result) == 0 ? 1 : 0;
 
+		// CHECK if some fields don't have permissions set
 		$query = $db->getQuery(true)
-			->select('rules')
-			->from('#__assets AS se')->join('LEFT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id')
-			->where('se.name LIKE ' . $db->quote('com_flexicontent.field.%'));
+			->select('se.id')
+			->from('#__assets AS se')->join('LEFT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
+			->where('se.id is NULL');
 		$db->setQuery($query);
-		$rules = $db->loadObjectList();
-		$rule = new JRules($rules);
-		$field_section = count($rule->getData());
+		$result = $db->loadObjectList();
+		$field_section = count($result) == 0 ? 1 : 0;
 		
-		return ($comp_section && $field_section && $category_section);
+		return ($comp_section && $category_section && $field_section);
 	}
 	
 	function initialPermission() {
 		jimport('joomla.access.rules');
 		$component	= JRequest::getCmd('option');
 		$db 		= JFactory::getDBO();
-
 		$asset	= JTable::getInstance('asset');
-
+		
+		/*** Component assets ***/
+		
 		if (!$asset->loadByName($component)) {
+			// The assets entry already exists, we will check if it has rules for all component's actions 
 			$root = JTable::getInstance('asset');
 			$root->loadByName('root.1');
 			$asset->name = $component;
@@ -945,10 +949,12 @@ class FlexicontentModelFlexicontent extends JModel
 			$asset->rules = $rules->__toString();
 
 			if (!$asset->check() || !$asset->store()) {
+				echo $asset->getError();
 				$this->setError($asset->getError());
 				return false;
 			}
 		} else {
+			// The assets entry does not exist, we will add default rules for all component's actions 
 			$rules = new JRules($asset->rules);
 			if (count($rules->getData()) != count(JAccess::getActions('com_flexicontent', 'component'))) {
 				$initerules = $this->_initRules($component);
@@ -959,16 +965,20 @@ class FlexicontentModelFlexicontent extends JModel
 				$asset->rules = $rules->__toString();
 
 				if (!$asset->check() || !$asset->store()) {
+					echo $asset->getError();
 					$this->setError($asset->getError());
 					return false;
 				}
 			}
 		}
-
+		
+		
+		/*** CATEGORY assets ***/
+		
 		$root = JTable::getInstance('asset');
 		$root->loadByName($component);
 
-		//Fix category acl
+		// Get a list com_content categories that do not have assets
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
@@ -976,7 +986,8 @@ class FlexicontentModelFlexicontent extends JModel
 			->order('c.lft ASC');
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
-
+		
+		// Add an asset to category that doesnot have one
 		if(count($results)>0) {
 			foreach($results as $category) {
 				$parentId = $this->_getAssetParentId(null, $category);
@@ -987,26 +998,37 @@ class FlexicontentModelFlexicontent extends JModel
 				$asset->name	= $name;
 				$asset->title	= $category->title;
 
-				if ($parentId == $root->id) {				
-					$actions	= JAccess::getActions($component, 'category');
-					$rules 		= json_decode($root->rules);		
-					foreach ($actions as $action) {
-						$catrules[$action->name] = $rules->{$action->name};
+				// Test if an asset with THE GIVEN NAME alread exists and set the category to use it instead of creating a new asset
+				$query = $db->getQuery(true)
+					->select('id')
+					->from('#__assets')
+					->where('name = "'.$asset->name.'"');
+				$db->setQuery($query);
+				$asset_id = $db->loadResult();
+				
+				if ( !$asset_id ) {
+					if ($parentId == $root->id) {				
+						$actions	= JAccess::getActions($component, 'category');
+						$rules 		= json_decode($root->rules);		
+						foreach ($actions as $action) {
+							$catrules[$action->name] = $rules->{$action->name};
+						}
+						$rules = new JRules(json_encode($catrules));
+						$asset->rules = $rules->__toString();
+					} else {
+						$parent = JTable::getInstance('asset');
+						$parent->load($parentId);
+						$asset->rules = $parent->rules;
 					}
-					$rules = new JRules(json_encode($catrules));
-					$asset->rules = $rules->__toString();
-				} else {
-					$parent = JTable::getInstance('asset');
-					$parent->load($parentId);
-					$asset->rules = $parent->rules;
+					
+					if (!$asset->check() || !$asset->store(false)) {
+						echo $asset->getError();
+						$this->setError($asset->getError());
+						return false;
+					}
+					$asset_id = $asset->id;
 				}
 				
-				if (!$asset->check() || !$asset->store(false)) {
-					$this->setError($asset->getError());
-					return false;
-				}
-				$asset_id = $asset->id;
-
 				$query = $db->getQuery(true)
 					->update('#__categories')
 					->set('asset_id = ' . (int)$asset_id)
@@ -1014,20 +1036,25 @@ class FlexicontentModelFlexicontent extends JModel
 				$db->setQuery($query);
 				
 				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;
 				}
 			}
 		}
-
-		//fix fields acl
+		
+		
+		/*** FLEXIcontent FIELDS assets ***/
+		
+		// Get a list flexicontent fields that do not have assets
 		$query = $db->getQuery(true)
 			->select('ff.id, ff.name')
-			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name= concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
-
+		
+		// Add an asset to every field that doesnot have one
 		if(count($results)>0) {
 			foreach($results as $field) {
 				$name = "com_flexicontent.field.{$field->id}";
@@ -1045,11 +1072,23 @@ class FlexicontentModelFlexicontent extends JModel
 				$rules = new JRules(json_encode($fieldrules));
 				$asset->rules = $rules->__toString();
 				
-				if (!$asset->check() || !$asset->store(false)) {
-					return false;
+				// Test if an asset with THE GIVEN NAME alread exists and set flexicontent field to use it instead of creating a new asset
+				$query = $db->getQuery(true)
+					->select('id')
+					->from('#__assets')
+					->where('name = "'.$asset->name.'"');
+				$db->setQuery($query);
+				$asset_id = $db->loadResult();
+				
+				if ( !$asset_id ) {
+					if (!$asset->check() || !$asset->store(false)) {
+						echo $asset->getError();
+						$this->setError($asset->getError());
+						return false;
+					}
+					$asset_id = $asset->id;
 				}
-				$asset_id = $asset->id;
-
+				
 				$query = $db->getQuery(true)
 					->update('#__flexicontent_fields')
 					->set('asset_id = ' . (int)$asset_id)
@@ -1057,6 +1096,7 @@ class FlexicontentModelFlexicontent extends JModel
 				$db->setQuery($query);
 				
 				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;
 				}
@@ -1072,14 +1112,11 @@ class FlexicontentModelFlexicontent extends JModel
 		$rules 		= array();
 
 		foreach($groups as $group) {
-			if(JAccess::checkGroup($group->id, 'core.admin')) {//super user
+			if(JAccess::checkGroup($group->id, 'core.admin')) { // Super User Privelege (can do anything, all other permissions are ignored)
 				$rules['core.admin'][$group->id] = 1;  //CanConfig
-			}
-			if(JAccess::checkGroup($group->id, 'core.manage')) {
-				foreach($actions as $action) {
-					if($action->name == 'core.admin') continue;
-					$rules[$action->name][$group->id] = 1;
-				}
+			}			
+			if(JAccess::checkGroup($group->id, 'core.manage')) { // Backend Access Privelege (can access/manage the component in the backend)
+				$rules['core.manage'][$group->id] = 1;  //CanBackend
 			}
 			if(JAccess::checkGroup($group->id, 'core.create')) {
 				$rules['core.create'][$group->id] = 1;//CanAdd
@@ -1096,7 +1133,7 @@ class FlexicontentModelFlexicontent extends JModel
 			if(JAccess::checkGroup($group->id, 'core.edit.own')) {
 				$rules['core.edit.own'][$group->id] = 1;//CanEditOwn
 			}
-			$rules['flexicontent.readfield'][$group->id] = 1;//CanEditOwn
+			$rules['flexicontent.readfield'][$group->id] = 1;//CanViewField
 		}
 		
 		return $rules;
