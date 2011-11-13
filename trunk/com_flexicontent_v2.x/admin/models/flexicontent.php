@@ -907,7 +907,7 @@ class FlexicontentModelFlexicontent extends JModel
 		// CHECK if some categories don't have permissions set
 		$query = $db->getQuery(true)
 			->select('c.id')
-			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
 			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
 		$result = $db->loadObjectList();
@@ -916,7 +916,7 @@ class FlexicontentModelFlexicontent extends JModel
 		// CHECK if some fields don't have permissions set
 		$query = $db->getQuery(true)
 			->select('se.id')
-			->from('#__assets AS se')->join('LEFT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();
@@ -927,23 +927,23 @@ class FlexicontentModelFlexicontent extends JModel
 	
 	function initialPermission() {
 		jimport('joomla.access.rules');
-		$component	= JRequest::getCmd('option');
+		$component_name	= JRequest::getCmd('option');
 		$db 		= JFactory::getDBO();
 		$asset	= JTable::getInstance('asset');
 		
 		/*** Component assets ***/
 		
-		if (!$asset->loadByName($component)) {
+		if (!$asset->loadByName($component_name)) {
 			// The assets entry already exists, we will check if it has rules for all component's actions 
 			$root = JTable::getInstance('asset');
 			$root->loadByName('root.1');
-			$asset->name = $component;
-			$asset->title = $component;
+			$asset->name = $component_name;
+			$asset->title = $component_name;
 			$asset->setLocation($root->id,'last-child');
 						
 			$groups 	= $this->_getUserGroups();
-			$actions	= JAccess::getActions($component, 'component');
-			$rules 		= $this->_initRules($component);
+			$actions	= JAccess::getActions($component_name, 'component');
+			$rules 		= $this->_initRules($component_name);
 			
 			$rules = new JRules(json_encode($rules));
 			$asset->rules = $rules->__toString();
@@ -957,7 +957,7 @@ class FlexicontentModelFlexicontent extends JModel
 			// The assets entry does not exist, we will add default rules for all component's actions 
 			$rules = new JRules($asset->rules);
 			if (count($rules->getData()) != count(JAccess::getActions('com_flexicontent', 'component'))) {
-				$initerules = $this->_initRules($component);
+				$initerules = $this->_initRules($component_name);
 				$initerules = new JRules(json_encode($initerules));
 				
 				$rules->merge($initerules);
@@ -972,12 +972,12 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 		
+		// Load component asset
+		$component_asset = JTable::getInstance('asset');
+		$component_asset->loadByName($component_name);
 		
-		/*** CATEGORY assets ***/
+		/*** CATEGORY assets ***/ /*** THESE MAY NO LONGER BE NEEDED ? ***/
 		
-		$root = JTable::getInstance('asset');
-		$root->loadByName($component);
-
 		// Get a list com_content categories that do not have assets
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title')
@@ -993,23 +993,17 @@ class FlexicontentModelFlexicontent extends JModel
 				$parentId = $this->_getAssetParentId(null, $category);
 				$name = "com_content.category.{$category->id}";
 				
-				$asset->id 		= null;
-				$asset->setLocation($parentId, 'last-child');
-				$asset->name	= $name;
-				$asset->title	= $category->title;
-
-				// Test if an asset with THE GIVEN NAME alread exists and set the category to use it instead of creating a new asset
-				$query = $db->getQuery(true)
-					->select('id')
-					->from('#__assets')
-					->where('name = "'.$asset->name.'"');
-				$db->setQuery($query);
-				$asset_id = $db->loadResult();
+				// Test if an asset for the current CATEGORY ID already exists and load it instead of creating a new asset
+				if ( ! $asset->loadByName($name) ) {
 				
-				if ( !$asset_id ) {
-					if ($parentId == $root->id) {				
-						$actions	= JAccess::getActions($component, 'category');
-						$rules 		= json_decode($root->rules);		
+					$asset->id 		= null;
+					$asset->setLocation($parentId, 'last-child');
+					$asset->name	= $name;
+					$asset->title	= $category->title;
+
+					if ($parentId == $component_asset->id) {				
+						$actions	= JAccess::getActions($component_name, 'category');
+						$rules 		= json_decode($component_asset->rules);		
 						foreach ($actions as $action) {
 							$catrules[$action->name] = $rules->{$action->name};
 						}
@@ -1026,12 +1020,11 @@ class FlexicontentModelFlexicontent extends JModel
 						$this->setError($asset->getError());
 						return false;
 					}
-					$asset_id = $asset->id;
 				}
 				
 				$query = $db->getQuery(true)
 					->update('#__categories')
-					->set('asset_id = ' . (int)$asset_id)
+					->set('asset_id = ' . (int)$asset->id)
 					->where('id = ' . (int)$category->id);
 				$db->setQuery($query);
 				
@@ -1058,40 +1051,33 @@ class FlexicontentModelFlexicontent extends JModel
 		if(count($results)>0) {
 			foreach($results as $field) {
 				$name = "com_flexicontent.field.{$field->id}";
+				
+				// Test if an asset for the current FIELD ID already exists and load it instead of creating a new asset
+				if ( ! $asset->loadByName($name) ) {
 
-				$asset->id = null;
-				$asset->setLocation($root->id, 'last-child');
-				$asset->name		= $name;
-				$asset->title		= $field->name;
-				
-				$actions	= JAccess::getActions($component, 'fields');
-				$rules 		= json_decode($root->rules);		
-				foreach ($actions as $action) {
-					$fieldrules[$action->name] = $rules->{$action->name};
-				}
-				$rules = new JRules(json_encode($fieldrules));
-				$asset->rules = $rules->__toString();
-				
-				// Test if an asset with THE GIVEN NAME alread exists and set flexicontent field to use it instead of creating a new asset
-				$query = $db->getQuery(true)
-					->select('id')
-					->from('#__assets')
-					->where('name = "'.$asset->name.'"');
-				$db->setQuery($query);
-				$asset_id = $db->loadResult();
-				
-				if ( !$asset_id ) {
+					$asset->id = null;
+					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
+					$asset->name		= $name;
+					$asset->title		= $field->name;
+					
+					$actions	= JAccess::getActions($component_name, 'fields');
+					$rules 		= json_decode($component_asset->rules);		
+					foreach ($actions as $action) {
+						$fieldrules[$action->name] = $rules->{$action->name};
+					}
+					$rules = new JRules(json_encode($fieldrules));
+					$asset->rules = $rules->__toString();
+					
 					if (!$asset->check() || !$asset->store(false)) {
 						echo $asset->getError();
 						$this->setError($asset->getError());
 						return false;
 					}
-					$asset_id = $asset->id;
 				}
 				
 				$query = $db->getQuery(true)
 					->update('#__flexicontent_fields')
-					->set('asset_id = ' . (int)$asset_id)
+					->set('asset_id = ' . (int)$asset->id)
 					->where('id = ' . (int)$field->id);
 				$db->setQuery($query);
 				
@@ -1114,9 +1100,13 @@ class FlexicontentModelFlexicontent extends JModel
 		foreach($groups as $group) {
 			if(JAccess::checkGroup($group->id, 'core.admin')) { // Super User Privelege (can do anything, all other permissions are ignored)
 				$rules['core.admin'][$group->id] = 1;  //CanConfig
-			}			
+			}
 			if(JAccess::checkGroup($group->id, 'core.manage')) { // Backend Access Privelege (can access/manage the component in the backend)
-				$rules['core.manage'][$group->id] = 1;  //CanBackend
+				$rules['core.manage'][$group->id] = 1;  //CanManage
+				foreach($actions as $action) {   // INITIALLY , WE WILL GIVE ALL PERMISSIONS TO ANYONE THAT CAN MANAGE THE COMPONENT
+					if ($action->name == 'core.admin') continue;
+					$rules[$action->name][$group->id] = 1;
+				}
 			}
 			if(JAccess::checkGroup($group->id, 'core.create')) {
 				$rules['core.create'][$group->id] = 1;//CanAdd
