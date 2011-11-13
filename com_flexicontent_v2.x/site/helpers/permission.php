@@ -20,8 +20,9 @@ class FlexicontentHelperPerm{
 			$permission->CanConfig 		= ($check || JAccess::check($user->id, 'core.admin', 			'com_flexicontent'));			
 			//!!! ALLOWs USERS in JOOMLA BACKEND :
 			//    (a) to view the FLEXIcontent menu item in Components Menu and
-			//    (b) to access the FLEXIcontent component screens (whatever they are allowed to see be individual FLEXIcontent area permissions)
-			$permission->CanBackend	= ($check || JAccess::check($user->id, 'core.manage', 			'com_flexicontent'));
+			//    (b) to access the FLEXIcontent component screens (whatever they are allowed to see by individual  
+			//        FLEXIcontent area permissions, THE INITIAL PERMISSION ALLOW ALL AREAS TO BE MANAGED
+			$permission->CanManage	= ($check || JAccess::check($user->id, 'core.manage', 			'com_flexicontent'));
 			$permission->CanTypes 		= ($check || JAccess::check($user->id, 'flexicontent.managetype',		'com_flexicontent'));
 			$permission->CanFields 		= ($check || JAccess::check($user->id, 'flexicontent.fields', 			'com_flexicontent'));
 			$permission->CanArchives 	= ($check || JAccess::check($user->id, 'flexicontent.archives', 			'com_flexicontent'));

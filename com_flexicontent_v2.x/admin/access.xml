@@ -10,29 +10,29 @@
 		<action name="core.edit.own" title="Can edit own content" description="Allow this group users to EDIT their (owned) items in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
 		<action name="core.edit.state" title="Can edit state of content" description="Allow this group users to ALTER the PUBLICATION STATE of items in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
 		
-		<action name="flexicontent.fields" title="Can manage fields" description="Can manage fields" />
-		<action name="flexicontent.readfield" title="Can view fields" description="Can view fields" />
+		<action name="flexicontent.fields" title="Can manage fields" description="Allow this group users to have FULL access to the Field Management" />
+		<action name="flexicontent.readfield" title="Can view fields" description="Allow this group users to view in the frontend  field values of all fields" />
 		
-		<action name="flexicontent.tags" title="Can manage tags" description="Can manage tags" />
-		<action name="flexicontent.archives" title="CanArchives" description="CanArchives" />
-		<action name="flexicontent.stats" title="Can manage stats" description="Can manage stats" />
-		<action name="flexicontent.templates" title="Can manage templates" description="Can manage templates" />
-		<action name="flexicontent.versioning" title="Can use version" description="Can use version" />
-		<action name="flexicontent.usetags" title="Can use tags" description="Can use tags" />
+		<action name="flexicontent.tags" title="Can manage tags" description="Allow this group users to have FULL access to the Tag Management" />
+		<action name="flexicontent.archives" title="CanArchives" description="Allow this group users to have FULL access to the Archive Management" />
+		<action name="flexicontent.stats" title="Can manage stats" description="Allow this group users to have FULL access to the Stats Management" />
+		<action name="flexicontent.templates" title="Can manage templates" description="Allow this group users to have FULL access to the Templates Management" />
+		<action name="flexicontent.versioning" title="Can use version" description="Allow this group users to use multiple Versions per Item" />
+		<action name="flexicontent.usetags" title="Can use tags" description="Allow this group users to assign Tags to Items" />
 		
-		<action name="flexicontent.manageitem" title="Can manage articles" description="Can manage articles" />		
-		<action name="flexicontent.copyitems" title="Can copy articles" description="Can copy articles" />
-		<action name="flexicontent.order" title="Can order articles" description="Can order articles" />
-		<action name="flexicontent.paramsitem" title="Can set article params" description="Can set article params" />
-		<action name="flexicontent.displayallitems" title="Can display all items" description="Can display all items" />
+		<action name="flexicontent.manageitem" title="Can manage articles" description="Allow this group users to have access to the Items Management. NOTE: the inherited privileges of each item are in effect. Thus the user can only perform specific actions on specific items" />		
+		<action name="flexicontent.copyitems" title="Can copy articles" description="Allow this group users to use the multiple Item Copy Task" />
+		<action name="flexicontent.order" title="Can order articles" description="Allow this group users to change the ordering of Items" />
+		<action name="flexicontent.paramsitem" title="Can set article params" description="Allow this group users to change the parameters of the items, that the user can edit." />
+		<action name="flexicontent.displayallitems" title="Can display all items" description="Allow this group users to view an all Items List in the Items Management, otherwise the user will only see the items that he/she can edit." />
 		
-		<action name="flexicontent.managetype" title="Can manage types" description="Can manage types" />
-		<action name="flexicontent.createtype" title="Can create type" description="Can create type" />
-		<action name="flexicontent.deletetype" title="Can delete type" description="Can delete type" />
-		<action name="flexicontent.edittype" title="Can edit type" description="Can edit type" />
-		<action name="flexicontent.edittype.state" title="Can edit state of type" description="Can edit state of type" />
+		<action name="flexicontent.managetype" title="Can manage types" description="Allow this group users to have access to the Types Management. NOTE: There are more permissions that control what the user can do with types." />
+		<action name="flexicontent.createtype" title="Can create type" description="Allow this group users to Create an New Content Type" />
+		<action name="flexicontent.deletetype" title="Can delete type" description="Allow this group users to Delete Any Content Type" />
+		<action name="flexicontent.edittype" title="Can edit type" description="Allow this group users to Edit the configuration of All Content Types" />
+		<action name="flexicontent.edittype.state" title="Can edit state of type" description="Allow this group users to alter the Publication State of Any Content type" />
 		
-		<action name="flexicontent.managecat" title="Can manage categories" description="Can manage categories" />
+		<action name="flexicontent.managecat" title="Can manage categories" description="Allow this group users to have access to the Category Management. NOTE: the inherited privileges of each category are in effect. Thus the user can only perform specific actions on specific categories" />		
 		<action name="flexicontent.usercats" title="View All Categories" description="View All Categories" />
 		<action name="flexicontent.viewtree" title="View categories tree" description="View categories tree" />
 		<action name="flexicontent.createcat" title="Can create category" description="Can create category" />
