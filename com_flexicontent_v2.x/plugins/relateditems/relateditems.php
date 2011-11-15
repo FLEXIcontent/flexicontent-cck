@@ -64,6 +64,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$required 	= $required ? ' required' : '';
 		
 		// initialise property
+		$default_values = '';
 		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
