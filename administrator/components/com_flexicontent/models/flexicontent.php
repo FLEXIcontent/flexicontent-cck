@@ -331,6 +331,28 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
+	 * Method to get if language of items is initialized properly
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function getItemsNoLang()
+	{
+		static $return;
+		if($return === NULL) {
+			$db =& JFactory::getDBO();
+			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext"
+				. " WHERE language = ''"
+				;
+			$db->setQuery($query);
+			$return = $db->loadResult();
+		}
+		
+		return $return;
+	}
+	
+	/**
 	 * Method to check if the versions table is created
 	 *
 	 * @access public

@@ -186,7 +186,9 @@ class flexicontent_html
 			} else {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view, false );
 			}
-			$url 	= 'index.php?option=com_mailto&tmpl=component&link='.base64_encode( $link );
+			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+			$url 	= 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link);
+			
 			$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 			if ($params->get('show_icons')) 	{
