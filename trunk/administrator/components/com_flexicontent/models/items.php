@@ -1484,15 +1484,15 @@ class FlexicontentModelItems extends JModel
 		$lang = $languages->get('site', 'en-GB');
 
 		// Get all Joomla sections
-	    $query = 'SELECT * FROM #__sections';
-    	$this->_db->setQuery($query);
+		$query = 'SELECT * FROM #__sections';
+		$this->_db->setQuery($query);
 		$sections = $this->_db->loadObjectList();
 		
 		$logs = new stdClass();
 		$logs->sec = 0;
 		$logs->cat = 0;
 		$logs->art = 0;
-//		$logs->err = new stdClass();
+		//$logs->err = new stdClass();
 		
 		// Create the new section for flexicontent items
 		$flexisection =& JTable::getInstance('section');
@@ -1502,7 +1502,7 @@ class FlexicontentModelItems extends JModel
 		$flexisection->ordering		= $flexisection->getNextOrder();
 		$flexisection->access		= 0;
 		$flexisection->scope		= 'content';
-	   	$flexisection->check();
+		$flexisection->check();
 		$flexisection->store();
 
 		// Get the category default parameters in a string
@@ -1512,10 +1512,11 @@ class FlexicontentModelItems extends JModel
 
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {
+				if (!$param->attributes('name')) continue;  // FIX for empty name e.g. seperator fields
 				$catparams->set($param->attributes('name'), $param->attributes('default'));
 			}
 		}
-    	$catparams = $catparams->toString();		
+		$catparams = $catparams->toString();		
 		
 		// Loop throught the section object and create cat -> subcat -> items -> fields
 		$k = 0;

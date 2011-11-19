@@ -39,23 +39,15 @@ class FlexicontentControllerFields extends FlexicontentController{
 
 	function getfieldspecificproperties() {
 		//$id		= JRequest::getVar( 'id', 0 );
-		JRequest::setVar( 'view', 'field' );
-		JRequest::setVar( 'format', 'raw' );
+		JRequest::setVar( 'view', 'field' );    // set view to be field, if not already done in http request
+		JRequest::setVar( 'format', 'raw' );    // force raw format, if not already done in http request
+		JRequest::setVar( 'cid', '' );          // needed when changing type of an existing field
 		//JRequest::setVar( 'hidemainmenu', 1 );
 		
 		// Import field to execute its constructor, e.g. needed for loading language file etc
 		JPluginHelper::importPlugin('flexicontent_fields', JRequest::getVar('field_type'));
 		
-		$model 	= $this->getModel('field');
-		$user	=& JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
-			return;
-		}
-
-		$model->checkout( $user->get('id') );
+		// Display the field parameters
 		parent::display();
 	}
 }
