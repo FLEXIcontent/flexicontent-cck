@@ -28,7 +28,7 @@ if ($this->permission->CanUseTags) {
 	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&tmpl=component&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&format=raw&".JUtility::getToken()."=1\", {
 				width: 260,
 				matchContains: false,
 				mustMatch: false,
@@ -122,7 +122,7 @@ function reseter(task, id, div){
 	var form = document.adminForm;
 	
 	if (task == 'items.resethits') {
-		form.hits.value = 0;
+		form.jform_hits.value = 0;
 	} else {
 	}
 		
@@ -155,6 +155,7 @@ $revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/imag
 $view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
 $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
 ?>
+
 <div class="flexicontent">
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm" autocomplete="off">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -229,7 +230,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								<tr>
 									<td>
 										<label for="notify">
-										<?php echo JText::_( 'FLEXI_NOTIFY' ); ?>
+										<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
 										</label>
 									</td>
 									<td>
@@ -352,9 +353,15 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 						?>
 						<tr>
 							<td class="key">
+							<?php if ($field->description) : ?>
 								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
 									<?php echo $field->label; ?>
 								</label>
+							<?php else : ?>
+								<label for="<?php echo $field->name; ?>">
+									<?php echo $field->label; ?>
+								</label>
+							<?php endif; ?>
 							</td>
 							<td>
 								<?php
@@ -433,7 +440,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<span <?php echo $visibility; ?>>
 					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resethits', '<?php echo $this->form->getValue('id'); ?>', 'hits')" />
 				</span>
-				<div id="hits"></div>
 			</td>
 		</tr>
 		<tr>

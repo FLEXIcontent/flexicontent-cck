@@ -58,15 +58,19 @@ class FlexicontentControllerItems extends JController {
 	function save() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
+		
 		$task	= JRequest::getVar('task');
 		$data	= JRequest::getVar('jform', array(), 'post', 'array');
 
 		$model 	= $this->getModel('item');
 		$form 	= $model->getForm($data, false);
 
-		$validData = $model->validate($form, $data);
-
+		//$validData = & $data;
+		$validData = & $model->validate($form, $data);
+		
+		//$diff_arr = array_diff_assoc ( $data, $validData);
+		//echo "<pre>"; print_r($diff_arr); exit();
+		
 		if ( $model->store($validData) ) {
 			switch ($task) {
 				case 'apply' :
@@ -558,43 +562,6 @@ class FlexicontentControllerItems extends JController {
 	}
 
 	/**
-	 * Method to reset hits
-	 * 
-	 * @since 1.0
-	 */
-	function resethits() {
-		$id		= JRequest::getInt( 'id', 0 );
-		$model = $this->getModel('item');
-
-		$model->resetHits($id);
-		
-		//$cache = &JFactory::getCache('com_flexicontent');
-		$cache = FLEXIUtilities::getCache();
-		$cache->clean('com_flexicontent_items');
-
-		echo 0;
-	}
-
-	/**
-	 * Method to reset votes
-	 * 
-	 * @since 1.0
-	 */
-	function resetvotes()
-	{
-		$id		= JRequest::getInt( 'id', 0 );
-		$model = $this->getModel('item');
-
-		$model->resetVotes($id);
-		
-		//$cache = &JFactory::getCache('com_flexicontent');
-		$cache = FLEXIUtilities::getCache();
-		$cache->clean('com_flexicontent_items');
-
-		echo JText::_( 'FLEXI_NOT_RATED_YET' );
-	}
-
-	/**
 	 * Method to fetch the tags form
 	 * 
 	 * @since 1.5
@@ -615,8 +582,8 @@ class FlexicontentControllerItems extends JController {
 			$used = array();
 		}
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTag : 0;
-		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 0;
+		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTag : 1;
+		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 1;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);
@@ -645,38 +612,7 @@ class FlexicontentControllerItems extends JController {
 		}
 		echo $rsp;
 	}
-	/**
-	 * Method to fetch the tags form
-	 * 
-	 * @since 1.5
-	 */
-	function viewtags() {
-		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
-		$user	=& JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 0;
-		if($CanUseTags) {
-			//header('Content-type: application/json');
-			@ob_end_clean();
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Cache-Control: no-cache");
-			header("Pragma: no-cache");
-			//header("Content-type:text/json");
-			$model 		=  $this->getModel('item');
-			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
-			$array = array();
-			echo "[";
-			foreach($tagobjs as $tag) {
-				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
-			}
-			echo implode(",", $array);
-			echo "]";
-			exit;
-		}
-	}
-
+	
 	/**
 	 * Method to get hits
 	 * 

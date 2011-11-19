@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
+// Added to allow the user to choose some of the pre-selected categories
 $cids = $this->params->get("cid");  // categories FIELD is READONLY ?
 $postcats = $this->params->get("postcats", 0);
 
@@ -54,11 +55,11 @@ if ($cids) :
 	}
 endif;
 
-
-
-JHTML::_('behavior.mootools');
-$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
-//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file
+if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+	JHTML::_('behavior.mootools');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.4.min.js');
+	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
+}
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -274,9 +275,9 @@ function deleteTag(obj) {
 <?php
 
 $autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
-print_r($this->perms);
 $canpublish = $this->perms['canpublish'];
-echo "autopublished:$autopublished<br />";
+//echo "Item Permissions:<br>\n"; print_r($this->perms);
+//echo "Auto-Publish Parameter: $autopublished<br />";
 ?>
 	<?php if (!$autopublished && $canpublish) : ?>
 	
