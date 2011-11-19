@@ -1501,11 +1501,11 @@ class FlexicontentModelItems extends JModel {
 		$topcat->access			= 1;
 		$topcat->language			= "*";
 		$topcat->setLocation(0, 'last-child');
-	   	$topcat->check();
+		$topcat->check();
 		$topcat->store();
 		$topcat->rebuildPath($topcat->id);
 		$topcat_id = $topcat->id;
-		
+
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
@@ -1513,6 +1513,7 @@ class FlexicontentModelItems extends JModel {
 
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {
+				if (!$param->attributes('name')) continue;  // FIX for empty name e.g. seperator fields
 				$catparams->set($param->attributes('name'), $param->attributes('default'));
 			}
 		}
