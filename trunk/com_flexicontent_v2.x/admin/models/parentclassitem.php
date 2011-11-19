@@ -232,6 +232,21 @@ class ParentClassItem extends JModelAdmin {
 				$fields = $this->getExtraFields();
 				
 				$item->cid = @$fields['categories']->value;
+				// Calculate item's score so far (percentage), we have 5 votes max , so 5 * 20 = 100%
+				$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
+						." FROM #__flexicontent_items_ext as ie "
+						. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
+						." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
+						." WHERE ie.item_id='".$this->_id."';";
+				$this->_db->setQuery($query);
+				$type = $this->_db->loadObject();
+				if($type) {
+					$item->typename = $type->typename;
+					$item->rating_count = $type->rating_count;
+					$item->score = $type->score;
+				}else{
+					$item->score = 0;
+				}
 			}
 			if($pk <= 0) {
 				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
@@ -492,8 +507,8 @@ class ParentClassItem extends JModelAdmin {
 		$user	=& JFactory::getUser();
 		
 		// tags and cats will need some manipulation so we retieve them 
-		$tags			= isset($data['tag'])?$data['tag']:array();
-		$cats			= isset($data['cid'])?$data['cid']:array();
+		$tags			= isset($data['tag']) ? $data['tag'] : array();
+		$cats			= isset($data['cid']) ? $data['cid'] : array();
 		
 		// Set the item id to the now empty item model
 		$id			= (int)$data['id'];
@@ -1212,7 +1227,7 @@ class ParentClassItem extends JModelAdmin {
 			$field->value = array($item->modified_by);
 			break;
 
-			case 'title': // hits
+			case 'title': // title
 			$field->value = array($item->title);
 			break;
 
@@ -1228,7 +1243,7 @@ class ParentClassItem extends JModelAdmin {
 			$field->value = array($item->version);
 			break;
 
-			case 'state': // state
+			case 'state': // publication state
 			$field->value = array($item->state);
 			break;
 

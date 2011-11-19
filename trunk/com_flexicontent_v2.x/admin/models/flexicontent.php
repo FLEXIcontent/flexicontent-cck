@@ -49,7 +49,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getPending() {
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -76,7 +76,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
 				. ' FROM #__content AS c'
@@ -106,7 +106,7 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user	= &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -132,7 +132,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getInprogress() {
 		$permission = FlexicontentHelperPerm::getPerm();
 		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 0;
+		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
