@@ -97,7 +97,7 @@ class FlexicontentController extends JController
 		$existseplg 		= & $model->getExistSearchPlugin();
 		$existsyplg 		= & $model->getExistSystemPlugin();
 		
-		$existlang	 		= & $model->getExistLanguageColumn();
+		$existlang	 	= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
 		$existauthors 		= & $model->getExistAuthorsTable();
@@ -364,25 +364,6 @@ VALUES
 		}
 	}
 
-	/**
-	 * Method to set the default site language the items with no language
-	 * 
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since 1.5
-	 */
-	function getItemsNoLang()
-	{
-		$db =& JFactory::getDBO();
-
-		$query 	= "SELECT item_id FROM #__flexicontent_items_ext"
-				. " WHERE language = ''"
-				;
-		$db->setQuery($query);
-		$cid = $db->loadResultArray();
-		
-		return $cid;
-	}
 
 	/**
 	 * Method to set the default site language the items with no language
@@ -391,18 +372,18 @@ VALUES
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function setItemsDefaultLang($cid, $lang)
+	function setItemsDefaultLang($lang)
 	{
 		$db =& JFactory::getDBO();
 
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET language = ' . $db->Quote($lang)
-				. ' WHERE item_id IN ( ' . implode(',', $cid) . ' )'
+				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$db->query();
+		$result = $db->query();
 		
-		return true;
+		return $result;
 	}
 
 	/**
@@ -420,21 +401,26 @@ VALUES
 		$db 		=& JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 
-		$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
-		$db->setQuery($query);
-		if (!$db->query()) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-		} else {
+		$fields = $db->getTableFields('#__flexicontent_items_ext');
+		$language_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+		if(!$language_col) {
+			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
+			$db->setQuery($query);
+			$result_lang_col = $db->query();
+			if (!$result_lang_col) echo "Cannot add language column<br>";
+		}
+		if ($model->getItemsNoLang()) {
 			// Add site default language to the language field if empty
 			$languages 	=& JComponentHelper::getParams('com_languages');
 			$lang 		= $languages->get('site', 'en-GB');
-			$cid 		= $this->getItemsNoLang();
+			$result_items_default_lang = $this->setItemsDefaultLang($lang);
+			if (!$result_tgrp_col) echo "Cannot set default language<br>";
+		}
 		
-			if (!$this->setItemsDefaultLang($cid, $lang)) {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-			} else {
-				echo '<span class="install-ok"></span>';
-			}
+		if (!$result_lang_col || !$result_items_default_lang) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existlanguagecolumn" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
 		}
 	}
 	
