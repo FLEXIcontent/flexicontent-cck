@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 923 2011-10-08 18:37:50Z ggppdk $
+ * @version 1.0 $Id: text.php 931 2011-10-17 06:09:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -44,10 +44,9 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
 		$required 	= $required ? ' required' : '';
-		$version = $item->getValue('version', NULL, 0);
-
+		
 		// initialise property
-		if($version < 2 && $default_value) {
+		if($item->getValue('version', NULL, 0) < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
@@ -58,7 +57,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );			
 			}
 		}
-
+		
 		if ($multiple) // handle multiple records
 		{
 			$document	= & JFactory::getDocument();
@@ -70,8 +69,9 @@ class plgFlexicontent_fieldsText extends JPlugin{
 					'constrain': true,
 					'clone': true,
 					'handle': '.drag".$field->id."'
-				});			
-			});";
+					});			
+				});
+			";
 			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
@@ -138,6 +138,8 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
@@ -151,7 +153,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				$n++;
 			}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
 			$field->html	= '<div>'.$pretext.'<input name="custom['.$field->name.'][]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';

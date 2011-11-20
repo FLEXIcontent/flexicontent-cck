@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 919 2011-10-03 02:17:05Z ggppdk $
+ * @version 1.0 $Id: image.php 943 2011-10-31 02:33:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -67,7 +67,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if(isset($field->value['originalname']))
 				$field->value = array($field->value);
 			foreach ($field->value as $value) {
-				//$value = unserialize($value);
+				$value = unserialize($value);
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
 				if ($always_allow_removal)
@@ -206,7 +206,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
 					$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
-				}
+				}  // This is the new code for new multibox version, old multibox hack is the following lines
 				/*$csshack = '
 				<!--[if lte IE 6]>
 				<style type="text/css">

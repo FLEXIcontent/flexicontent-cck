@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 315 2010-06-19 10:56:30Z emmanuel.danan $
+ * @version 1.5 stable $Id: items.php 964 2011-11-19 11:49:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,8 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItems extends JModel {
+class FlexicontentModelItems extends JModel
+{
 	/**
 	 * Items data
 	 *
@@ -62,8 +63,10 @@ class FlexicontentModelItems extends JModel {
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
+
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -87,7 +90,8 @@ class FlexicontentModelItems extends JModel {
 	 * @access	public
 	 * @param	int Category identifier
 	 */
-	function setId($id) {
+	function setId($id)
+	{
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
@@ -99,14 +103,16 @@ class FlexicontentModelItems extends JModel {
 	 * @access public
 	 * @return object
 	 */
-	function getData() {
+	function getData()
+	{
 		static $tconfig = array();
 		
 		// Lets load the Items if it doesn't already exist
-		if (empty($this->_data)) {
+		if (empty($this->_data))
+		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-
+			
 			$k = 0;
 			$count = count($this->_data);
 			for($i = 0; $i < $count; $i++)
@@ -128,14 +134,16 @@ class FlexicontentModelItems extends JModel {
 			$k = 1 - $k;
 		}
 		return $this->_data;
-	}
+	}			
+			
 	/**
 	 * Method to set the default site language to an item with no language
 	 * 
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function setSiteDefaultLang($id) {
+	function setSiteDefaultLang($id)
+	{
 		$languages =& JComponentHelper::getParams('com_languages');
 		$lang 		= $languages->get('site', 'en-GB');
 
@@ -155,12 +163,13 @@ class FlexicontentModelItems extends JModel {
 	 * @return array
 	 * @since 1.5
 	 */
-	function getExtdataStatus() {
+	function getExtdataStatus()
+	{
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-			. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
-			;
+				. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
+				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
 		$allids = is_array($allids)?$allids:array();// !important
@@ -176,9 +185,9 @@ class FlexicontentModelItems extends JModel {
 		$allcat = is_array($allcat)?$allcat:array();// !important
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
-			. ' GROUP BY item_id'
-			. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
-			;
+				. ' GROUP BY item_id'
+				. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
+				;
 		$this->_db->setQuery($query);
 		$allfi = $this->_db->loadResultArray();
 		$allfi = is_array($allfi)?$allfi:array();
@@ -194,7 +203,7 @@ class FlexicontentModelItems extends JModel {
 //		$status['nofi'] 		= array_diff($allids,$allfi);
 //		$status['countnofi'] 	= count($status['nofi']);
 //		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
-		$status['no'] 			= array_unique(array_merge($status['noext'], $status['nocat']));
+		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
 		return $status;
@@ -206,8 +215,10 @@ class FlexicontentModelItems extends JModel {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getUnassociatedItems($limit = 1000000) {
+	function getUnassociatedItems($limit = 1000000)
+	{
 		$status = $this->getExtdataStatus();
+
 		if ($status['no']) {
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
 			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
@@ -259,8 +270,9 @@ class FlexicontentModelItems extends JModel {
 
 		// insert items_ext datas
 		$itemext = array();
+		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-			$itemext = '('.(int)$row->id.', 1, '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
+			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
 			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();
@@ -311,7 +323,8 @@ class FlexicontentModelItems extends JModel {
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildQuery() {
+	function _buildQuery()
+	{
 		$mainframe = &JFactory::getApplication();
 		
 		// Get the WHERE and ORDER BY clauses for the query
@@ -348,10 +361,11 @@ class FlexicontentModelItems extends JModel {
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy() {
+	function _buildContentOrderBy()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-
+		
 		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$default_order = $cparams->get('items_manager_order', 'i.ordering');
@@ -378,7 +392,8 @@ class FlexicontentModelItems extends JModel {
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere() {
+	function _buildContentWhere()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$nullDate = $this->_db->getNullDate();
@@ -497,7 +512,6 @@ class FlexicontentModelItems extends JModel {
 
 		if ( $filter_id ) {
 			$where[] = 'i.id = ' . $filter_id;
-
 			}
 
 		//if (FLEXI_FISH) {
@@ -585,22 +599,22 @@ class FlexicontentModelItems extends JModel {
 				$curversion = (int)$item->version;
 				
 				//Save target item
-      			$row  				=& JTable::getInstance('flexicontent_items', '');
-      			$row 				= $item;
-      			$row->id 			= null;
-      			$row->item_id 		= null;
-      			$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
-      			$row->hits 			= 0;
-      			$row->version 		= 1;
-      			$datenow 			=& JFactory::getDate();
-      			$row->created 		= $datenow->toMySQL();
-      			$row->publish_up	= $datenow->toMySQL();
-      			$row->modified 		= $nullDate;
+				$row  				=& JTable::getInstance('flexicontent_items', '');
+				$row 					= $item;
+				$row->id 				= null;
+				$row->item_id 	= null;
+				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
+				$row->hits 			= 0;
+				$row->version 	= 1;
+				$datenow 				=& JFactory::getDate();
+				$row->created 		= $datenow->toMySQL();
+				$row->publish_up	= $datenow->toMySQL();
+				$row->modified 		= $nullDate = $this->_db->getNullDate();
 				$row->state			= $state ? $state : $row->state;
-				$row->language		= $lang ? $lang : $row->language;
-    			$row->store();
-    		
-    			$copyid = (int)$row->id;
+				$row->language	= $lang ? $lang : $row->language;
+				
+				$row->store();
+				$copyid = (int)$row->id;
 
 				// get the item fields
 				$query 	= 'SELECT *'
@@ -612,28 +626,13 @@ class FlexicontentModelItems extends JModel {
 				
 				foreach($fields as $field)
 				{
-/*
-					if ($field->field_id == 2 || $field->field_id == 4) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->created) . ')'
-								;
-					} else if ($field->field_id == 6) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($row->title) . ')'
-								;
-					} else {
+					if ($field->iscore != 1 && !empty($field->value)) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;
+						$this->_db->setQuery($query);
+						$this->_db->query();
 					}
-*/
-					if ($field->iscore != 1) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
-								;
-					}
-					$this->_db->setQuery($query);
-					$this->_db->query();
 				}
 				
 				// fix issue 39 => http://code.google.com/p/flexicontent/issues/detail?id=39
@@ -664,7 +663,6 @@ class FlexicontentModelItems extends JModel {
 							;
 					$this->_db->setQuery($query);
 					$this->_db->query();
-//dump($this->_db,'DB');				
 				}
 
 				// get the item categories
@@ -724,8 +722,6 @@ class FlexicontentModelItems extends JModel {
 	{
 		if (!$maincat) return true;
 		
-
-
 		$item =& JTable::getInstance('flexicontent_items', '');
 		$item->load($itemid);
 		$item->catid = $maincat;
@@ -791,10 +787,12 @@ class FlexicontentModelItems extends JModel {
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function setitemstate($id, $state = 1) {
+	function setitemstate($id, $state = 1)
+	{
 		$user 	=& JFactory::getUser();
 
-		if ( $id ) {
+		if ( $id )
+		{
 			$v = FLEXIUtilities::getCurrentVersions((int)$id);
 			
 			$query = 'UPDATE #__content'
@@ -968,7 +966,8 @@ class FlexicontentModelItems extends JModel {
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function move($direction) {
+	function move($direction)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
@@ -1082,7 +1081,8 @@ class FlexicontentModelItems extends JModel {
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveorder($cid = array(), $order) {
+	function saveorder($cid = array(), $order)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
@@ -1338,6 +1338,7 @@ class FlexicontentModelItems extends JModel {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
+		
 		$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
 	}
 
@@ -1467,6 +1468,7 @@ class FlexicontentModelItems extends JModel {
 			$name		 	= $language->code;
 			$langs->$name 	= $language;			
 		}
+		
 		return $langs;
 	}
 
@@ -1640,18 +1642,6 @@ class FlexicontentModelItems extends JModel {
 		return $fields;
 	}
 	
-	function getFieldsItems_old($fields) {
-		$fields = "'".implode("','", $fields)."'";
-		$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
-		//$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_items_versions as firel"
-			//." JOIN #__flexicontent_items_ext as ie ON firel.item_id=ie.item_id"
-			." JOIN #__content as a ON firel.item_id=a.id "//AND firel.version=a.version"
-			//." WHERE firel.field_id IN ({$fields}) AND ie.type_id='{$typeid}' AND a.state IN (1, -5);"
-			." WHERE firel.field_id IN ({$fields}) AND a.state IN (1, -5)"
-		;
-		$this->_db->setQuery($query);
-		return $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
-	}
 	
 	/**
 	 * Method to get a list of items (ids) that have value for the given fields

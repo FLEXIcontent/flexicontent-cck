@@ -128,12 +128,12 @@
 			
 			<field name="sep_items_retrieval" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
 			<field name="@spacer1" type="spacer" default="" label="" description="" />
-			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
+			<field name="display_subcategories_items" type="list" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
 				<option value="0">FLEXI_NO</option> 
 				<option value="1">1st sublevel</option> 
 				<option value="2">All sublevels</option> 
 			</field>
-			<field name="display_subcategories_fields" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS_FIELDS" description="FLEXI_DISPLAY_SUBCATS_FIELDS_DESC"> 
+			<field name="display_subcategories_fields" type="radio" default="1" label="FLEXI_DISPLAY_SUBCATS_FIELDS" description="FLEXI_DISPLAY_SUBCATS_FIELDS_DESC"> 
 				<option value="0">FLEXI_NO</option> 
 				<option value="1">FLEXI_YES</option> 
 			</field> 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: image.php 360 2010-07-05 09:01:47Z enjoyman $
+ * @version 1.5 stable $Id: image.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,12 +18,13 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
+
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
 	<tr>
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->permission->CanUpload) :
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 				
@@ -87,7 +88,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<td nowrap="nowrap">
 			 	<?php echo $this->lists['items']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
@@ -135,15 +136,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="center">
-				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<img src='<?php echo $srcb; ?>' alt='<?php echo $row->filename; ?>' />
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' ); ?>::<?php echo $row->filename; ?>">
+				<a style="cursor:pointer" onclick="qffileselementadd(document.getElementById('file<?php echo $row->id;?>'), '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<img src="<?php echo $src; ?>" alt="<?php echo $row->filename; ?>" />
 				</a>
 				</span>
 			</td>
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<a style="cursor:pointer" id="file<?php echo $row->id;?>" onclick="qffileselementadd(this, '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
 				<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 				</span>
@@ -171,6 +172,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	</tbody>
 
 	</table>
+	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="file" value="" />
 	<input type="hidden" name="files" value="<?php echo $this->files; ?>" />

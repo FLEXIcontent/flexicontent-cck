@@ -28,6 +28,10 @@ div#flexicontent .floattext {
 	margin: 0 0 0.5em; /* safari */
 }
 
+div#flexicontent .label {
+	font-weight: bold;
+}
+
 /**
  * @section buttons
  *

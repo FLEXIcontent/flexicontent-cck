@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 691 2011-07-26 11:15:35Z enjoyman@gmail.com $
+ * @version 1.0 $Id: textarea.php 931 2011-10-17 06:09:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -60,7 +60,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 
 		if ($use_html) {
 			$field->value[0] = htmlspecialchars( $field->value[0], ENT_NOQUOTES, 'UTF-8' );
-			$field->html	 = $editor->display( $field->name, $field->value[0], '100%', $height, $cols, $rows, array('pagebreak', 'readmore') );
+			$field->html	 = $editor->display( 'custom['.$field->name.']', $field->value[0], '100%', $height, $cols, $rows, array('pagebreak', 'readmore') );
 		} else {
 			$field->html	 = '<textarea name="custom['.$field->name.']" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">';
 			$field->html	.= $field->value[0];

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
+ * @version 1.0 $Id: fcpagenav.php 890 2011-09-02 15:21:59Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -86,7 +86,6 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$config 	= & JFactory::getConfig();
 			$now 		= $date->toMySQL();
 			$gid		= max ($user->getAuthorisedViewLevels());
-			
 	
 			if ($use_tooltip)
 				JHTML::_('behavior.tooltip');

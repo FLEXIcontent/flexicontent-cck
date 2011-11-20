@@ -31,9 +31,9 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radio') return;
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
@@ -132,9 +132,9 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radio') return;
+		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value ;
 

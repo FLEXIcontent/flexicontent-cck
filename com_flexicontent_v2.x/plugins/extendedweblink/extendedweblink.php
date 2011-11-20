@@ -29,9 +29,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	}
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'extendedweblink') return;
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
@@ -80,15 +80,15 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
-					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
+					thisNewField.getElements('input.urllink').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][link]');
 
 					thisNewField.getElements('input.urltitle').setProperty('value','');
-					thisNewField.getElements('input.urltitle').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][title]');
+					thisNewField.getElements('input.urltitle').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][title]');
 
 					thisNewField.getElements('input.urlhits').setProperty('value','0');
-					thisNewField.getElements('input.urlhits').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][hits]');
+					thisNewField.getElements('input.urlhits').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][hits]');
 					
-					thisNewField.getElements('span span').setHTML('0');
+					//thisNewField.getElements('span span').setHTML('0');
 
 					thisNewField.injectAfter(thisField);
 		
@@ -123,7 +123,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
 				curRowNum".$field->id."--;
 				}
@@ -143,6 +143,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			#sortables_'.$field->id.' li .admintable {
 				
@@ -162,13 +164,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$value  = unserialize($value);
 				
 				$linktext = $field->parameters->get( 'use_linktext', 0 ) ? true : '';
-				if($linktext) $linktext = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLLINK_TEXT' ).':</td><td><input class="urllinktext" name="'.$field->name.'['.$n.'][linktext]" type="text" size="'.$size.'" value="'.($value['linktext'] ? $value['linktext'] : $field->parameters->get( 'linktext_default' )).'" /></td></tr>';
+				if($linktext) $linktext = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLLINK_TEXT' ).':</td><td><input class="urllinktext" name="custom['.$field->name.']['.$n.'][linktext]" type="text" size="'.$size.'" value="'.($value['linktext'] ? $value['linktext'] : $field->parameters->get( 'linktext_default' )).'" /></td></tr>';
 				
 				$class = $field->parameters->get( 'use_class', 0 ) ? true : '';
-				if($class) $class = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLCLASS' ).':</td><td><input class="urlclass" name="'.$field->name.'['.$n.'][class]" type="text" size="'.$size.'" value="'.($value['class'] ? $value['class'] : $field->parameters->get( 'class_default', null )).'" /></td></tr>';
+				if($class) $class = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLCLASS' ).':</td><td><input class="urlclass" name="custom['.$field->name.']['.$n.'][class]" type="text" size="'.$size.'" value="'.($value['class'] ? $value['class'] : $field->parameters->get( 'class_default', null )).'" /></td></tr>';
 				
 				$id = $field->parameters->get( 'use_id', 0 ) ? true : '';
-				if($id) $id = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLID' ).':</td><td><input class="urlid" name="'.$field->name.'['.$n.'][id]" type="text" size="'.$size.'" value="'.($value['id'] ? $value['id'] : $field->parameters->get( 'id_default', null )).'" /></td></tr>';
+				if($id) $id = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLID' ).':</td><td><input class="urlid" name="custom['.$field->name.']['.$n.'][id]" type="text" size="'.$size.'" value="'.($value['id'] ? $value['id'] : $field->parameters->get( 'id_default', null )).'" /></td></tr>';
 				
 				$field->html	.= '
 				<li>
@@ -193,20 +195,20 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$n++;
 				}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
+			$field->html .= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
 
 		} else {
 			$value = unserialize($field->value[0]);
 			$n = 0;
 			
 			$linktext = $field->parameters->get( 'use_linktext', 0 ) ? true : '';
-			if($linktext) $linktext = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLLINK_TEXT' ).':</td><td><input class="urllinktext" name="'.$field->name.'['.$n.'][linktext]" type="text" size="'.$size.'" value="'.($value['linktext'] ? $value['linktext'] : $field->parameters->get( 'linktext_default' )).'" /></td></tr>';
+			if($linktext) $linktext = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLLINK_TEXT' ).':</td><td><input class="urllinktext" name="custom['.$field->name.']['.$n.'][linktext]" type="text" size="'.$size.'" value="'.($value['linktext'] ? $value['linktext'] : $field->parameters->get( 'linktext_default' )).'" /></td></tr>';
 			
 			$class = $field->parameters->get( 'use_class', 0 ) ? true : '';
-			if($class) $class = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLCLASS' ).':</td><td><input class="urlclass" name="'.$field->name.'['.$n.'][class]" type="text" size="'.$size.'" value="'.($value['class'] ? $value['class'] : $field->parameters->get( 'class_default', null )).'" /></td></tr>';
+			if($class) $class = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLCLASS' ).':</td><td><input class="urlclass" name="custom['.$field->name.']['.$n.'][class]" type="text" size="'.$size.'" value="'.($value['class'] ? $value['class'] : $field->parameters->get( 'class_default', null )).'" /></td></tr>';
 			
 			$id = $field->parameters->get( 'use_id', 0 ) ? true : '';
-			if($id) $id = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLID' ).':</td><td><input class="urlid" name="'.$field->name.'['.$n.'][id]" type="text" size="'.$size.'" value="'.($value['id'] ? $value['id'] : $field->parameters->get( 'id_default', null )).'" /></td></tr>';
+			if($id) $id = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URLID' ).':</td><td><input class="urlid" name="custom['.$field->name.']['.$n.'][id]" type="text" size="'.$size.'" value="'.($value['id'] ? $value['id'] : $field->parameters->get( 'id_default', null )).'" /></td></tr>';
 			
 			$field->html	.= '
 				<table class="admintable"><tbody>
@@ -248,14 +250,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					$newpost[$new]['title']		= $post[$n]['title'];
 					$newpost[$new]['id']		= $post[$n]['id'];
 					$newpost[$new]['class']		= $post[$n]['class'];
-					$newpost[$new]['linktext']	= $post[$n]['linktext'];
+					$newpost[$new]['linktext']	= @$post[$n]['linktext'];
 					$newpost[$new]['hits']		= $post[$n]['hits'];
 				} else {
 					$newpost[$new]['link']		= $post[$n]['link'];
 					$newpost[$new]['title']		= $post[$n]['title'];
 					$newpost[$new]['id']		= $post[$n]['id'];
 					$newpost[$new]['class']		= $post[$n]['class'];
-					$newpost[$new]['linktext']	= $post[$n]['linktext'];
+					$newpost[$new]['linktext']	= @$post[$n]['linktext'];
 					$newpost[$new]['hits']		= $post[$n]['hits'];
 				}
 				$new++;
@@ -278,6 +280,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$field->search = $searchindex;
 		} else {
 			$field->search = '';
+		}
+		
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
 		}
 	}
 

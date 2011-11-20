@@ -15,7 +15,7 @@
 	</files>
 	<config>
 	<fields name="attribs">
-		<fieldset name="basic" addfieldpath="/plugins/flexicontent_fields/fcloadmodule">
+		<fieldset name="basic" addfieldpath="/plugins/flexicontent_fields/fcloadmodule/fcloadmodule">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="1">Yes</option>
 				<option value="0">No</option>
@@ -23,7 +23,7 @@
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		<fieldset name="group-fcloadmodule">
-			<field name="module-method" type="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC">
+			<field name="module_method" type="radio" default="2" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC">
 				<option value="1">FLEXI_FIELD_MODULE_UNIQUE</option>
 				<option value="2">FLEXI_FIELD_MODULE_POSITION</option>
 			</field>

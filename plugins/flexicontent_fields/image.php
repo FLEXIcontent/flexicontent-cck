@@ -203,7 +203,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				// Multibox integration 
 				$document->addStyleSheet('components/com_flexicontent/librairies/multibox/multibox.css');
-
+				/*if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
+					$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+				}*/  // This is the new code that we will include for new multibox version, old multibox hack is the following lines
 				$csshack = '
 				<!--[if lte IE 6]>
 				<style type="text/css">
@@ -296,7 +298,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					';
 				} else if ($usepopup && $popuptype == 1) {
 					$field->{$prop} = '
-					<a href="'.$srcb.'" id="mb'.$id.'" class="mb">
+					<a href="'.$srcb.'" id="mb'.$id.'" class="mb" rel="[images]" >
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					</a>
 					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>

@@ -111,7 +111,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
 				curRowNum".$field->id."--;
 				}
@@ -134,6 +134,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
@@ -147,7 +149,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				$n++;
 			}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
 			$field->html = '<div><input name="custom['.$field->name.'][]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'" /></div>';

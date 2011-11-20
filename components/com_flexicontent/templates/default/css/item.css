@@ -19,7 +19,7 @@ div.subtitle2 .element,
 div.subtitle3 .element {
 	display:block;
 	float: left;
-	margin-right: 24px;
+	margin: 0px 24px 12px 0px;
 }
 
 div.topblock {

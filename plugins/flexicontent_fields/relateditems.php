@@ -67,7 +67,8 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		} else if (!$field->value) {
 			$field->value = array();
 		} else {
-			$field->value = unserialize($field->value[0]);
+			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
+			$field->value = ( $field_data = @unserialize($field->value[0]) ) ? $field_data : $field->value;
 		}
 		$fieldval = array();
 		foreach($field->value as $i=>$val) {
@@ -348,7 +349,7 @@ window.addEvent( 'domready', function() {
 		if($field->field_type != 'relateditems') return;
 		if(!$post) return;
 		
-		$post = serialize($post);
+		//$post = serialize($post);
 	}
 
 
@@ -363,9 +364,8 @@ window.addEvent( 'domready', function() {
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
 		$values = $values ? $values : $field->value ;
-		if (isset($values[0])) {
-			$values = unserialize($values[0]);
-		}
+		// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
+		$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
 
 		// some parameter shortcuts
 		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 655 2011-07-17 02:52:12Z ggppdk $
+ * @version 1.0 $Id: file.php 887 2011-08-31 15:59:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -117,7 +117,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				'height': 0,
 				'opacity': 0			
 			}).chain(function(){
-				row.remove();
+				row.destroy();
 			});
 		}
 		";
@@ -147,6 +147,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);

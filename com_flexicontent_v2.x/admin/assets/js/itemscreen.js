@@ -2,8 +2,7 @@ var itemscreen = new Class(
 {
 	options:  {
 		id: "",
-		//script_url: "index.php?option=com_flexicontent&format=raw",
-		script_url: "index.php?option=com_flexicontent&tmpl=component",
+		script_url: "index.php?option=com_flexicontent&controller=items&tmpl=component",
 		task: ""
 	},
 
@@ -12,7 +11,8 @@ var itemscreen = new Class(
 		this.name = name;
 	},  
 
-	fetchscreen: function( name, options ) {
+	fetchscreen: function( name, options )  
+	{
 		var doname = this.name;
 		if(typeof name!="undefined") {
 			doname = name;
@@ -43,7 +43,16 @@ var itemscreen = new Class(
 			url: url+'&cid='+cid,
 			method: 'get',
 			data : {'name' : tagname },
-			evalScripts: false
+			evalScripts: false,
+	    onSuccess: function(responseText){
+				myvar = responseText[0].wholeText.split("|");
+				if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") ) {
+					addToList(myvar[0], myvar[1]);
+				}
+	    },
+	    onFailure: function(){
+	    	alert('Failed to add tag');
+	    }
 		}).send();
 	},
 

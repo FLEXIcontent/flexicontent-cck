@@ -163,7 +163,7 @@ function addtag(id, tagname) {
 	}
 	if(id) return;
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&tmpl=component&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
 function submitbutton( pressbutton ) {
@@ -276,8 +276,10 @@ function deleteTag(obj) {
 
 $autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
 $canpublish = $this->perms['canpublish'];
-//echo "Item Permissions:<br>\n"; print_r($this->perms);
+$autoapprove = $cparams->get('auto_approve', 0);
+//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
 //echo "Auto-Publish Parameter: $autopublished<br />";
+//echo "Auto-Approve Parameter: $autoapprove<br />";
 ?>
 	<?php if (!$autopublished && $canpublish) : ?>
 	
@@ -418,9 +420,19 @@ $canpublish = $this->perms['canpublish'];
 		
 		<table class="admintable" width="100%">
 			<?php
+			$hidden = array(
+				'fcloadmodule',
+				'fcpagenav',
+				'toolbar'
+			);
 			foreach ($this->fields as $field) {
-				// used to hide the core fields from this listing
-				if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
+				// used to hide the core fields and the hidden fields from this listing
+				if 	(
+						(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
+						&& 
+						(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
+					) 
+				{
 				// set the specific label for the maintext field
 					if ($field->field_type == 'maintext')
 					{

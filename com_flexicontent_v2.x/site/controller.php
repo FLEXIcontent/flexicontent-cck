@@ -160,16 +160,17 @@ class FlexicontentController extends JController
 		$db			= & JFactory::getDBO();
 		$user		= & JFactory::getUser();
 
-		//get model
-		$model 	= $this->getModel('item');
-		
-		//get data from request
-		//$post = JRequest::get('post');
-		//$post['jform']['text'] = JRequest::getVar('text', '', 'post', 'string', JREQUEST_ALLOWRAW);
-
+		$task	= JRequest::getVar('task');
 		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+
+		$model 	= $this->getModel('item');
 		$form 	= $model->getForm($data, false);
-		$validData = $model->validate($form, $data);
+
+		//$validData = & $data;
+		$validData = & $model->validate($form, $data);
+		
+		//$diff_arr = array_diff_assoc ( $data, $validData);
+		//echo "<pre>"; print_r($diff_arr); exit();
 		
 		//perform access checks
 		$isNew = ((int) $validData['id'] < 1);
