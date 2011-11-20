@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: date.php 714 2011-07-29 06:27:11Z ggppdk $
+ * @version 1.0 $Id: date.php 759 2011-08-03 14:57:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.date
@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
 				curRowNum".$field->id."--;
 				}
@@ -145,6 +145,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
@@ -158,7 +160,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$n++;
 			}
 			$field->html 	.=	'</ul>';
-			$field->html 	.= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html 	.= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {
 			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], 'custom['.$field->name.'][]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
 		}

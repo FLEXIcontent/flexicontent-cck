@@ -115,7 +115,7 @@ function addtag(id, tagname) {
 	}
 	
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&tmpl=component&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
 function reseter(task, id, div){
@@ -334,9 +334,19 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					
 					<table class="admintable" width="100%">
 						<?php
+						$hidden = array(
+							'fcloadmodule',
+							'fcpagenav',
+							'toolbar'
+						);
 						foreach ($this->fields as $field) {
-							// used to hide the core fields from this listing
-							if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
+							// used to hide the core fields and the hidden fields from this listing
+							if 	(
+									(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
+									&& 
+									(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
+								) 
+							{
 							// set the specific label for the maintext field
 								if ($field->field_type == 'maintext') {
 									$field->label = $this->tparams->get('maintext_label', $field->label);

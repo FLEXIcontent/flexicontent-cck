@@ -30,10 +30,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 	function onDisplayField(&$field, $item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'weblink') return;
 
+		$field->label = JText::_($field->label);
+		
 		// some parameter shortcuts
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
@@ -85,15 +86,15 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 
 					thisNewField.getElements('input.urllink').setProperty('value','');
-					thisNewField.getElements('input.urllink').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][link]');
+					thisNewField.getElements('input.urllink').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][link]');
 
 					thisNewField.getElements('input.urltitle').setProperty('value','');
-					thisNewField.getElements('input.urltitle').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][title]');
+					thisNewField.getElements('input.urltitle').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][title]');
 
 					thisNewField.getElements('input.urlhits').setProperty('value','0');
-					thisNewField.getElements('input.urlhits').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][hits]');
+					thisNewField.getElements('input.urlhits').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][hits]');
 					
-					thisNewField.getElements('span span').setHTML('0');
+					//thisNewField.getElements('span span').setHTML('0');
 
 					thisNewField.injectAfter(thisField);
 		
@@ -128,7 +129,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					'height': 0,
 					'opacity': 0			
 					}).chain(function(){
-						row.remove();
+						row.destroy();
 					});
 				curRowNum".$field->id."--;
 				}
@@ -147,7 +148,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
+			li input.urllink, li input.urltitle, li input.fcbutton {
+				float:none;
+			} 
 			';
 			$document->addStyleDeclaration($css);
 
@@ -170,7 +176,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$n++;
 			}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else {
 			$field->value[0] = unserialize($field->value[0]);
@@ -221,6 +227,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$searchindex .= ' | ';
 
 		$field->search = $field->issearch ? $searchindex : '';
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
+		}
 	}
 
 

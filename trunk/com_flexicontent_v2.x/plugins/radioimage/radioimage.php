@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: radioimage.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
+ * @version 1.0 $Id: radioimage.php 890 2011-09-02 15:21:59Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.radioimage
@@ -31,10 +31,10 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
-
+		
+		$field->label = JText::_($field->label);
 		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
@@ -144,9 +144,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
+		$field->label = JText::_($field->label);
 		
 		$mainframe =& JFactory::getApplication();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 312 2010-06-19 08:22:19Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 587 2011-04-22 10:17:16Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,6 +39,9 @@ class FlexicontentViewFileselement extends JView
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
+		// Check for request forgeries
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
 		//Load pane behavior
 		jimport('joomla.html.pane');
 
@@ -58,16 +61,18 @@ class FlexicontentViewFileselement extends JView
 		JHTML::_('behavior.formvalidation');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 	'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 	'filter_uploader', '', 				'int' );
-		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 		'filter_url', 		'',				'word' );
-		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 	'filter_secure', 	'', 			'word' );
-		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 		'filter_ext', 		'', 			'alnum' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 		'filter_order', 	'f.filename', 	'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 				'filter', 			1, 				'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 	'filter_uploader', 	0, 				'int' );
+		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 			'filter_url', 		'',				'word' );
+		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 		'filter_secure', 	'', 			'word' );
+		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 			'filter_ext', 		'', 			'alnum' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 				'search', 			'', 			'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 				'items', 			0,	 			'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		$itemid 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.itemid', 'itemid', 0, 'int' );
 
 		//add css and submenu to document
 		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -79,27 +84,50 @@ class FlexicontentViewFileselement extends JView
 			$document->addStyleDeclaration($searchcss);
 		}
 		//a trick to avoid loosing general style in modal window
-		$css = 'body, td, th { font-size: 11px; }';
+		$css = 'body, td, th { font-size: 11px; }
+		a.striketext {
+			text-decoration: line-through;
+			color:red;
+			font-style:italic;
+		}
+		';
 		$document->addStyleDeclaration($css);
 
-		//add js to document
-		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
-		$js = "
-		function qffileselementadd(id, file) {
-			document.adminForm.file.value=id;
-			window.parent.qfSelectFile".$fieldid."(id, file);	
-			//document.adminForm.submit();	
-		}
-		";
-		$document->addScriptDeclaration($js);
 
 		$permission = FlexicontentHelperPerm::getPerm();
+		$CanUpload = $permission->CanUpload;
+		$CanViewAllFiles = $permission->CanViewAllFiles;
+
 
 		//Get data from the model
+		$model = $this->getModel();
 		$rows      	= & $this->get( 'Data');
 		$pageNav 	= & $this->get( 'Pagination' );
 		$items = & $this->get('Items');
 		$users = &$this->get('Users');
+		
+		$fname = $model->getFieldName($fieldid);
+		//add js to document
+		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
+		$js = "
+		function qffileselementadd(obj, id, file) {
+			obj.className = 'striketext';//work
+			document.adminForm.file.value=id;
+			window.parent.qfSelectFile".$fieldid."(id, file);
+		}
+		window.addEvent('domready', function() {
+			fileobjs = window.parent.document.getElementsByName('custom[{$fname}][]');
+			for(i=0,n=fileobjs.length;i<n;i++) {
+				row = document.getElementById('file'+fileobjs[i].value);
+				if((typeof row) !='undefined') {
+					row.className = 'striketext';
+				}
+			}
+		});
+		";
+		$document->addScriptDeclaration($js);
+		
+		$files_selected = $model->getItemFiles($itemid);
 
 		//search filter
 		$filters = array();
@@ -122,7 +150,7 @@ class FlexicontentViewFileselement extends JView
 		$items_list = array();
 		$items_list[] = JHTML::_('select.option', '', JText::_( '- Filter by item -' ) );
 		foreach($items as $item) {
-			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
+			$items_list[] = JHTML::_('select.option', $item->id, $item->title . ' (#' . $item->id . ')' );
 		}
 		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 		
@@ -174,7 +202,9 @@ class FlexicontentViewFileselement extends JView
 		$this->assignRef('pageNav' 			, $pageNav);
 		$this->assignRef('files' 			, $files);
 		$this->assignRef('fieldid' 			, $fieldid);
-		$this->assignRef('permission' 		, $permission);
+		$this->assignRef('CanUpload' 		, $CanUpload);
+		$this->assignRef('CanViewAllFiles' 	, $CanViewAllFiles);
+		$this->assignRef('files_selected', $files_selected);
 
 		parent::display($tpl);
 	}

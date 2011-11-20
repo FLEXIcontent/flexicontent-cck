@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 923 2011-10-08 18:37:50Z ggppdk $
+ * @version 1.0 $Id: core.php 931 2011-10-17 06:09:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea

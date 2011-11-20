@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 269 2010-06-11 09:04:21Z enjoyman $
+ * @version 1.5 stable $Id: default.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -23,7 +23,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->permission->CanUpload) :
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 			<!-- File Upload Form -->
@@ -146,7 +146,7 @@ echo $this->pane->endPane();
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
@@ -187,8 +187,11 @@ echo $this->pane->endPane();
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
-				<a style="cursor:pointer" onclick="qffileselementadd('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
-				<?php echo JHTML::image($row->icon, '').' '.htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>
+				<a style="cursor:pointer" id="file<?php echo $row->id;?>" onclick="javascript:qffileselementadd(this, '<?php echo $row->id;?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->filename ); ?>');">
+				<?php
+				echo JHTML::image($row->icon, '');
+				echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
+				?>
 				</a></span>
 			</td>
 			<td>
@@ -220,6 +223,7 @@ echo $this->pane->endPane();
 	</tbody>
 
 	</table>
+	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="file" value="" />
 	<input type="hidden" name="files" value="<?php echo $this->files; ?>" />

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: select.php 691 2011-07-26 11:15:35Z enjoyman@gmail.com $
+ * @version 1.0 $Id: select.php 931 2011-10-17 06:09:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.select
@@ -56,8 +56,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 
@@ -117,8 +125,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
@@ -201,8 +217,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
@@ -260,8 +284,15 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
-		
+			$jAp=& JFactory::getApplication();
+			
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			preg_match_all("/{item->[^}]+}/", $query, $matches);
+			if (count($matches[0])) {
+				$filter->html = sprintf( JText::_('FLEXI_WARNING_ITEM_SPECIFIC_AS_CATEGORY_FILTER'), $filter->label );
+				return;
+			}
+			
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			

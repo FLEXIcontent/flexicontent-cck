@@ -174,14 +174,17 @@ class FlexicontentModelItems extends JModel
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
+		$allids = is_array($allids)?$allids:array();// !important
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
 		$this->_db->setQuery($query);
 		$allext = $this->_db->loadResultArray();
+		$allext = is_array($allext)?$allext:array();// !important
 
 		$query 	= 'SELECT DISTINCT itemid FROM #__flexicontent_cats_item_relations';
 		$this->_db->setQuery($query);
 		$allcat = $this->_db->loadResultArray();
+		$allcat = is_array($allcat)?$allcat:array();// !important
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
 				. ' GROUP BY item_id'
@@ -189,6 +192,7 @@ class FlexicontentModelItems extends JModel
 				;
 		$this->_db->setQuery($query);
 		$allfi = $this->_db->loadResultArray();
+		$allfi = is_array($allfi)?$allfi:array();
 		
 		$status['allids'] 		= $allids;
 		$status['allext'] 		= $allext;
@@ -265,8 +269,8 @@ class FlexicontentModelItems extends JModel
 		$itemext = array();
 		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-		    $itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
-					$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
+			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
+			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
@@ -1347,10 +1351,8 @@ class FlexicontentModelItems extends JModel
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-
 		
 		$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
-
 	}
 
 	/**
@@ -1606,9 +1608,8 @@ class FlexicontentModelItems extends JModel
 	    		. ' SET params = ' . $this->_db->Quote($fparams)
 	    		. ' WHERE id = ' . $flexi->id;
 	    		;
-    	$this->_db->setQuery($query);
-    	$this->_db->query();
-
+		$this->_db->setQuery($query);
+		$this->_db->query();
 		return $logs;
 	}
 	

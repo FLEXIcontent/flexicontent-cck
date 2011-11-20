@@ -898,12 +898,15 @@ class ParentClassItem extends JModelAdmin {
 		$obj->item_id 		= $itemid;
 		$obj->valueorder	= $valueorder;
 		$obj->version		= (int)$version+1;
-		// @TODO : move to the plugin code
+		
+		// THIS IS REDUDANT (WILL BE REMOVED), since FLEXIcontenty field must have had serialize the parameters of each value already
 		if (is_array($value)) {
 			$obj->value			= serialize($value);
 		} else {
 			$obj->value			= $value;
 		}
+		$obj->value = $value;
+		
 		if($use_versioning) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 		if( ($isnew || $isapproveversion ) && !$iscore) {
 			unset($obj->version);
@@ -1298,13 +1301,17 @@ class ParentClassItem extends JModelAdmin {
 				;
 		$this->_db->setQuery($query);
 		$field_value = $this->_db->loadResultArray();
-		foreach($field_value as $k=>$value) {
+		
+		// The is different than plugin code from v1.5.x , plus it is problematic to unserialize here
+		// !!! The FLEXIcontent field plugin itself will always know better how to handle the values !!!
+		/*foreach($field_value as $k=>$value) {
 			if($unserialized_value = @unserialize($value)) {
 				return $unserialized_value;
 			} else {
 				break;
 			}
-		}
+		}*/
+		
 		return $field_value;
 	}
 	

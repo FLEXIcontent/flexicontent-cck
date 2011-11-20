@@ -498,14 +498,15 @@ table.adminlist thead #filter_cats {
 
 /* Tags list autocomplete */
 ul#ultagbox{
-	min-height: 26px;
-	margin: 0;
-	padding: 0;
+	min-height: 26px!important;
+	margin: 0!important;
+	padding: 0!important;
 }
 ul#ultagbox li{
 	list-style-type:none;
 	display:block;
 	float:left;
+	margin: 6px !important;
 }
 .tagitem {
 	border: 1px solid silver;
@@ -523,7 +524,11 @@ ul#ultagbox li{
 }
 /** tag selection */
 div#tags {
-	margin: 8px 3px;
+	margin: 4px!important;
+	padding:0px!important;
+}
+div#tags #input-tags {
+	margin: 4px!important;
 }
 .qf_tagbox {
 	display: block;
@@ -531,7 +536,7 @@ div#tags {
   	overflow: auto;
   	border: 1px dashed silver;
   	background: #fff;
-  	margin: 4px 4px 0px 0px;	
+  	margin: 6px;	
 }
 
 .qf_tagidbox {
@@ -602,8 +607,8 @@ div fieldset label {
 	margin:2px;
 	clear: none;
 }
-div fieldset input, div fieldset textarea,
-div fieldset select, div fieldset img, div fieldset button {
+div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+div.panel fieldset img, div.panel fieldset button {
 	margin:4px 1px 0px 4px!important;
 	display:inline;
 	float:left;
@@ -660,14 +665,13 @@ td.key label {
 	display:inline;
 }
 
-table.admintable td.key, table.admintable td.paramlist_key {
+div table.admintable td.key, div table.admintable td.paramlist_key {
     background-color: #E6E6E6;
-    border-bottom: 1px solid #D9E9D9;
-    border-right: 1px solid #D9D9D9;
+    border: 1px solid #D6D6D6;
     color: #666666;
     font-weight: bold;
     text-align: right;
-    width: 250px;
+    width: 140px;
 }
 
 table.admintable td {

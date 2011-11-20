@@ -63,9 +63,10 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
+		
+		$field->label = JText::_($field->label);
 		
 		$field->field_type = 'text';
 		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: minigallery.php 714 2011-07-29 06:27:11Z ggppdk $
+ * @version 1.0 $Id: minigallery.php 954 2011-11-07 21:39:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -117,7 +117,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					'height': 0,
 					'opacity': 0			
 				}).chain(function(){
-					row.remove();
+					row.destroy();
 				});
 			}
 		";
@@ -153,6 +153,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
@@ -182,12 +184,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 		}
 
-		$linkfrel = JURI::root().'administrator/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
+		$linkfsel = JURI::root().'administrator/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfrel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
@@ -243,7 +245,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			case 1: // top
 			case 3:	default : // bottom
 			$rows = ceil( (count($values) * ($w_s+8) ) / $w_l );  // thumbnail rows
-			echo $rows;
 			$series = ($scroll_thumbnails) ? 1: $rows;
 			$series_size = ($h_s+8) * $series;
 			break;
@@ -251,7 +252,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			case 2: // left
 			case 4: // right
 			$cols = ceil( (count($values) * ($h_s+8) ) / $h_l );  // thumbnail columns
-			echo $cols; 
 			$series = ($scroll_thumbnails) ? 1: $cols;
 			$series_size = ($w_s+8) * $series;
 			break;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fileselement.php 369 2010-07-16 11:44:14Z enjoyman $
+ * @version 1.5 stable $Id: fileselement.php 798 2011-08-11 04:03:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -72,8 +72,10 @@ class FlexicontentModelFileselement extends JModel
 	 */
 	var $_users = null;
 
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
+
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -111,7 +113,7 @@ class FlexicontentModelFileselement extends JModel
 		// Lets load the files if it doesn't already exist
 		if (empty($this->_data))
 		{
-			$query = $this->_buildQuery();//echo "query : $query<br />";
+			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
@@ -169,15 +171,16 @@ class FlexicontentModelFileselement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', 0, 'int' );
 
-		if($filter_item) {
-			$session = JFactory::getSession();
-			$files = $session->get('fileselement.'.$filter_item, null);
-			$files = $files?$files:array();
-			$files2 = $this->getItemFiles();
-			$files = array_merge($files, $files2);
-			$files = array_unique($files);
+		if($filter_item) 
+		{
+			$session	= JFactory::getSession();
+			$files 		= $session->get('fileselement.'.$filter_item, null);
+			$files 		= $files?$files:array();
+			$files2 	= $this->getItemFiles($filter_item);
+			$files 		= array_merge($files, $files2);
+			$files 		= array_unique($files);
 			$session->set('fileselement.'.$filter_item, $files);
 			$files = "'".implode("','", $files)."'";
 			$query = 'SELECT f.*, u.name AS uploader'
@@ -201,10 +204,10 @@ class FlexicontentModelFileselement extends JModel
 		return $query;
 	}
 	
-	function getItemFiles() {
+	function getItemFiles($filter_item=0) {
 		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 			'items', 			'', 'int' );
+		//$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
 		if($filter_item) {
 			$where		= $this->_buildContentWhere();
 			$db = JFactory::getDBO();
@@ -215,7 +218,7 @@ class FlexicontentModelFileselement extends JModel
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 			. $where
 			. ' AND fi.field_type = ' . $this->_db->Quote('file')
-			. ' AND rel.item_id=' . $filter_item
+			. ($filter_item?' AND rel.item_id=' . $filter_item : '')
 			. ' GROUP BY f.id'
 			;
 			$db->setQuery($query);
@@ -267,7 +270,8 @@ class FlexicontentModelFileselement extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentOrderBy() {
+	function _buildContentOrderBy()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -286,15 +290,16 @@ class FlexicontentModelFileselement extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere() {
+	function _buildContentWhere()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$permission = FlexicontentHelperPerm::getPerm();
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', '', 'int' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', 1, 'int' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', '', 'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', 0, 'int' );
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 'filter_url', '', 'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 'filter_secure', '', 'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 'filter_ext', '', 'alnum' );
@@ -347,12 +352,19 @@ class FlexicontentModelFileselement extends JModel
 	
 	function getItems() {
 		// File field relation sub query
-		$query = 'SELECT i.id,i.title'
-			. ' FROM #__content AS i '
-			;
+		$query	= 'SELECT i.id, i.title'
+				. ' FROM #__content AS i '
+				. ' ORDER BY i.title ASC'
+				;
 		$this->_db->setQuery( $query );
 		$lists = $this->_db->loadObjectList();
 		return $lists?$lists:array();
+	}
+	function getFieldName($fieldid) {
+		$db = &JFactory::getDBO();
+		$query = "SELECT name FROM #__flexicontent_fields WHERE id='{$fieldid}';";
+		$db->setQuery($query);
+		return $db->loadResult();
 	}
 }
 ?>

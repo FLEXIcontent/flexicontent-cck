@@ -759,7 +759,8 @@ class FlexicontentModelItem extends JModel {
 						$obj->item_id 		= $item->id;
 						$obj->valueorder	= $i;
 						$obj->version		= (int)$version+1;
-						// @TODO : move to the plugin code
+						
+						// THIS IS REDUDANT (WILL BE REMOVED), since FLEXIcontenty field must have had serialize the parameters of each value already
 						if (is_array($postvalue)) {
 							$obj->value			= serialize($postvalue);
 						} else {
