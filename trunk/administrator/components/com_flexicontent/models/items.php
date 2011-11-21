@@ -1677,7 +1677,7 @@ class FlexicontentModelItems extends JModel
 		if ($use_all_items == true) {
 			$query = "SELECT id FROM #__content";
 			$this->_db->setQuery($query);
-			return $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+			return $this->_db->loadResultArray();
 		}
 		
 		// Find item having tags
@@ -1685,7 +1685,7 @@ class FlexicontentModelItems extends JModel
 		if ($get_items_with_tags == true) {
 			$query  = 'SELECT DISTINCT itemid FROM #__flexicontent_tags_item_relations';
 			$this->_db->setQuery($query);
-			$items_with_tags = $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+			$items_with_tags = $this->_db->loadResultArray();
 		}
 		
 		// Find items having values for non core fields
@@ -1699,7 +1699,7 @@ class FlexicontentModelItems extends JModel
 			;
 			//echo $query;
 			$this->_db->setQuery($query);
-			$items_with_noncore = $this->_db->loadResultArray();// or die($this->_db->getErrorMsg());
+			$items_with_noncore = $this->_db->loadResultArray();
 		}
 		
 		$item_list = array_merge($items_with_tags,$items_with_noncore);

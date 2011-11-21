@@ -473,7 +473,7 @@ class modFlexicontentHelper
 						. ' GROUP BY ci.itemid'
 						;
 			$db->setQuery($q);
-			$curitem	= $db->loadObject() or die($db->getErrorMsg());
+			$curitem	= $db->loadObject();
 
 			// Get item dates
 			if ($date_type == 1) {
@@ -894,7 +894,7 @@ class modFlexicontentHelper
 						. ' WHERE c.id = ' . $cid
 						;
 			$db->setQuery($q);
-			$currcatdata = $db->loadObject() or die($db->getErrorMsg());
+			$currcatdata = $db->loadObject();
 			
 			
 			// Try to retrieve the category image source path

@@ -31,10 +31,10 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
-
+		
+		$field->label = JText::_($field->label);
 		global $mainframe;
 
 		// Import the file system library
@@ -144,9 +144,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'radioimage') return;
+		$field->label = JText::_($field->label);
 		
 		global $mainframe;
 

@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file, &$item )
+	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;

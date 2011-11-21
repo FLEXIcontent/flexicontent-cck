@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
-			thumb.src = '".JURI::root()."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
+			thumb.src = '".JURI::root()."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
@@ -91,7 +91,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 			
-			img.src = '".JURI::root()."/administrator/components/com_flexicontent/assets/images/move3.png';
+			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move3.png';
 			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
@@ -153,11 +153,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
 
-			$move 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
+			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 
@@ -165,14 +167,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$field->html = '<ul id="sortables_'.$field->id.'">';
 		
 		if($field->value) {
-			
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
 				$img_path = $filename->filename;
 				if(substr($filename->filename, 0, 7)!='http://')
 					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
-				$src = JURI::root() . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+				$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'[]" value="'.$file.'" />';
@@ -183,7 +184,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 		}
 
-		$linkfsel = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
+		$linkfsel = JURI::root().'administrator/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">
@@ -380,16 +381,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			case 'odg':
 			case 'bmp':
 			case 'jpeg':
-				$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/image.png';
+				$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
 			// Non-image document
 			default:
 				$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
 				if (file_exists($icon)) {
-					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
+					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
 				} else {
-					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
+					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 				}
 			break;
 		}
