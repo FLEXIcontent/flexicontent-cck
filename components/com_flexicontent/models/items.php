@@ -345,8 +345,9 @@ class FlexicontentModelItems extends JModel
 				$item->text .= '<hr id="system-readmore" />' . $item->fulltext;
 			}
 			
+			// (Fix for issue 261), not overwrite joomfish data with versioned data
 			if (FLEXI_FISH) {
-				// 1. Get current language (Fix for issue 261)
+				// 1. Find if item language is different than current language 
 				$currlang = JRequest::getWord('lang', '' );
 				if(empty($currlang)){
 					$langFactory= JFactory::getLanguage();
@@ -357,14 +358,17 @@ class FlexicontentModelItems extends JModel
 				$itemlang = substr($item->language ,0,2);
 				$langdiffers = ( $currlang != $itemlang );
 				
-				// 2. Find if item language is different than current language (Fix for issue 261)
+				// 2. Retrieve joomfish data so that if they exist we will not overwrite with versioned data
 				if ($langdiffers) {
 					$query = "SELECT jfc.* FROM #__jf_content as jfc "
 							." LEFT JOIN #__languages as jfl ON jfc.language_id = jfl.id"
 							." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} "
 							." AND jfc.published=1 AND jfl.shortcode=".$this->_db->Quote($currlang);
 					$this->_db->setQuery($query);
-					$jf_data = $this->_db->loadObjectList('reference_field') or die($this->_db->getErrorMsg());
+					$jf_data = $this->_db->loadObjectList('reference_field');
+					if ($jf_data===false) {
+					 die('Error while trying to retrieve (if the exist) item\'s joomfish for current language'.$this->_db->getErrorMsg());
+					}
 				}
 			}
 			

@@ -286,7 +286,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
 				." WHERE ai.field_id='{$field->id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
 			$db->setQuery($query);
-			$objs = $db->loadObjectList(); // or die($db->getErrorMsg());
+			$objs = $db->loadObjectList();
 			//echo "<pre>"; print_r($objs);echo "</pre>"; 
 			if ($objs===false) continue;
 			$objs = is_array($objs)?$objs:array($objs);

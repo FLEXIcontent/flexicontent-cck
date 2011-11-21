@@ -147,11 +147,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			span.drag'.$field->id.' img {
 				margin: -4px 8px;
 				cursor: move;
+				float: none;
+				display: inline;
 			}
 			';
 			$document->addStyleDeclaration($css);
 
-			$move 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
+			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
@@ -273,6 +275,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$db =& JFactory::getDBO();
 		$session = & JFactory::getSession();
 		jimport('joomla.database.table.session');
+		
 		$sessiontable =new JTableSession( $db );
 		$sessiontable->load($session->getId());
 		$and = '';

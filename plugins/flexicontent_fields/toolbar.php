@@ -81,10 +81,13 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// comments button
 		if ($display_comments)
 		{
+			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '#addcomments';
+			$comment_link  = JRoute::_($link);
+
 			$display	.= '
 			<div class="flexi-react toolbar-element">
 				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
-				<span class="comments-legend flexi-legend"><a href="#addcomments" title="'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
+				<span class="comments-legend flexi-legend"><a href="'.$comment_link.'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
 			</div>
 			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
@@ -141,11 +144,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			$pop		 = JRequest::getInt('pop');
 			$pstatus 	 = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-	        $print_link  = $pop ? '#' : JRoute::_('index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&print=1&tmpl=component');
-	        $js_link  	 = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
+			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '&pop=1&print=1&tmpl=component';
+			$print_link  = $pop ? '#' : JRoute::_($link);
+			$js_link  	 = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$display	.= '
 			<div class="flexi-print toolbar-element">
-				<span class="print-legend flexi-legend"><a href="'. JRoute::_($print_link) .'" '.$js_link.' class="editlinktip"  title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
+				<span class="print-legend flexi-legend"><a href="'. $print_link .'" '.$js_link.' class="editlinktip"  title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
 			</div>
 			<div class="toolbar-spacer"'.$spacer.'></div>
 			';

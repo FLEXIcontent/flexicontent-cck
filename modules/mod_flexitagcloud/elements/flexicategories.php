@@ -17,7 +17,7 @@
  */
 
 // Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die();
+defined('_JEXEC') or die('Restricted access');
 
 $fparams =& JComponentHelper::getParams('com_flexicontent');
 if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $fparams->get('flexi_section'));
