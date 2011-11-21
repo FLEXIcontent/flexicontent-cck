@@ -488,7 +488,7 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-			<?php //if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
@@ -498,7 +498,11 @@ window.addEvent('domready', function() {
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
-			<?php //endif; ?>
+			<?php else : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
+			<img src="../media/mod_languages/images/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
+			</td>
+			<?php endif; ?>
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>
