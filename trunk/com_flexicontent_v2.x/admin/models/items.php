@@ -1225,15 +1225,20 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function delete($cid) {
-		if (count( $cid )) {
-			$table =& JTable::getInstance('flexicontent_items', '');
+	function delete($cid)
+	{
+		if (count( $cid ))
+		{
 			$cids = implode( ',', $cid );
-			foreach($cid as $id) {
-				if(!$table->delete($id)) {
-					$this->setError($table->getError());
-					return false;
-				}
+			$query = 'DELETE FROM #__content'
+					. ' WHERE id IN ('. $cids .')'
+					;
+
+			$this->_db->setQuery( $query );
+			
+			if(!$this->_db->query()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
 			}
 			
 			// remove items extended
