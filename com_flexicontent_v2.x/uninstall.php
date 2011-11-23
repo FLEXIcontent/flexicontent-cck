@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: uninstall.php 319 2010-06-20 16:41:27Z emmanuel.danan $
+ * @version 1.5 stable $Id: uninstall.php 517 2011-03-22 01:37:54Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -56,8 +56,13 @@ $flexiplugins = array(
 	"toolbar"			=>	"flexicontent_fields",
 	"fcpagenav"			=>	"flexicontent_fields",
 	"fcloadmodule"		=>	"flexicontent_fields",
+	"relateditems"		=>	"flexicontent_fields",
+	"textselect"		=>	"flexicontent_fields",
+	"flexinotify"		=>	"flexicontent",
 	"flexisearch"		=>	"search",
-	"flexisystem"		=>	"system"
+	"flexiadvsearch"		=>	"search",
+	"flexisystem"		=>	"system",
+	"flexiadvroute"		=>	"system"
 );
 // additional extensions
 $add_array =& $this->manifest->xpath('additional');
@@ -66,6 +71,7 @@ if(count($add_array)) $add = $add_array[0];
 if (is_a($add, 'JXMLElement') && count($add->children())) {
     $exts =& $add->children();
     foreach ($exts as $ext) {
+
 		// set query
 		switch ($ext->name()) {
 			case 'plugin':
@@ -99,18 +105,18 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 					'status' => false);
 				break;
 		}
-    }
+	}
 }
 
 // uninstall additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
+	
 	if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 		$extension['status'] = true;
 	}
 }
-$session  =& JFactory::getSession();
-$session->set('flexicontent.postinstall', null);
+
 ?>
 <h3><?php echo JText::_('Additional Extensions'); ?></h3>
 <table class="adminlist">
@@ -134,7 +140,6 @@ $session->set('flexicontent.postinstall', null);
 					<span style="<?php echo $style; ?>"><?php echo $ext['status'] ? JText::_('Uninstalled successfully') : JText::_('Uninstall FAILED'); ?></span>
 				</td>
 			</tr>
-			<?php unset($extensions[$i]);?>
 		<?php endforeach; ?>
 	</tbody>
 </table>

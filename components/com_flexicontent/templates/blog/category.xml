@@ -18,14 +18,15 @@
 		<param name="" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
 		<param name="" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 		<param name="lead_strip_html" type="list" default="1" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">Yes, Force Read More</option>
+			<option value="2">FLEXI_YES</option>
 		</param>
 		<param name="lead_cut_text" type="text" size="4" default="400" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		<param name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 		<param name="lead_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="lead_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 		<param name="lead_position" type="list" default="1" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
@@ -33,8 +34,8 @@
 			<option value="1">FLEXI_IMAGE_RIGHT</option>
 		</param>		
 		<param name="lead_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="lead_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
 			<option value="">FLEXI_USE_PARAMS</option>
@@ -51,14 +52,15 @@
 		<param name="" type="separator" hr="false" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level1" menu="hide" />
 		<param name="" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 		<param name="intro_strip_html" type="list" default="1" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">Yes, Force Read More</option>
+			<option value="2">FLEXI_YES</option>
 		</param>
 		<param name="intro_cut_text" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		<param name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 		<param name="intro_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="intro_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 		<param name="intro_position" type="list" default="1" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
@@ -66,8 +68,8 @@
 			<option value="1">FLEXI_IMAGE_RIGHT</option>
 		</param>		
 		<param name="intro_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="intro_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
 			<option value="">FLEXI_USE_PARAMS</option>

@@ -208,19 +208,6 @@ if ($this->limitstart == 0) :
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1) && ( (strlen(trim($items[$i]->fulltext)) >= 1) || $this->params->get('lead_strip_html', 1) ) ) : ?>
-    			<span class="readmore">
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
-    				<?php
-    				if ($items[$i]->params->get('readmore')) :
-    					echo ' ' . $items[$i]->params->get('readmore');
-    				else :
-    					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $items[$i]->title);
-    				endif;
-    				?>
-    				</a>
-    			</span>
-    			<?php endif; ?>
 
 				<!-- BOF under-description-line1 block -->
 				<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>
@@ -275,6 +262,23 @@ if ($this->limitstart == 0) :
 				</div>
 				<?php endif; ?>
 				<!-- EOF under-description-line2-nolabel block -->
+
+    			<?php if (
+    				( $this->params->get('show_readmore', 1) && strlen(trim($items[$i]->fulltext)) >= 1 )
+    				||  $this->params->get('lead_strip_html', 1) == 1 /* option 2, strip-cuts and option 1 also forces read more  */
+    			) : ?>
+    			<span class="readmore">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
+    				<?php
+    				if ($items[$i]->params->get('readmore')) :
+    					echo ' ' . $items[$i]->params->get('readmore');
+    				else :
+    					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $items[$i]->title);
+    				endif;
+    				?>
+    				</a>
+    			</span>
+    			<?php endif; ?>
 
 			</div>
 		</li>
@@ -418,19 +422,6 @@ if ($this->limitstart == 0) :
 				endif;
 				?>
 				</p>
-    			<?php if ($this->params->get('show_readmore', 1) && ( (strlen(trim($items[$i]->fulltext)) >= 1) || $this->params->get('intro_strip_html', 1) ) ) : ?>
-    			<span class="readmore">
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
-    				<?php
-    				if ($items[$i]->params->get('readmore')) :
-    					echo ' ' . $items[$i]->params->get('readmore');
-    				else :
-    					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $items[$i]->title);
-    				endif;
-    				?>
-    				</a>
-    			</span>
-    			<?php endif; ?>
 
 				<!-- BOF under-description-line1 block -->
 				<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>
@@ -485,6 +476,23 @@ if ($this->limitstart == 0) :
 				</div>
 				<?php endif; ?>
 				<!-- EOF under-description-line2-nolabel block -->
+
+    			<?php if (
+    				( $this->params->get('show_readmore', 1) && strlen(trim($items[$i]->fulltext)) >= 1 )
+    				||  $this->params->get('intro_strip_html', 1) == 1 /* option 2, strip-cuts and option 1 also forces read more  */
+    			) : ?>
+    			<span class="readmore">
+    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
+    				<?php
+    				if ($items[$i]->params->get('readmore')) :
+    					echo ' ' . $items[$i]->params->get('readmore');
+    				else :
+    					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $items[$i]->title);
+    				endif;
+    				?>
+    				</a>
+    			</span>
+    			<?php endif; ?>
 
 			</div>
 		</li>

@@ -574,8 +574,13 @@ div#result table.versionlist th {
 	padding: 2px 0 6px 0;
 }
 
-fieldset label.radiobtn {
+div fieldset label.radiobtn {
 	padding-right:12px;
+	min-width:0px;
+	margin: 0px 0px 0px 2px;
+	float: left;
+	display:block;
+	clear:none;
 }
 
 div fieldset.adminform fieldset.radio label,

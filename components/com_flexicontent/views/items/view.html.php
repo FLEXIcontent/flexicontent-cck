@@ -523,7 +523,7 @@ class FlexicontentViewItems extends JView
 		
 		//build selectlist
 		$lists = array();
-		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'class="inputbox required validate-cid"'.$multiple, true);
+		$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, 'class="inputbox required "'.$multiple, true);
 		
 		$state = array();
 		$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
