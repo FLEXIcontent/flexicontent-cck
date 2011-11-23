@@ -32,7 +32,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	</div>
 	<?php endif; ?>
 	
-	<?php if ($this->params->get('show_description', 1)) : ?>
+	<?php if ($this->params->get('show_description', 1) && $this->category->description) : ?>
 	<div class="catdescription">
 		<?php echo $this->category->description; ?>
 	</div>
