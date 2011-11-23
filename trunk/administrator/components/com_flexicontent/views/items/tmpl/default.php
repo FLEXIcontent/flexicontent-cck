@@ -677,8 +677,10 @@ window.addEvent('domready', function(){
 		</tr>
 	</table>
 	
-	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.
-	
+	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br>
+	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items	
+	<sup>[3]</sup> Order saving works only for the currently selected category, not for subcatergory items, also make sure the currently selected category has items
+		
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />
