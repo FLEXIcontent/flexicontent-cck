@@ -164,6 +164,7 @@ class FlexicontentFields
 				;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
+		$item->fields	= $item->fields	? $item->fields	: array();
 		
 		jimport('joomla.html.parameter');
 		$item->parameters	= isset($item->parameters) ? $item->parameters : new JParameter( $item->attribs );
