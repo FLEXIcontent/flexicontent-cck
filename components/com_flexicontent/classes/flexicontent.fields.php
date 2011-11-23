@@ -162,6 +162,7 @@ class FlexicontentFields
 				;
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
+		$item->fields	= $item->fields	? $item->fields	: array();
 
 		$item->parameters	= isset($item->parameters) ? $item->parameters : new JParameter( $item->attribs );
 		$item->params		= $item->parameters;
