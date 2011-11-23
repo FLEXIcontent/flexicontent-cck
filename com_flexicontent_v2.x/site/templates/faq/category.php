@@ -20,12 +20,20 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <div id="flexicontent" class="flexicontent">
 
 <!-- BOF buttons -->
+	<?php
+	if ( $this->params->get('show_print_icon')
+		|| $this->params->get('show_email_icon')
+		|| JRequest::getCmd('print')
+		|| $this->params->get('show_feed_icon', 1)
+		) {
+	?>
 	<p class="buttons">
 		<?php //echo flexicontent_html::addbutton( $this->params ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
 		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
 	</p>
+	<?php } ?>
 <!-- EOF buttons -->
 
 <!-- BOF page title -->
