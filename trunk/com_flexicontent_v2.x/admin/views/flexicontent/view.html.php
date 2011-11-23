@@ -155,7 +155,7 @@ class FlexicontentViewFlexicontent extends JView{
 			//if ($user->gid > 24) {
 			if($permission->CanConfig)  {
 				$toolbar=&JToolBar::getInstance('toolbar');
-				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 			}
 			if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}

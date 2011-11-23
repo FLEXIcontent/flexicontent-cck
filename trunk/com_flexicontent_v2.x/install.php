@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: install.php 348 2010-06-29 06:27:41Z Matthieu.26 $
+ * @version 1.5 stable $Id: install.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -36,7 +36,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 	$css = JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css'; 
 	$document =& JFactory::getDocument(); 
 	$document->addStyleSheet($css);	
-
+	
 	// we use the static loadLanguage() method in the JPlugin class - a little tricky
 	jimport('joomla.plugin.plugin');
 	JPlugin::loadLanguage('com_flexicontent', JPATH_ADMINISTRATOR);
@@ -81,6 +81,7 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 			'status' => false);
     }
 }
+
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
@@ -102,6 +103,7 @@ if ($error) {
 		}
 	}
 }
+
 ?>
 <table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">
 	<tr>
@@ -120,14 +122,14 @@ if ($error) {
 <!--
 	<tr>
 		<td valign="top" style="font-weight: bold;">
-    		<?php echo JText::_('Choose an option to finish the install :'); ?>
+    		<?php // echo JText::_('Choose an option to finish the install :'); ?>
 		</td>
 		<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
 			<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
-    		<?php echo JText::_('New install'); ?>
+    		<?php // echo JText::_('New install'); ?>
     		</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
 			<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
-    		<?php echo JText::_('Update an existing install'); ?>
+    		<?php // echo JText::_('Update an existing install'); ?>
     		</a>
 		</td>
 	</tr>

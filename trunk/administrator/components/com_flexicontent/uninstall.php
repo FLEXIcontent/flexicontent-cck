@@ -56,7 +56,11 @@ $flexiplugins = array(
 	"toolbar"			=>	"flexicontent_fields",
 	"fcpagenav"			=>	"flexicontent_fields",
 	"fcloadmodule"		=>	"flexicontent_fields",
+	"relateditems"		=>	"flexicontent_fields",
+	"textselect"		=>	"flexicontent_fields",
+	"flexinotify"		=>	"flexicontent",
 	"flexisearch"		=>	"search",
+	"flexiadvsearch"		=>	"search",
 	"flexisystem"		=>	"system",
 	"flexiadvroute"		=>	"system"
 );
@@ -87,19 +91,19 @@ if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
 				break;
 			case 'module':
 				$query = 'SELECT * FROM #__modules WHERE module='.$db->Quote($ext->attributes('name'));
-		// query extension id and client id
-		$db->setQuery($query);
-		$res = $db->loadObject();
-		$extensions[] = array(
-			'name' => $ext->data(),
-			'type' => $ext->name(),
-			'id' => isset($res->id) ? $res->id : 0,
-			'client_id' => isset($res->client_id) ? $res->client_id : 0,
-			'installer' => new JInstaller(),
-			'status' => false);
+				// query extension id and client id
+				$db->setQuery($query);
+				$res = $db->loadObject();
+				$extensions[] = array(
+					'name' => $ext->data(),
+					'type' => $ext->name(),
+					'id' => isset($res->id) ? $res->id : 0,
+					'client_id' => isset($res->client_id) ? $res->client_id : 0,
+					'installer' => new JInstaller(),
+					'status' => false);
 				break;
 		}
-    }
+	}
 }
 
 // uninstall additional extensions
