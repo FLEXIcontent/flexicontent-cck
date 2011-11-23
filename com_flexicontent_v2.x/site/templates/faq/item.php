@@ -24,12 +24,20 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
 
 	<!-- BOF buttons -->
+	<?php
+	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
+	$mailbutton = flexicontent_html::mailbutton( 'items', $this->params, null , $this->item->slug );
+	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
+	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {
+	?>
 	<p class="buttons">
-		<?php echo flexicontent_html::pdfbutton( $this->item, $this->params ); ?>
-		<?php echo flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug ); ?>
-		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
-		<?php echo flexicontent_html::editbutton( $this->item, $this->params ); ?>
+		<?php echo $pdfbutton; ?>
+		<?php echo $mailbutton; ?>
+		<?php echo $printbutton; ?>
+		<?php echo $editbutton; ?>
 	</p>
+	<?php } ?>
 	<!-- EOF buttons -->
 
 	<!-- BOF page title -->
