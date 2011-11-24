@@ -401,7 +401,7 @@ VALUES
 
 		$db 		=& JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
-
+		
 		// Add language column
 		$fields = $db->getTableFields('#__flexicontent_items_ext');
 		$language_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
@@ -410,18 +410,21 @@ VALUES
 			$db->setQuery($query);
 			$result_lang_col = $db->query();
 			if (!$result_lang_col) echo "Cannot add language column<br>";
-		}
+		} else $result_lang_col = true;
 
-		// Add default language for items that do not have one
+		// Add default language for items that do not have one, and add translation group to items that do not have one set
+		$model = $this->getModel('flexicontent');
 		if ($model->getItemsNoLang()) {
 			// Add site default language to the language field if empty
 			$languages 	=& JComponentHelper::getParams('com_languages');
 			$lang 		= $languages->get('site', 'en-GB');
 			$result_items_default_lang = $this->setItemsDefaultLang($lang);
-			if (!$result_items_default_lang) echo "Cannot set default language<br>";
-		}
+			if (!$result_items_default_lang) echo "Cannot set default language or set default translation group<br>";
+		} else $result_items_default_lang = true;
 		
-		if (!$result_lang_col || !$result_items_default_lang) {
+		if (!$result_lang_col
+			|| !$result_items_default_lang
+		) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existlanguagecolumn" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
 			echo '<span class="install-ok"></span>';
