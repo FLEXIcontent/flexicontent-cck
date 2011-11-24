@@ -22,16 +22,16 @@
 	<fields name="params">
 		<fieldset name="basic">
 			<field name="redirect_cats" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
-				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
-				<option value="23">MANAGER</option>
-				<option value="24">ADMINISTRATOR</option>
-				<option value="25">SUPER ADMINISTRATOR</option>
+				<option value="6">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="6">MANAGER</option>
+				<option value="7">ADMINISTRATOR</option>
+				<option value="8">SUPER ADMINISTRATOR</option>
 			</field>
 			<field name="redirect_articles" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
-				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
-				<option value="23">MANAGER</option>
-				<option value="24">ADMINISTRATOR</option>
-				<option value="25">SUPER ADMINISTRATOR</option>
+				<option value="6">FLEXI_SYSTEM_NO_REDIRECT</option>
+				<option value="6">MANAGER</option>
+				<option value="7">ADMINISTRATOR</option>
+				<option value="8">SUPER ADMINISTRATOR</option>
 			</field>
 		</fieldset>
 	</fields>
