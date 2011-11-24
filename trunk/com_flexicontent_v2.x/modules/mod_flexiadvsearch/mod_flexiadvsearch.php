@@ -28,7 +28,7 @@ $linkadvsearch		 = $params->get('linkadvsearch', 1);
 $linkadvsearch_txt		 = $params->get('linkadvsearch_txt', 'Advanced Search');
 if($linkadvsearch && !trim($linkadvsearch_txt)) $linkadvsearch_txt = 'Advanced Search';
 if ($imagebutton) {
-    $img = modSearchHelper::getSearchImage( $button_text );
+		$img = JHtml::_('image','searchButton.gif', $button_text, NULL, true, true);
 }
 if($useitemid = $params->get('useitemid', '0')) {
 	$set_Itemid		 = intval($params->get('set_itemid', 0));

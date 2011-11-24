@@ -117,18 +117,19 @@ class plgSystemFlexisystem extends JPlugin
 
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
+					$cid = $cid ? $cid : JRequest::getVar('cid');
 					$urlItems .= '&controller=items&task=edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
 				} else if ($task == 'element') {
 					$urlItems .= '&view=itemelement&tmpl=component&object='.JRequest::getVar('object','');
 				} else {
 					$urlItems .= '&view=items';
 				}
-				$redirect = false;
+				/*$redirect = false;
 				if(in_array('-1', $minarts)) {
 					$redirect = false;
 				}elseif(in_array('-2', $minarts)) {
 					$redirect = true;
-				}
+				}*/ $redirect = true; // TODO FIX
 				if($redirect) {
 					$app->redirect($urlItems,'');
 				}elseif(count(array_intersect($usergroups, $minarts))>0) {
@@ -141,12 +142,12 @@ class plgSystemFlexisystem extends JPlugin
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 
 				$extension = JRequest::getVar('extension');
-				$redirect = false;
+				/*$redirect = false;
 				if(in_array('-1', $mincats)) {
 					$redirect = false;
 				}elseif(in_array('-2', $mincats)) {
 					$redirect = true;
-				}
+				}*/ $redirect = true; // TODO FIX
 				if($redirect  && ($extension == 'com_content')) {
 					$app->redirect($urlItems,'');
 				}elseif((count(array_intersect($usergroups, $mincats))>0) && ($extension == 'com_content')) {

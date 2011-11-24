@@ -376,6 +376,7 @@ VALUES
 	{
 		$db =& JFactory::getDBO();
 
+		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET language = ' . $db->Quote($lang)
 				. ' WHERE language = ""'
@@ -401,6 +402,7 @@ VALUES
 		$db 		=& JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 
+		// Add language column
 		$fields = $db->getTableFields('#__flexicontent_items_ext');
 		$language_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
 		if(!$language_col) {
@@ -409,12 +411,14 @@ VALUES
 			$result_lang_col = $db->query();
 			if (!$result_lang_col) echo "Cannot add language column<br>";
 		}
+
+		// Add default language for items that do not have one
 		if ($model->getItemsNoLang()) {
 			// Add site default language to the language field if empty
 			$languages 	=& JComponentHelper::getParams('com_languages');
 			$lang 		= $languages->get('site', 'en-GB');
 			$result_items_default_lang = $this->setItemsDefaultLang($lang);
-			if (!$result_tgrp_col) echo "Cannot set default language<br>";
+			if (!$result_items_default_lang) echo "Cannot set default language<br>";
 		}
 		
 		if (!$result_lang_col || !$result_items_default_lang) {
