@@ -103,6 +103,7 @@ if ($this->limitstart == 0) :
     			<?php 
     			if ($this->params->get('lead_use_image', 1)) :
     				if ($this->params->get('lead_image')) :
+    					FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('lead_image'), $values=null, $method='display');
 							if (isset($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
 								$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
 								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
