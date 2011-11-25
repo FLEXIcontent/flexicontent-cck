@@ -552,7 +552,7 @@ div.current dd {
 	float: left;
 	margin-right: 2px;
 	padding: 1px 2px;
-	position: relative;
+	/*position: relative;*/
 	right: 50%;
 	text-decoration: none;
 }
