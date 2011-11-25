@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.7" type="plugin" group="search" >
-	<name>PLG_SEARCH_FLEXISTDSEARCH</name>
+	<name>PLG_SEARCH_FLEXISEARCH</name>
 	<author>Aazam</author>
 	<creationDate>oct 2011</creationDate>
 	<copyright>Copyright (C) 2011 Aazam</copyright>
@@ -8,16 +8,16 @@
 	<authorEmail>aazam@yandex.ru</authorEmail>
 	<authorUrl>aazam.narod.ru</authorUrl>
 	<version>1.0</version>
-	<description>PLG_SEARCH_FLEXISTDSEARCH_DESCRIPTION</description>
+	<description>PLG_SEARCH_FLEXISEARCH_DESCRIPTION</description>
 	<files>
-		<filename plugin="flexistdsearch">flexistdsearch.php</filename>
+		<filename plugin="flexisearch">flexisearch.php</filename>
 		<filename>index.html</filename>
 	</files>
 	<languages>
-		<language tag="en-GB">en-GB.plg_search_flexistdsearch.ini</language>
-		<language tag="en-GB">en-GB.plg_search_flexistdsearch.sys.ini</language>
-		<language tag="ru-RU">ru-RU.plg_search_flexistdsearch.ini</language>
-		<language tag="ru-RU">ru-RU.plg_search_flexistdsearch.sys.ini</language>
+		<language tag="en-GB">en-GB.plg_search_flexisearch.ini</language>
+		<language tag="en-GB">en-GB.plg_search_flexisearch.sys.ini</language>
+		<language tag="ru-RU">ru-RU.plg_search_flexisearch.ini</language>
+		<language tag="ru-RU">ru-RU.plg_search_flexisearch.sys.ini</language>
 	</languages>	
 	<config>
 	<fields name="params">
