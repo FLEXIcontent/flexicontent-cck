@@ -368,61 +368,6 @@ class FlexicontentModelCategory extends JModelList{
 		return $this->_total;
 	}
 	
-	/**
-	 * Build the orderby for the query
-	 *
-	 * @return	string	$orderby portion of query
-	 * @since	1.5
-	 */
-	protected function _buildContentOrderBy()
-	{
-		$app		= JFactory::getApplication('site');
-		$db			= $this->getDbo();
-		//$params		= $this->state->params;
-		$itemid		= JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
-		$orderCol	= $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order', 'filter_order', 'a.ordering', 'string');
-		$orderDirn	= $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order_Dir', 'filter_order_Dir', 'ASC', 'cmd');
-		$orderby	= ' ';
-
-		if (!in_array($orderCol, $this->filter_fields)) {
-			$orderCol = null;
-		}
-
-		if (!in_array(strtoupper($orderDirn), array('ASC', 'DESC', ''))) {
-			$orderDirn = 'ASC';
-		}
-
-		if ($orderCol && $orderDirn) {
-			$orderby .= $db->getEscaped($orderCol) . ' ' . $db->getEscaped($orderDirn) . ', ';
-		}
-
-		/*$articleOrderby		= $params->get('orderby_sec', 'rdate');
-		$articleOrderDate	= $params->get('order_date');
-		$categoryOrderby	= $params->def('orderby_pri', '');
-		$secondary			= ContentHelperQuery::orderbySecondary($articleOrderby, $articleOrderDate) . ', ';
-		switch ($categoryOrderby)
-		{
-			case 'alpha' :
-				$primary = 'c.path, ';
-				break;
-
-			case 'ralpha' :
-				$primary = 'c.path DESC, ';
-				break;
-
-			case 'order' :
-				$primary = 'c.lft, ';
-				break;
-
-			default :
-				$primary = '';
-				break;
-		}
-
-		$orderby .= $db->getEscaped($primary) . ' ' . $db->getEscaped($secondary) . ' a.created ';
-		*/
-		return $orderby;
-	}
 
 	/**
 	 * Builds the query
@@ -438,6 +383,13 @@ class FlexicontentModelCategory extends JModelList{
 			$where			= $this->_buildItemWhere();
 			$orderby		= $this->_buildItemOrderBy();
 
+			$field_item = '';
+			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+			$params = $this->_category->parameters;
+			if ($params->get('orderbycustomfieldid', 0) != 0) {
+				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+			}
+		
 			//$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
 			$query = 'SELECT DISTINCT i.*, ie.*,c.lft,c.rgt,u.name as author, ty.name AS typename,'
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
@@ -445,6 +397,7 @@ class FlexicontentModelCategory extends JModelList{
 			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. $field_item
 			//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
 			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
