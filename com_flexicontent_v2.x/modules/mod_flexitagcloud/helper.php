@@ -122,10 +122,21 @@ class modFlexiTagCloudHelper
 			$lists[$i]->name 			= $row->name;
 			$lists[$i]->screenreader	= JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
 			if ($tagitemid) {
-				$lists[$i]->link 		= JRoute::_(FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid));
+				$lists[$i]->link 		= FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid);
 			} else {
-				$lists[$i]->link 		= JRoute::_(FlexicontentHelperRoute::getTagRoute($row->slug));
+				$lists[$i]->link 		= FlexicontentHelperRoute::getTagRoute($row->slug);
 			}
+			
+			// Set them here so that there passed to the model via the http request
+			$lists[$i]->link .= $params->get('orderby', '') ? ( '&orderby=' . $params->get('orderby', '') ) : '';
+			if ( $params->get('orderbycustomfieldid', '') ) {
+				$lists[$i]->link .= $params->get('orderbycustomfieldid', '') ? ( '&orderbycustomfieldid=' . $params->get('orderbycustomfieldid', '') ) : '';
+				$lists[$i]->link .= $params->get('orderbycustomfieldint', '') ? ( '&orderbycustomfieldint=' . $params->get('orderbycustomfieldint', '') ) : '';
+				$lists[$i]->link .= $params->get('orderbycustomfielddir', '') ? ( '&orderbycustomfielddir=' . $params->get('orderbycustomfielddir', '') ) : '';
+			}
+			
+			$lists[$i]->link 		= JRoute::_($lists[$i]->link);
+
 			$i++;
 		}
 

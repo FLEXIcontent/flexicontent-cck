@@ -465,10 +465,9 @@ class FlexicontentModelCategory extends JModelList{
 	{
 		$params = $this->_category->parameters;
 		
-		$filter_order		= $this->getState('filter_order', 'i.created');
-		$filter_order_dir	= $this->getState('filter_order_dir', 'DESC');
-		//$filter_order		= 'i.created';
-		//$filter_order_dir	= 'DESC';
+		$filter_order		= $this->getState('filter_order');
+		$filter_order_dir	= $this->getState('filter_order_dir');
+
 		if ($params->get('orderby')) {
 			$order = $params->get('orderby');
 			
@@ -477,9 +476,12 @@ class FlexicontentModelCategory extends JModelList{
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'ASC';
 				break;
-				default:
 				case 'rdate' :
 				$filter_order		= 'i.created';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'modified' :
+				$filter_order		= 'i.modified';
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'alpha' :
@@ -511,7 +513,16 @@ class FlexicontentModelCategory extends JModelList{
 				$filter_order_dir	= 'ASC';
 				break;
 			}
-		}		
+			
+		}
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		if ($params->get('orderbycustomfieldid', 0) != 0)
+			{
+			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+			$filter_order		= 'f.value'.$int;
+			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+			}
+		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 
 		return $orderby;
