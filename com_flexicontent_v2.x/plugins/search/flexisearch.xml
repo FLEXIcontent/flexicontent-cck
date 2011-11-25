@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="search" method="upgrade">
-	<name>Search - FLEXIcontent</name>
-	<author>Emmanuel Danan</author>
-	<creationDate>June 2009</creationDate>
-	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
+<install version="1.7" type="plugin" group="search" >
+	<name>PLG_SEARCH_FLEXISTDSEARCH</name>
+	<author>Aazam</author>
+	<creationDate>oct 2011</creationDate>
+	<copyright>Copyright (C) 2011 Aazam</copyright>
 	<license>GNU/GPL v2</license>
-	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
-	<authorUrl>www.vistamedia.fr</authorUrl>
+	<authorEmail>aazam@yandex.ru</authorEmail>
+	<authorUrl>aazam.narod.ru</authorUrl>
 	<version>1.0</version>
-	<description>FLEXI_SEARCH_PLUGIN</description>
+	<description>PLG_SEARCH_FLEXISTDSEARCH_DESCRIPTION</description>
 	<files>
-		<filename plugin="flexisearch">flexisearch.php</filename>
+		<filename plugin="flexistdsearch">flexistdsearch.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<languages>
-		<language tag="en-GB">en-GB.plg_search_flexisearch.ini</language>
-		<language tag="fr-FR">fr-FR.plg_search_flexisearch.ini</language>
-		<language tag="de-DE">de-DE.plg_search_flexisearch.ini</language>
-		<language tag="ru-RU">ru-RU.plg_search_flexisearch.ini</language>
+		<language tag="en-GB">en-GB.plg_search_flexistdsearch.ini</language>
+		<language tag="en-GB">en-GB.plg_search_flexistdsearch.sys.ini</language>
+		<language tag="ru-RU">ru-RU.plg_search_flexistdsearch.ini</language>
+		<language tag="ru-RU">ru-RU.plg_search_flexistdsearch.sys.ini</language>
 	</languages>	
 	<config>
 	<fields name="params">
 		<fieldset name="basic">
-			<field name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
+			<field name="filter_lang" type="radio" default="1" label="FLEXI_STDSEARCH_LANG" description="FLEXI_STDSEARCH_LANG_DESC">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_STDSEARCH_LIMIT" description="FLEXI_STDSEARCH_LIMIT_DESC"/>
+			<field name="search_title" type="radio" default="1" label="FLEXI_STDSEARCH_TITLE" description="FLEXI_STDSEARCH_TITLE_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_desc" type="radio" default="1" label="FLEXI_STDSEARCH_DESC" description="FLEXI_STDSEARCH_DESC_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_fields" type="radio" default="1" label="FLEXI_STDSEARCH_FIELDS" description="FLEXI_STDSEARCH_FIELDS_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_meta" type="radio" default="1" label="FLEXI_STDSEARCH_META" description="FLEXI_STDSEARCH_META_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_tags" type="radio" default="1" label="FLEXI_STDSEARCH_TAGS" description="FLEXI_STDSEARCH_TAGS_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
 		</fieldset>
 	</fields>
 	</config>
