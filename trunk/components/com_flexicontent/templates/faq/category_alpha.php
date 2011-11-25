@@ -39,7 +39,7 @@ if ($show_alpha == 1) {
 	$alphaaliases = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_ALIASES"));
 } else {  // $show_alpha == 2
 	// Custom setting
-	$alphacharacters = $this->params->get('alphacharacters', "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
+	$alphacharacters = $this->params->get('alphacharacters', "[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
 	
 	$lang = JRequest::getWord('lang', '' );
 	if(empty($lang)){
