@@ -182,6 +182,13 @@ foreach ($cat_items as $catid => $items) :
 			<?php foreach ($items as $item) : ?>
 				<li class='flexi-item'>
 				
+				<?php if ($this->params->get('show_editbutton', 0)) : ?>
+					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
+					<?php if ($editbutton) : ?>
+						<div style="float:left;"><?php echo $editbutton;?></div>
+					<?php endif; ?>
+				<?php endif; ?>
+					
 				<!-- BOF item title -->
 				<ul class='flexi-fieldlist'>
 				<?php if ($this->params->get('show_title', 1)) : ?>

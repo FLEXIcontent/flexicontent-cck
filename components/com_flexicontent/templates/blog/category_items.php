@@ -89,6 +89,13 @@ if ($this->limitstart == 0) :
 		?>
 		<li>
 			<div style="overflow: hidden;">
+					<?php if ($this->params->get('show_editbutton', 0)) : ?>
+						<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
+						<?php if ($editbutton) : ?>
+							<div style="float:left;"><?php echo $editbutton;?></div>
+						<?php endif; ?>
+					<?php endif; ?>
+					
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
    				<?php if ($this->params->get('link_titles', 0)) : ?>
@@ -304,6 +311,14 @@ if ($this->limitstart == 0) :
 		<?php for ($i=($this->limitstart == 0 ? $leadnum : 0 ); $i<$count; $i++) : ?>
 		<li class="<?php echo (($this->limitstart == 0) ? ($i+$leadnum)%2 : $i%2) ? 'even' : 'odd'; ?>">
 			<div style="overflow: hidden;">
+				
+					<?php if ($this->params->get('show_editbutton', 0)) : ?>
+						<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
+						<?php if ($editbutton) : ?>
+							<div style="float:left;"><?php echo $editbutton;?></div>
+						<?php endif; ?>
+					<?php endif; ?>
+					
     			<?php if ($this->params->get('show_title', 1)) : ?>
     			<h2 class="contentheading">
     				<?php if ($this->params->get('link_titles', 0)) : ?>

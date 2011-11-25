@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 931 2011-10-17 06:09:03Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 956 2011-11-08 11:22:31Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -113,6 +113,10 @@ if ($this->items) :
    		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
 			<thead>
 				<tr>
+					<?php if ($this->params->get('show_editbutton', 0)) : ?>
+					<th id="flexi_edit_col_head" scope="col"></th>
+					<?php endif; ?>
+					
 		   		<?php if ($this->params->get('show_title', 1)) : ?>
 					<th id="flexi_title" scope="col"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
 					<?php endif; ?>
@@ -128,6 +132,13 @@ if ($this->items) :
 			
 			<?php foreach ($items as $item) : ?>
 				<tr class="sectiontableentry">
+				
+				<?php if ($this->params->get('show_editbutton', 0)) : ?>
+					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
+					<?php if ($editbutton) : ?>
+						<td><?php echo $editbutton;?></td>
+					<?php endif; ?>
+				<?php endif; ?>
 				
 				<!-- BOF item title -->
 				<?php if ($this->params->get('show_title', 1)) : ?>
