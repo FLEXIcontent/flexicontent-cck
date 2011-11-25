@@ -42,6 +42,31 @@
 			<option value="0">FLEXI_NO</option>
 		</param>
 		<param name="force_itemid" type="text" default="" label="FLEXI_FORCE_ITEMID" description="FLEXI_FORCE_ITEMID_DESC" />
+
+		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
+		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+			<option value="">Default</option>
+			<option value="date">Oldest first</option>
+			<option value="rdate">Most recent first</option>
+			<option value="modified">Last modified first</option>
+			<option value="alpha">Title Alphabetical</option>
+			<option value="ralpha">Title Reverse-Alphabetical</option>
+			<option value="author">Author Alphabetical</option>
+			<option value="rauthor">Author Reverse-Alphabetical</option>
+			<option value="hits">Most Hits</option>
+			<option value="rhits">Least Hits</option>
+			<option value="order">Ordering</option>
+		</param>
+		<param name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+		<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
+			<option value="ASC">FLEXI_ASC</option>
+			<option value="DESC">FLEXI_DESC</option>
+		</param>
+		<param name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE">
+			<option value="0">FLEXI_TEXT</option>
+			<option value="1">FLEXI_INT</option>
+		</param>
+
 	</params>
 	
 	<params group="advanced">

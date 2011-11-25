@@ -104,6 +104,10 @@ class FlexicontentModelTags extends JModel
 		{		
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+			if ($this->_db->getErrorNum()) {
+				echo $query."<br>";
+				echo $this->_db->getErrorMsg()."<br>";
+			}
 		}
 		
 		return $this->_data;
@@ -161,23 +165,30 @@ class FlexicontentModelTags extends JModel
 
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
-
-        $query = 'SELECT i.id, i.title, i.*, ie.*,'
-         . ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-         . ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-         . ' FROM #__content AS i'
+		
+		// Add sort items by custom field.
+		$field_item = '';
+		if (JRequest::getVar('orderbycustomfieldid', 0) != 0) {
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+		}
+		
+		$query = 'SELECT i.id, i.title, i.*, ie.*,'
+		 . ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+		 . ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+		 . ' FROM #__content AS i'
 		 . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-         . ' INNER JOIN #__flexicontent_tags_item_relations AS t ON t.itemid = i.id'
-         . ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-         . ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-         . ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
-         . $joinaccess
-         . $where
-         . $andaccess
-         . ' GROUP BY i.id'
-         . $orderby
-         ;
-         return $query;
+		 . ' INNER JOIN #__flexicontent_tags_item_relations AS t ON t.itemid = i.id'
+		 . ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+		 . ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+		 . ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+		 . $field_item
+		 . $joinaccess
+		 . $where
+		 . $andaccess
+		 . ' GROUP BY i.id'
+		 . $orderby
+		 ;
+		return $query;
 	}
 
 	/**
@@ -187,6 +198,100 @@ class FlexicontentModelTags extends JModel
 	 * @return string
 	 */
 	function _buildItemOrderBy()
+	{
+		jimport( 'joomla.html.parameter' );
+		
+		// 1. Get the active menu item
+		$menu =& JSite::getMenu();
+		$item =& $menu->getActive();
+		$params = (!$item) ? new JParameter("") : new JParameter($item->params);
+		
+		// Higher Priority: prefer from http request than menu item
+		if (JRequest::getVar('orderby', '' )) {
+			$params->set('orderby', JRequest::getVar('orderby') );
+		}
+		if (JRequest::getVar('orderbycustomfieldid', '' )) {
+			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
+		} else {
+			JRequest::setVar('orderbycustomfieldid', $params->set('orderbycustomfieldid', '') );
+		}
+		if (JRequest::getVar('orderbycustomfieldint', '' )) {
+			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
+		}
+		if (JRequest::getVar('orderbycustomfielddir', '' )) {
+			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
+		}
+		
+		$filter_order		= $this->getState('filter_order');
+		$filter_order_dir	= $this->getState('filter_order_dir');
+
+		if ($params->get('orderby')) {
+			$order = $params->get('orderby');
+			
+			switch ($order) {
+				case 'date' :
+				$filter_order		= 'i.created';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rdate' :
+				$filter_order		= 'i.created';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'modified' :
+				$filter_order		= 'i.modified';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'alpha' :
+				$filter_order		= 'i.title';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'ralpha' :
+				$filter_order		= 'i.title';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'author' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rauthor' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'hits' :
+				$filter_order		= 'i.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rhits' :
+				$filter_order		= 'i.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'order' :
+				$filter_order		= 'rel.ordering';
+				$filter_order_dir	= 'ASC';
+				break;
+			}
+			
+		}
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		if ($params->get('orderbycustomfieldid', 0) != 0)
+			{
+			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+			$filter_order		= 'f.value'.$int;
+			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+			}
+		
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
+
+		return $orderby;
+	}
+
+	/**
+	 * Build the order clause
+	 *
+	 * @access private
+	 * @return string
+	 */
+	/*function _buildItemOrderBy()
 	{	
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
@@ -194,7 +299,7 @@ class FlexicontentModelTags extends JModel
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 
 		return $orderby;
-	}
+	}*/
 	
 	/**
 	 * Method to build the WHERE clause
