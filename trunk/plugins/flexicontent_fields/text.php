@@ -168,7 +168,8 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if(!$post) return;
 		$newpost = array();
 		$new = 0;
-
+		
+		if(!is_array($post)) $post = array ($post);
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n] != '')

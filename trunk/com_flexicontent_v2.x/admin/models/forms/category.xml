@@ -88,13 +88,17 @@
 			</field>
 			
 			<field name="sep_items_list" type="separator" hr="false" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" menu="hide" />
+			<field name="show_editbutton" type="radio" default="0" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
 			<field name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_Show/Hide_the_items_title">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS">
 				<option value="0">FLEXI_No</option>
@@ -106,8 +110,8 @@
 			</field>
 <!--
 			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_TIPLINKS">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 -->
 		</fieldset>
