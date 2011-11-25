@@ -525,7 +525,7 @@ div.current dd {
 	width: 100%;
 }
 
-#fc_alpha .letters {
+#fc_alpha .aichargrp {
 	float: left;
 	left: 50%;
 	margin-bottom: 5px;
@@ -535,33 +535,25 @@ div.current dd {
 	clear:both;
 }
 
-#fc_alpha .numbers {
-	clear: both;
-	float: left;
-	left: 50%;
-	margin-bottom: 5px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	clear:both;
+#fc_alpha .letters, #fc_alpha .numbers {   /* default alpha character group classes */ 
 }
 
-.fc_alpha_index {
+#fc_alpha .fc_alpha_index {  /* class of individual alpha characters */
 	background: #efefef;
 	border: 1px solid #c0c0c0;
 	float: left;
 	margin-right: 2px;
 	padding: 1px 2px;
-	/*position: relative;*/
+	position: relative;
 	right: 50%;
 	text-decoration: none;
 }
 
-span.fc_alpha_index {
+#fc_alpha span.fc_alpha_index {
 	color: #c0c0c0;
 }
 
-.fc_alpha_index_sep {
+#fc_alpha .fc_alpha_index_sep {
 	padding: 1px 0px;
 	border: 0px solid silver;
 	background: none;

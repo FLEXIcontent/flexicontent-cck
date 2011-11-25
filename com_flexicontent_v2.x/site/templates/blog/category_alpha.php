@@ -100,7 +100,7 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 		$group_start = true;
 		$letters = explode(",", $group);
 	?>
-	<div class="<?php echo $groupcssclasses[$i]; ?>">
+	<div class="aichargrp <?php echo $groupcssclasses[$i]; ?>">
 	<?php if($flag) {?>
 	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>

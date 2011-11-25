@@ -105,10 +105,6 @@ div.subcategorieslist {
 margin: 0 0 1em 0;
 }
 
-div#fc_alpha {
-margin: 0 0 1em 0;
-}
-
 div#flexicontent #fc_filter {
 margin: 0 0 1em 0; padding: 0.5em;
 border: solid 1px #ddd;
@@ -239,59 +235,6 @@ div.image.left {
 	float: left;
 	margin-right: 10px;
 }
-
-/**
- * Alphabetical index
- */
-#fc_alpha {
-	clear: both;
-	float: left;
-	overflow: hidden;
-	width: 100%;
-}
-#fc_alpha .letters {
-	margin-bottom: 5px;
-	margin-left: auto;
-	margin-right: auto;
-	float: left;
-	left: 50%;
-	position: relative;
-	clear: both;
-}
-#fc_alpha .numbers {
-	margin-bottom: 5px;
-	margin-left: auto;
-	margin-right: auto;
-	float: left;
-	left: 50%;
-	position: relative;
-	clear: both;
-}
-.fc_alpha_index {
-	padding: 1px 2px;
-	border: 1px solid silver;
-	background: #efefef;
-	text-decoration: none;
-	margin-right: 2px;
-	float: left;
-	/*position: relative;*/
-	right: 50%;
-}
-span.fc_alpha_index {
-	color: silver;
-}
-
-.fc_alpha_index_sep {
-	padding: 1px 0px;
-	border: 0px solid silver;
-	background: none;
-	text-decoration: none;
-	margin-right: 0px;
-	float: left;
-	position: relative;
-	right: 50%;
-}
-
 
 /* lines */
 .lineinfo {
