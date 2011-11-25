@@ -221,7 +221,7 @@ class FlexicontentModelItems extends JModel
 
 		if ($status['no']) {
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
-			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state FROM #__content as c'
+			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state, c.language FROM #__content as c'
 					. ' JOIN #__categories as cat ON c.catid=cat.id' 
 					. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
 					. $and
@@ -272,7 +272,8 @@ class FlexicontentModelItems extends JModel
 		$itemext = array();
 		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
+			$ilang = $row->language ? $row->language : $lang;
+			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
 			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();

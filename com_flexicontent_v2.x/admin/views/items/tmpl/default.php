@@ -500,7 +500,11 @@ window.addEvent('domready', function() {
 			</td>
 			<?php else : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
+			<?php if($row->lang=='*') : ?>
+				<?php echo JText::_("All");?>
+			<?php else : ?>
 			<img src="../media/mod_languages/images/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
+			<?php endif; ?>
 			</td>
 			<?php endif; ?>
 			<td align="center" class="col_type">
