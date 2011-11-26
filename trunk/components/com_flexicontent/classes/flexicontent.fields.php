@@ -115,6 +115,7 @@ class FlexicontentFields
 			}
 		}
 		
+		$cparams->merge($params);  // merge components parameters into field parameters
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
 
 		return $items;
@@ -380,22 +381,26 @@ class FlexicontentFields
 		  $fbypos[0]->position = $view;
 		}
 		
+		$always_create_fields_display = $params->get('always_create_fields_display',0);
+		
 		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
-		  // 'description' item field is implicitly used by category layout of some templates (blog), render it
-		  if ($view == 'category') {
-		    $field = $items[$i]->fields['text'];
-		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
-		  }
-			// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
-			else if ($view == 'items') {
-				foreach ($items[$i]->fields as $field) {
-					if ($field->iscore) {
-						$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+			if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
+			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
+			  if ($view == 'category') {
+			    $field = $items[$i]->fields['text'];
+			    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+			  }
+				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
+				else if ($view == 'items') {
+					foreach ($items[$i]->fields as $field) {
+						if ($field->iscore) {
+							$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+						}
 					}
 				}
-			}
+		  }
 		  
 		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {

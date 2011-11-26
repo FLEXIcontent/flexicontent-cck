@@ -209,6 +209,7 @@ if ($this->limitstart == 0) :
 				
 				<p>
 				<?php
+				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
 				if ($this->params->get('lead_strip_html', 1)) :
 				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
 				else :
@@ -432,6 +433,7 @@ if ($this->limitstart == 0) :
 
 				<p>
 				<?php
+				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
 				if ($this->params->get('intro_strip_html', 1)) :
 				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
 				else :
