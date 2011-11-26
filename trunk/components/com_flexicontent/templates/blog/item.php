@@ -156,11 +156,9 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- EOF beforedescription block -->
 
 	<!-- BOF description block -->
-	<?php if ($this->params->get('show_intro', 1)) : ?>
 	<div class="description">
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
-	<?php endif; ?>
 	<!-- EOF description block -->
 
 	<!-- BOF afterdescription block -->
