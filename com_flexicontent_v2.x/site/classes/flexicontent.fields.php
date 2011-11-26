@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 792 2011-08-09 07:41:10Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: flexicontent.fields.php 972 2011-11-23 04:24:23Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -35,7 +35,6 @@ class FlexicontentFields
 		}
 		if (!$items) return $items;
 
-		//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
 		$user 		= &JFactory::getUser();
 		$gid		= max ($user->getAuthorisedViewLevels());
 
@@ -116,6 +115,7 @@ class FlexicontentFields
 			}
 		}
 		
+		$cparams->merge($params);  // merge components parameters into field parameters
 		$items = FlexicontentFields::renderPositions($items, $view, $params);
 
 		return $items;
@@ -165,7 +165,7 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$item->fields	= $db->loadObjectList('name');
 		$item->fields	= $item->fields	? $item->fields	: array();
-		
+
 		jimport('joomla.html.parameter');
 		$item->parameters	= isset($item->parameters) ? $item->parameters : new JParameter( $item->attribs );
 		$item->params		= $item->parameters;
@@ -199,11 +199,10 @@ class FlexicontentFields
 	 */
 	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display')
 	{
-	  if (!isset($item->fieldsretrieved)) {
+	  if (!isset($item->fields)) {
 	  	// This if will succeed once per item ... because getFields will retrieve all values
 	  	// getFields() will not render the display of fields because we passed no params variable ...
 	  	FlexicontentFields::getFields(array(&$item));
-	  	$item->fieldsretrieved = true;
 	  }
 
 	  // Check if we have already created the display and return it
@@ -383,22 +382,26 @@ class FlexicontentFields
 		  $fbypos[0]->position = $view;
 		}
 		
+		$always_create_fields_display = $params->get('always_create_fields_display',0);
+		
 		// *** RENDER fields on DEMAND, (if present in template positions)
 		for ($i=0; $i < sizeof($items); $i++)
 		{
-		  // 'description' item field is implicitly used by category layout of some templates (blog), render it
-		  if ($view == 'category') {
-		    $field = $items[$i]->fields['text'];
-		    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
-		  }
-			// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
-			else if ($view == 'item') {
-				foreach ($items[$i]->fields as $field) {
-					if ($field->iscore) {
-						$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+			if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
+			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
+			  if ($view == 'category') {
+			    $field = $items[$i]->fields['text'];
+			    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+			  }
+				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
+				else if ($view == 'item') {
+					foreach ($items[$i]->fields as $field) {
+						if ($field->iscore) {
+							$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
+						}
 					}
 				}
-			}
+		  }
 		  
 		  // render fields if they are present in a template position (or dummy position ...)
 			foreach ($fbypos as $pos) {

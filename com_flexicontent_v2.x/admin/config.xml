@@ -31,6 +31,7 @@
 				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
 				<option value="1">FLEXI_ALWAYS</option>
 				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
+				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</field>
 			<field name="separator2" type="separator" default="SEF Options" level="level1" menu="hide" />
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />

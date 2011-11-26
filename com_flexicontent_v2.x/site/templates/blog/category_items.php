@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 978 2011-11-24 02:56:50Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 980 2011-11-25 00:07:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -110,6 +110,7 @@ if ($this->limitstart == 0) :
     			<?php 
     			if ($this->params->get('lead_use_image', 1)) :
     				if ($this->params->get('lead_image')) :
+    					FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('lead_image'), $values=null, $method='display');
 							if (isset($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
 								$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
 								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
@@ -208,6 +209,7 @@ if ($this->limitstart == 0) :
 				
 				<p>
 				<?php
+				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
 				if ($this->params->get('lead_strip_html', 1)) :
 				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
 				else :
@@ -332,6 +334,7 @@ if ($this->limitstart == 0) :
     			<?php 
     			if ($this->params->get('intro_use_image', 1)) :
     				if ($this->params->get('intro_image')) :
+							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('intro_image'), $values=null, $method='display');
 							if (isset($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
 								$dir{$i}	= $items[$i]->fields[$this->params->get('intro_image')]->parameters->get('dir');
 								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('intro_image')]->value[0]);
@@ -430,6 +433,7 @@ if ($this->limitstart == 0) :
 
 				<p>
 				<?php
+				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
 				if ($this->params->get('intro_strip_html', 1)) :
 				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
 				else :

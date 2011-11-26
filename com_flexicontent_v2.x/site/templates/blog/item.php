@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 920 2011-10-05 02:17:09Z ggppdk $
+ * @version 1.5 stable $Id: item.php 989 2011-11-26 08:41:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -69,6 +69,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 		<?php if (($this->params->get('show_author')) && ($this->item->creator != "")) : ?>
 		<span class="createdline">
 			<span class="createdby">
+				<?php FlexicontentFields::getFieldDisplay($this->item, 'created_by', $values=null, $method='display'); ?>
 				<?php echo JText::sprintf('FLEXI_WRITTEN_BY', $this->fields['created_by']->display); ?>
 			</span>
 			<?php endif; ?>
@@ -79,6 +80,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	
 			<?php if ($this->params->get('show_create_date')) : ?>
 			<span class="created">
+				<?php FlexicontentFields::getFieldDisplay($this->item, 'created', $values=null, $method='display'); ?>
 				<?php echo '['.JHTML::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>		
 			</span>
 			<?php endif; ?>
@@ -87,6 +89,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 		<span class="modifiedline">
 			<?php if (($this->params->get('show_modifier')) && ($this->item->modifier != "")) : ?>
 			<span class="modifiedby">
+				<?php FlexicontentFields::getFieldDisplay($this->item, 'modified_by', $values=null, $method='display'); ?>
 				<?php echo JText::_('FLEXI_LAST_UPDATED').' '.JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
 			</span>
 			<?php endif; ?>
@@ -97,6 +100,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 			
 			<?php if (intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) : ?>
 				<span class="modified">
+				<?php FlexicontentFields::getFieldDisplay($this->item, 'modified', $values=null, $method='display'); ?>
 				<?php echo '['.JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
 				</span>
 			<?php endif; ?>
@@ -111,12 +115,14 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 		
 		<?php if ($this->params->get('show_vote', 1)) : ?>
 		<span class="voting">
+		<?php FlexicontentFields::getFieldDisplay($this->item, 'voting', $values=null, $method='display'); ?>
 		<?php echo $this->fields['voting']->display; ?>
 		</span>
 		<?php endif; ?>
 
 		<?php if ($this->params->get('show_favs', 1)) : ?>
 		<span class="favourites">
+			<?php FlexicontentFields::getFieldDisplay($this->item, 'favourites', $values=null, $method='display'); ?>
 			<?php echo $this->fields['favourites']->display; ?>
 		</span>
 		<?php endif; ?>
@@ -157,6 +163,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 	<!-- BOF description block -->
 	<div class="description">
+	<?php FlexicontentFields::getFieldDisplay($this->item, 'text', $values=null, $method='display'); ?>
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
 	<!-- EOF description block -->
@@ -185,11 +192,13 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<div class="itemadditionnal">
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<span class="categories">
+			<?php FlexicontentFields::getFieldDisplay($this->item, 'categories', $values=null, $method='display'); ?>
 			<span class="fclabel"><?php echo $this->fields['categories']->label; ?></span>
 			<span class="fcvalue"><?php echo $this->fields['categories']->display; ?></span>
 		</span>
 		<?php endif; ?>
 
+		<?php FlexicontentFields::getFieldDisplay($this->item, 'tags', $values=null, $method='display'); ?>
 		<?php if ($this->params->get('show_tags', 1) && $this->fields['tags']->display) : ?>
 		<span class="tags">
 			<span class="fclabel"><?php echo $this->fields['tags']->label; ?></span>

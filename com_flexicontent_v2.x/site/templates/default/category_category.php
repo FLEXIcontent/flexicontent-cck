@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_category.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: category_category.php 975 2011-11-23 10:18:14Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
