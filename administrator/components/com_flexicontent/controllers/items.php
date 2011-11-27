@@ -65,8 +65,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		$task		= JRequest::getVar('task');
+		
+		$task	= JRequest::getVar('task');
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
@@ -98,7 +98,8 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ITEM' );
-			JError::raiseError( 500, $model->getError() );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
+			$msg = '';
 			$link 	= 'index.php?option=com_flexicontent&view=item';
 		}
 
@@ -158,8 +159,9 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$model = $this->getModel('items');
 		if(!$model->saveorder($cid, $order)) {
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
-			JError::raiseError(500, $model->getError());
 		} else {
 			$msg = JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
 		}
@@ -207,20 +209,23 @@ class FlexicontentControllerItems extends FlexicontentController
 				else
 				{
 					$msg = JText::_( 'FLEXI_ERROR_COPY_ITEMS' );
-					JError::raiseError( 500, $model->getError() );
+					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+					$msg = '';
 				}
 			}
 			else if ($method == 2) // move only
 			{
+				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($cid) );
+				
 				foreach ($cid as $itemid)
 				{
 					if ( !$model->moveitem($itemid, $maincat, $seccats) )
 					{
 						$msg = JText::_( 'FLEXI_ERROR_MOVE_ITEMS' );
-						JError::raiseError( 500, $model->getError() );
+						JError::raiseWarning( 500, $msg ." " . $model->getError() );
+						$msg = '';
 					}
 				}
-				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($cid) );
 				
 				$cache = &JFactory::getCache('com_flexicontent');
 				$cache->clean();
@@ -237,7 +242,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				else
 				{
 					$msg = JText::_( 'FLEXI_ERROR_COPYMOVE_ITEMS' );
-					JError::raiseError( 500, $model->getError() );
+					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+					$msg = '';
 				}
 			}
 			$link 	= 'index.php?option=com_flexicontent&view=items';
@@ -322,8 +328,11 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$model = $this->getModel('items');
 
-		if(!$model->setitemstate($id, $state)) {
-			JError::raiseError(500, $model->getError());
+		if(!$model->setitemstate($id, $state)) 
+		{
+			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
+			echo $msg . ": " .$model->getError();
+			return;
 		}
 
 		if ( $state == 1 ) {
@@ -438,12 +447,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else {
 
 			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = '';
+				JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			} else {
+				$msg = count($cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
+				$cache = &JFactory::getCache('com_flexicontent');
+				$cache->clean();
 			}
-			
-			$msg = count($cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
@@ -480,7 +490,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model = $this->getModel('items');
 		
 		if(!$model->access( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+			$msg = JText::_( 'FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL' );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
+			$msg = '';
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -666,6 +678,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		echo $rsp;
 	}
+	
 	/**
 	 * Method to fetch the tags form
 	 * 

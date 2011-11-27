@@ -27,14 +27,17 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends JController {
+class FlexicontentControllerItems extends JController
+{
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
+
 		// Register Extra task
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
@@ -55,14 +58,15 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function save() {
+	function save()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$task	= JRequest::getVar('task');
 		$data	= JRequest::getVar('jform', array(), 'post', 'array');
 
-		$model 	= $this->getModel('item');
+		$model = $this->getModel('item');
 		$form 	= $model->getForm($data, false);
 
 		//$validData = & $data;
@@ -72,7 +76,8 @@ class FlexicontentControllerItems extends JController {
 		//echo "<pre>"; print_r($diff_arr); exit();
 		
 		if ( $model->store($validData) ) {
-			switch ($task) {
+			switch ($task)
+			{
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=item&cid='.(int) $model->getId();
 					break;
@@ -98,9 +103,11 @@ class FlexicontentControllerItems extends JController {
 
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ITEM' );
-			JError::raiseError( 500, $model->getError() );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
+			$msg = '';
 			$link 	= 'index.php?option=com_flexicontent&view=item';
 		}
+
 		$this->setRedirect($link, $msg);
 	}
 	
@@ -111,7 +118,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function orderup() {
+	function orderup()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -128,7 +136,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function orderdown() {
+	function orderdown()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -145,7 +154,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function saveorder() {
+	function saveorder()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -154,8 +164,9 @@ class FlexicontentControllerItems extends JController {
 
 		$model = $this->getModel('items');
 		if(!$model->saveorder($cid, $order)) {
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
-			JError::raiseError(500, $model->getError());
 		} else {
 			$msg = JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
 		}
@@ -204,20 +215,23 @@ class FlexicontentControllerItems extends JController {
 				else
 				{
 					$msg = JText::_( 'FLEXI_ERROR_COPY_ITEMS' );
-					JError::raiseError( 500, $model->getError() );
+					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+					$msg = '';
 				}
 			}
 			else if ($method == 2) // move only
 			{
+				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($cid) );
+				
 				foreach ($cid as $itemid)
 				{
 					if ( !$model->moveitem($itemid, $maincat, $seccats) )
 					{
 						$msg = JText::_( 'FLEXI_ERROR_MOVE_ITEMS' );
-						JError::raiseError( 500, $model->getError() );
+						JError::raiseWarning( 500, $msg ." " . $model->getError() );
+						$msg = '';
 					}
 				}
-				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($cid) );
 				
 				//$cache = &JFactory::getCache('com_flexicontent');
 				$cache = FLEXIUtilities::getCache();
@@ -236,7 +250,8 @@ class FlexicontentControllerItems extends JController {
 				else
 				{
 					$msg = JText::_( 'FLEXI_ERROR_COPYMOVE_ITEMS' );
-					JError::raiseError( 500, $model->getError() );
+					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+					$msg = '';
 				}
 			}
 			$link 	= 'index.php?option=com_flexicontent&view=items';
@@ -252,7 +267,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function import() {
+	function import()
+	{		
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
@@ -300,10 +316,12 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function bindextdata() {
+	function bindextdata()
+	{
 		$extdata 	= JRequest::getInt('extdata', '');		
 		$model 		= $this->getModel('items');
 		$rows 		= $model->getUnassociatedItems($extdata);
+		
 		echo ($model->addFlexiData($rows));
 	}
 
@@ -314,14 +332,18 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function setitemstate() {
+	function setitemstate()
+	{
 		$id 	= JRequest::getInt( 'id', 0 );
 		$state 	= JRequest::getVar( 'state', 0 );
 
 		$model = $this->getModel('items');
 		@ob_end_clean();
-		if(!$model->setitemstate($id, $state)) {
-			JError::raiseError(500, $model->getError());
+		if(!$model->setitemstate($id, $state)) 
+		{
+			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
+			echo $msg . ": " .$model->getError();
+			return;
 		}
 
 		if ( $state == 1 ) {
@@ -419,7 +441,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function remove() {
+	function remove()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
@@ -436,15 +459,18 @@ class FlexicontentControllerItems extends JController {
 				$msg = JText::_( 'FLEXI_CANNOT_DELETE_ITEMS' );
 			}
 		} else {
+
 			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = '';
+				JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			} else {
+				$msg = count($cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
+				//$cache = &JFactory::getCache('com_flexicontent');
+				$cache = FLEXIUtilities::getCache();
+				$cache->clean('com_flexicontent_items');
 			}
-			
-			$msg = count($cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-			//$cache = &JFactory::getCache('com_flexicontent');
-			$cache = FLEXIUtilities::getCache();
-			$cache->clean('com_flexicontent_items');
 		}
+		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 
@@ -455,19 +481,22 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function access( ) {
+	function access( )
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id		= (int)$cid[0];
+		$id			= (int)$cid[0];
 		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
 		$access = $accesses[$id];
 
 		$model = $this->getModel('items');
 		
 		if(!$model->saveaccess( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+			$msg = JText::_( 'FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL' );
+			JError::raiseWarning( 500, $msg ." " . $model->getError() );
+			$msg = '';
 		} else {
 			//$cache = &JFactory::getCache('com_flexicontent');
 			$cache = FLEXIUtilities::getCache();
@@ -533,7 +562,8 @@ class FlexicontentControllerItems extends JController {
 	 * @return void
 	 * @since 1.0
 	 */
-	function edit() {		
+	function edit()
+	{		
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
@@ -558,6 +588,7 @@ class FlexicontentControllerItems extends JController {
 		}
 
 		$model->checkout( $user->get('id') );
+
 		parent::display();
 	}
 
@@ -613,26 +644,7 @@ class FlexicontentControllerItems extends JController {
 		echo $rsp;
 	}
 	
-	/**
-	 * Method to get hits
-	 * 
-	 * @since 1.0
-	 */
-	function gethits() {
-		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel('item');
-		
-		@ob_end_clean();
-		$hits 	= $model->gethits($id);
-		
-		if ($hits) {
-			echo $hits;
-		} else {
-			echo 0;
-		}
-		exit;
-	}
-	
+
 	/**
 	 * Method to fetch the votes
 	 * 
@@ -650,6 +662,27 @@ class FlexicontentControllerItems extends JController {
 			echo $score.'% | '.$vote;
 		} else {
 			echo JText::_( 'FLEXI_NOT_RATED_YET' );
+		}
+		exit;
+	}
+
+	/**
+	 * Method to get hits
+	 * 
+	 * @since 1.0
+	 */
+	function gethits()
+	{
+		$id 	= JRequest::getInt('id', 0);
+		$model 	= $this->getModel('item');
+		
+		@ob_end_clean();
+		$hits 	= $model->gethits($id);
+
+		if ($hits) {
+			echo $hits;
+		} else {
+			echo 0;
 		}
 		exit;
 	}

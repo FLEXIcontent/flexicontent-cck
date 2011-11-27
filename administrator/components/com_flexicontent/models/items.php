@@ -1079,6 +1079,11 @@ class FlexicontentModelItems extends JModel
 		global $mainframe, $option;
 		
 		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
+		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
+		if ($filter_subcats) {
+			$this->setError( JText::_( 'FLEXI_CANNOT_SAVEORDER_SUBCAT_ITEMS' ) );
+			return false;
+		}
 
 		if ($filter_cats == '' || $filter_cats == 0)
 		{
