@@ -68,9 +68,11 @@ $date_display = $params->get('date_display');
 // get module fields parameters
 $use_fields 			= $params->get('use_fields');
 $display_label 			= $params->get('display_label');
+$text_after_label 	= $params->get('text_after_label');
 $fields 				= $params->get('fields');
 // featured
 $display_label_feat 	= $params->get('display_label_feat');
+$text_after_label_feat 	= $params->get('text_after_label_feat');
 $fields_feat 			= $params->get('fields_feat');
 
 // module display params

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 989 2011-11-26 08:41:51Z ggppdk $
+ * @version 1.5 stable $Id: item.php 990 2011-11-26 09:08:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -50,7 +50,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"><a href='javascript:;'>
+	<h2 class="contentheading<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"><span class='fc_item_title'>
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -58,7 +58,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 			echo $this->item->title;
 		endif;
 		?>
-	</a></h2>
+	</span></h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
 

@@ -144,7 +144,7 @@ if ($this->items) :
 				<?php if ($this->params->get('show_title', 1)) : ?>
 		   		<th scope="row" class="table-titles">
 		   			<?php if ($this->params->get('link_titles', 0)) : ?>
-		   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+		   			<a class='fc_item_title' href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
 		   			<?php
 		   			else :
 		   			echo $item->title;
