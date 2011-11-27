@@ -168,7 +168,7 @@ $twocols = $params->get('item_columns', 1) == 2;
 						<?php foreach ($item->fields as $k => $field) : ?>
 						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label_feat) : ?>
-							<span class="field_label"><?php echo $field->label . ': '; ?></span>
+							<span class="field_label"><?php echo $field->label . $text_after_label_feat; ?></span>
 							<?php endif; ?>
 							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
@@ -234,7 +234,7 @@ $twocols = $params->get('item_columns', 1) == 2;
 						<?php foreach ($item->fields as $k => $field) : ?>
 						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label) : ?>
-							<span class="field_label"><?php echo $field->label . ': '; ?></span>
+							<span class="field_label"><?php echo $field->label . $text_after_label; ?></span>
 							<?php endif; ?>
 							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>

@@ -580,12 +580,10 @@ class FlexicontentModelItems extends JModel
 		// Merge type parameters into the page configuration (Priority 2)
 		$tparams = new JParameter($tparams);
 		$params->merge($tparams);
-		echo $params->get('show_title', 'not set');
 
 		// Merge item parameters into the page configuration (Priority 1)
 		$iparams = new JParameter($this->_item->attribs);
 		$params->merge($iparams);
-		echo $iparams->get('show_title', 'not set');
 
 /*
 		// Set the popup configuration option based on the request

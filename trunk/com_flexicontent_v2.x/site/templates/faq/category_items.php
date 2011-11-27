@@ -194,7 +194,7 @@ foreach ($cat_items as $catid => $items) :
 				<?php if ($this->params->get('show_title', 1)) : ?>
 		   		<li class='flexi-field flexi-title'>
 		   			<?php if ($this->params->get('link_titles', 0)) : ?>
-		   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+		   			<a class='fc_item_title' href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
 		   			<?php
 		   			else :
 		   			echo $item->title;

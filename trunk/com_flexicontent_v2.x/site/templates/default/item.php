@@ -50,7 +50,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading flexicontent"><a href='javascript:;'>
+	<h2 class="contentheading flexicontent"><span class='fc_item_title'>
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -58,7 +58,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 			echo $this->item->title;
 		endif;
 		?>
-	</a></h2>
+	</span></h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
 

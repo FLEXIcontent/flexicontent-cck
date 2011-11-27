@@ -285,17 +285,21 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		
 		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="text_after_label" type="text" default="" label="Text after label" description="The text that will be displayed after the label and before the field values(s)" />
 		<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
+
 		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 		<param name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="text_after_label" type="text" default="" label="Text after label" description="The text that will be displayed after the label and before the field values(s)" />
 		<param name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
   <param name="" type="jparamstab" description="FLEXI_MODULE_DISPLAY_PARAMS" />
