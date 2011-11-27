@@ -25,6 +25,8 @@ window.addEvent("domready", function() {
 });
 ');
 }
+
+$r = 0;
 ?>
 
 <form id="flexicontent-searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="get" name="searchForm">
@@ -190,7 +192,7 @@ window.addEvent("domready", function() {
 			<?php else:?>
 		
 			<tr>
-				<td colspan="3">>
+				<td colspan="3">
 				<input type="hidden" name="areas[]" value="flexicontent" id="area_flexicontent" />
 				</td>
 			</tr>	

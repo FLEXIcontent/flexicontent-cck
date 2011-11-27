@@ -342,11 +342,21 @@ class FlexicontentModelCategory extends JModelList{
 		if (empty($this->_data)) {
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
+			
+			if ($this->_db->getErrorNum()) {
+				echo $query."<br>";
+				echo $this->_db->getErrorMsg()."<br>";
+			}
 
 			if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
 			} else {
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
+			}
+			
+			if ($this->_db->getErrorNum()) {
+				echo $query."<br>";
+				echo $this->_db->getErrorMsg()."<br>";
 			}
 		}
 		return $this->_data;

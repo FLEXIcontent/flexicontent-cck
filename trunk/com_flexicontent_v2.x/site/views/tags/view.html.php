@@ -72,10 +72,18 @@ class FlexicontentViewTags extends JView
 		}
 		
 		$items 	= & $this->get('Data');
-        $tag	= & $this->get('Tag');
-        $total 	= & $this->get('Total');
+		$tag	= & $this->get('Tag');
+		$total 	= & $this->get('Total');
         
-        //set 404 if category doesn't exist or access isn't permitted
+		// @TODO check that as it seems to be dirty :(
+		$uri  			=& JFactory::getURI();
+		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$ucanonical 	= $base .'/'. FlexicontentHelperRoute::getTagRoute($tag->id);
+		if ($params->get('add_canonical', 1)) {
+			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+		}
+		        
+		//set 404 if category doesn't exist or access isn't permitted
 		if ( empty($tag) ) {
 			return JError::raiseError( 404, JText::sprintf( 'Tag #%d not found', $tid ) );
 		}

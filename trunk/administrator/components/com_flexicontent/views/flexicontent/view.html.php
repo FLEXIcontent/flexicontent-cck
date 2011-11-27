@@ -293,7 +293,8 @@ class FlexicontentViewFlexicontent extends JView
 	
 	function getUpdateComponent()
 	 {
-	 	$url = 'http://www.flexicontent.org/flexicontent_update.xml';
+		//$url = 'http://www.flexicontent.org/flexicontent_update.xml';
+		$url = 'http://http://flexicontent.googlecode.com/files/latest_j15.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
@@ -325,11 +326,14 @@ class FlexicontentViewFlexicontent extends JView
 			$errstr = '';
 
 			//timeout handling: 5s for the socket and 5s for the stream = 10s
-			$fsock = @fsockopen("www.flexicontent.org", 80, $errno, $errstr, 5);
+			//$fsock = @fsockopen("www.flexicontent.org", 80, $errno, $errstr, 5);
+			$fsock = @fsockopen("flexicontent.googlecode.com", 80, $errno, $errstr, 5);
 		
 			if ($fsock) {
-				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
-				@fputs($fsock, "HOST: www.flexicontent.org\r\n");
+				//@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
+				//@fputs($fsock, "HOST: www.flexicontent.org\r\n");
+				@fputs($fsock, "GET /files/latest_j15.xml HTTP/1.1\r\n");
+				@fputs($fsock, "HOST: flexicontent.googlecode.com\r\n");
 				@fputs($fsock, "Connection: close\r\n\r\n");
         
 				//force stream timeout...

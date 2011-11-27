@@ -71,7 +71,7 @@ if($this->check['connect'] == 0) {
 		} elseif( $this->check['current'] == -1 ) {
 			echo '<b><font color="red">'.JText::_( 'FLEXI_OLD_VERSION_INSTALLED' ).'</font></b>';
 		} else {
-			echo '<b><font color="orange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</font></b>';
+			echo '<b><font color="darkred">'.JText::_( 'You have installed a newer version than the latest officially stable version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</font></b>';
 		}
 	?>
 	</td>
