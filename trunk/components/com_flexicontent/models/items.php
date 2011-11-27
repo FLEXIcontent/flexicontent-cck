@@ -549,9 +549,26 @@ class FlexicontentModelItems extends JModel
 	{
 		global $mainframe;
 
-		// Get the page/component configuration
+		// Get the page/component configuration (Priority 4)
 		$params = clone($mainframe->getParams('com_flexicontent'));
-
+		
+		// Merge parameters from current category
+		if ($cid = JRequest::getVar( 'cid', 0 ) ) {
+			$query = 'SELECT c.params'
+					. ' FROM #__categories AS c'
+					. ' WHERE c.id = ' . (int)$cid
+					;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+			$catparams = new JParameter($catparams);
+			
+			// Prevent some params from propagating ...
+			$catparams->set('show_title', '');
+			
+			// Merge categories parameters (Priority 3)
+			$params->merge($catparams);
+		}
+		
 		$query = 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
@@ -560,13 +577,15 @@ class FlexicontentModelItems extends JModel
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		
-		// Merge type parameters into the page configuration
+		// Merge type parameters into the page configuration (Priority 2)
 		$tparams = new JParameter($tparams);
 		$params->merge($tparams);
+		echo $params->get('show_title', 'not set');
 
-		// Merge item parameters into the page configuration
+		// Merge item parameters into the page configuration (Priority 1)
 		$iparams = new JParameter($this->_item->attribs);
 		$params->merge($iparams);
+		echo $iparams->get('show_title', 'not set');
 
 /*
 		// Set the popup configuration option based on the request

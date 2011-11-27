@@ -106,6 +106,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="show_title" type="list" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
+				<option value="">Use Global</option>
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
 			<field name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW/HIDE_THE_INTRO_TEXT">
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_HIDE</option>
