@@ -171,7 +171,8 @@ class flexicontent_html
 	 */
 	function mailbutton($view, &$params, $slug = null, $itemslug = null )
 	{
-		if ( $params->get('show_email_icon') && !JRequest::getCmd('print') ) {
+		if ( file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )
+				&& $params->get('show_email_icon') && !JRequest::getCmd('print') ) {
 
 			$uri    =& JURI::getInstance();
 			$base  	= $uri->toString( array('scheme', 'host', 'port'));
