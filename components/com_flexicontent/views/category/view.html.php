@@ -139,6 +139,14 @@ class FlexicontentViewCategory extends JView
 
 
 		$document->setTitle( $params->get( 'page_title' ) );
+		
+		// @TODO check that as it seems to be dirty :(
+		$uri  			=& JFactory::getURI();
+		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$ucanonical 	= $base . '/'. FlexicontentHelperRoute::getCategoryRoute($category->slug);
+		if ($params->get('add_canonical', 1)) {
+			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+		}
 
 		if ($mainframe->getCfg('MetaTitle') == '1') {
 				$mainframe->addMetaTag('title', $category->title);

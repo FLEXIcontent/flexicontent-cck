@@ -31,7 +31,7 @@ $sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Weblink';
 
 // french
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_FAVOURITES'] = 'Mes favoris';
-$sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_SEARCH'] = 'Search';
+$sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_SEARCH'] = 'Recherche';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_TAGS'] = 'Tags';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT'] = 'Annuaire';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_EDIT'] = 'Editer';
@@ -39,7 +39,14 @@ $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_ADD'] = 'Ajouter';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_DOWNLOAD'] = 'Télécharger';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Lien web';
 
-
-
+// greek
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_FAVOURITES'] = 'Τα αγαπημένα μου';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_SEARCH'] = 'Αναζήτηση';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_TAGS'] = 'Ετικέτες';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT'] = 'Κατάλογος';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_EDIT'] = 'Επεξεργασία';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_ADD'] = 'Προσθήκη';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_DOWNLOAD'] = 'Μεταφόρτωση';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Ιστοσύνδεσμος';
 
 ?>
