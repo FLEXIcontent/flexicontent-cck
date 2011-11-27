@@ -9,11 +9,6 @@
 	<description>Modular item layout suitable for faq, file manager, or directory</description>
 	<params addpath="/administrator/components/com_flexicontent/elements">
 		<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-		<param name="show_title" type="list" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
-			<option value="">Use Global</option>
-			<option value="0">No</option>
-			<option value="1">Yes</option>
-		</param>
 		<param name="top_cols" type="list" default="two" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC"> 
 			<option value="">Use Global</option>
 			<option value="one">FLEXI_1_COL</option>

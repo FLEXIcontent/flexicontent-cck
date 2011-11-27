@@ -539,9 +539,26 @@ class FlexicontentModelItem extends ParentClassItem
 		$mainframe = &JFactory::getApplication();
 		jimport('joomla.html.parameter');
 
-		// Get the page/component configuration
+		// Get the page/component configuration (Priority 4)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 
+		// Merge parameters from current category
+		if ($cid = JRequest::getVar( 'cid', 0 ) ) {
+			$query = 'SELECT c.params'
+					. ' FROM #__categories AS c'
+					. ' WHERE c.id = ' . (int)$cid
+					;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+			$catparams = new JParameter($catparams);
+			
+			// Prevent some params from propagating ...
+			$catparams->set('show_title', '');
+			
+			// Merge categories parameters (Priority 3)
+			$params->merge($catparams);
+		}
+		
 		$query = 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
@@ -550,15 +567,15 @@ class FlexicontentModelItem extends ParentClassItem
 		$this->_db->setQuery($query);
 		$typeparams = $this->_db->loadResult();
 		
-		// Merge TYPE parameters into the page configuration
+		// Merge TYPE parameters into the page configuration (Priority 2)
 		$typeparams = new JParameter($typeparams);
 		$params->merge($typeparams);
 
-		// Merge ITEM parameters into the page configuration
+		// Merge ITEM parameters into the page configuration (Priority 1)
 		$itemparams = new JParameter($this->_item->attribs);
 		$params->merge($itemparams);
 
-		// Merge ACCESS permissions into the page configuration
+		// Merge ACCESS permissions into the page configuration (Priority 0)
 		$accessperms = $this->_getItemAccess();
 		$params->merge($accessperms);
 
