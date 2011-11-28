@@ -29,6 +29,7 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewItem extends JView {
 	var $_type='';
+	var $_name='Item';
 	
 	/**
 	 * Creates the item page
