@@ -218,8 +218,9 @@ class FlexicontentFields
 	  // Field not found, this is either due to no access or wrong name ...
 	  $item->onDemandFields[$fieldname]->noaccess = false;
 	  if ($field->name!=$fieldname) {
+		  $item->onDemandFields[$fieldname]->label = 'not found for this type of item';
 	  	$item->onDemandFields[$fieldname]->noaccess = true;
-	  	$item->onDemandFields[$fieldname]->{$method} = "not found or no access";
+	  	$item->onDemandFields[$fieldname]->{$method} = "not found for this type of item or no access";
 	  	return $item->onDemandFields[$fieldname]->{$method};
 	  }
 	  	  

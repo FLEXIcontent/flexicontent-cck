@@ -172,7 +172,7 @@ class FlexicontentModelTags extends JModel
 		
 		// Add sort items by custom field.
 		$field_item = '';
-		if (JRequest::getVar('orderbycustomfieldid', 0) != 0) {
+		if ($params->get('orderbycustomfieldid', 0) != 0) {
 			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
 		}
 
@@ -192,7 +192,7 @@ class FlexicontentModelTags extends JModel
 		 . ' GROUP BY i.id'
 		 . $orderby
 		 ;
-		 return $query;
+		return $query;
 	}
 
 
@@ -216,7 +216,7 @@ class FlexicontentModelTags extends JModel
 		if (JRequest::getVar('orderbycustomfieldid', '' )) {
 			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
 		} else {
-			JRequest::setVar('orderbycustomfieldid', $params->set('orderbycustomfieldid', '') );
+			JRequest::setVar('orderbycustomfieldid', $params->get('orderbycustomfieldid', '') );
 		}
 		if (JRequest::getVar('orderbycustomfieldint', '' )) {
 			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
