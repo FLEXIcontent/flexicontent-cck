@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 336 2010-06-25 10:11:52Z emmanuel.danan $
+ * @version 1.5 stable $Id: tags.php 986 2011-11-25 15:16:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -168,10 +168,10 @@ class FlexicontentModelTags extends JModel
 		
 		// Add sort items by custom field.
 		$field_item = '';
-		if (JRequest::getVar('orderbycustomfieldid', 0) != 0) {
+		if ($params->get('orderbycustomfieldid', 0) != 0) {
 			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
 		}
-		
+
 		$query = 'SELECT i.id, i.title, i.*, ie.*,'
 		 . ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 		 . ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -190,6 +190,7 @@ class FlexicontentModelTags extends JModel
 		 ;
 		return $query;
 	}
+
 
 	/**
 	 * Build the order clause
@@ -213,7 +214,7 @@ class FlexicontentModelTags extends JModel
 		if (JRequest::getVar('orderbycustomfieldid', '' )) {
 			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
 		} else {
-			JRequest::setVar('orderbycustomfieldid', $params->set('orderbycustomfieldid', '') );
+			JRequest::setVar('orderbycustomfieldid', $params->get('orderbycustomfieldid', '') );
 		}
 		if (JRequest::getVar('orderbycustomfieldint', '' )) {
 			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
