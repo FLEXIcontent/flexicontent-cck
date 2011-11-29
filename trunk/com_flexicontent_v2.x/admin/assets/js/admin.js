@@ -36,6 +36,12 @@ Joomla.submitform = function (pressbutton){
 			if (typeof form.onsubmit == "function") {
 				form.onsubmit();
 			}
+
+			// Execute submit
+			if (typeof form.fireEvent == "function") {
+				form.fireEvent('submit');
+			}
+
 			// Submit the form
 			form.submit();
 		} else {
@@ -52,6 +58,11 @@ Joomla.submitform = function (pressbutton){
 		// Execute onsubmit
 		if (typeof form.onsubmit == "function") {
 			form.onsubmit();
+		}
+
+		// Execute submit
+		if (typeof form.fireEvent == "function") {
+			form.fireEvent('submit');
 		}
 		// Submit the form
 		form.submit();
