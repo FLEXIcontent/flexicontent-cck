@@ -215,12 +215,19 @@ class FlexicontentViewItems extends JView
 		}
 
 		// Just put item's text (description field) inside property 'text' in case the events modify the given text,
-		$item->text = @$item->fields['text']->display;
+		$item->text = isset($item->fields['text']->display) ? $item->fields['text']->display : '';
 		
-		// Maybe here not to import all plugins but just those for description field ?
+		// Maybe here not to import all plugins but just those for description field ???
+		// Anyway these events are usually not very time consuming, so lets trigger all of them ???
 		JPluginHelper::importPlugin('content');
 		
+		// Set the view and option to 'article' and 'com_content'
+		JRequest::setVar('view', 'article');
+		JRequest::setVar('option', 'com_content');
+		JRequest::setVar("isflexicontent", "yes");
+		
 		// These events return text that could be displayed at appropriate positions by our templates
+		$item->event = new stdClass();
 		
 		$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
@@ -231,8 +238,12 @@ class FlexicontentViewItems extends JView
 		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
-		// Put text back into the description field
-		$item->fields['text']->display = $item->text;
+		// Set the view and option back to 'items' and 'com_flexicontent'
+	  JRequest::setVar('view', 'items');
+	  JRequest::setVar('option', 'com_flexicontent');
+		
+		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
+		$item->fields['text']->display = & $item->text;
 				
 		$pathway 	=& $mainframe->getPathWay();
 		if (count($globaltypes) > 0) {

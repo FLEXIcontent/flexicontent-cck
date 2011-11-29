@@ -23,6 +23,14 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
 
+  <!-- BOF beforeDisplayContent -->
+  <?php if ($this->item->event->beforeDisplayContent) : ?>
+		<div class='fc_beforeDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->beforeDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF beforeDisplayContent -->
+	
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
@@ -61,6 +69,15 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	</span></h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
+	
+  <!-- BOF afterDisplayTitle -->
+  <?php if ($this->item->event->afterDisplayTitle) : ?>
+		<div class='fc_afterDisplayTitle' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayTitle; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayTitle -->
+
 
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($this->item->positions['subtitle1'])) : ?>
@@ -208,4 +225,12 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF comments -->
 
+  <!-- BOF afterDisplayContent -->
+  <?php if ($this->item->event->afterDisplayContent) : ?>
+		<div class='fc_afterDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayContent -->
+	
 </div>

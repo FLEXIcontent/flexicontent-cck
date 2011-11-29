@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 976 2011-11-23 10:53:36Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: item.php 996 2011-11-27 22:49:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -23,10 +23,18 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
 
+  <!-- EOF beforeDisplayContent -->
+  <?php if ($this->item->event->beforeDisplayContent) : ?>
+		<div class='fc_beforeDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->beforeDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF beforeDisplayContent -->
+	
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( 'items', $this->params, null , $this->item->slug );
+	$mailbutton = flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {
@@ -61,6 +69,15 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	</span></h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
+	
+  <!-- EOF afterDisplayTitle -->
+  <?php if ($this->item->event->afterDisplayTitle) : ?>
+		<div class='fc_afterDisplayTitle' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayTitle; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayTitle -->
+
 
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($this->item->positions['subtitle1'])) : ?>
@@ -208,4 +225,12 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF comments -->
 
+  <!-- EOF afterDisplayContent -->
+  <?php if ($this->item->event->afterDisplayContent) : ?>
+		<div class='fc_afterDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayContent -->
+	
 </div>

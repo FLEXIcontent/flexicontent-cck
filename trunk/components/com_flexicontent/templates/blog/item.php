@@ -23,6 +23,14 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
 
+  <!-- BOF beforeDisplayContent -->
+  <?php if ($this->item->event->beforeDisplayContent) : ?>
+		<div class='fc_beforeDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->beforeDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF beforeDisplayContent -->
+	
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
@@ -61,6 +69,14 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	</span></h2>
 	<?php endif; ?>
 	<!-- EOF item title -->
+	
+  <!-- BOF afterDisplayTitle -->
+  <?php if ($this->item->event->afterDisplayTitle) : ?>
+		<div class='fc_afterDisplayTitle' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayTitle; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayTitle -->
 
 	<!-- BOF item informations -->
 	<?php if ((intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($this->item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($this->item->modified) !=0))) : ?>
@@ -129,17 +145,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	</div>
 	<?php endif; ?>
 	<!-- EOF item rating, favourites -->
-
-	<!-- BOF event afterDisplayTitle -->
-	<?php if (!$this->params->get('show_intro')) :
-		echo $this->item->event->afterDisplayTitle;
-	endif; ?>
-	<!-- EOF event afterDisplayTitle -->
-
-	<!-- BOF event beforeDisplayContent -->
-	<?php echo $this->item->event->beforeDisplayContent; ?>
-	<!-- EOF event beforeDisplayContent -->
-
+	
 	<!-- BOF TOC -->
 	<?php if (isset($this->item->toc)) : ?>
 		<?php echo $this->item->toc; ?>
@@ -183,10 +189,6 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF afterdescription block -->
 	
-	<!-- BOF event afterDisplayContent -->
-	<?php echo $this->item->event->afterDisplayContent; ?>
-	<!-- EOF event afterDisplayContent -->
-
 	<!-- BOF item categories, tags -->
 	<?php if (($this->params->get('show_tags', 1)) || ($this->params->get('show_category', 1)))  : ?>
 	<div class="itemadditionnal">
@@ -231,4 +233,12 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF comments -->
 
+  <!-- BOF afterDisplayContent -->
+  <?php if ($this->item->event->afterDisplayContent) : ?>
+		<div class='fc_afterDisplayContent' style='clear:both;'>
+			<?php echo $this->item->event->afterDisplayContent; ?>
+		</div>
+	<?php endif; ?>
+  <!-- EOF afterDisplayContent -->
+	
 </div>
