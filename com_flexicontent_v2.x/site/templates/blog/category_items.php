@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 980 2011-11-25 00:07:26Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 990 2011-11-26 09:08:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -89,6 +89,15 @@ if ($this->limitstart == 0) :
 		?>
 		<li>
 			<div style="overflow: hidden;">
+					
+				  <!-- BOF beforeDisplayContent -->
+				  <?php if ($items[$i]->event->beforeDisplayContent) : ?>
+						<div class='fc_beforeDisplayContent' style='clear:both;'>
+							<?php echo $items[$i]->event->beforeDisplayContent; ?>
+						</div>
+					<?php endif; ?>
+				  <!-- EOF beforeDisplayContent -->
+
 					<?php if ($this->params->get('show_editbutton', 0)) : ?>
 						<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
 						<?php if ($editbutton) : ?>
@@ -107,6 +116,15 @@ if ($this->limitstart == 0) :
     			?>
     			</h2>
     			<?php endif; ?>
+	    				
+				  <!-- BOF afterDisplayTitle -->
+				  <?php if ($items[$i]->event->afterDisplayTitle) : ?>
+						<div class='fc_afterDisplayTitle' style='clear:both;'>
+							<?php echo $items[$i]->event->afterDisplayTitle; ?>
+						</div>
+					<?php endif; ?>
+				  <!-- EOF afterDisplayTitle -->
+					
     			<?php 
     			if ($this->params->get('lead_use_image', 1)) :
     				if ($this->params->get('lead_image')) :
@@ -288,7 +306,15 @@ if ($this->limitstart == 0) :
     				</a>
     			</span>
     			<?php endif; ?>
-
+			    
+			    <!-- BOF afterDisplayContent -->
+			    <?php if ($items[$i]->event->afterDisplayContent) : ?>
+						<div class='afterDisplayContent' style='clear:both;'>
+							<?php echo $items[$i]->event->afterDisplayContent; ?>
+						</div>
+					<?php endif; ?>
+			    <!-- EOF afterDisplayContent -->
+					
 			</div>
 		</li>
 		<?php endfor; ?>
@@ -312,7 +338,15 @@ if ($this->limitstart == 0) :
 		<?php for ($i=($this->limitstart == 0 ? $leadnum : 0 ); $i<$count; $i++) : ?>
 		<li class="<?php echo (($this->limitstart == 0) ? ($i+$leadnum)%2 : $i%2) ? 'even' : 'odd'; ?>">
 			<div style="overflow: hidden;">
-				
+					
+				  <!-- BOF beforeDisplayContent -->
+				  <?php if ($items[$i]->event->beforeDisplayContent) : ?>
+						<div class='fc_beforeDisplayContent' style='clear:both;'>
+							<?php echo $items[$i]->event->beforeDisplayContent; ?>
+						</div>
+					<?php endif; ?>
+				  <!-- EOF beforeDisplayContent -->
+
 					<?php if ($this->params->get('show_editbutton', 0)) : ?>
 						<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
 						<?php if ($editbutton) : ?>
@@ -331,6 +365,15 @@ if ($this->limitstart == 0) :
     				?>
     			</h2>
     			<?php endif; ?>
+					
+				  <!-- BOF afterDisplayTitle -->
+				  <?php if ($items[$i]->event->afterDisplayTitle) : ?>
+						<div class='fc_afterDisplayTitle' style='clear:both;'>
+							<?php echo $items[$i]->event->afterDisplayTitle; ?>
+						</div>
+					<?php endif; ?>
+				  <!-- EOF afterDisplayTitle -->
+					
     			<?php 
     			if ($this->params->get('intro_use_image', 1)) :
     				if ($this->params->get('intro_image')) :
@@ -512,7 +555,15 @@ if ($this->limitstart == 0) :
     				</a>
     			</span>
     			<?php endif; ?>
-
+			    
+			    <!-- BOF afterDisplayContent -->
+			    <?php if ($items[$i]->event->afterDisplayContent) : ?>
+						<div class='afterDisplayContent' style='clear:both;'>
+							<?php echo $items[$i]->event->afterDisplayContent; ?>
+						</div>
+					<?php endif; ?>
+			    <!-- EOF afterDisplayContent -->
+					
 			</div>
 		</li>
 		<?php endfor; ?>

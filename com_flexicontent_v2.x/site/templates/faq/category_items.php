@@ -181,7 +181,15 @@ foreach ($cat_items as $catid => $items) :
 			<ul class='flexi-itemlist'>
 			<?php foreach ($items as $item) : ?>
 				<li class='flexi-item'>
-				
+					
+				  <!-- BOF beforeDisplayContent -->
+				  <?php if ($item->event->beforeDisplayContent) : ?>
+						<div class='fc_beforeDisplayContent' style='clear:both;'>
+							<?php echo $item->event->beforeDisplayContent; ?>
+						</div>
+					<?php endif; ?>
+				  <!-- EOF beforeDisplayContent -->
+
 				<?php if ($this->params->get('show_editbutton', 0)) : ?>
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
@@ -203,7 +211,15 @@ foreach ($cat_items as $catid => $items) :
 					</li>
 				<?php endif; ?>
 				<!-- BOF item title -->
-				
+	    				
+			  <!-- BOF afterDisplayTitle -->
+			  <?php if ($item->event->afterDisplayTitle) : ?>
+					<div class='fc_afterDisplayTitle' style='clear:both;'>
+						<?php echo $item->event->afterDisplayTitle; ?>
+					</div>
+				<?php endif; ?>
+			  <!-- EOF afterDisplayTitle -->
+						  
 				<!-- BOF item fields block aftertitle -->
 				<?php
 				foreach ($columns['aftertitle'] as $name => $label) :
@@ -217,7 +233,15 @@ foreach ($cat_items as $catid => $items) :
 				<?php endforeach; ?>
 				</ul>
 				<!-- EOF item fields block aftertitle -->
-					
+			    
+		    <!-- BOF afterDisplayContent -->
+		    <?php if ($item->event->afterDisplayContent) : ?>
+					<div class='afterDisplayContent' style='clear:both;'>
+						<?php echo $item->event->afterDisplayContent; ?>
+					</div>
+				<?php endif; ?>
+		    <!-- EOF afterDisplayContent -->
+				
 				</li>
 			<?php endforeach; ?>
 			</ul>
