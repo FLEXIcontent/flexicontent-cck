@@ -145,8 +145,8 @@ class FlexicontentModelTags extends JModel
 
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
-        // Get the WHERE and ORDER BY clauses for the query
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params = $this->_loadTagParams();
+		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
@@ -173,7 +173,7 @@ class FlexicontentModelTags extends JModel
 		// Add sort items by custom field.
 		$field_item = '';
 		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
 
 		$query = 'SELECT i.id, i.title, i.*, ie.*,'
@@ -204,27 +204,8 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
-		// 1. Get the active menu item
-		$menu =& JSite::getMenu();
-		$item =& $menu->getActive();
-		$params = (!$item) ? new JParameter("") : new JParameter($item->params);
-		
-		// Higher Priority: prefer from http request than menu item
-		if (JRequest::getVar('orderby', '' )) {
-			$params->set('orderby', JRequest::getVar('orderby') );
-		}
-		if (JRequest::getVar('orderbycustomfieldid', '' )) {
-			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
-		} else {
-			JRequest::setVar('orderbycustomfieldid', $params->get('orderbycustomfieldid', '') );
-		}
-		if (JRequest::getVar('orderbycustomfieldint', '' )) {
-			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
-		}
-		if (JRequest::getVar('orderbycustomfielddir', '' )) {
-			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
-		}
-		
+		$params = $this->_loadTagParams();
+				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
 
@@ -380,6 +361,51 @@ class FlexicontentModelTags extends JModel
         
 		return $this->_tag;
 	}
+	
+	
+	/**
+	 * Method to load parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadTagParams()
+	{
+		global $mainframe;
+		static $_params = null;
+		
+		if ($_params) return $_params;
+		
+		// a. Get the PAGE/COMPONENT parameters
+		$params 	= & $mainframe->getParams('com_flexicontent');
+		
+		// Get menu
+		$menu =& JSite::getMenu();
+		$item =& $menu->getActive();
+		$mparams = (!$item) ? new JParameter("") : new JParameter($item->params);
+		
+		// b. Merge menu parameters
+		$params->merge($mparams);
+		
+		// c. Higher Priority: prefer from http request than menu item
+		if (JRequest::getVar('orderby', '' )) {
+			$params->set('orderby', JRequest::getVar('orderby') );
+		}
+		if (JRequest::getVar('orderbycustomfieldid', '' )) {
+			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
+		}
+		if (JRequest::getVar('orderbycustomfieldint', '' )) {
+			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
+		}
+		if (JRequest::getVar('orderbycustomfielddir', '' )) {
+			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
+		}
+		
+		$_params = $params;
+		
+		return $_params;
+	}	
 	
 	/**
 	 * Method to store the tag

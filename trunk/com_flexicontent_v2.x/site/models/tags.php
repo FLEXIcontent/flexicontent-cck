@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 986 2011-11-25 15:16:41Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 999 2011-11-28 06:27:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -141,8 +141,8 @@ class FlexicontentModelTags extends JModel
 	{   	
 		$user		= & JFactory::getUser();
 		$gid = max ($user->getAuthorisedViewLevels());
-        // Get the WHERE and ORDER BY clauses for the query
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$params = $this->_loadTagParams();
+		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
@@ -169,7 +169,7 @@ class FlexicontentModelTags extends JModel
 		// Add sort items by custom field.
 		$field_item = '';
 		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
 
 		$query = 'SELECT i.id, i.title, i.*, ie.*,'
@@ -200,29 +200,8 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
-		jimport( 'joomla.html.parameter' );
-		
-		// 1. Get the active menu item
-		$menu =& JSite::getMenu();
-		$item =& $menu->getActive();
-		$params = (!$item) ? new JParameter("") : new JParameter($item->params);
-		
-		// Higher Priority: prefer from http request than menu item
-		if (JRequest::getVar('orderby', '' )) {
-			$params->set('orderby', JRequest::getVar('orderby') );
-		}
-		if (JRequest::getVar('orderbycustomfieldid', '' )) {
-			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
-		} else {
-			JRequest::setVar('orderbycustomfieldid', $params->get('orderbycustomfieldid', '') );
-		}
-		if (JRequest::getVar('orderbycustomfieldint', '' )) {
-			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
-		}
-		if (JRequest::getVar('orderbycustomfielddir', '' )) {
-			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
-		}
-		
+		$params = $this->_loadTagParams();
+				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
 
@@ -313,8 +292,14 @@ class FlexicontentModelTags extends JModel
 		$user		= & JFactory::getUser();
 		$gid = max ($user->getAuthorisedViewLevels());
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
-		// shortcode of the site active language (joomfish)
+		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		$filtertag  = $params->get('filtertag', 0);
 
 		// First thing we need to do is to select only the requested items
@@ -368,6 +353,51 @@ class FlexicontentModelTags extends JModel
         
 		return $this->_tag;
 	}
+	
+	
+	/**
+	 * Method to load content article parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadTagParams()
+	{
+		jimport( 'joomla.html.parameter' );
+		static $_params = null;
+		
+		if ($_params) return $_params;
+		
+		// a. Get the PAGE/COMPONENT parameters
+		$params = & JComponentHelper::getParams('com_flexicontent');
+		
+		// Get menu
+		$menu =& JSite::getMenu();
+		$item =& $menu->getActive();
+		$mparams = (!$item) ? new JParameter("") : new JParameter($item->params);
+		
+		// b. Merge menu parameters
+		$params->merge($mparams);
+		
+		// c. Higher Priority: prefer from http request than menu item
+		if (JRequest::getVar('orderby', '' )) {
+			$params->set('orderby', JRequest::getVar('orderby') );
+		}
+		if (JRequest::getVar('orderbycustomfieldid', '' )) {
+			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
+		}
+		if (JRequest::getVar('orderbycustomfieldint', '' )) {
+			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
+		}
+		if (JRequest::getVar('orderbycustomfielddir', '' )) {
+			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
+		}
+		
+		$_params = $params;
+		
+		return $_params;
+	}	
 	
 	/**
 	 * Method to store the tag
