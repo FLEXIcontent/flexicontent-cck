@@ -44,7 +44,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="item_columns" type="list" default="1" label="Columns for standard items" description="Featured items always appear full width, standard items can appear in 1 or more columns">
+		<param name="item_columns" type="list" default="1" label="FLEXI_COLS_DEFAULT_ITEMS" description="FLEXI_COLS_DEFAULT_ITEMS_DESC">
 			<option value="1">1</option>
 			<option value="2">2</option>
 		</param>
@@ -182,7 +182,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="mod_do_stripcat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
+		<param name="mod_do_stripcat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT_DESC" >
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
@@ -196,7 +196,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="mod_do_stripcat_feat" type="radio" default="1" label="Strip tags and cut text" description="Controls whether the text will be stripped of html tags and then cut to a maximum length" >
+		<param name="mod_do_stripcat_feat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT" >
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
@@ -239,11 +239,11 @@
 		<param name="mod_width_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 		<param name="mod_height_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 		
-		<param name="" type="separator" default="Dates parameters" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_DATE_PARAMS" level="level1" menu="hide" />
 		
-		<param name="display_date" type="radio" default="1" label="Display Date" >
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+		<param name="display_date" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		
 		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
@@ -251,11 +251,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="date_type" type="list" default="1" label="Display Date Type" >
-			<option value="0">Modified</option>
-			<option value="1">Created</option>
+		<param name="date_type" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
+			<option value="0">FLEXI_MODIFIED</option>
+			<option value="1">FLEXI_CREATED</option>
 		</param>
-		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="What date" >
+		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -268,11 +268,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="date_type_feat" type="list" default="1" label="Display Date Type" >
-			<option value="0">Modified</option>
-			<option value="1">Created</option>
+		<param name="date_type_feat" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
+			<option value="0">FLEXI_MODIFIED</option>
+			<option value="1">FLEXI_CREATED</option>
 		</param>
-		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="What date" >
+		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -291,7 +291,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="text_after_label" type="text" default="" label="Text after label" description="The text that will be displayed after the label and before the field values(s)" />
+		<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
 		<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
 		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
@@ -299,7 +299,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="text_after_label" type="text" default="" label="Text after label" description="The text that will be displayed after the label and before the field values(s)" />
+		<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
 		<param name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
   <param name="" type="jparamstab" description="FLEXI_MODULE_DISPLAY_PARAMS" />
@@ -337,18 +337,18 @@
 		<param name="currcat_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 		<param name="currcat_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 		
-		<param name="" type="separator" default="More parameters" level="level1" menu="hide" />
-		<param name="show_more" type="radio" default="0" label="Show More" description="Show a Link at the bottom of the module that links to the category page - or whatever page you want.">
+		<param name="" type="separator" default="FLEXI_MORE_PARAMS" level="level1" menu="hide" />
+		<param name="show_more" type="radio" default="0" label="FLEXI_DISPLAY_SHOW_MORE" description="FLEXI_DISPLAY_SHOW_MORE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="more_title" type="text" default="" label="More Title" description="The text of the link. &lt;br/&gt; &lt;b&gt; Leave blank for language default:&lt;/b&gt; More from this category" size="40" />
-		<param name="more_link" type="text" default="index.php" label="More Link" description="The link to the page you want the user to be redirected when clicking the" />
-		<param name="more_blank" type="radio" default="0" label="Open in new window" description="Open the 'Other Articles' link in a new window or tab.">
+		<param name="more_title" type="text" default="" label="FLEXI_SHOW_MORE_TITLE" description="FLEXI_SHOW_MORE_TITLE_DESC" size="40" />
+		<param name="more_link" type="text" default="index.php" label="FLEXI_SHOW_MORE_LINK" description="FLEXI_SHOW_MORE_LINK" />
+		<param name="more_blank" type="radio" default="0" label="FLEXI_SHOW_MORE_NEW_WINDOW" description="FLEXI_SHOW_MORE_NEW_WINDOW_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="more_css" type="textarea" cols="30" rows="3" default="" label="CSS - More..." description="CSS code to apply on the 'More Articles...' link at the bottom of the module." />
+		<param name="more_css" type="textarea" cols="30" rows="3" default="" label="FLEXI_SHOW_MORE_CSS" description="FLEXI_SHOW_MORE_CSS_DESC" />
 		
   <param name="" type="jparamstab" description="FLEXI_CUSTOM_PARAMS" />
 		<param name="custom1" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM1" description="FLEXI_CUSTOM_DESC" />
