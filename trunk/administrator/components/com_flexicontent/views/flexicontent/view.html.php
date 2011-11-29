@@ -294,7 +294,7 @@ class FlexicontentViewFlexicontent extends JView
 	function getUpdateComponent()
 	 {
 		//$url = 'http://www.flexicontent.org/flexicontent_update.xml';
-		$url = 'http://http://flexicontent.googlecode.com/files/latest_j15.xml';
+		$url = 'http://flexicontent.googlecode.com/files/latest_j15.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
