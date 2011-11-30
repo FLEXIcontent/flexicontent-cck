@@ -132,11 +132,24 @@ class FlexicontentModelItem extends ParentClassItem
 		}
 		// Initialise variables.
 		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-		//$pk = (!empty($pk)) ? $pk : (int) $this->getState('article.id');
 
-		//if ($this->_item === null) {
-		//	$this->_item = array();
-		//}
+		$preview = JRequest::getVar('preview');
+		if($preview) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			if ( !($permission->CanEdit || $permission->CanEditOwn) ) {
+				//cannot edit
+				JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
+				return;
+			}
+			$lversion = JRequest::getVar('version');//loaded version
+			$lversion = $lversion?$lversion:FLEXIUtilities::getLastVersions($pk, true);//latest version
+			$cversion = FLEXIUtilities::getCurrentVersions($pk, true);
+			if($lversion!=$cversion) {
+				$warning = "This version of the document IS NOT YET CURRENT, the administrator must approved it before it becomes current and visible to the public";
+				JError::raiseWarning(403, $warning);
+			}
+			JRequest::setVar('lversion', $lversion);
+		}
 
 		if (!isset($this->_item[$pk])) {
 
@@ -152,7 +165,7 @@ class FlexicontentModelItem extends ParentClassItem
 					'a.mask, a.catid, a.created, a.created_by, a.created_by_alias, ' .
 					'a.modified, a.modified_by, a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, ' .
 					'a.images, a.urls, a.attribs, a.version, a.parentid, a.ordering, ' .
-					'a.metakey, a.metadesc, a.access, a.hits, a.metadata, a.featured, a.language, a.xreference'
+					'a.metakey, a.metadesc, a.access, a.hits, a.metadata, a.featured, a.language, a.xreference'.($preview?',ver.version_id':'')
 					)
 				);
 				$query->from('#__content AS a');
@@ -201,6 +214,12 @@ class FlexicontentModelItem extends ParentClassItem
 				$subquery .= 'WHERE parent.extension = ' . $db->quote('com_content');
 				$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
 				$query->join('LEFT OUTER', $subquery . ' AS badcats ON badcats.id = c.id');
+				
+				//preview mode
+				if($preview) {
+					$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = a.id');
+					$query->where("ver.version_id = '" . $lversion . "'");
+				}
 
 				// Filter by published state.
 				$published = $this->getState('filter.published');
@@ -213,6 +232,19 @@ class FlexicontentModelItem extends ParentClassItem
 				$db->setQuery($query);
 
 				$data = $db->loadObject();
+				
+		if($preview) {
+			$user	= & JFactory::getUser();
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $data->id);
+	
+			// TODO: correct individual item access check
+			if ( !($permission->CanEdit || ($permission->CanEditOwn && $data->created_by == $user->get('id')) || in_array('edit', $rights)) ) {
+				//cannot edit
+				JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
+				return;
+			}
+			$data = $this->loadUnapprovedVersion($data, $lversion);
+		}
 
 				if ($error = $db->getErrorMsg()) {
 					throw new Exception($error);
@@ -252,6 +284,37 @@ class FlexicontentModelItem extends ParentClassItem
 
 		//return $this->_item[$pk];
 		return $this->_item;
+	}
+	
+	/**
+	* Method to load unapproved version
+	*/
+	function &loadUnapprovedVersion(&$data, $lversion) {
+		$db = &JFactory::getDBO();
+		$jfields = flexicontent_html::getJCoreFields(NULL, true, true);
+		$query = "SELECT f.field_type,f.name,ftr.field_id, iv.valueorder, value FROM #__flexicontent_items_versions as iv"
+			. " JOIN #__flexicontent_fields_type_relations as ftr ON iv.field_id=ftr.field_id"
+			. " JOIN #__flexicontent_fields as f ON iv.field_id=f.id"
+			. " WHERE ftr.type_id='{$data->type_id}' AND iv.version='{$lversion}' AND iv.item_id='{$data->id}'"
+			. " AND published='1' AND iscore='1'"
+			;
+		$db->setQuery($query);
+		$objs = $db->loadObjectList();
+		$objs = $objs ? $objs : array();
+		foreach($objs as $obj) {
+			$v = @json_decode($obj->value);
+			if($v) {
+				$obj->value = $v;
+			}
+			if(isset($jfields[$obj->field_type]) && isset($data->$jfields[$obj->field_type])) {
+				if(@json_decode($obj->value)) {
+					$data->$jfields[$obj->field_type] = json_decode($obj->value);
+				}else{
+					$data->$jfields[$obj->field_type] = $obj->value;
+				}
+			}
+		}
+		return $data;
 	}
 
 	/**

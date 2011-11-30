@@ -486,6 +486,7 @@ class FlexicontentViewItem extends JView {
 		 * More info at http://www.joomlaworks.gr and http://k2.joomlaworks.gr
 		 * Designed and developed by the JoomlaWorks team
 		 */
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'views'.DS.'item'.DS.'tmpl');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');

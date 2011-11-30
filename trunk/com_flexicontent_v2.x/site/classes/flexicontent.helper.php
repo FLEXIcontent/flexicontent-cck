@@ -1050,21 +1050,41 @@ class flexicontent_html
 		return array($html1, $html2);
 	}
 
-	function getJCoreFields($ffield=NULL, $mapcorefield=false) {
-		$flexifield = array(
-			'text'=>'maintext',
-			'created'=>'created',
-			'created_by'=>'createdby',
-			//'modified'=>'modified',
-			//'modified_by'=>'modifiedby',
-			'title'=>'title',
-			'hits'=>'hits',
-			//'document_type'=>'type',
-			'version'=>'version',
-			'state'=>'state'
-		);
-		if($mapcorefield) {
-			$flexifield['introtext'] = 'maintext';
+	function getJCoreFields($ffield=NULL, $mapcorefield=false, $swap=false) {
+		if(!$swap) {//core field=>flexicontent field
+			$flexifield = array(
+				'catid'=>'categories',
+				'text'=>'maintext',
+				'created'=>'created',
+				'created_by'=>'createdby',
+				//'modified'=>'modified',
+				//'modified_by'=>'modifiedby',
+				'title'=>'title',
+				'hits'=>'hits',
+				//'document_type'=>'type',
+				'version'=>'version',
+				'state'=>'state'
+			);
+			if($mapcorefield) {
+				$flexifield['introtext'] = 'maintext';
+			}
+		}else{//flexicontent field=>core field
+			$flexifield = array(
+				'categories'=>'catid',
+				'maintext'=>'text',
+				'created'=>'created',
+				'createdby'=>'created_by',
+				//'modified'=>'modified',
+				//'modifiedby'=>'modified_by',
+				'title'=>'title',
+				'hits'=>'hits',
+				//'type'=>'document_type',
+				'version'=>'version',
+				'state'=>'state'
+			);
+			if($mapcorefield) {
+				$flexifield['maintext'] = 'introtext';
+			}
 		}
 		if($ffield===NULL) return $flexifield;
 		return isset($flexifield[$ffield])?$flexifield[$ffield]:NULL;
