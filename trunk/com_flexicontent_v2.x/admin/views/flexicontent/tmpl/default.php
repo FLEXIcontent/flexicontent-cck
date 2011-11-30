@@ -174,7 +174,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
 						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
 						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
 						<td>
@@ -216,7 +216,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
 						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
 						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -258,7 +258,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
 						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
 						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -300,7 +300,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						$canConfig =  JAccess::check($user->id, 'core.admin', 'root.1');
 						$canEdit 		= in_array('core.edit', $rights) || $canConfig;
 						$canEditOwn		= (in_array('core.edit.own', $rights) && ($row->created_by == $user->id)) || $canConfig;
-						$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
