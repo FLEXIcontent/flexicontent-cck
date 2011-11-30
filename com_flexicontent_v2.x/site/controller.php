@@ -295,7 +295,8 @@ class FlexicontentController extends JController
 		
 		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 		$permission = FlexicontentHelperPerm::getPerm();
-		
+		$cid = (int)JRequest::getVar('cid', 0);
+		$item->load($cid);
 		// TODO: correct individual item access check
 		if ( $permission->CanEdit || ( $permission->CanEditOwn && $item->created_by == $user->get('id') ) || in_array('edit', $rights) ) {
 			$item->checkin($data['id']);
