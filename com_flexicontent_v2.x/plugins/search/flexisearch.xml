@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.7" type="plugin" group="search" >
-	<name>PLG_SEARCH_FLEXISEARCH</name>
+	<name>PLG_SEARCH_FLEXISTDSEARCH</name>
 	<author>Aazam</author>
 	<creationDate>oct 2011</creationDate>
 	<copyright>Copyright (C) 2011 Aazam</copyright>
