@@ -326,7 +326,7 @@ class FlexicontentFields
 				/*} else if (!is_array($field->parameters->get('plugins'))) {
 					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				*/} else {
-					foreach ($field->parameters->get('plugins') as $plg) {
+					foreach (explode('|',$field->parameters->get('plugins')) as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
