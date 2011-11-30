@@ -213,14 +213,22 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
-		<div class="flexi_buttons">
-            <button type="submit" class="button" onclick="return submitbutton('save')">
-        	    <?php echo JText::_( 'FLEXI_SAVE' ) ?>
-        	</button>
-        	<button type="reset" class="button" onclick="submitbutton('cancel')">
-        	    <?php echo JText::_( 'FLEXI_CANCEL' ) ?>
-        	</button>
-        </div>
+	<div class="flexi_buttons">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid'))).'&preview=1';?>" target="_blank">
+			<button type="button" class="button" onclick="javascript:;">
+				<?php echo JText::_( 'FLEXI_PREVIEW' ) ?>
+			</button>
+		</a>
+		<button type="submit" class="button" onclick="javascript:return submitbutton('save_a_preview');">
+			<?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?>
+		</button>
+		<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
+			<?php echo JText::_( 'FLEXI_SAVE' ) ?>
+		</button>
+		<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
+			<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
+		</button>
+	</div>
          
         <br class="clear" />
 	

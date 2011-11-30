@@ -184,7 +184,7 @@ class FlexicontentFields
 		$item->vote			= @$vote 				? $vote 			: '';
 		
 		if ($item->fields) {
-			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields);
+			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, isset($item->version_id)?$item->version_id:$item->version);
 		}
 		
 		return $item;
@@ -433,12 +433,17 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function _getFieldsvalues($item, $fields)
+	function _getFieldsvalues($item, $fields, $version=0)
 	{
+		$preview = JRequest::getVar('preview');
+		if($preview) {
+			$lversion = $version?$version:JRequest::setVar('lversion');
+		}
 		$db =& JFactory::getDBO();
 		$query = 'SELECT field_id, value'
-				.' FROM #__flexicontent_fields_item_relations'
+				.($preview?' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id = ' . (int)$item
+				.($preview?' AND version=' . (int)$lversion:'')
 				.' ORDER BY field_id, valueorder'
 				;
 		$db->setQuery($query);

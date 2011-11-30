@@ -37,6 +37,9 @@ class FlexicontentController extends JController
 	function __construct()
 	{
 		parent::__construct();
+		
+		// Register Extra task
+		$this->registerTask( 'save_a_preview', 'save');
 	}
 
 	/**
@@ -256,7 +259,12 @@ class FlexicontentController extends JController
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
-
+		$task = JRequest::getVar('task');
+		if($task=='save_a_preview') {
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid), false).'&preview=1';
+			$this->setRedirect($link);
+			return;
+		}
 		if ($user->authorize('com_flexicontent', 'state') )
 		{
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
