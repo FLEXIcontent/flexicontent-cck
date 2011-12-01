@@ -54,19 +54,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
-		$display_comments	= $field->parameters->get('display-comments', 1);
-		$display_resizer	= $field->parameters->get('display-resizer', 1);
-		$display_print 		= $field->parameters->get('display-print', 1);
-		$display_email 		= $field->parameters->get('display-email', 1);
-		$display_voice 		= $field->parameters->get('display-voice', 1);
-		$display_pdf 		= $field->parameters->get('display-pdf', 1);
-		$display_social 	= $field->parameters->get('display-social', 1);
-		$load_css 			= $field->parameters->get('load-css', 1);
-		$addthis_user		= $field->parameters->get('addthis-user', '');
-		$spacer_size		= $field->parameters->get('spacer-size', 21);
+		$display_comments	= $field->parameters->get('display_comments', 1);
+		$display_resizer	= $field->parameters->get('display_resizer', 1);
+		$display_print 		= $field->parameters->get('display_print', 1);
+		$display_email 		= $field->parameters->get('display_email', 1);
+		$display_voice 		= $field->parameters->get('display_voice', 1);
+		$display_pdf 		= $field->parameters->get('display_pdf', 1);
+		$display_social 	= $field->parameters->get('display_social', 1);
+		$load_css 			= $field->parameters->get('load_css', 1);
+		$addthis_user		= $field->parameters->get('addthis_user', '');
+		$spacer_size		= $field->parameters->get('spacer_size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
-		$default_size 		= $field->parameters->get('default-size', 12);
-		$default_line 		= $field->parameters->get('default-line', 16);
+		$default_size 		= $field->parameters->get('default_size', 12);
+		$default_line 		= $field->parameters->get('default_line', 16);
 		$target 			= $field->parameters->get('target', 'flexicontent');
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 

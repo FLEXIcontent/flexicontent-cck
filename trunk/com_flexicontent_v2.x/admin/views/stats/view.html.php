@@ -53,6 +53,8 @@ class FlexicontentViewStats extends JView{
 		$votesstats	= & $this->get( 'Votesstats' );
 		$creators	= & $this->get( 'Creators' );
 		$editors	= & $this->get( 'Editors' );
+		
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
