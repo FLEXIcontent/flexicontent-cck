@@ -56,18 +56,39 @@
 	display: block;
 }
 
+/* This is one column*/
 .fclabel {
 	font-weight:bold;
 	width:200px;
 	display:block;
 	float:left;
+	min-height:25px;
+	vertical-align:middle;
 }
 
 .fcvalue {
 	padding-left: 5px;
 	display:block;
 	clear:right;
+	min-height:25px;
+	vertical-align:middle;
 }
+
+/* This is two columns*/
+/*.fclabel {
+	font-weight:bold;
+	width:200px;
+	display:block;
+	float:left;
+	padding-left: 20px;
+}
+
+.fcvalue {
+	padding-left: 5px;
+	display:block;
+	//clear:right;
+	float:left;
+}*/
 
 .customblock {
 	padding: 1%;
