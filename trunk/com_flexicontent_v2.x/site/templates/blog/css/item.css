@@ -56,13 +56,19 @@
 	display: block;
 }
 
-.fcvalue {
-	padding-left: 5px;
-}
-
 .fclabel {
 	font-weight:bold;
+	width:200px;
+	display:block;
+	float:left;
 }
+
+.fcvalue {
+	padding-left: 5px;
+	display:block;
+	clear:right;
+}
+
 .customblock {
 	padding: 1%;
 	border: 1px solid #dddddd;
@@ -75,6 +81,6 @@
 
 .customblock .element {
 	display:block;
-	float:left;
+	/*float:left;*/
 	margin-right: 20px;
 }
