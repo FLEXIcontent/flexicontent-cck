@@ -235,6 +235,9 @@ class FLEXIcontentViewSearch extends JView
 		}
 		$this->result	= JText::sprintf( 'FLEXI_TOTALRESULTSFOUND', $total );
 
+		$print_link = JRoute::_('&pop=1&tmpl=component&print=1');
+		
+		$this->assignRef('print_link',  $print_link);
 		$this->assignRef('pagination',  $pagination);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('results',		$results);

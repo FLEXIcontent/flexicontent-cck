@@ -8,7 +8,14 @@
 </div>
 <?php endif; ?>
 
-<?php echo $this->loadTemplate('form'); ?>
+<?php 
+
+if (!JRequest::getVar('print',0)) {
+	echo flexicontent_html::printbutton( $this->print_link, $this->params );
+}
+?>
+
+<?php if (!JRequest::getVar('print',0)) echo $this->loadTemplate('form'); ?>
 <?php if(!$this->error && count($this->results) > 0) :
 	echo $this->loadTemplate('results');
 else :
