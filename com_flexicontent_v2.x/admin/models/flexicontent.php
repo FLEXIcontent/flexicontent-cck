@@ -173,7 +173,7 @@ class FlexicontentModelFlexicontent extends JModel
 		}*/
 		
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' AND id='{$_component_default_menuitem_id}'";
+		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' AND id='{$_component_default_menuitem_id}' AND access=1";
 		$this->_db->setQuery($query);
 		$count = $this->_db->loadResult();
 			
