@@ -29,7 +29,7 @@ window.addEvent("domready", function() {
 $r = 0;
 ?>
 
-<form id="searchForm" action="index.php" method="get" name="searchForm">
+<form id="flexicontent-searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="get" name="searchForm">
 	
 	<fieldset id='fc_search_set_advsearch' class='fc_search_set'>
 		<legend><?php echo JText::_('FLEXI_BASIC_SEARCH'); ?></legend>

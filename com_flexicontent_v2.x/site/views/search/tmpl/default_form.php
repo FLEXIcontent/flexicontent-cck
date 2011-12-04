@@ -79,7 +79,7 @@ $r = 0;
 			<?php if (!$autodisplayextrafields) : ?>
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td colspan="3" class="fc_search_option_cell">
-					<a href="javascript:;" id="advancedsearchtext"><?php echo $this->params->get('linkadvsearch_txt', 'Advanced Search');?></a>
+					<a href="javascript:;" id="advancedsearchtext"><?php echo JText::_('FLEXI_ADVANCED_SEARCH'); ?></a>
 				</td>
 			</tr>
 			<?php endif; ?>
@@ -248,6 +248,7 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 ?>
 <input type="hidden" name="ordering" value="<?php echo $default_searchordering;?>" />
 <?php } ?>
-
+<input type="hidden" name="option" value="com_flexicontent" />
+<input type="hidden" name="task" value="search" />
 <input type="hidden" name="Itemid" value="<?php echo JRequest::getVar("Itemid");?>" />
 </form>
