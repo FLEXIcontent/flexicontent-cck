@@ -104,7 +104,7 @@
 			<option value="1">1st sublevel</option> 
 			<option value="2">All sublevels</option> 
 		</param> 
-		<param name="filtercat" type="radio" default="0" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
+		<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
 			<option value="">Use Global</option>
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>

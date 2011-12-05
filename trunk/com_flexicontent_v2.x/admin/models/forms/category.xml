@@ -141,7 +141,7 @@
 				<option value="0">FLEXI_NO</option> 
 				<option value="1">FLEXI_YES</option> 
 			</field> 
-			<field name="filtercat" type="radio" default="0" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
+			<field name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
