@@ -222,15 +222,16 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		//echo "<pre>"; foreach ($tree as $index => $cat) echo "$index\n";
 		//exit();
-
+		
+		$ri_field_name  = str_replace('-','_',$field->name);
 		$field->html .= "<div style='float:left;margin-right:16px;'>Select Category:<br>\n";
-		$field->html .= flexicontent_cats::buildcatselect($allowedtree, $field->name.'_fccats', $catvals="", false, ' class="inputbox" '.$size, true);
+		$field->html .= flexicontent_cats::buildcatselect($allowedtree, $ri_field_name.'_fccats', $catvals="", false, ' class="inputbox" '.$size, true);
 		$field->html .= "</div>\n";
 		
 		$field->html  .= "&nbsp;&nbsp;&nbsp;";
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Category Items:<br>\n";
-		$field->html .= '<select id="'.$field->name.'_visitems" name="'.$field->name.'_visitems[]" multiple="multiple" style="min-width:140px;" class="" '.$size.' >'."\n";
+		$field->html .= '<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" style="min-width:140px;" class="" '.$size.' >'."\n";
 		$field->html .= '</select>'."\n";
 		$field->html .= "</div>\n";
 		
@@ -243,14 +244,14 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/filterlist.js' );
 
 			$field->html.=	'
-				<br /><input id="'.$field->name.'_regexp" name="'.$field->name.'_regexp" onKeyUp="'.$field->name.'_titlefilter.set(this.value)" size="20" />
-				<br /><input type="button" onClick="'.$field->name.'_titlefilter.set(this.form.'.$field->name.'_regexp.value)" value="'.JText::_('FLEXI_FIELD_FILTER').'" style="margin-top:6px;" />
-				<input type="button" onClick="'.$field->name.'_titlefilter.reset();this.form.'.$field->name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_FIELD_RESET').'" style="margin-top:6px;" />
+				<br /><input id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="20" />
+				<br /><input type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_FIELD_FILTER').'" style="margin-top:6px;" />
+				<input type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_FIELD_RESET').'" style="margin-top:6px;" />
 				
 				<script type="text/javascript">
 				<!--
-				var filteredfield = document.getElementById("'.$field->name.'_visitems");
-				var '.$field->name.'_titlefilter = new filterlist( filteredfield );
+				var filteredfield = document.getElementById("'.$ri_field_name.'_visitems");
+				var '.$ri_field_name.'_titlefilter = new filterlist( filteredfield );
 				//-->
 				</script>
 				';
@@ -283,17 +284,17 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$field->name.'" name="custom['.$field->name.'][]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;"  '.$size.' >';
+		$field->html .= '<select id="'.$ri_field_name.'" name="'.$ri_field_name.'[]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
-		$field->html .= '<select id="'.$field->name.'_selitems" name="'.$field->name.'_selitems[]" multiple="multiple" style="min-width:140px;" '.$size.' >';
+		$field->html .= '<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" style="min-width:140px;" '.$size.' >';
 		$field->html .= $items_options;
 		$field->html .= '</select>'."\n";
 		
 		$field->html .= "</div>\n";
 		
-		$field->html .= '<select id="'.$field->name.'_hiditems" name="'.$field->name.'_hiditems" style="display:none;" >';
+		$field->html .= '<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" >';
 		$field->html .= $items_options_unused;
 		$field->html .= '</select>'."\n";
 		
@@ -303,16 +304,16 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 window.addEvent( 'domready', function() {
  
     jQuery('#btn-add').click(function(){
-        jQuery('#".$field->name."_visitems option:selected').each( function() {
-            jQuery('#".$field->name."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
-            jQuery('#".$field->name."').append(\"<option selected='selected' class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+        jQuery('#".$ri_field_name."_visitems option:selected').each( function() {
+            jQuery('#".$ri_field_name."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+            jQuery('#".$ri_field_name."').append(\"<option selected='selected' class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
             jQuery(this).remove();
         });
     });
     jQuery('#btn-remove').click(function(){
-        jQuery('#".$field->name."_selitems option:selected').each( function() {
-            jQuery('#".$field->name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
-            jQuery(\"#".$field->name." option[value='\"+jQuery(this).val()+\"']\").remove();
+        jQuery('#".$ri_field_name."_selitems option:selected').each( function() {
+            jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+            jQuery(\"#".$ri_field_name." option[value='\"+jQuery(this).val()+\"']\").remove();
             jQuery(this).remove();
         });
     });
@@ -320,25 +321,25 @@ window.addEvent( 'domready', function() {
 });
 
 window.addEvent( 'domready', function() {
-	$('".$field->name."_fccats').addEvent( 'change', function() {
+	$('".$ri_field_name."_fccats').addEvent( 'change', function() {
 		
-		".$field->name."_titlefilter.reset(); this.form.".$field->name."_regexp.value='';
+		". ( $title_filter ? $ri_field_name."_titlefilter.reset(); this.form.".$ri_field_name."_regexp.value='';" : "" ) . "
 		
-	  jQuery('#".$field->name."_visitems option').each( function() {
+	  jQuery('#".$ri_field_name."_visitems option').each( function() {
 	  	var data = jQuery(this).val().split(':'); 
 	  	var itemid = data[0];
-	  	jQuery('#".$field->name."_hiditems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+itemid+\"'>\"+jQuery(this).text()+\"</option>\");
+	  	jQuery('#".$ri_field_name."_hiditems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+itemid+\"'>\"+jQuery(this).text()+\"</option>\");
 	  	jQuery(this).remove();
 		});
 		
-	  jQuery('#".$field->name."_hiditems option').each( function() {
-	  	if ( jQuery(this).hasClass('cat_' + jQuery('#".$field->name."_fccats').attr('value') ) ) {
-			  jQuery('#".$field->name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+jQuery('#".$field->name."_fccats').val()+\"'>\"+jQuery(this).text()+\"</option>\");
+	  jQuery('#".$ri_field_name."_hiditems option').each( function() {
+	  	if ( jQuery(this).hasClass('cat_' + jQuery('#".$ri_field_name."_fccats').attr('value') ) ) {
+			  jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+jQuery('#".$ri_field_name."_fccats').val()+\"'>\"+jQuery(this).text()+\"</option>\");
 				jQuery(this).remove();
 	  	}
 		});
 		
-		".$field->name."_titlefilter.init();
+		". ( $title_filter ? $ri_field_name."_titlefilter.init();" : "" ) . "
 		
 	});
 });";
