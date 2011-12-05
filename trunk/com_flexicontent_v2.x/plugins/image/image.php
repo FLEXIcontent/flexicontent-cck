@@ -68,6 +68,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->value = array($field->value);
 			foreach ($field->value as $value) {
 				$value = unserialize($value);
+				
+				// Check and rebuild thumbnails if needed
+				$this->rebuildThumbs($field,$value);
+				
 				$image = $value['originalname'];
 				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
 				if ($always_allow_removal)
@@ -660,6 +664,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$filename = $value['originalname'];
 		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 		$filepath = $onlypath . $filename;
+		if (!file_exists($filepath)) {
+			echo "Original file seems to have been deleted, cannot find image file: ".$filepath ."<br />\n";
+			return;
+		}
 		$filesize	= getimagesize($filepath);
 		$origsize_h = $filesize[1];
 		$origsize_w = $filesize[0];
@@ -668,15 +676,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		foreach ($sizes as $size)
 		{
 			$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . $size . '_' . $filename);
-			$filesize = getimagesize($path);
-			$filesize_h = $filesize[1];
-			$filesize_w = $filesize[0];
-			$param_h = $field->parameters->get('h_'.$size);
-			$param_w = $field->parameters->get('w_'.$size);
-			$crop = $field->parameters->get('method_'.$size);
+			$thumbnail_exists = false;
+			if (file_exists($path)) {
+				$filesize = getimagesize($path);
+				$filesize_h = $filesize[1];
+				$filesize_w = $filesize[0];
+				$param_h = $field->parameters->get('h_'.$size);
+				$param_w = $field->parameters->get('w_'.$size);
+				$crop = $field->parameters->get('method_'.$size);
+				$thumbnail_exists = true;
+			}
 			
 			// Check if size of file is not same as parameters and recreate the thumbnail
 			if (
+					!$thumbnail_exists ||
 					( $crop==0 && (
 													($origsize_w >= $param_w && $filesize_w != $param_w) &&  // scale width can be larger than it is currently
 													($origsize_h >= $param_h && $filesize_h != $param_h)     // scale height can be larger than it is currently
