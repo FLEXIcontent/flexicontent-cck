@@ -60,7 +60,7 @@ class FlexicontentViewFilemanager extends JView{
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 			'item_id', 			'', 'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -110,7 +110,7 @@ class FlexicontentViewFilemanager extends JView{
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
 		}
-		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 
 		//build secure/media filterlist
 		$secure 	= array();
