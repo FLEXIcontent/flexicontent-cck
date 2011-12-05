@@ -142,7 +142,7 @@ echo $this->pane->endPane();
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-			 	<?php echo $this->lists['items']; ?>
+			 	<?php echo $this->lists['item_id']; ?>
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>

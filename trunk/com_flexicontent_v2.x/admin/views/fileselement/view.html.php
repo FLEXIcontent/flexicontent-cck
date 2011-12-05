@@ -69,7 +69,7 @@ class FlexicontentViewFileselement extends JView
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 		'filter_secure', 	'', 			'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 			'filter_ext', 		'', 			'alnum' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 				'search', 			'', 			'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 				'items', 			0,	 			'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 				'item_id', 			0,	 			'int' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 		
 		$itemid 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.itemid', 'itemid', 0, 'int' );
@@ -152,7 +152,7 @@ class FlexicontentViewFileselement extends JView
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, $item->title . ' (#' . $item->id . ')' );
 		}
-		$lists['items'] = JHTML::_('select.genericlist', $items_list, 'items', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 		
 		//build secure/media filterlist
 		$secure 	= array();

@@ -351,7 +351,7 @@ class FlexicontentModelFileselement extends JModel
 	}
 	
 	function getItems() {
-		// File field relation sub query
+		// FC items list sub query
 		$query	= 'SELECT i.id, i.title'
 				. ' FROM #__content AS i '
 				. ' ORDER BY i.title ASC'
@@ -360,6 +360,7 @@ class FlexicontentModelFileselement extends JModel
 		$lists = $this->_db->loadObjectList();
 		return $lists?$lists:array();
 	}
+	
 	function getFieldName($fieldid) {
 		$db = &JFactory::getDBO();
 		$query = "SELECT name FROM #__flexicontent_fields WHERE id='{$fieldid}';";
