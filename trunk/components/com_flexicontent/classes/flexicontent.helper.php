@@ -1730,6 +1730,40 @@ class FLEXIUtilities {
 		}
 	}
 	
+	
+	function call_Content_Plg_Func( $fieldname, $func, $args=null ) {
+		static $content_plgs;
+		
+		if ( !isset( $content_plgs[$fieldname] ) ) {
+			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
+			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.DS.strtolower($fieldname).'.php';
+			if(file_exists($path)) require_once($path);
+			else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $fieldname\n Please correct field name"),'error');
+				return;
+			}
+			
+			// 2. Create plugin instance
+			$class = "plgContent{$fieldname}";
+			if( class_exists($class) ) {
+				$className = 'plg'.'content'.$fieldname;
+				$dispatcher = &JDispatcher::getInstance();
+				$content_plgs[$fieldname] =  new $className($dispatcher, array());
+			} else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+				return;
+			}
+		}
+		
+		// 3. Execute only if it exists
+		$class = "plgContent{$fieldname}";
+		if(in_array($func, get_class_methods($class))) {
+			call_user_func_array(array($content_plgs[$fieldname], $func), $args);
+		}
+	}
+	
 	/**
 	 * Return unicode char by its code
 	 * Credits: ?
