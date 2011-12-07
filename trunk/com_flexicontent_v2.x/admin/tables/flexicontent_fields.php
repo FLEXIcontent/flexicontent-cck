@@ -79,10 +79,15 @@ class flexicontent_fields extends JTable
 			return false;
 		}
 
-		$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
-
-		if((empty($this->name) || $this->name === $name) && $this->iscore != 1 ) {
-			$this->name = $newname;
+		//$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
+		$pattern = '/^[a-z]+[a-z0-9]+$/i';
+		$matches = NULL;
+		$false = !preg_match($pattern, $this->name, $matches);
+		if((empty($this->name) || $false) && $this->iscore != 1 ) {
+			$name = $this->name;
+			$this->name = 'field' . ($this->_getLastId()+1);//newname
+			$msg = "Your field name is not correct, it was changed from '{$name}' to be {$this->name} already.";
+			JError::raiseWarning(100, $msg);
 		}
 
 		/** check for existing name */
