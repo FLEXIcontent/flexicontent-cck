@@ -76,7 +76,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
-					<tr>
+					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
 						<td class="key">
 							<label for="published">
 								<?php echo JText::_( 'FLEXI_FIELD_IS_SEARCHABLE' ).':'; ?>
@@ -89,7 +89,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
-					<tr>
+					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
 						<td class="key">
 							<label for="published">
 								<?php echo JText::_( 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE' ).':'; ?>
@@ -102,8 +102,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
-					<!-- tr style="display:none;" -->
-					<tr>
+					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
 						<td class="key">
 							<label for="published">
 								<?php echo JText::_( 'FLEXI_FIELD_ISFILTER' ).':'; ?>

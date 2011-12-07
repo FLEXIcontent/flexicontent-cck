@@ -73,8 +73,24 @@ class FlexicontentViewField extends JView {
 		// Import field to execute its constructor, e.g. needed for loading language file etc
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
 		// If constructor does not load language file then this will load it
+
+		//support checking.
+		$supportsearch = true;
+		$supportadvsearch = false;
+		$supportfilter = false;
+		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple');
+		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple');
 		if($row->field_type) {
 			JPlugin::loadLanguage('plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type), JPATH_ADMINISTRATOR);
+			$classname	= 'plgFlexicontent_fields'.($row->iscore ? 'core' : $row->field_type);
+			$classmethods	= get_class_methods($classname);
+			if($row->iscore) {
+				$supportadvsearch = in_array($row->field_type, $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
+				$supportfilter = in_array($row->field_type, $core_filters);
+			}else{
+				$supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
+				$supportfilter = in_array('onDisplayFilter', $classmethods);
+			}
 		}
 				
 		//build selectlists
@@ -152,6 +168,9 @@ class FlexicontentViewField extends JView {
 		$this->assignRef('lists'      	, $lists);
 //		$this->assignRef('tmpls'      	, $tmpls);
 		$this->assignRef('form'			, $form);
+		$this->assignRef('supportsearch', $supportsearch);
+		$this->assignRef('supportadvsearch', $supportadvsearch);
+		$this->assignRef('supportfilter', $supportfilter);
 
 		parent::display($tpl);
 	}
