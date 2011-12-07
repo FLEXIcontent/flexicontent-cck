@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexicontent.ini</language>
+		<language tag="fr-FR">languages/fr-FR.mod_flexicontent.ini</language>
 		<language tag="ru-RU">languages/ru-RU.mod_flexicontent.ini</language>
 	</languages>
 	
