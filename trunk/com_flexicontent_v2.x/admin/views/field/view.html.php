@@ -66,6 +66,26 @@ class FlexicontentViewField extends JView {
 		//Get data from the model
 		$model				= & $this->getModel();
 		$form				= $this->get('Form');
+		
+		//support checking.
+		$this->supportsearch = true;
+		$this->supportadvsearch = false;
+		$this->supportfilter = false;
+		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple');
+		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple');
+		if($form->getValue('field_type')) {
+			JPlugin::loadLanguage('plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type')), JPATH_ADMINISTRATOR);
+			$classname	= 'plgFlexicontent_fields'.($form->getValue("iscore") ? 'core' : $form->getValue('field_type'));
+			$classmethods	= get_class_methods($classname);
+			if($form->getValue("iscore")) {
+				$this->supportadvsearch = in_array($form->getValue('field_type'), $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
+				$this->supportfilter = in_array($form->getValue('field_type'), $core_filters);
+			}else{
+				$this->supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
+				$this->supportfilter = in_array('onDisplayFilter', $classmethods);
+			}
+		}
+		
 		JHTML::_('behavior.tooltip');
 
 		//build field_type list

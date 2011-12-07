@@ -65,7 +65,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('published'); ?>
 						</td>
 					</tr>
-					<tr>
+					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('issearch').':'; ?>
 						</td>
@@ -73,7 +73,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('issearch'); ?>
 						</td>
 					</tr>
-					<tr>
+					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('isadvsearch').':'; ?>
 						</td>
@@ -81,7 +81,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('isadvsearch'); ?>
 						</td>
 					</tr>
-					<tr>
+					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('isfilter').':'; ?>
 						</td>
