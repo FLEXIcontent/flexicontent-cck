@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access'); ?>
 
 <?php
- $basetemplates = array('default', 'blog', 'faq');
+ $basetemplates = array('default', 'blog', 'faq', 'presentation');
 ?>
 
 <form action="index.php" method="post" name="adminForm">

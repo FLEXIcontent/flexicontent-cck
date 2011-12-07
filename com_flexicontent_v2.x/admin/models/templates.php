@@ -122,7 +122,7 @@ class FlexicontentModelTemplates extends JModel
 
 		$path 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
 		
-		if (!$dir || ($dir == 'blog') || ($dir == 'default')) return false;		
+		if (!$dir || ($dir == 'blog') || ($dir == 'default') || ($dir == 'faq') || ($dir == 'presentation')) return false;		
 		if (!JFolder::delete($path.$dir)) return false;
 		
 		// delete old record

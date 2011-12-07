@@ -171,27 +171,35 @@ function submitbutton( pressbutton ) {
 	var validator = document.formvalidator;
 	var title = $(form.title).getValue();
 	title.replace(/\s/g,'');
-//	if(!validator.checkRequired()) return false;
+	//if(!validator.checkRequired()) return false;
 	if ( title.length==0 ) {
-		//alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");
+		/*alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");*/ // commented out because each type may have custom name for title via an template override, and it will be confusing
 		validator.handleResponse(false,form.title);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
-			//form.title.focus();
-			return false;
-	}<?php if(!$cid) {?> else if ( form.cid.selectedIndex == -1 ) {
-		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
+		//form.title.focus();
+		return false;
+	} else if ( typeof form.cid != 'undefined' && typeof form.cid.selectedIndex != 'undefined' && form.cid.selectedIndex == -1 ) {
+		/*alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");*/  // commented out because each type may have custom name for categories via an template override, and it will be confusing
 		validator.handleResponse(false,form.cid);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
 		return false;
-	} <?php } ?>else {
-	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) echo $this->editor->save( 'text' ); ?>
+	} else {
+		<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) : ?>
+			// commented out because each type may have custom name for description via type configutation, and it will be confusing
+			/*var text = <?php echo $this->editor->getContent( 'text' ); ?>
+			if (text == '') {
+				alert ( "<?php echo JText::_( 'Article must have some text', true ); ?>");
+				return false;
+			}*/
+		<?php endif; ?>
+	}
+	
 	submitform(pressbutton);
 	return true;
-	}
 }
 
 function deleteTag(obj) {
@@ -384,10 +392,22 @@ function deleteTag(obj) {
 		
 		<table class="admintable" width="100%">
 			<?php
+			$hidden = array(
+				'fcloadmodule',
+				'fcpagenav',
+				'toolbar'
+			);
+			
 			foreach ($this->fields as $field) {
 				// used to hide the core fields from this listing
-				if ( (!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) && !$field->parameters->get('backend_hidden') ) {
-				// set the specific label for the maintext field
+				if 	(
+						(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
+						&& 
+						(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
+					) 
+				{
+					
+					// set a type specific label, description for the main text field
 					if ($field->field_type == 'maintext')
 					{
 						$field->label = $this->tparams->get('maintext_label', $field->label);
