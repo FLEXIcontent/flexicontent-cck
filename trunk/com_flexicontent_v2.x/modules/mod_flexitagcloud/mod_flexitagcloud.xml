@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.ini</language>
+		<language tag="fr-FR">languages/fr-FR.mod_flexitagcloud.ini</language>
 	</languages>
 
 	<config>
