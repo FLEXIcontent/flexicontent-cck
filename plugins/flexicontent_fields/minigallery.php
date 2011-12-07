@@ -140,21 +140,24 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			#sortables_'.$field->id.' { margin: 0 0 10px 0; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
 				list-style: none;
-				height: 100px;
-				padding-top:10px;
-				}
+				height: 130px;
+				width: 100px;
+				margin: 8px 0px 0px 12px;
+				float:left;
+			}
 			#sortables_'.$field->id.' li img.thumbs {
 				border: 1px solid silver;
-				padding: 0;
-				margin: 0 0 -5px 0;
+				padding: 0;  margin: 0px 0px 6px 0px;
+				float: left; clear:both;
 				}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag'.$field->id.' img {
-				margin: -4px 8px;
-				cursor: move;
-				float: none;
-				display: inline;
+			#sortables_'.$field->id.' li input { float:left; }
+			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-right: 8px; }
+			span.drag'.$field->id.' img {	float:left; cursor: move;	}
+			.button-add {	float:left; clear:both; margin-top:6px;	}
+			.button-add a {
+				display: block; float:left; padding:4px 8px; 
+				background-color: darkred; color:white; color:white!important; font-weight:bold; 
+				border-radius:4px; border:1px solid #eeeeee;
 			}
 			';
 			$document->addStyleDeclaration($css);
@@ -175,10 +178,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
 				$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
-				$field->html .= '<img class="thumbs" src="'.$src.'"/>';
-				$field->html .= '<input type="hidden" id="a_id'.$i.'" name="'.$field->name.'[]" value="'.$file.'" />';
-				$field->html .= '<input class="inputbox fcbutton" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
-				$field->html .= '<span class="drag'.$field->id.'">'.$move.'</span>';
+				$field->html .= ' <img class="thumbs" src="'.$src.'"/>';
+				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$field->name.'[]" value="'.$file.'" />';
+				$field->html .= '  <input class="inputbox fcbutton" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
+				$field->html .= '  <span class="drag'.$field->id.'">'.$move.'</span>';
 				$field->html .= '</li>';
 				$i++;
 			}
