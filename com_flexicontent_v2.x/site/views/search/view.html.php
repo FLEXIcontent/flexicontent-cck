@@ -93,6 +93,7 @@ class FLEXIcontentViewSearch extends JView
 				$field->field_type = 'text';
 			}
 			$label = $field->label;
+			$field->from = 'advsearch';
 			$fieldsearch = @$custom[$field->name];
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			$field->value = isset($fieldsearch[0])?$fieldsearch:array();

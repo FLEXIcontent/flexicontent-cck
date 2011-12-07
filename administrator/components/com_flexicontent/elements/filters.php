@@ -51,7 +51,7 @@ class JElementFilters extends JElement
 		$query = 'SELECT id AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
-		. ' AND field_type IN ("'.$filterstring.'")'
+		. ' AND (field_type IN ("'.$filterstring.'") OR isfilter=1)'
 		. ' ORDER BY label ASC, id ASC'
 		;
 		$db->setQuery($query);
