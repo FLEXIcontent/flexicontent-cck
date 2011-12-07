@@ -253,5 +253,14 @@ class flexicontent_fields extends JTable
 
 		return true;
 	}*/
+	private function _getLastId()
+	{
+		$query  = 'SELECT MAX(id)'
+			. ' FROM #__flexicontent_fields'
+			;
+		$this->_db->setQuery($query);
+		$lastid = $this->_db->loadResult();
+		return (int)$lastid;
+	}
 }
 ?>
