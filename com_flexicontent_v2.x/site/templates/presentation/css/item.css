@@ -1,0 +1,105 @@
+/* Default Theme : item template CSS file */
+div.lineinfo {
+	display: block;
+	margin: 0 0 1em;
+	overflow: hidden;
+	/*border: 3px double silver;*/
+	/*padding:4px;*/
+}
+
+div.subtitle1 {
+}
+div.subtitle2 {
+}
+div.subtitle3 {
+}
+
+div.subtitle1 .element,
+div.subtitle2 .element,
+div.subtitle3 .element {
+	display:block;
+	float: left;
+	margin: 0px 24px 12px 0px;
+}
+
+div.topblock {
+	overflow: hidden;
+	width: 100%;
+	margin-bottom: 10px;
+	/*border:1px solid red;*/
+}
+
+div.topblock .image {
+	border: 2px solid silver;
+	float: left;
+	margin-right: 10px;
+	line-height: 0px;
+}
+div.topblock .image a {
+	outline: none;
+}
+div.topblock .image img {
+	border: 1px solid white;
+}
+div.topblock .infoblock {
+	overflow: hidden;
+}
+
+div.infoblock {
+	border: 1px solid silver;
+	margin: 0 0 10px;
+	padding: 10px;
+}
+#flexicontent div.infoblock ul {
+	margin: 0;
+	padding: 0;
+}
+#flexicontent div.infoblock ul li {
+	padding: 0;
+	background: none;
+	min-height: 10px;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0%;
+	zoom: 1;
+	*display: inline;
+	_height: 10px;
+}
+span.label, div.label {
+	float: left;
+	border-bottom: 1px solid silver;
+	color: #777;
+	font-size: 90%;
+	margin-right: 8px;
+	display:block;
+}
+span.value, div.value {
+	float: left;
+}
+
+div.onecols ul li {
+	width: 100%;
+}
+div.onecols div.label {
+	width: 20%;
+	margin-right: 4%;
+	margin-bottom:6px;
+}
+div.onecols div.value {
+	width: 74%;
+	margin-right: 1%;
+}
+
+div.twocols ul li {
+	width: 48%;
+}
+div.twocols div.label {
+	width: 34%;
+	margin-right: 6%;
+	margin-bottom:6px;
+}
+div.twocols div.value {
+	width: 58%;
+	margin-right: 1%;
+}
