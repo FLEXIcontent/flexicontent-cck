@@ -19,7 +19,8 @@
 		</fieldset>
 	</fields>
 	<fieldgroups>
-		<group readonly="true">title</group>
+		<group readonly="true">subcategory_title</group>
+		<group readonly="true">subcategory_description</group>
 		<group>aftertitle</group>
 	</fieldgroups>	
 	<csscategory>

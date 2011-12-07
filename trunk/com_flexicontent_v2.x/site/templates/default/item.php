@@ -23,7 +23,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
 
-  <!-- EOF beforeDisplayContent -->
+  <!-- BOF beforeDisplayContent -->
   <?php if ($this->item->event->beforeDisplayContent) : ?>
 		<div class='fc_beforeDisplayContent' style='clear:both;'>
 			<?php echo $this->item->event->beforeDisplayContent; ?>
@@ -70,7 +70,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF item title -->
 	
-  <!-- EOF afterDisplayTitle -->
+  <!-- BOF afterDisplayTitle -->
   <?php if ($this->item->event->afterDisplayTitle) : ?>
 		<div class='fc_afterDisplayTitle' style='clear:both;'>
 			<?php echo $this->item->event->afterDisplayTitle; ?>
@@ -225,7 +225,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
 	<!-- EOF comments -->
 
-  <!-- EOF afterDisplayContent -->
+  <!-- BOF afterDisplayContent -->
   <?php if ($this->item->event->afterDisplayContent) : ?>
 		<div class='fc_afterDisplayContent' style='clear:both;'>
 			<?php echo $this->item->event->afterDisplayContent; ?>

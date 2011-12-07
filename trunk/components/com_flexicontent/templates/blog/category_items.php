@@ -74,7 +74,13 @@ if ($count) :
 		<!-- BOF items total-->
 		<?php if ($this->params->get('show_item_total', 1)) : ?>
 		<div id="item_total" class="item_total">
-			<?php echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', count($this->items));?>
+			<?php
+				$currstart = $this->getModel()->_state->limitstart + 1;
+				$currend = $this->getModel()->_state->limitstart + $this->getModel()->_state->limit;
+				$currend = ($currend > $this->getModel()->_total) ? $this->getModel()->_total : $currend;
+				echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', $this->getModel()->_total);
+				echo '&nbsp; &nbsp; ' . JText::sprintf( 'FLEXI_DISPLAYING_RANGE', $currstart, $currend);
+			?>
 		</div>
 		<?php endif; ?>
 		<!-- BOF items total-->
