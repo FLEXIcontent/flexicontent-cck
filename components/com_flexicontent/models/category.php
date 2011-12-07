@@ -895,33 +895,17 @@ class FlexicontentModelCategory extends JModel{
 		}
 		
 		$query  = 'SELECT fi.*'
-			. ' FROM #__flexicontent_fields AS fi'
-			. ' WHERE fi.published = 1'
-			. $where
-			. $scope
-			. ' ORDER BY fi.ordering, fi.name'
-			;
-		$this->_db->setQuery($query);
-		$filters = $this->_db->loadObjectList('name');
-		$item = new stdClass;
-		$item->version = 0;
-		foreach ($filters as $filter) {
-			$filter->item_id		= 0;
-			$filter->from			= 'filter';
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.$filter->field_type.'.xml';
-			$filter->parameters = new JParameter($filter->attribs, $path);
-			$filter->parameters->set( 'use_html', 0 );
-			$filter->parameters->set( 'allow_multiple', 0 );
-			$filter->value = $filter->parameters->get( 'default_value', array() );
-			if( ($filter->field_type == 'title') || ($filter->field_type == 'maintext') || ($filter->field_type == 'textarea')) {
-				$filter->field_type = 'text';
-			}
-			$label = $filter->label;
+				. ' FROM #__flexicontent_fields AS fi'
+				. ' WHERE fi.published = 1'
+				. $where
+				. $scope
+				. ' ORDER BY fi.ordering, fi.name'
+				;
+			$this->_db->setQuery($query);
+			$filters = $this->_db->loadObjectList('name');
 
-			$fieldname = $filter->iscore ? 'core' : $filter->field_type;
-			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayField', array( &$filter, &$item ));
-			
-			$field->label = $label;
+		foreach ($filters as $filter) {
+			$filter->parameters = new JParameter($filter->attribs);
 		}
 		
 		return $filters;
