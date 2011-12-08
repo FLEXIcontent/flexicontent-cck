@@ -465,8 +465,8 @@ class FlexicontentModelCategory extends JModel{
 		{
 			foreach ($filters as $filtre)
 			{
-				$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
-				if ($filtervalue) {
+				$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				if (strlen($filtervalue)>0) {
 					$where .= $this->_getFiltered($filtre->id, $filtervalue, $filtre->field_type);
 				}
 			}
@@ -959,13 +959,13 @@ class FlexicontentModelCategory extends JModel{
 			break;
 			
 			default:
-		$query  = 'SELECT item_id'
+			$query  = 'SELECT item_id'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = ' . $field_id
-				. ' AND value = ' . $this->_db->Quote($value)
+				. ' AND value LIKE ' . $this->_db->Quote($value)
 				. ' GROUP BY item_id'
 				;
-		$this->_db->setQuery($query);
+			$this->_db->setQuery($query);
 				$filtered = $this->_db->loadResultArray();
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break; 

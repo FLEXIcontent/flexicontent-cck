@@ -608,8 +608,8 @@ class FlexicontentModelCategory extends JModelList{
 		{
 			foreach ($filters as $filtre)
 			{
-				$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'cmd' );
-				if ($setfilter) {
+				$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				if (strlen($setfilter)>0) {
 					$ids 	= $this->_getFiltered($filtre->id, $setfilter);
 					if ($ids)
 					{
@@ -696,7 +696,7 @@ class FlexicontentModelCategory extends JModelList{
 				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
 			}
 		}
-		
+
 		return $where;
 	}
 
@@ -1004,13 +1004,12 @@ class FlexicontentModelCategory extends JModelList{
 		$query  = 'SELECT item_id'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = ' . $field_id
-				. ' AND value = ' . $this->_db->Quote($value)
+				. ' AND value LIKE ' . $this->_db->Quote($value)
 				. ' GROUP BY item_id'
 				;
 		$this->_db->setQuery($query);
 		$filters = $this->_db->loadResultArray();
 		$filters = implode(',', $filters);
-		
 		return $filters;
 	}
 
