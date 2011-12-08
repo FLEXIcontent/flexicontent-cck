@@ -32,7 +32,7 @@ $tmpl = $this->tmpl;
 </script>
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
-<form action="<?php echo htmlentities($this->action); ?>" method="post" id="adminForm">
+<form action="<?php echo htmlentities($this->action); ?>" method="get" id="adminForm">
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
 <div id="fc_filter" class="floattext">
 	<?php if ($this->params->get('use_search')) : ?>
@@ -67,6 +67,7 @@ endif;
 <input type="hidden" name="letter" value="" id="alpha_index" />
 <input type="hidden" name="task" value="" />
 <input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
+<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 </form>
 <?php endif; ?>
 
