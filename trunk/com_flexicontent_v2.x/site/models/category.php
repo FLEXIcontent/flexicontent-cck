@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 313 2010-06-19 08:32:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: category.php 1035 2011-12-09 00:16:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -397,7 +397,7 @@ class FlexicontentModelCategory extends JModelList{
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$params = $this->_category->parameters;
 			if ($params->get('orderbycustomfieldid', 0) != 0) {
-				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id';
+				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
 			}
 		
 			//$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
