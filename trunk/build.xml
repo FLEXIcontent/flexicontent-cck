@@ -27,6 +27,7 @@
 		<copy file="modules/mod_flexicontent/mod_flexicontent.php" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.php" />
 		<copy file="modules/mod_flexicontent/mod_flexicontent.xml" tofile="flexipack/modules/mod_flexicontent/mod_flexicontent.xml" />
 		<copy file="language/en-GB/en-GB.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/languages/en-GB.mod_flexicontent.ini" />
+		<copy file="language/fr-FR/fr-FR.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/languages/fr-FR.mod_flexicontent.ini" />
 		<copy file="language/ru-RU/ru-RU.mod_flexicontent.ini" tofile="flexipack/modules/mod_flexicontent/languages/ru-RU.mod_flexicontent.ini" />
 		<copy todir="flexipack/modules/mod_flexicontent/classes" >
 			<fileset dir="modules/mod_flexicontent/classes">
@@ -49,6 +50,7 @@
 		<copy file="modules/mod_flexitagcloud/mod_flexitagcloud.php" tofile="flexipack/modules/mod_flexitagcloud/mod_flexitagcloud.php" />
 		<copy file="modules/mod_flexitagcloud/mod_flexitagcloud.xml" tofile="flexipack/modules/mod_flexitagcloud/mod_flexitagcloud.xml" />
 		<copy file="language/en-GB/en-GB.mod_flexitagcloud.ini" tofile="flexipack/modules/mod_flexitagcloud/languages/en-GB.mod_flexitagcloud.ini" />
+		<copy file="language/fr-FR/fr-FR.mod_flexitagcloud.ini" tofile="flexipack/modules/mod_flexitagcloud/languages/fr-FR.mod_flexitagcloud.ini" />
 		<copy todir="flexipack/modules/mod_flexitagcloud/elements" >
 			<fileset dir="modules/mod_flexitagcloud/elements">
 				<exclude name=".**" />
@@ -64,6 +66,7 @@
 		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.php" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.php" />
 		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" />
 		<copy file="language/en-GB/en-GB.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/en-GB.mod_flexiadvsearch.ini" />
+		<copy file="language/fr-FR/fr-FR.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/fr-FR.mod_flexiadvsearch.ini" />
 		<copy todir="flexipack/modules/mod_flexitagcloud/elements" >
 			<fileset dir="modules/mod_flexitagcloud/elements">
 				<exclude name=".**" />
