@@ -203,6 +203,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="show_filter_labels" type="radio" default="0" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+		 	</field>
 			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
