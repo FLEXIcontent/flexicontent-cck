@@ -263,8 +263,8 @@ class FlexicontentModelCategory extends JModel{
 	{
 		$params = $this->_category->parameters;
 		
-		$filter_order		= $this->getState('filter_order');
-		$filter_order_dir	= $this->getState('filter_order_dir');
+		$filter_order		= $this->getState('filter_order', 'i.title');
+		$filter_order_dir	= $this->getState('filter_order_dir', 'ASC');
 
 		if ($params->get('orderby')) {
 			$order = $params->get('orderby');

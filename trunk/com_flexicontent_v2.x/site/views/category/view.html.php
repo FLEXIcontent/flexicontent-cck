@@ -291,6 +291,13 @@ class FlexicontentViewCategory extends JView
 		
 		// remove previous alpha index filter
 		$uri->delVar('letter');
+		
+		// remove filter variables (includes search box and sort order)
+		preg_match_all('/filter[^=]*/', $uri->toString(), $matches);
+		foreach($matches[0] as $match)
+		{
+			$uri->delVar($match);
+		}
 
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');

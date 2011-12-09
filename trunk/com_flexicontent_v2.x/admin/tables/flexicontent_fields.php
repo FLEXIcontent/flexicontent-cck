@@ -80,7 +80,7 @@ class flexicontent_fields extends JTable
 		}
 
 		//$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
-		$pattern = '/^[a-z]+[a-z0-9]+$/i';
+		$pattern = '/^[a-z_]+[a-z_0-9]+$/i';
 		$matches = NULL;
 		$false = !preg_match($pattern, $this->name, $matches);
 		if((empty($this->name) || $false) && $this->iscore != 1 ) {

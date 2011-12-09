@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_alpha.php 892 2011-09-07 22:16:02Z ggppdk $
+ * @version 1.5 stable $Id: category_alpha.php 988 2011-11-25 17:24:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -184,8 +184,9 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 			if ($has_item) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
-				if ($caching) echo " document.getElementById('adminForm').action+='&letter=".$letter."'; ";
-				echo " document.getElementById('adminForm').submit();\">".mb_strtoupper($letter_label)."</a>";
+				echo " var form=document.getElementById('adminForm'); ";
+				//if ($caching) echo " form.action+='&letter=".$letter."'; ";
+				echo " adminFormPrepare(form); form.submit(); \">".mb_strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<span class=\"$aiclass\">".mb_strtoupper($letter_label)."</span>";

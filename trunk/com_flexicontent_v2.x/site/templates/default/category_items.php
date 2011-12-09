@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 980 2011-11-25 00:07:26Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1033 2011-12-08 08:58:02Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,31 +27,93 @@ $tmpl = $this->tmpl;
 
 		form.filter_order.value 	= order;
 		form.filter_order_Dir.value	= dir;
-		document.getElementById("adminForm").submit( task );
+		
+		var form = document.getElementById("adminForm");
+		
+		adminFormPrepare(form);
+		form.submit( task );
+	}
+	
+	function adminFormPrepare(form) {
+		var extra_action = '';
+		for(i=0; i<form.elements.length; i++) {
+			
+			var element = form.elements[i];
+			
+			// No need to add the default values for ordering, to the URL
+			if (element.name=='filter_order' && element.value=='i.title') continue;
+			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
+			
+			var matches = element.name.match(/(filter[.]*|letter)/);
+			if (matches && element.value != '') {
+			  extra_action += '&' + element.name + '=' + element.value;
+			}
+		}
+		form.action += extra_action;   //alert(extra_action);
+	}
+	
+	function adminFormClearFilters (form) {
+		for(i=0; i<form.elements.length; i++) {
+			var element = form.elements[i];
+			
+			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
+			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
+			
+			var matches = element.name.match(/(filter[.]*|letter)/);
+			if (matches) {
+				element.value = '';
+			}
+		}
 	}
 </script>
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
-<form action="<?php echo htmlentities($this->action); ?>" method="post" id="adminForm">
+<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="adminFormPrepare(this);">
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
 <div id="fc_filter" class="floattext">
 	<?php if ($this->params->get('use_search')) : ?>
 	<div class="fc_fleft">
 		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" onchange="document.getElementById('adminForm').submit();" />
-		<button onclick="document.getElementById('adminForm').submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-		<button onclick="document.getElementById('filter').value='';document.getElementById('adminForm').submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+		<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
+		  <br>
+		<?php endif; ?>
+		<button class='fc_button' onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+		<button class='fc_button' onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 	</div>
 	<?php endif; ?>
 	<?php if ($this->params->get('use_filters', 0) && $this->filters) : ?>
-	<div class="fc_fright">
+	
+	<!--div class="fc_fright"-->
 	<?php
 	foreach ($this->filters as $filt) :
-		echo '<span class="filter">';
-		echo @$filt->html;
-		echo '</span>';
-	endforeach;
+		if (empty($filt->html)) continue;
+		// Add form preparation
+		if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
+			$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
+		} else {
+			$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
+		}
 	?>
-	</div>
+		<span class="filter" style='white-space: nowrap;'>
+			
+			<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
+				<span class="filter_label">
+				<?php echo $filt->label; ?>
+				</span>
+			<?php endif; ?>
+			
+			<span class="filter_field">
+			<?php echo $filt->html; ?>
+			</span>
+			
+		</span>
+	<?php endforeach; ?>
+	
+	<?php if (!$this->params->get('use_search')) : ?>
+		<button onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+	<?php endif; ?>
+	<!--/div-->
+	
 	<?php endif; ?>
 </div>
 <?php endif; ?>
@@ -64,9 +126,10 @@ endif;
 <input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 <input type="hidden" name="filter_order_Dir" value="" />
 <input type="hidden" name="view" value="category" />
-<input type="hidden" name="letter" value="" id="alpha_index" />
+<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
 <input type="hidden" name="task" value="" />
 <input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
+<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 </form>
 <?php endif; ?>
 
@@ -108,9 +171,11 @@ if ($this->items) :
 				$currstart = $this->getModel()->get('state')->limitstart + 1;
 				$currend = $this->getModel()->get('state')->limitstart + $this->getModel()->get('state')->limit;
 				$currend = ($currend > $this->getModel()->_total) ? $this->getModel()->_total : $currend;
-				echo JText::sprintf( 'FLEXI_ITEMS_TOTAL', $this->getModel()->_total);
-				echo '&nbsp; &nbsp; ' . JText::sprintf( 'FLEXI_DISPLAYING_RANGE', $currstart, $currend);
 			?>
+				<span class='item_total_label'><?php echo JText::_( 'FLEXI_TOTAL'); ?></span>
+				<span class='item_total_value'><?php echo $this->getModel()->_total ." " .JText::_( 'FLEXI_ITEM_S'); ?></span>
+				<span class='item_total_label'><?php echo JText::_( 'FLEXI_DISPLAYING'); ?></span>
+				<span class='item_total_value'><?php echo $currstart ." - " .$currend ." " .JText::_( 'FLEXI_ITEM_S'); ?></span>
 		</div>
 		<?php endif; ?>
 		<!-- BOF items total-->

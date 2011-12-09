@@ -32,6 +32,10 @@ div#flexicontent .label {
 	font-weight: bold;
 }
 
+div#flexicontent .label {
+	font-weight: bold;
+}
+
 /**
  * @section buttons
  *
@@ -89,6 +93,26 @@ div.pageslinks {
 	float: left;
 	overflow: hidden;
 	width: 100%;
+	text-align: center;
+}
+
+/* prefixed by the flexicontent id to force a more correct behavior,
+other pagination are not prefixed so that joomla templates can style them */
+#flexicontent div.pageslinks ul li {
+	display: inline-block;
+	margin: 0px 4px 0px 4px;
+}
+
+/* Commented out because it conflicts with various joomla templates */
+/*#flexicontent div.pageslinks ul li span, #flexicontent div.pageslinks ul li a {
+	padding: 2px 6px 2px 6px;
+	border: 1px solid #dddddd;
+	border-radius: 6px;
+	background: none;
+}*/
+
+div.pageslinks ul li a {
+	text-decoration: none;
 }
 
 div#flexicontent .pagescounter {
@@ -120,6 +144,10 @@ div#flexicontent .subcategories {
 	/* font-size: 1.2em; font-weight: bold; */
 	margin: 0.8em 0;
 	padding: 0.5em 0.3em;
+}
+
+div.subcategorieslist {
+	margin: 0 0 1em 0;
 }
 
 /**
@@ -185,31 +213,13 @@ div#flexicontent table.flexitable tr:hover th {
  * @section flexicontent Table Filter Form
  *
  */
-div.subcategorieslist {
-	margin: 0 0 1em 0;
-}
 
-div#fc_alpha {
-	margin: 0 0 1em 0;
-}
-
-div#flexicontent #fc_filter {
-	border: solid 1px #dddddd;
-	margin: 0 0 1em 0;
-	padding: 0.5em;
-}
-
-div#flexicontent .fc_fleft {
-	float: left;
-}
-
-div#flexicontent .fc_fright {
-	float: right;
-}
-
-div#flexicontent .fc_fright .filter {
-	margin-left: 10px;
-}
+div#flexicontent #fc_filter { border: solid 1px #dddddd;	margin: 0 0 1em 0;	padding: 0.5em;  }
+div#flexicontent .fc_fleft {  float: left;  }
+div#flexicontent .fc_fright {	 float: right;  }
+div#flexicontent .filter {  float: left; display:block; margin: -6px 0px 6px 10px; }
+div#flexicontent .filter .filter_label { font-size: 100%; float: left; display:block; clear:both;}
+div#flexicontent .filter .filter_field { font-size: 90%; float: left; display:block; clear:both;}
 
 /** Item submission Form **/
  
@@ -523,6 +533,7 @@ div.current dd {
 	float: left;
 	overflow: hidden;
 	width: 100%;
+	margin: 0 0 1em 0;
 }
 
 #fc_alpha .aichargrp {
@@ -596,7 +607,7 @@ div.current dd {
 	text-decoration: none;
 }
 
-.fc_alpha_index.current {
+#fc_alpha .fc_alpha_index.current {
 	margin-left:12px;
 	margin-right:12px;
 	color: darkred;
@@ -653,3 +664,17 @@ fieldset#fc_search_set_search_behavior legend {
 	font-weight:bold;
 }
 
+button.fc_button {
+	margin: 1px solid gray;
+	padding: 2px;
+	margin: 0px;
+	overflow: visible;
+	font-size: 90%;
+	font-weight: bold;
+}
+
+
+/* Items Total */
+.item_total { } 
+.item_total .item_total_label { font-weight: bold; display:inline-block; }
+.item_total .item_total_value { display:inline-block; margin-right: 24px; }

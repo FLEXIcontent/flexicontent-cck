@@ -184,8 +184,9 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 			if ($has_item) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
-				if ($caching) echo " document.getElementById('adminForm').action+='&letter=".$letter."'; ";
-				echo " document.getElementById('adminForm').submit();\">".mb_strtoupper($letter_label)."</a>";
+				echo " var form=document.getElementById('adminForm'); ";
+				//if ($caching) echo " form.action+='&letter=".$letter."'; ";
+				echo " adminFormPrepare(form); form.submit(); \">".mb_strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<span class=\"$aiclass\">".mb_strtoupper($letter_label)."</span>";

@@ -120,7 +120,7 @@ class FlexicontentModelCategory extends JModelList{
 		$this->setState('limitstart', $limitstart);
 
 		// set filter order variables
-		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'title'));
+		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
 	}
 	/**
@@ -429,8 +429,8 @@ class FlexicontentModelCategory extends JModelList{
 	{
 		$params = $this->_category->parameters;
 		
-		$filter_order		= $this->getState('filter_order');
-		$filter_order_dir	= $this->getState('filter_order_dir');
+		$filter_order		= $this->getState('filter_order', 'i.title');
+		$filter_order_dir	= $this->getState('filter_order_dir', 'ASC');
 
 		if ($params->get('orderby')) {
 			$order = $params->get('orderby');
