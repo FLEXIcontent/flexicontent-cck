@@ -314,23 +314,29 @@ class FlexicontentModelItems extends JModel
 				return false;
 			}
 			
+			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the last one
 			$isnew = (($this->_id <= 0) || !$this->_id);
-			$current_version = isset($item->version)?$item->version:0;
+			$current_version = isset($item->version) ? $item->version : 0;
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
 			if($version==0) 
 				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
-				
+			
+			// -- If loading not the current one, then raise a notice to inform the user
 			if($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
 				$unapproved_version_notice = 1;  //  While we are in edit form, we catch cases such as modules loading items , or someone querying priviledges of items, etc
 				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
 			}
 
-			if($use_versioning) {
+			// -- Get by (a) the table that contains versioned data, or by (b) the normal table (current version data only)
+			if($use_versioning) 
+			{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_items_versions as iv "
 					." JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.version='".$version."' AND iv.item_id='".$this->_id."';";
-			}else{
+			}
+			else
+			{
 				$query = "SELECT f.id,iv.value,f.field_type,f.name FROM #__flexicontent_fields_item_relations as iv "
 					." JOIN #__flexicontent_fields as f on f.id=iv.field_id "
 					." WHERE iv.item_id='".$this->_id."';";
@@ -338,16 +344,18 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery($query);
 			$fields = $this->_db->loadObjectList();
 			$fields = $fields?$fields:array();
-
-			// Create the description field called 'text' by appending introtext + readmore + fulltext
+			
+			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
 			if (JString::strlen($item->fulltext) > 1) {
 				$item->text .= '<hr id="system-readmore" />' . $item->fulltext;
 			}
 			
 			// (Fix for issue 261), not overwrite joomfish data with versioned data
+			
+			// -- Retrieve joomfish data for current language if it exists (we will use them on next step instead of versioned data)
 			if (FLEXI_FISH) {
-				// 1. Find if item language is different than current language 
+				// a. Find if item language is different than current language 
 				$currlang = JRequest::getWord('lang', '' );
 				if(empty($currlang)){
 					$langFactory= JFactory::getLanguage();
@@ -358,7 +366,7 @@ class FlexicontentModelItems extends JModel
 				$itemlang = substr($item->language ,0,2);
 				$langdiffers = ( $currlang != $itemlang );
 				
-				// 2. Retrieve joomfish data so that if they exist we will not overwrite with versioned data
+				// b. Retrieve joomfish data so that if they exist we will not overwrite with versioned data
 				if ($langdiffers) {
 					$query = "SELECT jfc.* FROM #__jf_content as jfc "
 							." LEFT JOIN #__languages as jfl ON jfc.language_id = jfl.id"
@@ -372,12 +380,10 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 			
-			// Overwrite item fields with the requested version, we try to be compatibile with joomfish
+			// -- Overwrite item fields with the requested VERSION data, !! we do not overwrite fields that must be translated by joomfish
 			foreach($fields as $f) {
 				
-				// Skip versioned data for fields that must be translated. (Fix for issue 261)
-				// (a) item title not translated in item view but (IT SHOULD) and
-				// (b) text field translated by joomfish in edit form (IT SHOULD NOT)
+				// Skip using versioned data for fields that must be translated by joomfish, wWe ONLY skip if joomfish data exists (Fix for issue 261)
 				if (FLEXI_FISH) {
 					$jf_translated_fields = array('title', 'text', 'introtext', 'fulltext' );
 					if ( $task != 'edit' && $langdiffers && in_array($f->name, $jf_translated_fields) ) {
@@ -386,7 +392,7 @@ class FlexicontentModelItems extends JModel
 					}
 				}
 				
-				// Use versioned data
+				// Use versioned data, by overwriting the item data 
 				$fieldname = $f->name;
 				if( (($f->field_type=='categories') && ($f->name=='categories')) || (($f->field_type=='tags') && ($f->name=='tags')) ) {
 					$item->$fieldname = unserialize($f->value);
@@ -395,18 +401,22 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 			
+			// -- Retrieve tags (THESE ARE NOT VERSIONED ??? why are they in FC v2.x ?)
 			if(!isset($item->tags)||!is_array($item->tags)) {
 				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 				$this->_db->setQuery($query);
 				$item->tags = $this->_db->loadResultArray();
 			}
+			
+			// -- Retrieve categories (THESE ARE NOT VERSIONED)
 			if(!isset($item->categories)||!is_array($item->categories)) {
 				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
 				$this->_db->setQuery($query);
 				$item->categories = $this->_db->loadResultArray();
 			}
 			$item->id = $this->_id;
-
+			
+			// -- Retrieve item TYPE parameters, and ITEM ratings (THESE ARE NOT VERSIONED)
 			$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 					." FROM #__flexicontent_items_ext as ie "
 					. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
@@ -433,6 +443,7 @@ class FlexicontentModelItems extends JModel
 				$item->state 		= -4;
 			}
 			
+			// -- Detect if current version doesnot exist in version table and add it !!!
 			$this->_item = &$item;
 			if(!$isnew && $use_versioning && ($current_version>$lastversion) ) {//add current version.
 				$mainframe = &JFactory::getApplication();
@@ -768,6 +779,7 @@ class FlexicontentModelItems extends JModel
 	 * Method to store the item
 	 *
 	 * @access	public
+	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
 	function store($data) {
