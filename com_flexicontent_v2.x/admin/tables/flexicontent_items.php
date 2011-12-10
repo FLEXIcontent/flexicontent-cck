@@ -439,7 +439,7 @@ class flexicontent_items extends JTable{
 		if(empty($this->alias)) {
 			$this->alias = $this->title;
 		}
-		$this->alias = JFilterOutput::stringURLSafe($this->alias);
+		$this->alias = JApplication::stringURLSafe($this->alias);
 
 		if(trim(str_replace('-','',$this->alias)) == '') {
 			$datenow =& JFactory::getDate();
