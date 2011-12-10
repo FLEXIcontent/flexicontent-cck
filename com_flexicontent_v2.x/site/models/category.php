@@ -573,7 +573,7 @@ class FlexicontentModelCategory extends JModelList{
 
 
 		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtercat) {
+		if (/*FLEXI_FISH &&*/ $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
