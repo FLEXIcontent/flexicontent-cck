@@ -52,7 +52,6 @@ class FLEXIcontentViewSearch extends JView
 		$state 		= &$this->get('state');
 		$searchword = $state->get('keyword');
 
-		//$params = &$mainframe->getParams();
 		$params = JComponentHelper::getParams('com_flexicontent');
 		//$params->bind($params->_raw);
 		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
@@ -75,14 +74,14 @@ class FLEXIcontentViewSearch extends JView
 		$item->version = 0;
 
 		$search_fields = $params->get('search_fields', '');
-		$search_fields = "'".str_replace(",", "','", $search_fields)."'";
+		$search_fields = explode(",", $search_fields);
+		$search_fields = "'".implode("','", array_unique($search_fields))."'";
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
 		
 		//Import fields
 		JPluginHelper::importPlugin('flexicontent_fields');
 		
 		// Add html to field object trought plugins
-		//$custom = JRequest::getVar('custom', array());
 		foreach ($fields as $field) {
 			$field->parameters->set( 'use_html', 0 );
 			$field->parameters->set( 'allow_multiple', 0 );
@@ -109,10 +108,10 @@ class FLEXIcontentViewSearch extends JView
 		if (is_object( $menu )) {
 			$menu_params = new JParameter( $menu->params );
 			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	JText::_( 'Search' ));
+				$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
 			}
 		} else {
-			$params->set('page_title',	JText::_( 'Search' ));
+			$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
 		}
 
 		$document	= &JFactory::getDocument();
@@ -140,19 +139,19 @@ class FLEXIcontentViewSearch extends JView
 			$default_searchordering = $params->get('default_searchordering', 'newest');
 			// built select lists
 			$orders = array();
-			$orders[] = JHTML::_('select.option',  'newest', JText::_( 'Newest first' ) );
-			$orders[] = JHTML::_('select.option',  'oldest', JText::_( 'Oldest first' ) );
-			$orders[] = JHTML::_('select.option',  'popular', JText::_( 'Most popular' ) );
-			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'Alphabetical' ) );
-			$orders[] = JHTML::_('select.option',  'category', JText::_( 'Section/Category' ) );
+			$orders[] = JHTML::_('select.option',  'newest', JText::_( 'FLEXI_ADV_NEWEST_FIRST' ) );
+			$orders[] = JHTML::_('select.option',  'oldest', JText::_( 'FLEXI_ADV_OLDEST_FIRST' ) );
+			$orders[] = JHTML::_('select.option',  'popular', JText::_( 'FLEXI_ADV_MOST_POP' ) );
+			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
+			$orders[] = JHTML::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
 			$lists['ordering'] = JHTML::_('select.genericlist',   $orders, 'ordering', 'class="inputbox"', 'value', 'text', $state->get('ordering', $default_searchordering) );
 		}
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
 			$searchphrases 		= array();
-			$searchphrases[] 	= JHTML::_('select.option',  'all', JText::_( 'All words' ) );
-			$searchphrases[] 	= JHTML::_('select.option',  'any', JText::_( 'Any words' ) );
-			$searchphrases[] 	= JHTML::_('select.option',  'exact', JText::_( 'Exact phrase' ) );
+			$searchphrases[]    = JHTML::_('select.option',  'all', JText::_( 'FLEXI_ALL_WORDS' ) );
+			$searchphrases[]    = JHTML::_('select.option',  'any', JText::_( 'FLEXI_ANY_WORDS' ) );
+			$searchphrases[]    = JHTML::_('select.option',  'exact', JText::_( 'FLEXI_EXACT_SENTENCE' ) );
 			$lists['searchphrase' ]= JHTML::_('select.radiolist',  $searchphrases, 'searchphrase', '', 'value', 'text', $state->get('match', $default_searchphrase) );
 		}
 		if($show_operator = $params->get('show_operator', 1)) {

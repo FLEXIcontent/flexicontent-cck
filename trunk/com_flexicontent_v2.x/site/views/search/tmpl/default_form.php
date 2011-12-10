@@ -27,6 +27,11 @@ window.addEvent("domready", function() {
 }
 
 $r = 0;
+
+//params[search_fields]
+$search_fields = $this->params->get('search_fields', '');
+$search_fields = $search_fields?explode(",", $search_fields):array();
+$fields = &$this->fields;
 ?>
 
 <form id="flexicontent-searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="get" name="searchForm">
@@ -46,7 +51,7 @@ $r = 0;
 					<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
 				</td>
 				<td width="100%" nowrap="nowrap">
-					<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
+					<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'FLEXI_SEARCH' );?></button>
 				</td>
 			</tr>
 			
@@ -76,7 +81,7 @@ $r = 0;
 			</tr>
 			<?php endif; ?>
 			
-			<?php if (!$autodisplayextrafields) : ?>
+			<?php if ((count($search_fields)>0) && !$autodisplayextrafields) : ?>
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td colspan="3" class="fc_search_option_cell">
 					<a href="javascript:;" id="advancedsearchtext"><?php echo JText::_('FLEXI_ADVANCED_SEARCH'); ?></a>
@@ -87,17 +92,13 @@ $r = 0;
 		</table>
 	
 	</fieldset>
-			
+	<?php if(count($search_fields)>0) {?>
 	<fieldset id='fc_search_set_advsearch' class='fc_search_set'>
 		<legend><?php echo JText::_('FLEXI_ADVANCED_SEARCH'); ?></legend>
-		
+
 		<table id="extrafields" class="extrafields <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
 		
 		<?php
-			//params[search_fields]
-			$search_fields = $this->params->get('search_fields', '');
-			$search_fields = explode(",", $search_fields);
-			$fields = &$this->fields;
 			foreach($search_fields as $f) {
 				if(!isset($fields[$f])) continue;
 		?>
@@ -131,7 +132,7 @@ $r = 0;
 		</table>
 		
 	</fieldset>
-		
+	<?php } ?>	
 	<fieldset id='fc_search_set_search_behavior' class='fc_search_set'>
 		<legend><?php echo JText::_('FLEXI_SEARCH_BEHAVIOR'); ?></legend>
 		
@@ -207,7 +208,7 @@ $r = 0;
 	<tr>
 		<td colspan="3" >
 			<br />
-			<?php echo JText::_( 'Search Keyword' ) .' <b>'. $this->escape($this->searchword) .'</b>'; ?>
+			<?php echo JText::_( 'FLEXI_SEARCH_KEYWORD' ) .' <b>'. $this->escape($this->searchword) .'</b>'; ?>
 		</td>
 	</tr>
 	<tr>

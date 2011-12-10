@@ -28,7 +28,6 @@ window.addEvent("domready", function() {
 
 $r = 0;
 
-
 //params[search_fields]
 $search_fields = $this->params->get('search_fields', '');
 $search_fields = $search_fields?explode(",", $search_fields):array();
@@ -52,7 +51,7 @@ $fields = &$this->fields;
 					<input type="text" name="searchword" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
 				</td>
 				<td width="100%" nowrap="nowrap">
-					<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'Search' );?></button>
+					<button name="Search" onclick="this.form.submit()" class="button"><?php echo JText::_( 'FLEXI_SEARCH' );?></button>
 				</td>
 			</tr>
 			
@@ -209,7 +208,7 @@ $fields = &$this->fields;
 	<tr>
 		<td colspan="3" >
 			<br />
-			<?php echo JText::_( 'Search Keyword' ) .' <b>'. $this->escape($this->searchword) .'</b>'; ?>
+			<?php echo JText::_( 'FLEXI_SEARCH_KEYWORD' ) .' <b>'. $this->escape($this->searchword) .'</b>'; ?>
 		</td>
 	</tr>
 	<tr>

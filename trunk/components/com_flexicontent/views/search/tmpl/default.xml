@@ -19,9 +19,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="default_searchphrase" type="list" default="all" label="Default combination method" description="Default method of combining the search words">
-				<option value="all">All words</option>
-				<option value="any">Any words</option>
-				<option value="exact">Exact phrase</option>
+				<option value="all">FLEXI_ALL_WORDS</option>
+				<option value="any">FLEXI_ANY_WORDS</option>
+				<option value="exact">FLEXI_EXACT_SENTENCE</option>
 			</param>
 			<param name="minchars" type="text" default="3" label="Minimum length" description="Minimum character length the search words are allowed to have" />
 			<param name="maxchars" type="text" default="20" label="Maxmum length" description="Maximum characters length the search words are allowed to have" />
@@ -59,11 +59,11 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
-				<option value="newest">Newest first</option>
-				<option value="oldest">Oldest first</option>
-				<option value="popular">Most popular</option>
-				<option value="alpha">Alphabetical</option>
-				<option value="category">Section/Category</option>
+				<option value="newest">FLEXI_ADV_NEWEST_FIRST</option>
+				<option value="oldest">FLEXI_ADV_OLDEST_FIRST</option>
+				<option value="popular">FLEXI_ADV_MOST_POP</option>
+				<option value="alpha">FLEXI_ADV_ALPHA</option>
+				<option value="category">FLEXI_ADV_SEARCH_SEC_CAT</option>
 			</param>
 			
 		<param name="" type="separator" level="level1" default="Search Results Configuration" />
