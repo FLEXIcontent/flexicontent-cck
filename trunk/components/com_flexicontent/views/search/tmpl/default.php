@@ -8,12 +8,20 @@
 </div>
 <?php endif; ?>
 
-<?php 
-
-if (!JRequest::getVar('print',0)) {
-	echo flexicontent_html::printbutton( $this->print_link, $this->params );
-}
-?>
+	<!-- BOF buttons -->
+	<?php
+	$pdfbutton = '';
+	$mailbutton = '';
+	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton) {
+	?>
+	<p class="buttons">
+		<?php echo $pdfbutton; ?>
+		<?php echo $mailbutton; ?>
+		<?php echo $printbutton; ?>
+	</p>
+	<?php } ?>
+	<!-- EOF buttons -->
 
 <?php if (!JRequest::getVar('print',0)) echo $this->loadTemplate('form'); ?>
 <?php if(!$this->error && count($this->results) > 0) :
