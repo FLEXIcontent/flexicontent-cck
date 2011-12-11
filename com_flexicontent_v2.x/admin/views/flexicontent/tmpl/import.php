@@ -52,7 +52,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			<input id="import" type="button" class="button" value="<?php echo JText::_( 'FLEXI_IMPORT_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="button" onclick="window.parent.SqueezeBox.close();;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
 			</td>
 		</tr>
 	</table>

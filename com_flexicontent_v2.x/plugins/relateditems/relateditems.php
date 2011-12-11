@@ -284,7 +284,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$ri_field_name.'" name="'.$ri_field_name.'[]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;" '.$size.' >';
+		$field->html .= '<select id="'.$ri_field_name.'" name="custom['.$ri_field_name.'][]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		

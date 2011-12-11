@@ -54,7 +54,7 @@ window.addEvent('domready', function(){
 			<input id="import" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();window.parent.SqueezeBox.close();;" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
