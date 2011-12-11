@@ -21,20 +21,21 @@ defined('_JEXEC') or die('Restricted access');
 <script type="text/javascript">
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
+		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
-		if(MooTools.version>="1.2.4") {
-			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-		}else{
-			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-		}
-		this.send({
-			update: $('log-bind')
-		});
+
+		new Request.HTML({
+			 url: this.get('action'),
+		   evalScripts: true,
+		   update: $('log-bind'),
+		   data: $('adminForm')
+		}).send();
+		
 	});
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&task=categories.params&layout=params&tmpl=component" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></legend>
@@ -50,7 +51,7 @@ window.addEvent('domready', function(){
 			<input id="copy" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="button" onclick="window.parent.SqueezeBox.close();;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
 			</td>
 		</tr>
 	</table>
@@ -58,9 +59,9 @@ window.addEvent('domready', function(){
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="controller" value="categories" />
-<input type="hidden" name="view" value="categories" />
-<input type="hidden" name="task" value="params" />
+<input type="hidden" name="task" value="categories.params" />
+<input type="hidden" name="layout" value="categories.params" />
+<input type="hidden" name="format" value="raw" />
 </form>
 
 <?php

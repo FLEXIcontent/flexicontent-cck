@@ -73,6 +73,10 @@ class FlexicontentViewCategories extends JView {
 		foreach ($rows as &$item) {
 			$this->ordering[$item->parent_id][] = $item->id;
 		}
+		
+		$categories = $globalcats;
+		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
+		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
 
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );
