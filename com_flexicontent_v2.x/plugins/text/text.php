@@ -268,7 +268,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		
 		$n = 0;
 		foreach ($values as $value) {
-			$field->{$prop}[]	= $values[$n] ? $pretext.$values[$n].$posttext : '';
+			$field->{$prop}[]	= strlen($values[$n]) ? $pretext.$values[$n].$posttext : '';
 			$n++;
 		}
 		if($field->{$prop}) {

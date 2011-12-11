@@ -313,20 +313,21 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 
 		} else { // Elements mode
 
-		$listelements = explode("%% ", $field_elements);
-		$listarrays = array();
-		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
+			$listelements = explode("%% ", $field_elements);
+			$listarrays = array();
+			foreach ($listelements as $listelement) {
+				$listarrays[] = explode("::", $listelement);
 			}
-
-		$options = array(); 
-		
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		foreach ($listarrays as $listarray) {
-			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
-			}			
+	
+			$options = array(); 
+			
+			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+			foreach ($listarrays as $listarray) {
+				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
+			}
+			
 			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 		}
 	}
 	
