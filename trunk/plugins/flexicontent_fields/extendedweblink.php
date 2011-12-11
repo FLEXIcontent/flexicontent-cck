@@ -244,22 +244,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		{
 			if ($post[$n]['link'] != '')
 			{
-				if (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) 
-				{
-					$newpost[$new]['link']		= 'http://'.$post[$n]['link'];
-					$newpost[$new]['title']		= $post[$n]['title'];
-					$newpost[$new]['id']		= $post[$n]['id'];
-					$newpost[$new]['class']		= $post[$n]['class'];
-					$newpost[$new]['linktext']	= @$post[$n]['linktext'];
-					$newpost[$new]['hits']		= $post[$n]['hits'];
-				} else {
-					$newpost[$new]['link']		= $post[$n]['link'];
-					$newpost[$new]['title']		= $post[$n]['title'];
-					$newpost[$new]['id']		= $post[$n]['id'];
-					$newpost[$new]['class']		= $post[$n]['class'];
-					$newpost[$new]['linktext']	= @$post[$n]['linktext'];
-					$newpost[$new]['hits']		= $post[$n]['hits'];
-				}
+				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
+				$newpost[$new]['link']		= $http_prefix.$post[$n]['link'];
+				$newpost[$new]['title']		= $post[$n]['title'];
+				$newpost[$new]['id']		= @$post[$n]['id'];
+				$newpost[$new]['class']		= @$post[$n]['class'];
+				$newpost[$new]['linktext']	= @$post[$n]['linktext'];
+				$newpost[$new]['hits']		= $post[$n]['hits'];
 				$new++;
 			}
 		}
