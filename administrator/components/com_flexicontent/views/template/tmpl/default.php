@@ -179,7 +179,12 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						<?php
 						$count++;
 						if ( isset($this->layout->attributes[$count]) && isset($this->layout->attributes[$count]['readonly']) ) {
-							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize use TEMPLATE parameters by editing each <b>".$this->layout->view."</b></div>";
+							switch ($this->layout->view) {
+								case 'items': $msg='in the <b>Item Type</b> configuration and/or in each individual <b>Item</b>'; break;
+								case 'category': $msg='in each individual <b>Category</b>'; break;
+								default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
+							}
+							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize edit TEMPLATE parameters ".$msg."</div>";
 							continue;
 						}
 						?>
