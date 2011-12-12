@@ -38,6 +38,11 @@
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
 		</param>
+		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_BEFORE_SELECT</option>
+			<option value="2">FLEXI_IN_SELECT</option>
+		</param>
 		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">No</option>
 			<option value="1">Yes</option>

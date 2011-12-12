@@ -260,6 +260,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$db->query();
 		$i = 0;
 		foreach($post as $v) {
+			$v = is_array($v) ? serialize($v) : $v;
 			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','{$field->field_type}','{$i}', ".$db->Quote(strip_tags($v)).");";
 			$db->setQuery($query);
 			$db->query();
