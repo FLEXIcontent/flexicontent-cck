@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: date.php 759 2011-08-03 14:57:41Z ggppdk $
+ * @version 1.0 $Id: date.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.date
@@ -46,7 +46,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->value[0] = '';
 		}
 		
-		if ($multiple) {
+		if ($multiple) // handle multiple records
+		{
 			$document	= & JFactory::getDocument();
 
 			//add the drag and drop sorting feature
@@ -152,18 +153,100 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$document->addStyleDeclaration($css);
 
 			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$n=0;
+			$n = 0;
 			$field->html = '<ul id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
 				$field->html .= '<li>' . JHTML::_('calendar', $value, 'custom['.$field->name.'][]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"') . '<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span></li>';
 				$n++;
 			}
-			$field->html 	.=	'</ul>';
+			$field->html .=	'</ul>';
 			$field->html 	.= '<input type="button" id="add'.$field->name.'" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
-		} else {
+
+		} else { // handle single records
 			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], 'custom['.$field->name.'][]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
 		}
+	}
+
+
+	function onDisplayFilter(&$filter, $value='')
+	{
+		// execute the code only if the field type match the plugin type
+		if($filter->field_type != 'date') return;
+		
+		global $globalcats;
+		$db =& JFactory::getDBO();
+		$cid = JRequest::getInt('cid', 0);
+		$authorid = JRequest::getInt('authorid', 0);
+		if (!$cid && !$authorid) {
+			$filter->html = "Filter for : $field->label cannot be displayed, both cid and authorid not set<br />";
+			return;
+		}
+		
+		// some parameter shortcuts
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
+		if ($authorid) $where[] = 'i.created_by ='.$authorid;
+		$where[] = 'fi.field_id ='.$filter->id;
+		
+		if ($cid) {
+			// Retrieve category parameters
+			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
+			$db->setQuery($query);
+			$catparams = $db->loadResult();
+			$cparams = new JParameter($catparams);
+			
+			$display_subcats = $cparams->get('display_subcategories_items', 0);
+			$_group_cats = array($cid);
+			
+			// Display items from (current and) immediate sub-categories (1-level)
+			if ($display_subcats==1) {
+				$db->setQuery('SELECT id FROM #__categories WHERE parent_id='.$cid);
+				$results = $db->loadObjectList();
+				if(is_array($results))
+					foreach($results as $cat)
+						$_group_cats[] = $cat->id;
+			}
+			// Display items from (current and) all sub-categories (any-level)
+			if ($display_subcats==2) {
+				// descendants also includes current category
+				$_group_cats = array_map('trim',explode(",",$globalcats[$cid]->descendants));
+			}
+			
+			$_group_cats = array_unique($_group_cats);
+			$_group_cats = "'".implode("','", $_group_cats)."'";
+			
+			$where[] = ' ci.catid IN ('.$_group_cats.')';
+		}
+		
+		$where = " WHERE " . implode(" AND ", $where);
+		
+		$query = 'SELECT DISTINCT fi.value as value, fi.value as text'
+				.' FROM #__flexicontent_fields_item_relations as fi '
+				.' LEFT JOIN #__flexicontent_cats_item_relations AS ci ON fi.item_id=ci.itemid'
+				.($authorid  ? ' LEFT JOIN #__content as i ON i.id=ci.itemid' : '')
+				.$where
+				.' ORDER BY fi.value'
+				;
+		//echo $query;
+		// Make sure there aren't any errors
+		$db->setQuery($query);
+		$results = $db->loadObjectList();
+		if ($db->getErrorNum()) {
+			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br /><br />" .$query);
+			$filter->html	 = "Filter for : $field->label cannot be displayed, error during db query<br />";
+			return;
+		}
+		
+		$options = array();
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		foreach($results as $result) {
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 	}
 
 
@@ -175,7 +258,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$newpost = array();
 		$new = 0;
-
+		
+		if(!is_array($post)) $post = array ($post);
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n] != '')
@@ -185,15 +269,50 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$new++;
 		}
 		$post = $newpost;
+		
+		// create the fulltext search index
+		$searchindex = '';
+		
+		foreach ($post as $v)
+		{
+			$searchindex .= $v;
+			$searchindex .= ' ';
+		}
+
+		$searchindex .= ' | ';
+
+		$field->search = $field->issearch ? $searchindex : '';
+
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
+			plgFlexicontent_fieldsDate::onIndexAdvSearch($field, $post);
+		}
+	}
+
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'date') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='date';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','date','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
 		
+		$field->label = JText::_($field->label);
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
@@ -237,5 +356,30 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$n++;
 		}
 		$field->{$prop} = implode($separatorf, $field->{$prop});	
+	}
+	
+	function onFLEXIAdvSearch(&$field, $fieldsearch) {
+		if($field->field_type!='date') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='date' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			//echo "<pre>"; print_r($objs);echo "</pre>"; 
+			if ($objs===false) continue;
+			$objs = is_array($objs)?$objs:array($objs);
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		//echo "<pre>"; print_r($resultfields);echo "</pre>"; 
+		$field->results = $resultfields;
+		//return $resultfields;
 	}
 }
