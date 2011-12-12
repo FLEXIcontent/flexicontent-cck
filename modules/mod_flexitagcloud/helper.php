@@ -135,7 +135,7 @@ class modFlexiTagCloudHelper
 			}
 			
 			$lists[$i]->link 		= JRoute::_($lists[$i]->link);
-			
+
 			$i++;
 		}
 

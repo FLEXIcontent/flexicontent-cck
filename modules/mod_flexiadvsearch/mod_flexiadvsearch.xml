@@ -13,7 +13,7 @@
 	<files>
 		<filename module="mod_flexiadvsearch">mod_flexiadvsearch.php</filename>
 		<filename>index.html</filename>
-	        <folder>tmpl</folder>
+		<folder>tmpl</folder>
 	</files>
 	
 	<languages>
@@ -24,41 +24,42 @@
 	<params>
 		<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
 		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="width" type="text" default="20" label="Box Width" description="Size of the search text box in characters" />
-		<param name="text" type="text" default="" label="Text" description="PARAMTEXT" />
+		<param name="width" type="text" default="20" label="FLEXI_BOX_WIDTH" description="FLEXI_BOX_WIDTH_DESC" />
+		<param name="text" type="text" default="" label="FLEXI_TEXT" description="FLEXI_TEXT_DESC" />
 		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="button" type="radio" default="" label="Search Button" description="Display a Search Button">
-			<option value="">No</option>
-			<option value="1">Yes</option>
+		<param name="button" type="radio" default="" label="FLEXI_SEARCH_BUTTON" description="FLEXI_SEARCH_BUTTON_DESC">
+			<option value="">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="button_pos" type="list" default="right" label="Button Position" description="Position of the button relative to the search box">
-			<option value="right">Right</option>
-			<option value="left">Left</option>
-			<option value="top">Top</option>
-			<option value="bottom">Bottom</option>
+		<param name="button_pos" type="list" default="right" label="FLEXI_BUTTON_POSITION" description="FLEXI_BUTTON_POSITION_DESC">
+			<option value="right">FLEXI_BUTTON_RIGHT</option>
+			<option value="left">FLEXI_BUTTON_LEFT</option>
+			<option value="top">FLEXI_BUTTON_TOP</option>
+			<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
 		</param>
-		<param name="imagebutton" type="radio" default="" label="Search button as image" description="Use an image as button">
-			<option value="">No</option>
-			<option value="1">Yes</option>
+		<param name="imagebutton" type="radio" default="" label="FLEXI_BUTTON_IMAGE" description="FLEXI_BUTTON_IMAGE_DESC">
+			<option value="">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="button_text" type="text" default="" label="Button Text" description="PARAMBUTTONTEXT" />
+		<param name="button_text" type="text" default="" label="FLEXI_BUTTON_TEXT" description="FLEXI_BUTTON_TEXT_DESC" />
 		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="useitemid" type="radio" default="0" label="Use Itemid(menu id)" description="Use Itemid(menu id)">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+		<param name="useitemid" type="radio" default="0" label="FLEXI_MENU_ITEM" description="FLEXI_MENU_ITEM_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="linkadvsearch" type="radio" default="1" label="Link Advanced Search" description="Link to advanced search.">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+		<param name="set_itemid" type="text" default="" label="FLEXI_MENU_ITEMID" description="FLEXI_MENU_ITEMID_DESC" />
+		<param name="linkadvsearch" type="radio" default="1" label="FLEXI_ADV_SEARCH" description="FLEXI_ADV_SEARCH_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="Advanced Search Text" description="Advanced Search Text" />
-		<param name="set_itemid" type="text" default="" label="Set Itemid" description="PARAMSETITEMID" />
+		<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="FLEXI_ADV_SEARCH_TEXT" description="FLEXI_ADV_SEARCH_TEXT_DESC" />
 	</params>
+
 	<params group="advanced">
-		<param name="cache" type="list" default="1" label="Caching" description="Select whether to cache the content of this module">
-			<option value="1">Use global</option>
-			<option value="0">No caching</option>
+		<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
+			<option value="1">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_NO_CACHING</option>
 		</param>
-		<param name="cache_time" type="text" default="900" label="Cache Time" description="The time before the module is recached" />
+		<param name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
 	</params>
 </install>

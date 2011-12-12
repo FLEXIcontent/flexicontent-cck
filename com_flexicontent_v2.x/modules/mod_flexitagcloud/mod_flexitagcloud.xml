@@ -22,6 +22,7 @@
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.ini</language>
 		<language tag="fr-FR">languages/fr-FR.mod_flexitagcloud.ini</language>
+		<language tag="de-DE">languages/de-DE.mod_flexitagcloud.ini</language>
 	</languages>
 
 	<config>
@@ -51,6 +52,7 @@
 				<option value="">Default</option>
 				<option value="date">Oldest first</option>
 				<option value="rdate">Most recent first</option>
+				<option value="modified">Last modified first</option>
 				<option value="alpha">Title Alphabetical</option>
 				<option value="ralpha">Title Reverse-Alphabetical</option>
 				<option value="author">Author Alphabetical</option>
