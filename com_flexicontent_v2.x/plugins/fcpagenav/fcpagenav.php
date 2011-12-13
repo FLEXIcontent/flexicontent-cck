@@ -158,11 +158,14 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$field_item = '';
+			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
+				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category of item and resave the category, you can use 'copy parameters' to quickly update many categories";
+				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+			}
 			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
 				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
-				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id';
-				$xwhere .= ' AND f.field_id = '.$cparams->get('orderbycustomfieldid');
+				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.$cparams->get('orderbycustomfieldid');
 			}
 			
 			// array of articles in same category correctly ordered
@@ -177,12 +180,15 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					. ' WHERE rel.catid = ' . ($cid ? $cid : (int) $item->catid)
 					. ( (FLEXI_FISH && $filtercat) ? ' AND ie.language LIKE ' . $db->Quote( $lang .'%' ) : "" )  // FILTER FOR CURRENT LAGNUAGE
 					. $andaccess
-					. $xwhere
 					//. ' GROUP BY a.id'  // NOT NEEDED and may mask errors, commented out
 					. ' ORDER BY '. $orderby
 					;
 			$db->setQuery($query);
 			$list = $db->loadObjectList('id');
+			if ($db->getErrorNum()) {
+				echo $query."<br/><br/>";
+				echo $db->getErrormsg()."<br/><br/>";
+			}
 
 			// this check needed if incorrect Itemid is given resulting in an incorrect result
 			if ( !is_array($list) ) {
@@ -243,7 +249,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$html .= '
 					<span class="pagenav_prev' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_prev.'::'.$field->prevtitle.'"' : '') . '>
-						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>
+						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>&nbsp;['.($location).']
 					</span>'
 					;
 				}
@@ -263,7 +269,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$html .= '
 					<span class="pagenav_next' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_next.'::'.$field->nexttitle.':: "' : '') . '>
-						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>
+						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>&nbsp;['.(count($list)-$location-1).']
 					</span>'
 					;
 				}

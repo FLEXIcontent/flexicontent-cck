@@ -396,6 +396,11 @@ class FlexicontentModelCategory extends JModelList{
 			$field_item = '';
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$params = $this->_category->parameters;
+			
+			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
+				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories";
+				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+			}
 			if ($params->get('orderbycustomfieldid', 0) != 0) {
 				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
 			}

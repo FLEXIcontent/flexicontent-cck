@@ -72,14 +72,16 @@ class JFormFieldFields extends JFormField
 		$attribs = "";
 		if ($node->getAttribute('multiple')) {
 			$attribs .= 'multiple="true" size="10"';
+			$fieldname = $this->name.'[]';
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
+			$fieldname = $this->name;
 		}
 		if ($onchange = $node->getAttribute('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 		
-		return JHTML::_('select.genericlist', $fields, $this->name.'[]', $attribs, 'value', 'text', $values);
+		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values);
 	}
 }
