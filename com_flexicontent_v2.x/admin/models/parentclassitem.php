@@ -576,7 +576,7 @@ class ParentClassItem extends JModelAdmin {
 		
 		$dispatcher = & JDispatcher::getInstance();
 		// NOTE: This event isn't used yet but may be useful in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item ));
+		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$data ));
 
 		if(!$this->saveFields($isnew, $item, $data)) return false;
 		

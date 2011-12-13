@@ -1038,7 +1038,7 @@ class FlexicontentModelItems extends JModel
 		$fields		= $this->getExtrafields();
 		
 		// NOTE: This event is used by 'flexinotify' plugin, and possibly others in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item, &$post ));
+		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$post ));
 		
 		// versioning backup procedure
 		// first see if versioning feature is enabled
