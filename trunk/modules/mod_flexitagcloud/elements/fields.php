@@ -68,14 +68,16 @@ class JElementFields extends JElement
 		$attribs = "";
 		if ($node->attributes('multiple')) {
 			$attribs .= 'multiple="true" size="10"';
+			$fieldname = $control_name.'['.$name.'][]';
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
+			$fieldname = $control_name.'['.$name.']';
 		}
 		if ($onchange = $node->attributes('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
-		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $attribs, 'value', 'text', $value, $control_name.$name);
+		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
 	}
 }
