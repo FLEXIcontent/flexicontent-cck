@@ -397,7 +397,7 @@ class FlexicontentModelCategory extends JModelList{
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$params = $this->_category->parameters;
 			
-			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
+			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
 				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories";
 				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
 			}
