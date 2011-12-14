@@ -231,12 +231,12 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$field->html .= "</div>\n";
 		
 		$field->html .= "<div style='float:left;margin-right:16px;'><br>\n";
-		$field->html .= '<a href="JavaScript:void(0);" id="btn-add">Add &raquo;</a><br>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove">&laquo; Remove</a><br>'."\n";
+		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'">Add &raquo;</a><br>'."\n";
+    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'">&laquo; Remove</a><br>'."\n";
     
     if ($title_filter) {
 			$document = &JFactory::getDocument();
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/filterlist.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/filterlist.js' );
 
 			$field->html.=	'
 				<br /><input id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="20" />
@@ -298,14 +298,14 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 window.addEvent( 'domready', function() {
  
-    jQuery('#btn-add').click(function(){
+    jQuery('#btn-add_".$ri_field_name."').click(function(){
         jQuery('#".$ri_field_name."_visitems option:selected').each( function() {
             jQuery('#".$ri_field_name."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
             jQuery('#".$ri_field_name."').append(\"<option selected='selected' class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
             jQuery(this).remove();
         });
     });
-    jQuery('#btn-remove').click(function(){
+    jQuery('#btn-remove_".$ri_field_name."').click(function(){
         jQuery('#".$ri_field_name."_selitems option:selected').each( function() {
             jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
             jQuery(\"#".$ri_field_name." option[value='\"+jQuery(this).val()+\"']\").remove();

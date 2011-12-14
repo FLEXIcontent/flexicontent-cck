@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 		}
 
-		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
+		$linkfsel = JURI::root().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"button-add\">
@@ -246,12 +246,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if ($values)
 		{
 			if (!$js_and_css_added) {
-			  $document->addStyleSheet('plugins/flexicontent_fields/minigallery/minigallery.css');
+			  $document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/minigallery.css');
 			  // this allows you to override the default css files
-			  $document->addStyleSheet(JURI::base().'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+			  $document->addStyleSheet(JURI::root().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
 			  JHTML::_('behavior.mootools');
-			  $document->addScript('plugins/flexicontent_fields/minigallery/backgroundslider.js');
-			  $document->addScript('plugins/flexicontent_fields/minigallery/slideshow.js');
+			  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/backgroundslider.js');
+			  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/slideshow.js');
 			}
 		  $js_and_css_added = true;
 			
@@ -305,7 +305,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 			if ($controller) {
 				$controls_html = '<div id="'.$thumbbox_id.'" class="mingalcontrolbox" >';
-				$icontag = '<img src="'.JURI::base(true).'/plugins/flexicontent_fields/minigallery/icons/%s" />';
+				$icontag = '<img src="'.JURI::root().'plugins/flexicontent_fields/minigallery/icons/%s" />';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.play();" class="mingalbutton">'.sprintf($icontag,'playback_start.png').'</a>';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.stop();" class="mingalbutton">'.sprintf($icontag,'playback_pause.png').'</a>';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.previous();" class="mingalbutton">'.sprintf($icontag,'skip_backward.png').'</a>';
@@ -326,7 +326,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if ($filename) {
 					$img_path = $filename->filename;
 					if(substr($filename->filename,0,7)!='http://') {
-						$img_path = JURI::base(true) . '/' . $mediapath . '/' . $filename->filename;
+						$img_path = JURI::root() . $mediapath . '/' . $filename->filename;
 					}
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';

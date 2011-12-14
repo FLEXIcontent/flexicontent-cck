@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// define a global variable to be sure the script is loaded only once
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
-		if ($load_css) $document->addStyleSheet('plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+		if ($load_css) $document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		
 		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
 
@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// email button
 		if ($display_email)
 		{
-			$link		 = JURI::base().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
+			$link		 = JURI::root().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
