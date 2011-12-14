@@ -206,10 +206,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					)
 			{
 				// Multibox integration 
-				$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
 				
 				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-					$document->addStyleSheet('components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
 				}  // This is the new code for new multibox version, old multibox hack is the following lines
 				/*$csshack = '
 				<!--[if lte IE 6]>
@@ -223,8 +223,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$document->addCustomTag($csshack);*/
 
 				JHTML::_('behavior.mootools');
-				$document->addScript('components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
-				$document->addScript('components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
 
 				$box = "
 					window.addEvent('domready', function(){
@@ -296,9 +296,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
-				$field->{"display_small"} = JURI::base() . $srcs;
-				$field->{"display_medium"} = JURI::base() . $srcm;
-				$field->{"display_large"} = JURI::base() . $srcb;    
+				$field->{"display_small"} = JURI::root() . $srcs;
+				$field->{"display_medium"} = JURI::root() . $srcm;
+				$field->{"display_large"} = JURI::root() . $srcb;    
 				
 				// first condition is for the display for the preview feature
 				if ($mainframe->isAdmin()) {
@@ -357,7 +357,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$sizes = array('s',  's','m','l');
 				$w = $field->parameters->get('w_'.$sizes[$thumb_size]);
 				$h = $field->parameters->get('h_'.$sizes[$thumb_size]);
-				$field->{$prop} = "<img alt='' title='' src='".JURI::base().$default_image."' width='$w' height='$h' />";
+				$field->{$prop} = "<img alt='' title='' src='".JURI::root().$default_image."' width='$w' height='$h' />";
 			} else {
 				$field->{$prop} = '';
 			}
