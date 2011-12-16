@@ -326,7 +326,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if ($filename) {
 					$img_path = $filename->filename;
 					if(substr($filename->filename,0,7)!='http://') {
-						$img_path = JURI::root() . $mediapath . '/' . $filename->filename;
+						$img_path = JURI::base(true) .'/'. $mediapath . '/' . $filename->filename;
 					}
 					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
