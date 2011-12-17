@@ -378,7 +378,8 @@ if ($this->items) :
 				</div>
 			<?php endif; ?>
 	    <!-- EOF afterDisplayContent -->
-					
+			
+			<div class="fc_item_seperator"></div>
 
 	<?php endforeach; ?>
 		
