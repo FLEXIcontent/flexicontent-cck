@@ -78,7 +78,6 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php endif; ?>
   <!-- EOF afterDisplayTitle -->
 
-
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($this->item->positions['subtitle1'])) : ?>
 	<div class="lineinfo subtitle1">

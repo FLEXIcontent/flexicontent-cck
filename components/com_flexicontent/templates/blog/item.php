@@ -19,6 +19,14 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl; // for backwards compatiblity
+
+// Set the class for controlling number of columns in custom field blocks
+switch ($this->params->get( 'columnmode', 2 )) {
+	case 0: $columnmode = 'singlecol'; break;
+	case 1: $columnmode = 'doublecol'; break;
+	default: $columnmode = ''; break;
+}
+
 ?>
 
 <div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
@@ -156,11 +164,11 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php if (isset($this->item->positions['beforedescription'])) : ?>
 	<div class="customblock beforedescription">
 		<?php foreach ($this->item->positions['beforedescription'] as $field) : ?>
-		<span class="element">
+		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="fcvalue field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+			<span class="fcvalue field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
 		</span>
 		<?php endforeach; ?>
 	</div>
@@ -178,11 +186,11 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<?php if (isset($this->item->positions['afterdescription'])) : ?>
 	<div class="customblock afterdescription">
 		<?php foreach ($this->item->positions['afterdescription'] as $field) : ?>
-		<span class="element">
+		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="fcvalue field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+			<span class="fcvalue field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
 		</span>
 		<?php endforeach; ?>
 	</div>

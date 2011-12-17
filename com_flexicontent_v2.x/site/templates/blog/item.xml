@@ -50,6 +50,15 @@
 			<option value="0">Hide</option>
 			<option value="1">Show</option>
 		</field>
+		
+		<field name="Customblocks" type="separator" hr="false" default="Blocks for custom fields" level="level2" menu="hide" />
+		
+		<field name="columnmode" type="list" default="2" label="Column Mode" description="Force 1,2, Auto columns (2 columns for small, full row for large fields)">
+			<option value="0">Force 1 column</option>
+			<option value="1">Force 2 columns</option>
+			<option value="2">Auto columns</option>
+		</field>
+		
 		</fieldset>
 	</fields> 
 	<fieldgroups>

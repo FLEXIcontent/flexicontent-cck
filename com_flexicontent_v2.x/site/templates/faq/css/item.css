@@ -3,6 +3,7 @@ div.lineinfo {
 	display: block;
 	margin: 0 0 1em;
 	overflow: hidden;
+	clear: both;
 	/*border: 3px double silver;*/
 	/*padding:4px;*/
 }

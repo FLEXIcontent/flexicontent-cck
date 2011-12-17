@@ -1,4 +1,9 @@
 /* Blog Template */
+
+/********************************************************************/
+/*** Part 1, CSS rules for fields display via Template parameters ***/
+/********************************************************************/
+
 .iteminfo .createdline {
 	font-family:tahoma;
 	font-size:9px;
@@ -56,25 +61,89 @@
 	display: block;
 }
 
-.fcvalue {
-	padding-left: 5px;
-}
+.fclabel { font-weight:bold; }
+.fcvalue { font-weight:normal; }
 
-.fclabel {
-	font-weight:bold;
-}
+
+
+
+
+/*******************************************************************/
+/*** Part 2, CSS rules for fields display via Template positions ***/
+/*******************************************************************/
+
+
+/* Rule for customblock used to display fields via template positions */
 .customblock {
-	padding: 1%;
-	border: 1px solid #dddddd;
+	width: 98%!important;
+	padding: 1%!important;
+	margin: 8px 0px!important;
+	
 	display:block;
 	float:left;
-	width:98%;
-	margin-top:8px;
-	margin-bottom:8px;
+	border: 1px solid #dddddd;
 }
 
+
+/* Default rule for elements: Use auto columns, via min-width we can have full row automaticaly for larger elements (pseudo colspan=2 via css) */
 .customblock .element {
+	min-width: 48%!important;
+	padding: 0% 2% 0% 0%!important;
+	margin: 0%!important;
+	
 	display:block;
 	float:left;
-	margin-right: 20px;
+	border-width: 0%;
 }
+
+/* Force 1 column for all elements */
+.customblock .element.singlecol {
+	width: 100%!important;
+	padding: 0%!important;
+}
+
+/* Force 2 columns for all elements */
+.customblock .element.doublecol {
+	width: 48%!important;
+	overflow: hidden;
+}
+
+
+/* Field label inside the custom blocks */
+.customblock .fclabel {
+	width: 30%!important;
+	margin: 0% 3% 0% 0%!important;
+	padding: 0%!important;
+	
+	display:block;
+	float:left;
+	border-width: 0%;
+	
+	font-weight:bold;
+	min-height:25px;
+	vertical-align:middle;
+	text-align: right;
+}
+
+/* Field value inside the custom blocks */
+.customblock .fcvalue {
+	width: 66%!important;
+	margin: 0%!important;
+	padding: 0%!important;
+	
+	display:block;
+	float:left;
+	border-width: 0%;
+	
+	font-weight:normal;
+	min-height:25px;
+	vertical-align:middle;
+	text-align: left;
+}
+
+/* Field value when having no label */
+.customblock .fcvalue.nolabel {
+	width: 100%!important;
+}
+
+
