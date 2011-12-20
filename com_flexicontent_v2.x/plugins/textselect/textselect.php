@@ -17,7 +17,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsTextSelect extends JPlugin{
+class plgFlexicontent_fieldsTextSelect extends JPlugin {
+
 	function plgFlexicontent_fieldsTextSelect( &$subject, $params ) {
 		parent::__construct( $subject, $params );
         	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
@@ -26,6 +27,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
         	JPluginHelper::importPlugin('flexicontent_fields', 'text' );
         	JPluginHelper::importPlugin('flexicontent_fields', 'select' );
 	}
+	
+	
 	function onAdvSearchDisplayField(&$field, &$item) {
 		if($field->field_type != 'textselect') return;
 		$arrays = $field->parameters->renderToArray('params', 'group-textselect');
@@ -42,6 +45,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin{
 		$field->field_type = 'select';
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
 	}
+	
+	
 	function onDisplayField(&$field, &$item) {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type

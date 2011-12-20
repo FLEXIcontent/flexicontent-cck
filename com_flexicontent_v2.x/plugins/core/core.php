@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 931 2011-10-17 06:09:03Z ggppdk $
+ * @version 1.0 $Id: core.php 1050 2011-12-12 02:02:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -260,6 +260,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$db->query();
 		$i = 0;
 		foreach($post as $v) {
+			$v = is_array($v) ? serialize($v) : $v;
 			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','{$field->field_type}','{$i}', ".$db->Quote(strip_tags($v)).");";
 			$db->setQuery($query);
 			$db->query();
@@ -300,9 +301,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$obj = new stdClass;
 				$obj->item_id = $o->item_id;
 				$obj->label = $field->label;
-				/*if ($field->field_type=='tags' && isset() )
-					$obj->value = 'a';$tag_data[$fsearch]['name'];
-				else*/
+				/*if ($field->field_type=='tags' && isset($tag_data[$fsearch]->name) ) {
+					//echo $fsearch. " ";
+					$obj->value = $tag_data[$fsearch]->name;
+				} else*/
 					$obj->value = $fsearch;
 				$resultfields[] = $obj;
 			}

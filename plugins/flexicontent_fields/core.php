@@ -301,9 +301,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$obj = new stdClass;
 				$obj->item_id = $o->item_id;
 				$obj->label = $field->label;
-				/*if ($field->field_type=='tags' && isset() )
-					$obj->value = 'a';$tag_data[$fsearch]['name'];
-				else*/
+				/*if ($field->field_type=='tags' && isset($tag_data[$fsearch]->name) ) {
+					//echo $fsearch. " ";
+					$obj->value = $tag_data[$fsearch]->name;
+				} else*/
 					$obj->value = $fsearch;
 				$resultfields[] = $obj;
 			}

@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsCheckboximage extends JPlugin
@@ -24,16 +23,23 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_checkboximage', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
+	
+	
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'checkboximage') return;
 		plgFlexicontent_fieldsCheckboximage::onDisplayField($field, $item);
 	}
+	
+	
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkboximage') return;
+		
+		$field->label = JText::_($field->label);
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
 		jimport('joomla.filesystem.file');
@@ -44,6 +50,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$imagedir 			= preg_replace('#^(/)*#', '', $imagedir);
 		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
+						
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required validate-checkbox' : '';
 
@@ -69,7 +76,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$separator = '&nbsp;';
 			break;
 		}
-		
+
 		// initialise property
 		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
@@ -84,8 +91,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$listarrays[] = explode("::", $listelement);
 		}
 
-		$i = 1;
-		$options = "";
+		$i = 0;
+		$options  = "";
 		foreach ($listarrays as $listarray) {
 			// get the image src
 			$prefix = $mainframe->isAdmin() ? '../':'';
@@ -99,9 +106,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
 			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 			$i++;
-		}			
-			
-		$field->html 	= $options;
+		}
+		$field->html	= $options;
 	}
 
 
@@ -111,8 +117,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		if($field->field_type != 'checkboximage') return;
 		if(!$post) return;
 		
+		// create the fulltext search index
 		if ($field->issearch) {
-			// create the fulltext search index
 			$searchindex = '';
 			
 			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
@@ -123,7 +129,6 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				$listarrays[] = explode("::", $listelement);
 				}
 	
-			$i = 0;
 			$display = array();
 			foreach ($listarrays as $listarray) {
 				for($n=0, $c=count($post); $n<$c; $n++) {
@@ -131,28 +136,52 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 						$display[] = $listarray[1];
 						}
 					} 
-				$i++;
 				}			
 				
 			$searchindex  = implode(' ', $display);
+			$advsearchindex_values[] = $searchindex;
 			$searchindex .= ' | ';
 	
 			$field->search = $searchindex;
 		} else {
 			$field->search = '';
 		}
+		
+		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
+			plgFlexicontent_fieldsCheckboximage::onIndexAdvSearch($field, $advsearchindex_values);
+		}
+	}
+	
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'checkboximage') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='checkboximage';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','checkboximage','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'checkboximage') return;
 
+		$field->label = JText::_($field->label);
+		
 		$values = $values ? $values : $field->value;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
@@ -182,20 +211,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
-		// initialise property
-/*
-		if(!$values || $values[0] == '') {
-			$values = explode(",", $default_values);
-			}
-*/
+
 		$listelements = explode("%% ", $field_elements);
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
 			}
 
-		$i = 1;
 		$display = array();
 		foreach ($listarrays as $listarray) {
 			// get the image src
@@ -207,8 +229,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 					}
 				} 
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$i++;
 			}
+			
 		$field->{$prop} = implode($separatorf, $display);
 	}
 
@@ -218,24 +240,62 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'checkboximage') return;
 
-		// some parameter shortcuts
+		// ** some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
 		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
 		$field->html = '';
-						
+		
+		
+		// *** Retrieve values
 		$listelements = explode("%% ", $field_elements);
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
-			$listarrays[] = explode("::", $listelement);
-			}
-
-		$options = array(); 
+			list($val, $label, $image) = explode("::", $listelement);
+			$results[$val] = new stdClass();
+			$results[$val]->value = $val;
+			$results[$val]->text = $label;
+		}
+		
+		
+		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+		$results = array_intersect_key($results, flexicontent_cats::getFilterValues($filter));
+		
+		
+		// *** Create the select form field used for filtering
+		$options = array();
 		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		foreach ($listarrays as $listarray) {
-			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
-			}			
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';		
+		
+		foreach($results as $result) {
+			if (!trim($result->value)) continue;
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
 		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		
 	}
+	
+	
+	function onFLEXIAdvSearch(&$field, $fieldsearch) {
+		if($field->field_type!='checkboximage') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='checkboximage' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			if ($objs===false) continue;
+			$objs = is_array($objs)?$objs:array($objs);
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		$field->results = $resultfields;
+	}
+
 }

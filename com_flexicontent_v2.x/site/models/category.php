@@ -119,35 +119,10 @@ class FlexicontentModelCategory extends JModelList{
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
-		// set filter order variables
+		// Set filter order variables
 		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
 	}
-	/**
-	 * Constructor
-	 *
-	 * @since 1.0
-	 */
-	/*function __construct() {
-		parent::__construct();
-		$mainframe = &JFactory::getApplication();
-		$cid			= JRequest::getInt('cid', 0);
-		// we need to merge parameters here to get the correct page limit value
-		$params = $this->_loadCategoryParams($cid);
-
-		//get the number of entries from session
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');
-		$limitstart		= JRequest::getInt('limitstart');
-		
-		$this->setId((int)$cid);
-
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-
-		// Get the filter request variables
-		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
-		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
-	}*/
 	
 	/**
 	 * Method to auto-populate the model state.
@@ -701,8 +676,9 @@ class FlexicontentModelCategory extends JModelList{
 				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
 			}
 		}
-
-		return $where;
+		
+		global $currcat_data;
+		return $currcat_data['where'] = $where;
 	}
 
 	/**
@@ -958,7 +934,9 @@ class FlexicontentModelCategory extends JModelList{
 		$cparams = new JParameter($catparams);
 		$params->merge($cparams);
 
-		return $params;
+		
+		global $currcat_data;
+		return $currcat_data['params'] = $params;
 	}
 
 	/**
@@ -1038,7 +1016,7 @@ class FlexicontentModelCategory extends JModelList{
 		$owneritems = $cparams->get('owneritems', '0');
 		
 		// Filter the category view with the active active language
-		$and = FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
+		$and 	= /*FLEXI_FISH ? */' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) /*: ''*/;
 		//Display all items or owner items
 		$and2 = '';
 		$and3 = '';

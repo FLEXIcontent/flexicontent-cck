@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 980 2011-11-25 00:07:26Z ggppdk $
+ * @version 1.0 $Id: text.php 1050 2011-12-12 02:02:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -14,27 +14,30 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsText extends JPlugin{
 	
-	function plgFlexicontent_fieldsText( &$subject, $params ) {
+	function plgFlexicontent_fieldsText( &$subject, $params )
+	{
 		parent::__construct( $subject, $params );
         	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 	
 	
-	function onAdvSearchDisplayField(&$field, &$item) {
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
 		if($field->field_type != 'text') return;
 		plgFlexicontent_fieldsText::onDisplayField($field, $item);
 	}
 	
 	
-	function onDisplayField(&$field, &$item) {
-		$field->label = JText::_($field->label);
+	function onDisplayField(&$field, &$item)
+	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
+		
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
 		$required 			= $field->parameters->get( 'required', 0 ) ;
@@ -50,7 +53,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
 		$required 	= $required ? ' required' : '';
-		
+
 		// initialise property
 		if( ( $item->getValue('version', NULL, 0) < 2 || $default_value_use > 0) && strlen($default_value)) {
 			$field->value = array();
@@ -167,92 +170,12 @@ class plgFlexicontent_fieldsText extends JPlugin{
 	}
 
 
-	function onDisplayFilter(&$filter, $value='')
-	{
-		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'text') return;
-		
-		global $globalcats;
-		$db =& JFactory::getDBO();
-		$cid = JRequest::getInt('cid', 0);
-		$authorid = JRequest::getInt('authorid', 0);
-		if (!$cid && !$authorid) {
-			$filter->html = "Filter for : $field->label cannot be displayed, both cid and authorid not set<br />";
-			return;
-		}
-		
-		// some parameter shortcuts
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
-		$field->html = '';
-		
-		if ($authorid) $where[] = 'i.created_by ='.$authorid;
-		$where[] = 'fi.field_id ='.$filter->id;
-		
-		if ($cid) {
-			// Retrieve category parameters
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
-			$db->setQuery($query);
-			$catparams = $db->loadResult();
-			$cparams = new JParameter($catparams);
-			
-			$display_subcats = $cparams->get('display_subcategories_items', 0);
-			$_group_cats = array($cid);
-			
-			// Display items from (current and) immediate sub-categories (1-level)
-			if ($display_subcats==1) {
-				$db->setQuery('SELECT id FROM #__categories WHERE parent_id='.$cid);
-				$results = $db->loadObjectList();
-				if(is_array($results))
-					foreach($results as $cat)
-						$_group_cats[] = $cat->id;
-			}
-			// Display items from (current and) all sub-categories (any-level)
-			if ($display_subcats==2) {
-				// descendants also includes current category
-				$_group_cats = array_map('trim',explode(",",$globalcats[$cid]->descendants));
-			}
-			
-			$_group_cats = array_unique($_group_cats);
-			$_group_cats = "'".implode("','", $_group_cats)."'";
-			
-			$where[] = ' ci.catid IN ('.$_group_cats.')';
-		}
-		
-		$where = " WHERE " . implode(" AND ", $where);
-		
-		$query = 'SELECT DISTINCT fi.value as value, fi.value as text'
-				.' FROM #__flexicontent_fields_item_relations as fi '
-				.' LEFT JOIN #__flexicontent_cats_item_relations AS ci ON fi.item_id=ci.itemid'
-				.($authorid  ? ' LEFT JOIN #__content as i ON i.id=ci.itemid' : '')
-				.$where
-				.' ORDER BY fi.value'
-				;
-		//echo $query;
-		// Make sure there aren't any errors
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		if ($db->getErrorNum()) {
-			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br /><br />" .$query);
-			$filter->html	 = "Filter for : $field->label cannot be displayed, error during db query<br />";
-			return;
-		}
-		
-		$options = array();
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		foreach($results as $result) {
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
-		}
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-	}
-
-
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 		if(!$post) return;
+		
 		$newpost = array();
 		$new = 0;
 		
@@ -280,11 +203,13 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 		$field->search = $field->issearch ? $searchindex : '';
 
-		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+		if($field->isadvsearch && $data['vstate']==2) {
 			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
 		}
 	}
-
+	
+	
 	function onIndexAdvSearch(&$field, $post) {
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
@@ -310,7 +235,8 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if($field->field_type != 'text') return;
 
 		$field->label = JText::_($field->label);
-		$values = $values ? $values : $field->value ;
+		
+		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
 		$default_value		= $field->parameters->get( 'default_value', '' ) ;
@@ -371,6 +297,37 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			$field->{$prop} = '';
 		}
 	}
+
+
+	function onDisplayFilter(&$filter, $value='')
+	{
+		// execute the code only if the field type match the plugin type
+		if($filter->field_type != 'text') return;
+
+		// ** some parameter shortcuts
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
+		
+		// *** Retrieve values
+		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+		$results = flexicontent_cats::getFilterValues($filter);
+		
+		
+		// *** Create the select form field used for filtering
+		$options = array();
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		
+		foreach($results as $result) {
+			if (!trim($result->value)) continue;
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		
+	}
+	
 	
 	function onFLEXIAdvSearch(&$field, $fieldsearch) {
 		if($field->field_type!='text') return;
@@ -381,7 +338,6 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				." WHERE ai.field_id='{$field->id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
 			$db->setQuery($query);
 			$objs = $db->loadObjectList();
-			//echo "<pre>"; print_r($objs);echo "</pre>"; 
 			if ($objs===false) continue;
 			$objs = is_array($objs)?$objs:array($objs);
 			foreach($objs as $o) {
@@ -392,8 +348,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				$resultfields[] = $obj;
 			}
 		}
-		//echo "<pre>"; print_r($resultfields);echo "</pre>"; 
 		$field->results = $resultfields;
-		//return $resultfields;
 	}
+
 }

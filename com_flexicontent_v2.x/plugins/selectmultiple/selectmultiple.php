@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: selectmultiple.php 909 2011-09-24 02:36:01Z ggppdk $
+ * @version 1.0 $Id: selectmultiple.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.selectmultiple
@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsSelectmultiple extends JPlugin
@@ -24,25 +23,32 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_selectmultiple', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
+	
+	
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'selectmultiple') return;
 		plgFlexicontent_fieldsSelectmultiple::onDisplayField($field, $item);
 	}
+	
+	
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;
+		
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$size				= $field->parameters->get( 'size', 6 ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
-						
+		
 		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 		$size	 	= $size ? ' size="'.$size.'"' : '';
-		
+
 		// initialise property
 		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
@@ -66,11 +72,10 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			
 			$db->setQuery($query);
 			$options = $db->loadObjectList();
-			
+
 			if (!$query || !is_array($options)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			} else {
-			
 				$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 			}
 
@@ -83,15 +88,9 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			}
 
 			$options = array(); 
-			$display = array();
 			foreach ($listarrays as $listarray) {
 				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
-				for($n=0, $c=count($field->value); $n<$c; $n++) {
-					if ($field->value[$n] == $listarray[0]) {
-						$display[] = JText::_($listarray[1]);
-					}
-				}
-			}			
+			}
 			$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 		}
 	}
@@ -115,6 +114,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if($pretext) 	{ $pretext 	= $remove_space ? '' : $pretext . ' '; }
 		if($posttext) 	{ $posttext	= $remove_space ? '' : ' ' . $posttext; }
 
+		$advsearchindex_values = array();
 		if ($sql_mode) { // SQL mode
 			
 			$db =& JFactory::getDBO();
@@ -131,11 +131,10 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
 			
-			if (!$results) {
-				$display = '';
+			$advsearchindex_values = array();
 			
-			} else {
-
+			if ($results) {
+				
 				$display = array();
 				foreach($results as $result) {
 					for($n=0, $c=count($post); $n<$c; $n++) {
@@ -144,15 +143,19 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 						}
 					}
 				}
-				$searchindex	 = implode(' ', $display);
-				$searchindex	.= ' | ';
+				$searchindex  = implode(' ', $display);
+				$advsearchindex_values[] = $searchindex;
+				$searchindex .= ' | ';
+
 				$field->search = $field->issearch ? $searchindex : '';
+				
 			}
 
 		} else { // Elements mode
 
 			$listelements = explode("%% ", $field_elements);
 			$listarrays = array();
+		
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);
 			}
@@ -165,20 +168,46 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					}
 				} 
 			}
-			$searchindex	 = implode(' ', $display);
-			$searchindex	.= ' | ';
+			$searchindex  = implode(' ', $display);
+			$advsearchindex_values[] = $searchindex;
+			$searchindex .= ' | ';
 			$field->search = $field->issearch ? $searchindex : '';
-		}			
+		}
+		
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+		if($field->isadvsearch && $data['vstate']==2) {
+			plgFlexicontent_fieldsSelectmultiple::onIndexAdvSearch($field, $advsearchindex_values);
+		}
+	}
+	
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'selectmultiple') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='selectmultiple';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','selectmultiple','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
 	}
 
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'selectmultiple') return;
+
+		$field->label = JText::_($field->label);
 		
-		$values = $values ? $values : $field->value ;
+		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
 		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
@@ -263,6 +292,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			// initialise property
 			$listelements = explode("%% ", $field_elements);
 			$listarrays = array();
+
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);
 			}
@@ -290,58 +320,97 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'selectmultiple') return;
 
-		// some parameter shortcuts
+		// ** some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
 		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
 		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
 		$field->html = '';
 		
-		if ($sql_mode) { // SQL mode
+		
+		// *** Retrieve values
+		if ($sql_mode) {  // CASE 1: SQL mode
 			
 			$db =& JFactory::getDBO();
 			$jAp=& JFactory::getApplication();
 			
+			// !! CHECK: The field depends on item data so it cannot be used as filter in category
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			preg_match_all("/{item->[^}]+}/", $query, $matches);
 			if (count($matches[0])) {
-				echo "here";
-				$filter->html = JText::_('FLEXI_WARNING_ITEM_SPECIFIC_AS_CATEGORY_FILTER'); //sprintf( '', $filter->label );
+				$filter->html = sprintf( JText::_('FLEXI_WARNING_ITEM_SPECIFIC_AS_CATEGORY_FILTER'), $filter->label );
 				return;
 			}
 			
+			// Execute SQL query to retrieve the field value - label pair
 			$db->setQuery($query);
-			$results = $db->loadObjectList();
+			$results = $db->loadObjectList('value');
 			
+			// !! CHECK: DB query had an error, set a message to warn the user
+			if ($db->getErrorNum()) {
+				JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
+				$filter->html	 = "<br />Filter for : $field->label cannot be displayed, error during db query, please correct field configuration<br />";
+				return;
+			}
+			
+			// !! CHECK: DB query produced no data, do not create the filter
 			if (!$results) {
-				$field->html .= '';
-			
-			} else {
-			
-				$options = array();
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				foreach($results as $result) {
-					$options[] = JHTML::_('select.option', $result->value, $result->text);
-				}
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$field->html = '';
+				return;
 			}
 
-		} else { // Elements mode
+		} else { // CASE 2: Elements mode
 
 			$listelements = explode("%% ", $field_elements);
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
-				$listarrays[] = explode("::", $listelement);
+				list($val, $label) = explode("::", $listelement);
+				$results[$val] = new stdClass();
+				$results[$val]->value = $val;
+				$results[$val]->text = $label;
 			}
-
-			$options = array(); 
-			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-			foreach ($listarrays as $listarray) {
-				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
-			}			
-			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			
 		}
+		
+		
+		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+		$results = array_intersect_key($results, flexicontent_cats::getFilterValues($filter));
+		
+		
+		// *** Create the select form field used for filtering
+		$options = array();
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		
+		foreach($results as $result) {
+			if (!trim($result->value)) continue;
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		
 	}
+	
+	
+	function onFLEXIAdvSearch(&$field, $fieldsearch) {
+		if($field->field_type!='selectmultiple') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='selectmultiple' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			if ($objs===false) continue;
+			$objs = is_array($objs)?$objs:array($objs);
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		$field->results = $resultfields;
+	}
+
 }
