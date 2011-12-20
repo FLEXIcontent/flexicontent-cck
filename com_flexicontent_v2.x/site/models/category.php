@@ -588,7 +588,8 @@ class FlexicontentModelCategory extends JModelList{
 		{
 			foreach ($filters as $filtre)
 			{
-				$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				//$setfilter 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				$setfilter 	= JRequest::getString('filter_'.$filtre->id, '', 'request');
 				if (strlen($setfilter)>0) {
 					$ids 	= $this->_getFiltered($filtre->id, $setfilter);
 					if ($ids)

@@ -318,7 +318,8 @@ class FlexicontentViewCategory extends JView
 
 			foreach ($filters as $filtre)
 			{
-				$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				//$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				$value 	= JRequest::getString('filter_'.$filtre->id, '', 'request');
 				JPluginHelper::importPlugin('flexicontent_fields', ($filtre->iscore ? 'core' : $filtre->field_type) );
 				$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				$lists['filter_' . $filtre->id] = $value;
