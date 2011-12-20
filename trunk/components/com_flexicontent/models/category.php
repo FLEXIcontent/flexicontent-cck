@@ -536,7 +536,8 @@ class FlexicontentModelCategory extends JModel{
 			}
 		}
 		
-		return $where;
+		global $currcat_data;
+		return $currcat_data['where'] = $where;
 	}
 
 	/**
@@ -857,7 +858,8 @@ class FlexicontentModelCategory extends JModel{
 			 $params->set('clayout', $clayout);
 		}
 		
-		return $params;
+		global $currcat_data;
+		return $currcat_data['params'] = $params;
 	}
 
 	/**

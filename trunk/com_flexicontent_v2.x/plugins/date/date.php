@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: date.php 967 2011-11-21 00:01:36Z ggppdk $
+ * @version 1.0 $Id: date.php 1050 2011-12-12 02:02:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.date
@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsDate extends JPlugin
@@ -24,14 +23,20 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		parent::__construct( $subject, $params );
         	JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
+	
+	
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
 		plgFlexicontent_fieldsDate::onDisplayField($field, $item);
 	}
+	
+	
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
+		
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
@@ -169,87 +174,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	}
 
 
-	function onDisplayFilter(&$filter, $value='')
-	{
-		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'date') return;
-		
-		global $globalcats;
-		$db =& JFactory::getDBO();
-		$cid = JRequest::getInt('cid', 0);
-		$authorid = JRequest::getInt('authorid', 0);
-		if (!$cid && !$authorid) {
-			$filter->html = "Filter for : $field->label cannot be displayed, both cid and authorid not set<br />";
-			return;
-		}
-		
-		// some parameter shortcuts
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
-		$field->html = '';
-		
-		if ($authorid) $where[] = 'i.created_by ='.$authorid;
-		$where[] = 'fi.field_id ='.$filter->id;
-		
-		if ($cid) {
-			// Retrieve category parameters
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
-			$db->setQuery($query);
-			$catparams = $db->loadResult();
-			$cparams = new JParameter($catparams);
-			
-			$display_subcats = $cparams->get('display_subcategories_items', 0);
-			$_group_cats = array($cid);
-			
-			// Display items from (current and) immediate sub-categories (1-level)
-			if ($display_subcats==1) {
-				$db->setQuery('SELECT id FROM #__categories WHERE parent_id='.$cid);
-				$results = $db->loadObjectList();
-				if(is_array($results))
-					foreach($results as $cat)
-						$_group_cats[] = $cat->id;
-			}
-			// Display items from (current and) all sub-categories (any-level)
-			if ($display_subcats==2) {
-				// descendants also includes current category
-				$_group_cats = array_map('trim',explode(",",$globalcats[$cid]->descendants));
-			}
-			
-			$_group_cats = array_unique($_group_cats);
-			$_group_cats = "'".implode("','", $_group_cats)."'";
-			
-			$where[] = ' ci.catid IN ('.$_group_cats.')';
-		}
-		
-		$where = " WHERE " . implode(" AND ", $where);
-		
-		$query = 'SELECT DISTINCT fi.value as value, fi.value as text'
-				.' FROM #__flexicontent_fields_item_relations as fi '
-				.' LEFT JOIN #__flexicontent_cats_item_relations AS ci ON fi.item_id=ci.itemid'
-				.($authorid  ? ' LEFT JOIN #__content as i ON i.id=ci.itemid' : '')
-				.$where
-				.' ORDER BY fi.value'
-				;
-		//echo $query;
-		// Make sure there aren't any errors
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		if ($db->getErrorNum()) {
-			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br /><br />" .$query);
-			$filter->html	 = "Filter for : $field->label cannot be displayed, error during db query<br />";
-			return;
-		}
-		
-		$options = array();
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		foreach($results as $result) {
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
-		}
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-	}
-
-
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		// execute the code only if the field type match the plugin type
@@ -287,7 +211,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			plgFlexicontent_fieldsDate::onIndexAdvSearch($field, $post);
 		}
 	}
-
+	
+	
 	function onIndexAdvSearch(&$field, $post) {
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
@@ -311,15 +236,16 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
-		
+
 		$field->label = JText::_($field->label);
+		
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
 		$customdate			= $field->parameters->get( 'custom_date', '%Y-%m-%d' ) ; 
 		$dateformat			= $field->parameters->get( 'date_format', $customdate ) ;
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
-
+		
 		switch($separatorf)
 		{
 			case 0:
@@ -342,21 +268,52 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
-								
+		
 		// initialise property
-		$field->{$prop} 	= array();
-
-		$n=0;
+		$field->{$prop} = array();
+		
+		$n = 0;
 		foreach ($values as $value) {
 			// We must use timezone offset ZERO, because the date(-time) value is stored in its final value
 			// AND NOT as GMT-0 which would need to be converted to localtime, if not specified the JHTML-date
 			// will convert to local time using a timezone offset, giving erroneous output
-			// J1.6+  CANNOT USE 0 as $timezone_offset, removed it ...
+			// J1.6+  CANNOT USE 0 as $timezone_offset, also it is not needed ... commented out it ...
 			$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat)/*, $timezone_offset=0*/ ) : JText::_( 'FLEXI_NO_VALUE' );
 			$n++;
 		}
 		$field->{$prop} = implode($separatorf, $field->{$prop});	
 	}
+
+
+	function onDisplayFilter(&$filter, $value='')
+	{
+		// execute the code only if the field type match the plugin type
+		if($filter->field_type != 'date') return;
+
+		// ** some parameter shortcuts
+		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		$field->html = '';
+		
+		
+		// *** Retrieve values
+		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+		$results = flexicontent_cats::getFilterValues($filter);
+		
+		
+		// *** Create the select form field used for filtering
+		$options = array();
+		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		
+		foreach($results as $result) {
+			if (!trim($result->value)) continue;
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		
+	}
+	
 	
 	function onFLEXIAdvSearch(&$field, $fieldsearch) {
 		if($field->field_type!='date') return;
@@ -367,7 +324,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				." WHERE ai.field_id='{$field->id}' AND ai.extratable='date' AND ai.search_index like '%{$fsearch}%';";
 			$db->setQuery($query);
 			$objs = $db->loadObjectList();
-			//echo "<pre>"; print_r($objs);echo "</pre>"; 
 			if ($objs===false) continue;
 			$objs = is_array($objs)?$objs:array($objs);
 			foreach($objs as $o) {
@@ -378,8 +334,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$resultfields[] = $obj;
 			}
 		}
-		//echo "<pre>"; print_r($resultfields);echo "</pre>"; 
 		$field->results = $resultfields;
-		//return $resultfields;
 	}
+
 }
