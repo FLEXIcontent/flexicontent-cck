@@ -40,6 +40,10 @@
 				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 				<option value="0">FLEXI_DMI_ID_NO</option>
 			</field>
+			<field name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 			<field name="separator3" label="" type="separator" default="FLEXI_MULTILINGUAL_CONF" level="level1" menu="hide" />
 			
