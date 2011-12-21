@@ -125,7 +125,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_canonical" type="radio" default="0" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

@@ -143,7 +143,9 @@ class FlexicontentViewCategory extends JView
 		// @TODO check that as it seems to be dirty :(
 		$uri  			=& JFactory::getURI();
 		$base 			= $uri->getScheme() . '://' . $uri->getHost();
-		$ucanonical 	= $base . '/'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+		$start = JRequest::getVar('start', '');
+		$start = $start ? "&start=".$start : "";
+		$ucanonical 	= $base . '/'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
