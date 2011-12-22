@@ -293,7 +293,7 @@
 		<copy file="language/en-GB/en-GB.com_flexicontent.ini" tofile="flexipack/site/language/en-GB.com_flexicontent.ini" />
 		<copy file="language/fr-FR/fr-FR.com_flexicontent.ini" tofile="flexipack/site/language/fr-FR.com_flexicontent.ini" />
 		<copy file="language/ru-RU/ru-RU.com_flexicontent.ini" tofile="flexipack/site/language/ru-RU.com_flexicontent.ini" />
-		<copy file="language/de-De/de-DE.com_flexicontent.ini" tofile="flexipack/site/language/de-DE.com_flexicontent.ini" />
+		<copy file="language/de-DE/de-DE.com_flexicontent.ini" tofile="flexipack/site/language/de-DE.com_flexicontent.ini" />
 		
 		<tar destfile="com_flexicontent.tar.gz" basedir="flexipack" compression="gzip"/>
 <!--
