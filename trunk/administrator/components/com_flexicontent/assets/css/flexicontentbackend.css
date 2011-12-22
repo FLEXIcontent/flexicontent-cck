@@ -499,9 +499,9 @@ table.adminlist thead #filter_cats {
 
 /* Tags list autocomplete */
 ul#ultagbox{
-	min-height: 26px;
-	margin: 0;
-	padding: 0;
+	min-height: 26px!important;
+	margin: 0!important;
+	padding: 0!important;
 }
 ul#ultagbox li{
 	list-style-type:none;
@@ -560,12 +560,24 @@ div#tags {
 	width: 235px;
 }
 
-div#result table.versionlist{
+div#result table.versionlist {
 	border: 1px dashed silver;
 	padding: 5px;
 	margin-bottom: 5px;
 }
-div#result table.versionlist th{
+div#result table.versionlist th {
 	border-bottom: 1px dotted silver;
 	padding: 2px 0 6px 0;
 }
+
+.fc_select_button {
+	display:block;  float:left;  padding:6px;  margin: 12px; 
+	background-color:#eeeeee;  border:1px solid #dddddd;  border-radius:6px;
+	font-weight:bold;  font-size:12px;  font-family:tahoma;
+	text-align:left;  text-decoration:none;
+}
+
+.fc_select_button:hover {
+	background-color:#dddddd;
+}
+

@@ -83,6 +83,62 @@ class FlexicontentControllerItems extends JController {
 	}
 
 	/**
+	 * Method to select new state for many items
+	 * 
+	 * @since 1.5
+	 */
+	function selectstate() {
+		
+		$user	=& JFactory::getUser();
+		$permission = FlexicontentHelperPerm::getPerm();
+		$CanPublish = (!$permission->CanConfig) ? $permission->CanPublish : 1;
+		if($CanPublish) {
+			//header('Content-type: application/json');
+			@ob_end_clean();
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Cache-Control: no-cache");
+			header("Pragma: no-cache");
+
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css">';
+
+			$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'color' => 'darkgreen' );
+			$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'color' => 'darkred' );
+			$state['A'] = array( 'name' =>'FLEXI_ARCHIVED', 'desc' =>'FLEXI_ARCHIVED_STATE', 'icon' => 'disabled.png', 'color' => 'gray' );
+			$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'color' => 'darkgreen' );
+			$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'color' => 'darkred' );
+			$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_NEED_TO_BE_APROVED', 'icon' => 'publish_r.png', 'color' => 'darkred' );
+			
+			echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b><br /><br />";
+		?>
+			
+		<?php
+			foreach($state as $shortname => $statedata) {
+				$css = "width:28%; margin:0px 1% 12px 1%; padding:1%; color:".$statedata['color'].";";
+				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".JUtility::getToken()."=1";
+				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
+		?>
+				<a	style="<?php echo $css; ?>" class="fc_select_button" href="javascript:;"
+						onclick="
+							window.parent.document.adminForm.newstate.value='<?php echo $shortname; ?>';
+							if(window.parent.document.adminForm.boxchecked.value==0)
+								alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>');
+							else
+								window.parent.Joomla.submitbutton('items.changestate')";
+						target="_parent">
+					<img src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo JText::_( $statedata['desc'] ); ?>" />
+					<?php echo JText::_( $statedata['name'] ); ?>
+				</a>
+		<?php
+			}
+		?>
+			
+		<?php
+			exit();
+		}
+	}
+	
+	
+	/**
 	 * Method to reset hits
 	 * 
 	 * @since 1.0

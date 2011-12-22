@@ -164,6 +164,15 @@ class FlexicontentViewItems extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
+		$toolbar =&JToolBar::getInstance('toolbar');
+		
+		if ($CanPublish) {
+			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent&controller=items&task=selectstate&format=raw', 840, 200);
+		}
+		
+		JToolBarHelper::spacer();
+		JToolBarHelper::divider();
+		JToolBarHelper::spacer();
 		if ($CanAdd) {
 			JToolBarHelper::addNew();
 			if ($CanCopy) {
@@ -176,6 +185,10 @@ class FlexicontentViewItems extends JView {
 		if ($CanDelete) {
 			JToolBarHelper::deleteList();
 		}
+		
+		JToolBarHelper::spacer();
+		JToolBarHelper::divider();
+		JToolBarHelper::spacer();
 		if (FLEXI_ACCESS && !$CanPublish) {
 			JToolBarHelper::customX( 'approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
