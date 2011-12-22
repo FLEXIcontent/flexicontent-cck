@@ -574,6 +574,17 @@ div#result table.versionlist th {
 	padding: 2px 0 6px 0;
 }
 
+.fc_select_button {
+	display:block;  float:left;  padding:6px;  margin: 12px; 
+	background-color:#eeeeee;  border:1px solid #dddddd;  border-radius:6px;
+	font-weight:bold;  font-size:12px;  font-family:tahoma;
+	text-align:left;  text-decoration:none;
+}
+
+.fc_select_button:hover {
+	background-color:#dddddd;
+}
+
 div fieldset label.radiobtn {
 	padding-right:12px;
 	min-width:0px;

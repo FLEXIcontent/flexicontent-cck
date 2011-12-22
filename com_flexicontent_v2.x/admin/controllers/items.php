@@ -374,6 +374,48 @@ class FlexicontentControllerItems extends JController
 		exit;
 	}
 
+
+	/**
+	 * Logic to change state of multiple items
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function changestate()
+	{
+		$cids	= JRequest::getVar( 'cid', array(), 'post', 'array' );
+		$model 	= $this->getModel('items');
+		
+		$newstate = JRequest::getVar("newstate", '');
+		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => -1 );
+		$statenames = array ( 'PE' => 'FLEXI_PENDING', 'OQ' => 'FLEXI_TO_WRITE', 'IP' => 'FLEXI_IN_PROGRESS', 'P' => 'FLEXI_PUBLISHED', 'U' => 'FLEXI_UNPUBLISHED', 'A' => 'FLEXI_ARCHIVED' );
+		
+		if ( !isset($stateids[$newstate]) ) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'Invalid State' ).": ".$newstate );
+		}
+		
+		if ( !count( $cids ) ) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_NO_ITEMS_SELECTED' ) );
+		}		
+		if ( is_array( $cids ) && count( $cids ) ) {
+			
+			foreach ($cids as $item_id) {
+				$model->setitemstate($item_id, $stateids[$newstate]);
+			}
+			$msg = JText::_( 'FLEXI_ITEMS_STATE_CHANGED_TO')." -- ".JText::_( $statenames[$newstate] ) ." --";
+		}
+
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
+
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
+	}
+
+
 	/**
 	 * Logic to submit item to approval
 	 *

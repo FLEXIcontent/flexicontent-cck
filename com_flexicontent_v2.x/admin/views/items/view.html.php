@@ -122,19 +122,31 @@ class FlexicontentViewItems extends JView {
 			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
 		
-		$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
-		$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
-		$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
 		$permission = FlexicontentHelperPerm::getPerm();
 		FLEXIcontentSubmenu('notvariable');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
+		$toolbar =&JToolBar::getInstance('toolbar');
+		
+		if ($permission->CanPublish) {
+			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw', 840, 200);
+		}
+		
+		JToolBarHelper::spacer();
+		JToolBarHelper::divider();
+		JToolBarHelper::spacer();
 		if ($permission->CanAdd) {
-			JToolBarHelper::addNew('items.add');
+			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
+			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
+			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
+			//$js .= "});";
+			//$document->addScriptDeclaration($js);
+			//JToolBarHelper::addNew('items.add');
+			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
+			
+			$toolbar->appendButton('Popup', 'new', 'JTOOLBAR_NEW', JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
+			
 			if ($permission->CanCopy) {
 				JToolBarHelper::customX( 'items.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
 			}
@@ -145,9 +157,17 @@ class FlexicontentViewItems extends JView {
 		if ($permission->CanDelete) {
 			JToolBarHelper::deleteList('Are you sure?', 'items.remove');
 		}
+		
+		JToolBarHelper::spacer();
+		JToolBarHelper::divider();
+		JToolBarHelper::spacer();
 		if (!$permission->CanPublish) {
 			JToolBarHelper::customX( 'items.approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
+		
+		JToolBarHelper::spacer();
+		JToolBarHelper::divider();
+		JToolBarHelper::spacer();
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
@@ -157,8 +177,6 @@ class FlexicontentViewItems extends JView {
 		$authors		= & $this->get( 'Authorslist' );
 		$unassociated		= & $this->get( 'UnassociatedItems' );
 		$status      		= & $this->get( 'ExtdataStatus');
-		
-		JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 		
 		//if (FLEXI_FISH) {
 			$langs	= & $this->get( 'Languages' );
