@@ -253,7 +253,7 @@ class modFlexicontentHelper
 				$lists[$ord]['featured'][$i]->id = $row->id;
 				//date
 				if ($params->get('display_date', 1) == 1) {
-					$dateformat = $params->get('date_format_feat', 'DATE_FORMAT_LC3');
+					$dateformat = JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'));
 					if($dateformat == JText::_('custom'))
 						$dateformat = $params->get('custom_date_format_feat', JText::_('DATE_FORMAT_LC3'));
 					if ($params->get('date_type_feat', 1) == 1) {
@@ -325,7 +325,7 @@ class modFlexicontentHelper
 				$lists[$ord]['standard'][$i]->id = $row->id;
 				//date
 				if ($params->get('display_date', 1) == 1) {
-					$dateformat = $params->get('date_format', 'DATE_FORMAT_LC3');
+					$dateformat = JText::_($params->get('date_format', 'DATE_FORMAT_LC3'));
 					if($dateformat == JText::_('custom'))
 						$dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 					if ($params->get('date_type', 1) == 1) {
