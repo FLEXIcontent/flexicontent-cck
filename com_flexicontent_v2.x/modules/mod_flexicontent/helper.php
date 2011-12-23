@@ -253,12 +253,15 @@ class modFlexicontentHelper
 				$lists[$ord]['featured'][$i]->id = $row->id;
 				//date
 				if ($params->get('display_date', 1) == 1) {
+					$dateformat = $params->get('date_format_feat', 'DATE_FORMAT_LC3');
+					if($dateformat == JText::_('custom'))
+						$dateformat = $params->get('custom_date_format_feat', JText::_('DATE_FORMAT_LC3'));
 					if ($params->get('date_type_feat', 1) == 1) {
 						$lists[$ord]['featured'][$i]->date = $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
-						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->created, JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'))) . '</span>';
+						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
 					} else {
 						$lists[$ord]['featured'][$i]->date = $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_MODIFIED').':</span> ' : '';
-						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->modified, JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'))) . '</span>';
+						$lists[$ord]['featured'][$i]->date .= '<span class="date_value_feat">' . JHTML::_('date', $row->modified, $dateformat) . '</span>';
 					}
 				}
 				$lists[$ord]['featured'][$i]->image 	= $thumb;
@@ -322,15 +325,14 @@ class modFlexicontentHelper
 				$lists[$ord]['standard'][$i]->id = $row->id;
 				//date
 				if ($params->get('display_date', 1) == 1) {
+					$dateformat = $params->get('date_format', 'DATE_FORMAT_LC3');
+					if($dateformat == JText::_('custom'))
+						$dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 					if ($params->get('date_type', 1) == 1) {
 						$lists[$ord]['standard'][$i]->date = $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
-						$dateformat = $params->get('date_format', 'DATE_FORMAT_LC3');
-						if($dateformat == JText::_('custom')) $dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 						$lists[$ord]['standard'][$i]->date .= '<span class="date_value">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
 					} else {
 						$lists[$ord]['standard'][$i]->date = $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_MODIFIED').':</span> ' : '';
-						$dateformat = $params->get('date_format', 'DATE_FORMAT_LC3');
-						if($dateformat == JText::_('custom')) $dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 						$lists[$ord]['standard'][$i]->date .= '<span class="date_value">' . JHTML::_('date', $row->modified, $dateformat) . '</span>';
 					}
 				}

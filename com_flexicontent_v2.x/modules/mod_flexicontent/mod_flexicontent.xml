@@ -285,7 +285,9 @@
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
 				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+				<option value="custom">FLEXI_CUSTOM</option>
 			</field>
+			<field name="custom_date_format_feat" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT_FEAT" description="FLEXI_CUSTOM_DATE_FORMAT_FEAT_DESC" />
 			
 			<field name="FLEXI_FIELDS_PARAMS" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 			<field name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
