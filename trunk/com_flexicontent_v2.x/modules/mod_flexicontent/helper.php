@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 922 2011-10-05 17:42:58Z ggppdk $
+ * @version 1.2 $Id: helper.php 1068 2011-12-23 04:06:02Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -54,6 +54,10 @@ class modFlexicontentHelper
 		$layout 				= $params->get('layout');
 		$add_ccs 				= $params->get('add_ccs');
 		$add_tooltips 			= $params->get('add_tooltips', 1);
+		
+		// get other module parameters
+		$method_curlang	= (int)$params->get('method_curlang', 1);
+		
 		// standard
 		$display_title 			= $params->get('display_title');
 		$link_title 			= $params->get('link_title');
@@ -265,7 +269,7 @@ class modFlexicontentHelper
 					}
 				}
 				$lists[$ord]['featured'][$i]->image 	= $thumb;
-				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
+				$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 				$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
 				$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 				$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
@@ -337,7 +341,7 @@ class modFlexicontentHelper
 					}
 				}
 				$lists[$ord]['standard'][$i]->image 	= $thumb;
-				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/));
+				$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug/*, $forced_itemid*/).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 				$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
 				$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 				$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
@@ -475,7 +479,7 @@ class modFlexicontentHelper
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
 			
-			$q 	 		= 'SELECT c.*, ie.type_id, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
+			$q 	 		= 'SELECT c.*, ie.type_id, ie.language, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
 						. ' WHERE c.id = ' . $id
@@ -794,7 +798,7 @@ class modFlexicontentHelper
 					break;
 				}
 				
-				$query 	= 'SELECT i.*, ie.type_id, count(com.object_id) AS nr, ty.name AS typename,'
+				$query 	= 'SELECT i.*, ie.type_id, ie.language, count(com.object_id) AS nr, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -814,7 +818,7 @@ class modFlexicontentHelper
 				break;
 
 			case 'rated':
-				$query 	= 'SELECT i.*, (cr.rating_sum / cr.rating_count) * 20 AS votes, ie.type_id, ty.name AS typename,'
+				$query 	= 'SELECT i.*, (cr.rating_sum / cr.rating_count) * 20 AS votes, ie.type_id, ie.language, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -859,7 +863,7 @@ class modFlexicontentHelper
 		}
 		
 		if (!isset($query)) {
-			$query 	= 'SELECT i.*, ie.type_id, ty.name AS typename,'
+			$query 	= 'SELECT i.*, ie.type_id, ie.language, ty.name AS typename,'
 					. $select_image
 					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
