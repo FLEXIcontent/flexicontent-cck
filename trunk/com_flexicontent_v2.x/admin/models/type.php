@@ -28,7 +28,8 @@ jimport('joomla.application.component.modeladmin');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelType extends JModelAdmin{
+class FlexicontentModelType extends JModelAdmin
+{
 	/**
 	 * Type data
 	 *
@@ -43,7 +44,8 @@ class FlexicontentModelType extends JModelAdmin{
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  array(0), '', 'array');
@@ -62,7 +64,8 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @access	public
 	 * @param	int type identifier
 	 */
-	function setId($id) {
+	function setId($id)
+	{
 		// Set type id and wipe data
 		$this->_id	    = $id;
 	}
@@ -200,8 +203,10 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin() {
-		if ($this->_id) {
+	function checkin()
+	{
+		if ($this->_id)
+		{
 			$type = & JTable::getInstance('flexicontent_types', '');
 			$user = &JFactory::getUser();
 			return $type->checkout($user->get('id'), $this->_id);
@@ -217,8 +222,10 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null) {
-		if ($this->_id) {
+	function checkout($uid = null)
+	{
+		if ($this->_id)
+		{
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
 				$user	=& JFactory::getUser();
@@ -263,7 +270,8 @@ class FlexicontentModelType extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data) {
+	function store($data)
+	{
 		$type  =& $this->getTable('flexicontent_types', '');
 
 		// bind it to the table
@@ -274,7 +282,8 @@ class FlexicontentModelType extends JModelAdmin{
 
 		$attribs		= $data['jform']['attribs'];
 		// Build parameter INI string
-		if (is_array($attribs)) {
+		if (is_array($attribs))
+		{
 			$txt = array ();
 			foreach ($attribs as $k => $v) {
 				if (is_array($v)) {
@@ -284,6 +293,7 @@ class FlexicontentModelType extends JModelAdmin{
 			}
 			$type->attribs = implode("\n", $txt);
 		}
+
 		// Make sure the data is valid
 		if (!$type->check()) {
 			$this->setError($type->getError() );
@@ -296,24 +306,26 @@ class FlexicontentModelType extends JModelAdmin{
 			return false;
 		}
 		$insertid = (int)$this->_db->insertid();
-		$this->setId($insertid);
 		$this->_type	=& $type;
-
-		$core = $this->_getCoreFields();
 		
 		// only insert default relations if the type is new
 		if ($insertid) {
+			$this->setId($insertid);
+			$core = $this->_getCoreFields();
 			foreach ($core as $fieldid) {
 				$obj = new stdClass();
 				$obj->field_id	 	= (int)$fieldid;
 				$obj->type_id		= $type->id;
+
 				$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
 			}
 		}
+
 		return true;
 	}
 	
 	function addtype($name) {
+		
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
