@@ -96,7 +96,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 		}
 
 		$model->checkin();
-
 		$this->setRedirect($link, $msg);
 	}
 
@@ -140,8 +139,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 	= $this->getModel('types');
 
+		$msg = '';
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 		} else if (!$model->candelete($cid)) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED' ));

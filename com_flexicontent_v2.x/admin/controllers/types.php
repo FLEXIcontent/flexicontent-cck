@@ -27,13 +27,15 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerTypes extends FlexicontentController {
+class FlexicontentControllerTypes extends FlexicontentController
+{
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		// Register Extra task
@@ -50,17 +52,22 @@ class FlexicontentControllerTypes extends FlexicontentController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function save() {
+	function save()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+
 		$task		= JRequest::getVar('task');
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
+
 		$model = $this->getModel('type');
 
 		if ( $model->store($post) ) {
-			switch ($task) {
+
+			switch ($task)
+			{
 				case 'apply' :
 					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->getId();
 					break;
@@ -77,11 +84,14 @@ class FlexicontentControllerTypes extends FlexicontentController {
 
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
+
 		} else {
+
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_TYPE' );
 			//JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=type';
 		}
+
 		$model->checkin();
 		$this->setRedirect($link, $msg);
 	}
@@ -93,7 +103,8 @@ class FlexicontentControllerTypes extends FlexicontentController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function publish() {
+	function publish()
+	{
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -120,7 +131,8 @@ class FlexicontentControllerTypes extends FlexicontentController {
 	 * @return void
 	 * @since 1.5
 	 */
-	function unpublish() {
+	function unpublish()
+	{
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 	= $this->getModel('types');
 

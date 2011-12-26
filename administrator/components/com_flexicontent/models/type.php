@@ -160,7 +160,8 @@ class FlexicontentModelType extends JModel
 		if ($this->_id)
 		{
 			$type = & JTable::getInstance('flexicontent_types', '');
-			return $type->checkout($uid, $this->_id);
+			$user = &JFactory::getUser();
+			return $type->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -256,13 +257,13 @@ class FlexicontentModelType extends JModel
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		$insertid = $this->_db->insertid();
+		$insertid = (int)$this->_db->insertid();
 		$this->_type	=& $type;
-
-		$core = $this->_getCoreFields();
 		
 		// only insert default relations if the type is new
 		if ($insertid) {
+			$this->setId($insertid);
+			$core = $this->_getCoreFields();
 			foreach ($core as $fieldid) {
 				$obj = new stdClass();
 				$obj->field_id	 	= (int)$fieldid;
@@ -275,7 +276,7 @@ class FlexicontentModelType extends JModel
 		return true;
 	}
 	
-	function addtype($name){
+	function addtype($name) {
 		
 		$obj = new stdClass();
 		$obj->name	 	= $name;
