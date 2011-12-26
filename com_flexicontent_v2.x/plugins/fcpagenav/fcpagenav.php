@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 890 2011-09-02 15:21:59Z ggppdk $
+ * @version 1.0 $Id: fcpagenav.php 1054 2011-12-14 06:09:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -111,41 +111,20 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			}
 
 			// Determine sort order
-			$orderby = "";
+			$orderby = "a.title";
 			$order_method = $cparams->get('orderby', '');
 			switch ($order_method)
 			{
-				case 'date' :
-					$orderby = 'a.created';
-					break;
-	
-				case 'rdate' :
-					$orderby = 'a.created DESC';
-					break;
-	
-				case 'alpha' :
-					$orderby = 'a.title';
-					break;
-	
-				case 'ralpha' :
-					$orderby = 'a.title DESC';
-					break;
-	
-				case 'hits' :
-					$orderby = 'a.hits';
-					break;
-	
-				case 'rhits' :
-					$orderby = 'a.hits DESC';
-					break;
-	
-				case 'order' :
-					$orderby = 'rel.ordering';
-					break;
-	
-				default :
-					$orderby = 'a.ordering';
-					break;
+				case 'date'    : $orderby = 'a.created';  break;
+				case 'rdate'   : $orderby = 'a.created DESC';  break;
+				case 'modified': $orderby = 'a.modified DESC';  break;
+				case 'alpha'   : $orderby = 'a.title'; break;
+				case 'ralpha'  : $orderby = 'a.title DESC'; break;
+				case 'author'  : $orderby = 'u.name';  break;
+				case 'rauthor' : $orderby = 'u.name DESC';  break;
+				case 'hits'    : $orderby = 'a.hits';  break;
+				case 'rhits'   : $orderby = 'a.hits DESC';  break;
+				case 'order'   : $orderby = 'rel.ordering';  break;
 			}
 			
 			$types		= is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
@@ -165,8 +144,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
 				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
-				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.$cparams->get('orderbycustomfieldid');
+				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.(int)$cparams->get('orderbycustomfieldid', 0);
 			}
+			
+			$orderby .= ', a.title';
 			
 			// array of articles in same category correctly ordered
 			$query 	= 'SELECT a.id, a.title,'
@@ -175,10 +156,12 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					. ' FROM #__content AS a'
 					. ' LEFT JOIN #__categories AS cc ON cc.id = '. ($cid ? $cid : (int) $item->catid)
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+					. ' LEFT JOIN #__users AS u ON u.id = a.created_by'
 					. $field_item
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
 					. ' WHERE rel.catid = ' . ($cid ? $cid : (int) $item->catid)
 					. ( (FLEXI_FISH && $filtercat) ? ' AND ie.language LIKE ' . $db->Quote( $lang .'%' ) : "" )  // FILTER FOR CURRENT LAGNUAGE
+					. $xwhere
 					. $andaccess
 					//. ' GROUP BY a.id'  // NOT NEEDED and may mask errors, commented out
 					. ' ORDER BY '. $orderby
