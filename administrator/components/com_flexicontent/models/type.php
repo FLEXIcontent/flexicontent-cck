@@ -258,7 +258,6 @@ class FlexicontentModelType extends JModel
 			return false;
 		}
 		$insertid = (int)$this->_db->insertid();
-		$this->_type	=& $type;
 		
 		// only insert default relations if the type is new
 		if ($insertid) {
@@ -272,6 +271,7 @@ class FlexicontentModelType extends JModel
 				$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
 			}
 		}
+		$this->_type	=& $type;
 
 		return true;
 	}
