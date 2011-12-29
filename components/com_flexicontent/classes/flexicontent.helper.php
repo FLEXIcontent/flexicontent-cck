@@ -1691,7 +1691,8 @@ class FLEXIUtilities {
 			if(file_exists($path)) require_once($path);
 			$class = "plgFlexicontent_fields{$plg}";
 			if(class_exists($class) && in_array($act, get_class_methods($class))) {
-				call_user_func("$class::$act");
+				//call_user_func("$class::$act");
+				call_user_func(array($class, $act));
 			}
 		}
 	}
