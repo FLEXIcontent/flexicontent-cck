@@ -1757,6 +1757,20 @@ class FLEXIUtilities {
 		return $versionscount;
 	}
 	
+	function doPlgAct() {
+		$plg = JRequest::getVar('plg');
+		$act = JRequest::getVar('act');
+		if($plg && $act) {
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($plg).DS.strtolower($plg).'.php';
+			if(file_exists($path)) require_once($path);
+			$class = "plgFlexicontent_fields{$plg}";
+			if(class_exists($class) && in_array($act, get_class_methods($class))) {
+				//call_user_func("$class::$act");
+				call_user_func(array($class, $act));
+			}
+		}
+	}
+	
 	function getCache($group='', $client=0) {
 		$conf = JFactory::getConfig();
 		//$client = 0;//0 is site, 1 is admin
