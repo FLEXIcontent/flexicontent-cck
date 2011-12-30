@@ -953,5 +953,8 @@ class FlexicontentController extends JController
 		JRequest::setVar('view', 'search');
 		parent::display(true);
 	}
+	function doPlgAct() {
+		FLEXIUtilities::doPlgAct();
+	}
 }
 ?>
