@@ -786,5 +786,8 @@ VALUES
 			parent::display();
 		exit;
 	}
+	function doPlgAct() {
+		FLEXIUtilities::doPlgAct();
+	}
 }
 ?>
