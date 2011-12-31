@@ -1859,6 +1859,93 @@ class FLEXIUtilities {
 		return($ords);
 	}
 
+	function count_new_hit(&$params) // If needed to modify params then clone them !! ??
+	{
+		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
+		
+		$db =& JFactory::getDBO();
+		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
+		$current_secs = time();  // Current time as seconds since Unix epoch
+		$item_id = JRequest::getVar("id",0);
+		if ($item_id==0) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
+			return 1; // Invalid item id ?? (do not try to decrement hits in content table)
+		}
+		
+		
+		// CHECK RULE 1: Skip if visitor is from the specified ips
+		$hits_skip_ips = $params->get('hits_skip_ips', 1);   // Skip ips enabled
+		$hits_ips_list = $params->get('hits_ips_list', '127.0.0.1');  // List of ips, by default localhost
+		if($hits_skip_ips)
+		{
+			// consider as blocked ip , if remote address is not set (is this correct behavior?)
+			if( !isset($_SERVER['REMOTE_ADDR']) ) return 0;
+			
+			$remoteaddr = $_SERVER['REMOTE_ADDR'];
+			$ips_array = explode(",", $hits_ips_list);
+			foreach($ips_array as $blockedip)
+			{
+				if (preg_match('/'.trim($blockedip).'/i', $remoteaddr)) return 0;  // found blocked ip, do not count new hit
+			}
+		}
+		
+		
+		// CHECK RULE 2: Skip if visitor is a bot
+		$hits_skip_bots = $params->get('hits_skip_bots', 1);  // Skip bots enabled
+		$hits_bots_list = $params->get('hits_bots_list', 'bot,spider,crawler,search,libwww,archive,slurp,teoma');   // List of bots
+		if($hits_skip_bots)
+		{
+			// consider as bot , if user agent name is not set (is this correct behavior?)
+			if( !isset($_SERVER['HTTP_USER_AGENT']) ) return 0;
+
+			$useragent = $_SERVER['HTTP_USER_AGENT'];
+			$bots_array = explode(",", $hits_bots_list);
+			foreach($bots_array as $botname)
+			{
+				if (preg_match('/'.trim($botname).'/i', $useragent)) return 0;  // found bot, do not count new hit
+			}
+		}
+		
+		
+		// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
+		$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
+		
+		// Try to find matching records for visitor's IP, that is within time limit of unique hit
+		$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
+		$db->setQuery($query);
+		$result = $db->query();
+		if ($db->getErrorNum()) {
+			$select_error_msg = $db->getErrorMsg();
+			$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
+			$db->setQuery($query_create);
+			$result = $db->query();
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$select_error_msg."\n"),'error');
+			}
+			return 1; // on select error e.g. table created, count a new hit
+		}
+		$count = $db->loadResult();
+		
+		// Log the visit into the hits logging db table
+		if(empty($count))
+		{
+			$query = "REPLACE INTO #__flexicontent_hits_log (item_id, timestamp, ip) VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")";
+			$db->setQuery($query);
+			$result = $db->query();
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			}
+			return 1;  // last visit not found or is beyond time limit, count a new hit
+		}
+		
+		// Last visit within time limit, do not count new hit
+		return 0;
+	}
+
+
 	/**
 	 * Return unicode char by its code
 	 *

@@ -213,6 +213,24 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		
+		<param name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" level="level1" menu="hide" />
+		
+		<param name="hits_count_unique" type="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="hits_mins_to_unique" type="text" size="5" default="10" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
+		<param name="hits_skip_ips" type="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" />
+		<param name="hits_skip_bots" type="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
+		
 		<param name="" type="separator" default="FLEXI_CACHE_CONF" level="level1" menu="hide" />
 		
 		<param name="advcache" type="radio" default="1" label="FLEXI_ADV_CACHE" description="FLEXI_ADV_CACHE_DESC" menu="hide">
