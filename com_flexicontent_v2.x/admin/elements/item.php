@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 313 2010-06-19 08:32:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: item.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,9 +37,11 @@ class JFormFieldItem extends JFormField
 	* @var		string
 	*/
 	var	$type = 'Item';
-	
-	function getInput() {
+
+	function getInput()
+	{
 		$doc 		=& JFactory::getDocument();
+		$fieldName	= "jform[request][".$this->element["name"]."]";
 		$value		= $this->value;
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -59,11 +61,15 @@ class JFormFieldItem extends JFormField
 				$('a_id').setProperty('value', '0');
 			});
 		});
-
+		
 		function qfSelectItem(id, cid, title) {
 			document.getElementById('a_id').value = id;
+			
+			var cid_field =	document.getElementById('jform_request_cid');
+			if (cid_field) cid_field.value = cid;
+			/*else document.getElementById('a_id').value += ':'+cid; */
+			
 			document.getElementById('a_name').value = title;
-			document.getElementById('jform_request_cid').value = cid;
 			$('sbox-btn-close').fireEvent('click');
 		}";
 
@@ -73,8 +79,8 @@ class JFormFieldItem extends JFormField
 		JHTML::_('behavior.modal', 'a.modal');
 
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 650, y: 375}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"jform[request][".$this->element["name"]."]\" value=\"{$value}\" />";
+		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x:window.getScrollSize().x-100, y: window.getScrollSize().y-100}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
+		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
 
 		return $html;

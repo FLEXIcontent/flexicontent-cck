@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 313 2010-06-19 08:32:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 659 2011-07-18 09:06:39Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm">
 
 <table class="adminform">
 	<tr>
@@ -43,9 +43,9 @@ defined('_JEXEC') or die('Restricted access');
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
+			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -91,16 +91,20 @@ defined('_JEXEC') or die('Restricted access');
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td align="center"><?php echo $row->id; ?></td>
+			<td align="center">
+				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+			</td>
 			<td align="left">
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<?php if(JRequest::getVar('object','')==''): ?>
 					<a style="cursor:pointer" onclick="window.parent.qfSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+					<?php else: ?>
+					<a style="cursor:pointer" onclick="window.parent.jSelectArticle('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', '<?php echo JRequest::getVar('object',''); ?>');">
+					<?php endif; ?>
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
-			<td align="center">
-				<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
-			</td>
-			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
