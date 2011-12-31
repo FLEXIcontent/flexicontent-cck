@@ -51,6 +51,27 @@ class FlexicontentController extends JController
 		} else {
 			parent::display(true);
 		}
+		
+		// Count only unique hits e.g. every 10 minutes from same IP
+		$view = JRequest::getVar('view', '');
+		
+		if ($view == 'items') {
+			if ( $id = JRequest::getVar('id', '') ) {
+				// Get the PAGE/COMPONENT parameters
+				$jAp =& JFactory::getApplication();
+				$params = $jAp->getParams('com_flexicontent');
+				if ( ! FLEXIUtilities::count_new_hit($params) )	{
+					$query = "UPDATE #__content SET hits=hits-1 WHERE id =". (int)$id;// ." AND hits>0";
+					$db = & JFactory::getDBO();
+					$db->setQuery($query);
+					$result = $db->query();
+					if ($db->getErrorNum())  {
+						$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+					}
+				}
+			}
+		}
+		
 	}
 
 	/**
