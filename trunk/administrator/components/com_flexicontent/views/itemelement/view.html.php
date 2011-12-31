@@ -31,7 +31,9 @@ class FlexicontentViewItemelement extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db			= & JFactory::getDBO();

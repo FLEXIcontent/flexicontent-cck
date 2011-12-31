@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 313 2010-06-19 08:32:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 886 2011-08-31 15:10:00Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -29,7 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewItemelement extends JView {
 
-	function display($tpl = null) {
+	function display($tpl = null)
+	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -53,9 +54,9 @@ class FlexicontentViewItemelement extends JView {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet('templates/'.$template.'/css/general.css');
+		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.'/css/general.css');
 
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
