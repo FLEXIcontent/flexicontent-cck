@@ -340,6 +340,12 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		 		<?php echo $this->item->getInput('language');?>
 			</td>
 		</tr>
+		<tr>
+			<td>
+			<?php echo $this->item->getLabel('featured'); ?>
+			</td>
+			<td><?php echo $this->item->getInput('featured');?></td>
+		</tr>
 		<?php 
 		if ($this->perms['canconfig']) :
 		$this->document->addScriptDeclaration("

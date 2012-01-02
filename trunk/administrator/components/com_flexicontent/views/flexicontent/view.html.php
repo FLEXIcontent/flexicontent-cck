@@ -37,7 +37,7 @@ class FlexicontentViewFlexicontent extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		
 		//Load pane behavior

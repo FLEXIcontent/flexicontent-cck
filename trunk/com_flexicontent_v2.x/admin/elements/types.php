@@ -46,21 +46,24 @@ class JFormFieldTypes extends JFormField
 		. ' WHERE published = 1'
 		. ' ORDER BY name ASC, id ASC'
 		;
+		
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
+
 		$attribs = "";
 		if ($node->getAttribute('multiple')) {
-			$attribs .= 'multiple="true" size="4"';
+			$attribs .= 'multiple="true" ';
 			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
-			$fieldname = $this->name;//.'[]';
+			$fieldname = $this->name.'[]';
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 			$fieldname = $this->name;
 		}
 		$values = $this->value;
-		//var_dump($values);
-		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $this->id);
+		$element_id = $this->id;
+
+		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }
 ?>
