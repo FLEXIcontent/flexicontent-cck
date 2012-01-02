@@ -276,10 +276,16 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							</td>
 							</tr>
 							<tr>
-								<td><label for="notify">
+								<td><label for="language">
 								<?php echo $this->form->getLabel('language'); ?>
 								</label></td>
 								<td><?php echo $this->form->getInput('language');?></td>
+							</tr>
+							<tr>
+								<td><label for="featured">
+								<?php echo $this->form->getLabel('featured'); ?>
+								</label></td>
+								<td><?php echo $this->form->getInput('featured');?></td>
 							</tr>
 							</table>
 						</td>

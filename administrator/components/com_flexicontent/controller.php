@@ -134,11 +134,11 @@ class FlexicontentController extends JController
 	 */
 	function saveacl()
 	{
-		global $mainframe, $option;
 
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Initialize some variables
+		$mainframe = &JFactory::getApplication();
 		$option			= JRequest::getVar('option');
 		$filename		= JRequest::getVar('filename', '', 'post', 'cmd');
 		$filecontent	= JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
@@ -364,7 +364,37 @@ VALUES
 		}
 	}
 
+	/**
+	 * Set phpThumb cache permissions
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function cachethumbchmod()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$format		= JRequest::getVar('format', '');
+		// PhpThumb cache directory
+		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+		$success = JPath::setPermissions($phpthumbcache, '0777', '0777');
+		if (!$success) {
+			if ($format == 'raw') {
+				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			} else {
+				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
+				return false;
+			}
+		} else {
+			if ($format == 'raw') {
+				echo '<span class="install-ok"></span>';
+			} else {
+				return true;
+			}
+		}
+	}
 	/**
 	 * Method to set the default site language the items with no language
 	 * 
@@ -614,6 +644,7 @@ VALUES
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$db =& JFactory::getDBO();
+		$mainframe = &JFactory::getApplication();
 
 		$queries 	= array();
 		// alter some table field types
@@ -631,7 +662,7 @@ VALUES
 		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
-		global $mainframe;
+
 		foreach($rows as $row) {
 			$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 			if($row->version > $lastversion) {

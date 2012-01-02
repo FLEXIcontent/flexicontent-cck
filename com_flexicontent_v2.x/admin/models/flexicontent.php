@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 262 2010-06-11 05:02:20Z enjoyman $
+ * @version 1.5 stable $Id: flexicontent.php 962 2011-11-19 07:39:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -150,7 +150,6 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	
-	
 	/**
 	 * Method to check if default Flexi Menu Items exist
 	 *
@@ -159,6 +158,10 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistMenuItems()
 	{
+		// Try to get id of Flexicontent component
+		$flexi =& JComponentHelper::getComponent('com_flexicontent');
+		$flexi_comp_id = $flexi->id;
+		// Try to get params of Flexicontent component, and then 'default_menu_itemid' parameter
 		$params =& JComponentHelper::getParams('com_flexicontent');
 		if ($params) {
 			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
@@ -166,21 +169,18 @@ class FlexicontentModelFlexicontent extends JModel
 			$_component_default_menuitem_id = '';
 		}
 		
-		/*$menus	= &JApplication::getMenu('site', array());
-		$menuitem = $menus->getItem($_component_default_menuitem_id);
-		if (!$menuitem || $menuitem->component != 'com_flexicontent') {
-			return false;
-		}*/
-		
-		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' AND id='{$_component_default_menuitem_id}' AND access=1";
-		$this->_db->setQuery($query);
+		$query 	= 'SELECT COUNT( * )'
+				. ' FROM #__menu as m'
+				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'" AND m.access=1 '
+				. ' AND m.component_id="'.$flexi_comp_id.'" AND m.type="component" '
+				;
+		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
 			
-		if (!$count) {
-			return false;
+		if ($count >= 1) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	/**
@@ -321,6 +321,29 @@ class FlexicontentModelFlexicontent extends JModel
 		return $return;
 	}
 
+	/**
+	 * Method to get if language of items is initialized properly
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function getItemsNoLang()
+	{
+		static $return;
+		if($return === NULL) {
+			$db =& JFactory::getDBO();
+			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
+				. " LEFT JOIN #__content as i ON i.id=ie.item_id "
+				. " WHERE ie.language='' OR i.language<>ie.language "
+				;
+			$db->setQuery($query);
+			$return = $db->loadResult();
+		}
+		
+		return $return;
+	}
+	
 	/**
 	 * Method to check if the versions table is created
 	 *
@@ -548,7 +571,8 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistsec() {
+	function getExistsec()
+	{
 		if (FLEXI_CAT_EXTENSION) {
 			$query = 'SELECT COUNT( id )'
 			. ' FROM #__categories'
@@ -575,7 +599,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistmenu()
 	{
 		$component =& JComponentHelper::getComponent('com_flexicontent');
-		
+
 		// This code doesn't work as in J1.5 ...
 		/*$menus	= &JApplication::getMenu('site', array());
 		$items	= $menus->getItems('component_id', $component->id);*/
@@ -744,7 +768,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. " JOIN #__categories as cat ON c.catid=cat.id "
 				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";// ."AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
 
-		$db->setQuery($query); 
+		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		$diff_arrays = $this->getDiffVersions();
 		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
@@ -786,9 +810,6 @@ class FlexicontentModelFlexicontent extends JModel
 				}
 				$fields[] = $f;
 				foreach($fields as $field) {
-					// process field mambots onBeforeSaveField
-					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -815,8 +836,6 @@ class FlexicontentModelFlexicontent extends JModel
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
-					// process field mambots onAfterSaveField
-					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 					//$searchindex 	.= @$field->search;
 				}
 				if(!$catflag) {
@@ -867,7 +886,8 @@ class FlexicontentModelFlexicontent extends JModel
 		return true;
 	}
 	
-	function formatFlexiPlugins() {
+	function formatFlexiPlugins()
+	{
 		$db 	= & $this->_db;
 		$query	= 'SELECT extension_id, name FROM #__extensions'
 				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
@@ -875,6 +895,7 @@ class FlexicontentModelFlexicontent extends JModel
 				;
 		$db->setQuery($query);
 		$flexiplugins = $db->loadObjectList();
+		
 		foreach ($flexiplugins as $fp) {
 			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
 				$query = 'UPDATE #__extensions SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE `type`='.$db->Quote('plugin').' AND extension_id = ' . (int)$fp->id;

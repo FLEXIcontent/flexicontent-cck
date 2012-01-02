@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 297 2010-06-14 07:00:35Z emmanuel.danan $
+ * @version 1.5 stable $Id: controller.php 1015 2011-12-04 09:21:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -67,7 +67,7 @@ class FlexicontentController extends JController
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
 		}
-				
+		
 		// Register Extra task
 		$this->registerTask( 'apply'					, 'save' );
 		$this->registerTask( 'applyacl'					, 'saveacl' );
@@ -96,13 +96,12 @@ class FlexicontentController extends JController
 		$existseplg 		= & $model->getExistSearchPlugin();
 		$existsyplg 		= & $model->getExistSystemPlugin();
 		
-		$existlang	 		= & $model->getExistLanguageColumn();
+		$existlang	 	= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= & $model->getExistVersionsTable();
 		$existversionsdata	= & $model->getExistVersionsPopulated();
 		$cachethumb			= & $model->getCacheThumbChmod();
 		
 		$oldbetafiles		= & $model->getOldBetaFiles();
-		
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
 		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
 		
@@ -132,13 +131,13 @@ class FlexicontentController extends JController
 	 * Saves the acl file
 	 *
 	 */
-	function saveacl() {
+	function saveacl()
+	{
 
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		$option = JRequest::getVar('option');
-		$mainframe = &JFactory::getApplication();
 
 		// Initialize some variables
+		$mainframe = &JFactory::getApplication();
 		$option			= JRequest::getVar('option');
 		$filename		= JRequest::getVar('filename', '', 'post', 'cmd');
 		$filecontent	= JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
@@ -193,7 +192,8 @@ class FlexicontentController extends JController
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function createDefaultType() {
+	function createDefaultType()
+	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
@@ -402,38 +402,28 @@ VALUES
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function getItemsNoLang()
+	function setItemsDefaultLang($lang)
 	{
 		$db =& JFactory::getDBO();
 
-		$query 	= "SELECT item_id FROM #__flexicontent_items_ext"
-				. " WHERE language = ''"
-				;
-		$db->setQuery($query);
-		$cid = $db->loadResultArray();
-		
-		return $cid;
-	}
-
-	/**
-	 * Method to set the default site language the items with no language
-	 * 
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since 1.5
-	 */
-	function setItemsDefaultLang($cid, $lang)
-	{
-		$db =& JFactory::getDBO();
-
+		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET language = ' . $db->Quote($lang)
-				. ' WHERE item_id IN ( ' . implode(',', $cid) . ' )'
+				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$db->query();
+		$result = $db->query();
 		
-		return true;
+		// Set default language for items that do not have their language set
+		$query 	= 'UPDATE #__content i '
+				. " LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
+				. ' SET i.language = ie.language '
+				. " WHERE i.language <> ie.language "				
+				;
+		$db->setQuery($query);
+		$result &= $db->query();
+		
+		return $result;
 	}
 
 	/**
@@ -450,22 +440,33 @@ VALUES
 
 		$db 		=& JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
+		
+		// Add language column
+		$fields = $db->getTableFields('#__flexicontent_items_ext');
+		$language_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+		if(!$language_col) {
+			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
+			$db->setQuery($query);
+			$result_lang_col = $db->query();
+			if (!$result_lang_col) echo "Cannot add language column<br>";
+		} else $result_lang_col = true;
 
-		$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
-		$db->setQuery($query);
-		if (!$db->query()) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-		} else {
+		// Add default language for items that do not have one, and add translation group to items that do not have one set
+		$model = $this->getModel('flexicontent');
+		if ($model->getItemsNoLang()) {
 			// Add site default language to the language field if empty
 			$languages 	=& JComponentHelper::getParams('com_languages');
 			$lang 		= $languages->get('site', 'en-GB');
-			$cid 		= $this->getItemsNoLang();
+			$result_items_default_lang = $this->setItemsDefaultLang($lang);
+			if (!$result_items_default_lang) echo "Cannot set default language or set default translation group<br>";
+		} else $result_items_default_lang = true;
 		
-			if (!$this->setItemsDefaultLang($cid, $lang)) {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-			} else {
-				echo '<span class="install-ok"></span>';
-			}
+		if (!$result_lang_col
+			|| !$result_items_default_lang
+		) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existlanguagecolumn" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
 		}
 	}
 	
@@ -660,11 +661,6 @@ VALUES
 					$db->query();
 				}*/
 				foreach($fields as $field) {
-					//JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-					
-					// process field mambots onBeforeSaveField
-					//$results = $mainframe->triggerEvent('onBeforeSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -691,8 +687,6 @@ VALUES
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
-					// process field mambots onAfterSaveField
-					//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 					//$searchindex 	.= @$field->search;
 				}
 				if(!$catflag) {
@@ -754,7 +748,8 @@ VALUES
 		}
 	}
 	
-	function addCurrentVersionData() {
+	function addCurrentVersionData()
+	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 

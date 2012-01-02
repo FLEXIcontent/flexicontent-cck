@@ -90,6 +90,8 @@ class flexicontent_items extends JTable{
 	var $access				= null;
 	/** @var int */
 	var $hits				= null;
+	/** @var boolean */
+	var $featured		= 0;
 
 	/** @var int Primary Foreign key */
 	var $item_id 			= null;
@@ -309,6 +311,9 @@ class flexicontent_items extends JTable{
 		$type_ext->_tbl_key = $this->_frn_key;
 		foreach ($this->getProperties() as $p => $v) {
 			// If the property is in the join properties array we add it to the items_ext object
+			if ($p == "language") {
+				$type->$p = $v;
+			}
 			if (in_array($p, $this->_join_prop)) {
 				$type_ext->$p = $v;
 				// Else we add it to the type object

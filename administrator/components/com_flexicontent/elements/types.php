@@ -58,6 +58,9 @@ class JElementTypes extends JElement
 			$attribs .= 'class="inputbox"';
 			$fieldname = $control_name.'['.$name.']';
 		}
-		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
+		$values = $value;
+		$element_id = $control_name.$name;
+
+		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

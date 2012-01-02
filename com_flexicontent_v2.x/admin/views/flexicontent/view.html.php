@@ -28,13 +28,15 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFlexicontent extends JView{
+class FlexicontentViewFlexicontent extends JView
+{
 	/**
 	 * Creates the Entrypage
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null ) {
+	function display( $tpl = null )
+	{
 		$mainframe = &JFactory::getApplication();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$layout = JRequest::getVar('layout', 'default');
@@ -52,11 +54,14 @@ class FlexicontentViewFlexicontent extends JView{
 
 		// handle jcomments integration
 		if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
+			$CanComments 	= 1;
 			$dest 			= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins'.DS.'com_flexicontent.plugin.php';
 			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
 			if (!JFile::exists($dest)) {
 				JFile::copy($source, $dest);
 			}
+		} else {
+			$CanComments 	= 0;
 		}
 
 		// handle joomfish integration
@@ -119,7 +124,7 @@ class FlexicontentViewFlexicontent extends JView{
 			$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
 			$existseplg 		= & $this->get( 'ExistSearchPlugin' );
 			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
-			$existlang	 		= & $this->get( 'ExistLanguageColumn' );
+			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 		= & $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
 			$cachethumb			= & $this->get( 'CacheThumbChmod' );

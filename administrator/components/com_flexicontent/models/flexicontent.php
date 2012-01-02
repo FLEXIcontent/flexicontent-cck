@@ -159,6 +159,7 @@ class FlexicontentModelFlexicontent extends JModel
 		return $genstats;
 	}
 	
+	
 	/**
 	 * Method to check if default Flexi Menu Items exist
 	 *
@@ -178,14 +179,15 @@ class FlexicontentModelFlexicontent extends JModel
 			$_component_default_menuitem_id = '';
 		}
 		
-		$query 	= 'SELECT COUNT( m.id )'
+		$query 	= 'SELECT COUNT( * )'
 				. ' FROM #__menu as m'
-				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'" AND m.componentid="'.$flexi_comp_id.'"'
+				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'" AND m.access=1 '
+				. ' AND m.componentid="'.$flexi_comp_id.'"'
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
 			
-		if ($count >=1) {
+		if ($count >= 1) {
 			return true;
 		}
 		return false;
@@ -254,8 +256,8 @@ class FlexicontentModelFlexicontent extends JModel
 			
 		if ($count > 13) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 	/**
@@ -342,8 +344,8 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return === NULL) {
 			$db =& JFactory::getDBO();
-			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext"
-				. " WHERE language = ''"
+			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
+				. " WHERE ie.language='' "
 				;
 			$db->setQuery($query);
 			$return = $db->loadResult();
@@ -420,12 +422,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getCacheThumbChmod()
 	{
-		return true;
-/*
 		// Open phpThumb cache directory
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 		return (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
-*/
 	}
 
 	/**
@@ -440,8 +439,8 @@ class FlexicontentModelFlexicontent extends JModel
 			$files 	= array (
 				'author.xml',
 				'author.php',
-				'myitems.php',
 				'myitems.xml',
+				'myitems.php',
 				'default.xml',
 				'default.php',
 				'index.html',
@@ -590,8 +589,8 @@ class FlexicontentModelFlexicontent extends JModel
 			
 		if ($count > 0) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 	/**
@@ -603,33 +602,33 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistsec()
 	{
 		if (FLEXI_SECTION) {
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__sections'
-		. ' WHERE id = ' . FLEXI_SECTION
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-			
-		if ($count > 0) {
-			return true;
-		} else {
-			// Save the created section as flexi_section for the component
-			$component =& JComponentHelper::getParams('com_flexicontent');
-			$component->set('flexi_section', '');
-			$cparams = $component->toString();
-
-			$flexi =& JComponentHelper::getComponent('com_flexicontent');
-
-			$query 	= 'UPDATE #__components'
-					. ' SET params = ' . $this->_db->Quote($cparams)
-					. ' WHERE id = ' . $flexi->id;
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-			return true;
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__sections'
+			. ' WHERE id = ' . FLEXI_SECTION
+			;
+			$this->_db->setQuery( $query );
+			$count = $this->_db->loadResult();
+				
+			if ($count > 0) {
+				return true;
+			} else {
+				// Save the created section as flexi_section for the component
+				$component =& JComponentHelper::getParams('com_flexicontent');
+				$component->set('flexi_section', '');
+				$cparams = $component->toString();
+	
+				$flexi =& JComponentHelper::getComponent('com_flexicontent');
+	
+				$query 	= 'UPDATE #__components'
+						. ' SET params = ' . $this->_db->Quote($cparams)
+						. ' WHERE id = ' . $flexi->id;
+						;
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				return true;
+			}
 		}
-		}
-	return false;
+		return false;
 	}
 
 	/**
@@ -647,8 +646,8 @@ class FlexicontentModelFlexicontent extends JModel
 			
 		if (count($items) > 0) {
 			return true;
-			}
-	return false;
+		}
+		return false;
 	}
 
 
