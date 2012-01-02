@@ -30,6 +30,7 @@
 .icon-32-params				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
 .icon-32-import				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-upload.png); }
 .icon-32-duplicate			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
+.icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
 
 /* Buttons */
 .button-add a {

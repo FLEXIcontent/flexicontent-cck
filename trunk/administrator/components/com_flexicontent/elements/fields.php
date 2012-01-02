@@ -40,21 +40,28 @@ class JElementFields extends JElement
 
 		$db =& JFactory::getDBO();
 		
-		$and = ($node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
-		if ($node->attributes('fieldnameastext')) {
+		$and = ((boolean)$node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
+		if ((boolean)$node->attributes('fieldnameastext')) {
 			$text = 'CONCAT(label, \'(\', `name`, \')\')';
 		}else{
 			$text = 'label';
 		}
-		if ($node->attributes('fieldnameasvalue')) {
+		if ((boolean)$node->attributes('fieldnameasvalue')) {
 			$ovalue = '`name`';
 		}else{
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
+		
 		$isadvsearch = $node->attributes('isadvsearch');
 		if($isadvsearch!==NULL) {
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
+		
+		$field_type = $node->attributes('field_type');
+		if($field_type!==NULL) {
+			$and .= " AND field_type='{$field_type}'";
+		}
+		
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
@@ -64,10 +71,11 @@ class JElementFields extends JElement
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
-
+		
 		$attribs = "";
-		if ($node->attributes('multiple')) {
-			$attribs .= 'multiple="true" size="10"';
+		if ((boolean)$node->attributes('multiple')) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
 			$fieldname = $control_name.'['.$name.'][]';
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));

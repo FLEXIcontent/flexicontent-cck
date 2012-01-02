@@ -674,8 +674,3 @@ $ Missing JText for the item restore function
 # disable version table when use_versioning is disabled
 # PHP5.3 fix in blog template with new params
 $ French language file (admin)
-
-
-
-
-+ Add : Advanced Search, a moudule, a plugin and search view(by enjoyman).

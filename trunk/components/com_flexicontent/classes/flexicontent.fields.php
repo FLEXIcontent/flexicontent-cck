@@ -237,7 +237,7 @@ class FlexicontentFields
 	  
 	  // Render the (display) method of the field and return it
 	  $field = FlexicontentFields::renderField($item, $field, $values, $method);
-	  $item->onDemandFields[$fieldname]->{$method} = $field->{$method};
+	  $item->onDemandFields[$fieldname]->{$method} = @$field->{$method};
 	  return $item->onDemandFields[$fieldname]->{$method};
 	}
 	
@@ -287,7 +287,7 @@ class FlexicontentFields
 				$field->slug = $item->slug;
 				$field->sectionid = $item->sectionid;
 				$field->catid = $item->catid;
-				$field->catslug = $item->categoryslug;
+				$field->catslug = @$item->categoryslug;
 				$field->fieldid = $field->id;
 				$field->id = $item->id;
 				$field->state = $item->state;
@@ -413,14 +413,14 @@ class FlexicontentFields
 						// Field with name: $f does not exist for the type of current item, we simply skip it
 						continue;
 					}
-					$field = & $items[$i]->fields[$f];
+					$field = $items[$i]->fields[$f];
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
-					$field 	= & FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					if (isset($field->display) && $field->display) {
 						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
 						$items[$i]->positions[$pos->position]->{$f}->name 		= $field->name;
 						$items[$i]->positions[$pos->position]->{$f}->label 		= $field->parameters->get('display_label') ? $field->label : '';
-						$items[$i]->positions[$pos->position]->{$f}->display	= & $field->display;
+						$items[$i]->positions[$pos->position]->{$f}->display	= $field->display;
 					}
 				}
 			}

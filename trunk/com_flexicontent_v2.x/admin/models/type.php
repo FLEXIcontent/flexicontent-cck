@@ -68,6 +68,7 @@ class FlexicontentModelType extends JModelAdmin
 	{
 		// Set type id and wipe data
 		$this->_id	    = $id;
+		$this->_type	= null;
 	}
 	
 	function getId() {
@@ -306,7 +307,6 @@ class FlexicontentModelType extends JModelAdmin
 			return false;
 		}
 		$insertid = (int)$this->_db->insertid();
-		$this->_type	=& $type;
 		
 		// only insert default relations if the type is new
 		if ($insertid) {
@@ -320,7 +320,8 @@ class FlexicontentModelType extends JModelAdmin
 				$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
 			}
 		}
-
+		$this->_type	=& $type;
+		
 		return true;
 	}
 	

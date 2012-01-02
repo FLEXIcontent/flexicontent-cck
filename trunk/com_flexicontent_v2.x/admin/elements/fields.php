@@ -42,9 +42,8 @@ class JFormFieldFields extends JFormField
 
 		$db =& JFactory::getDBO();
 		$node = &$this->element;
-
-		$and = ($node->getAttribute('isnotcore')) ? ' AND iscore = 0' : '';
 		
+		$and = ((boolean)$node->getAttribute('isnotcore')) ? ' AND iscore = 0' : '';
 		if ((boolean)$node->getAttribute('fieldnameastext')) {
 			$text = 'CONCAT(label, \'(\', `name`, \')\')';
 		}else{
@@ -55,10 +54,17 @@ class JFormFieldFields extends JFormField
 		}else{
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
+		
 		$isadvsearch = $node->getAttribute('isadvsearch');
 		if($isadvsearch!==NULL) {
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
+		
+		$field_type = $node->getAttribute('field_type');
+		if($field_type!==NULL) {
+			$and .= " AND field_type='{$field_type}'";
+		}
+		
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
@@ -68,10 +74,11 @@ class JFormFieldFields extends JFormField
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
-
+		
 		$attribs = "";
-		if ($node->getAttribute('multiple')) {
-			$attribs .= 'multiple="true" size="10"';
+		if ((boolean)$node->getAttribute('multiple')) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
 			$fieldname = $this->name.'[]';
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
@@ -81,7 +88,7 @@ class JFormFieldFields extends JFormField
 		if ($onchange = $node->getAttribute('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
-		
+
 		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values);
 	}
 }

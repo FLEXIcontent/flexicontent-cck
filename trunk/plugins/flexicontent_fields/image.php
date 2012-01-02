@@ -524,6 +524,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 	function create_thumb( &$field, $filename, $size ) {
 		// some parameters for phpthumb
+		jimport('joomla.filesystem.file');
 		$ext 		= strtolower(JFile::getExt($filename));
 		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 		$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent') . DS);

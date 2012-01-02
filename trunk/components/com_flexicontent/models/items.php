@@ -417,7 +417,7 @@ class FlexicontentModelItems extends JModel
 			$item->id = $this->_id;
 			
 			// -- Retrieve item TYPE parameters, and ITEM ratings (THESE ARE NOT VERSIONED)
-			$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
+			$query = "SELECT t.name as typename, t.alias as typealias, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 					." FROM #__flexicontent_items_ext as ie "
 					. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
 					." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
@@ -426,6 +426,7 @@ class FlexicontentModelItems extends JModel
 			$type = $this->_db->loadObject();
 			if($type) {
 				$item->typename = $type->typename;
+				$item->typealias = $type->typealias;
 				$item->rating_count = $type->rating_count;
 				$item->score = $type->score;
 				$item->version = $current_version;
@@ -1066,63 +1067,40 @@ class FlexicontentModelItems extends JModel
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ) );
 
-				// add the new values to the database 
-				if (is_array($post[$field->name])) {
-					$postvalues = $post[$field->name];
-					$i = 1;
-					foreach ($postvalues as $postvalue) {
+				// -- Add the new values to the database 
+				$postvalues = $post[$field->name];
+				$postvalues = is_array($postvalues) ? $postvalues : array($postvalues);
+				$i = 1;
+				foreach ($postvalues as $postvalue) {
+					
+					// -- a. Add versioning values, but do not version the 'hits' field
+					if ($field->field_type!='hits' && $field->field_type!='hits') {
 						$obj = new stdClass();
 						$obj->field_id 		= $field->id;
 						$obj->item_id 		= $item->id;
 						$obj->valueorder	= $i;
 						$obj->version		= (int)$version+1;
-						// @TODO : move to the plugin code
-						if (is_array($postvalue)) {
-							$obj->value			= serialize($postvalue);
-						} else {
-							$obj->value			= $postvalue;
+						
+						// Normally this is redudant, since FLEXIcontent field must have had serialized the parameters of each value already
+						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
+						if ($use_versioning) {
+							if ( isset($obj->value) && strlen(trim($obj->value)) ) {
+								$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+							}
 						}
-						$fields[$key]->value[] = $obj->value;
-						if ($use_versioning)
-							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-						if(
-							($isnew || ($post['vstate']==2) )
-							&& !isset($jcorefields[$field->name])
-							&& !in_array($field->field_type, $jcorefields)
-							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-							&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-						) {
-							unset($obj->version);
+					}
+					//echo $field->field_type." ".strlen(trim($obj->value))." ".$field->iscore."<br />";
+					
+					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
+					if(	( $isnew || $post['vstate']==2 ) && !$field->iscore ) {
+						unset($obj->version);
+						if ( isset($obj->value) && strlen(trim($obj->value)) ) {
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						}
-						$i++;
 					}
-				} else if (isset($post[$field->name])) {
-					$obj = new stdClass();
-					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $item->id;
-					$obj->valueorder	= 1;
-					$obj->version		= (int)$version+1;
-					// @TODO : move in the plugin code
-					if (is_array($post[$field->name])) {
-						$obj->value			= serialize($post[$field->name]);
-					} else {
-						$obj->value			= $post[$field->name];
-					}
-					$fields[$key]->value[] = $obj->value;
-					if($use_versioning)
-						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-					if(
-						($isnew || ($post['vstate']==2) )
-						&& !isset($jcorefields[$field->name])
-						&& !in_array($field->field_type, $jcorefields)
-						&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-						&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-					) {
-						unset($obj->version);
-						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-					}
+					$i++;
 				}
+				
 				// process field mambots onAfterSaveField
 				//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
