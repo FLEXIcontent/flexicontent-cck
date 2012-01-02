@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.7" type="plugin" group="search" >
-	<name>PLG_SEARCH_FLEXISTDSEARCH</name>
+	<name>PLG_SEARCH_FLEXISEARCH</name>
 	<author>Aazam</author>
 	<creationDate>oct 2011</creationDate>
 	<copyright>Copyright (C) 2011 Aazam</copyright>
 	<license>GNU/GPL v2</license>
 	<authorEmail>aazam@yandex.ru</authorEmail>
 	<authorUrl>aazam.narod.ru</authorUrl>
-	<version>1.0</version>
+	<version>1.1</version>
 	<description>PLG_SEARCH_FLEXISEARCH_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexisearch">flexisearch.php</filename>
@@ -47,6 +47,11 @@
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
+			<field name="search_select_types" type="radio" default="1" label="FLEXI_STDSEARCH_SELECT_TYPES" description="FLEXI_STDSEARCH_SELECT_TYPES_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="search_types" type="text" size="40" default="" label="FLEXI_STDSEARCH_TYPES" description="FLEXI_STDSEARCH_TYPES_DESC"/>
 		</fieldset>
 	</fields>
 	</config>
