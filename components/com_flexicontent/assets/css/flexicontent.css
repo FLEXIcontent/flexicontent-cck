@@ -678,3 +678,36 @@ button.fc_button {
 .item_total { } 
 .item_total .item_total_label { font-weight: bold; display:inline-block; }
 .item_total .item_total_value { display:inline-block; margin-right: 24px; }
+
+
+/*******************/
+/* CSS HACKS START */
+/*******************/
+div#flexicontent .fc_inline_block {
+	float: none !important;
+	width: auto !important;
+  display:inline-block !important; /* For modern browsers */
+  *display:inline !important; /* Hack for IE 7 and less */
+  zoom:1; /* Hack for IE */
+  _height:1%; /* Hack for IE6 */
+  vertical-align:top; /* Just makes sure everything is at the top */
+}
+div#flexicontent .fc_block {
+	display: block !important;
+}
+div#flexicontent .fc_inline {
+	display: inline !important;
+}
+div#flexicontent .fc_inline_clear {
+  display:inline!important;
+}
+div#flexicontent .fc_inline_clear:after {
+	content:"\a";
+	white-space: pre-wrap;
+}
+div#flexicontent .fc_clearfix {
+	clear: both;
+}
+/*****************/
+/* CSS HACKS END */
+/*****************/

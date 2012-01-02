@@ -63,6 +63,10 @@ class FlexicontentModelType extends JModel
 		$this->_type	= null;
 	}
 	
+	function getId() {
+		return $this->_id;
+	}
+	
 	/**
 	 * Overridden get method to get properties from the type
 	 *

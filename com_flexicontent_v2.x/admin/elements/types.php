@@ -51,6 +51,7 @@ class JFormFieldTypes extends JFormField
 		$attribs = "";
 		if ($node->getAttribute('multiple')) {
 			$attribs .= 'multiple="true" size="4"';
+			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
 			$fieldname = $this->name;//.'[]';
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));

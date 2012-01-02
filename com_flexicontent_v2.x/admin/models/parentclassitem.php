@@ -233,7 +233,7 @@ class ParentClassItem extends JModelAdmin {
 				
 				$item->cid = @$fields['categories']->value;
 				// Calculate item's score so far (percentage), we have 5 votes max , so 5 * 20 = 100%
-				$query = "SELECT t.name as typename, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
+				$query = "SELECT t.name as typename, t.alias as typealias, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 						." FROM #__flexicontent_items_ext as ie "
 						. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
 						." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
@@ -242,6 +242,7 @@ class ParentClassItem extends JModelAdmin {
 				$type = $this->_db->loadObject();
 				if($type) {
 					$item->typename = $type->typename;
+					$item->typealias = $type->typealias;
 					$item->rating_count = $type->rating_count;
 					$item->score = $type->score;
 				}else{

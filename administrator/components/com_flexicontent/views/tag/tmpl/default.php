@@ -24,6 +24,15 @@ defined('_JEXEC') or die('Restricted access');
 	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td class="key">
+				<label>
+					<?php echo JText::_( 'FLEXI_ID' ).':'; ?>
+				</label>
+			</td>
+			<td>
+				<span id="id" class=""><?php echo $this->row->id; ?></span>
+			</td>
+		</tr><tr>
+			<td class="key">
 				<label for="name">
 					<?php echo JText::_( 'FLEXI_TAG_NAME' ).':'; ?>
 				</label>
@@ -31,6 +40,16 @@ defined('_JEXEC') or die('Restricted access');
 			<td>
 				<input id="name" name="name" class="required" value="<?php echo $this->row->name; ?>" size="50" maxlength="100" />
 			</td>
+		</tr><tr>
+			<td class="key">
+				<label for="alias">
+					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+				</label>
+			</td>
+			<td>
+				<input id="alias" name="alias" class="" value="<?php echo $this->row->alias; ?>" size="50" maxlength="100" />
+			</td>
+		</tr><tr>
 			<td class="key">
 				<label for="published">
 					<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>

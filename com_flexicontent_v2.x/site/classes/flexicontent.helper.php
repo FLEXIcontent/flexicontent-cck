@@ -1887,7 +1887,7 @@ class FLEXIUtilities {
 		$db =& JFactory::getDBO();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
-		$item_id = JRequest::getVar("id",0);
+		$item_id = JRequest::getInt("id",0);
 		if ($item_id==0) {
 			$jAp=& JFactory::getApplication();
 			$jAp->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');

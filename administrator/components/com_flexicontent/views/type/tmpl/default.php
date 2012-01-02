@@ -50,7 +50,7 @@ defined('_JEXEC') or die('Restricted access');
 					</tr>
 				</table>			
 			</td>
-			<td valign="top" width="320px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php
 				$title = JText::_( 'FLEXI_PARAMETERS' );
 				echo $this->pane->startPane( 'det-pane' );

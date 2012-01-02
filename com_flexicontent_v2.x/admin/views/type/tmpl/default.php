@@ -52,7 +52,7 @@ defined('_JEXEC') or die('Restricted access');
 					</tr>
 				</table>			
 			</td>
-			<td valign="top" width="350px" style="padding: 7px 0 0 5px" align="left" valign="top">
+			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$fieldSets = $this->form->getFieldsets('attribs');
