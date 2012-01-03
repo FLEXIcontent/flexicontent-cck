@@ -171,8 +171,8 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		$query 	= 'SELECT COUNT( * )'
 				. ' FROM #__menu as m'
-				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'" AND m.access=1 '
-				. ' AND m.component_id="'.$flexi_comp_id.'" AND m.type="component" '
+				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'"'
+				. ' AND m.access=1 AND m.component_id="'.$flexi_comp_id.'" AND m.type="component" '
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();

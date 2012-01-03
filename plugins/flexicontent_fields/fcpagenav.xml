@@ -13,36 +13,40 @@
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
 		<folder plugin="fcpagenav">fcpagenav</folder>
 	</files>
-	<params group="standard" addpath="/plugins/flexicontent_fields/fcpagenav">
+	<params group="standard" addpath="/administrator/components/com_flexicontent/elements">
 		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
 		</param>
 		<param name="backend_hidden" type="hidden" default="1" />
 	</params>
 	<params group="group-fcpagenav">
 		<param name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
 		</param>
 		<param name="use_tooltip" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_USETIP" description="FLEXI_FIELD_PAGENAV_USETIP_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
 		</param>
 		<param name="tooltip_title_next" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT" description="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT_DESC" />
 		<param name="tooltip_title_prev" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV" description="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV_DESC" />
 		<param name="use_title" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USETITLE" description="FLEXI_FIELD_PAGENAV_USETITLE_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
 		</param>
-		<param name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="FLEXI_FIELD_PAGENAV_PREV_DESC" />
-		<param name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="FLEXI_FIELD_PAGENAV_NEXT_DESC" />
+		<param name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="..." />
+		<param name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="..." />
 		<param name="use_category_link" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
+			<option value="1">FLEXI_YES</option>
+			<option value="0">FLEXI_NO</option>
 		</param>
-		<param name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" />
-		<param name="type_to_exclude" type="types" default="" label="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE" description="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE_DESC" />
+		<param name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" description="..." />
+		<param name="type_to_exclude" type="types" default="" multiple="true" size="5" label="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE" description="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE_DESC" />
+		<param name="show_prevnext_count" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_SHOWCOUNT" description="FLEXI_FIELD_PAGENAV_SHOWCOUNT_DESC">
+			<option value="1">FLEXI_SHOW</option>
+			<option value="0">FLEXI_HIDE</option>
+		</param>
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcpagenav.ini</language>

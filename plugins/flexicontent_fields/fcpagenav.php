@@ -40,7 +40,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'fcpagenav') return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$view = JRequest::getString('view', 'items');
 		if ($view != 'items') return;
 		
@@ -61,6 +61,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$use_tooltip		= $field->parameters->get('use_tooltip', 1);
 		$use_title			= $field->parameters->get('use_title', 0);
 		$use_category_link	= $field->parameters->get('use_category_link', 0);
+		$show_prevnext_count = $field->parameters->get('show_prevnext_count', 1);
 		$tooltip_title_next	= $field->parameters->get('tooltip_title_next', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$tooltip_title_prev	= $field->parameters->get('tooltip_title_prev', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
 		$types_to_exclude	= $field->parameters->get('type_to_exclude', '');
@@ -226,9 +227,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 
 				if ($field->prev)
 				{
+					$prev_count = $show_prevnext_count ? '&nbsp;['.($location).']' : '';
 					$html .= '
 					<span class="pagenav_prev' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_prev.'::'.$field->prevtitle.'"' : '') . '>
-						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>&nbsp;['.($location).']
+						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>'.$prev_count.'
 					</span>'
 					;
 				}
@@ -246,9 +248,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			
 				if ($field->next)
 				{
+					$next_count = $show_prevnext_count ? '&nbsp;['.(count($list)-$location-1).']' : '';
 					$html .= '
 					<span class="pagenav_next' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_next.'::'.$field->nexttitle.':: "' : '') . '>
-						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>&nbsp;['.(count($list)-$location-1).']
+						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>'.$next_count.'
 					</span>'
 					;
 				}
