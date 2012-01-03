@@ -372,10 +372,6 @@ class FlexicontentModelCategory extends JModelList{
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$params = $this->_category->parameters;
 			
-			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
-				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories";
-				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
-			}
 			if ($params->get('orderbycustomfieldid', 0) != 0) {
 				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
 			}
@@ -921,21 +917,30 @@ class FlexicontentModelCategory extends JModelList{
 	 * @since	1.5
 	 */
 	function _loadCategoryParams($cid) {
-		jimport("joomla.html.parameter");
-		$mainframe = &JFactory::getApplication();
-
-		$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
-		$this->_db->setQuery($query);
-		$catparams = $this->_db->loadResult();
-
-		// Get the page/component configuration
-		$params = clone($mainframe->getParams('com_flexicontent'));
-
-		// Merge category parameters into the page configuration
-		$cparams = new JParameter($catparams);
-		$params->merge($cparams);
-
+		static $params;
 		
+		if ($params === NULL) {
+			jimport("joomla.html.parameter");
+			$mainframe = &JFactory::getApplication();
+	
+			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+	
+			// Get the page/component configuration
+			$params = clone($mainframe->getParams('com_flexicontent'));
+	
+			// Merge category parameters into the page configuration
+			$cparams = new JParameter($catparams);
+			$params->merge($cparams);
+			
+			// Bug of v2.0 RC2
+			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
+				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories";
+				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+			}
+		}
+				
 		global $currcat_data;
 		return $currcat_data['params'] = $params;
 	}

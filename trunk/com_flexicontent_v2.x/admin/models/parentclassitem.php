@@ -483,6 +483,10 @@ class ParentClassItem extends JModelAdmin {
 					$rights 	= FlexicontentHelperPerm::checkAllItemAccess($uid, 'item', $id);
 					$canEdit 	= in_array('core.edit', $rights) || $permission->CanEdit;
 					$canEditOwn	= (in_array('core.edit.own', $rights) && ($item->created_by == $user->id));
+					/*echo "<pre>"; print_r($rights); echo "</pre>";
+					echo "canEdit: $canEdit<br>\n";
+					echo "canEditOwn: $canEditOwn<br>\n";
+					die("here");*/
 					if ($canEdit || $canEditOwn) return true;
 					return false;
 				}

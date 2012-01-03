@@ -809,54 +809,58 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _loadCategoryParams($cid)
 	{
-		global $mainframe;
+		static $params;
 		
-		// Retrieve author parameters if using displaying AUTHOR pseudo-view
-		$author_basicparams = '';
-		$author_catparams = '';
-		if ($this->_authorid!=0) {
-			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
-			$this->_db->setQuery($query);
-			$author_extdata = $this->_db->loadObject();
-			if ($author_extdata) {
-				$author_basicparams = $author_extdata->author_basicparams;
-				$author_catparams =  $author_extdata->author_catparams;
-				
-				$authorparams = new JParameter($author_basicparams);
-				if (!$authorparams->get('override_currcatconf',0)) {
-					$author_catparams = '';
+		if ($params === NULL) {
+			$mainframe = &JFactory::getApplication();
+			
+			// Retrieve author parameters if using displaying AUTHOR pseudo-view
+			$author_basicparams = '';
+			$author_catparams = '';
+			if ($this->_authorid!=0) {
+				$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
+				$this->_db->setQuery($query);
+				$author_extdata = $this->_db->loadObject();
+				if ($author_extdata) {
+					$author_basicparams = $author_extdata->author_basicparams;
+					$author_catparams =  $author_extdata->author_catparams;
+					
+					$authorparams = new JParameter($author_basicparams);
+					if (!$authorparams->get('override_currcatconf',0)) {
+						$author_catparams = '';
+					}
 				}
 			}
-		}
-		
-		$catparams = "";
-		if ($cid) {
-			// Retrieve category parameters
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
-			$this->_db->setQuery($query);
-			$catparams = $this->_db->loadResult();
-		}
-		
-		// a. Get the PAGE/COMPONENT parameters
-		$params = clone($mainframe->getParams('com_flexicontent'));
-
-		// b. Merge category parameters
-		$cparams = new JParameter($catparams);
-		$params->merge($cparams);
-		
-		// c. Merge author basic parameters
-		if ($author_basicparams!=='') {
-			$params->merge( new JParameter($author_basicparams) );
-		}
-
-		// d. Merge author OVERRIDDEN category parameters
-		if ($author_catparams!=='') {
-			$params->merge( new JParameter($author_catparams) );
-		}
-
-		if ($this->_layout=='myitems') {
-			$clayout = JRequest::getVar('clayout', 'default');
-			 $params->set('clayout', $clayout);
+			
+			$catparams = "";
+			if ($cid) {
+				// Retrieve category parameters
+				$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
+				$this->_db->setQuery($query);
+				$catparams = $this->_db->loadResult();
+			}
+			
+			// a. Get the PAGE/COMPONENT parameters
+			$params = clone($mainframe->getParams('com_flexicontent'));
+	
+			// b. Merge category parameters
+			$cparams = new JParameter($catparams);
+			$params->merge($cparams);
+			
+			// c. Merge author basic parameters
+			if ($author_basicparams!=='') {
+				$params->merge( new JParameter($author_basicparams) );
+			}
+	
+			// d. Merge author OVERRIDDEN category parameters
+			if ($author_catparams!=='') {
+				$params->merge( new JParameter($author_catparams) );
+			}
+	
+			if ($this->_layout=='myitems') {
+				$clayout = JRequest::getVar('clayout', 'default');
+				 $params->set('clayout', $clayout);
+			}
 		}
 		
 		global $currcat_data;
