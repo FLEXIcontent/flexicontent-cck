@@ -43,6 +43,7 @@
 
 .fcvote ul li a, 
 .fcvote ul li.current-rating {
+	background-color: transparent !important;
 	border: medium none;
 	cursor: pointer;
 	left: 0pt;
@@ -117,7 +118,7 @@
 .fcvote ul, 
 .fcvote ul li a:hover, 
 .fcvote ul li.current-rating {
-	background-image: url(star.gif)!important;
+	background-image: url(../images/star.gif)!important;
 }
 
 .fcvote ul li a, 

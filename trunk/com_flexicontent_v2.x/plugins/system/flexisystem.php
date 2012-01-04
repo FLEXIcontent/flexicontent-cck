@@ -190,10 +190,10 @@ class plgSystemFlexisystem extends JPlugin
 					$db->setQuery($query);
 					$section = $db->loadResult();
 
-					if ($section == $flexisection) {
+					//if ($section == $flexisection) {
 						$app->redirect($urlItem);
 						return false;
-					}
+					//}
 				}
 			}
 		}
