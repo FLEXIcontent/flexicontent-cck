@@ -476,6 +476,7 @@ class FlexicontentController extends JController
 					->set('rating_count = 1');
 				if ( (int)$xid ) 
 					$query->set('extra_id = ' . (int)$xid);
+					
 				$db->setQuery( $query );
 				$db->query() or die( $db->stderr() );
 				$result->ratingcount = 1;
