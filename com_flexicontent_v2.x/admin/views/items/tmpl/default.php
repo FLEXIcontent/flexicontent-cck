@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 321 2010-06-21 04:18:51Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 1063 2011-12-22 04:15:04Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,6 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 $limit = $this->pageNav->limit;
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
+
 ?>
 <script language="javascript" type="text/javascript">
 if(MooTools.version>="1.2.4") {
@@ -26,13 +30,15 @@ if(MooTools.version>="1.2.4") {
 	window.onDomReady(stateselector.init.bind(stateselector));
 }
 
-function dostate(state, id) {
+function dostate(state, id)
+{
 	var change = new processstate();
 	change.dostate( state, id );
 }
 
-function fetchcounter() {
-	var url = "index.php?option=com_flexicontent&task=items.getorphans&templ=component&format=raw";
+function fetchcounter()
+{
+	var url = "index.php?option=com_flexicontent&task=items.getorphans&tmpl=component&format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
@@ -59,7 +65,8 @@ function fetchcounter() {
 }
 
 // the function overloads joomla standard event
-function submitform(pressbutton) {
+function submitform(pressbutton)
+{
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
@@ -96,7 +103,8 @@ function submitform(pressbutton) {
 }
 
 // delete active filter
-function delFilter(name) {
+function delFilter(name)
+{
 	var myForm = $('adminForm');
 	$(name).setProperty('value', '');
 }
@@ -161,7 +169,7 @@ window.addEvent('domready', function() {
 			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = e.stop();
 		}else{
-			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = new Event(e).stop();
 		}
 		if(MooTools.version>="1.2.4") {
@@ -200,6 +208,10 @@ window.addEvent('domready', function() {
 			<td align="center" width="35%">
 				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;<?php echo count($this->unassociated); ?>&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
 				<?php echo $this->lists['extdata']; ?>
+				<?php
+					$types = & $this->get( 'Typeslist' );
+					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
+				?>
 				<input id="button-bind" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" />
 				<div id="log-bind"></div>
 			</td>
@@ -230,7 +242,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php //if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH || $j16ge) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -239,7 +251,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php //endif; ?>
+			<?php endif; ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -340,11 +352,11 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-			<?php //if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH || $j16ge) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
-			<?php //endif; ?>
+			<?php endif; ?>
 			<td class="left col_type">
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
@@ -355,8 +367,8 @@ window.addEvent('domready', function() {
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left col_cats">
-			<?php $checked = @$this->filter_subcats ? ' checked="checked"' : ''; ?>
-				<span class="radio"><label for="filter_subcats"><input type="checkbox" name="filter_subcats" value="1" id="filter_subcats" class="inputbox"<?php echo $checked; ?> /><?php echo ' '.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label></span>
+				<label for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<?php echo $this->lists['filter_cats']; ?>
 			</td>
 			<td class="left col_authors">
@@ -373,11 +385,11 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo /*FLEXI_FISH ?*/ '15' /*: '14'*/; ?>" class="filterbuttons">
+			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo /*FLEXI_FISH ?*/ "delFilter('filter_lang');" /*: ""*/; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || $j16ge) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo /*FLEXI_FISH ?*/ "delFilter('filter_lang');" /*: ""*/; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || $j16ge) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 <!--
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
@@ -390,7 +402,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo /*FLEXI_FISH ?*/ '15' /*: '14'*/; ?>">
+			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -408,19 +420,24 @@ window.addEvent('domready', function() {
 		$canPublishAll 		= $this->permission->CanPublish;
 		$canPublishOwnAll	= true;//I(enjoyman) not sure in this line.
 		$check = $this->permission->CanConfig;
+		
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
+
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+				
 			$canEdit 			= $canEditAll || in_array('edit', $rights) || $check;
 			$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || $check;
 			$canPublish 		= $canPublishAll || in_array('publish', $rights) || $check;
 			$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || $check;
+
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
 			$publish_up->setOffset($config->getValue('config.offset'));
 			$publish_down->setOffset($config->getValue('config.offset'));
 
 			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+
 			if ($this->permission->CanConfig) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
 			}else $access = $this->escape($row->access_level);
@@ -488,7 +505,7 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-			<?php if (FLEXI_FISH) : ?>
+		<?php if (FLEXI_FISH && isset($row->lang) && @$row->lang ) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
@@ -498,15 +515,19 @@ window.addEvent('domready', function() {
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
-			<?php else : ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
-			<?php if($row->lang=='*') : ?>
+		<?php elseif(@$row->lang=='*') : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_("All"); ?>">
 				<?php echo JText::_("All");?>
-			<?php else : ?>
-			<img src="../media/mod_languages/images/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
-			<?php endif; ?>
 			</td>
-			<?php endif; ?>
+		<?php elseif(@$row->lang) : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
+				<img src="../media/mod_languages/images/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
+			</td>
+		<?php else : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_('Undefined');?>">
+				&nbsp;
+			</td>
+		<?php endif; ?>
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>
@@ -680,17 +701,17 @@ window.addEvent('domready', function() {
 		</tr>
 		<tr>
 			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
 			<td><img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
-
-	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br>
-	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items
-
+	
+	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br />
+	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items<br />
+		
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />

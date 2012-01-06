@@ -57,7 +57,7 @@ class FlexicontentViewTags extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu('CanTags');
+		FLEXISubmenu('CanTags');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );

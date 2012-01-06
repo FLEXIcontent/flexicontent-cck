@@ -22,8 +22,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
 require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
-if(!function_exists('FLEXIcontentSubmenu')) {
-	function FLEXIcontentSubmenu($cando) {
+if(!function_exists('FLEXISubmenu')) {
+	function FLEXISubmenu($cando) {
 		$permission = FlexicontentHelperPerm::getPerm();
 		if (isset($permission->$cando) && !$permission->$cando) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));

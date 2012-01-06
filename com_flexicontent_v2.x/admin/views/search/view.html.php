@@ -35,7 +35,7 @@ class FLEXIcontentViewSearch extends JView
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
 
-		FLEXIcontentSubmenu('notvariable');
+		FLEXISubmenu('notvariable');
 		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), 'searchtext.png' );

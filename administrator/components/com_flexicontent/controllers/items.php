@@ -839,7 +839,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
 		$votes 	= $model->getvotes($id);
-
+		
+		@ob_end_clean();
 		if ($votes) {
 			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * 20), 2);
 			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
@@ -847,6 +848,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else {
 			echo JText::_( 'FLEXI_NOT_RATED_YET' );
 		}
+		exit;
 	}
 
 	/**
@@ -858,6 +860,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
+
+		@ob_end_clean();
 		$hits 	= $model->gethits($id);
 
 		if ($hits) {
@@ -865,12 +869,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else {
 			echo 0;
 		}
+		exit;
 	}
 	
 	function getversionlist() {
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
+		@ob_end_clean();
 		$id 		= JRequest::getInt('id', 0);
 		$active 	= JRequest::getInt('active', 0);
 		if(!$id) return;
@@ -906,5 +911,6 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 				echo "</td></tr>";
 		}
+		exit;
 	}
 }

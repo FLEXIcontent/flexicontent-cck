@@ -697,6 +697,7 @@ class FlexicontentControllerItems extends JController
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
 		$votes 	= $model->getvotes($id);
+		
 		@ob_end_clean();
 		if ($votes) {
 			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * 20), 2);
@@ -717,7 +718,7 @@ class FlexicontentControllerItems extends JController
 	{
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel('item');
-		
+
 		@ob_end_clean();
 		$hits 	= $model->gethits($id);
 

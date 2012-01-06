@@ -31,14 +31,17 @@ class FlexicontentViewItems extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
 		$document	= & JFactory::getDocument();
 		$option		= JRequest::getCmd( 'option' );
-		$context	= 'com_flexicontent';
 		$task		= JRequest::getVar('task', '');
 		$cid		= JRequest::getVar('cid', array());
 		$extlimit	= JRequest::getInt('extlimit', 100);
@@ -59,7 +62,7 @@ class FlexicontentViewItems extends JView {
 		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
 		
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $context.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
+		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
 		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
 		if ($filter_cats && $filter_order == 'i.ordering') {
@@ -69,20 +72,20 @@ class FlexicontentViewItems extends JView {
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
 
-		$filter_type 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
-		$filter_authors		= $mainframe->getUserStateFromRequest( $context.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		if (FLEXI_FISH) {
-			$filter_lang	 = $mainframe->getUserStateFromRequest( $context.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
+		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
+		if (FLEXI_FISH || $j16ge) {
+			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
 		}
-		$scope	 			= $mainframe->getUserStateFromRequest( $context.'.items.scope', 			'scope', 			1, 				'int' );
-		$date	 			= $mainframe->getUserStateFromRequest( $context.'.items.date', 				'date', 			1, 				'int' );
-		$startdate	 		= $mainframe->getUserStateFromRequest( $context.'.items.startdate', 		'startdate', 		'', 			'cmd' );
-		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $context.'.items.startdate', '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( $context.'.items.enddate', 			'enddate', 			'', 			'cmd' );
-		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $context.'.items.enddate', '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.filter_id', 		'filter_id', 		'', 			'int' );
-		$search 			= $mainframe->getUserStateFromRequest( $context.'.items.search', 			'search', 			'', 			'string' );
+		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 				'int' );
+		$date	 			= $mainframe->getUserStateFromRequest( $option.'.items.date', 				'date', 			1, 				'int' );
+		$startdate	 		= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 		'startdate', 		'', 			'cmd' );
+		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $option.'.items.startdate', '' ); }
+		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 			'enddate', 			'', 			'cmd' );
+		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $option.'.items.enddate', '' ); }
+		$filter_id 			= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', 		'', 			'int' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 			'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -102,7 +105,7 @@ class FlexicontentViewItems extends JView {
 		if ($filter_state) {
 			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
 		}
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			if ($filter_lang) {
 				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
 			}
@@ -174,6 +177,14 @@ class FlexicontentViewItems extends JView {
 		JToolBarHelper::divider();
 		JToolBarHelper::spacer();
 		if ($CanAdd) {
+			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
+			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
+			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
+			//$js .= "});";
+			//$document->addScriptDeclaration($js);
+			//JToolBarHelper::addNew();
+			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
+			
 			JToolBarHelper::addNew();
 			if ($CanCopy) {
 				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
@@ -201,7 +212,7 @@ class FlexicontentViewItems extends JView {
 		$unassociated	= & $this->get( 'UnassociatedItems' );
 		$status      	= & $this->get( 'ExtdataStatus');
 		
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			$langs	= & $this->get( 'Languages' );
 		}
 		$categories = $globalcats?$globalcats:array();
@@ -277,16 +288,16 @@ class FlexicontentViewItems extends JView {
 			$ordering = ($lists['order'] == 'catsordering');
 		}
 
-		if (FLEXI_FISH) {
-		//build languages filter
-		$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
+		if (FLEXI_FISH || $j16ge) {
+			//build languages filter
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
 		}
 		
 		//assign data to template
 		$this->assignRef('db'  			, $db);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			$this->assignRef('langs'    , $langs);
 		}
 		$this->assignRef('cid'      	, $cid);
@@ -316,12 +327,13 @@ class FlexicontentViewItems extends JView {
 
 	function _displayCopyMove($tpl = null, $cid)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
 		$document	= & JFactory::getDocument();
-		$context	= 'com_flexicontent';
+		$option		= JRequest::getCmd( 'option' );
 		
 		JHTML::_('behavior.tooltip');
 
@@ -332,8 +344,8 @@ class FlexicontentViewItems extends JView {
 		$document->addScript('components/com_flexicontent/assets/js/copymove.js');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
 
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();

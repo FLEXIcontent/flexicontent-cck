@@ -52,7 +52,7 @@ class FlexicontentViewTemplates extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu('CanTemplates');
+		FLEXISubmenu('CanTemplates');
 		
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 

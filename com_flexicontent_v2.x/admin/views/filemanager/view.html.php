@@ -73,7 +73,7 @@ class FlexicontentViewFilemanager extends JView{
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu('CanFiles');
+		FLEXISubmenu('CanFiles');
 		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FILEMANAGER' ), 'files' );

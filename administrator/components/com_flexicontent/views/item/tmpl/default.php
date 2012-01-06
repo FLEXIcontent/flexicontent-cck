@@ -457,7 +457,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<span <?php echo $visibility; ?>>
 					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
-				<div id="hits"></div>
 			</td>
 		</tr>
 		<tr>

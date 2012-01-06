@@ -213,6 +213,7 @@ class FlexicontentController extends JController
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
 			JError::raiseError( 500, $model->getError() );
 		}
+
 		$model->checkin();
 
 		if ($isNew || $validData['vstate']!=2) {
@@ -222,12 +223,12 @@ class FlexicontentController extends JController
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int) $model->_item->id
-			;
+				;
 
 			$db->setQuery( $query );
 
 			$categories = $db->loadObjectList();
-			
+
 			//loop through the categories to create a string
 			$n = count($categories);
 			$i = 0;
@@ -438,14 +439,6 @@ class FlexicontentController extends JController
 		$db  	= &JFactory::getDBO();
 		$query	= $db->getQuery(true);
 		
-		/*
-		$plugin = &JPluginHelper::getPlugin('content', 'extravote');
-		$params = new JParameter($plugin->params);
-
-		if ( $params->get('access') == 1 && !$user->get('id') ) {
-			echo 'login';
-		} else {
-		*/
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
 		$xid 			= JRequest::getVar('xid');
@@ -742,19 +735,19 @@ class FlexicontentController extends JController
 		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"' : '' ;
 
 		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
-		.' FROM #__flexicontent_fields_item_relations AS rel'
-		.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
-		.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-		.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
-		. $joinaccess
-		. $joinaccess2
-		.' WHERE rel.item_id = ' . (int)$contentid
-		.' AND rel.field_id = ' . (int)$fieldid
-		.' AND f.id = ' . (int)$id
-		.' AND f.published= 1'
-		. $andaccess
-		. $andaccess2
-		;
+				.' FROM #__flexicontent_fields_item_relations AS rel'
+				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
+				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+				. $joinaccess
+				. $joinaccess2
+				.' WHERE rel.item_id = ' . (int)$contentid
+				.' AND rel.field_id = ' . (int)$fieldid
+				.' AND f.id = ' . (int)$id
+				.' AND f.published= 1'
+				. $andaccess
+				. $andaccess2
+				;
 		$db->setQuery($query);
 		$file = $db->loadObject();
 
@@ -975,6 +968,7 @@ class FlexicontentController extends JController
 		JRequest::setVar('view', 'search');
 		parent::display(true);
 	}
+	
 	function doPlgAct() {
 		FLEXIUtilities::doPlgAct();
 	}
