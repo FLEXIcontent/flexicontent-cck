@@ -21,6 +21,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 class flexicontent_html
 {
 	/**
+	 * joomla version specific strings
+	 * @access	protected
+	 * @var		string
+	 */
+	var $_itemview = 'items';
+	var $_icon_folder = 'images/M_images/';
+	
+	/**
 	 * Strip html tags and cut after x characters
 	 *
 	 * @param 	string 		$text
@@ -99,7 +107,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
-			} elseif($view == 'items') {
+			} elseif($view == $this->_item_view) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
@@ -109,7 +117,7 @@ class flexicontent_html
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'livemarks.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_FEED' ));
+				$image = JHTML::_('image.site', 'livemarks.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_FEED' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
 			}
@@ -139,14 +147,14 @@ class flexicontent_html
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
-				$image = JHTML::_('image.site', 'printButton.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_PRINT' ));
+				$image = JHTML::_('image.site', 'printButton.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
 
 			if (JRequest::getInt('pop')) {
 				//button in popup
-				$output = '<a href="#" onclick="window.print();return false;">'.$image.'</a>';
+				$output = '<a href="javascript:;" onclick="window.print();return false;">'.$image.'</a>';
 			} else {
 				//button in view
 				$overlib = JText::_( 'FLEXI_PRINT_TIP' );
@@ -178,7 +186,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
-			} elseif($view == 'items') {
+			} elseif($view == $this->_item_view) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
@@ -191,7 +199,7 @@ class flexicontent_html
 			$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'emailButton.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+				$image = JHTML::_('image.site', 'emailButton.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
 			}
@@ -218,14 +226,14 @@ class flexicontent_html
 		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'pdf_button.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				$image = JHTML::_('image.site', 'pdf_button.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
 			$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 			$text = JText::_( 'FLEXI_CREATE_PDF' );
 
-			$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
+			$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -251,14 +259,14 @@ class flexicontent_html
 			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)))
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -269,14 +277,14 @@ class flexicontent_html
 			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', 'images/M_images/', NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -306,7 +314,7 @@ class flexicontent_html
 			$overlib = JText::_( 'FLEXI_ADD_TIP' );
 			$text = JText::_( 'FLEXI_ADD' );
 
-			$link 	= 'index.php?view=items&task=add';
+			$link 	= 'index.php?view='.$this->_item_view.'&task=add';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -452,16 +460,15 @@ class flexicontent_html
 	 */
  	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
 	{
-		$live_path = JURI::base();
-
 		$document =& JFactory::getDocument();
+		$live_path = JURI::base(true);
 		
 		$counter 	= $field->parameters->get( 'counter', 1 );
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim		= $field->parameters->get( 'dimension', 25 );    	
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
 		$class 		= $field->name;
-		$img_path	= $live_path . $image;
+		$img_path	= $live_path .'/'. $image;
 	
 		$percent = 0;
 		$stars = '';
@@ -470,26 +477,12 @@ class flexicontent_html
 		
 	 	if (!$VoteAddScript)
 	 	{ 
-			$css 	= $live_path.'components/com_flexicontent/assets/css/fcvote.css';
-			$js		= $live_path.'components/com_flexicontent/assets/js/fcvote.js';
+			$css 	= $live_path .'/components/com_flexicontent/assets/css/fcvote.css';
+			$js		= $live_path .'/components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
 			$document->addScript($js);
 		
-         	echo "
-			<script type=\"text/javascript\" language=\"javascript\">
-			<!--
-			var sfolder = '".JURI::base(true)."';
-			var fcvote_text=Array(
-				'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX' )."',
-				'".JText::_( 'FLEXI_LOADING' )."',
-				'".JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' )."',
-				'".JText::_( 'FLEXI_YOU_NEED_TO_LOGIN' )."',
-				'".JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' )."',
-				'".JText::_( 'FLEXI_VOTES' )."',
-				'".JText::_( 'FLEXI_VOTE' )."'
-				);
-			-->
-			</script>";
+			$document->addScriptDeclaration('var sfolder = "'.JURI::base(true).'";');
 
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
@@ -514,35 +507,34 @@ class flexicontent_html
 			if ( $counter == 3 ) $counter = 0;
 		}
 								
-	 	$html="
-		<div class=\"".$class."\">
-			<div class=\"fcvote\">
+	 	$html='
+		<div class="'.$class.'">
+			<div class="fcvote">
 				<ul>
-    				<li id=\"rating_".$id."_".$xid."\" class=\"current-rating\" style=\"width:".(int)$percent."%;\"></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",1,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_VERY_POOR' )."\" class=\"one\">1</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",2,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_POOR' )."\" class=\"two\">2</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",3,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_REGULAR' )."\" class=\"three\">3</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",4,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_GOOD' )."\" class=\"four\">4</a></li>
-    				<li><a href=\"javascript:void(null)\" onclick=\"javascript:FCVote(".$id.",5,".$rating_sum.",".$rating_count.",'".$xid."',".$counter.");\" title=\"".JText::_( 'FLEXI_VERY_GOOD' )."\" class=\"five\">5</a></li>
+    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'">1</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'">2</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'">3</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'">4</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'">5</a></li>
 				</ul>
-			</div>
-  			<span id=\"fcvote_".$id."_".$xid."\" class=\"fcvote-count\">
-  				<small>";
-	  		if ( $counter != -1 ) {
-  				if ( $counter != 0 ) {
-					$html .= "(";
-				 		if($rating_count!=1) {
-					 		$html .= $rating_count." ".JText::_( 'FLEXI_VOTES' );
-				 		} else { 
-			 				$html .= $rating_count." ".JText::_( 'FLEXI_VOTE' );
-     					}
- 	 				$html .=")";
+	  			<div id="fcvote_'.$id.'_'.$xid.'" class="fcvote-count">';
+		  		if ( $counter != -1 ) {
+	  				if ( $counter != 0 ) {
+						$html .= "(";
+					 		if($rating_count!=1) {
+						 		$html .= $rating_count." ".JText::_( 'FLEXI_VOTES' );
+					 		} else { 
+				 				$html .= $rating_count." ".JText::_( 'FLEXI_VOTE' );
+	     					}
+	 	 				$html .=")";
+					}
 				}
-			}
- 	 	$html .="
- 	 			</small>
- 	 		</span>
- 	 	</div>";
+	 	 	$html .='
+	 	 		</div>
+ 	 			<div class="clear"></div>
+ 	 		</div>
+ 	 	</div>';
 		
 	 	return $html;
  	}
@@ -593,10 +585,10 @@ class flexicontent_html
 	 */
 	function favicon($field, $favoured)
 	{
-		$live_path 	= JURI::base();
+		$live_path 	= JURI::base(true);
 		$user		= & JFactory::getUser();
 		$document 	= & JFactory::getDocument();
-		$js			= $live_path.'components/com_flexicontent/assets/js/fcfav.js';
+		$js			= $live_path .'/components/com_flexicontent/assets/js/fcfav.js';
 		$document->addScript($js);
 		
          	$output = "
@@ -782,7 +774,7 @@ class flexicontent_html
 	 */
 	function buildlanguageslist($name, $class, $selected, $type = 1)
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 
 		$query = 'SELECT *'
@@ -856,6 +848,20 @@ class flexicontent_html
 					} else {
 						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
 					}
+					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
+					$list 	.= '</label><br />';
+				}
+				break;
+			case 5:
+				$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+				$fishpath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
+				$list		= '';
+
+				foreach ($languages as $lang) {
+					if ($lang->code==$selected) continue;
+					$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
 					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
 					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
@@ -1053,21 +1059,41 @@ class flexicontent_html
 		return array($html1, $html2);
 	}
 
-	function getJCoreFields($ffield=NULL, $mapcorefield=false) {
-		$flexifield = array(
-			'text'=>'maintext',
-			'created'=>'created',
-			'created_by'=>'createdby',
-			//'modified'=>'modified',
-			//'modified_by'=>'modifiedby',
-			'title'=>'title',
-			'hits'=>'hits',
-			//'document_type'=>'type',
-			'version'=>'version',
-			'state'=>'state'
-		);
-		if($mapcorefield) {
-			$flexifield['introtext'] = 'maintext';
+	function getJCoreFields($ffield=NULL, $mapcorefield=false, $swap=false) {
+		if(!$swap) {//core field=>flexicontent field
+			$flexifield = array(
+				'catid'=>'categories',
+				'text'=>'maintext',
+				'created'=>'created',
+				'created_by'=>'createdby',
+				//'modified'=>'modified',
+				//'modified_by'=>'modifiedby',
+				'title'=>'title',
+				'hits'=>'hits',
+				//'document_type'=>'type',
+				'version'=>'version',
+				'state'=>'state'
+			);
+			if($mapcorefield) {
+				$flexifield['introtext'] = 'maintext';
+			}
+		}else{//flexicontent field=>core field
+			$flexifield = array(
+				'categories'=>'catid',
+				'maintext'=>'text',
+				'created'=>'created',
+				'createdby'=>'created_by',
+				//'modified'=>'modified',
+				//'modifiedby'=>'modified_by',
+				'title'=>'title',
+				'hits'=>'hits',
+				//'type'=>'document_type',
+				'version'=>'version',
+				'state'=>'state'
+			);
+			if($mapcorefield) {
+				$flexifield['maintext'] = 'introtext';
+			}
 		}
 		if($ffield===NULL) return $flexifield;
 		return isset($flexifield[$ffield])?$flexifield[$ffield]:NULL;
@@ -1679,10 +1705,7 @@ class FLEXIUtilities {
 		
 		return $versionscount;
 	}
-	/*function parseTask($origTask, &$outTask) {
-		$outTask = explode(':', $origTask);
-		if(isset($outTask[1])) JRequest::setVar('doPlgAct', $outTask[1]);
-	}*/
+	
 	function doPlgAct() {
 		$plg = JRequest::getVar('plg');
 		$act = JRequest::getVar('act');
@@ -1695,6 +1718,21 @@ class FLEXIUtilities {
 				call_user_func(array($class, $act));
 			}
 		}
+	}
+	
+	function getCache($group='', $client=0) {
+		$conf = JFactory::getConfig();
+		//$client = 0;//0 is site, 1 is admin
+		$options = array(
+			'defaultgroup'	=> $group,
+			'storage' 		=> $conf->get('cache_handler', ''),
+			'caching'		=> true,
+			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
+		);
+
+		jimport('joomla.cache.cache');
+		$cache = JCache::getInstance('', $options);
+		return $cache;
 	}
 	
 	

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 291 2010-06-13 05:46:19Z enjoyman $
+ * @version 1.5 stable $Id: controller.php 1077 2011-12-31 10:45:00Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -448,13 +448,14 @@ class FlexicontentController extends JController
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
 			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-
+			$currip_quoted = $db->Quote( $currip );
+			$dbtbl = !(int)$xid ? '#__content_rating' : '#__content_extravote';
+			$and_extra_id = (int)$xid ? ' AND extra_id = '.(int)$xid : '';
+			
 			$query->clear();
 			$query->select('*')
-				->from((!(int)$xid ? '#__content_rating' : '#__content_extravote').' AS a')
-				->where('content_id = ' . (int)$cid);
-			if ( (int)$xid ) 
-				$query->where('extra_id = ' . (int)$xid);
+				->from($dbtbl.' AS a ')
+				->where('content_id = '.(int)$cid.' '.$and_extra_id);
 			
 			$db->setQuery( $query );
 			$votesdb = $db->loadObject();
@@ -462,13 +463,13 @@ class FlexicontentController extends JController
 			if ( !$votesdb )
 			{
 				$query->clear();
-				$query->insert((!(int)$xid ? '#__content_rating' : '#__content_extravote'))
-					->set('content_id = ' . (int)$cid)
-					->set('lastip = ' . $db->Quote( $currip ))
-					->set('rating_sum = ' . (int)$user_rating)
+				$query->insert($dbtbl)
+					->set('content_id = '.(int)$cid)
+					->set('lastip = '.$currip_quoted)
+					->set('rating_sum = '.(int)$user_rating)
 					->set('rating_count = 1');
 				if ( (int)$xid ) 
-					$query->set('extra_id = ' . (int)$xid);
+					$query->set('extra_id = '.(int)$xid);
 					
 				$db->setQuery( $query );
 				$db->query() or die( $db->stderr() );
@@ -480,13 +481,12 @@ class FlexicontentController extends JController
 				if ($currip != ($votesdb->lastip))
 				{
 					$query->clear();
-					$query->update((!(int)$xid ? '#__content_rating' : '#__content_extravote'))
+					$query->update($dbtbl)
 						->set('rating_count = rating_count + 1')
-						->set('rating_sum = rating_sum + ' . (int)$user_rating)
-						->set('lastip = '. $db->Quote($currip))
-						->where('content_id = ' . (int)$cid);
-					if ( (int)$xid ) 
-						$query->where('extra_id = ' . (int)$xid);
+						->set('rating_sum = rating_sum + '.(int)$user_rating)
+						->set('lastip = '.$currip_quoted)
+						->where('content_id = '.(int)$cid.' '.$and_extra_id);
+					
 					$db->setQuery( $query );
 					$db->query() or die( $db->stderr() );
 					$result->ratingcount = $votesdb->rating_count + 1;
@@ -494,6 +494,9 @@ class FlexicontentController extends JController
 				} 
 				else 
 				{
+					// avoid setting percentage ... since it may confuse the user because someone from same ip may have voted and
+					// despite telling user that she/he has voted already, user will see a change in the percentage of highlighted stars
+					//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * 20;
 					$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
 					$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
 					echo json_encode($result);

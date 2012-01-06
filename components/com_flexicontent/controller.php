@@ -340,7 +340,7 @@ class FlexicontentController extends JController
 	 */
 	function vote()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$id 		= JRequest::getInt('id', 0);
 		$cid 		= JRequest::getInt('cid', 0);
@@ -390,7 +390,7 @@ class FlexicontentController extends JController
 	 */
 	function ajaxfav()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$user 	=& JFactory::getUser();
 		$id 	=  JRequest::getInt('id', 0);
 		$db  	=& JFactory::getDBO();
@@ -430,102 +430,79 @@ class FlexicontentController extends JController
 	/**
 	 *  Method for voting (ajax)
 	 *
-	 * @TODO move the query part to the items model
+	 * @TODO move the query part to the item model
 	 * @access public
 	 * @since 1.5
 	 */
-	function ajaxvote()
+	public function ajaxvote()
 	{
-		global $mainframe;
-		$user = &JFactory::getUser();
-
-		/*
-		$plugin = &JPluginHelper::getPlugin('content', 'extravote');
-		$params = new JParameter($plugin->params);
-
-		if ( $params->get('access') == 1 && !$user->get('id') ) {
-			echo 'login';
-		} else {
-		*/
+		$app 	=& JFactory::getApplication();
+		$user 	= &JFactory::getUser();
+		$db  	= &JFactory::getDBO();
+		
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
 		$xid 			= JRequest::getVar('xid');
-		$db  			= &JFactory::getDBO();
-	
+
+		$result	= new JObject;
+
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
 			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-		
-			if ( !(int)$xid )
+			$currip_quoted = $db->Quote( $currip );
+			$dbtbl = !(int)$xid ? '#__content_rating' : '#__content_extravote';
+			$and_extra_id = (int)$xid ? ' AND extra_id = '.(int)$xid : '';
+			
+			$query = ' SELECT *'
+				. ' FROM '.$dbtbl.' AS a '
+				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+			
+			$db->setQuery( $query );
+			$votesdb = $db->loadObject();
+
+			if ( !$votesdb )
 			{
-				$query 	= 'SELECT * FROM #__content_rating'
-						. ' WHERE content_id = ' . $cid
-						;
+				$query = ' INSERT '.$dbtbl
+					. ' SET content_id = '.(int)$cid.', '
+					. '  lastip = '.$currip_quoted.', '
+					. '  rating_sum = '.(int)$user_rating.', '
+					. '  rating_count = 1 '
+					. (int)$xid ? ', extra_id = '.(int)$xid : '';
+					
 				$db->setQuery( $query );
-				$votesdb = $db->loadObject();
-			
-				if ( !$votesdb )
+				$db->query() or die( $db->stderr() );
+				$result->ratingcount = 1;
+				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
+			} 
+			else 
+			{
+				if ($currip != ($votesdb->lastip))
 				{
-					$query 	= 'INSERT INTO #__content_rating ( content_id, lastip, rating_sum, rating_count )'
-							. ' VALUES ( ' . $cid . ', ' . $db->Quote( $currip ) . ', ' . $user_rating . ', 1 )'
-							;
-					$db->setQuery( $query );
-					$db->query() or die( $db->stderr() );;
-			
-				} else {
-			
-					if ($currip != ($votesdb->lastip))
-					{
-						$query	= 'UPDATE #__content_rating'
-								. ' SET rating_count = rating_count + 1, rating_sum = rating_sum + ' .   $user_rating . ', lastip = ' . $db->Quote( $currip )
-								. ' WHERE content_id = ' . $cid
-								;
-						$db->setQuery( $query );
-						$db->query() or die( $db->stderr() );
-				
-					} else {
-				
-					echo 'voted';
-					exit();
-				}
-			}
-			
-			} else {
-			
-				$query 	= 'SELECT * FROM #__content_extravote'
-						. ' WHERE content_id='.$cid.' AND extra_id='.$xid
-						;
-				$db->setQuery( $query );
-				$votesdb = $db->loadObject();
-				
-				if ( !$votesdb )
-				{
-					$query	= 'INSERT INTO #__content_extravote  (content_id, extra_id, lastip, rating_sum, rating_count)'
-							. ' VALUES ('.$cid.', '.$xid.', '.$db->Quote($currip).', '.$user_rating.', 1)'
-							;
+					$query = " UPDATE ".$dbtbl
+					. ' SET rating_count = rating_count + 1, '
+					. '  rating_sum = rating_sum + '.(int)$user_rating.', '
+					. '  lastip = '.$currip_quoted
+					. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+					
 					$db->setQuery( $query );
 					$db->query() or die( $db->stderr() );
-				
-				} else {
-				
-					if ($currip != ($votesdb->lastip))
-					{
-						$query	= 'UPDATE #__content_extravote'
-								. ' SET rating_count = rating_count + 1, rating_sum = rating_sum + ' .  $user_rating . ', lastip = ' . $db->Quote( $currip )
-								. ' WHERE content_id='.$cid
-								. ' AND extra_id='.$xid
-								;
-						$db->setQuery( $query );
-						$db->query() or die( $db->stderr() );
-				
-					} else {
-				
-					echo 'voted';
+					$result->ratingcount = $votesdb->rating_count + 1;
+					$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+				} 
+				else 
+				{
+					// avoid setting percentage ... since it may confuse the user because someone from same ip may have voted and
+					// despite telling user that she/he has voted already, user will see a change in the percentage of highlighted stars
+					//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * 20;
+					$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+					$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
+					echo json_encode($result);
 					exit();
-					}
 				}
 			}
-		echo 'thanks';
+			$result->percentage = ( ((isset($votesdb->rating_sum) ? $votesdb->rating_sum : 0) + (int)$user_rating) / $result->ratingcount ) * 20;
+			$result->html 		= JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+			echo json_encode($result);
 		}
 	}
 
@@ -740,7 +717,7 @@ class FlexicontentController extends JController
 	 */
 	function download()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		jimport('joomla.filesystem.file');
 
@@ -881,7 +858,7 @@ class FlexicontentController extends JController
 	 */
 	function weblink()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$user		= & JFactory::getUser();
 		$gid		= (int) $user->get('aid');
