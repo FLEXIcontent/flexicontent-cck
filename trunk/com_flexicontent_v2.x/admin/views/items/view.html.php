@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 268 2010-06-11 08:45:12Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1078 2011-12-31 14:02:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,16 +28,20 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewItems extends JView {
-	function display($tpl = null) {
+
+	function display($tpl = null)
+	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
 		$document	= & JFactory::getDocument();
 		$option		= JRequest::getCmd( 'option' );
-		$context	= 'com_flexicontent';
 		$task		= JRequest::getVar('task', '');
 		$cid		= JRequest::getVar('cid', array());
 		$extlimit	= JRequest::getInt('extlimit', 100);
@@ -58,7 +62,7 @@ class FlexicontentViewItems extends JView {
 		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
 		
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $context.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
+		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
 		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
 		if ($filter_cats && $filter_order == 'i.ordering') {
@@ -67,21 +71,21 @@ class FlexicontentViewItems extends JView {
 			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', $default_order );
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
-		
-		$filter_type 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
-		$filter_authors		= $mainframe->getUserStateFromRequest( $context.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $context.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		//if (FLEXI_FISH) {
-			$filter_lang	 = $mainframe->getUserStateFromRequest( $context.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
-		//}
-		$scope	 			= $mainframe->getUserStateFromRequest( $context.'.items.scope', 			'scope', 			1, 				'int' );
-		$date	 			= $mainframe->getUserStateFromRequest( $context.'.items.date', 				'date', 			1, 				'int' );
-		$startdate	 		= $mainframe->getUserStateFromRequest( $context.'.items.startdate', 		'startdate', 		'', 			'cmd' );
+
+		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
+		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
+		if (FLEXI_FISH || $j16ge) {
+			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
+		}
+		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 				'int' );
+		$date	 			= $mainframe->getUserStateFromRequest( $option.'.items.date', 				'date', 			1, 				'int' );
+		$startdate	 		= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 		'startdate', 		'', 			'cmd' );
 		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $option.'.items.startdate', '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( $context.'.items.enddate', 			'enddate', 			'', 			'cmd' );
+		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 			'enddate', 			'', 			'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $option.'.items.enddate', '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( $context.'.items.$filter_id', 		'filter_id', 		'', 			'int' );
-		$search 			= $mainframe->getUserStateFromRequest( $context.'.items.search', 			'search', 			'', 			'string' );
+		$filter_id 			= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', 		'', 			'int' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 			'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -101,11 +105,11 @@ class FlexicontentViewItems extends JView {
 		if ($filter_state) {
 			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
 		}
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			if ($filter_lang) {
 				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
 			}
-		//}
+		}
 		if ($filter_id) {
 			$js .= "$$('.col_id').each(function(el){ el.addClass('yellow'); });";
 		}
@@ -121,9 +125,11 @@ class FlexicontentViewItems extends JView {
 		} else {
 			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
+		$js .= "});";
+		$document->addScriptDeclaration($js);
 		
 		$permission = FlexicontentHelperPerm::getPerm();
-		FLEXIcontentSubmenu('notvariable');
+		FLEXISubmenu('notvariable');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
@@ -175,14 +181,14 @@ class FlexicontentViewItems extends JView {
 		$pageNav 		= & $this->get( 'Pagination' );
 		$types			= & $this->get( 'Typeslist' );
 		$authors		= & $this->get( 'Authorslist' );
-		$unassociated		= & $this->get( 'UnassociatedItems' );
-		$status      		= & $this->get( 'ExtdataStatus');
+		$unassociated	= & $this->get( 'UnassociatedItems' );
+		$status      	= & $this->get( 'ExtdataStatus');
 		
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			$langs	= & $this->get( 'Languages' );
-		//}
+		}
 		$categories = $globalcats?$globalcats:array();
-
+		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
@@ -192,7 +198,10 @@ class FlexicontentViewItems extends JView {
 		$state[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
 
 		$lists['filter_state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-
+				
+		// build the include subcats boolean list
+		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox"', $filter_subcats );
+		
 		// build the categories select list for filter
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', true);
 
@@ -215,8 +224,8 @@ class FlexicontentViewItems extends JView {
 		$dates[] = JHTML::_('select.option',  '2', JText::_( 'FLEXI_REVISED' ) );
 		$lists['date'] = JHTML::_('select.radiolist', $dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
 
-		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'9',  'maxlength'=>'20'));
-		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'9',  'maxlength'=>'20'));
+		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
+		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
 
 		// search filter
 		$extdata = array();
@@ -251,18 +260,18 @@ class FlexicontentViewItems extends JView {
 			$ordering = ($lists['order'] == 'catsordering');
 		}
 
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			//build languages filter
 			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
-		//}
+		}
 		
 		//assign data to template
 		$this->assignRef('db'  			, $db);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || $j16ge) {
 			$this->assignRef('langs'    , $langs);
-		//}
+		}
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
@@ -286,30 +295,29 @@ class FlexicontentViewItems extends JView {
 		parent::display($tpl);
 	}
 
-	function _displayCopyMove($tpl = null, $cid) {
+	function _displayCopyMove($tpl = null, $cid)
+	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
 		$document	= & JFactory::getDocument();
-		$context	= 'com_flexicontent';
+		$option		= JRequest::getCmd( 'option' );
 		
 		JHTML::_('behavior.tooltip');
 
-		//add css and submenu to document
+		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
 		//add js functions
 		$document->addScript('components/com_flexicontent/assets/js/copymove.js');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-		
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
+
 		$permission = FlexicontentHelperPerm::getPerm();
-		//Create Submenu
-		FLEXIcontentSubmenu();
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );

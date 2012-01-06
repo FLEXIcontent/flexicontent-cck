@@ -46,7 +46,7 @@ class FlexicontentViewCategories extends JView {
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$permission = FlexicontentHelperPerm::getPerm();
 		//Create Submenu
-		FLEXIcontentSubmenu('CanCats');
+		FLEXISubmenu('CanCats');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );

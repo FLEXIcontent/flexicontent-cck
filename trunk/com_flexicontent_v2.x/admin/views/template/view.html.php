@@ -133,7 +133,7 @@ class FlexicontentViewTemplate extends JView {
 		}
 		
 		//Create Submenu
-		FLEXIcontentSubmenu('CanTemplates');
+		FLEXISubmenu('CanTemplates');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );

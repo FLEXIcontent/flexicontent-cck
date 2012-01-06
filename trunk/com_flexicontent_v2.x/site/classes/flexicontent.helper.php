@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 632 2011-07-08 02:01:38Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1079 2012-01-02 00:18:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1786,6 +1786,74 @@ class FLEXIUtilities {
 		return $cache;
 	}
 	
+	/* !!! FUNCTION NOT ADAPTED YET FOR J1.7 */
+	function call_FC_Field_Func( $fieldname, $func, $args=null ) {
+		static $fc_plgs;
+		
+		if ( !isset( $fc_plgs[$fieldname] ) ) {
+			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($fieldname).'.php';
+			if(file_exists($path)) require_once($path);
+			else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Cannot load FC Field: $fieldname\n Please correct field name"),'error');
+				return;
+			}
+			
+			// 2. Create plugin instance
+			$class = "plgFlexicontent_fields{$fieldname}";
+			if( class_exists($class) ) {
+				$className = 'plg'.'flexicontent_fields'.$fieldname;
+				$dispatcher = &JDispatcher::getInstance();
+				$fc_plgs[$fieldname] =  new $className($dispatcher, array());
+			} else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+				return;
+			}
+		}
+		
+		// 3. Execute only if it exists
+		$class = "plgFlexicontent_fields{$fieldname}";
+		if(in_array($func, get_class_methods($class))) {
+			call_user_func_array(array($fc_plgs[$fieldname], $func), $args);
+		}
+	}
+	
+	/* !!! FUNCTION NOT ADAPTED YET FOR J1.7 */
+	function call_Content_Plg_Func( $fieldname, $func, $args=null ) {
+		static $content_plgs;
+		
+		if ( !isset( $content_plgs[$fieldname] ) ) {
+			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
+			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.DS.strtolower($fieldname).'.php';
+			if(file_exists($path)) require_once($path);
+			else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $fieldname\n Please correct field name"),'error');
+				return;
+			}
+			
+			// 2. Create plugin instance
+			$class = "plgContent{$fieldname}";
+			if( class_exists($class) ) {
+				$className = 'plg'.'content'.$fieldname;
+				$dispatcher = &JDispatcher::getInstance();
+				$content_plgs[$fieldname] =  new $className($dispatcher, array());
+			} else {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+				return;
+			}
+		}
+		
+		// 3. Execute only if it exists
+		$class = "plgContent{$fieldname}";
+		if(in_array($func, get_class_methods($class))) {
+			call_user_func_array(array($content_plgs[$fieldname], $func), $args);
+		}
+	}
+	
 	/**
 	 * Return unicode char by its code
 	 * Credits: ?
@@ -2014,4 +2082,5 @@ if(!function_exists('diff_version')) {
 		return $difference;
 	}
 }
+
 ?>

@@ -18,29 +18,50 @@
 
 defined('_JEXEC') or die('Restricted access');
 $limit = $this->pageNav->limit;
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
+
 ?>
 <script language="javascript" type="text/javascript">
-window.onDomReady(stateselector.init.bind(stateselector));
+if(MooTools.version>="1.2.4") {
+	window.addEvent('domready', function() {stateselector.init()});
+}else{
+	window.onDomReady(stateselector.init.bind(stateselector));
+}
 
 function dostate(state, id)
-{	
+{
 	var change = new processstate();
-    change.dostate( state, id );
+	change.dostate( state, id );
 }
 
 function fetchcounter()
 {
 	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
-	var ajax = new Ajax(url, {
-		method: 'get',
-		update: $('count'),
-		onComplete:function(v) {
-			if(v==0)
-				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
-					location.href = 'index.php?option=com_flexicontent&view=items';
-		}
-	});
-	ajax.request();
+	if(MooTools.version>="1.2.4") {
+		new Request.HTML({
+			url: url,
+			method: 'get',
+			update: $('count'),
+			onSuccess:function(responseTree, responseElements, responseHTML, responseJavaScript) {
+				if(responseHTML==0)
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+						location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		}).send();
+	}else{
+		var ajax = new Ajax(url, {
+			method: 'get',
+			update: $('count'),
+			onComplete:function(v) {
+				if(v==0)
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+						location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		});
+		ajax.request();
+	}
 }
 
 // the function overloads joomla standard event
@@ -49,7 +70,7 @@ function submitform(pressbutton)
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' ); ?>')
+		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' )); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;
@@ -91,34 +112,41 @@ function delFilter(name)
 window.addEvent('domready', function(){
 	var startdate	= $('startdate');
 	var enddate 	= $('enddate');
-	if (startdate.getValue() == '') {
+	if(MooTools.version>="1.2.4") {
+		var sdate = startdate.value;
+		var edate = enddate.value;
+	}else{
+		var sdate = startdate.getValue();
+		var edate = enddate.getValue();
+	}
+	if (sdate == '') {
 		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
 	}
-	if (enddate.getValue() == '') {
+	if (edate == '') {
 		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
 	}
 	$('startdate').addEvent('focus', function() {
-		if (startdate.getValue() == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
+		if (sdate == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
 			startdate.setProperty('value', '');
 		}		
 	});
 	$('enddate').addEvent('focus', function() {
-		if (enddate.getValue() == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
+		if (edate == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
 			enddate.setProperty('value', '');
-		}		
+		}
 	});
 	$('startdate').addEvent('blur', function() {
-		if (startdate.getValue() == '') {
+		if (sdate == '') {
 			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
 		}		
 	});
 	$('enddate').addEvent('blur', function() {
-		if (enddate.getValue() == '') {
+		if (edate == '') {
 			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
 		}		
 	});
 
-/*
+<?php /*
 	$('show_filters').setStyle('display', 'none');
 	$('hide_filters').addEvent('click', function() {
 		$('filterline').setStyle('display', 'none');
@@ -130,23 +158,37 @@ window.addEvent('domready', function(){
 		$('show_filters').setStyle('display', 'none');
 		$('hide_filters').setStyle('display', '');
 	});
-*/
+*/ ?>
 });
 </script>
 <?php if ($this->unassociated) : ?>
 <script type="text/javascript">
-window.addEvent('domready', function(){
-	var count = fetchcounter();
+window.addEvent('domready', function() {
 	$('bindForm').addEvent('submit', function(e) {
-		$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
-		e = new Event(e).stop();
-		
-		this.send({
-			update: 	$('log-bind'),
-			onComplete:	function() {
-				fetchcounter();
-			}
-		});
+		if(MooTools.version>="1.2.4") {
+			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			e = e.stop();
+		}else{
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			e = new Event(e).stop();
+		}
+		if(MooTools.version>="1.2.4") {
+			new Request.HTML({
+				url: this.action,
+				method: 'post',
+				update: $('log-bind'),
+				onComplete: function() {
+					fetchcounter();
+				}
+			}).send();
+		}else{
+			this.send({
+				update: $('log-bind'),
+				onComplete: function() {
+					fetchcounter();
+				}
+			});
+		}
 	});
 }); 
 </script>
@@ -164,11 +206,11 @@ window.addEvent('domready', function(){
 			</span>
 			</td>
 			<td align="center" width="35%">
-				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
+				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;<?php echo count($this->unassociated); ?>&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
 				<?php echo $this->lists['extdata']; ?>
 				<?php
-				    $types = & $this->get( 'Typeslist' );
-				    echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
+					$types = & $this->get( 'Typeslist' );
+					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
 				?>
 				<input id="button-bind" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" />
 				<div id="log-bind"></div>
@@ -200,7 +242,7 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH || $j16ge) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -310,7 +352,7 @@ window.addEvent('domready', function(){
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-			<?php if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH || $j16ge) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
@@ -343,11 +385,11 @@ window.addEvent('domready', function(){
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>" class="filterbuttons">
+			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo FLEXI_FISH ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || $j16ge) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo FLEXI_FISH ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || $j16ge) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 <!--
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
@@ -360,7 +402,7 @@ window.addEvent('domready', function(){
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo FLEXI_FISH ? '15' : '14'; ?>">
+			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -416,7 +458,7 @@ window.addEvent('domready', function(){
 			}
 
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
-
+				$alt = "";
 				if ( $row->state == 1 ) {
 					$img = 'tick.png';
 					$alt = JText::_( 'FLEXI_PUBLISHED' );
@@ -458,7 +500,7 @@ window.addEvent('domready', function(){
 						$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
 					}
 				}
-			$row->lang = @$row->lang ? $row->lang : 'en-GB';
+				$row->lang = @$row->lang ? $row->lang : 'en-GB';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
@@ -478,9 +520,7 @@ window.addEvent('domready', function(){
 				?>
 				
 			</td>
-			<?php if (FLEXI_FISH) :
-				if( isset($row->lang) && @$row->lang ) :
-				?>
+		<?php if (FLEXI_FISH && isset($row->lang) && @$row->lang ) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
@@ -490,12 +530,15 @@ window.addEvent('domready', function(){
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
-				<?php else : ?>
+		<?php elseif(@$row->lang) : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
+				<?php echo $row->lang; ?>
+			</td>
+		<?php else : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_('Undefined');?>">
 				&nbsp;
 			</td>
-				<?php endif;?>
-			<?php endif; ?>
+		<?php endif; ?>
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>
@@ -506,7 +549,7 @@ window.addEvent('domready', function(){
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<div id="row<?php echo $row->id; ?>">
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
-							<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+							<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 						</span>
 					</div>
 					</a>
@@ -515,42 +558,42 @@ window.addEvent('domready', function(){
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_PUBLISH_THIS_ITEM' ); ?>">
-									<img src="images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('0', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_UNPUBLISH_THIS_ITEM' ); ?>">
-									<img src="images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
 								</a>	
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_ARCHIVE_THIS_ITEM' ); ?>">
-									<img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-3', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_PENDING' ); ?>">
-									<img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
 								</a>
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-4', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_TO_WRITE' ); ?>">
-									<img src="images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
 								</a>	
 								</div>
 							</li>
 							<li>
 								<div>
 								<a href="javascript:void(0);" onclick="dostate('-5', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_IN_PROGRESS' ); ?>">
-									<img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
 								</a>	
 								</div>
 							</li>
@@ -561,7 +604,7 @@ window.addEvent('domready', function(){
 			<?php else : ?>
 			<div id="row<?php echo $row->id; ?>">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
-					<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 				</span>
 			</div>
 			<?php endif ; ?>
@@ -660,19 +703,19 @@ window.addEvent('domready', function(){
 	
 	<table cellspacing="0" cellpadding="4" border="0" align="center">
 		<tr>
-			<td><img src="images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
 		</tr>
 		<tr>
-			<td><img src="images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
