@@ -1,6 +1,6 @@
-<?php 
+<?php
 /**
- * @version 1.5 stable $Id: view.html.php 351 2010-06-29 11:00:04Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1001 2011-11-29 08:51:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,7 +27,8 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItem extends JView {
+class FlexicontentViewItem extends JView
+{
 	var $_type='';
 	var $_name='Item';
 	
@@ -312,6 +313,9 @@ class FlexicontentViewItem extends JView {
 	function _displayForm($tpl) {
 
 		$mainframe = &JFactory::getApplication();
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Initialize variables
 		$dispatcher = & JDispatcher::getInstance();
@@ -414,6 +418,11 @@ class FlexicontentViewItem extends JView {
 		jimport( 'joomla.html.parameter' );
 		$tparams = new JParameter($tparams);
 
+		//ensure $used is an array
+		if(!is_array($usedtags)){
+			$usedtags =  array();
+		}
+		
 		//add css file
 		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 		//$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
@@ -422,16 +431,16 @@ class FlexicontentViewItem extends JView {
 		//Get the lists
 		$lists = $this->_buildEditLists($perms['multicat']);
 
-		if (FLEXI_FISH) {
-		//build languages list
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item->language, 3);
+		if (FLEXI_FISH || $j16ge) {
+			//build languages list
+			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item->getValue("language"), 3);
 		} else {
 			$item->language = flexicontent_html::getSiteDefaultLang();
 		}
 
 
 		//Load the JEditor object
-		//$editor =& JFactory::getEditor();
+		$editor =& JFactory::getEditor();
 
 		//Build the page title string
 		$title = $item->getValue('id') ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
@@ -461,7 +470,7 @@ class FlexicontentViewItem extends JView {
 		$this->assignRef('item',		$item);
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',		$lists);
-		//$this->assignRef('editor',		$editor);
+		$this->assignRef('editor',		$editor);
 		$this->assignRef('user',		$user);
 		$this->assignRef('usedtags',		$usedtags);
 		$this->assignRef('fields',		$fields);

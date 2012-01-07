@@ -525,7 +525,7 @@ ul#ultagbox li{
 }
 /** tag selection */
 div#tags {
-	margin: 4px!important;
+	margin: 4px 0px!important;
 	padding:0px!important;
 }
 div#tags #input-tags {
@@ -537,7 +537,7 @@ div#tags #input-tags {
   	overflow: auto;
   	border: 1px dashed silver;
   	background: #fff;
-  	margin: 6px;	
+  	margin: 0px 4px 4px 0px;	
 }
 
 .qf_tagidbox {
@@ -682,15 +682,41 @@ td.key label {
 	display:inline;
 }
 
-div table.admintable td.key, div table.admintable td.paramlist_key {
-    background-color: #E6E6E6;
-    border: 1px solid #D6D6D6;
-    color: #666666;
-    font-weight: bold;
-    text-align: right;
-    width: 140px;
+div table.adminform {
+	background-color: #F4F4F4;
+	font-size:11px;
 }
 
-table.admintable td {
-    padding: 2px 8px 2px 4px;
+div input#jform_title, div input#jform_leveltitle, div input#jform_grouptitle {
+	font-size:14px;
+}
+
+div table.adminform td {
+	font-size:11px;
+	padding:2px 2px;
+	text-align:left;
+}
+
+div table.adminform input { font-size:11px; padding:2px; }
+div table.adminform select { font-size:10px; }
+
+div table.admintable td {
+	/*background-color:#F9F9F9;*/
+	border:1px solid #F0F0F0;
+	font-weight: normal;
+	text-align: left;
+	padding: 6px 4px 6px 4px;
+}
+div table.admintable td.key, div table.admintable td.paramlist_key {
+	background-color: #E6E6E6;
+	border:1px solid #D6D6D6;
+	color: #666666;
+	font-weight:normal;
+	text-align:right;
+	width: 140px;
+	padding: 2px 8px 2px 4px;
+}
+
+div div#element-box div.m {
+	background-color: #FFFFFF;
 }

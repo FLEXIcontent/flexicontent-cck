@@ -31,6 +31,9 @@ class FlexicontentViewItem extends JView {
 	function display($tpl = null)
 	{
 		global $globalcats;
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -39,6 +42,7 @@ class FlexicontentViewItem extends JView {
 		
 		//initialise variables
 		$mainframe	= & JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
@@ -52,6 +56,9 @@ class FlexicontentViewItem extends JView {
 			JHTML::_('behavior.mootools');
 			$document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 		}
+		// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+		//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+
 		JHTML::_('behavior.tooltip');
 
 		$nullDate 		= $db->getNullDate();
@@ -124,6 +131,7 @@ class FlexicontentViewItem extends JView {
 			$usedtagsA 	= & $this->get( 'UsedtagsArray' );
 			$usedtags 	= $model->getUsedtags($usedtagsA);
 		}
+
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
 		{
@@ -255,8 +263,8 @@ class FlexicontentViewItem extends JView {
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
 		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
-		if (FLEXI_FISH) {
-		//build languages list
+		if (FLEXI_FISH || $j16ge) {
+			//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
 		} else {
 			$row->language = flexicontent_html::getSiteDefaultLang();

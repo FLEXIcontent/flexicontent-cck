@@ -40,8 +40,8 @@ class FlexicontentViewItems extends JView
 		// Ensure that the global vars are array
 		if (!is_array($globaltypes))	$globaltypes	= array();
 		
-		global $mainframe;
-		
+		$mainframe = &JFactory::getApplication();
+
 		//initialize variables
 		$document 	= & JFactory::getDocument();
 		$user		= & JFactory::getUser();
@@ -300,7 +300,10 @@ class FlexicontentViewItems extends JView
 	 */
 	function _displayForm($tpl) {
 
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Initialize variables
 		$dispatcher = & JDispatcher::getInstance();
@@ -317,8 +320,8 @@ class FlexicontentViewItems extends JView
 		//$params		=& JComponentHelper::getParams('com_flexicontent');
 		
 		$Itemid		=&JRequest::getVar('Itemid', 0);
+		$db = &JFactory::getDBO();
 		if($Itemid) {
-			$db = &JFactory::getDBO();
 			$query = "SELECT params FROM #__menu WHERE id='{$Itemid}';";
 			$db->setQuery($query);
 			$paramsstring = $db->loadResult();
@@ -443,8 +446,8 @@ class FlexicontentViewItems extends JView
 		//Get the lists
 		$lists = $this->_buildEditLists($perms['multicat']);
 
-		if (FLEXI_FISH) {
-		//build languages list
+		if (FLEXI_FISH || $j16ge) {
+			//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item->language, 3);
 		} else {
 			$item->language = flexicontent_html::getSiteDefaultLang();
@@ -477,7 +480,7 @@ class FlexicontentViewItems extends JView
 
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
-//		JFilterOutput::objectHTMLSafe( $item );
+		//JFilterOutput::objectHTMLSafe( $item );
 
 		$this->assign('action', 	$uri->toString());
 

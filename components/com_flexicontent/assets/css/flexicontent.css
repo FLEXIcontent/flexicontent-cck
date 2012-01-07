@@ -711,3 +711,22 @@ div#flexicontent .fc_clearfix {
 /*****************/
 /* CSS HACKS END */
 /*****************/
+
+table.admintable {
+	border-collapse:separate !important;
+	border-spacing:2px;
+}
+
+table.admintable td.key, table.admintable td.paramlist_key {
+	background-color: #E6E6E6;
+	border:1px solid #F0F0F0;
+	color: #666666;
+	font-weight:normal;
+	text-align:right;
+}
+table.admintable td {
+	border:1px solid #F0F0F0;
+	font-weight: normal;
+	text-align: left;
+	padding: 6px 4px 6px 4px;
+}

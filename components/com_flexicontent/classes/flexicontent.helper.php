@@ -25,8 +25,8 @@ class flexicontent_html
 	 * @access	protected
 	 * @var		string
 	 */
-	var $_itemview = 'items';
-	var $_icon_folder = 'images/M_images/';
+	static private $_itemview = 'items';
+	static private $_icondir = 'images/M_images/';
 	
 	/**
 	 * Strip html tags and cut after x characters
@@ -107,7 +107,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
-			} elseif($view == $this->_item_view) {
+			} elseif($view == self::$_itemview) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
@@ -117,7 +117,7 @@ class flexicontent_html
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'livemarks.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_FEED' ));
+				$image = JHTML::_('image.site', 'livemarks.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_FEED' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
 			}
@@ -147,7 +147,7 @@ class flexicontent_html
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
-				$image = JHTML::_('image.site', 'printButton.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
+				$image = JHTML::_('image.site', 'printButton.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -186,7 +186,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
-			} elseif($view == $this->_item_view) {
+			} elseif($view == self::$_itemview) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
@@ -199,7 +199,7 @@ class flexicontent_html
 			$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'emailButton.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+				$image = JHTML::_('image.site', 'emailButton.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
 			}
@@ -226,14 +226,14 @@ class flexicontent_html
 		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'pdf_button.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				$image = JHTML::_('image.site', 'pdf_button.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
 			$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 			$text = JText::_( 'FLEXI_CREATE_PDF' );
 
-			$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
+			$link 	= 'index.php?view='.self::$_itemview.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -259,14 +259,14 @@ class flexicontent_html
 			if ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)))
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view='.self::$_itemview.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -277,14 +277,14 @@ class flexicontent_html
 			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
 			{
 				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', $this->_icon_folder, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+					$image = JHTML::_('image.site', 'edit.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 				} else {
 					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 				}
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view='.$this->_item_view.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view='.self::$_itemview.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -314,7 +314,7 @@ class flexicontent_html
 			$overlib = JText::_( 'FLEXI_ADD_TIP' );
 			$text = JText::_( 'FLEXI_ADD' );
 
-			$link 	= 'index.php?view='.$this->_item_view.'&task=add';
+			$link 	= 'index.php?view='.self::$_itemview.'&task=add';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -825,7 +825,7 @@ class flexicontent_html
 					} else {
 						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
 					}
-					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'" style="white-space:nowrap">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
 					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
 					$list 	.= '</label>';
