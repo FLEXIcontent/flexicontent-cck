@@ -224,14 +224,14 @@ class modFlexicontentHelper
 							$image	= unserialize($row->image);
 							$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
 
-		    				$h		= '&h=' . $mod_height_feat;
-		   					$w		= '&w=' . $mod_width_feat;
-		    				$aoe	= '&aoe=1';
-		    				$q		= '&q=95';
-		    				$zc		= $mod_method_feat ? '&zc=' . $mod_method_feat : '';
-		    				$conf	= $w . $h . $aoe . $q . $zc;
-		
-		    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+							$h		= '&amp;h=' . $mod_height_feat;
+							$w		= '&amp;w=' . $mod_width_feat;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+							$conf	= $w . $h . $aoe . $q . $zc;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else {
 							$thumb	= '';
 						}
@@ -240,15 +240,15 @@ class modFlexicontentHelper
 						$articleimage = flexicontent_html::extractimagesrc($row);
 						if ($articleimage) {
 						  $src	= JURI::base(true) . '/' . $articleimage;
-						  
-		    				$h		= '&h=' . $mod_height_feat;
-		   					$w		= '&w=' . $mod_width_feat;
-		    				$aoe	= '&aoe=1';
-		    				$q		= '&q=95';
-		    				$zc		= $mod_method_feat ? '&zc=' . $mod_method_feat : '';
-		    				$conf	= $w . $h . $aoe . $q . $zc;
-	    				
-		    			$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+
+							$h		= '&amp;h=' . $mod_height_feat;
+							$w		= '&amp;w=' . $mod_width_feat;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+							$conf	= $w . $h . $aoe . $q . $zc;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		    		} else {
 		    		  $thumb = '';
 		    		}
@@ -296,14 +296,14 @@ class modFlexicontentHelper
 							$image	= unserialize($row->image);
 							$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
 
-		    				$h		= '&h=' . $mod_height;
-		   					$w		= '&w=' . $mod_width;
-		    				$aoe	= '&aoe=1';
-		    				$q		= '&q=95';
-		    				$zc		= $mod_method ? '&zc=' . $mod_method : '';
-		    				$conf	= $w . $h . $aoe . $q . $zc;
-		
-		    				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+							$h		= '&amp;h=' . $mod_height;
+							$w		= '&amp;w=' . $mod_width;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
+							$conf	= $w . $h . $aoe . $q . $zc;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else {
 							$thumb	= '';
 						}
@@ -312,15 +312,15 @@ class modFlexicontentHelper
 						$articleimage = flexicontent_html::extractimagesrc($row);
 						if ($articleimage) {
 						  $src	= JURI::base(true) . '/' . $articleimage;
-						  
-	    				$h		= '&h=' . $mod_height;
-	   					$w		= '&w=' . $mod_width;
-	    				$aoe	= '&aoe=1';
-	    				$q		= '&q=95';
-	    				$zc		= $mod_method ? '&zc=' . $mod_method : '';
-	    				$conf	= $w . $h . $aoe . $q . $zc;
-	    				
-		    			$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+
+							$h		= '&amp;h=' . $mod_height;
+							$w		= '&amp;w=' . $mod_width;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
+							$conf	= $w . $h . $aoe . $q . $zc;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		    		} else {
 		    		  $thumb = '';
 		    		}
@@ -961,11 +961,11 @@ class modFlexicontentHelper
 			if (empty($catimagesrc)) {
   			unset($currcatdata->image);
   		} else {
-				$h		= '&h=' . $currcat_height;
-				$w		= '&w=' . $currcat_width;
-				$aoe	= '&aoe=1';
-				$q		= '&q=95';
-				$zc		= $currcat_method ? '&zc=' . $currcat_method : '';
+				$h		= '&amp;h=' . $currcat_height;
+				$w		= '&amp;w=' . $currcat_width;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $currcat_method ? '&amp;zc=' . $currcat_method : '';
 				$conf	= $w . $h . $aoe . $q . $zc;
 				
   			$currcatdata->image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$catimagesrc.$conf;
