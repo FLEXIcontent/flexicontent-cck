@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 353 2010-06-29 11:54:33Z emmanuel.danan $
+ * @version 1.5 stable $Id: form.php 1031 2011-12-07 21:57:29Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,9 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 $cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
 // Added to allow the user to choose some of the pre-selected categories
@@ -169,33 +172,42 @@ function addtag(id, tagname) {
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
-		//return false;
+		return false;
 	}
+
 	var form = document.adminForm;
 	var validator = document.formvalidator;
 	var title = form.jform_title.value;
 	title.replace(/\s/g,'');
+	//if(!validator.checkRequired()) return false;
 	if ( title.length==0 ) {
-		//alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");
+		/*alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");*/ // commented out because each type may have custom name for title via an template override, and it will be confusing
 		validator.handleResponse(false,form.jform_title);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
 		//form.title.focus();
 		return false;
-	}<?php if(!$cids) {?> else if ( form.jformcid.selectedIndex == -1 ) {   // categories FIELD is READONLY ?
-		//alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");
+	} else if ( typeof form.jformcid != 'undefined' && typeof form.jformcid.selectedIndex != 'undefined' && form.jformcid.selectedIndex == -1 ) {
+		/*alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");*/  // commented out because each type may have custom name for categories via an template override, and it will be confusing
 		validator.handleResponse(false,form.jformcid);
 		var invalid = $$('.invalid');
 		new Fx.Scroll(window).toElement(invalid[0]);
 		invalid[0].focus();
 		return false;
-	} <?php } ?>else {
-	<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) {$editor = & JFactory::getEditor();echo $editor->save( 'jform_text' );} ?>
-	submitform(pressbutton);
-	//return true;
+	} else {
+		<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) : ?>
+			// commented out because each type may have custom name for description via type configutation, and it will be confusing
+			/*var text = <?php echo $this->editor->getContent( 'jform_text' ); ?>
+			if (text == '') {
+				alert ( "<?php echo JText::_( 'Article must have some text', true ); ?>");
+				return false;
+			}*/
+		<?php endif; ?>
 	}
-	return false;
+	
+	submitform(pressbutton);
+	return true;
 }
 
 function deleteTag(obj) {
@@ -213,33 +225,32 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
-	<div class="flexi_buttons">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');?>" target="_blank">
-			<button type="button" class="button" onclick="javascript:;">
-				<?php echo JText::_( 'FLEXI_PREVIEW' ) ?>
+		<div class="flexi_buttons">
+			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');?>" target="_blank">
+				<button type="button" class="button" onclick="javascript:;">
+					<?php echo JText::_( 'FLEXI_PREVIEW' ) ?>
+				</button>
+			</a>
+			<button type="submit" class="button" onclick="javascript:return submitbutton('save_a_preview');">
+				<?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?>
 			</button>
-		</a>
-		<button type="submit" class="button" onclick="javascript:return submitbutton('save_a_preview');">
-			<?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?>
-		</button>
-		<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
-			<?php echo JText::_( 'FLEXI_SAVE' ) ?>
-		</button>
-		<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
-			<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
-		</button>
-	</div>
+			<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
+				<?php echo JText::_( 'FLEXI_SAVE' ) ?>
+			</button>
+			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
+				<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
+			</button>
+		</div>
          
-        <br class="clear" />
-	
-        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+		<br class="clear" />
+		
+	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td>
 				<?php echo $this->item->getLabel('title');?>
 			</td>
 			<td>
 				<?php echo $this->item->getInput('title');?>
-				<!-- <input type="text" name="jform[title]" id="jform_title" value="<?php echo $this->escape($this->item->getValue('title')); ?>" class="inputbox required" size="55" maxlength="254" /> -->
 			</td>
 		</tr>
 		<tr>
@@ -306,12 +317,12 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		<?php	if (!$cparams->get('auto_approve', 0)) :	?>
 		<tr>
 			<td>
-	 			<label for="vstate" class="flexi_label">
+				<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
 				</label>
 			</td>
 			<td>
-	  		<?php echo $this->lists['vstate']; ?>
+				<?php echo $this->lists['vstate']; ?>
 			</td>
 		</tr>
 		<?php	endif; ?>
@@ -331,15 +342,16 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		</tr>
 		
 	<?php endif; ?>
-	
+		<?php if (FLEXI_FISH || $j16ge) : ?>
 		<tr>
 			<td>
-		  		<?php echo $this->item->getLabel('language'); ?>
+				<?php echo $this->item->getLabel('language'); ?>
 			</td>
 			<td>
-		 		<?php echo $this->item->getInput('language');?>
+				<?php echo $this->lists['languages']; ?>
 			</td>
 		</tr>
+		<?php endif; ?>
 		<tr>
 			<td>
 			<?php echo $this->item->getLabel('featured'); ?>
@@ -359,21 +371,22 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					});
 				});
 			");
+
 		?>
 		<tr>
 			<td colspan="2">
 			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 			<table id="tabacces" class="admintable" width="100%">
-		    		<tr>
-		    		<td>
-		        		<div id="accessrules"><?php echo $this->item->getInput('rules'); ?></div>
-		        	</td>
-		    	</tr>
+				<tr>
+					<td>
+						<div id="accessrules"><?php echo $this->item->getInput('rules'); ?></div>
+					</td>
+				</tr>
 			</table>
 			<div id="notabacces">
 			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 			</div>
-        	</tr>
+		</tr>
 		<?php endif; ?>
 		<tr>
 			<td>
@@ -381,17 +394,17 @@ $autoapprove = $cparams->get('auto_approve', 0);
 			</td>
 			<td>
 				<div class="qf_tagbox" id="qf_tagbox">
-				<ul id="ultagbox">
-				<?php
-					foreach($this->usedtags as $tag) {
-						if ($this->perms['canusetags']) {
-							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-						} else {
-							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
+					<ul id="ultagbox">
+					<?php
+						foreach($this->usedtags as $tag) {
+								if ($this->perms['canusetags']) {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								} else {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
+								}
 						}
-					}
 					?>
 					</ul>
 					<br class="clear" />
@@ -439,6 +452,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				'fcpagenav',
 				'toolbar'
 			);
+			
 			foreach ($this->fields as $field) {
 				// used to hide the core fields and the hidden fields from this listing
 				if 	(
@@ -572,26 +586,6 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		</ul>
 		</fieldset>
 
-		<?php
-		/* echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
-		?>
-		<fieldset class="panelform">
-			<?php echo $this->item->getLabel('metadesc'); ?>
-			<?php echo $this->item->getInput('metadesc'); ?>
-
-			<?php echo $this->item->getLabel('metakey'); ?>
-			<?php echo $this->item->getInput('metakey'); ?>
-			<?php foreach($this->item->getGroup('metadata') as $field): ?>
-				<?php if ($field->hidden): ?>
-					<?php echo $field->input; ?>
-				<?php else: ?>
-					<?php echo $field->label; ?>
-					<?php echo $field->input; ?>
-				<?php endif; ?>
-			<?php endforeach; ?>
-		</fieldset>
-		<?php */?>
 		<?php
 		$fieldSets = $this->item->getFieldsets('attribs');
 		foreach ($fieldSets as $name => $fieldSet) :

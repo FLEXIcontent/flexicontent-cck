@@ -17,10 +17,14 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
 $postcats = $this->params->get("postcats", 0);
+
 if ($cid) :
 	global $globalcats;
 	$cids 		= explode(",", $cid);
@@ -161,10 +165,11 @@ function addtag(id, tagname) {
 	var tag = new itemscreen();
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
+
 function submitbutton( pressbutton ) {
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
-		return;
+		return false;
 	}
 
 	var form = document.adminForm;
@@ -224,17 +229,17 @@ function deleteTag(obj) {
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
 		<div class="flexi_buttons">
-            <button type="button" class="button" onclick="return submitbutton('save')">
-        	    <?php echo JText::_( 'FLEXI_SAVE' ) ?>
-        	</button>
-        	<button type="reset" class="button" onclick="submitbutton('cancel')">
-        	    <?php echo JText::_( 'FLEXI_CANCEL' ) ?>
-        	</button>
-        </div>
+			<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
+				<?php echo JText::_( 'FLEXI_SAVE' ) ?>
+			</button>
+			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
+				<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
+			</button>
+		</div>
          
-        <br class="clear" />
-	
-        <fieldset class="flexi_general">
+		<br class="clear" />
+		
+		<fieldset class="flexi_general">
 			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
 			<div class="flexi_formblock">
 				<label for="title" class="flexi_label">
@@ -279,10 +284,10 @@ function deleteTag(obj) {
 				if (!$this->params->get('auto_approve', 1)) :
 				?>
 			<div class="flexi_formblock">
-          		<label for="vstate" class="flexi_label">
+				<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
 				</label>
-          		<?php echo $this->lists['vstate']; ?>
+				<?php echo $this->lists['vstate']; ?>
 			</div>
 				<?php
 				else :
@@ -296,18 +301,16 @@ function deleteTag(obj) {
 			?>
 			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
 			<?php 
-			endif; 
-			if (FLEXI_FISH) :
+			endif;
 			?>
+		<?php if (FLEXI_FISH || $j16ge) : ?>
 			<div class="flexi_formblock">
-          		<label for="languages" class="flexi_label">
+				<label for="languages" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ).':';?>
 				</label>
-          		<?php echo $this->lists['languages']; ?>
+				<?php echo $this->lists['languages']; ?>
 			</div>
-			<?php 
-			endif; 
-			?>
+		<?php endif; ?>
 		</fieldset>
 		
 		<?php
@@ -328,38 +331,38 @@ function deleteTag(obj) {
 		<fieldset class="flexiaccess">
 			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 			<table id="tabacces" class="admintable" width="100%">
-            	<tr>
-            		<td>
-                		<div id="access"><?php echo $this->lists['access']; ?></div>
-                	</td>
-            	</tr>
-        	</table>
+				<tr>
+					<td>
+						<div id="access"><?php echo $this->lists['access']; ?></div>
+					</td>
+				</tr>
+			</table>
 			<div id="notabacces">
 			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-        	</div>
-        </fieldset>
-        <?php endif; ?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
 <?php if(@$this->fields['tags']) {?>
 	<fieldset class="flexi_tags">
 		<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
-		<div class="qf_tagbox" id="qf_tagbox">
-		<ul id="ultagbox">
-		<?php
-			foreach( $this->tags as $tag ) {
-				if(in_array($tag->id, $this->used)) {
-					if ($this->perms['cantags']) {
-						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-					} else {
-						echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-						echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
-					}
-				}
-			}
-			?>
-		</ul>
-		<br class="clear" />
-	</div>
+				<div class="qf_tagbox" id="qf_tagbox">
+					<ul id="ultagbox">
+					<?php
+						foreach( $this->tags as $tag ) {
+							if(in_array($tag->id, $this->used)) {
+								if ($this->perms['cantags']) {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								} else {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+								}
+							}
+						}
+					?>
+					</ul>
+					<br class="clear" />
+				</div>
 		<?php if ($this->perms['cantags']) : ?>
 		<div id="tags">
 		<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
@@ -399,7 +402,7 @@ function deleteTag(obj) {
 			);
 			
 			foreach ($this->fields as $field) {
-				// used to hide the core fields from this listing
+				// used to hide the core fields and the hidden fields from this listing
 				if 	(
 						(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
 						&& 

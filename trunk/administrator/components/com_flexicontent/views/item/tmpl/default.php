@@ -17,6 +17,11 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
+
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->CanUseTags || $this->CanVersion) {
@@ -211,12 +216,12 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									<td>
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
-										echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
-											if (!$this->cparams->get('auto_approve', 1)) :
-												echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
-											else :
-												echo '<input type="hidden" name="vstate" value="2" />';
-											endif;
+										echo $this->lists['state'] . '&nbsp;';
+										if (!$this->cparams->get('auto_approve', 1)) :
+											echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
+										else :
+											echo '<input type="hidden" name="vstate" value="2" />';
+										endif;
 									else :
 										echo $this->published;
 										echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
@@ -229,7 +234,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									?>
 									</td>
 								</tr>
-								<?php if (FLEXI_FISH) : ?>
+								<?php if (FLEXI_FISH || $j16ge) : ?>
 								<tr>
 									<td>
 										<label for="language">
@@ -307,17 +312,17 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
-                    	<tr>
-                    		<td>
-                        		<div id="access"><?php echo $this->lists['access']; ?></div>
-                        	</td>
-                    	</tr>
-                	</table>
+						<tr>
+							<td>
+								<div id="access"><?php echo $this->lists['access']; ?></div>
+							</td>
+						</tr>
+					</table>
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-                	</div>
-                </fieldset>
-                <?php endif; ?>
+					</div>
+				</fieldset>
+				<?php endif; ?>
 
 				<?php
 				if ($this->fields) {
@@ -565,17 +570,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<?php
 				endif;
 			endforeach;
-			/*
-			$currentdate =& JFactory::getDate();
-			$currentdate = $currentdate->toUnix();
-			?>
-			<tr>
-				<td class="versions-first"><?php echo '#' . $this->row->version; ?></td>
-				<td class="versions-first"><?php echo JHTML::_('date', $currentdate, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></td>
-				<td class="versions-first"><?php echo $this->row->modifier; ?></td>
-				<td class="versions-first" align="center"><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&cid=<?php echo $this->row->id;?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a></td>
-			</tr>
-			<?php */ endif; ?>
+			endif; ?>
 		</table>
 		</div>
 		<div id="pager"></div>
@@ -614,7 +609,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 		</table>
 
-			<?php
+		<?php
 			$title = JText::_( 'FLEXI_DETAILS' );
 			echo $this->pane->startPane( 'det-pane' );
 			echo $this->pane->startPanel( $title, 'details' );

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 376 2010-08-24 04:12:01Z enjoyman $
+ * @version 1.5 stable $Id: default.php 1084 2012-01-06 10:42:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,12 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+jimport( 'joomla.version' );
+$jversion = new JVersion;
+$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
+
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 if ($this->permission->CanUseTags) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
@@ -198,20 +204,10 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									<td>
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
-										//echo $this->lists['state'] . '&nbsp;&nbsp;&nbsp;';
-										echo $this->form->getInput('state');
-										if (!$this->cparams->get('auto_approve', 1)) : ?>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo $this->form->getLabel('vstate'); ?>
-									</td>
-									<td>
-										<?php echo $this->form->getInput('vstate'); ?>
-									</td>
-								</tr>
-										<?php else :
+										echo $this->form->getInput('state') . '&nbsp;';
+										if (!$this->cparams->get('auto_approve', 1)) :
+											echo $this->form->getLabel('vstate') . $this->form->getInput('vstate');
+										else :
 											echo '<input type="hidden" name="jform[vstate]" value="2" />';
 										endif;
 									else :
@@ -226,6 +222,18 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									?>
 									</td>
 								</tr>
+								<?php if (FLEXI_FISH || $j16ge) : ?>
+								<tr>
+									<td>
+										<label for="language">
+										<?php echo $this->form->getLabel('language').':'; ?>
+										</label>
+									</td>
+									<td>
+									<?php echo $this->lists['languages']; ?>
+									</td>
+								</tr>
+								<?php endif; ?>
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
@@ -250,7 +258,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							<td colspan="2">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
-<?php
+								<?php
 									$nused = count($this->usedtags);
 									for( $i = 0, $nused; $i < $nused; $i++ ) {
 										$tag = $this->usedtags[$i];
@@ -262,7 +270,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 											echo '<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
 										}
 									}
-?>
+									?>
 								</ul>
 								<br class="clear" />
 							</div>
@@ -276,13 +284,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							</td>
 							</tr>
 							<tr>
-								<td width="1%"><label for="language">
-								<?php echo $this->form->getLabel('language'); ?>
-								</label></td>
-								<td><?php echo $this->form->getInput('language');?></td>
-							</tr>
-							<tr>
-								<td width="1%"><label for="featured">
+								<td width="20%"><label for="featured">
 								<?php echo $this->form->getLabel('featured'); ?>
 								</label></td>
 								<td><?php echo $this->form->getInput('featured');?></td>
@@ -296,24 +298,25 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
-						var slideaccess = new Fx.Slide('tabacces');
-						var slidenoaccess = new Fx.Slide('notabacces');
-						slideaccess.hide();
+					var slideaccess = new Fx.Slide('tabacces');
+					var slidenoaccess = new Fx.Slide('notabacces');
+					slideaccess.hide();
 						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
 							slideaccess.toggle();
 							slidenoaccess.toggle();
+							});
 						});
-					});
-				");
+					");
+
 				?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
-				    	<tr>
-				    		<td>
-				        		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-				        	</td>
-				    	</tr>
+						<tr>
+							<td>
+								<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+							</td>
+						</tr>
 					</table>
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
@@ -331,8 +334,9 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 						});
 					");
 				?>
-				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 
+				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+				
 				<fieldset>
 					<legend>
 						<?php echo $this->form->getValue("type_id") ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->fieldtype->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
@@ -409,6 +413,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				?>
 			</td>
 			<td valign="top" width="380px" style="padding: 7px 0 0 5px">
+			
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		if ( !$this->form->getValue("hits") ) {

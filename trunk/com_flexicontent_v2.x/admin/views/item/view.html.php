@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 185 2010-04-04 07:53:52Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 896 2011-09-10 07:59:35Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,22 +27,29 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewItem extends JView {
-	function display($tpl = null) {
+
+	function display($tpl = null)
+	{
 		global $globalcats;
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$permission = FlexicontentHelperPerm::getPerm();
+		jimport( 'joomla.version' );
+		$jversion = new JVersion;
+		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
-
+		//Get the route helper for the preview function
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		
 		//initialise variables
+		$permission = FlexicontentHelperPerm::getPerm();
+		$mainframe	= & JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		$db  		= & JFactory::getDBO();
-		$dispatcher	= & JDispatcher::getInstance();
+		$dispatcher = & JDispatcher::getInstance();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
-		
+
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 			JHTML::_('behavior.mootools');
 			$document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
@@ -64,18 +71,6 @@ class FlexicontentViewItem extends JView {
 		//add js function to overload the joomla submitform
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-
-		//create the toolbar
-		if ( $cid ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );
-
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
-		}
-		JToolBarHelper::apply('items.apply');
-		JToolBarHelper::save('items.save');
-		JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel('items.cancel');
 
 		//Get data from the model
 		$model			= & $this->getModel();
@@ -112,9 +107,23 @@ class FlexicontentViewItem extends JView {
 		//$lastversion 	= FLEXIUtilities::getLastVersions($row->id, true);
 		$categories 	= $globalcats;
 
+		//create the toolbar
+		if ( $cid ) 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );
+		} 
+		else 
+		{
+			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );
+		}
+		JToolBarHelper::apply('items.apply');
+		JToolBarHelper::save('items.save');
+		JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('items.cancel');
+
 		$usedtags = array();
-		
 		if ($cid) {
+			//$usedtags 	= $model->getusedtags($cid);
 			$usedtagsA 	= & $fields['tags']->value;
 			$usedtags 	= $model->getUsedtagsData($usedtagsA);
 		}
@@ -183,12 +192,13 @@ class FlexicontentViewItem extends JView {
 		//$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		//$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
 		//$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
-		/*if (FLEXI_FISH) {
-		//build languages list
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
+		if (FLEXI_FISH || $j16ge) {
+			//build languages list
+			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $form->getValue("language"), 3);
 		} else {
 			$row->language = flexicontent_html::getSiteDefaultLang();
-		}*/
+		}
+		
 		switch ($form->getValue("state")) {
 			case 0:
 			$published = JText::_( 'FLEXI_UNPUBLISHED' );
