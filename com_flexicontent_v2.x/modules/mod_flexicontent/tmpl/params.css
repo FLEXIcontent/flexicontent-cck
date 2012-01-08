@@ -1,7 +1,0 @@
-div fieldset label, div fieldset span.faux-label {
-    margin: 2px 0;
-}
-
-div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
-    margin: 2px 5px 2px 0;
-}

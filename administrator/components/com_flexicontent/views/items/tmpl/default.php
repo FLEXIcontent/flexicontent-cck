@@ -18,9 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 $limit = $this->pageNav->limit;
-jimport( 'joomla.version' );
-$jversion = new JVersion;
-$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 ?>
 <script language="javascript" type="text/javascript">
@@ -242,7 +239,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php if (FLEXI_FISH || $j16ge) : ?>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -352,7 +349,7 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-			<?php if (FLEXI_FISH || $j16ge) : ?>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
@@ -385,7 +382,7 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>" class="filterbuttons">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || $j16ge) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
@@ -402,7 +399,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || $j16ge) ? '15' : '14'; ?>">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>

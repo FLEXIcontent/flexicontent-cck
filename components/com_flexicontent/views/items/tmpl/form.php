@@ -17,9 +17,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport( 'joomla.version' );
-$jversion = new JVersion;
-$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
@@ -303,7 +300,7 @@ function deleteTag(obj) {
 			<?php 
 			endif;
 			?>
-		<?php if (FLEXI_FISH || $j16ge) : ?>
+		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<div class="flexi_formblock">
 				<label for="languages" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ).':';?>

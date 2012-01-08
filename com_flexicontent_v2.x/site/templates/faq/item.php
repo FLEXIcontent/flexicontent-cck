@@ -34,7 +34,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug );
+	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $this->item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {

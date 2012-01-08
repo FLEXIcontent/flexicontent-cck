@@ -37,13 +37,13 @@ class date_time{
         }
 
         /* Split into separate sections: date and time */
-        list($date, $time)=split(" ", $datetime);
+        list($date, $time)=preg_split("/ /", $datetime);
         
         /* Break down the date */
-        list($year, $month, $day)=split("-", $date, 3);
+        list($year, $month, $day)=preg_split("/-/", $date, 3);
         
         /* Break down the time */
-        list($hour, $min, $sec)=split(":", $time, 3);
+        list($hour, $min, $sec)=preg_split("/:/", $time, 3);
         
 
         /* This is the date shifting area */
@@ -84,7 +84,7 @@ class date_time{
      */
     function machine_date($date){
         
-        list($month, $date, $year)=split("-", $date);
+        list($month, $date, $year)=preg_split("/-/", $date);
         
         return $year . "-" . $month . "-" . $date;
 
@@ -100,7 +100,7 @@ class date_time{
      */
      function human_date($date){
      
-         list($year, $month, $date)=split("-", $date);
+         list($year, $month, $date)=preg_split("/-/", $date);
         
         return $month . "-" . $date . "-" . $year;
      
@@ -122,7 +122,7 @@ class date_time{
         
         
         /* Split the time */
-        list($hour, $min)=split(":", $time);
+        list($hour, $min)=preg_split("/:/", $time);
         
         switch($ampm){
             
@@ -154,7 +154,7 @@ class date_time{
     function convert_from_24_hr($time){
     
         /* Split up the time */
-        list($hour, $min)=split(":", $time);
+        list($hour, $min)=preg_split("/:/", $time);
         
         if($hour > 12){
             $hour=$hour-12;

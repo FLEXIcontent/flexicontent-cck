@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: admin.flexicontent.php 354 2010-06-29 12:08:53Z emmanuel.danan $ 
+ * @version 1.5 stable $Id: admin.flexicontent.php 1078 2011-12-31 14:02:09Z enjoyman@gmail.com $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,9 +19,26 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//include constants file
+require_once (JPATH_COMPONENT.DS.'defineconstants.php');
+//include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
+if (FLEXI_J16GE)
+	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
+else
+	require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
+
+// Set the table directory
+JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
+
+// Import the flexicontent_fields plugins and flexicontent plugins
+if (!FLEXI_ONDEMAND)
+	JPluginHelper::importPlugin('flexicontent_fields');
+JPluginHelper::importPlugin('flexicontent');
+//load language file com_content component
+JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
+
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($cando) {
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -49,45 +66,31 @@ if(!function_exists('FLEXISubmenu')) {
 	}
 }
 
-// Set the table directory
-JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
-
-// Import the field plugins
-JPluginHelper::importPlugin('flexicontent_fields');
-JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
-
-require_once(dirname(__FILE__).DS.'defineconstants.php');
-
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
-// Require specific controller if requested
-/*$controller = JRequest::getWord('controller');
-$task = JRequest::getVar('task');
-if(!$controller) {
-	$list = explode('.', $task);
-	if(count($list)>=2) {
-		$controller = $list[0];
-		$task = $list[1];
+if (FLEXI_J16GE) {
+	//Create the controller
+	$controller	= JController::getInstance('Flexicontent');
+} else {
+	// Require specific controller if requested
+	if( $controller = JRequest::getWord('controller') ) {
+		$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
+		if (file_exists($path)) {
+			require_once $path;
+		} else {
+			$controller = '';
+		}
 	}
-	unset($list);
+	
+	//Create the controller
+	$classname  = 'FlexicontentController'.$controller;
+	$controller = new $classname( );
 }
-if( $controller ) {
-	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	if (file_exists($path)) {
-		require_once $path;
-	} else {
-		$controller = '';
-	}
-}*/
-
-//Create the controller
-//$classname  = 'FlexicontentController'.$controller;
-//$controller = new $classname( );
-
-$controller	= JController::getInstance('Flexicontent');
 
 // Perform the Request task
-$controller->execute( JRequest::getVar('task') );
+$controller->execute( JRequest::getCmd('task') );
+
+// Redirect if set by the controller
 $controller->redirect();
 ?>

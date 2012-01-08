@@ -17,6 +17,7 @@
         <folder>elements</folder>
         <folder>classes</folder>
         <folder>tmpl</folder>
+        <folder>tmpl_common</folder>
 	</files>
 	
 	<languages>
@@ -27,17 +28,18 @@
 	</languages>
 	
 	<params addpath="/modules/mod_flexicontent/elements">
-		<param	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
-             	description="FLEXI_CHOOSE_TMPL_DESC" 
-             	directory="/modules/mod_flexicontent/tmpl" 
-             	default="news" hide_default="1" hide_none="1" 
-             	stripext="1" filter="\.php$" exclude="^_" /> 
-		<!--
-		<param name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
+		<param name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
+						description="FLEXI_CHOOSE_TMPL_DESC" 
+						directory="/modules/mod_flexicontent/tmpl" 
+						default="news" hide_default="1" hide_none="1" 
+						stripext="1" filter="\.php$" exclude="^_"
+		/> 
+
+		<!--param name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		-->
+		</param-->
+
 		<param name="" type="separator" default="FLEXI_FETCHING" level="level1" menu="hide" />
 		<param name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
@@ -101,7 +103,7 @@
 
 		<param name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level1" menu="hide" />
 		<param name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
-		<param name="types" type="types" label="FLEXI_TYPES" description="FLEXI_TYPES_DESC" />
+		<param name="types" type="types" multiple="true" size="5" label="FLEXI_TYPES" description="FLEXI_TYPES_DESC" />
 		<param name="behaviour_types" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
 			<option value="0">FLEXI_STATIC</option>
 			<option value="1">FLEXI_SAME_TYPE</option>
@@ -114,19 +116,20 @@
 			<option value="2">FLEXI_EXCLUDE</option>
 			<option value="3">FLEXI_INCLUDE</option>
 		</param>
-		<param name="authors" type="text" default="" label="FLEXI_AUTHORS" description="FLEXI_AUTHORS_DESC" />
+		<param name="authors" type="text" default="" size="40" label="FLEXI_AUTHORS" description="FLEXI_AUTHORS_DESC" />
 		<param name="behaviour_auth" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
 			<option value="0">FLEXI_STATIC</option>
 			<option value="1">FLEXI_SAME_AUTHOR</option>
 			<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
 		</param>
+		
 		<param name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level1" menu="hide" />
 		<param name="method_items" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
 			<option value="1">FLEXI_ALL</option>
 			<option value="2">FLEXI_EXCLUDE</option>
 			<option value="3">FLEXI_INCLUDE</option>
 		</param>
-		<param name="items" type="text" default="" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
+		<param name="items" type="text" default="" size="40" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
 		<param name="behaviour_items" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
 			<option value="0">FLEXI_STATIC</option>
 			<option value="1">FLEXI_RELATED</option>
@@ -242,21 +245,19 @@
 		<param name="mod_height_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 		
 		<param name="" type="separator" default="FLEXI_DATE_PARAMS" level="level1" menu="hide" />
-		
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_date" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		
-		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="date_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="date_type" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
-			<option value="0">FLEXI_MODIFIED</option>
-			<option value="1">FLEXI_CREATED</option>
-		</param>
+		<param name="date_fields" type="fccheckbox" default=""
+				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+		/>
 		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
@@ -268,14 +269,18 @@
 		<param name="custom_date_format" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT" description="FLEXI_CUSTOM_DATE_FORMAT_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+		<param name="display_date_feat" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="date_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="date_type_feat" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
-			<option value="0">FLEXI_MODIFIED</option>
-			<option value="1">FLEXI_CREATED</option>
-		</param>
+		<param name="date_fields_feat" type="fccheckbox" default=""
+				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+		/>
 		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
@@ -286,13 +291,14 @@
 		</param>
 		<param name="custom_date_format_feat" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT_FEAT" description="FLEXI_CUSTOM_DATE_FORMAT_FEAT_DESC" />
 		
+		
+		
 		<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		
-		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -301,6 +307,10 @@
 		<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
 		<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+		<param name="use_fields_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

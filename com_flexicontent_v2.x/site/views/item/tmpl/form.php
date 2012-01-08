@@ -17,9 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport( 'joomla.version' );
-$jversion = new JVersion;
-$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
+
 $cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
 // Added to allow the user to choose some of the pre-selected categories
@@ -342,7 +340,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		</tr>
 		
 	<?php endif; ?>
-		<?php if (FLEXI_FISH || $j16ge) : ?>
+		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<tr>
 			<td>
 				<?php echo $this->item->getLabel('language'); ?>

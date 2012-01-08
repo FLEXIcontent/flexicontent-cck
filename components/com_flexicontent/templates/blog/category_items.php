@@ -206,15 +206,16 @@ if ($this->limitstart == 0) :
     				else :
     					$src = flexicontent_html::extractimagesrc($items[$i]);
     				endif;
-    				$w		= '&w=' . $this->params->get('lead_width', 200);
-   					$h		= '&h=' . $this->params->get('lead_height', 200);
-    				$aoe	= '&aoe=1';
-    				$q		= '&q=95';
-    				$zc		= $this->params->get('lead_method') ? '&zc=' . $this->params->get('lead_method') : '';
+    				$w		= '&amp;w=' . $this->params->get('lead_width', 200);
+   					$h		= '&amp;h=' . $this->params->get('lead_height', 200);
+    				$aoe	= '&amp;aoe=1';
+    				$q		= '&amp;q=95';
+    				$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
     				$conf	= $w . $h . $aoe . $q . $zc;
     				
     				if (!$this->params->get('lead_image_size')) :
-    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.JURI::base(true).'/'.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :
     					$thumb = $src;
     				endif;
@@ -455,15 +456,16 @@ if ($this->limitstart == 0) :
     				else :
     					$src = flexicontent_html::extractimagesrc($items[$i]);
     				endif;
-    				$w		= '&w=' . $this->params->get('intro_width', 200);
-   					$h		= '&h=' . $this->params->get('intro_height', 200);
-    				$aoe	= '&aoe=1';
-    				$q		= '&q=95';
-    				$zc		= $this->params->get('intro_method') ? '&zc=' . $this->params->get('intro_method') : '';
+    				$w		= '&amp;w=' . $this->params->get('intro_width', 200);
+   					$h		= '&amp;h=' . $this->params->get('intro_height', 200);
+    				$aoe	= '&amp;aoe=1';
+    				$q		= '&amp;q=95';
+    				$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
     				$conf	= $w . $h . $aoe . $q . $zc;
     				
     				if (!$this->params->get('intro_image_size')) :
-    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.JURI::base(true).'/'.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :
     					$thumb = $src;
     				endif;

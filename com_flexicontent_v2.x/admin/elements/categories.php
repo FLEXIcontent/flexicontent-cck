@@ -4,12 +4,8 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.html.html');
 jimport('joomla.form.formfield');
 
-if(!class_exists('FLEXIUtilities')) {
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.utilities.php');
-}
-if(!class_exists('flexicontent_cats')) {
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-}
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+
 class JFormFieldCategories extends JFormField{
 	/**
 	 * The field type.

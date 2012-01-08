@@ -301,9 +301,6 @@ class FlexicontentViewItems extends JView
 	function _displayForm($tpl) {
 
 		$mainframe = &JFactory::getApplication();
-		jimport( 'joomla.version' );
-		$jversion = new JVersion;
-		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Initialize variables
 		$dispatcher = & JDispatcher::getInstance();
@@ -446,7 +443,7 @@ class FlexicontentViewItems extends JView
 		//Get the lists
 		$lists = $this->_buildEditLists($perms['multicat']);
 
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item->language, 3);
 		} else {

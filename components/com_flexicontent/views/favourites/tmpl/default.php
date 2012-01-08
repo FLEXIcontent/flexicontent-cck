@@ -79,18 +79,19 @@ $dateformat 	= ($dateformat != "DATE_FORMAT_CUSTOM") ? $dateformat : $customdate
 		<?php
 		foreach ($this->items as $item) :
     		$src 	= flexicontent_html::extractimagesrc($item);
-    		$w		= '&w=40';
-    		$h		= '&h=40';
+    		$w		= '&amp;w=40';
+    		$h		= '&amp;h=40';
     		$aoe	= '';
-    		$q		= '&q=95';
+    		$q		= '&amp;q=95';
     		$conf	= $w . $h . $aoe . $q;
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 		?>
   			<tr class="sectiontableentry" >
 				<?php if ($this->params->get('use_image', 1)) : ?>
     			<td headers="fc_image" align="center">
     				<?php if ($src) : ?>
     				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
-						<img src="<?php echo JURI::base(); ?>components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=<?php echo JURI::base(true) . '/' .$src . $conf; ?>" />
+						<img src="<?php echo JURI::base(); ?>components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=<?php echo $base_url . $src . $conf; ?>" />
 					</a>
 					<?php endif; ?>
 				</td>

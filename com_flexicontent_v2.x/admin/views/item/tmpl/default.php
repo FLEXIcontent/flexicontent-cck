@@ -17,9 +17,6 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-jimport( 'joomla.version' );
-$jversion = new JVersion;
-$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 
@@ -222,7 +219,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									?>
 									</td>
 								</tr>
-								<?php if (FLEXI_FISH || $j16ge) : ?>
+								<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 								<tr>
 									<td>
 										<label for="language">

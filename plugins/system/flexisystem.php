@@ -34,16 +34,8 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		parent::__construct( $subject, $config );
 
-		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		if (!defined('FLEXI_SECTION'))		define('FLEXI_SECTION'		, $fparams->get('flexi_section'));
-		if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-		if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $fparams->get('advcache', 1));
-		if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $fparams->get('advcache_time', 3600));
-		if (!defined('FLEXI_CACHE_GUEST'))	define('FLEXI_CACHE_GUEST'	, $fparams->get('advcache_guest', 1));
-		if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $fparams->get('purge_gc', 1));
-		if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($fparams->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-
-        JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
+		require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
         
 	function onAfterInitialise()
@@ -64,7 +56,7 @@ class plgSystemFlexisystem extends JPlugin
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 
 		$this->trackSaveConf();
-		if (FLEXI_SECTION) {
+		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
 			// add the category tree to categories cache

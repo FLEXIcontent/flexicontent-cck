@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 996 2011-11-27 22:49:02Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1058 2011-12-17 04:48:12Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -34,7 +34,7 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( 'item', $this->params, null , $this->item->slug );
+	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $this->item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {
@@ -77,7 +77,6 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 		</div>
 	<?php endif; ?>
   <!-- EOF afterDisplayTitle -->
-
 
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($this->item->positions['subtitle1'])) : ?>

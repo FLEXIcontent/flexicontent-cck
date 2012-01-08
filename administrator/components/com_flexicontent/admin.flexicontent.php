@@ -19,29 +19,25 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//include constants file
+require_once (JPATH_COMPONENT.DS.'defineconstants.php');
+//include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
+if (FLEXI_J16GE)
+	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
+else
+	require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
 
-// Import the plugins
-//JPluginHelper::importPlugin('flexicontent_fields');   // COMMENTED OUT to trigger events of flexicontent_fields on DEMAND !!!
+// Import the flexicontent_fields plugins and flexicontent plugins
+if (!FLEXI_ONDEMAND)
+	JPluginHelper::importPlugin('flexicontent_fields');
 JPluginHelper::importPlugin('flexicontent');
+//load language file com_content component
 JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
-
-// Set filepath
-$params =& JComponentHelper::getParams('com_flexicontent');
-define('COM_FLEXICONTENT_FILEPATH',    JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
-define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
-
-// Define some constants
-if (!defined('FLEXI_SECTION'))	define('FLEXI_SECTION', $params->get('flexi_section'));
-if (!defined('FLEXI_ACCESS')) 	define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-if (!defined('FLEXI_FISH'))		define('FLEXI_FISH',	($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'RC2a (r1057)');
 
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($variable, $dopostinstall=true) {
@@ -95,26 +91,31 @@ if(!function_exists('FLEXISubmenu')) {
 	}
 }
 
-
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
-// Require specific controller if requested
-if( $controller = JRequest::getWord('controller') ) {
-	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	if (file_exists($path)) {
-		require_once $path;
-	} else {
-		$controller = '';
+if (FLEXI_J16GE) {
+	//Create the controller
+	$controller	= JController::getInstance('Flexicontent');
+} else {
+	// Require specific controller if requested
+	if( $controller = JRequest::getWord('controller') ) {
+		$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
+		if (file_exists($path)) {
+			require_once $path;
+		} else {
+			$controller = '';
+		}
 	}
+	
+	//Create the controller
+	$classname  = 'FlexicontentController'.$controller;
+	$controller = new $classname( );
 }
 
-//Create the controller
-$classname  = 'FlexicontentController'.$controller;
-$controller = new $classname( );
-//$task = null;
-//FLEXIUtilities::parseTask(JRequest::getVar('task'), $task);
 // Perform the Request task
 $controller->execute( JRequest::getCmd('task') );
+
+// Redirect if set by the controller
 $controller->redirect();
 ?>

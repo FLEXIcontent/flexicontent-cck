@@ -40,6 +40,10 @@
 				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 				<option value="0">FLEXI_DMI_ID_NO</option>
 			</field>
+			<field name="default_menuitem_nopathway" type="list" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
 			<field name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

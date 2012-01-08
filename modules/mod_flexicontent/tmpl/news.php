@@ -15,30 +15,26 @@
  * // standard
  * $display_title
  * $link_title
+ * $display_date
  * $display_text
  * $mod_readmore
  * $mod_use_image
- * $mod_image
  * $mod_link_image
- * $mod_width
- * $mod_height
- * $mod_method
  * // featured
  * $display_title_feat 
  * $link_title_feat 
+ * $display_date_feat
  * $display_text_feat 
  * $mod_readmore_feat
  * $mod_use_image_feat 
  * $mod_link_image_feat 
- * $mod_width_feat 
- * $mod_height_feat 
- * $mod_method_feat 
  *
  * // Fields parameters
  * $use_fields 
  * $display_label 
  * $fields 
  * // featured
+ * $use_fields_feat
  * $display_label_feat 
  * $fields_feat 
  *
@@ -52,49 +48,14 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
-
-global ${$layout};
-
-if ($add_tooltips)
-	JHTML::_('behavior.tooltip');
-	
-$display_date = $params->get('display_date', 1);
-$twocols = $params->get('item_columns', 1) == 2;
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
-	<?php
 	
-	if ($catdata) {
-		echo "<div class='currcatdata' style='clear:both; float:left;'>\n";
-		if ($params->get('currcat_showtitle', 0)) {
-			echo "<div class='currcattitle'>\n";
-			if (isset($catdata->titlelink)) {
-				echo "<a href='{$catdata->titlelink}'>".$catdata->title."</a>";
-			} else {
-				echo $catdata->title;
-			}
-			echo "</div>\n";
-		}
-		if (isset($catdata->image)) {
-			echo "<div class='image_currcat'>";
-			if (isset($catdata->imagelink)) {
-				echo "<a href='{$catdata->imagelink}'>";
-			}
-			echo "<img src='{$catdata->image}' alt='".flexicontent_html::striptagsandcut($catdata->title, 60)."' />\n";
-			if (isset($catdata->imagelink)) {
-				echo "</a>";
-			}
-			echo "</div>\n";
-		}
-		if (isset($catdata->description)) {
-			echo "<div class='currcatdescr'>". $catdata->description ."</div>\n";
-		}
-		echo "<div class='modclear'></div>\n";
-		echo "</div>\n";
-		echo "<div class='modclear'></div>\n";
-	}
-
+	<?php
+	// Display Category Information
+	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/category.php');
+	
 	$ord_titles = array(
 		'popular'=>JText::_( 'FLEXI_MOST_POPULAR'),
 		'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
@@ -109,162 +70,245 @@ $twocols = $params->get('item_columns', 1) == 2;
 	
 	$separator = "";
 	$rowtoggler = 0;
+	$twocols = $params->get('item_columns', 1) == 2;
+	
 	foreach ($ordering as $ord) :
-			
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
   	  $separator = "<div class='ordering_seperator' ></div>";
     } else {
-    	//continue;
   	  $separator = "";
   	}
 	?>
 	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
 		
-		<?php
-		if ($ordering_addtitle && $ord) echo "<div class='order_group_title'> ".$ord_titles[$ord]." </div>";
+		<?php	if ($ordering_addtitle && $ord) : ?>
+		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
+		<?php endif; ?>
 		
-		if (isset($list[$ord]['featured'])) :
-		?>
+		<!-- BOF featured items -->
+		<?php if (isset($list[$ord]['featured'])) :	?>
+
 		<div class="mod_flexicontent_featured">
+			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php $rowtoggler = !$rowtoggler; ?>
+			
+			<!-- BOF current item -->	
 			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler)?'odd':'even'; ?>">
-				<?php if ($mod_use_image_feat && $item->image) : ?>
-				<div class="image_featured">
-					<?php if ($mod_link_image_feat) : ?>
-					<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
-					<?php else : ?>
-					<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-				<?php if ($display_title_feat || $display_date || $display_text_feat || $mod_readmore_feat || ($use_fields && @$item->fields && $fields_feat)) : ?>
-				<div class="content_featured">
-					
-					<?php if ($display_title_feat) : ?>
-					<div class="news_title">
+				
+				<!-- BOF current item's title -->	
+				<?php if ($display_title_feat) : ?>
+				<span class="fc_block" >
+					<span class="fc_inline_block news_title">
 						<?php if ($link_title_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 						<?php else : ?>	
 						<?php echo $item->title; ?>
 						<?php endif; ?>
-					</div>
+					</span>
+				</span>
+				<?php endif; ?>
+				<!-- EOF current item's title -->	
+				
+				<!-- BOF current item's image -->	
+				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
+
+				<span class="image_featured">
+					<?php if ($mod_link_image_feat) : ?>
+						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
+					<?php else : ?>
+						<?php echo $item->image_rendered; ?>
+					<?php endif; ?>
+				</span>
+				
+				<?php elseif ($mod_use_image_feat && $item->image) : ?>
+				
+				<span class="image_featured">
+					<?php if ($mod_link_image_feat) : ?>
+						<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+					<?php else : ?>
+						<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+					<?php endif; ?>
+				</span>
+				
+				<?php endif; ?>
+				<!-- BOF current item's image -->
+				
+				<!-- BOF current item's content -->
+				<?php if ($display_date_feat || $display_text_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
+				<span class="content_featured">
+					
+					<?php if ($display_date_feat && $item->date_created) : ?>
+					<span class="fc_block">
+						<span class="fc_inline news_date created">
+							<?php echo $item->date_created; ?>
+						</span>
+					</span>
 					<?php endif; ?>
 					
-					<?php if ($display_date) : ?>
-					<div class="news_date">
-						<?php echo $item->date; ?>
-					</div>
+					<?php if ($display_date_feat && $item->date_modified) : ?>
+					<span class="fc_block">
+						<span class="fc_inline news_date modified">
+							<?php echo $item->date_modified; ?>
+						</span>
+					</span>
 					<?php endif; ?>
 					
 					<?php if ($display_text_feat && $item->text) : ?>
-					<div class="news_text">
+					<span class="news_text">
 						<?php echo $item->text; ?>
-					</div>
+					</span>
 					<?php endif; ?>
-					<?php if ($use_fields && @$item->fields && $fields_feat) : ?>
-					<div class="news_fields">
+					
+					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
+					<span class="news_fields">
+						
 						<?php foreach ($item->fields as $k => $field) : ?>
-						<div class="field_block field_<?php echo $k; ?>">
+						<span class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label_feat) : ?>
 							<span class="field_label"><?php echo $field->label . $text_after_label_feat; ?></span>
 							<?php endif; ?>
-							<div class="field_value"><?php echo $field->display; ?></div>
-						</div>
+							<span class="field_value"><?php echo $field->display; ?></span>
+						</span>
 						<?php endforeach; ?>
-					</div>
+						
+					</span>
 					<?php endif; ?>
+					
 					<?php if ($mod_readmore_feat) : ?>
-					<div class="news_readon">
+					<span class="news_readon">
 						<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
-					</div>
+					</span>
 					<?php endif; ?>
-				</div>
+					
+					<span class="clearfix"></span> 
+					
+				</span> <!-- EOF current item's content -->
 				<?php endif; ?>
-			</div>
-			<!--<div class="modclear"></div>-->
+				
+			</div> <!-- EOF current item -->
 			<?php endforeach; ?>
-		</div>
+			
+		</div><!-- EOF featured items -->
+		
 		<?php endif; ?>
-
-		<?php
-		if (isset($list[$ord]['standard'])) :
-			$rowtoggler = 0;
-		?>
+		
+		
+		<!-- BOF standard items -->
+		<?php	if (isset($list[$ord]['standard'])) : ?>
+		<?php	$rowcount = 0; ?>
+		
 		<div class="mod_flexicontent_standard">
+			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
-			<?php $rowtoggler = !$rowtoggler; ?>
-			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowtoggler)?'odd':'even'; ?>">
-				<?php if ($mod_use_image && $item->image) : ?>
-				<div class="image_standard">
-					<?php if ($mod_link_image) : ?>
-					<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
-					<?php else : ?>
-					<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-				<?php if ($display_title || $display_date || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
-				<div class="content_standard">
-					
+			<?php $rowcount++; ?>
+			
+			<!-- BOF current item -->	
+			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4 < 2)?'odd':'even'; ?>">
+
 					<?php if ($display_title) : ?>
-					<div class="news_title">
-						<?php if ($link_title) : ?>
-						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-						<?php else : ?>	
-						<?php echo $item->title; ?>
-						<?php endif; ?>
-					</div>
+					<span class="fc_block" >
+						<span class="fc_inline_block news_title">
+							<?php if ($link_title) : ?>
+							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+							<?php else : ?>	
+							<?php echo $item->title; ?>
+							<?php endif; ?>
+						</span>
+					</span>
+					<?php endif; ?>
+				
+				<!-- BOF current item's image -->	
+				<?php if ($mod_use_image && $item->image_rendered) : ?>
+				<span class="image_standard">
+					<?php if ($mod_link_image) : ?>
+						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
+					<?php else : ?>
+						<?php echo $item->image_rendered; ?>
+					<?php endif; ?>
+				</span>
+				
+				<?php elseif ($mod_use_image && $item->image) : ?>
+				
+				<span class="image_standard">
+					<?php if ($mod_link_image) : ?>
+						<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+					<?php else : ?>
+						<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+					<?php endif; ?>
+				</span>
+				
+				<?php endif; ?>
+				<!-- BOF current item's image -->	
+				
+				<!-- BOF current item's content -->
+				<?php if ($display_date || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<span class="content_standard">
+										
+					<?php if ($display_date && $item->date_created) : ?>
+					<span class="fc_block">
+						<span class="fc_inline news_date created">
+							<?php echo $item->date_created; ?>
+						</span>
+					</span>
 					<?php endif; ?>
 					
-					<?php if ($display_date) : ?>
-					<div class="news_date">
-						<?php echo $item->date; ?>
-					</div>
+					<?php if ($display_date && $item->date_modified) : ?>
+					<span class="fc_block">
+						<span class="fc_inline news_date modified">
+							<?php echo $item->date_modified; ?>
+						</span>
+					</span>
 					<?php endif; ?>
 					
 					<?php if ($display_text && $item->text) : ?>
-					<div class="news_text">
+					<span class="news_text">
 						<?php echo $item->text; ?>
-					</div>
+					</span>
 					<?php endif; ?>
+					
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
-					<div class="news_fields">
+					<span class="news_fields">
+						
 						<?php foreach ($item->fields as $k => $field) : ?>
-						<div class="field_block field_<?php echo $k; ?>">
+						<span class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label) : ?>
 							<span class="field_label"><?php echo $field->label . $text_after_label; ?></span>
 							<?php endif; ?>
-							<div class="field_value"><?php echo $field->display; ?></div>
-						</div>
+							<span class="field_value"><?php echo $field->display; ?></span>
+						</span>
 						<?php endforeach; ?>
-					</div>
+						
+					</span>
 					<?php endif; ?>
+					
 					<?php if ($mod_readmore) : ?>
-					<div class="news_readon">
-						<a href="<?php echo $item->link; ?>"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
-					</div>
+					<span class="news_readon">
+						<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+					</span>
 					<?php endif; ?>
-				</div>
+
+					<span class="clearfix"></span> 
+					
+				</span> <!-- EOF current item's content -->
 				<?php endif; ?>
-			</div>
-			<?php echo (!$rowtoggler) ? '<div class="modclear"></div>' : ''; ?>
+				
+			</div> <!-- EOF current item -->
+			<?php echo !($rowcount%2) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
-		</div>
+			
+		</div><!-- EOF standard items -->
 		<?php endif; ?>
-		
+				
 		<div class="modclear"></div>
 
 	</div>
 	<?php endforeach; ?>
-
-	<?php if ($show_more == 1) : ?>
-	<div class="news_readon_module">
-	  <div class="news_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
-		  <a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
-	 </div>
-	</div>
-	<?php endif;?>
-
+	
+	<?php
+	// Display readon of module
+	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/readon.php');
+	?>
+	
 </div>

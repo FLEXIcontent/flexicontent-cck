@@ -33,9 +33,6 @@ class FlexicontentViewItems extends JView {
 	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
-		jimport( 'joomla.version' );
-		$jversion = new JVersion;
-		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -75,7 +72,7 @@ class FlexicontentViewItems extends JView {
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
 		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
 		}
 		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 				'int' );
@@ -105,7 +102,7 @@ class FlexicontentViewItems extends JView {
 		if ($filter_state) {
 			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
 		}
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ($filter_lang) {
 				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
 			}
@@ -212,7 +209,7 @@ class FlexicontentViewItems extends JView {
 		$unassociated	= & $this->get( 'UnassociatedItems' );
 		$status      	= & $this->get( 'ExtdataStatus');
 		
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs	= & $this->get( 'Languages' );
 		}
 		$categories = $globalcats?$globalcats:array();
@@ -288,7 +285,7 @@ class FlexicontentViewItems extends JView {
 			$ordering = ($lists['order'] == 'catsordering');
 		}
 
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			//build languages filter
 			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
 		}
@@ -297,7 +294,7 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('db'  			, $db);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$this->assignRef('langs'    , $langs);
 		}
 		$this->assignRef('cid'      	, $cid);
