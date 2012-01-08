@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 207 2010-04-16 07:51:31Z emmanuel.danan $
+ * @version 1.5 stable $Id: flexicontent.php 898 2011-09-10 15:44:47Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,61 +18,44 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//include the route helper
-require_once (JPATH_COMPONENT.DS.'helpers'.DS.'route.php');
-//include the needed classes
-require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.helper.php');
-require_once (JPATH_COMPONENT.DS.'helpers'.DS.'permission.php');
-//require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.acl.php');
-require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
-
-//Set filepath
+// Get component parameters and add tooltips css and js code
 $params =& JComponentHelper::getParams('com_flexicontent');
-define('COM_FLEXICONTENT_FILEPATH',    JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
-define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
-
-// Tooltips
 if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
-// define section
-if($flexi_cat_extension = $params->get('flexi_cat_extension', 'com_content')) {
-	if (!defined('FLEXI_CAT_EXTENSION')) {
-		define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension'));
-		$db = &JFactory::getDBO();
-		$query = "SELECT lft,rgt FROM #__categories WHERE id=1";
-		$db->setQuery($query);
-		$obj = $db->loadObject();
-		if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
-		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
-	}
-}
-if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $params->get('advcache', 1));
-if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
-if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $params->get('purge_gc', 1));
-//if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, 0);
+//include constants file
+require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+//include the route helper
+require_once (JPATH_COMPONENT.DS.'helpers'.DS.'route.php');
+//include the needed classes and helpers
+require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.helper.php');
+if (FLEXI_J16GE)
+	require_once (JPATH_COMPONENT.DS.'helpers'.DS.'permission.php');
+else
+	require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.acl.php');
+require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
 
-// Import the field plugins
-JPluginHelper::importPlugin('flexicontent_fields');
+// Import the flexicontent_fields plugins and flexicontent plugins
+if (!FLEXI_ONDEMAND)
+	JPluginHelper::importPlugin('flexicontent_fields');
+JPluginHelper::importPlugin('flexicontent');
 
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
-$controller = JRequest::getWord('controller');
-if(!$controller) {
-	$task = JRequest::getVar('task');
-	$tasks = explode(".", $task);
-	if(count($tasks)>=2) {
-		$controller = $controller?$controller:$tasks[0];
-		$task = $tasks[1];
-		JRequest::setVar('task', $tasks[1]);
-	}
+$task = JRequest::getCmd('task');
+$tasks = explode(".", $task);
+if(count($tasks)>=2) {
+	$controller = $controller?$controller:$tasks[0];
+	$task = $tasks[1];
+	JRequest::setVar('task', $tasks[1]);
+} else {
+	$controller = JRequest::getWord('controller');
 }
+
 // Require specific controller if requested
 if($controller) {
 	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
@@ -93,4 +76,19 @@ $controller->execute($task);
 // Redirect if set by the controller
 $controller->redirect();
 
+// TO BE MOVED TO HELPER FILE ...
+// Remove (thus prevent) the default menu item from showing in the pathway
+if ( $params->get('default_menuitem_nopathway',1) ) {
+	$mainframe = & JFactory::getApplication();
+	$pathway 	= & $mainframe->getPathWay();
+	$default_menu_itemid = $params->get('default_menu_itemid', 0);
+	$pathway_arr = $pathway->getPathway();
+	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) ) {
+		if ($matches[1] == $default_menu_itemid) {
+			array_shift ($pathway_arr);
+			$pathway->setPathway($pathway_arr);
+			$pathway->set('_count',count($pathway_arr));
+		}
+	}
+}
 ?>

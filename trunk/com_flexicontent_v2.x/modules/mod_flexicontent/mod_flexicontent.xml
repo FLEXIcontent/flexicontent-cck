@@ -17,6 +17,7 @@
         <folder>elements</folder>
         <folder>classes</folder>
         <folder>tmpl</folder>
+        <folder>tmpl_common</folder>
 	</files>
 	
 	<languages>
@@ -30,17 +31,18 @@
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
 		
 		<fieldset name="basic">
-			<field	name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
-	             	description="FLEXI_CHOOSE_TMPL_DESC" 
-	             	directory="/modules/mod_flexicontent/tmpl" 
-	             	default="news" hide_default="1" hide_none="1" 
-	             	stripext="1" filter="\.php$" exclude="^_" />
-		<!--
-		<field name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
+			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
+						description="FLEXI_CHOOSE_TMPL_DESC" 
+						directory="/modules/mod_flexicontent/tmpl" 
+						default="news" hide_default="1" hide_none="1" 
+						stripext="1" filter="\.php$" exclude="^_"
+		/> 
+
+		<!--field name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</field>
-		-->
+		</field-->
+
 			<field name="FLEXI_FETCHING" type="separator" hr="false" default="FLEXI_FETCHING" level="level1" menu="hide" />
 			<field name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 			<field name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
@@ -53,6 +55,7 @@
 				<option value="1">1</option>
 				<option value="2">2</option>
 			</field>
+
 			<field name="FLEXI_EMPTY_FIELD_FILTER" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" menu="hide" />
 			<field name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -71,20 +74,21 @@
 		</fieldset>
 		
 		<fieldset name="FLEXI_SCOPE">
+		
 			<field name="FLEXI_CURITEM_SCOPE" type="separator" default="FLEXI_CURITEM_SCOPE" level="level1" menu="hide" />
 			<field name="method_curitem" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_CURITEM_DESC">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
 			</field>
-			
+		
 			<field name="FLEXI_CURLANG_SCOPE" type="separator" default="FLEXI_CURLANG_SCOPE" level="level1" menu="hide" />
 			<field name="method_curlang" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURLANG_DESC">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
 			</field>
-			
+		
 			<field name="FLEXI_CAT_SCOPE" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 			<field name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
@@ -100,7 +104,7 @@
 				<option value="3">FLEXI_CHILDREN_PARENTS</option>
 				<option value="4">FLEXI_OTHER_CATS_OF_ITEM</option>
 			</field>
-	
+
 			<field name="FLEXI_TYPES_SCOPE" type="separator" default="FLEXI_TYPES_SCOPE" level="level1" menu="hide" />
 			<field name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 			<field name="types" type="types" multiple="true" label="FLEXI_TYPES" description="FLEXI_TYPES_DESC" />
@@ -122,6 +126,7 @@
 				<option value="1">FLEXI_SAME_AUTHOR</option>
 				<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
 			</field>
+		
 			<field name="FLEXI_ITEM_SCOPE" type="separator" default="FLEXI_ITEM_SCOPE" level="level1" menu="hide" />
 			<field name="method_items" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
 				<option value="1">FLEXI_ALL</option>
@@ -157,7 +162,7 @@
 				<option value="1">FLEXI_DATE_ITEM</option>
 			</field>
 		</fieldset>
-		
+
 		<fieldset name="FLEXI_ITEMLIST_DISPLAY_PARAMS">
 			<field name="FLEXI_TITLE" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
 			<field name="FLEXI_STD" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
@@ -210,7 +215,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			
+		
 			<field name="FLEXI_IMAGE_PARAMS" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
 			<field name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="FLEXI_STD2" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
@@ -244,22 +249,20 @@
 			<field name="mod_width_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="mod_height_feat" type="text" size="4" default="140" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
-			<field name="FLEXI_DATE_FIELDS" type="separator" default="FLEXI_DATE_FIELDS" level="level1" menu="hide" />
-			
+			<field name="FLEXI_DATE_PARAMS" type="separator" default="FLEXI_DATE_PARAMS" level="level1" menu="hide" />
+			<field name="FLEXI_STD3" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="display_date" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="FLEXI_STD3" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="date_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="date_type" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
-				<option value="0">FLEXI_MODIFIED</option>
-				<option value="1">FLEXI_CREATED</option>
-			</field>
+			<field name="date_fields" type="fccheckbox" default=""
+					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+			/>
 			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
@@ -269,16 +272,20 @@
 				<option value="custom">FLEXI_CUSTOM</option>
 			</field>
 			<field name="custom_date_format" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT" description="FLEXI_CUSTOM_DATE_FORMAT_DESC" />
-			
+		
 			<field name="FLEXI_FEAT3" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="display_date_feat" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="date_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="date_type_feat" type="list" default="1" label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" >
-				<option value="0">FLEXI_MODIFIED</option>
-				<option value="1">FLEXI_CREATED</option>
-			</field>
+			<field name="date_fields_feat" type="fccheckbox" default=""
+					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+			/>
 			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
@@ -289,13 +296,13 @@
 			</field>
 			<field name="custom_date_format_feat" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT_FEAT" description="FLEXI_CUSTOM_DATE_FORMAT_FEAT_DESC" />
 			
+			
 			<field name="FLEXI_FIELDS_PARAMS" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
+			<field name="FLEXI_STD4" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-		
-			<field name="FLEXI_STD4" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -304,6 +311,10 @@
 			<field name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 
 			<field name="FLEXI_FEAT4" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="use_fields_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -311,7 +322,7 @@
 			<field name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
 			<field name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 		</fieldset>
-		
+
 		<fieldset name="FLEXI_MODULE_DISPLAY_PARAMS" >
 			<field name="FLEXI_CURRCAT" type="separator" default="FLEXI_CURRCAT" level="level1" menu="hide" />
 			<field name="FLEXI_CURRCAT_INFO" type="separator" default="FLEXI_CURRCAT_INFO" level="level2" menu="hide" />
@@ -329,7 +340,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+		
 			<field name="FLEXI_IMAGE_PARAMS" type="separator" default="FLEXI_IMAGE_PARAMS" level="level2" menu="hide" />
 			<field name="currcat_use_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -368,7 +379,7 @@
 			<field name="custom4" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM4" description="FLEXI_CUSTOM_DESC" />
 			<field name="custom5" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM5" description="FLEXI_CUSTOM_DESC" />
 		</fieldset>
-		
+
 		<fieldset name="FLEXI_MOD_ADVANCED">
 			<field name="FLEXI_MODULE_STYLING" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
 			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />

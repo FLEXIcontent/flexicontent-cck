@@ -27,7 +27,6 @@ class flexicontent_html
 	 * @access	protected
 	 * @var		string
 	 */
-	static private $_itemview = 'item';
 	static private $_icondir = 'media/system/images/';
 	
 	/**
@@ -87,8 +86,11 @@ class flexicontent_html
 		$image = '';
 		if (count($images)) $image = $images[2];
 		
-		$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
-
+		if (!preg_match("#^http|^https|^ftp#i", $image)) {
+			// local file check that it exists
+			$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
+		}
+		
 		return $image;
 	}
 
@@ -109,7 +111,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
-			} elseif($view == self::$_itemview) {
+			} elseif($view == FLEXI_ITEMVIEW) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
@@ -188,7 +190,7 @@ class flexicontent_html
 			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 			if($view == 'category') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
-			} elseif($view == self::$_itemview) {
+			} elseif($view == FLEXI_ITEMVIEW) {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 			} elseif($view == 'tags') {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
@@ -235,7 +237,7 @@ class flexicontent_html
 			$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 			$text = JText::_( 'FLEXI_CREATE_PDF' );
 
-			$link 	= 'index.php?view='.self::$_itemview.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
+			$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -267,7 +269,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 			$text 		= JText::_( 'FLEXI_EDIT' );
 
-			$link 	= 'index.php?option=com_flexicontent&view='.self::$_itemview.'&cid='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+			$link 	= 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -284,7 +286,7 @@ class flexicontent_html
 				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 				$text 		= JText::_( 'FLEXI_EDIT' );
 	
-				$link 	= 'index.php?view='.self::$_itemview.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+				$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 	
 				return $output;
@@ -314,7 +316,7 @@ class flexicontent_html
 			$overlib = JText::_( 'FLEXI_ADD_TIP' );
 			$text = JText::_( 'FLEXI_ADD' );
 
-			$link 	= 'index.php?view='.self::$_itemview.'&task=add';
+			$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -1440,7 +1442,7 @@ class flexicontent_tmpl
 			$tmplxml = $tmpldir.DS.$tmpl.DS.'item.xml';
 			if (JFile::exists($tmplxml)) {
 				$themes->items->{$tmpl}->name 		= $tmpl;
-				$themes->items->{$tmpl}->view 		= 'item';
+				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
 				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';	
 				//$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
@@ -1535,18 +1537,18 @@ class flexicontent_tmpl
 
 	function getTemplates()
 	{
-		/*if (FLEXI_CACHE)
+		if (FLEXI_CACHE)
 		{
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
 			$tmplcache->setCaching(1); 		//force cache
 			$tmplcache->setLifeTime(84600); //set expiry to one day
-		    $tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
+			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
 		}
 		else 
-		{*/
+		{
 			$tmpls = flexicontent_tmpl::parseTemplates();
-		//}
+		}
 	    
 	    return $tmpls;
 	}
@@ -1814,7 +1816,7 @@ class FLEXIUtilities {
 		
 		if ( !isset( $fc_plgs[$fieldname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($fieldname).'.php';
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($fieldname).DS.strtolower($fieldname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
@@ -1848,7 +1850,7 @@ class FLEXIUtilities {
 		
 		if ( !isset( $content_plgs[$fieldname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.DS.strtolower($fieldname).'.php';
+			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.DS.strtolower($fieldname).DS.strtolower($fieldname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();

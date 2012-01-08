@@ -38,6 +38,7 @@ class JElementSeparator extends JElement
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$level = $node->attributes('level');
+		
 		if ($level == 'level2') {
 			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
 		} else if ($level == 'level3') {
@@ -51,7 +52,7 @@ class JElementSeparator extends JElement
 			$class = "hasTip";
 			$title = JText::_($value)."::".JText::_($node->attributes('description'));
 		}
-		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</div>';
+		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>';
 	}
 
 }

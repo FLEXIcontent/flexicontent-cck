@@ -27,18 +27,16 @@ jimport('joomla.form.formfield');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-
 class JFormFieldFlexicategories extends JFormField
 {
-   /**
-	* Element name
-	*
-	* @access	protected
-	* @var		string
-	*/
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	
 	var	$type = 'Flexicategories';
 
-	
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		//var_dump($this->value);

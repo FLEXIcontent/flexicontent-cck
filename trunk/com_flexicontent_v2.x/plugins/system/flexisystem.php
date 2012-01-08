@@ -34,25 +34,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		parent::__construct( $subject, $config );
 
-		$fparams =& JComponentHelper::getParams('com_flexicontent');
-		if (!defined('FLEXI_CAT_EXTENSION')) {
-			define('FLEXI_CAT_EXTENSION', $fparams->get('flexi_cat_extension', 'com_content'));
-			$db = &JFactory::getDBO();
-			if(FLEXI_CAT_EXTENSION) {
-				$query = "SELECT lft,rgt FROM #__categories WHERE id=".($ROOT_CATEGORY_ID=1);
-				$db->setQuery($query);
-				$obj = $db->loadObject();
-				if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
-				if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
-			}
-		}
-		if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-		if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $fparams->get('advcache', 1));
-		if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $fparams->get('advcache_time', 3600));
-		if (!defined('FLEXI_CACHE_GUEST'))	define('FLEXI_CACHE_GUEST'	, $fparams->get('advcache_guest', 1));
-		if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $fparams->get('purge_gc', 1));
-		if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($fparams->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-
+		require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
         
@@ -74,7 +56,7 @@ class plgSystemFlexisystem extends JPlugin
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 
 		$this->trackSaveConf();
-		if (FLEXI_CAT_EXTENSION) {
+		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
 				// add the category tree to categories cache

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 892 2011-09-07 22:16:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,11 +42,11 @@ class FlexicontentViewFavourites extends JView
 		$document 	= & JFactory::getDocument();
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$params 	= & $mainframe->getParams('com_flexicontent');
 		$uri 		= & JFactory::getURI();
 
 		$limitstart		= JRequest::getInt('limitstart');
-		$limit			= JFactory::getApplication()->getUserStateFromRequest('com_flexicontent.favourites.limit', 'limit', $params->def('limit', 0), 'int');
+		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.favourites.limit', 'limit', $params->def('limit', 0), 'int');
 
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -58,6 +58,9 @@ class FlexicontentViewFavourites extends JView
 			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
 		}
 
+		$items 	= & $this->get('Data');
+		$total 	= & $this->get('Total');
+		
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
 		if (is_object( $menu )) {
@@ -76,10 +79,8 @@ class FlexicontentViewFavourites extends JView
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 		
-		$items 	= & $this->get('Data');
-        $total 	= & $this->get('Total');
         
-        //ordering
+		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
 		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
 		$filter				= JRequest::getString('filter');
@@ -88,8 +89,7 @@ class FlexicontentViewFavourites extends JView
 		$lists['filter_order']		= $filter_order;
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
-		
-				
+						
 		// Create the pagination object
 		jimport('joomla.html.pagination');
 		

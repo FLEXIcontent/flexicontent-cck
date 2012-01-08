@@ -36,7 +36,7 @@ class FlexicontentViewFavourites extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();
@@ -54,13 +54,17 @@ class FlexicontentViewFavourites extends JView
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
 		}
 
+		$items 	= & $this->get('Data');
+		$total 	= & $this->get('Total');
+		
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
 		if (is_object( $menu )) {
+			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		
 			$params->merge($menu_params);
 			
@@ -75,10 +79,8 @@ class FlexicontentViewFavourites extends JView
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 		
-		$items 	= & $this->get('Data');
-        $total 	= & $this->get('Total');
         
-        //ordering
+		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
 		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
 		$filter				= JRequest::getString('filter');
@@ -87,8 +89,7 @@ class FlexicontentViewFavourites extends JView
 		$lists['filter_order']		= $filter_order;
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
-		
-				
+						
 		// Create the pagination object
 		jimport('joomla.html.pagination');
 		

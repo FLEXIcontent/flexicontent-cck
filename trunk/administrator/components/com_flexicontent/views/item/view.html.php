@@ -31,9 +31,6 @@ class FlexicontentViewItem extends JView {
 	function display($tpl = null)
 	{
 		global $globalcats;
-		jimport( 'joomla.version' );
-		$jversion = new JVersion;
-		$j16ge = version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' );
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -263,7 +260,7 @@ class FlexicontentViewItem extends JView {
 		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
 		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
 		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 1 );
-		if (FLEXI_FISH || $j16ge) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			//build languages list
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3);
 		} else {
