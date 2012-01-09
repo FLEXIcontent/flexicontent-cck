@@ -101,6 +101,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$now = $date->toMySQL();
 
 	$text = trim( $text );
+	JRequest::setVar('title', array($text));
 	/*if ( $text == '' ) {	return array();	} */
 	
 	$searchFlexicontent = JText::_( 'FLEXICONTENT' );
@@ -166,7 +167,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$search_fields = $params->get('search_fields', '');
-	$search_fields = "'".str_replace(",", "','", $search_fields)."'";
+	$search_fields = "'".str_replace(",", "','", $search_fields)."','title'";
 	$query = "SELECT f.* " //f.id,f.field_type,f.name,f.label,f.attribs" // .", fir.value,fir.item_id"
 		//." FROM #__flexicontent_fields_item_relations as fir "
 		//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
