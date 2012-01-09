@@ -45,6 +45,11 @@
 				<exclude name=".**" />
 			</fileset>
 		</copy>
+		<copy todir="flexipack/modules/mod_flexicontent/tmpl_common" >
+			<fileset dir="modules/mod_flexicontent/tmpl_common">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
 
 		<copy file="modules/mod_flexitagcloud/helper.php" tofile="flexipack/modules/mod_flexitagcloud/helper.php" />
 		<copy file="modules/mod_flexitagcloud/index.html" tofile="flexipack/modules/mod_flexitagcloud/index.html" />
