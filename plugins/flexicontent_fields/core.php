@@ -294,7 +294,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$db->setQuery($query);
 			//echo $query;
 			$objs = $db->loadObjectList();
-			if ($objs===false) continue;
+			if (($objs===false) || ($objs===NULL)) continue;
 			//echo "<pre>"; print_r($objs);echo "</pre>"; 
 			$objs = is_array($objs)?$objs:array($objs);
 			foreach($objs as $o) {
