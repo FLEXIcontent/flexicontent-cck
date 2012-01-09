@@ -204,7 +204,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 			//echo $fieldsearch ."<br>";
 			$fieldsearch = explode(" ", $fieldsearch);
 			$dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $fieldsearch));
-			if(count($field->results)>0) {
+			if(isset($field->results) && (count($field->results)>0)) {
 				//echo "<pre>"; print_r($results);echo "</pre>"; 
 				foreach($field->results as $r) {
 					if($r) {
