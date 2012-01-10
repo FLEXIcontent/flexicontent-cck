@@ -7,7 +7,7 @@
 	</layout>
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
+			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" required="required" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">

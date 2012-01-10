@@ -41,6 +41,8 @@ class JFormFieldQfcategory extends JFormField
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
 		$value		= $this->__get('value');
+		if (!$value) $value = "";
+		$node = &$this->element;
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item =& JTable::getInstance('flexicontent_categories', '');
@@ -55,12 +57,12 @@ class JFormFieldQfcategory extends JFormField
 		{
 			$('remove').addEvent('click', function(){
 				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."');
-				$('a_id').setProperty('value', '0');
+				$('jform_request_".$node["name"]."').setProperty('value', '');
 			});
 		});
 
 		function qfSelectCategory(cid, title) {
-			document.getElementById('a_id').value = cid;
+			document.getElementById('jform_request_".$node["name"]."').value = cid;
 			document.getElementById('a_name').value = title;
 			//document.getElementById('sbox-window').close();
 			//document.getElementById('sbox-btn-close').click();
@@ -71,10 +73,11 @@ class JFormFieldQfcategory extends JFormField
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');
+		$required = $node->getAttribute('required') ? ' required="required" class="required" aria-required="true" ' : '';
 
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 650, y: 375}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"jform[request][".$this->element["name"]."]\" value=\"{$value}\" />";
+		$html .= "\n<input type=\"hidden\" id=\"jform_request_".$node["name"]."\" name=\"jform[request][".$this->element["name"]."]\" ".$required." value=\"{$value}\" />";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
 
 		return $html;

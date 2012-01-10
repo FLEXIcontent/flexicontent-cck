@@ -29,7 +29,7 @@ defined('_JEXEC') or die('Restricted access');
 
 class JElementQfcategory extends JElement
 {
-   /**
+ /**
 	* Element name
 	*
 	* @access	protected
@@ -49,17 +49,32 @@ class JElementQfcategory extends JElement
 			$item->load($value);
 		} else {
 			$item->title = JText::_( 'FLEXI_SELECT_ONE_CATEGORY' );
+			$value = "";
 		}
 
+		if ($node->attributes('required')) {
+			$required ="
+				$$('#toolbar-apply a.toolbar').setProperty('onclick',
+					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('apply'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
+				);
+				
+				$$('#toolbar-save a.toolbar').setProperty('onclick',
+					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('save'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
+				);
+			";
+		} else $required="";
+		
 		$js = "
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
 				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."');
-				$('a_id').setProperty('value', '0');
+				$('a_id').setProperty('value', '');
 			});
+			
+		".$required."	
 		});
-
+		
 		function qfSelectCategory(cid, title) {
 			document.getElementById('a_id').value = cid;
 			document.getElementById('a_name').value = title;
