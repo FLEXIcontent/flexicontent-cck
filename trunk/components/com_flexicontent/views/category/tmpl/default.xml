@@ -9,7 +9,7 @@
 		<name>FLEXICONTENT_CATEGORY</name>
 		<description>FLEXICONTENT_CATEGORY_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-			<param name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
+			<param name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" required="required" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
 		</url>
 		<params addpath="/administrator/components/com_flexicontent/elements">
             <param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
