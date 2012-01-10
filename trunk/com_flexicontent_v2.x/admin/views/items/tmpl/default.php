@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1063 2011-12-22 04:15:04Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1088 2012-01-08 16:40:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -239,7 +239,6 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -248,7 +247,6 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php endif; ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -349,11 +347,9 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
-			<?php endif; ?>
 			<td class="left col_type">
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
@@ -382,11 +378,11 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>" class="filterbuttons">
+			<td colspan="15" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');delFilter('filter_lang');this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');delFilter('filter_lang');this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 <!--
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
@@ -399,7 +395,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>">
+			<td colspan="15">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
