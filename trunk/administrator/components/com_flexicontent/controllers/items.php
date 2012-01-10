@@ -251,6 +251,89 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$this->setRedirect($link, $msg);
 	}
+	
+	/**
+	 * Logic to importcsv of the items
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function importcsv()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		$link 	= 'index.php?option=com_flexicontent&view=items';
+
+		$task		= JRequest::getVar('task');
+		$model 		= $this->getModel('item');
+		if ($task == 'importcsv') {
+			$csvfile = @$_FILES["csvfile"]["tmp_name"];
+			if(!is_file($csvfile)) {
+				$this->setRedirect($link, "Upload file error!");
+				return;
+			}
+			$contents = file_get_contents($csvfile);
+			$lines = explode("\n", $contents);
+			if(count($lines)<=0) {
+				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
+				return;
+			}
+			$columns = explode(",", $lines[0]);
+			$columns = $this->trimA($columns);
+
+			if(!in_array('title', $columns)) {
+				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 2.");
+				return;
+			}
+			unset($lines[0]);
+			
+			$mainframe = &JFactory::getApplication();
+			$maincat 	= JRequest::getInt( 'maincat', '' );
+			$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
+			if(!$maincat) $maincat = @$seccats[0];
+			JRequest::setVar('catid', $maincat);
+			JRequest::setVar('cid', $seccats);
+			JRequest::setVar('vstate', $seccats);//we must use default value from global configuration[enjoyman]
+			JRequest::setVar('state', -4);
+
+			$fp  = fopen($csvfile, 'r');
+			while (($line = fgetcsv($fp)) !== FALSE) {
+				if($line[0]=="title") {
+					$columns = $this->trimA($line);
+					continue;
+				}
+				$data = $this->trimA($line);
+				foreach($data as $j=>$d) {
+					JRequest::setVar($columns[$j], $d);
+				}
+				JRequest::setVar('id', 0);
+				//Sanitize
+				$data = JRequest::get( 'request' );
+				$data['text'] = JRequest::getVar( 'text', '', 'request', 'string', JREQUEST_ALLOWRAW );
+				if(!$model->store($data)) {
+					$msg = "Import item '" . implode(",", $line) . "' error" ;
+					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+				}else{
+					$msg = "Import item '" . implode(",", $line) . "' success" ;
+					$mainframe->enqueueMessage($msg);
+				}
+			}
+			fclose($fp);
+			$cache = &JFactory::getCache('com_flexicontent');
+			$cache->clean();
+		}		
+		//$this->setRedirect($link, $msg);
+		$this->setRedirect($link);
+	}
+	
+	function trimA($array) {
+		if(!is_array($array)) return false;
+		foreach($array as $k=>$a) {
+			$array[$k] = trim($a);
+		}
+		return $array;
+	}
 
 	/**
 	 * Import Joomla com_content datas
