@@ -809,7 +809,7 @@ class flexicontent_html
 			array_unshift($languages, $lang_all);
 			//require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
 		//}
-		
+		$selected = $selected?$selected:'*';
 		switch ($type)
 		{
 			case 1:
@@ -838,11 +838,14 @@ class flexicontent_html
 					if (isset($lang->sef)) {
 						$img = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 					} else {
-						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
+						$img	 = @$lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
 					}
 					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'" style="white-space:nowrap">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
+					if($lang->shortcode=="*")
+						$list 	.= JText::_("All");
+					else
+						$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
 					$list 	.= '</label>';
 					$checked	= '';
 				}
