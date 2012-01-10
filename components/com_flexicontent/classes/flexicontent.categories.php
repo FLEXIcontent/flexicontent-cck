@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //include constants file
-require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 class flexicontent_cats
 {

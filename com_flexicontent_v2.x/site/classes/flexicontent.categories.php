@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.categories.php 1059 2011-12-20 07:18:32Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.categories.php 1093 2012-01-10 04:48:00Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //include constants file
-require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 class flexicontent_cats
 {

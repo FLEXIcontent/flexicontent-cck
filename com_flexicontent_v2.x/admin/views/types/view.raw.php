@@ -36,12 +36,12 @@ class FlexicontentViewTypes extends JView{
 		echo "<b>". JText::_( 'FLEXI_SELECT_TYPE' ).":</b><br /><br />";
 
 		foreach($itemtypes as $itemtype) {
-			$css = "width:auto; margin:0px 1% 12px 1%; padding:1%; color:".$statedata['color'].";";
+			$css = "width:auto; margin:0px 1% 12px 1%; padding:1%; ";
 			$link = "index.php?option=com_flexicontent&amp;task=items.add&amp;typeid=".$itemtype->id."&".JUtility::getToken()."=1";
 			$icon = "components/com_flexicontent/assets/images/layout_add.png";
 	?>
 			<a style="<?php echo $css; ?>" class="fc_select_button" href="<?php echo $link; ?>" target="_parent">
-				<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo JText::_( $statedata['desc'] ); ?>" />&nbsp;
+				<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $itemtype->name; ?>" />&nbsp;
 				<?php echo $itemtype->name; ?>
 			</a>
 	<?php
