@@ -910,7 +910,7 @@ class ParentClassItem extends JModelAdmin {
 		} else {
 			$obj->value			= $value;
 		}
-		$obj->value = $value;
+		//$obj->value = $value;
 		
 		if($use_versioning) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 		if( ($isnew || $isapproveversion ) && !$iscore) {
