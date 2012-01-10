@@ -18,6 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//include constants file
+require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+
 class flexicontent_cats
 {
 	/**
@@ -32,12 +35,17 @@ class flexicontent_cats
 	 *
 	 * @var array
 	 */
-	var $parentcats = array();
+	var $parentcats = array();	// ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
 	
-	var $category = array();
+	var $category = array();		// data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
 	
 	/**
 	 * Constructor
+	 *
+	 * the constructor will build the parent category array (ancestor of given category up to the root category) by calling:
+	 * a. buildParentCats()
+	 * b. getParentCats()
+	 * so that it can be later retrieved via getParentlist()
 	 *
 	 * @param int $cid
 	 * @return flexicontent_categories
@@ -45,10 +53,15 @@ class flexicontent_cats
 	function flexicontent_cats($cid)
 	{
 		$this->id = $cid;
-		$this->buildParentCats($this->id);
-		$this->getParentCats();
+		$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats'
+		$this->getParentCats();							// Get basic data for ancestors (id,title,categoryslug) and set them in member array variable 'category'
 	}
     
+	/**
+	 * Retrieves parent categories (anscestors) of category until the category
+	 * and sets this parent in the member variable 'parentcats'
+	 *
+	 */
 	function getParentCats()
 	{
 		$db			=& JFactory::getDBO();
@@ -60,8 +73,8 @@ class flexicontent_cats
 			$query = 'SELECT id, title,'
 					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
 					.' FROM #__categories'
-					.' WHERE id ='. (int)$cid 
-					.' AND section = ' . FLEXI_SECTION
+					.' WHERE id ='. $db->Quote((int)$cid)
+					.( !FLEXI_J16GE ? ' AND section = ' . FLEXI_SECTION : '' )
 					.' AND published = 1'
 					;
 			$db->setQuery($query);
@@ -69,15 +82,20 @@ class flexicontent_cats
 		}
 	}
 	
+	/**
+	 * Retrieves parent categories (anscestors) of category until the category
+	 * and sets this parent in the member variable 'parentcats'
+	 *
+	 */
 	function buildParentCats($cid)
 	{
 		$db 		=& JFactory::getDBO();
 
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid. ' AND section = ' . FLEXI_SECTION;
+		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid .( !FLEXI_J16GE ? ' AND section = ' . FLEXI_SECTION : '' );
 		$db->setQuery( $query );
 		$parents[$cid] = $db->loadResult();
 
-		if($parents[$cid] != 0) {
+		if ( (!FLEXI_J16GE && $parents[$cid] != 0 )  ||  (FLEXI_J16GE && $parents[$cid] > 1) ) {
 			array_push($this->parentcats, $cid);
 		}
 
@@ -87,13 +105,24 @@ class flexicontent_cats
 		}
 	}
 	
+	/*
+	 * Returns the parent category array that was build by functions buildParentCats() and getParentCats(), which were by constructor for category cid
+	 *
+	 */
 	function getParentlist()
 	{
 		return $this->category;
 	}
 	
 	/**
-    * Get the categorie tree
+    * Get the category tree (a sorted and padded array) but without any filtering or disabling data 
+    *
+    * a. A children array is constructed for every category
+    * b. Then treerecurse() is called to sort the category array according to each category parent and also to pad the category titles
+    * 
+    * NOTE: the final category array has no filtering or disabling data ( this is done by buildcatselect() )
+    * NOTE: the output of this function can be given to buildcatselect() for the purpose of building a select form field (aka category tree)
+    *       that has filtering (via FLEXIaccess or via J1.6+ permission) and disabling of specific categories !!!
     *
     * @return array
     */
@@ -103,17 +132,17 @@ class flexicontent_cats
 		
 		if ($published) {
 			$where[] = 'published = 1';
-			$where[] = 'section = ' . FLEXI_SECTION;
-		} else {
-			$where[] = 'section = ' . FLEXI_SECTION;
 		}
+		if (!FLEXI_J16GE) $where[] = 'section = ' . FLEXI_SECTION;
+		if (FLEXI_J16GE)  $where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		
 		$query = 'SELECT *, id AS value, title AS text'
 				.' FROM #__categories'
 				.$where
-				.' ORDER BY parent_id, ordering'
+				.' ORDER BY parent_id '
+				. ( !FLEXI_J16GE ? ', ordering' : ', lft' )
 				;
 
 		$db->setQuery($query);
@@ -134,14 +163,19 @@ class flexicontent_cats
 		}
 		
 		//get list of the items
-		$list = flexicontent_cats::treerecurse(0, '', array(), $children, true, max(0, $levellimit-1));
+		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
+		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $levellimit-1));
 
 		return $list;
 	}
 	
 	/**
-    * Get the categorie tree
-    * based on the joomla 1.0 treerecurse 
+    * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
+    * The sorting of categories is done by:
+    * a. looping through all categories  v  in given children array padding all of category v with same padding
+    * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
+    *
+    * This function is based on the joomla 1.0 treerecurse 
     *
     * @access public
     * @return array
@@ -149,6 +183,7 @@ class flexicontent_cats
 	function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
 	{
 		if (!$ancestors) $ancestors = array();
+		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
 		
 		if (@$children[$parent_id] && $level <= $maxlevel) {
 			foreach ($children[$parent_id] as $v) {
@@ -167,13 +202,13 @@ class flexicontent_cats
 				}
 
 				if ($title) {
-					if ( $v->parent_id == 0 ) {
+					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
 						$txt    = ''.$v->title;
 					} else {
 						$txt    = $pre.$v->title;
 					}
 				} else {
-					if ( $v->parent_id == 0 ) {
+					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
 						$txt    = '';
 					} else {
 						$txt    = $pre;
@@ -193,7 +228,12 @@ class flexicontent_cats
 	}
 
 	/**
-	 * Build Categories select list
+	 * Build a html select form field that displays a Category Tree
+	 *
+	 * The output is filtered (via FLEXIaccess or via J1.6+ permission) and has disabled specific categories
+	 * About Disabled categories:"
+	 * - currently edited category is disabled
+	 * - if the user can view all categories then categories he has no permission are disabled !!!
 	 *
 	 * @param array $list
 	 * @param string $name
@@ -225,6 +265,7 @@ class flexicontent_cats
 		}
 		
 		foreach ($list as $item) {
+			$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 			if ((!$published) || ($published && $item->published)) {
 				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
@@ -234,12 +275,10 @@ class flexicontent_cats
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					} else {
-						$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 						// FLEXIaccess rule $viewtree enables tree view
 						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
 					}
 				} else {
-					$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 				}
 			}
@@ -247,6 +286,16 @@ class flexicontent_cats
 		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected );
 	}
 	
+	
+	/**
+	 * Retrieves all available values of the given field,
+	 * that are used by any item visible via current category filtering (search box, alpha-index, filters, language, etc)
+	 *
+	 *
+	 * @param string $filter			the field object used as filter
+	 * @param string $force				controls whether to force only available values, ('all', 'limit', any other value uses the category configuration)
+	 * @return array							the available values
+	 */
 	function getFilterValues (&$filter, $force='default') {
 		
 		global $currcat_data;
