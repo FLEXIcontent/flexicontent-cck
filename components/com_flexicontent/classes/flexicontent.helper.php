@@ -1987,39 +1987,15 @@ class FLEXIUtilities {
 		return 0;
 	}
 
-
-	/**
-	 * Return unicode char by its code
-	 *
-	 * @param int $u
-	 * @return utf8 char
-	 */
-	/*function unichrB($u) {
-		return mb_convert_encoding('&#' . intval($u) . ';', 'UTF-8', 'HTML-ENTITIES');
-	}*/
-	
-	/**
-	 * Return unicode char by its code
-	 *
-	 * @param int $u (ord)
-	 * @return utf8 char
-	 */
-	/*function unichrC($u) {
-		return mb_convert_encoding(pack("N",$u), mb_internal_encoding(), 'UCS-4BE');
-	}*/
-	
-	/**
-	 * Return unicode string when giving an array of utf8 ords
-	 *
-	 * @param int $codes
-	 * @return utf8 str
-	 */
-	/*function ords_to_unistrB ($codes) {
-    if (is_scalar($codes)) $codes= func_get_args();
-    $str= '';
-    foreach ($codes as $code) $str.= html_entity_decode('&#'.$code.';',ENT_NOQUOTES,'UTF-8');
-    return $str;
-	}*/
+	function isSqlValidDate($date)
+	{
+		$db = & JFactory::getDBO();
+		$q = "SELECT day(".$db->Quote($date).")";
+		$db->setQuery($q);
+		$num = $db->loadResult();
+		$valid = $num > 0;
+		return $valid;
+	}
 }
 
 if(!function_exists('diff_version')) {
