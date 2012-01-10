@@ -1537,7 +1537,7 @@ class flexicontent_tmpl
 
 	function getTemplates()
 	{
-		if (FLEXI_CACHE)
+		/*if (FLEXI_CACHE)
 		{
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
@@ -1548,7 +1548,8 @@ class flexicontent_tmpl
 		else 
 		{
 			$tmpls = flexicontent_tmpl::parseTemplates();
-		}
+		}*/
+		$tmpls = flexicontent_tmpl::parseTemplates();
 	    
 	    return $tmpls;
 	}
