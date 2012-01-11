@@ -15,6 +15,10 @@
 			<option value="3">FLEXI_3_COLS</option>
 			<option value="4">FLEXI_4_COLS</option>
 		</param>
+		<param name="show_item_total" type="list" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 	</params>
 	<fieldgroups>
 		<group readonly="true">subcategory_title</group>

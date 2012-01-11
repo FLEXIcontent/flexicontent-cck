@@ -83,6 +83,10 @@
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
 		</param>
+		<param name="show_item_total" type="list" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 	</params>
 	<fieldgroups>
 		<group>above-description-line1</group>
