@@ -9,35 +9,88 @@
 		<name>FLEXICONTENT_MAIN</name>
 		<description>FLEXICONTENT_MAIN_DESC</description>
 		<params addpath="/administrator/components/com_flexicontent/elements">
+			
 			<param name="rootcat" type="qfcategory" default="0" label="FLEXI_SELECT_ROOT_CATEGORY" description="FLEXI_SELECT_ROOT_CATEGORY_DESC" />
-            <param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
-                <option value="0">FLEXI_ROOT</option> 
-                <option value="1">FLEXI_LEVEL_1</option> 
-                <option value="2">FLEXI_LEVEL_2</option> 
-                <option value="3">FLEXI_LEVEL_3</option> 
-                <option value="4">FLEXI_LEVEL_4</option> 
-                <option value="5">FLEXI_LEVEL_5</option> 
-            </param> 
+			<param name="item_depth" type="list" default="O" label="FLEXI_ITEM_DEPTH" description="FLEXI_ITEM_DEPTH_DESC"> 
+				<option value="0">FLEXI_ROOT</option> 
+				<option value="1">FLEXI_LEVEL_1</option> 
+				<option value="2">FLEXI_LEVEL_2</option> 
+				<option value="3">FLEXI_LEVEL_3</option> 
+				<option value="4">FLEXI_LEVEL_4</option> 
+				<option value="5">FLEXI_LEVEL_5</option> 
+			</param> 
 			<param name="introtext" type="textarea" default="" label="FLEXI_INTROTEXT_FIELD" rows="8" cols="30" description="FLEXI_INTROTEXT_FIELD_TIP"/>
 			<param name="showintrotext" type="radio" default="0" label="FLEXI_DISPLAY_INTROTEXT" description="FLEXI_DISPLAY_INTROTEXT_TIP">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</param>
 			<param name="showassignated" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</param>
 			<param name="catlimit" type="text" default="200" size="4" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" />
+
+			<param name="" type="separator" default="FLEXI_VIEW_CATS_CONF" level="level1" menu="hide" />
 			<param name="hide_empty_cats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_CATS" description="FLEXI_HIDE_EMPTY_CATS_DESC">
-				<option value="0">FLEXI_SHOW</option>
-				<option value="1">FLEXI_HIDE</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="show_cat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="cat_descr_cut" type="text" size="4" default="100" label="FLEXI_DESCRIPTION_MAXLEN" description="FLEXI_DESCRIPTION_MAXLEN_DESC" menu="hide"/>
+			<param name="show_cat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="cat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</param>
+			<param name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</param>		
+			<param name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<param name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+					
+			<param name="" type="separator" default="FLEXI_VIEW_SUBCATS_CONF" level="level1" menu="hide" />
 			<param name="hide_empty_subcats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_SUBCATS" description="FLEXI_HIDE_EMPTY_SUBCATS_DESC">
-				<option value="0">FLEXI_SHOW</option>
-				<option value="1">FLEXI_HIDE</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="show_subcat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="subcat_descr_cut" type="text" size="4" default="50" label="FLEXI_DESCRIPTION_MAXLEN" description="FLEXI_DESCRIPTION_MAXLEN_DESC" menu="hide"/>
+			<param name="show_subcat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="subcat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</param>
+			<param name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</param>		
+			<param name="subcat_image_width" type="text" size="4" default="40" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<param name="subcat_image_height" type="text" size="4" default="40" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
-			<param name="@spacer" type="spacer" default="" label="" description="" />
+			<param name="" type="separator" default="FLEXI_LAYOUT_CONF" level="level1" menu="hide" />
 
 			<param name="columns_count" type="list" default="1" label="FLEXI_COLUMNS_COUNT" description="FLEXI_COLUMNS_COUNT_DESC">
 				<option value="1">FLEXI_1_COL</option>
