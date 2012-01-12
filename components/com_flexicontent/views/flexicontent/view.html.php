@@ -37,7 +37,7 @@ class FlexicontentViewFlexicontent extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		//initialize variables
 		$document 	= & JFactory::getDocument();
@@ -66,14 +66,15 @@ class FlexicontentViewFlexicontent extends JView
 		// because the application sets a default page title, we need to get it
 		// right from the menu item itself
 		if (is_object( $menu )) {
+			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		
 			
 			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	$menu->name);
+				$params->set('page_title',	@$menu->name);
 			}
 			
 		} else {
-			$params->set('page_title',	JText::_( 'Site Directory' ));
+			$params->set('page_title',	JText::_( 'FLEXICONTENT_MAIN' ));
 		}
 
 		/*

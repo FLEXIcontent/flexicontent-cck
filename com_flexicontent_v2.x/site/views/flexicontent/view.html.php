@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 219 2010-05-04 06:28:08Z enjoyman $
+ * @version 1.5 stable $Id: view.html.php 712 2011-07-29 05:48:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,6 +37,8 @@ class FlexicontentViewFlexicontent extends JView
 	 */
 	function display( $tpl = null )
 	{
+		$mainframe =& JFactory::getApplication();
+
 		//initialize variables
 		$document 	= & JFactory::getDocument();
 		$menus		= &JSite::getMenu();
@@ -59,7 +61,6 @@ class FlexicontentViewFlexicontent extends JView
 		$limit 		= $params->def('catlimit', 0);
 		$total		= $this->get('Total');
 		$categories	= & $this->get('Data');
-		
 		$categories	= !is_array($categories)?array():$categories;
 
 		// because the application sets a default page title, we need to get it
@@ -73,7 +74,7 @@ class FlexicontentViewFlexicontent extends JView
 			}
 			
 		} else {
-			$params->set('page_title',	JText::_( 'FLEXI_ITEM' ));
+			$params->set('page_title',	JText::_( 'FLEXICONTENT_MAIN' ));
 		}
 
 		/*

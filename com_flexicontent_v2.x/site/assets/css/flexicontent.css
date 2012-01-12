@@ -730,3 +730,33 @@ table.admintable td {
 	text-align: left;
 	padding: 6px 4px 6px 4px;
 }
+
+
+div#flexicontent .fcdirectory .fccat_image {
+	padding: 1px;
+	border-radius: 6px;
+	float: left;
+	margin: 2px 6px 1px 0px;
+	border:1px solid #dddddd;
+}
+
+div#flexicontent .fcdirectory .fcsubcat_image {
+	padding: 1px;
+	border-radius: 6px;
+	float: left;
+	margin: 2px 6px 1px 0px;
+	border:1px solid #dddddd;
+}
+
+
+div#flexicontent .fcdirectory  .fcsubcat_bottom,
+div#flexicontent .fcdirectory  .fcsubcats_top {
+	border-bottom:1px dashed #dddddd !important;
+	margin:2px 0px 2px 0px !important;
+}
+
+div#flexicontent .fcdirectory .fcsubcat.odd {
+}
+
+div#flexicontent .fcdirectory .fcsubcat.even {
+}
