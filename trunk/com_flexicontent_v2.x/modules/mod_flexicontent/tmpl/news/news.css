@@ -173,6 +173,7 @@
 /* CONTAINER of item description */
 .mod_flexicontent_wrapper .news_text { /* for image (not contained inside) see more below */
 	text-align:justify;
+	margin:0px; padding:0px;
 }
 
 

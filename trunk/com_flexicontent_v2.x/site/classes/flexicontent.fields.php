@@ -234,8 +234,9 @@ class FlexicontentFields
 	  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 	  }
 	  
-	  // Set other field data like label
+	  // Set other field data like label and field itself !!!
 	  $item->onDemandFields[$fieldname]->label = $field->label;
+	  $item->onDemandFields[$fieldname]->field = & $field;
 	  
 	  // Render the (display) method of the field and return it
 	  $field = FlexicontentFields::renderField($item, $field, $values, $method);

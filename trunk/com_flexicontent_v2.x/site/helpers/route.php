@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 707 2011-07-28 17:51:28Z ggppdk $
+ * @version 1.5 stable $Id: route.php 922 2011-10-05 17:42:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -41,7 +41,7 @@ class FlexicontentHelperRoute
 		static $_component_menuitems = null;
 		if ($_component_menuitems) return $_component_menuitems;
 		
-		// Get menu ITEMs pointing to the Flexicontent component
+		// Get menu items pointing to the Flexicontent component
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 		$menus	= &JApplication::getMenu('site', array());
 		$_component_menuitems	= $menus->getItems('component_id', $component->id);
@@ -74,23 +74,25 @@ class FlexicontentHelperRoute
 		if ($default_menuitem_preference==1  &&  !$app->isAdmin()) {
 			$menu = &JSite::getMenu();
 			$activemenuItem = &$menu->getActive();
-			$activemenuItemId = $activemenuItem->id;
-			
-			$db 	=& JFactory::getDBO();
-			$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
-			$flexi_comp_id = $db->loadResult();	
-			
-			$query 	= 'SELECT COUNT( m.id )'
-				. ' FROM #__menu as m'
-				. ' WHERE m.published=1 AND m.id="'.$activemenuItemId.'" AND m.component_id="'.$flexi_comp_id.'"'
-				;
-			$db->setQuery( $query );
-			$count = $db->loadResult();
-
-			// Use currently active ... it is pointing to FC
-			if ($count) {
-				//  USE current Active ID it maybe irrelevant
-				return  $_component_default_menuitem_id = $activemenuItem->id;
+			if ($activemenuItem) {
+				$activemenuItemId = $activemenuItem->id;
+				
+				$db 	=& JFactory::getDBO();
+				$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
+				$flexi_comp_id = $db->loadResult();	
+				
+				$query 	= 'SELECT COUNT( m.id )'
+					. ' FROM #__menu as m'
+					. ' WHERE m.published=1 AND m.id="'.$activemenuItemId.'" AND m.component_id="'.$flexi_comp_id.'"'
+					;
+				$db->setQuery( $query );
+				$count = $db->loadResult();
+	
+				// Use currently active ... it is pointing to FC
+				if ($count) {
+					//  USE current Active ID it maybe irrelevant
+					return  $_component_default_menuitem_id = $activemenuItem->id;
+				}
 			}
 		}
 		

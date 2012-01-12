@@ -33,6 +33,7 @@ if ($this->CanUseTags || $this->CanVersion) {
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
 				width: 260,
+				max: 100,
 				matchContains: false,
 				mustMatch: false,
 				selectFirst: false,
