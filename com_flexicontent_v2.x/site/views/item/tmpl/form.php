@@ -82,6 +82,7 @@ if ($this->perms['canusetags']) {
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".JUtility::getToken()."=1\", {
 				width: 260,
+				max: 100,
 				matchContains: false,
 				mustMatch: false,
 				selectFirst: false,

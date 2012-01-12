@@ -156,9 +156,9 @@ defined('_JEXEC') or die('Restricted access');
 					<?php endif; ?>
 					
 					<?php if ($display_text_feat && $item->text) : ?>
-					<span class="news_text">
+					<p class="news_text">
 						<?php echo $item->text; ?>
-					</span>
+					</p>
 					<?php endif; ?>
 					
 					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
@@ -177,8 +177,10 @@ defined('_JEXEC') or die('Restricted access');
 					<?php endif; ?>
 					
 					<?php if ($mod_readmore_feat) : ?>
-					<span class="news_readon">
-						<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+					<span class="fc_block">
+						<span class="news_readon">
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+						</span>
 					</span>
 					<?php endif; ?>
 					
