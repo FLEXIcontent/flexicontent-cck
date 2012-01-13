@@ -202,7 +202,7 @@ class FlexicontentViewCategory extends JView
 	
 			// Allow to trigger content plugins on category description
 			$category->text			= $category->description;
-			$results 				= $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
 			$category->description 	= $category->text;
 		}
 
