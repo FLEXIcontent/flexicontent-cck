@@ -47,7 +47,7 @@ class FlexicontentViewItems extends JView
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
-		$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
+		$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 
 		$document = &JFactory::getDocument();
 
