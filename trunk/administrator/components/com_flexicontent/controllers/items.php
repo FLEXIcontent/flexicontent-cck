@@ -252,6 +252,68 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->setRedirect($link, $msg);
 	}
 	
+	/*
+	This function from http://stackoverflow.com/questions/1269562/how-to-create-an-array-from-a-csv-file-using-php-and-the-fgetcsv-function
+	*/
+	function csvstring_to_array($string, $separatorChar = ',', $enclosureChar = '"', $newlineChar = "\n") {
+		// @author: Klemen Nagode
+		$array = array();
+		$size = strlen($string);
+		$columnIndex = 0;
+		$rowIndex = 0;
+		$fieldValue="";
+		$isEnclosured = false;
+		for($i=0; $i<$size;$i++) {
+
+		$char = $string{$i};
+		$addChar = "";
+
+		if($isEnclosured) {
+		    if($char==$enclosureChar) {
+
+			if($i+1<$size && $string{$i+1}==$enclosureChar){
+			    // escaped char
+			    $addChar=$char;
+			    $i++; // dont check next char
+			}else{
+			    $isEnclosured = false;
+			}
+		    }else {
+			$addChar=$char;
+		    }
+		}else {
+		    if($char==$enclosureChar) {
+			$isEnclosured = true;
+		    }else {
+
+			if($char==$separatorChar) {
+
+			    $array[$rowIndex][$columnIndex] = $fieldValue;
+			    $fieldValue="";
+
+			    $columnIndex++;
+			}elseif($char==$newlineChar) {
+			    echo $char;
+			    $array[$rowIndex][$columnIndex] = $fieldValue;
+			    $fieldValue="";
+			    $columnIndex=0;
+			    $rowIndex++;
+			}else {
+			    $addChar=$char;
+			}
+		    }
+		}
+		if($addChar!=""){
+		    $fieldValue.=$addChar;
+
+		}
+		}
+
+		if($fieldValue) { // save last field
+		$array[$rowIndex][$columnIndex] = $fieldValue;
+		}
+		return $array;
+		}
 	/**
 	 * Logic to importcsv of the items
 	 *
@@ -272,18 +334,34 @@ class FlexicontentControllerItems extends FlexicontentController
 				$this->setRedirect($link, "Upload file error!");
 				return;
 			}
-			$fp  = fopen($csvfile, 'r');
-			$line = fgetcsv($fp);
+			$contents = $this->csvstring_to_array(file_get_contents($csvfile));
+			
+			/*require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'DataSource.php');
+			$csv = new File_CSV_DataSource;
+			$csv->load($csvfile);
+			$columns = $csv->getHeaders();*/
+			
+			/*$fp  = fopen($csvfile, 'r');
+			$line = fgetcsv($fp, 0, ',', '"');
 			if(count($line)<=0) {
 				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
 				return;
 			}
-			$columns = $this->trimA($line);
+			$columns = $this->trimA($line);*/
+			if(count($contents[0])<=0) {
+				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
+				return;
+			}
+			$columns = $this->trimA($contents[0]);
+			unset($contents[0]);
 
 			if(!in_array('title', $columns)) {
 				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 2.");
 				return;
 			}
+			//echo "<xmp>";var_dump($csv->getRows());echo "</xmp>";
+			//$rows = $csv->connect();
+			
 			
 			$mainframe = &JFactory::getApplication();
 			$maincat 	= JRequest::getInt( 'maincat', '' );
@@ -294,11 +372,16 @@ class FlexicontentControllerItems extends FlexicontentController
 			JRequest::setVar('vstate', $seccats);//we must use default value from global configuration[enjoyman]
 			JRequest::setVar('state', -4);
 
-			while (($line = fgetcsv($fp)) !== FALSE) {
+			//while (($line = fgetcsv($fp, 0, ',', '"')) !== FALSE) {
+			//foreach($rows as $line) {
+			foreach($contents as $line) {
 				$data = $this->trimA($line);
 				foreach($data as $j=>$d) {
 					JRequest::setVar($columns[$j], $d);
 				}
+				/*foreach($line as $k=>$d) {
+					JRequest::setVar($k, $d);
+				}*/
 				JRequest::setVar('id', 0);
 				//Sanitize
 				$data = JRequest::get( 'request' );
@@ -311,7 +394,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$mainframe->enqueueMessage($msg);
 				}
 			}
-			fclose($fp);
+			//fclose($fp);
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}		
