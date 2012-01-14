@@ -259,8 +259,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function importcsv()
-	{
+	function importcsv() {
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		$link 	= 'index.php?option=com_flexicontent&view=items';
@@ -273,20 +272,18 @@ class FlexicontentControllerItems extends FlexicontentController
 				$this->setRedirect($link, "Upload file error!");
 				return;
 			}
-			$contents = file_get_contents($csvfile);
-			$lines = explode("\n", $contents);
-			if(count($lines)<=0) {
+			$fp  = fopen($csvfile, 'r');
+			$line = fgetcsv($fp);
+			if(count($line)<=0) {
 				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
 				return;
 			}
-			$columns = explode(",", $lines[0]);
-			$columns = $this->trimA($columns);
+			$columns = $this->trimA($line);
 
 			if(!in_array('title', $columns)) {
 				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 2.");
 				return;
 			}
-			unset($lines[0]);
 			
 			$mainframe = &JFactory::getApplication();
 			$maincat 	= JRequest::getInt( 'maincat', '' );
@@ -297,12 +294,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			JRequest::setVar('vstate', $seccats);//we must use default value from global configuration[enjoyman]
 			JRequest::setVar('state', -4);
 
-			$fp  = fopen($csvfile, 'r');
 			while (($line = fgetcsv($fp)) !== FALSE) {
-				if($line[0]=="title") {
-					$columns = $this->trimA($line);
-					continue;
-				}
 				$data = $this->trimA($line);
 				foreach($data as $j=>$d) {
 					JRequest::setVar($columns[$j], $d);
