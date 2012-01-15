@@ -53,10 +53,19 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe;
-
-		// Get the paramaters of the active menu item
-		$params = & $mainframe->getParams('com_flexicontent');
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 		
 		//set limits
 		$limit 			= $params->def('catlimit', 5);
@@ -105,18 +114,30 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQuery()
 	{
-		global $mainframe;
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$ordering	= 'c.ordering ASC';
-		// Get the components parameters
-		$params 	=& $mainframe->getParams('com_flexicontent');
+		$user = & JFactory::getUser();
+		$gid = !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
+
 		// Get the root category from this directory
 		$rootcat = JRequest::getVar('rootcat',false);
-		if(!$rootcat) $rootcat = $params->get('rootcat',0);
+		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
+		
 		// Shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
+		$lang	= JRequest::getWord('lang', '' );
 		if(empty($lang)){
 			$langFactory= JFactory::getLanguage();
 			$tagLang = $langFactory->getTag();
@@ -178,7 +199,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.section = '.FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				. ' AND c.parent_id = '.$rootcat
 				. $and
 				. ' ORDER BY '.$ordering
@@ -195,15 +216,26 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQueryTotal()
 	{
-		global $mainframe;
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		// Get the components parameters
-		$params 	=& $mainframe->getParams('com_flexicontent');
+		$user = & JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		
 		// Get the root category from this directory
 		$rootcat = JRequest::getVar('rootcat',false);
-		if(!$rootcat) $rootcat = $params->get('rootcat',0);
+		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
@@ -258,13 +290,24 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _getsubs($id)
 	{
-		global $mainframe;
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$ordering	= 'c.ordering ASC';
-		// Get the components parameters
-		$params 	=& $mainframe->getParams('com_flexicontent');
+		$user = & JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
+		
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		if(empty($lang)){
@@ -332,7 +375,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.section = '.FLEXI_SECTION
+				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
 				. ' AND c.parent_id = '.(int)$id
 				. $and
 				. ' ORDER BY '.$ordering
@@ -352,13 +395,24 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getFeed()
 	{
-		global $mainframe;
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
+		$user = &JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		$limit 		= JRequest::getVar('limit', 10);
-		// Get the components parameters
-		$params 	=& $mainframe->getParams('com_flexicontent');
+		
 		// shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
 		if(empty($lang)){
@@ -383,7 +437,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 				. ' WHERE c.published = 1'
-				. ' AND c.section = '.FLEXI_SECTION
+				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
 				. ' AND c.access <= '.$gid
 				. $and
 				. ' AND i.state IN (1, -5)'

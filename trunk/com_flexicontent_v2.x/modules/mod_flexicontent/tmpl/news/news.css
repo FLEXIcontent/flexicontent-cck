@@ -78,7 +78,7 @@
 }
 .mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.even,
 .mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.even {
-	background-color: #f7f7f7;
+	background-color: #ffffff;
 	float: left;
 	margin-bottom:4px;
 	border-radius:0px;
@@ -91,12 +91,12 @@
 .mod_flexicontent_featured,
 .mod_flexicontent_standard {
 	margin-top:2px;
-	margin-bottom:12px;
+	margin-bottom:0px;
 	margin-left: 0%!important;
 	margin-right: 0%!important;
 	
 	padding-top:2px;
-	padding-bottom:6px;
+	padding-bottom:0px;
 	padding-left: 0%!important;
 	padding-right: 0%!important;
 	
@@ -121,23 +121,22 @@
 
 /* CONTAINER of item title */
 .mod_flexicontent_wrapper .news_title {
-	padding:1px 4px 1px 4px;  margin: 2px 0px 8px 0px;
-	border: 1px dashed #bbbbbb;
-	background-color:#dddddd; color: black;
+	padding:1px 4px 1px 4px;  margin: 2px 0px 2px 0px;
+	/*border: 1px dashed #bbbbbb;*/
 	font-size: 110%;  font-weight:bold;	text-align:left;
 }
 .mod_flexicontent_wrapper .news_title:hover {
-	border: 1px dashed #444444;
+	/*border: 1px dashed black;*/
 }
 
 /* item title styling (link, etc) */
 .mod_flexicontent_wrapper .news_title a {
-	background-color: transparent; color: black;
+	background-color: transparent; color: #555555;
 	text-decoration:none;
 }
 .mod_flexicontent_wrapper .news_title:hover a,
 .mod_flexicontent_wrapper .news_title a:hover {
-	background-color: transparent;  color: black;
+	background-color: transparent;  color: darkred;
 	text-decoration: none;
 }
 

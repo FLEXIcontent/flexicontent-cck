@@ -27,6 +27,7 @@ defined('_JEXEC') or die('Restricted access');
   	  $separator = "<div class='ordering_seperator' ></div>";
     } else {
   	  $separator = "";
+  	  continue;
   	}
 	?>
 	

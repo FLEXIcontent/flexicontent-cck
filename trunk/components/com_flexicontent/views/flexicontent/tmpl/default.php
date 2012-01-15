@@ -21,11 +21,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <div id="flexicontent" class="flexicontent directory">
 
 <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
-
-    <h2 class="componentheading flexicontent">
+	<h2 class="componentheading flexicontent">
 		<?php echo $this->params->get('page_title'); ?>
 	</h2>
-
 <?php endif; ?>
 
 

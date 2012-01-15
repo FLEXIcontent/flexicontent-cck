@@ -8,7 +8,7 @@
 	
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="rootcat" type="qfcategory" default="0" label="FLEXI_SELECT_ROOT_CATEGORY" description="FLEXI_SELECT_ROOT_CATEGORY_DESC" />
+			<field name="rootcat" type="qfcategory" default="1" label="FLEXI_SELECT_ROOT_CATEGORY" description="FLEXI_SELECT_ROOT_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	

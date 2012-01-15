@@ -32,29 +32,32 @@
 /* THE (OPTIONAL) CURRENT CATEGORY INFORMATION */
 .mod_flexicontent_wrapper .catdata {   /* external container */
 	border-bottom: 1px dashed darkgray;
+	margin: 0px 0px 6px 0px;
 }
 
 .mod_flexicontent_wrapper .catdata .cattitle {  /* the category title */
 	padding:1px 16px 1px 16px;  margin:2px 0px 8px 0px;  border:1px dashed #bbbbbb;
 	background-color:#dddddd; color:black;
-	font-size:140%;  font-weight:bold;  text-align:left;
+	font-size:12px;  font-weight:bold;  text-align:left;
 }
-
-.mod_flexicontent_wrapper .catdata .cattitle a {  /* the link to category title */
+.mod_flexicontent_wrapper .catdata .cattitle:hover {  /* the category title hover */
+	border: 1px dashed #444444;
+}
+.mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link {  /* the link to category title */
 	background-color: transparent; color: black;
 	text-decoration:none;
 }
-.mod_flexicontent_wrapper .catdata .cattitle:hover a,
-.mod_flexicontent_wrapper .catdata .cattitle a:hover {  /* the link to category title on mouse over */
+.mod_flexicontent_wrapper .catdata .cattitle:hover a.cattitle_link,
+.mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link:hover {  /* the link to category title on mouse over */
 	background-color: transparent;  color: darkred;
 	text-decoration: none;
 }
 
-.mod_flexicontent_wrapper .catdata .image_cat {  /* the category image container */
+.mod_flexicontent_wrapper .catdata .catimage {  /* the category image container */
 	float: left;
 	margin: 0 5px 5px 0;
 }
-.mod_flexicontent_wrapper .image_cat img {  /* the category image */
+.mod_flexicontent_wrapper .catdata .catimage img.catimage_thumb {  /* the category image */
   padding:1px; border:1px solid #dddddd;  
 }
 
@@ -67,6 +70,7 @@
 
 
 /* THE (OPTIONAL) LINK AT THE BOTTOM OF MODULE */
+.mod_flexicontent_wrapper .cat_readon,
 .mod_flexicontent_wrapper .module_readon {  /* style of external container of link */
 	font-size: 12px;
 	float:left;
@@ -79,6 +83,7 @@
 	margin: 0px 0px 3px 4px;
 }
 
+.mod_flexicontent_wrapper .cat_readon:hover,
 .mod_flexicontent_wrapper .module_readon:hover { /* style of external container of link */
 	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 1px;
 	border: solid gray;
@@ -87,12 +92,29 @@
 	margin: 0px 0px 3px 4px;
 }
 
+.mod_flexicontent_wrapper .cat_readon a.readon,
+.mod_flexicontent_wrapper .cat_readon a.readon span {  /* style of link */
+	padding: 0px;
+	background:none;
+	text-decoration: none!important;
+	color: darkgreen;
+	cursor:pointer;
+}
+
+.mod_flexicontent_wrapper .cat_readon:hover a.readon,
+.mod_flexicontent_wrapper .cat_readon:hover a.readon span { /* style of link when hovering external container */
+	padding: 0px;
+	background:none;
+	text-decoration: none!important;
+	color: darkgreen;
+}
+
 .mod_flexicontent_wrapper .module_readon a.readon,
 .mod_flexicontent_wrapper .module_readon a.readon span {  /* style of link */
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: darkblue;
 	cursor:pointer;
 }
 
@@ -101,9 +123,8 @@
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: darkblue;
 }
-
 
 
 /*******************/
@@ -118,22 +139,11 @@
   _height:1%; /* Hack for IE6 */
   vertical-align:top; /* Just makes sure everything is at the top */
 }
-.mod_flexicontent_wrapper .fc_block {
-	display: block !important;
-}
-.mod_flexicontent_wrapper .fc_inline {
-	display: inline !important;
-}
-.mod_flexicontent_wrapper .fc_inline_clear {
-  display:inline!important;
-}
-.mod_flexicontent_wrapper .fc_inline_clear:after {
-	content:"\a";
-	white-space: pre-wrap;
-}
-.mod_flexicontent_wrapper .fc_clearfix {
-	clear: both;
-}
+.mod_flexicontent_wrapper .fc_block { display: block !important; }
+.mod_flexicontent_wrapper .fc_inline { display: inline !important; }
+.mod_flexicontent_wrapper .fc_inline_clear { display:inline!important; }
+.mod_flexicontent_wrapper .fc_inline_clear:after { content:"\a";  white-space: pre-wrap; }
+.mod_flexicontent_wrapper .fc_clearfix { clear: both; }
 /*****************/
 /* CSS HACKS END */
 /*****************/

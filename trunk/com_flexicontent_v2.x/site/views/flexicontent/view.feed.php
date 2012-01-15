@@ -56,7 +56,7 @@ class FlexicontentViewFlexicontent extends JView
 			
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_('index.php?option=com_flexicontent&view=item&cid='. $row->catslug .'&id='.$row->slug );
+			$link = JRoute::_('index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='. $row->catslug .'&id='.$row->slug );
 
 			// strip html from feed item description text
 			$description	= ($params->get('feed_summary', 0) ? $row->introtext.$row->fulltext : $row->introtext);
