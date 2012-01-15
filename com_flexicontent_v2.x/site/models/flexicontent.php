@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: flexicontent.php 712 2011-07-29 05:48:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -53,15 +53,19 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		parent::__construct();
 
-		// Get the paramaters of the active menu item
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menuParams = new JRegistry;
-		if ($menu = JSite::getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
-
-		$mergedParams = clone $menuParams;
-		$mergedParams->merge($params);
 		
 		//set limits
 		$limit 			= $params->def('catlimit', 5);
@@ -110,22 +114,37 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQuery()
 	{
-		$user =& JFactory::getUser();
-		$gid = max ($user->getAuthorisedViewLevels());
-		$ordering	= 'c.ordering ASC';
-		// Get the components parameters
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menuParams = new JRegistry;
-		if ($menu = JSite::getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
-		
-		$params->merge($menuParams);
+
+		$user = & JFactory::getUser();
+		$gid = !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
 
 		// Get the root category from this directory
-		$rootcat	= JRequest::getInt('rootcat',0);
+		$rootcat = JRequest::getVar('rootcat',false);
+		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
+		
 		// Shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
+		$lang	= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 		// show unauthorized items
@@ -180,13 +199,11 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
-				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" '
-				. ($rootcat ? 'AND c.parent_id = ' . $rootcat. ' ' : ' ')
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
+				. ' AND c.parent_id = '.$rootcat
 				. $and
-				//. ' ORDER BY '.$ordering
+				. ' ORDER BY '.$ordering
 				;
-
 		return $query;
 	}
 
@@ -199,21 +216,26 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQueryTotal()
 	{
-		$user =& JFactory::getUser();
-		$gid = max ($user->getAuthorisedViewLevels());
-		
-		// Get the components parameters
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menuParams = new JRegistry;
-		if ($menu = JSite::getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
 
-		$mergedParams = clone $menuParams;
-		$mergedParams->merge($params);
+		$user = & JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		
 		// Get the root category from this directory
-		$rootcat	= $params->get('rootcat');
+		$rootcat = JRequest::getVar('rootcat',false);
+		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
@@ -234,9 +256,8 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
-				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" '
-				. ($rootcat ? 'AND c.parent_id = ' . $rootcat. ' ' : ' ')
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
+				. ' AND c.parent_id = ' . $rootcat
 				. $and
 				;
 
@@ -269,21 +290,32 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _getsubs($id)
 	{
-		$user =& JFactory::getUser();
-		$gid = max ($user->getAuthorisedViewLevels());
-		$ordering	= 'c.ordering ASC';
-		// Get the components parameters
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menuParams = new JRegistry;
-		if ($menu = JSite::getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
 
-		$mergedParams = clone $menuParams;
-		$mergedParams->merge($params);
+		$user = & JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
 		
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 		// show unauthorized items
@@ -343,10 +375,10 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. (FLEXI_J16GE ? '' : ' AND c.sectionid = ' . FLEXI_SECTION)
 				. ' AND c.parent_id = '.(int)$id
 				. $and
-				//. ' ORDER BY '.$ordering
+				. ' ORDER BY '.$ordering
 				;
 
 		$this->_db->setQuery($query);
@@ -363,21 +395,32 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getFeed()
 	{
-		$user =& JFactory::getUser();
-		$gid = max ($user->getAuthorisedViewLevels());
-		$limit 		= JRequest::getVar('limit', 10);
-		// Get the components parameters
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menuParams = new JRegistry;
-		if ($menu = JSite::getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
+		if (!FLEXI_J16GE) {
+			global $mainframe;
+			// Get the components parameters
+			$params 	=& $mainframe->getParams('com_flexicontent');
+		} else {
+			// Get the components parameters
+			$params = & JComponentHelper::getParams('com_flexicontent');
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
 
-		$mergedParams = clone $menuParams;
-		$mergedParams->merge($params);
+		$user = &JFactory::getUser();
+		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
+		$limit 		= JRequest::getVar('limit', 10);
 		
 		// shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 
@@ -394,7 +437,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 				. ' WHERE c.published = 1'
-				//. ' AND c.lft >= '.$this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
+				. (FLEXI_J16GE ? '' : ' AND c.sectionid = ' . FLEXI_SECTION)
 				. ' AND c.access <= '.$gid
 				. $and
 				. ' AND i.state IN (1, -5)'

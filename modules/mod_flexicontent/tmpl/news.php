@@ -78,6 +78,7 @@ defined('_JEXEC') or die('Restricted access');
   	  $separator = "<div class='ordering_seperator' ></div>";
     } else {
   	  $separator = "";
+  	  continue;
   	}
 	?>
 	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
@@ -207,7 +208,7 @@ defined('_JEXEC') or die('Restricted access');
 			<?php $rowcount++; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4 < 2)?'odd':'even'; ?>">
+			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4==1 || $rowcount%4==2)?'odd':'even'; ?>">
 
 					<?php if ($display_title) : ?>
 					<span class="fc_block" >

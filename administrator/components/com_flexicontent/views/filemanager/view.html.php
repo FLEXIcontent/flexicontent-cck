@@ -98,7 +98,7 @@ class FlexicontentViewFilemanager extends JView
 
 		//item lists
 		$items_list = array();
-		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'Filter by item' ) .' -' );
+		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) );
 		}

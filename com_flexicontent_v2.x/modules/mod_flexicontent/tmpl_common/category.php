@@ -1,13 +1,12 @@
-
 <?php if ($catdata) : ?>
 
 	<div class='catdata'>
 		
-		<?php if (isset($catdata->title)) : ?>
-		<span class='block'>
-			<span class='inline_block cattitle'>
-				<?php	if (isset($catdata->titlelink)) : ?>
-					<a href='<?php echo $catdata->titlelink; ?>'><?php echo $catdata->title; ?></a>
+		<?php if ($catdata->conf->showtitle) : ?>
+		<span class='fc_block'>
+			<span class='fc_block cattitle'>
+				<?php	if ($catdata->conf->link_title) : ?>
+					<a class="cattitle_link" href='<?php echo $catdata->titlelink; ?>'><?php echo $catdata->title; ?></a>
 				<?php else : ?>
 					<?php echo $catdata->title; ?>
 				<?php endif; ?>
@@ -15,14 +14,19 @@
 		</span>
 		<?php endif; ?>
 		
-		<?php if (isset($catdata->image)) : ?>
-			<span class='image_cat'>
-				<?php if (isset($catdata->imagelink)) : ?>
-					<a href='<?php echo $catdata->imagelink; ?>'>
-						<img src='<?php echo $catdata->image; ?>' alt='<?php echo flexicontent_html::striptagsandcut($catdata->title, 60); ?>' />
-					</a>
+		<?php if ($catdata->conf->show_image && ($catdata->image || $catdata->conf->show_default_image ) ) : ?>
+			<span class='catimage'>
+				<?php
+				if ($catdata->image) {
+					$catimage_thumb = '<img class="catimage_thumb" src="'.$catdata->image.'" alt="'.addslashes($catdata->title).'" title="'.addslashes($catdata->title).'"/>';
+				} else { // DEFAULT IMAGE or empty image place holder
+					//$catimage_thumb = '<div class="fccat_image" style="height:'.$catconf->image_height.'px;width:'.$catconf->image_width.'px;" ></div>';
+				}
+				?>
+				<?php	if ($catdata->conf->link_title) : ?>
+					<a class="catimage_link" href='<?php echo $catdata->imagelink; ?>'><?php echo $catimage_thumb; ?></a>
 				<?php else : ?>
-					<img src='<?php echo $catdata->image; ?>' alt='<?php echo flexicontent_html::striptagsandcut($catdata->title, 60); ?>' />
+					<?php echo $catimage_thumb; ?>
 				<?php endif; ?>
 			</span>
 		<?php endif; ?>
@@ -34,6 +38,5 @@
 		<span class='modclear'></span>
 		
 	</div>
-	
-	<span class='modclear'></span>
+
 <?php endif; ?>

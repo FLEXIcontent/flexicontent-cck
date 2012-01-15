@@ -45,16 +45,24 @@ class FlexicontentViewFlexicontent extends JView
 		$menu		= $menus->getActive();
 		
 		// Get the page/component configuration
-		$params = $mainframe->getParams('com_flexicontent');
+		if (!FLEXI_J16GE)	$params = $mainframe->getParams('com_flexicontent');
+		else							$params = & JComponentHelper::getParams('com_flexicontent');
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
+		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (!FLEXI_J16GE) {
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+			}
+		} else {
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
+			}
 		}
 
 		$limitstart	= JRequest::getInt('limitstart');
@@ -83,10 +91,16 @@ class FlexicontentViewFlexicontent extends JView
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 
-		if ($mainframe->getCfg('MetaTitle') == '1') {
-				$mainframe->addMetaTag('title', $params->get('page_title'));
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') {
+					$mainframe->addMetaTag('title', $params->get('page_title'));
+			}
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') {
+					$document->setMetaData('title', $params->get('page_title'));
+			}
 		}
-				
+		
 		if ($params->get('show_feed_link', 1) == 1) {
 			//add alternate feed link
 			$link	= '&format=feed';

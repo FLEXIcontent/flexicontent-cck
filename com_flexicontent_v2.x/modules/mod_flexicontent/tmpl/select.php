@@ -29,6 +29,8 @@ defined('_JEXEC') or die('Restricted access');
 	echo JHTML::_('select.genericlist', $options, 'select_list_'.$module->id, $js, 'value', 'text', null);
 	?>
 	</form>
+
+	<div class="modclear"></div>
 	
 	<?php
 	// Display readon of module

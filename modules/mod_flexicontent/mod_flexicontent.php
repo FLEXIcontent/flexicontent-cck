@@ -75,7 +75,7 @@ $fields_feat 						= $params->get('fields_feat');
 // module display params
 $show_more		= (int)$params->get('show_more', 1);
 $more_link		= $params->get('more_link');
-$more_title		= $params->get('more_title', 'FLEXI_READ_MORE_FROM_CATEGORY');
+$more_title		= $params->get('more_title', 'FLEXI_MODULE_READ_MORE');
 $more_css			= $params->get('more_css');
 
 // custom parameters
@@ -92,17 +92,17 @@ $custom5 				= $params->get('custom5');
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
-$list = modFlexicontentHelper::getList($params);
-$catdata = modFlexicontentHelper::getCategoryData($params);
-
+$list_arr = modFlexicontentHelper::getList($params);
+$catdata_arr = modFlexicontentHelper::getCategoryData($params);
+if (!$catdata_arr) $catdata_arr = array (false);
 
 // Only when caching not active, we can be xhtml compliant by inserting css file at the html head
 if ($add_ccs && !$caching && $layout) {
 	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 		// active layout css
 		$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
-		$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
 	}
+	$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
 }
 
 // Only when caching is active, we insert somewhere inside body, which is not xhtml compliant, but this is ok for all browsers
@@ -110,12 +110,22 @@ if ($add_ccs && $caching && $layout) {
 	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 		// active layout css
 		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
 	}
+	echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
 }
 
 // Tooltips
 if ($add_tooltips) JHTML::_('behavior.tooltip');
 
 // Render Layout
-require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
+foreach ($catdata_arr as $i => $catdata) {
+	$list = & $list_arr[$i];
+	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
+}
+?>
+
+<?php if ($show_more == 1) : ?>
+	<span class="module_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
+		<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
+	</span>
+<?php endif;?>

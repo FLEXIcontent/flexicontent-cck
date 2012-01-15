@@ -43,7 +43,9 @@ $subcat_image_method = $this->params->get('subcat_image_method', 1);
 $subcat_image_width = $this->params->get('subcat_image_width', 80);
 $subcat_image_height = $this->params->get('subcat_image_height', 80);
 
-
+jimport( 'joomla.html.parameter' );
+$config 	=& JFactory::getConfig();
+$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
 
 // Get the directory menu parameters 
 $cols = JRequest::getVar('columns_count',false);
@@ -69,14 +71,14 @@ switch ($cols)
 	$condition1	= $c1;
 	$condition2	= '';
 	$condition3	= '';
-	$style		= ' style="width:47%;"';
+	$style		= ' style="width:49%;"';
 	break;
 
 	case 3 :
 	$condition1	= $c1;
 	$condition2	= ($c1+$c2);
 	$condition3	= '';
-	$style		= ' style="width:31%;"';
+	$style		= ' style="width:32%;"';
 	break;
 
 	case 4 :
@@ -88,10 +90,11 @@ switch ($cols)
 }
 ?>
 
-<div class="column"<?php echo $style; ?>>
+<div class="fccatcolumn "<?php echo $style; ?>>
 <?php foreach ($this->categories as $sub) : ?>
 
   <?php
+	$sub->params = new JParameter($sub->params);
   if ($this->params->get('hide_empty_cats')) {
     $subcats_are_empty = 1;
     if (!$sub->assigneditems) foreach($sub->subcats as $subcat) {
@@ -106,26 +109,28 @@ switch ($cols)
   }
   ?>
 
-<div class="floattext fcdirectory">
+<div class="floattext">
     
-	<h2 class="flexicontent cat<?php echo $sub->id; ?>">
-		<a href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>">
+	<h2 class="fccat_title_box cat<?php echo $sub->id; ?>">
+		<a class="fccat_title" href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>">
 			<?php echo $this->escape($sub->title); ?>
 			<?php if ($showassignated) : ?>
-			<span class="small"><?php echo $sub->assigneditems != null ? '('.$sub->assigneditems.')' : '(0)'; ?></span>
+			<span class="fccat_assigned small"><?php echo $sub->assigneditems != null ? '('.$sub->assigneditems.')' : '(0)'; ?></span>
 			<?php endif; ?>
 		</a>
 	</h2>
 	
-	<?php 
+	<?php
+	// category image
+	$sub->image = FLEXI_J16GE ? $sub->params->get('image') : $sub->image;
 	$image = "";
 	if ($show_cat_image) {
 		$image = "";
 		$sub->introtext = & $sub->description;
 		$sub->fulltext = "";
 		
-		if ( $cat_image_source && @$sub->image && JFile::exists( JPATH_SITE .DS. "images" .DS. "stories" .DS. $sub->image ) ) {
-			$src = JURI::base(true)."/images/stories/".$sub->image;
+		if ( $cat_image_source && $sub->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $sub->image ) ) {
+			$src = JURI::base(true)."/".$joomla_image_path."/".$sub->image;
 	
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
@@ -151,7 +156,7 @@ switch ($cols)
 		if ($image) {
 			$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($sub->title).'" title="'.$this->escape($sub->title).'"/>';
 		} else {
-			$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
+			//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
 		}
 		if ($cat_link_image && $image) {
 			$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ).'">'.$image.'</a>';
@@ -160,22 +165,22 @@ switch ($cols)
 	?>
 	
 	<?php if ($image) : ?>
-		<?php echo $image; ?>
+	<span class="fccat_image_box"><?php echo $image; ?></span>
 	<?php endif; ?>
 	
-	<?php if ($show_cat_descr) : ?>
+	<?php if ($show_cat_descr && $sub->description) : ?>
 	<span class="fccat_descr"><?php echo flexicontent_html::striptagsandcut( $sub->description, $cat_descr_cut); ?></span>
 	<?php endif; ?>
 	
 	<div class='clear'></div>
-	<div class='fcsubcats_top'></div>
 	
-	<ul class="catdets cat<?php echo $sub->id; ?>" >
+	<ul class="fcsubcats_list cat<?php echo $sub->id; ?>" >
 		
 		<?php $oddeven = ''; ?>
 		
 		<?php foreach ($sub->subcats as $subcat) : ?>
 			<?php
+			$subcat->params = new JParameter($subcat->params);
 			$oddeven = $oddeven=='even' ? 'odd' : 'even';
 			
 			if ($hide_empty_subcats) {
@@ -184,20 +189,22 @@ switch ($cols)
 			?>
 		
 			<li class='fcsubcat <?php echo $oddeven; ?>' >
-				<a href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
+				<a class='fcsubcat_title'  href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
 				<?php if ($showassignated) : ?>
-				<span class="small"><?php echo $subcat->assignedsubitems != null ? '('.$subcat->assignedsubitems.'/'.$subcat->assignedcats.')' : '(0/'.$subcat->assignedcats.')'; ?></span>
+				<span class="fcsubcat_assigned small"><?php echo $subcat->assignedsubitems != null ? '('.$subcat->assignedsubitems.'/'.$subcat->assignedcats.')' : '(0/'.$subcat->assignedcats.')'; ?></span>
 				<?php endif; ?>
 
 			<?php 
+			// Category image
+			$subcat->image = FLEXI_J16GE ? $subcat->params->get('image') : $subcat->image;
 			$image = "";
 			if ($show_subcat_image) {
-				$image = "";
+				
 				$subcat->introtext = & $subcat->description;
 				$subcat->fulltext = "";
 				
-				if ( $subcat_image_source && @$subcat->image && JFile::exists( JPATH_SITE .DS. "images" .DS. "stories" .DS. $subcat->image ) ) {
-					$src = JURI::base(true)."/images/stories/".$subcat->image;
+				if ( $subcat_image_source && $subcat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $subcat->image ) ) {
+					$src = JURI::base(true)."/".$joomla_image_path."/".$subcat->image;
 			
 					$h		= '&amp;h=' . $subcat_image_height;
 					$w		= '&amp;w=' . $subcat_image_width;
@@ -223,7 +230,7 @@ switch ($cols)
 				if ($image) {
 					$image = '<img class="fcsubcat_image" src="'.$image.'" alt="'.$this->escape($subcat->title).'" title="'.$this->escape($subcat->title).'"/>';
 				} else {
-					$image = '<div class="fcsubcat_image" style="height:'.$subcat_image_height.'px;width:'.$subcat_image_width.'px;" ></div>';
+					//$image = '<div class="fcsubcat_image" style="height:'.$subcat_image_height.'px;width:'.$subcat_image_width.'px;" ></div>';
 				}
 				
 				if ($subcat_link_image && $image) {
@@ -233,17 +240,15 @@ switch ($cols)
 			?>
 			
 			<?php if ($image) : ?>
-				<?php echo $image; ?>
+			<span class="fcsubcat_image_box"><?php echo $image; ?></span>
 			<?php endif; ?>
 			
-			
-			<?php if ($show_subcat_descr) : ?>
+			<?php if ($show_subcat_descr && $subcat->description) : ?>
 			<span class="fcsubcat_descr"><?php echo flexicontent_html::striptagsandcut( $subcat->description, $cat_descr_cut); ?></span>
 			<?php endif; ?>
 			
 			<div class='clear'></div>
-			<div class='fcsubcat_bottom'></div>
-			
+						
 			</li>
 		<?php endforeach; ?>
 		
@@ -253,7 +258,7 @@ switch ($cols)
 <?php 
 		$i++;
 		if ($i == $condition1 || $i == $condition2 || $i == $condition3) :
-			echo '</div><div class="column"'.$style.'>';
+			echo '</div><div class="fccatcolumn"'.$style.'>';
 		endif;
 endforeach; ?>
 </div>
