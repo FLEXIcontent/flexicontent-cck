@@ -195,7 +195,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$fieldsearch = JRequest::getVar($field->name, array());
 		$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
 		if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
-			$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
+			$foundfields[$field->id] = array();
 			$fieldsearch = $fieldsearch[0];
 			//echo $fieldsearch ."<br>";
 			$fieldsearch = explode(" ", $fieldsearch);
