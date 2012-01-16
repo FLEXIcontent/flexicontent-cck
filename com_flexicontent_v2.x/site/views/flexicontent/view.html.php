@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 712 2011-07-29 05:48:52Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1108 2012-01-15 04:06:31Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -78,7 +78,7 @@ class FlexicontentViewFlexicontent extends JView
 			$menu_params = new JParameter( $menu->params );		
 			
 			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	@$menu->name);
+				$params->set('page_title',	(!FLEXI_J16GE ? $menu->name: $menu->title));
 			}
 			
 		} else {

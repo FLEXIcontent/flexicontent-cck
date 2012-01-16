@@ -78,7 +78,7 @@ class FlexicontentViewFlexicontent extends JView
 			$menu_params = new JParameter( $menu->params );		
 			
 			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	@$menu->name);
+				$params->set('page_title',	(!FLEXI_J16GE ? $menu->name: $menu->title));
 			}
 			
 		} else {
