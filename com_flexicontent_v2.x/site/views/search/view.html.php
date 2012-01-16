@@ -113,6 +113,14 @@ class FLEXIcontentViewSearch extends JView
 			$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
 		}
 
+		// Add Site Name to page title
+		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+		}
+		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		}
+
 		$document	= &JFactory::getDocument();
 		$document->setTitle( $params->get( 'page_title' ) );
 

@@ -123,6 +123,14 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$params->set('page_title',	$category->title);
 		}
+
+		// Add Site Name to page title
+		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+		}
+		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		}
 		
 		// pathway construction @TODO try to find and automated solution
 		for($p=$params->get('item_depth', 0); $p<count($parents); $p++) {
