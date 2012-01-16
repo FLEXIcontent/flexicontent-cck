@@ -82,6 +82,14 @@ class FlexicontentViewTags extends JView
 		} else {
 			$params->set('page_title',	JText::_( FLEXI_TAGS).": ".JText::_( $tag->name ));
 		}
+
+		// Add Site Name to page title
+		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+		}
+		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		}
 		
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );

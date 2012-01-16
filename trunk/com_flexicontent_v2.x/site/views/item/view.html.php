@@ -149,6 +149,14 @@ class FlexicontentViewItem extends JView
 			}
 		}
 
+		// Add Site Name to page title
+		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+		}
+		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		}
+
 		/*
 		 * Create the document title
 		 * 
