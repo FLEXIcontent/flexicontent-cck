@@ -96,7 +96,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 
 						if ($this->dopostinstall && $this->CanAuthors)
 						{
-							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users';
+							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users&amp;task=add';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'person2_f2.png', "<br>".JText::_( 'FLEXI_ADD_AUTHOR' ) );
 							$link = 'index.php?option='.$option.'&amp;view=users';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-user.png', JText::_( 'FLEXI_AUTHORS' ) );
