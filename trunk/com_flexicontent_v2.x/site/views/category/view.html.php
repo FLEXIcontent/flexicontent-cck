@@ -37,9 +37,10 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe, $option, $globalnoroute, $globalcats;
+		global $globalnoroute, $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 		JHTML::_('behavior.tooltip');
 
@@ -148,8 +149,14 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 
-		if (JApplication::getCfg('MetaTitle') == '1') {
-				$document->setMetaData('title', $category->title);
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') {
+					$mainframe->addMetaTag('title', $category->title);
+			}
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') {
+					$document->setMetaData('title', $category->title);
+			}
 		}
 		
 		if ($params->get('show_feed_link', 1) == 1) {
@@ -215,7 +222,7 @@ class FlexicontentViewCategory extends JView
 			$item->event 	= new stdClass();
 			$item->params 	= new JParameter($item->attribs);
 			
-			// !!! The triggering of the event onPrepareContent of content plugins
+			// !!! The triggering of the event onContentPrepare of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
 			// !!! fields is handled by flexicontent.fields.php
 			// !!! Had serious performance impact

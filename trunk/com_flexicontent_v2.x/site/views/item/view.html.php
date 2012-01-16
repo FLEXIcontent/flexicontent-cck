@@ -120,7 +120,7 @@ class FlexicontentViewItem extends JView
 		$parents	= $cats->getParentlist();
 		$depth		= $params->get('item_depth', 0);
 		
-		// !!! The triggering of the event onPrepareContent of content plugins
+		// !!! The triggering of the event onContentPrepare of content plugins
 		// !!! for description field (maintext) along with all other flexicontent
 		// !!! fields is handled by flexicontent.fields.php
 		// CODE REMOVED

@@ -37,8 +37,9 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
-		global $mainframe, $option, $globalnoroute, $globalcats;
-		// Insure that the global vars are array
+		global $globalnoroute, $globalcats;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 		JHTML::_('behavior.tooltip');
@@ -139,7 +140,7 @@ class FlexicontentViewCategory extends JView
 
 
 		$document->setTitle( $params->get( 'page_title' ) );
-		
+
 		// @TODO check that as it seems to be dirty :(
 		$uri  			=& JFactory::getURI();
 		$base 			= $uri->getScheme() . '://' . $uri->getHost();
@@ -150,11 +151,17 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 
-		if ($mainframe->getCfg('MetaTitle') == '1') {
-				$mainframe->addMetaTag('title', $category->title);
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') {
+					$mainframe->addMetaTag('title', $category->title);
+			}
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') {
+					$document->setMetaData('title', $category->title);
+			}
 		}
 		
-		if ($params->get('add_feed_to_head', 1) == 1) {
+		if ($params->get('show_feed_link', 1) == 1) {
 			//add alternate feed link
 			$link	= '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
