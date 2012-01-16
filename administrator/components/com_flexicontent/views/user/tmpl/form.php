@@ -102,7 +102,7 @@
 						</label>
 					</td>
 					<td>
-						<?php if(!$this->user->get('password')) : ?>
+						<?php if(0 && !$this->user->get('password')) : ?>
 							<input class="inputbox disabled" type="password" name="password" id="password" size="40" value="" disabled="disabled" />
 						<?php else : ?>
 							<input class="inputbox" type="password" name="password" id="password" size="40" value=""/>
@@ -116,7 +116,7 @@
 						</label>
 					</td>
 					<td>
-						<?php if(!$this->user->get('password')) : ?>
+						<?php if(0 && !$this->user->get('password')) : ?>
 							<input class="inputbox disabled" type="password" name="password2" id="password2" size="40" value="" disabled="disabled" />
 						<?php else : ?>
 							<input class="inputbox" type="password" name="password2" id="password2" size="40" value=""/>

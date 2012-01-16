@@ -40,5 +40,5 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'item' );
 
 // Version constants
 define('FLEXI_VERSION',	'2.0');
-define('FLEXI_RELEASE',	'RC2a (r1057)');
+define('FLEXI_RELEASE',	'preRC3 (r1110)');
 ?>

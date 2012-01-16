@@ -77,21 +77,6 @@ class FlexicontentControllerusers extends FlexicontentController
 	function save()
 	{
 		global $mainframe;
-		// *** AUTHOR EXTENDED DATA ***
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$author_postdata['user_id']	= JRequest::getVar( 'id', 0, 'post', 'int');
-		$author_postdata['author_basicparams']	= JRequest::getVar('authorbasicparams', '', 'post', 'array');
-		$author_postdata['author_catparams']	= JRequest::getVar('authorcatparams', '', 'post', 'array');
-		
-		$flexiauthor_extdata = & JTable::getInstance('flexicontent_authors_ext', '');
-		
-		// Bind data, Check data & Store the data to the database table
-		if (!$flexiauthor_extdata->save($author_postdata))
-		{
-			$mainframe->enqueueMessage(JText::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION'), 'message');
-			$mainframe->enqueueMessage($flexiauthor_extdata->getError(), 'error');
-			return $this->execute('edit');
-		}
 
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
@@ -117,8 +102,8 @@ class FlexicontentControllerusers extends FlexicontentController
 
 		if (!$user->bind($post))
 		{
-			$mainframe->enqueueMessage(JText::_('CANNOT SAVE THE USER INFORMATION'), 'message');
-			$mainframe->enqueueMessage($user->getError(), 'error');
+			JError::raiseWarning(0, JText::_('CANNOT SAVE THE USER INFORMATION'));
+			JError::raiseWarning(0, $user->getError());
 			//$mainframe->redirect( 'index.php?option=com_flexicontent&controller=users&view=users', $user->getError() );
 			//return false;
 			return $this->execute('edit');
@@ -128,28 +113,27 @@ class FlexicontentControllerusers extends FlexicontentController
 		$groups 	= $acl->get_object_groups( $objectID, 'ARO' );
 		$this_group = strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
 
-
 		if ( $user->get('id') == $me->get( 'id' ) && $user->get('block') == 1 )
 		{
 			$msg = JText::_( 'You cannot block Yourself!' );
-			$mainframe->enqueueMessage($msg, 'message');
+			JError::raiseWarning(0, $msg);
 			return $this->execute('edit');
 		}
 		else if ( ( $this_group == 'super administrator' ) && $user->get('block') == 1 ) {
 			$msg = JText::_( 'You cannot block a Super Administrator' );
-			$mainframe->enqueueMessage($msg, 'message');
+			JError::raiseWarning(0, $msg);
 			return $this->execute('edit');
 		}
 		else if ( ( $this_group == 'administrator' ) && ( $me->get( 'gid' ) == 24 ) && $user->get('block') == 1 )
 		{
 			$msg = JText::_( 'WARNBLOCK' );
-			$mainframe->enqueueMessage($msg, 'message');
+			JError::raiseWarning(0, $msg);
 			return $this->execute('edit');
 		}
 		else if ( ( $this_group == 'super administrator' ) && ( $me->get( 'gid' ) != 25 ) )
 		{
 			$msg = JText::_( 'You cannot edit a super administrator account' );
-			$mainframe->enqueueMessage($msg, 'message');
+			JError::raiseWarning(0, $msg);
 			return $this->execute('edit');
 		}
 		// Are we dealing with a new user which we need to create?
@@ -183,10 +167,29 @@ class FlexicontentControllerusers extends FlexicontentController
 		if (!$user->save())
 		{
 
-			$mainframe->enqueueMessage(JText::_('CANNOT SAVE THE USER INFORMATION'), 'message');
-			$mainframe->enqueueMessage($user->getError(), 'error');
+			JError::raiseWarning(0, JText::_('CANNOT SAVE THE USER INFORMATION'));
+			JError::raiseWarning(0, $user->getError());
 			return $this->execute('edit');
 		}
+		
+		
+		// *** BOF AUTHOR EXTENDED DATA ***
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		$author_postdata['user_id']	= $user->get('id');
+		$author_postdata['author_basicparams']	= JRequest::getVar('authorbasicparams', '', 'post', 'array');
+		$author_postdata['author_catparams']	= JRequest::getVar('authorcatparams', '', 'post', 'array');
+		
+		$flexiauthor_extdata = & JTable::getInstance('flexicontent_authors_ext', '');
+		
+		// Bind data, Check data & Store the data to the database table
+		if (!$flexiauthor_extdata->save($author_postdata))
+		{
+			JError::raiseWarning(0, JText::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION'));
+			JError::raiseWarning(0, $flexiauthor_extdata->getError());
+			return $this->execute('edit');
+		}
+		// *** EOF AUTHOR EXTENDED DATA ***
+
 
 		/*
 	 	 * Time for the email magic so get ready to sprinkle the magic dust...
