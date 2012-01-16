@@ -80,18 +80,22 @@ class FlexicontentControllerSearch extends FlexicontentController{
 		$fieldid_arr = array_keys($fields);
 		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);
 		
-		
+		$db = &JFactory::getDBO();
+		$fields = array();
 		for($cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++) {
 			if ($cnt >= count($itemid_arr)) break;
 			$itemid = $itemid_arr[$cnt];
 			foreach($fieldid_arr as $fieldid) {
-				$db = &JFactory::getDBO();
-				$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
-				$db->setQuery($query);
-				if(!$field = $db->loadObject()) {
-					echo "fail|1";
-					exit;
+				
+				if(!isset($fields[$fieldid])) {
+					$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
+					$db->setQuery($query);
+					if(!$fields[$fieldid] = $db->loadObject()) {
+						echo "fail|1";
+						exit;
+					}
 				}
+				$field = clone($fields[$fieldid]);
 				$field->item_id = $itemid;
 				$field->parameters = new JParameter($field->attribs);
 				
@@ -107,7 +111,6 @@ class FlexicontentControllerSearch extends FlexicontentController{
 					$db->setQuery($query);
 					$data = $db->loadObject();
 					if ( isset( $data->{$field->name} ) ) {
-						//echo $data->{$field->name};
 						$values = $data->{$field->name};
 						$values = is_array($values)?$values:array($values);
 					} else $values=array();
@@ -121,7 +124,6 @@ class FlexicontentControllerSearch extends FlexicontentController{
 				}
 				$dispatcher =& JDispatcher::getInstance();
 				JPluginHelper::importPlugin('flexicontent_fields');
-				//echo $field->name;
 				if(count($values)==1)
 					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
 				elseif(count($values)>1)
