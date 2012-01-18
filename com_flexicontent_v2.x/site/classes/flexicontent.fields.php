@@ -21,6 +21,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // This is needed by some content plugins
 require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 
+//include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 class FlexicontentFields
 {
 	/**

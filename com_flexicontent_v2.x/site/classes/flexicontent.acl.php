@@ -17,6 +17,9 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 /**************************************************************************
  * All permissions are granted and denied within FLEXIcontent
  * with the following commands 

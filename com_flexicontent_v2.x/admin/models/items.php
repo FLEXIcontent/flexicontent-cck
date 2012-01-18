@@ -1461,7 +1461,7 @@ class FlexicontentModelItems extends JModel
 		$lang->name = 'All';
 		$lang->shortcode = '*';
 		$lang->id = 0;
-		$lang->imageurl = '';//JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+		//$lang->imageurl = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 		$langs->{$lang->code} = $lang;
 		
 		//if (isset($languages[0]->sef)) {
@@ -1471,7 +1471,7 @@ class FlexicontentModelItems extends JModel
 				//$lang->name = $lang->title;
 				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
 				$lang->id = $lang->extension_id; //$lang->lang_id;
-				$lang->imageurl = '';//JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+				//$lang->imageurl = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 				$langs->{$lang->code} = $lang;
 			}
 		//}
