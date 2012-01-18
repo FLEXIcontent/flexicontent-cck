@@ -72,14 +72,16 @@ defined('_JEXEC') or die('Restricted access');
 						<td class="key"><?php echo JText::_( 'FLEXI_METHOD' ); ?></td>
 						<td>
 							<label for="menus-copy">
+							<label for="menus-copy" style="white-space:nowrap; display:inline-block!important;float:none!important; margin:0px!important;">
+							<label for="menus-copy" class="lang_box" >
 								<input id="menus-copy" type="radio" name="method" value="1" onclick="copyonly();" checked="checked" />
 								<?php echo JText::_( 'FLEXI_COPYONLY' ); ?>
 							</label><br />
-							<label for="method-move">
+							<label for="method-move" class="lang_box"  >
 								<input id="method-move" type="radio" name="method" value="2" onclick="moveonly();" />
 								<?php echo JText::_( 'FLEXI_MOVEONLY' ); ?>
 							</label><br />
-							<label for="method-copymove">
+							<label for="method-copymove" class="lang_box" >
 								<input id="method-copymove" type="radio" name="method" value="3" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_COPYMOVE' ); ?>
 							</label>
@@ -126,11 +128,11 @@ defined('_JEXEC') or die('Restricted access');
 							<input type="text" id="copynr" name="copynr" value="1" size="3" />
 						</td>
 					</tr>
-					<?php if (FLEXI_FISH) : ?>
+					<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></td>
+						<td class="key"><?php echo JText::_( 'NEW' )." ".JText::_( 'FLEXI_LANGUAGE' ); ?></td>
 						<td>
-							<?php echo flexicontent_html::buildlanguageslist('language', '', '', $type = 4); ?>
+							<?php echo flexicontent_html::buildlanguageslist('language', '', $this->rows[0]->lang, $type = 5); ?>
 						</td>
 					</tr>
 					<?php endif; ?>

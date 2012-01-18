@@ -18,6 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 class flexicontent_html
 {
 	/**
@@ -778,23 +781,77 @@ class flexicontent_html
 	{
 		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
-
-		$query = 'SELECT *'
-				.' FROM #__languages'
-//				.' WHERE active = 1'
-//				.' ORDER BY ordering ASC'
-				;
+		
+		// Retrieve languages
+		if (FLEXI_J16GE) {   // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
+			$query = 'SELECT DISTINCT *'
+					.' FROM #__extensions'
+					.' WHERE type="language" '
+					.' GROUP BY element';
+		} else if (FLEXI_FISH) {   // Use joomfish languages table
+			$query = 'SELECT *'
+					.' FROM #__languages'
+				//.' WHERE active = 1'        // removed by JoomFish v2.2+ ??
+				//.' ORDER BY ordering ASC'   // removed by JoomFish v2.2+ ??
+					;
+		} else {
+			return 'buildlanguageslist(): ERROR no joomfish installed';
+		}
 		$db->setQuery($query);
 		$languages = $db->loadObjectList();
+
+
+		// Calculate image paths
+		if (FLEXI_J16GE) {  // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
+			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+			$mediapath	= $mainframe->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
+		} else {
+			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
+		}
 		
-		if (isset($languages[0]->sef)) {
+		// Prepare language objects
+		if (FLEXI_J16GE) {  // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
+			
 			foreach ($languages as $lang) {
+				// Calculate/Fix languages data
+				$lang->code = $lang->element;
+				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				$lang->id = $lang->extension_id;
+				// Get image path
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
+			}
+			
+			// Also prepend '*' (ALL) language to language array
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = 'All';
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			array_unshift($languages, $lang_all);
+			
+			// Select language -ALL- if none selected
+			$selected = $selected ? $selected : '*';
+			
+		} else if (isset($languages[0]->sef)) { // JoomFish v2.2+
+			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+		
+			foreach ($languages as $lang) {
+				// Calculate/Fix languages data
 				$lang->code = $lang->lang_code;
 				$lang->name = $lang->title;
 				$lang->shortcode = $lang->sef;
 				$lang->id = $lang->lang_id;
+				// Get image path via helper function
+				$lang->imgsrc = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 			}
-			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+			
+		} else { // JoomFish until v2.1
+		
+			foreach ($languages as $lang) {
+				// Get image path till 
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';			
+			}
 		}
 		
 		switch ($type)
@@ -813,8 +870,6 @@ class flexicontent_html
 				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
 				break;
 			case 3:
-				$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-				$fishpath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
 				$checked	= '';
 				$list		= '';
 				
@@ -822,51 +877,51 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					if (isset($lang->sef)) {
-						$img = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
-					} else {
-						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
-					}
-					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'" style="white-space:nowrap">';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'" >';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
+					if($lang->shortcode=="*") {
+						$list 	.= JText::_("All");  // Can appear in J1.6+ only
+					} else if (@$lang->imgsrc) {
+						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					} else {
+						echo $lang->name;
+					}	
 					$list 	.= '</label>';
 					$checked	= '';
 				}
 				break;
 			case 4:
-				$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-				$fishpath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
-				$list		= '';
-				
-				$list 	.= '<label for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'">';
+				$list 	 = '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
 				$list 	.= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
 				$list 	.= '</label><br />';
 
 				foreach ($languages as $lang) {
-					if (isset($lang->sef)) {
-						$img = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
-					} else {
-						$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
-					}
-					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
+					if($lang->shortcode=="*") {
+						$list 	.= JText::_("All");  // Can appear in J1.6+ only
+					} else if (@$lang->imgsrc) {
+						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					} else {
+						echo $lang->name;
+					}	
 					$list 	.= '</label><br />';
 				}
 				break;
 			case 5:
-				$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-				$fishpath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
 				$list		= '';
-
 				foreach ($languages as $lang) {
 					if ($lang->code==$selected) continue;
-					$img	 = $lang->image ? $imgpath . $lang->image : $fishpath . $lang->shortcode . '.gif';
-					$list 	.= '<label for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<img src="'.$img.'" alt="'.$lang->name.'" />';
+					if($lang->shortcode=="*") {
+						$list 	.= JText::_("All");  // Can appear in J1.6+ only
+					} else if (@$lang->imgsrc) {
+						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					} else {
+						echo $lang->name;
+					}	
 					$list 	.= '</label><br />';
 				}
 				break;
@@ -1370,6 +1425,7 @@ class flexicontent_tmpl
 	function parseTemplates($tmpldir='')
 	{
 		jimport('joomla.filesystem.file');
+		jimport('joomla.form.form');
 		$themes = new stdClass();
 		
 		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
@@ -1382,7 +1438,12 @@ class flexicontent_tmpl
 				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
 				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';	
-				$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
+				if (!FLEXI_J16GE) {
+					$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
+				} else {
+					$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+					$themes->items->{$tmpl}->params->loadFile($tmplxml);
+				}
 				foreach ($themes->items as $ilay) {
 					$parser =& JFactory::getXMLParser('Simple');		
 					$parser->loadFile($tmplxml);
@@ -1426,7 +1487,12 @@ class flexicontent_tmpl
 				$themes->category->{$tmpl}->view 		= 'category';
 				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
 				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';	
-				$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
+				if (!FLEXI_J16GE) {
+					$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
+				} else {
+					$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+					$themes->category->{$tmpl}->params->loadFile($tmplxml);
+				}
 				foreach ($themes->category as $clay) {
 					$parser =& JFactory::getXMLParser('Simple');
 					$parser->loadFile($tmplxml);
@@ -1470,7 +1536,7 @@ class flexicontent_tmpl
 
 	function getTemplates()
 	{
-		if (FLEXI_CACHE)
+		if (FLEXI_CACHE && !FLEXI_J16GE)
 		{
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
@@ -1627,7 +1693,13 @@ class FLEXIUtilities {
 		static $g_currentversions;
 		if( ($g_currentversions==NULL) || ($force) ) {
 			$db =& JFactory::getDBO();
-			$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+			if (!FLEXI_J16GE) {
+				$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+			} else {
+				$query = "SELECT c.id,c.version FROM #__content as c"
+						. " JOIN #__categories as cat ON c.catid=cat.id"
+						. " WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";
+			}
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_currentversions = array();
@@ -1658,9 +1730,12 @@ class FLEXIUtilities {
 		static $status;
 		if(!$status) {
 			$db =& JFactory::getDBO();
-			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-				" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-				" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL LIMIT 0,1;";
+			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
+				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
+				.(FLEXI_J16GE ? " JOIN #__categories as cat ON c.catid=cat.id" : "")
+				." WHERE c.version > '1' AND iv.version IS NULL"
+				.(!FLEXI_J16GE ? " AND sectionid='".FLEXI_SECTION."'" : " AND cat.extension='".FLEXI_CAT_EXTENSION."'")
+				." LIMIT 0,1";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
 			$rows = is_array($rows)?$rows:array();
@@ -1714,7 +1789,8 @@ class FLEXIUtilities {
 		$plg = JRequest::getVar('plg');
 		$act = JRequest::getVar('act');
 		if($plg && $act) {
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($plg).'.php';
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($plg);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($plg).'.php';
 			if(file_exists($path)) require_once($path);
 			$class = "plgFlexicontent_fields{$plg}";
 			if(class_exists($class) && in_array($act, get_class_methods($class))) {
@@ -1745,7 +1821,8 @@ class FLEXIUtilities {
 		
 		if ( !isset( $fc_plgs[$fieldname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($fieldname).'.php';
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldname);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
@@ -1779,7 +1856,8 @@ class FLEXIUtilities {
 		
 		if ( !isset( $content_plgs[$fieldname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.DS.strtolower($fieldname).'.php';
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldname);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($fieldname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();

@@ -239,6 +239,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -247,6 +248,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
+			<?php endif; ?>
 			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -347,15 +349,20 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
 			</td>
+			<?php endif; ?>
 			<td class="left col_type">
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
 			<td class="left col_state">
 				<?php echo $this->lists['filter_state']; ?>
 			</td>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			<td class="left"></td>
+			<?php endif; ?>
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left"></td>
@@ -378,11 +385,11 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="15" class="filterbuttons">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');delFilter('filter_lang');this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');delFilter('filter_lang');this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 <!--
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
@@ -395,7 +402,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="15">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -493,7 +500,8 @@ window.addEvent('domready', function() {
 						$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
 					}
 				}
-				$row->lang = @$row->lang ? $row->lang : 'en-GB';
+				$lang_default = !FLEXI_J16GE ? '' : '*';
+				$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
@@ -513,23 +521,23 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-		<?php if (FLEXI_FISH && isset($row->lang) && @$row->lang ) : ?>
+		<?php if ((FLEXI_FISH || FLEXI_J16GE) && isset($row->lang) && $row->lang ) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
-				<?php if (isset($this->langs->{$row->lang}->imageurl)) : ?>
+				<?php if (@$this->langs->{$row->lang}->imageurl) : /* image calculated by joomfish vJ2.2+ getLanguageImageSource() helper function  */ ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php elseif ($this->langs->{$row->lang}->image) : ?>
+				<?php elseif (@$this->langs->{$row->lang}->image) : /* custom image from language db table*/ ?>
 				<img src="../images/<?php echo $this->langs->{$row->lang}->image; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php else : ?>
+				<?php else : /* default image for language  */ ?>
 				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
-		<?php elseif(@$row->lang) : ?>
+		<?php elseif(FLEXI_J16GE && $row->lang=='*') : ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_("All"); ?>">
+				<?php echo JText::_("All");?>
+			</td>
+		<?php elseif(isset($row->lang) && $row->lang) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php echo $row->lang; ?>
-			</td>
-		<?php else : ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_('Undefined');?>">
-				&nbsp;
 			</td>
 		<?php endif; ?>
 			<td align="center" class="col_type">

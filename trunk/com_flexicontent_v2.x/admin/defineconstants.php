@@ -7,10 +7,18 @@ if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 1 );
 //jimport( 'joomla.version' );  $jversion = new JVersion;
 //define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 
-// Set filepaths
+// Set file manager paths
 $params =& JComponentHelper::getParams('com_flexicontent');
 define('COM_FLEXICONTENT_FILEPATH',    JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
 define('COM_FLEXICONTENT_MEDIAPATH',   JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
+
+// Set the media manager paths definitions
+$view = JRequest::getCmd('view',null);
+$popup_upload = JRequest::getCmd('pop_up',null);
+$path = "fleximedia_path";
+if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
+define('COM_FLEXIMEDIA_BASE',    JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
+define('COM_FLEXIMEDIA_BASEURL', JURI::root().$params->get($path, 'images/stories'));
 
 // J1.5 Section or J1.7 category type
 if (!FLEXI_J16GE) {

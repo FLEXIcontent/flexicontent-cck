@@ -1,5 +1,8 @@
 <?php
 
+//include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 class FlexicontentHelperPerm{
 	function getPerm($force = false) {

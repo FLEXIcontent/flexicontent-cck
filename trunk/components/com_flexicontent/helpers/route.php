@@ -22,6 +22,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Component Helper
 jimport('joomla.application.component.helper');
 
+//include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 /**
  * FLEXIcontent Component Route Helper
  *
