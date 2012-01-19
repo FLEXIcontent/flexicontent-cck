@@ -467,7 +467,7 @@ class FlexicontentController extends JController
 					. '  lastip = '.$currip_quoted.', '
 					. '  rating_sum = '.(int)$user_rating.', '
 					. '  rating_count = 1 '
-					. (int)$xid ? ', extra_id = '.(int)$xid : '';
+					. ( (int)$xid ? ', extra_id = '.(int)$xid : '' );
 					
 				$db->setQuery( $query );
 				$db->query() or die( $db->stderr() );

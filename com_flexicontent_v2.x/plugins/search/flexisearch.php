@@ -1,8 +1,19 @@
 <?php
 /**
- * @version		$Id: content.php 21097 2011-04-07 15:38:03Z dextercowley $
- * @copyright	Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version 1.0 $Id: flexisearch.php 677 2011-07-24 15:19:52Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 // no direct access
@@ -15,8 +26,8 @@ require_once JPATH_SITE.'/components/com_flexicontent/router.php';
 /**
  * Content Search plugin
  *
- * @package		Joomla.Plugin
- * @subpackage	Search.content
+ * @package		FLEXIcontent.Plugin
+ * @subpackage	Search.flexisearch
  * @since		1.6
  */
 class plgSearchFlexisearch extends JPlugin
@@ -27,12 +38,14 @@ class plgSearchFlexisearch extends JPlugin
 		$this->loadLanguage();
 	}
 	function _getAreas(){
+		$params = & $this->params;
+		
 		$areas = array();
-		if ($this->params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
-		if ($this->params->get('search_desc',	1)) {$areas['FlexisearchDesc'] = JText::_('FLEXI_STDSEARCH_DESC');}
-		if ($this->params->get('search_fields',	1)) {$areas['FlexisearchFields'] = JText::_('FLEXI_STDSEARCH_FIELDS');}
-		if ($this->params->get('search_meta',	1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
-		if ($this->params->get('search_tags',	1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
+		if ($params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
+		if ($params->get('search_desc',	1)) {$areas['FlexisearchDesc'] = JText::_('FLEXI_STDSEARCH_DESC');}
+		if ($params->get('search_fields',	1)) {$areas['FlexisearchFields'] = JText::_('FLEXI_STDSEARCH_FIELDS');}
+		if ($params->get('search_meta',	1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
+		if ($params->get('search_tags',	1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
 		end($areas);
 		$areas[key($areas)]=current($areas).'<br><br>';
 		return $areas;
@@ -66,6 +79,8 @@ class plgSearchFlexisearch extends JPlugin
 				$ContentType['FlexisearchType'.$item->id]=$item->name.'<br>';
 			}
 		}
+		end($ContentType);
+		$ContentType[key($ContentType)]=current($ContentType).'<br>';
 		return $ContentType;
 	
 	}
@@ -76,7 +91,7 @@ class plgSearchFlexisearch extends JPlugin
 	{
 		static $areas = array();
 		
-		 $areas = $this->params->get('search_select_types',	1) ? $this->_getAreas() + $this->_getContentTypes() :  $this->_getAreas();
+		$areas = $this->params->get('search_select_types',	1) ? $this->_getAreas() + $this->_getContentTypes() :  $this->_getAreas();
 		return $areas;			
 	}
 
@@ -147,7 +162,7 @@ class plgSearchFlexisearch extends JPlugin
 																	 $wheres2[]	= 'a.fulltext LIKE '.$text;}
 				if (in_array('FlexisearchMeta', $searchAreas))	{$wheres2[]	= 'a.metakey LIKE '.$text;
 																	 $wheres2[]	= 'a.metadesc LIKE '.$text;}
-				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= 'fir.value LIKE '.$text;}
+				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
 				if (in_array('FlexisearchTags', $searchAreas))	{$wheres2[]	= 't.name LIKE '.$text;}
 				$where		= '(' . implode(') OR (', $wheres2) . ')';
 				break;
@@ -164,9 +179,9 @@ class plgSearchFlexisearch extends JPlugin
 																		 $wheres2[]	= 'a.fulltext LIKE '.$word;}
 					if (in_array('FlexisearchMeta', $searchAreas))	{$wheres2[]	= 'a.metakey LIKE '.$word;
 																		 $wheres2[]	= 'a.metadesc LIKE '.$word;}
-					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= 'fir.value LIKE '.$word;}
+					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
 					if (in_array('FlexisearchTags', $searchAreas))	{$wheres2[]	= 't.name LIKE '.$word;}
-					$wheres[]	= implode(' OR ', $wheres2);
+					$wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
 				}
 				$where = '(' . implode(($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
 				break;
@@ -211,7 +226,7 @@ class plgSearchFlexisearch extends JPlugin
 				.'a.modified AS created, '
 				.'t.name AS tagname, '
 				.'CONCAT(a.introtext, a.fulltext) AS text, '
-				.'CONCAT_WS("/", c.title) AS section, '
+				.'c.title AS section, '
 				.'CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END AS slug, '
 				.'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug, '
 				.'"2" AS browsernav ');
@@ -222,8 +237,8 @@ class plgSearchFlexisearch extends JPlugin
 				.'LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid) '
 				.'LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id '
 				.'LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	');
-			$query->where(" ((f.field_type='text' AND f.issearch=1) Or f.field_type Is Null Or t.id Is Not Null) "
-				.'AND ('. $where .') ' 
+				//echo $where;
+			$query->where(' ('. $where .') ' 
 				.'AND ie.type_id IN('.$types.') '
 				.'AND a.state=1 AND c.published = 1 AND a.access IN ('.$groups.') '
 				.'AND c.access IN ('.$groups.') '
