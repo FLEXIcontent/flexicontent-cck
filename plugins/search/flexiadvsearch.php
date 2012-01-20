@@ -88,6 +88,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	//$limit 			= $pluginParams->def( 'search_limit', 50 );
 	$limit 			= $pluginParams->get( 'search_limit', 50 );
+	$limitstart = JRequest::getVar('limitstart', 0);
 	//$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
 	$filter_lang 	= $pluginParams->get( 'filter_lang', 1 );
 	//$browsernav 	= (int)$pluginParams->def( 'browsernav', 2 );
@@ -267,7 +268,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
 		. ' ORDER BY '. $order
 	;
-	$db->setQuery( $query, 0, $limit );
+	//$db->setQuery( $query, $limitstart, $limit );
+	$db->setQuery( $query );
 	$list = $db->loadObjectList();
 	if(isset($list)) {
 		foreach($list as $key => $row) {
