@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
+$user =& JFactory::getUser();
 ?>
 <script type="text/javascript">
 	function tableOrdering( order, dir, task )
@@ -150,7 +151,19 @@ if ($this->items) :
 	endforeach;
 ?>
 
-<?php $items = & $this->items; ?>
+<?php
+$items = & $this->items;
+
+// Decide whether to show the edit column
+$edit_button_exists = false;
+if ( $user->id && $this->params->get('show_editbutton', 0) ) :
+	foreach ($items as $item) :
+		if ($item->editbutton = flexicontent_html::editbutton( $item, $this->params )) :
+			$edit_button_exists = true;
+		endif;
+	endforeach;
+endif;
+?>
 
 <?php
 	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
@@ -184,12 +197,10 @@ if ($this->items) :
    		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
 			<thead>
 				<tr>
-					<?php if ($this->params->get('show_editbutton', 0)) : ?>
-					<th id="flexi_edit_col_head" scope="col"></th>
-					<?php endif; ?>
-					
-		   		<?php if ($this->params->get('show_title', 1)) : ?>
-					<th id="flexi_title" scope="col"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
+		   		<?php if ($edit_button_exists || $this->params->get('show_title', 1)) : ?>
+					<th id="flexi_title" scope="col">
+						<?php echo $this->params->get('show_title', 1) ? JText::_( 'FLEXI_ITEMS' ) : ''; ?>
+					</th>
 					<?php endif; ?>
 					
 					<?php foreach ($columns as $name => $label) : ?>
@@ -204,23 +215,15 @@ if ($this->items) :
 			<?php foreach ($items as $item) : ?>
 				<tr class="sectiontableentry">
 				
-				<?php if ($this->params->get('show_editbutton', 0)) : ?>
-					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
-					<?php if ($editbutton) : ?>
-						<td><?php echo $editbutton;?></td>
-					<?php endif; ?>
-				<?php endif; ?>
-				
 				<!-- BOF item title -->
-				<?php if ($this->params->get('show_title', 1)) : ?>
+				<?php if ($edit_button_exists || $this->params->get('show_title', 1)) : ?>
 		   		<th scope="row" class="table-titles">
-		   			<?php if ($this->params->get('link_titles', 0)) : ?>
-		   			<a class='fc_item_title' href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
-		   			<?php
-		   			else :
-		   			echo $item->title;
-		   			endif;
-		    			?>
+						<?php if ($this->params->get('show_title', 1)) : ?>
+			   			<?php if ($this->params->get('link_titles', 0)) : ?>
+			   			<a class='fc_item_title' href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+			   			<?php else : echo $item->title; endif; ?>
+		   			<?php endif; ?>
+		   			<?php echo !empty($item->editbutton) ? $item->editbutton : ''; ?>
 					</th>
 				<?php endif; ?>
 				<!-- BOF item title -->
