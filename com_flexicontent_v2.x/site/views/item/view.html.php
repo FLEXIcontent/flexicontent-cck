@@ -264,6 +264,9 @@ class FlexicontentViewItem extends JView
 		
 		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
 		$item->fields['text']->display = & $item->text;
+		if(isset($item->fields['text']->toc)) {
+			$item->toc = &$item->fields['text']->toc;
+		}
 				
 		$pathway 	=& $mainframe->getPathWay();
 		if (count($globaltypes) > 0) {
