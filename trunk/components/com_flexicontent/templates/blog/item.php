@@ -155,8 +155,8 @@ switch ($this->params->get( 'columnmode', 2 )) {
 	<!-- EOF item rating, favourites -->
 	
 	<!-- BOF TOC -->
-	<?php if (isset($this->item->fields['text']->toc)) : ?>
-		<?php echo $this->item->fields['text']->toc; ?>
+	<?php if (isset($this->item->toc)) : ?>
+		<?php echo $this->item->toc; ?>
 	<?php endif; ?>
 	<!-- EOF TOC -->
 
