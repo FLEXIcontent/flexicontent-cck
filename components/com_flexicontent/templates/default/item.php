@@ -163,8 +163,8 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	<div class="clear"></div>
 
 	<!-- BOF TOC -->
-	<?php if (isset($this->item->toc)) : ?>
-		<?php echo $this->item->toc; ?>
+	<?php if (isset($this->item->fields['text']->toc)) : ?>
+		<?php echo $this->item->fields['text']->toc; ?>
 	<?php endif; ?>
 	<!-- EOF TOC -->
 
