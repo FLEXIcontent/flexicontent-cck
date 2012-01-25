@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -31,15 +31,13 @@ class FlexicontentViewItemelement extends JView {
 
 	function display($tpl = null)
 	{
-		global $globalcats;
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		global $mainframe, $option, $globalcats;
 
 		//initialise variables
 		$db			= & JFactory::getDBO();
 		$document	= & JFactory::getDocument();
 		$template 	= $mainframe->getTemplate();
-		
+
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
@@ -49,6 +47,9 @@ class FlexicontentViewItemelement extends JView {
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 	'filter_state', 	'*'				, 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 		'filter_cats', 		0, 				'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 		'filter_type', 		0, 				'int' );
+		if (FLEXI_FISH) {
+			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', 		'', 			'cmd' );
+		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -64,14 +65,14 @@ class FlexicontentViewItemelement extends JView {
 		$pageNav 	= & $this->get( 'Pagination' );
 
 		$categories = $globalcats;
-		
+
 		// build the categories select list for filter
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false, false);
 
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		
+
 		$ordering = ($lists['order'] == 'i.ordering');
 
 		//build type select list
@@ -79,7 +80,7 @@ class FlexicontentViewItemelement extends JView {
 
 		// search filter
 		$lists['search']= $search;
-		
+
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
@@ -88,6 +89,11 @@ class FlexicontentViewItemelement extends JView {
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+
+		if (FLEXI_FISH) {
+			//build languages filter
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
+		}
 
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);
