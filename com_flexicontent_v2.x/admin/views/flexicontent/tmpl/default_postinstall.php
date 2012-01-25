@@ -189,7 +189,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			}
 		});
 <?php endif; ?>
-<?php if(!$this->oldbetafiles) : ?>
+<?php if(0 /*!$this->oldbetafiles*/) : ?>
 	$('oldbetafiles').addEvent('click', function(e) {
 			e = new Event(e).stop();
 			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";

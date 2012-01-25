@@ -1715,7 +1715,9 @@ class FlexicontentModelItems extends JModel
 		
 		$item_list = array_merge($items_with_tags,$items_with_noncore);
 		//echo count($item_list);
-		return array_unique($item_list);
+		
+		// array_unique() creates gaps in the index of the array, and if passed to json_encode it will output object !!! so we use array_values()
+		return array_values(array_unique($item_list));
 	}	
 	
 }

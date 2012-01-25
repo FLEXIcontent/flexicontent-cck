@@ -62,7 +62,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 			//echo $typeid_for_advsearch.'|';
 			//echo count($keys)*count($items).'|';
 			echo json_encode($keys).'|';
-			echo json_encode($items);
+			echo json_encode($items);    // warning: json_encode will output object if given an array with gaps in the indexing
 		//}else{
 		//	echo 'fail|0';
 		//}
