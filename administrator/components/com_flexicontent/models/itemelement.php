@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -129,8 +129,9 @@ class FlexicontentModelItemelement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
+		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
 
-		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, ' . $lang . 'u.name AS editor'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -173,6 +174,9 @@ class FlexicontentModelItemelement extends JModel
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
+		if (FLEXI_FISH) {
+			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
+		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -194,13 +198,19 @@ class FlexicontentModelItemelement extends JModel
 				$where[] = 'i.state = -5';
 			}
 		}
-		
+
 		if ( $filter_cats ) {
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
 
 		if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
+		}
+
+		if (FLEXI_FISH) {
+			if ( $filter_lang ) {
+				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
+			}
 		}
 
 		if ( $search ) {
@@ -214,7 +224,7 @@ class FlexicontentModelItemelement extends JModel
 
 	/**
 	 * Method to get types list
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -227,7 +237,7 @@ class FlexicontentModelItemelement extends JModel
 				;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();
-		
+
 		return $types;
 	}
 
