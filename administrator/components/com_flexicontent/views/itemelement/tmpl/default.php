@@ -48,7 +48,7 @@ defined('_JEXEC') or die('Restricted access');
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<?php if (FLEXI_FISH) : ?>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th width="50px" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
@@ -109,6 +109,7 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
+			<td align="center"><?php echo $row->lang; ?></td>
 			<td align="center">
 				<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 			</td>
