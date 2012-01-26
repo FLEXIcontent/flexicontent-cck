@@ -104,6 +104,9 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 						<td>
 							<?php echo $this->form->getInput('field_type'); ?>
+								&nbsp;&nbsp;&nbsp;&nbsp;[ <span id="field_typename">
+									<?php echo $this->form->getValue('field_type'); ?>
+								</span> ]
 						</td>
 					</tr>
 					<?php endif; ?>

@@ -708,6 +708,9 @@ class flexicontent_html
 		
 		$db->setQuery($query);
 		$global_field_types = $db->loadObjectList();
+		foreach($global_field_types as $field_type) {
+			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
+		}
 
 		$list = JHTML::_('select.genericlist', $global_field_types, $name, $class, 'value', 'text', $selected );
 		

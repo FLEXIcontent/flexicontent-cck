@@ -121,6 +121,7 @@ class FlexicontentViewField extends JView {
 								method:'get',
 								onComplete:function(response) {
 									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
+									$('field_typename').innerHTML = $('field_type').value;
 								},
 								update:$('fieldspecificproperties')
 							};

@@ -136,6 +136,9 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 						<td>
 							<?php echo $this->lists['field_type']; ?>
+								&nbsp;&nbsp;&nbsp;&nbsp;[ <span id="field_typename">
+									<?php echo $this->row->field_type; ?>
+								</span> ]
 						</td>
 					</tr>
 					<?php endif; ?>

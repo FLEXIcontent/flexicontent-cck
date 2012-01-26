@@ -95,13 +95,6 @@ class FlexicontentViewField extends JView {
 					window.addEvent('domready', function() {
 						$$('#jform_field_type').addEvent('change', function(ev) {
 							$('fieldspecificproperties').set('html', '<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
-							var ajaxoptions ={
-								method:'get',
-								onComplete:function(response) {
-									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
-								},
-								update:$('fieldspecificproperties')
-							};
 							new Request.HTML({
 								url: 'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&cid=".$form->getValue("id")."&field_type='+this.value+'&format=raw',
 								method: 'get',
@@ -109,6 +102,7 @@ class FlexicontentViewField extends JView {
 								evalScripts: false,
 								onComplete:function(response) {
 									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
+									$('field_typename').innerHTML = $('jform_field_type').value;
 								}
 							}).send();
 						});
