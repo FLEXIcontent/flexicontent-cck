@@ -54,6 +54,9 @@ class JFormFieldFieldtypeslist extends JFormFieldList{
 		
 		$db->setQuery($query);
 		$global_field_types = $db->loadObjectList();
+		foreach($global_field_types as $field_type) {
+			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
+		}
 		return $global_field_types;
 	}
 }
