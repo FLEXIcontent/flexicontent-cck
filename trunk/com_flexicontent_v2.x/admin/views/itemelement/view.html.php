@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 886 2011-08-31 15:10:00Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: view.html.php 1121 2012-01-25 11:14:15Z maxime.danjou@netassopro.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -49,6 +49,9 @@ class FlexicontentViewItemelement extends JView {
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 	'filter_state', 	'*'				, 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 		'filter_cats', 		0, 				'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 		'filter_type', 		0, 				'int' );
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', 		'', 			'cmd' );
+		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -56,7 +59,7 @@ class FlexicontentViewItemelement extends JView {
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
 		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.'/css/general.css');
 
-		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
@@ -97,6 +100,11 @@ class FlexicontentViewItemelement extends JView {
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			//build languages filter
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
+		}
 
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);

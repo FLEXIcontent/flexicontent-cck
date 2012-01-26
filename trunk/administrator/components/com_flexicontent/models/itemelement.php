@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -52,8 +52,8 @@ class FlexicontentModelItemelement extends JModel
 	function __construct()
 	{
 		parent::__construct();
-
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.itemelement.limitstart', 'limitstart', 0, 'int' );
@@ -78,6 +78,10 @@ class FlexicontentModelItemelement extends JModel
 			$db =& JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
+			if ( $db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			}
 		}
 		return $this->_data;
 	}
@@ -129,7 +133,7 @@ class FlexicontentModelItemelement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
+		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
 
 		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, ' . $lang . 'u.name AS editor'
 					. ' FROM #__content AS i'
@@ -151,7 +155,8 @@ class FlexicontentModelItemelement extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',		'filter_order_Dir',	'', 			'word' );
@@ -169,12 +174,13 @@ class FlexicontentModelItemelement extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
 		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
@@ -183,7 +189,7 @@ class FlexicontentModelItemelement extends JModel
 		$where = array();
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' sectionid = ' . FLEXI_SECTION;
+		if (!FLEXI_J16GE) $where[] = ' sectionid = ' . FLEXI_SECTION;
 
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
@@ -198,7 +204,7 @@ class FlexicontentModelItemelement extends JModel
 				$where[] = 'i.state = -5';
 			}
 		}
-
+		
 		if ( $filter_cats ) {
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
@@ -207,7 +213,7 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = 'ie.type_id = ' . $filter_type;
 		}
 
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ( $filter_lang ) {
 				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
 			}
@@ -224,7 +230,7 @@ class FlexicontentModelItemelement extends JModel
 
 	/**
 	 * Method to get types list
-	 *
+	 * 
 	 * @return array
 	 * @since 1.5
 	 */
@@ -237,7 +243,7 @@ class FlexicontentModelItemelement extends JModel
 				;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();
-
+		
 		return $types;
 	}
 

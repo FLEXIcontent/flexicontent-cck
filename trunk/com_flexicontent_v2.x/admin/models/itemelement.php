@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: itemelement.php 313 2010-06-19 08:32:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: itemelement.php 1122 2012-01-25 11:14:56Z maxime.danjou@netassopro.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -49,7 +49,8 @@ class FlexicontentModelItemelement extends JModel
 	 *
 	 * @since 0.9
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -74,6 +75,13 @@ class FlexicontentModelItemelement extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
+			if ( $db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			}
 		}
 		return $this->_data;
 	}
@@ -125,8 +133,9 @@ class FlexicontentModelItemelement extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
+		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
 
-		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, ' . $lang . 'u.name AS editor'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -144,7 +153,8 @@ class FlexicontentModelItemelement extends JModel
 	 * @access private
 	 * @return string
 	 */
-	function _buildContentOrderBy() {
+	function _buildContentOrderBy()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -162,19 +172,24 @@ class FlexicontentModelItemelement extends JModel
 	 * @access private
 	 * @return string
 	 */
-	function _buildContentWhere() {
+	function _buildContentWhere()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
+		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		$where = array();
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
+		if (!FLEXI_J16GE) $where[] = ' sectionid = ' . FLEXI_SECTION;
 
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
@@ -196,6 +211,12 @@ class FlexicontentModelItemelement extends JModel
 
 		if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
+		}
+
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			if ( $filter_lang ) {
+				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
+			}
 		}
 
 		if ( $search ) {
