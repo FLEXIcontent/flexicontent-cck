@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -32,7 +32,7 @@ defined('_JEXEC') or die('Restricted access');
 		<td nowrap="nowrap">
 			<?php echo $this->lists['filter_type'];	?>
 			<?php echo $this->lists['filter_cats'];	?>
-			<?php if (FLEXI_FISH) : ?>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 				<?php echo $this->lists['filter_lang']; ?>
 			<?php endif; ?>
 			<?php echo $this->lists['state'];	?>
@@ -47,9 +47,9 @@ defined('_JEXEC') or die('Restricted access');
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<?php if (FLEXI_FISH) : ?>
-			<th width="50px" nowrap="nowrap" class="center">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			<th width="50px" nowrap="nowrap">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
@@ -59,7 +59,7 @@ defined('_JEXEC') or die('Restricted access');
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? 5 : 4; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -69,34 +69,34 @@ defined('_JEXEC') or die('Restricted access');
 		<?php
 		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
-		$row = $this->rows[$i];
-
-		if ( $row->state == 1 ) {
-			$img = 'tick.png';
-			$alt = JText::_( 'FLEXI_PUBLISHED' );
-			$state = 1;
-		} else if ( $row->state == 0 ) {
-			$img = 'publish_x.png';
-			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-			$state = 0;
-		} else if ( $row->state == -1 ) {
-			$img = 'disabled.png';
-			$alt = JText::_( 'FLEXI_ARCHIVED' );
-			$state = -1;
-		} else if ( $row->state == -3 ) {
-			$img = 'publish_r.png';
-			$alt = JText::_( 'FLEXI_PENDING' );
-			$state = -3;
-		} else if ( $row->state == -4 ) {
-			$img = 'publish_y.png';
-			$alt = JText::_( 'FLEXI_TO_WRITE' );
-			$state = -4;
-		} else if ( $row->state == -5 ) {
-			$img = 'publish_g.png';
-			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-			$state = -5;
-		}
-		?>
+			$row = $this->rows[$i];
+			
+				if ( $row->state == 1 ) {
+					$img = 'tick.png';
+					$alt = JText::_( 'FLEXI_PUBLISHED' );
+					$state = 1;
+				} else if ( $row->state == 0 ) {
+					$img = 'publish_x.png';
+					$alt = JText::_( 'FLEXI_UNPUBLISHED' );
+					$state = 0;
+				} else if ( $row->state == -1 ) {
+					$img = 'disabled.png';
+					$alt = JText::_( 'FLEXI_ARCHIVED' );
+					$state = -1;
+				} else if ( $row->state == -3 ) {
+					$img = 'publish_r.png';
+					$alt = JText::_( 'FLEXI_PENDING' );
+					$state = -3;
+				} else if ( $row->state == -4 ) {
+					$img = 'publish_y.png';
+					$alt = JText::_( 'FLEXI_TO_WRITE' );
+					$state = -4;
+				} else if ( $row->state == -5 ) {
+					$img = 'publish_g.png';
+					$alt = JText::_( 'FLEXI_IN_PROGRESS' );
+					$state = -5;
+				}
+   		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td align="left">
@@ -109,7 +109,9 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td align="center"><?php echo $row->lang; ?></td>
+			<?php endif; ?>
 			<td align="center">
 				<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 			</td>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 659 2011-07-18 09:06:39Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1124 2012-01-25 17:50:18Z maxime.danjou@netassopro.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -32,6 +32,9 @@ defined('_JEXEC') or die('Restricted access');
 		<td nowrap="nowrap">
 			<?php echo $this->lists['filter_type'];	?>
 			<?php echo $this->lists['filter_cats'];	?>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+				<?php echo $this->lists['filter_lang']; ?>
+			<?php endif; ?>
 			<?php echo $this->lists['state'];	?>
 		</td>
 	</tr>
@@ -43,15 +46,20 @@ defined('_JEXEC') or die('Restricted access');
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			<th width="50px" nowrap="nowrap">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+			<?php endif; ?>
+			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
+			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? 5 : 4; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -91,10 +99,6 @@ defined('_JEXEC') or die('Restricted access');
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
-			<td align="center"><?php echo $row->id; ?></td>
-			<td align="center">
-				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
-			</td>
 			<td align="left">
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
 					<?php if(JRequest::getVar('object','')==''): ?>
@@ -105,6 +109,13 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			<td align="center"><?php echo $row->lang; ?></td>
+			<?php endif; ?>
+			<td align="center">
+				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+			</td>
+			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
