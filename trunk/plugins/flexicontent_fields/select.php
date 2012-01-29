@@ -40,15 +40,14 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
-		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
-		$empty_option		= $field->parameters->get( 'empty_option', 1 ) ;
-		$field_elements		= $field->parameters->get( 'field_elements' ) ;
-		$default_value		= $field->parameters->get( 'default_value' ) ;
+		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$default_value	= $field->parameters->get( 'default_value' ) ;
 		
 		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
 		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
 		
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 
 		// initialise property
@@ -81,7 +80,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			} else {
 			
 				$options = array();
-				if ($empty_option) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+				if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 				}

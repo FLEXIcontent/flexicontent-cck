@@ -183,7 +183,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 </script>
 -->
 <?php // endif; ?>
-<?php if (!$this->oldbetafiles) : ?>
+<?php if (0/*!$this->oldbetafiles*/) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('oldbetafiles').addEvent('click', function(e) {
