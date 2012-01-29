@@ -628,6 +628,7 @@ div fieldset.panelform label.hasTip {
 	font-weight: bold;
 	text-align: right;
 	width: 140px;
+	overflow:hidden;
 }
 
 div fieldset label {

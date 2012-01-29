@@ -37,6 +37,11 @@
 		<param name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 		<param name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
 		<param name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+		<param name="firstoptiontext" type="text" default="Please Select" label="First option text" description="First option text." />
+		<param name="usefirstoption" type="radio" default="1" label="Use first option" description="Use 'Please Select' option, if you don't need to use this option you can click No.">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
 			<option value="1">FLEXI_LINE_BREAK</option>

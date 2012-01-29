@@ -457,7 +457,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				if 	(
 						(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
 						&& 
-						(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
+						(!$field->parameters->get('frontend_hidden') && !in_array($field->field_type, $hidden)) 
 					) 
 				{
 				// set the specific label for the maintext field

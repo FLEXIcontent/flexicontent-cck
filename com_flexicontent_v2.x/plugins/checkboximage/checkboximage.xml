@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Checkbox image</name>
+	<name>FLEXIcontent - Checkbox (or Multi-Select) image</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
@@ -16,11 +16,22 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-checkboximage">
+			<field name="display_as_select" type="radio" default="0" label="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT" description="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="firstoptiontext" type="text" default="Please Select" label="First option text" description="First option text." />
+			<field name="usefirstoption" type="radio" default="1" label="Use first option" description="Use 'Please Select' option, if you don't need to use this option you can click No.">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
@@ -42,8 +53,8 @@
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 	</fields>

@@ -47,11 +47,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 		$level = $this->element['level'];
 		if ($level == 'level2') {
-			$style = 'padding: 4px 4% 4px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 2px 2% 2px 6%; width:84%; display: block; float: left;';
+			$style = 'padding: 1px 0% 1px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 2px 2% 2px 6%; width:84%; display: block; float: left; text-align: center;';
 		} else if ($level == 'level3') {
 			$style = 'padding: 4px 6% 4px 6%; font-weight: bold; clear:both; width:100%; display: block; float: left;';
 		} else {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #777; color: #fff; font-weight: bold; margin: 2px 3% 2px 3%; width:91%; display: block; float: left;';
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #777; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left;';
 		}
 		
 		$class = ""; $title = "";

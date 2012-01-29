@@ -40,13 +40,16 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
-		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
-		$field_elements		= $field->parameters->get( 'field_elements' ) ;
-		$size				= $field->parameters->get( 'size', 6 ) ;
-		$default_values		= $field->parameters->get( 'default_values', '' ) ;
+		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$default_values	= $field->parameters->get( 'default_values', '' ) ;
 		
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
+		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
+		
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
+		$size		= $field->parameters->get( 'size', 6 ) ;
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 
 		// initialise property
@@ -72,6 +75,10 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			
 			$db->setQuery($query);
 			$options = $db->loadObjectList();
+			if ($usefirstoption) {
+				$first_option = new stdClass();  $first_option->value = '';  $first_option->text = JText::_($firstoptiontext);
+				array_unshift($options, $first_option);
+			}
 
 			if (!$query || !is_array($options)) {
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -88,6 +95,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			}
 
 			$options = array(); 
+			if($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			foreach ($listarrays as $listarray) {
 				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}

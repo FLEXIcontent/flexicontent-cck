@@ -38,19 +38,22 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if($field->field_type != 'radioimage') return;
 		
 		$field->label = JText::_($field->label);
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
 		jimport('joomla.filesystem.file');
 
 		// some parameter shortcuts
-		$field_elements		= $field->parameters->get( 'field_elements' ) ;
-		$imagedir			= $field->parameters->get( 'imagedir' ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$imagedir				= $field->parameters->get( 'imagedir' ) ;
 		$imagedir 			= preg_replace('#^(/)*#', '', $imagedir);
 		$separator			= $field->parameters->get( 'separator' ) ;
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
+		$default_value	= $field->parameters->get( 'default_value', '' ) ;
 						
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
+		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
+		
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required validate-radio' : '';
 
 		switch($separator)
@@ -91,23 +94,31 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			$listarrays[] = explode("::", $listelement);
 		}
 
-		$i = 0;
-		$options  = "";
-		foreach ($listarrays as $listarray) {
-			// get the image src
-			$prefix = $mainframe->isAdmin() ? '../':'';
-			$imgsrc =  $prefix . $imagedir . $listarray[2] ;
-			
-			$checked  = "";
-			if ($listarray[0] == $field->value[0]) {
-				$checked = ' checked="checked"';
-				}
-			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
-			$i++;
+		if ($field->parameters->get( 'display_as_select', 0 )) {
+			$options = array(); 
+			if($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+			foreach ($listarrays as $listarray) {
+				$options[] = JHTML::_('select.option', $listarray[0], JText::_($listarray[1])); 
+			}
+			$field->html	= JHTML::_('select.genericlist', $options, $field->name, 'class="'.$required.'"', 'value', 'text', $field->value);
+		} else {
+			$i = 0;
+			$options = "";
+			foreach ($listarrays as $listarray) {
+				// get the image src
+				$prefix = $mainframe->isAdmin() ? '../':'';
+				$imgsrc =  $prefix . $imagedir . $listarray[2] ;
+				
+				$checked  = "";
+				if ($listarray[0] == $field->value[0]) {
+					$checked = ' checked="checked"';
+					}
+				$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
+				$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+				$i++;
+			}
+			$field->html = $options;
 		}
-			
-		$field->html = $options;
 	}
 
 
@@ -174,7 +185,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 		$field->label = JText::_($field->label);
 		
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$values = $values ? $values : $field->value;
 
@@ -243,14 +254,12 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// *** Create the select form field used for filtering
 		$options = array();
 		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		
 		foreach($results as $result) {
 			if (!trim($result->value)) continue;
 			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 		}
 		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
 		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-		
 	}
 	
 	

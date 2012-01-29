@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: checkboximage.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
+ * @version 1.0 $Id: checkboximage.php 1059 2011-12-20 07:18:32Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.checkboximage
@@ -45,14 +45,19 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		jimport('joomla.filesystem.file');
 
 		// some parameter shortcuts
-		$field_elements		= $field->parameters->get( 'field_elements' ) ;
-		$imagedir			= $field->parameters->get( 'imagedir' ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$imagedir				= $field->parameters->get( 'imagedir' ) ;
 		$imagedir 			= preg_replace('#^(/)*#', '', $imagedir);
 		$separator			= $field->parameters->get( 'separator' ) ;
-		$default_values		= $field->parameters->get( 'default_values', '' ) ;
+		$default_values	= $field->parameters->get( 'default_values', '' ) ;
 						
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
+		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
+		
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required validate-checkbox' : '';
+		$size		= $field->parameters->get( 'size', 6 ) ;
+		$size		= $size ? ' size="'.$size.'"' : '';
 
 		switch($separator)
 		{
@@ -91,23 +96,32 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$listarrays[] = explode("::", $listelement);
 		}
 
-		$i = 0;
-		$options  = "";
-		foreach ($listarrays as $listarray) {
-			// get the image src
-			$prefix = $mainframe->isAdmin() ? '../':'';
-			$imgsrc =  $prefix . $imagedir . $listarray[2] ;
-			$checked  = "";
-			for($n=0, $c=count($field->value); $n<$c; $n++) {
-				if ($field->value[$n] == $listarray[0]) {
-					$checked = ' checked="checked"';
-				}
+		if ($field->parameters->get( 'display_as_select', 0 )) {
+			$options = array(); 
+			if($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+			foreach ($listarrays as $listarray) {
+				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}
-			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="custom['.$field->name.'][]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;
-			$i++;
+			$field->html	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
+		} else {
+			$i = 0;
+			$options  = "";
+			foreach ($listarrays as $listarray) {
+				// get the image src
+				$prefix = $mainframe->isAdmin() ? '../':'';
+				$imgsrc =  $prefix . $imagedir . $listarray[2] ;
+				$checked  = "";
+				for($n=0, $c=count($field->value); $n<$c; $n++) {
+					if ($field->value[$n] == $listarray[0]) {
+						$checked = ' checked="checked"';
+					}
+				}
+				$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
+				$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="custom['.$field->name.'][]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;
+				$i++;
+			}
+			$field->html	= $options;
 		}
-		$field->html	= $options;
 	}
 
 
