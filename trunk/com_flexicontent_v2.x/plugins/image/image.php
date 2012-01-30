@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 943 2011-10-31 02:33:28Z ggppdk $
+ * @version 1.0 $Id: image.php 1079 2012-01-02 00:18:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -176,6 +176,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		global $multiboxadded;
 		$mainframe = &JFactory::getApplication();
+		$view = JRequest::getVar('view');
 		jimport('joomla.filesystem');
 
 		$values = $values ? $values : $field->value;
@@ -185,11 +186,37 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
 		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
 		
+		// Check and disable 'uselegend'
+		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
+  	$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
+  	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
+  	if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
+		
+		// Check and disable 'usepopup'
+		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category'));
+  	$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
+  	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
+  	if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
+		
 		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
 		
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
+		
+		// Allow for thumbnailing of the default image
+		if (!$values || $values[0] == '') {
+			$default_image = $field->parameters->get( 'default_image', '');
+			if ( $default_image !== '' ) {
+				$values[0] = array();
+				$values[0]['is_default_image'] = true;
+				$values[0]['default_image'] = $default_image;
+				$values[0]['originalname'] = basename($default_image);
+				$values[0]['title'] = $values[0]['alt'] = $values[0]['desc'] = $values[0]['urllink'] = '';
+				$values[0] = serialize($values[0]);
+				$field->value[0] = $values[0];
+			}
+		}
 		
 		if ($values && $values[0] != '')
 		{
@@ -280,12 +307,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
 				$i++;
 				
-				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'item'));
+				$view 	= JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 				
 				$thumb_size = 0;
 				if ($view == 'category')
 				  $thumb_size =  $field->parameters->get('thumbincatview',2);
-				if($view == 'item')
+				if($view == FLEXI_ITEMVIEW)
 				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
 				switch ($thumb_size)
 				{
@@ -344,23 +371,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($showdesc) $field->{$prop} .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
 			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
 		} else {
-			$default_image = $field->parameters->get( 'default_image', '');
-			if ( $default_image !== '' ) {
-				
-				$view 	= JRequest::setVar('view', JRequest::getVar('view', 'item'));
-				$thumb_size = 0;
-				if ($view == 'category')
-				  $thumb_size =  $field->parameters->get('thumbincatview',2);
-				if($view == 'item')
-				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
-				
-				$sizes = array('s',  's','m','l');
-				$w = $field->parameters->get('w_'.$sizes[$thumb_size]);
-				$h = $field->parameters->get('h_'.$sizes[$thumb_size]);
-				$field->{$prop} = "<img alt='' title='' src='".JURI::root().$default_image."' width='$w' height='$h' />";
-			} else {
-				$field->{$prop} = '';
-			}
+			$field->{$prop} = '';
 		}
 		// some parameter shortcuts
 	}
@@ -538,11 +549,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	}
 
 
-	function create_thumb( &$field, $filename, $size ) {
+	function create_thumb( &$field, $filename, $size, $onlypath='' ) {
 		// some parameters for phpthumb
-		jimport('joomla.filesystem.file');	
+		jimport('joomla.filesystem.file');
 		$ext 		= strtolower(JFile::getExt($filename));
-		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$onlypath 	= $onlypath ? $onlypath : JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 		$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent') . DS);
 		$prefix		= $size . '_';
 		$w			= $field->parameters->get('w_'.$size);
@@ -663,8 +674,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function rebuildThumbs( &$field, $value )
 	{
 		$filename = $value['originalname'];
-		$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
-		$filepath = $onlypath . $filename;
+		if (empty($value['is_default_image'])) {
+			$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+			$filepath = $onlypath . $filename;
+		} else {
+			$onlypath = JPATH_BASE.DS.dirname($value['default_image']).DS;
+			$filepath = JPATH_BASE.DS.$value['default_image'];
+		}
+		
 		if (!file_exists($filepath)) {
 			echo "Original file seems to have been deleted, cannot find image file: ".$filepath ."<br />\n";
 			return;
@@ -704,7 +721,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				 )
 			 {
 				//echo "SIZE: $size CROP: $crop OLDSIZE(w,h): $filesize_w,$filesize_h  NEWSIZE(w,h): $param_w,$param_h <br />";
-				$this->create_thumb( $field, $filename, $size );
+				$this->create_thumb( $field, $filename, $size, $onlypath );
 			}
 		}
 	}
