@@ -54,16 +54,20 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		// ensure the PHP version is correct
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
+		
+		$option = JRequest::getCMD('option');
+		$task = JRequest::getVar('task', '');
+		if(($option=='com_content')&&($task=='ins_pagebreak')) return;
 
 		$this->trackSaveConf();
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 			global $globalcats;
 			if (FLEXI_CACHE) {
-			// add the category tree to categories cache
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-			$catscache->setCaching(1); 		//force cache
-			$catscache->setLifeTime(84600); //set expiry to one day
-		    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+				// add the category tree to categories cache
+				$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+				$catscache->setCaching(1); 		//force cache
+				$catscache->setLifeTime(84600); //set expiry to one day
+				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}

@@ -54,6 +54,10 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		// ensure the PHP version is correct
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
+		
+		$option = JRequest::getCMD('option');
+		$layout = JRequest::getVar('layout', '');
+		if(($option=='com_content')&&($layout=='pagebreak')) return;
 
 		$this->trackSaveConf();
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
