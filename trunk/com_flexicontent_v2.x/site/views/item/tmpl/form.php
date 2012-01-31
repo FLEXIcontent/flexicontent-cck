@@ -474,7 +474,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 						} else {
 							$height = $this->tparams->get('height', 400);
 							$editor = & JFactory::getEditor();
-							$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array('pagebreak'), 'jform_text' ) ;
+							$field->html = $editor->display( 'jform[text]', $maintext, '100%', $height, '75', '20', array(), 'jform_text' ) ;
 						}
 					}
 			?>
