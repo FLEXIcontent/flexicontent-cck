@@ -117,8 +117,7 @@ class FlexicontentHelperPerm{
 			$rule_string = str_replace("{$dbsection}", "{$section}", $rule_string);
 			$rule = new JRules($rule_string);
 			$actions[$id] = array();
-			//$groups = $user->getAuthorisedGroups();
-			$groups = JAccess::getGroupsByUser($uid, $recursive);
+			$groups = JFactory::getUser($uid)->getAuthorisedGroups();   //$groups = JAccess::getGroupsByUser($uid, $recursive);
 			foreach($rule->getData() as $action=>$data) {
 				if($data->allow($groups)) $actions[$id][] = str_replace("{$extension}.", "", $action);
 			}

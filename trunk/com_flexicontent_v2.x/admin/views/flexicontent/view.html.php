@@ -127,6 +127,7 @@ class FlexicontentViewFlexicontent extends JView
 			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 		= & $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
+			$existauthors			= & $this->get( 'ExistAuthorsTable' );
 			$cachethumb			= & $this->get( 'CacheThumbChmod' );
 			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
@@ -192,6 +193,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata'	, $existversionsdata);
+		$this->assignRef('existauthors'		, $existauthors);
 		$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);

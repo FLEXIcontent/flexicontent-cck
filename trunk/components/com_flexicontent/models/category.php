@@ -91,13 +91,14 @@ class FlexicontentModelCategory extends JModel{
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
+	public function __construct()
 	{
+		// Get category id and call constrcuctor
+		$mainframe = &JFactory::getApplication();
+		$cid			= JRequest::getInt('cid', 0);
+		$this->setId((int)$cid);
 		parent::__construct();
 
-		global $mainframe;
-
-		$cid			= JRequest::getInt('cid', 0);
 		$this->_layout = JRequest::getVar('layout', 'category');
 		
 		if ($this->_layout=='author') {
@@ -109,20 +110,19 @@ class FlexicontentModelCategory extends JModel{
 			}
 			$this->_authorid = $user->id;
 		}
-		
+
 		// we need to merge parameters here to get the correct page limit value
 		$params = $this->_loadCategoryParams($cid);
 
 		//get the number of entries from session
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');		
+		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');
 		$limitstart		= JRequest::getInt('limitstart');
 		
-		$this->setId((int)$cid);
-
+		// set pagination limit variables
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
-		// Get the filter request variables
+		// Set filter order variables
 		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
 	}
@@ -156,15 +156,24 @@ class FlexicontentModelCategory extends JModel{
 			$query = $this->_buildQuery();
 
 			$this->_total = $this->_getListCount($query);
+			if ($this->_db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
+
 			if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
 			} else {
+				$this->setState('limitstart',0);
+				$this->setState('start',0);
+				JRequest::setVar('start',0);
+				JRequest::setVar('limitstart',0);
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
 			}
-			
-			// TODO CHECK THIS
-			//$this->_db->setQuery("SELECT FOUND_ROWS()");
-			//$this->_total = $this->_db->loadResult();
+			if ($this->_db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
 		}
 
 		return $this->_data;
@@ -187,6 +196,19 @@ class FlexicontentModelCategory extends JModel{
 
 		return $this->_total;
 	}
+	
+	/**
+	 * Total nr of Categories
+	 *
+	 * @access public
+	 * @return integer
+	 */
+	function & getParams()
+	{
+		$params = & $this->_loadCategoryParams($this->_id);
+		return $params;
+	}
+
 
 	/**
 	 * Builds the query
@@ -334,21 +356,22 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe, $option, $globalcats;
-	    
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
 		//Get active menu parameters.
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-
+		
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
 
-		if (!$this->_authorid || $this->_id) {
+		if ($this->_id) {
 			// display sub-categories
 			$display_subcats = $cparams->get('display_subcategories_items', 0);
 			
@@ -368,9 +391,7 @@ class FlexicontentModelCategory extends JModel{
 				$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
 			}
 			
-			$_group_cats = array_unique($_group_cats);
-			$this->_group_cats = $_group_cats;
-			$_group_cats = "'".implode("','", $_group_cats)."'";
+			$this->_group_cats = array_unique($_group_cats);
 		}
 		
 		// Get the site default language in case no language is set in the url
@@ -392,36 +413,51 @@ class FlexicontentModelCategory extends JModel{
 		$where = ' WHERE 1=1';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
-		if (!$this->_authorid || $this->_id) {
+		if ($this->_id) {
+			$_group_cats = "'".implode("','", $this->_group_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_group_cats.')';
 		} 
 
-		// Second is to only select items the user has access to
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
+		// Limit to published items. Exceptions when: (a) user is editor, item is created by or modified by the user
+		// THE ABOVE MENTIONED EXCEPTIONS WILL NOT OVERRIDE ACCESS
+		if (FLEXI_J16GE) {
+			$isEditor = $user->authorize('core.edit', 'com_flexicontent');
+		} else {
+			$isEditor = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
+		}
+
+		$states = $isEditor ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
-		// is the content current?
+		// Limit by publication date. Exception: when displaying personal user items or items modified by the user
 		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtercat) {
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 		
-		$where .= ' AND i.sectionid = ' . FLEXI_SECTION;
+		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
-		// filter by permissions
+		// Select only items user has access view, if showing unauthorized items is not enabled
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if ( isset($readperms['item']) && count($readperms['item']) ) {
-					$where .= ' AND ( ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) ) )';
-				} else {
-					$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-				}
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where .= ' AND i.access IN ('.$aid_list.')';
 			} else {
-				$where .= ' AND ( i.access <= '.$gid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if ( isset($readperms['item']) && count($readperms['item']) ) {
+						$where .= ' AND ( ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) ) )';
+					} else {
+						$where .= ' AND ( i.access <= '.$aid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+					}
+				} else {
+					$where .= ' AND ( i.access <= '.$aid.' OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+				}
 			}
 		}
 
@@ -466,6 +502,7 @@ class FlexicontentModelCategory extends JModel{
 				}
 			}
 		}
+		
 		$session  =& JFactory::getSession();
 		$alpha = JRequest::getVar('letter');
 		if($alpha===NULL) {
@@ -550,37 +587,42 @@ class FlexicontentModelCategory extends JModel{
 	function _buildChildsquery()
 	{
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$ordering	= 'ordering ASC';
+		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
-		$andaccess = '';
 		
 		// filter by permissions
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['category']) && count($readperms['category']) ) {
-					$andaccess = ' AND ( c.access <= '.$gid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
-				} else {
-					$andaccess = ' AND c.access <= '.$gid;
-				}
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess = ' AND c.access IN ('.$aid_list.')';
 			} else {
-				$andaccess = ' AND c.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if (isset($readperms['category']) && count($readperms['category']) ) {
+						$andaccess = ' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
+					} else {
+						$andaccess = ' AND c.access <= '.$aid;
+					}
+				} else {
+					$andaccess = ' AND c.access <= '.$aid;
+				}
 			}
 		}
 
 		$query = 'SELECT c.*,'
-				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
-				. ' FROM #__categories AS c'
-				. ' WHERE c.published = 1'
-				. ' AND c.parent_id = '. $this->_id
-				. $andaccess
-				. ' ORDER BY '.$ordering
-				;
+			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
+			. ' FROM #__categories AS c'
+			. ' WHERE c.published = 1'
+			. ' AND c.parent_id = '. $this->_id
+			. $andaccess
+			. ' ORDER BY '.$ordering
+			;
 		return $query;
 	}
 
@@ -592,10 +634,10 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _getassigned($id)
 	{
-		global $mainframe, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
 
 		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
 
 		// Get the category parameters
 		$cparams 	= $this->_category->parameters;
@@ -626,23 +668,36 @@ class FlexicontentModelCategory extends JModel{
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
-		
-		if ($show_itemcount==2) {
-			$where .= ' AND rel.catid = '. $id;
-		} else { // ($show_itemcount==1)
-			$where .= ' AND rel.catid IN ('. (@$globalcats[$id]->descendants?$globalcats[$id]->descendants:"''"). ')';
+		// Limit to published items. Exceptions when: (a) user is editor, item is created by or modified by the user
+		// THE ABOVE MENTIONED EXCEPTIONS WILL NOT OVERRIDE ACCESS
+		if (FLEXI_J16GE) {
+			$isEditor = $user->authorize('core.edit', 'com_flexicontent');
+		} else {
+			$isEditor = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
 		}
+
+		$states = $isEditor ? '1, -5, 0, -3, -4' : '1, -5';
+		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		
+		// Count items according to subcategories included (none,1st level,all level)
+		$_group_cats = "'".implode("','", $this->_group_cats)."'";
+		$where .= ' AND rel.catid IN ('.$_group_cats. ')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int) $gid . ')';
-				$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where .= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
 			} else {
-				$where .= ' AND cc.access <= '.$gid;
-				$where .= ' AND i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int) $aid . ')';
+					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $aid . ')';
+				} else {
+					$where .= ' AND cc.access <= '.$aid;
+					$where .= ' AND i.access <= '.$aid;
+				}
 			}
 		}
 
@@ -671,30 +726,42 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function _getsubs($id)
 	{
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$ordering	= 'ordering ASC';
+		$cparams 	= $this->_category->parameters;
+		$show_noauth	= $cparams->get('show_noauth', 0);
+		$user			= &JFactory::getUser();
 
-		if (FLEXI_ACCESS) {
-		$query = 'SELECT DISTINCTROW sc.*,'
-				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', sc.id, sc.alias) ELSE sc.id END as slug'
-				. ' FROM #__categories as sc'
-				. ' LEFT JOIN #__flexiaccess_acl AS gi ON sc.id = gi.axo AND gi.aco = "read" AND gi.axosection = "category"'
-				. ' WHERE sc.published = 1'
-				. ' AND sc.parent_id = '. (int)$id
-				. ' AND (gi.aro IN ( '.$user->gmid.' ) OR sc.access <= '. (int) $gid . ')'
-				. ' ORDER BY '.$ordering
-				;
-		} else {
-		$query = 'SELECT *,'
-				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
-				. ' FROM #__categories'
-				. ' WHERE published = 1'
-				. ' AND parent_id = '. (int)$id
-				. ' AND access <= '.$gid
-				. ' ORDER BY '.$ordering
-				;
+		// Access
+		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
+		
+		// Where
+		$where = ' WHERE sc.published = 1';
+		$where .= ' AND sc.parent_id = '. (int)$id;
+		if (!$show_noauth) {
+			if (FLEXI_J16GE) {
+				$aid_arr	= $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where .= ' AND sc.access IN ( '.$aid_list.' )';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR sc.access <= '. (int) $aid . ')';
+				} else {
+					$where .= ' AND sc.access <= '.$aid;
+				}
+			}
 		}
+		
+		// Order
+		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
+		$orderby = ' ORDER BY '.$ordering;
+		
+		$query = 'SELECT DISTINCT *,'
+			. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', sc.id, sc.alias) ELSE sc.id END as slug'
+			. ' FROM #__categories as sc'
+			. $joinaccess
+			. $where
+			. $orderby
+			;
 
 		$this->_db->setQuery($query);
 		$this->_subs = $this->_db->loadObjectList();
@@ -738,13 +805,12 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function getCategory()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		//initialize some vars
 		$user		= & JFactory::getUser();
-		$aid		= (int) $user->get('aid');
 		
-		if (!$this->_authorid || $this->_id) {
+		if ($this->_id) {
 			//get categories
 			$query 	= 'SELECT c.*,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
@@ -755,19 +821,28 @@ class FlexicontentModelCategory extends JModel{
 	
 			$this->_db->setQuery($query);
 			$this->_category = $this->_db->loadObject();
-		} else {
+			if ( $this->_db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+				$jAp->enqueueMessage('ERROR URL:<br/>'.JFactory::getURI()->toString(), 'warning' );
+				$jAp->enqueueMessage('Please report to website administrator.','message');
+				$jAp->redirect( 'index.php' );
+			}
+		} else if ($this->_authorid) {
 			$this->_category = new stdClass;
 			$this->_category->published = 1;
 			$this->_category->id = 0;
 			$this->_category->title = '';
 			$this->_category->description = '';
 			$this->_category->slug = '';
+		} else {
+			$this->_category = false;
 		}
 		
 		//Make sure the category is published
-		if (!$this->_category->published)
+		if (!$this->_category)
 		{
-			JError::raiseError(404, JText::sprintf( 'CATEGORY #%d NOT FOUND or NOT PUBLISHED', $this->_id ));
+			JError::raiseError(404, JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id ));
 			return false;
 		}
 		
@@ -775,24 +850,35 @@ class FlexicontentModelCategory extends JModel{
 		$cparams = $this->_category->parameters;
 
 		//check whether category access level allows access
-		$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
+		$canread = true;
+		if ($this->_id) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$canread = in_array($this->_category->access, $aid_arr);
+			} else {
+				$aid = (int) $user->get('aid');
+				$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
+			}
+		}
+		
 		if (!$canread && $this->_id!=0)
 		{
-			if (!$aid) {
+			if($user->guest) {
 				// Redirect to login
 				$uri		= JFactory::getURI();
 				$return		= $uri->toString();
-
-				$url  = $cparams->get('login_page', 'index.php?option=com_user&view=login');
+				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+				$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
 				$url .= '&return='.base64_encode($return);
 
-				$mainframe->redirect($url, JText::_('You must login first') );
+				JError::raiseWarning( 403, JText::_("FLEXI_LOGIN_TO_ACCESS"));
+				$mainframe->redirect( $url );
 			} else {
 				if ($cparams->get('unauthorized_page', '')) {
 					$mainframe->redirect($cparams->get('unauthorized_page'));				
 				} else {
-					JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-					return false;
+					JError::raiseWarning( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
+					$mainframe->redirect( 'index.php' );
 				}
 			}
 		}
@@ -812,6 +898,7 @@ class FlexicontentModelCategory extends JModel{
 		static $params;
 		
 		if ($params === NULL) {
+			jimport("joomla.html.parameter");
 			$mainframe = &JFactory::getApplication();
 			
 			// Retrieve author parameters if using displaying AUTHOR pseudo-view
@@ -859,7 +946,7 @@ class FlexicontentModelCategory extends JModel{
 	
 			if ($this->_layout=='myitems') {
 				$clayout = JRequest::getVar('clayout', 'default');
-				 $params->set('clayout', $clayout);
+				$params->set('clayout', $clayout);
 			}
 		}
 		
@@ -876,28 +963,36 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function getFilters()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
-		$user 		= &JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$params 	= $this->_loadCategoryParams($this->_id);
-		$scope		= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
+		$user		= &JFactory::getUser();
+		$params	= $this->_loadCategoryParams($this->_id);
+		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
 		$filters	= null;
 		
-		if (FLEXI_ACCESS) {
-			$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-			if (isset($readperms['field']) && count($readperms['field']) ) {
-				$where = ' AND ( fi.access <= '.$gid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
-			} else {
-				$where = ' AND fi.access <= '.$gid;
-			}
+		if (FLEXI_J16GE) {
+			$aid_arr = $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			$where = ' AND fi.access IN ('.$aid_list.') ';
 		} else {
-			$where = ' AND fi.access <= '.$gid;
+			$aid = (int) $user->get('aid');
+			
+			if (FLEXI_ACCESS) {
+				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+				if (isset($readperms['field']) && count($readperms['field']) ) {
+					$where = ' AND ( fi.access <= '.$aid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
+				} else {
+					$where = ' AND fi.access <= '.$aid;
+				}
+			} else {
+				$where = ' AND fi.access <= '.$aid;
+			}
 		}
 		
 		$query  = 'SELECT fi.*'
 				. ' FROM #__flexicontent_fields AS fi'
 				. ' WHERE fi.published = 1'
+				. ' AND fi.isfilter = 1'
 				. $where
 				. $scope
 				. ' ORDER BY fi.ordering, fi.name'
@@ -905,7 +1000,8 @@ class FlexicontentModelCategory extends JModel{
 			$this->_db->setQuery($query);
 			$filters = $this->_db->loadObjectList('name');
 
-		foreach ($filters as $filter) {
+		foreach ($filters as $filter)
+		{
 			$filter->parameters = new JParameter($filter->attribs);
 		}
 		
@@ -976,62 +1072,34 @@ class FlexicontentModelCategory extends JModel{
 	}
 
 	/**
-	* Method to build the alphabetical index
-	*
-	* @access public
-	* @return string
-	* @since 1.5
-	*/
-	function getAlphaindex()
+	 * Method to build the alphabetical index
+	 * 
+	 * @access public
+	 * @return array
+	 * @since 1.5
+	 */
+ 	function getAlphaindex()
 	{
-		global $mainframe;
+		$where			= $this->_buildItemWhere();
 		
-		$user      = & JFactory::getUser();
-		$gid      = (int) $user->get('aid');
-
-		// Get the site default language in case no language is set in the url
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
-		
-		$now = $mainframe->get('requestTime');
-		$nullDate = $this->_db->getNullDate();
-		
-		// Get the category parameters
-		$cparams    = $this->_category->parameters;
-		// show unauthorized items
-		$show_noauth = $cparams->get('show_noauth', 0);
-		
-		// Filter the category view with the active active language
-		$and 	= FLEXI_FISH ? ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) : '';
-		$and2 = $show_noauth ? '' : ' AND c.access <= '.$gid.' AND i.access <= '.$gid;
-		
-		//Is the content current
-		$and3 = ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
-		$and3.= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
-		
-		$_group_cats = implode("','", $this->_group_cats);
-		$query   	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
+		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id IN (\''. $_group_cats .'\')'
-				. ' WHERE rel.catid IN (\''. $_group_cats .'\')'
-				. $and
-				. ' AND i.state IN (1, -5)'
-				. ' AND i.sectionid = '.FLEXI_SECTION
-				. $and2
-				. $and3
+				. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. $where
 				. ' GROUP BY alpha'
 				. ' ORDER BY alpha ASC'
 				;
 		$this->_db->setQuery($query);
 		$alpha = $this->_db->loadResultArray();
+		if ($this->_db->getErrorNum()) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		}
 		return $alpha;
-   }
+	}
 }
 ?>

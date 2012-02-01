@@ -168,6 +168,27 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			}
 		});
 <?php endif; ?>
+<?php if (!$this->existauthors) : ?>
+		$('existauthors').addEvent('click', function(e) {
+			e = new Event(e).stop();
+			var url = "index.php?option=com_flexicontent&task=createauthorstable&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+			if(MooTools.version>="1.2.4") {
+				$('existauthors-log').set('html', ajaxloader);
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('existauthors-log')
+				}).send();
+			}else{
+				$('existauthors-log').set('html',ajaxloader);
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('existauthors-log')
+				});
+				ajax.request.delay(500, ajax);
+			}
+		});
+<?php endif; ?>
 <?php if(!$this->cachethumb) : ?>
 		$('cachethumb').addEvent('click', function(e) {
 			e = new Event(e).stop();
@@ -330,6 +351,14 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 		<td id="existversionsdata-log">
 			<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
+		</td>
+		<td id="existauthors-log">
+			<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 972 2011-11-23 04:24:23Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1114 2012-01-18 14:07:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -33,7 +33,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getFields($items, $view = 'item', $params = null, $aid = 0)
+	function & getFields(&$items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0)
 	{
 		if (!is_array($items)) {
 			$rows[] = $items;
@@ -42,7 +42,6 @@ class FlexicontentFields
 		if (!$items) return $items;
 
 		$user 		= &JFactory::getUser();
-		$gid		= max ($user->getAuthorisedViewLevels());
 
 		$mainframe	= &JFactory::getApplication();
 		$cparams	=& $mainframe->getParams('com_flexicontent');
@@ -84,26 +83,25 @@ class FlexicontentFields
 					$items[$i]->tags[] = $tag;
 				}
 			}
-
-			//if (FLEXI_ACCESS) {
-			//	if ((($user->gmid == '0') || ($user->gmid == '0,1')) && FLEXI_CACHE) {
-			//		$hits = $items[$i]->hits;
-			//		$items[$i]->hits = 0;
-			//		$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
-			//		$items[$i]->hits = $hits;
-			//	} else {
-			//		$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
-			//	}
-			//} else {
-				if (FLEXI_CACHE) {
-					$hits = $items[$i]->hits;
-					$items[$i]->hits = 0;
-					$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
-					$items[$i]->hits = $hits;
-				} else {
-					$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
-				}
-			//}
+			
+			// Apply the fields cache to public or just registered users
+			$apply_cache = true;
+			if (FLEXI_ACCESS) {
+				$apply_cache = $user->gmid == '0' || $user->gmid == '0,1';
+			} else if (FLEXI_J16GE) {
+				$apply_cache = max($user->getAuthorisedGroups()) <= 1;
+			} else {
+				$apply_cache = $user->gid <= 18;
+			}
+			
+			if ( $apply_cache && FLEXI_CACHE ) {
+				$hits = $items[$i]->hits;
+				$items[$i]->hits = 0;
+				$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
+				$items[$i]->hits = $hits;
+			} else {
+				$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
+			}
 
 			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
 			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
@@ -134,16 +132,15 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getItemFields($item, $var, $aid)
+	function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=0)
 	{
 		$db =& JFactory::getDBO();
 
 		$mainframe = &JFactory::getApplication();
 		if (!$item) return;
+		if (!FLEXI_J16GE && $item->sectionid != FLEXI_SECTION) return;
 
 		$user 		= &JFactory::getUser();
-		$gid_a		= $user->getAuthorisedViewLevels();
-		$gids		= "'".implode("','", $gid_a)."'";
 		$dispatcher = &JDispatcher::getInstance();
 
 		$favourites	= $var['favourites'];
@@ -152,10 +149,17 @@ class FlexicontentFields
 		$author		= $var['authors'];
 		$typename	= $var['typenames'];
 		$vote		= $var['votes'];
-
-		//$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $gid . ')' : ' AND fi.access <= '.$gid ;
-		$andaccess 	= ' AND fi.access IN ('.$gids.')' ;
-		$joinaccess	= '' ;
+		
+		if (FLEXI_J16GE) {
+			$aid_arr = ($aid && is_array($aid)) ? $aid : $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			$andaccess 	= ' AND fi.access IN ('.$aid_list.')' ;
+			$joinaccess = '';
+		} else {
+			$aid = $aid ? $aid : (int) $user->get('aid');
+			$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ')' : ' AND fi.access <= '.$aid ;
+			$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+		}
 
 		$query 	= 'SELECT fi.*'
 				. ' FROM #__flexicontent_fields AS fi'
@@ -278,7 +282,7 @@ class FlexicontentFields
 			$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
 
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
-				$field->text = isset($field->display) ? $field->display : '';
+				$field->text = isset($field->{$method}) ? $field->{$method} : '';
 				$field->title = $item->title;
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
@@ -298,7 +302,7 @@ class FlexicontentFields
 				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
-				if ($flexiview == 'item') {
+				if ($flexiview == FLEXI_ITEMVIEW) {
 				  JRequest::setVar('view', 'article');
 				  JRequest::setVar('option', 'com_content');
 				}
@@ -309,13 +313,13 @@ class FlexicontentFields
 					$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 				
 				// Set the view and option back to items and com_flexicontent
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'item');
+				if ($flexiview == FLEXI_ITEMVIEW) {
+				  JRequest::setVar('view', FLEXI_ITEMVIEW);
 				  JRequest::setVar('option', 'com_flexicontent');
 				}
 				
 				$field->id = $field->fieldid;
-				$field->display = $field->text;
+				$field->{$method} = $field->text;
 			}
 		}
 		else
@@ -325,7 +329,7 @@ class FlexicontentFields
 			$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			
 			if ($field->parameters->get('trigger_onprepare_content', 0)) {
-				$field->text = isset($field->display) ? $field->display : '';
+				$field->text = isset($field->{$method}) ? $field->{$method} : '';
 				$field->title = $item->title;
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
@@ -345,20 +349,20 @@ class FlexicontentFields
 				$field->state = $item->state;
 
 				// Set the view and option to article and com_content
-				if ($flexiview == 'item') {
+				if ($flexiview == FLEXI_ITEMVIEW) {
 				  JRequest::setVar('view', 'article');
 				  JRequest::setVar('option', 'com_content');
 				}
 				JRequest::setVar("isflexicontent", "yes");
 				$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 				// Set the view and option back to items and com_flexicontent
-				if ($flexiview == 'item') {
-				  JRequest::setVar('view', 'item');
+				if ($flexiview == FLEXI_ITEMVIEW) {
+				  JRequest::setVar('view', FLEXI_ITEMVIEW);
 				  JRequest::setVar('option', 'com_flexicontent');
 				}
 				
 				$field->id = $field->fieldid;
-				$field->display = $field->text;
+				$field->{$method} = $field->text;
 			}
 		}
 		
@@ -373,15 +377,15 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderPositions($items, $view = 'item', $params = null)
+	function & renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null)
 	{
 		if (!$items) return;
 		if (!$params) return $items;
 		
 		if ($view == 'category')	$layout = 'clayout';
-		if ($view == 'item') 		$layout = 'ilayout';
+		if ($view == FLEXI_ITEMVIEW) 		$layout = 'ilayout';
 
-		if ($view == 'category' || $view == 'item') {
+		if ($view == 'category' || $view == FLEXI_ITEMVIEW) {
 		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
 		}	else { // $view == 'module', or other
 			// Create a fake template position, for module fields
@@ -402,7 +406,7 @@ class FlexicontentFields
 			    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');
 			  }
 				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
-				else if ($view == 'item') {
+				else if ($view == FLEXI_ITEMVIEW) {
 					foreach ($items[$i]->fields as $field) {
 						if ($field->iscore) {
 							$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display');

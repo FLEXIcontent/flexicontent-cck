@@ -103,7 +103,7 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
-			<field name="login_page" type="text" size="50" default="index.php?option=com_user&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" menu="hide" />
+			<field name="login_page" type="text" size="50" default="index.php?option=com_users&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" menu="hide" />
 			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" menu="hide" />
 			
 			<field name="separator6" label="" type="separator" default="FLEXI_ITEMS_CONF" level="level1" menu="hide" />
