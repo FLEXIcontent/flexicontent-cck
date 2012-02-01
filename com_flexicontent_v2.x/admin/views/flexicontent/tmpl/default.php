@@ -21,7 +21,8 @@ $mainframe = &JFactory::getApplication();
 $template	= $mainframe->getTemplate();
 $option = JRequest::getVar('option');
 // ensures the PHP version is correct
-if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+if (version_compare(PHP_VERSION, '5.0.0', '<'))
+{
 	echo '<div class="fc-error">';
 	echo JText::_( 'FLEXI_UPGRADE_PHP' ) . '<br />';
 	echo '</div>';

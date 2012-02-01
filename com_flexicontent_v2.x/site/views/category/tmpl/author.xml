@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="FLEXICONTENT_CATEGORY">
+	<layout title="FLEXICONTENT_AUTHOR">
 		<message>
-			<![CDATA[FLEXICONTENT_CATEGORY_TIP]]>
+			<![CDATA[FLEXICONTENT_AUTHOR_TIP]]>
 		</message>
 	</layout>
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" required="required" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
+			<field name="authorid" type="author" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC" />
+			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">

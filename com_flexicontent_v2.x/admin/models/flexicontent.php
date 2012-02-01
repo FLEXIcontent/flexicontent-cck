@@ -362,6 +362,23 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
+	 * Method to check if the versions table is created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistAuthorsTable()
+	{
+		static $return;
+		if($return === NULL) {
+			$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_authors_ext');
+			$this->_db->setQuery($query);
+			$return = $this->_db->loadResult() ? true : false;
+		}
+		return $return;
+	}
+
+	/**
 	 * Method to check if the system plugin is installed
 	 *
 	 * @access public

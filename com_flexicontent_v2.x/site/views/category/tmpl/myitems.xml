@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="FLEXICONTENT_CATEGORY">
+	<layout title="FLEXICONTENT_MYITEMS">
 		<message>
-			<![CDATA[FLEXICONTENT_CATEGORY_TIP]]>
+			<![CDATA[FLEXICONTENT_MYITEMS_TIP]]>
 		</message>
 	</layout>
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" required="required" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />
+			<field name="clayout" type="categorylayout" label="FLEXI_CHOOSE_MY_ITEMS_LAYOUT" description="FLEXI_CHOOSE_MY_ITEMS_LAYOUT_DESC" />
 		</fieldset> 
 	</fields>
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">

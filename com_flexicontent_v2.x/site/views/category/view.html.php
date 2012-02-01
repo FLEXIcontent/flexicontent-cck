@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 371 2010-07-21 06:50:10Z enjoyman $
+ * @version 1.5 stable $Id: view.html.php 1109 2012-01-16 01:05:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -52,12 +52,8 @@ class FlexicontentViewCategory extends JView
 		$uri 		= & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
 		$user		= & JFactory::getUser();
-		$aid		= max ($user->getAuthorisedViewLevels());
+		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 
-		// Request variables
-		$limitstart		= JRequest::getInt('limitstart');
-		$format			= JRequest::getVar('format', null);
-		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -79,19 +75,26 @@ class FlexicontentViewCategory extends JView
 		$alpha	 	= & $this->get('Alphaindex');
 		$model		= & $this->getModel();
 		
+		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
+		$limitstart		= JRequest::getInt('limitstart');
+		$format			= JRequest::getVar('format', null);
+		
 		$cparams	=& $category->parameters;
 		$params->merge($cparams);
-		
-		$groups	= $user->getAuthorisedViewLevels();
-		if (!in_array($category->access, $groups)) {
-			return JError::raiseError(403, JText::_('JERROR_ALERTNOAUTHOR'));
-		}
 
 		$total 		= & $this->get('Total');
-
+		
+		$authorid = JRequest::getInt('authorid', 0);
+		$layout = JRequest::getInt('layout', 0);
+		$authordescr_item = false;
+		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
+			$authordescr_item = & $this->get('AuthorDescrItem');
+			list($authordescr_item) = FlexicontentFields::getFields($authordescr_item, 'items', $params, $aid);
+		}
+		
 		// Bind Fields
 		if ($format != 'feed') {
-			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
+			$items 	= & FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
 		//Set layout
@@ -123,13 +126,15 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$params->set('page_title',	$category->title);
 		}
-
-		// Add Site Name to page title
-		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
-		}
-		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		
+		if (FLEXI_J16GE) {
+			// Add Site Name to page title
+			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+			}
+			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+				$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+			}
 		}
 		
 		// pathway construction @TODO try to find and automated solution
@@ -178,6 +183,43 @@ class FlexicontentViewCategory extends JView
 		
 		$themes		= flexicontent_tmpl::getTemplates();
 		
+		$authordescr_item_html = false;
+		if ($authordescr_item) {
+			
+			//echo "<pre>"; print_r($authordescr_item);exit();
+			$ilayout = $authordescr_item->params->get('ilayout', '');
+			if ($ilayout==='') {
+				$type = & JTable::getInstance('flexicontent_types', '');
+				$type->id = $authordescr_item->type_id;
+				$type->load();
+				$type->params = new JParameter($type->attribs);
+				$ilayout = $type->params->get('ilayout', 'default');
+				//echo "<pre>"; print_r($type);exit();
+			}
+			
+			// start capturing output into a buffer
+			$this->item = & $authordescr_item; 
+			$this->params = & $authordescr_item->params;
+			$this->tmpl = '.item.'.$ilayout;
+			$this->print_link = JRoute::_('index.php?view=items&id='.$authordescr_item->slug.'&pop=1&tmpl=component');
+			
+			ob_start();
+			// include the requested template filename in the local scope
+			// (this will execute the view logic).
+			if ( file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
+				include JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
+			else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
+				include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
+			else
+				include JPATH_COMPONENT.DS.'templates'.DS.'default'.DS.'item.php';
+			
+			// done with the requested template; get the buffer and
+			// clear it.
+			$authordescr_item_html = ob_get_contents();
+			ob_end_clean();
+		}
+		//echo $authordescr_item_html; exit();
+		
 		if ($params->get('clayout')) {
 			// Add the templates css files if availables
 			if (isset($themes->category->{$params->get('clayout')}->css)) {
@@ -217,7 +259,12 @@ class FlexicontentViewCategory extends JView
 	
 			// Allow to trigger content plugins on category description
 			$category->text			= $category->description;
-			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
+			if (FLEXI_J16GE) {
+				$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
+			} else {
+				$results = $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			}
+			
 			$category->description 	= $category->text;
 		}
 
@@ -230,7 +277,7 @@ class FlexicontentViewCategory extends JView
 			$item->event 	= new stdClass();
 			$item->params 	= new JParameter($item->attribs);
 			
-			// !!! The triggering of the event onContentPrepare of content plugins
+			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
 			// !!! fields is handled by flexicontent.fields.php
 			// !!! Had serious performance impact
@@ -350,11 +397,12 @@ class FlexicontentViewCategory extends JView
 
 		$this->assign('action', 			$uri->toString());
 
-		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.'&pop=1&tmpl=component');
+		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , 	$categories);
 		$this->assignRef('items' , 			$items);
+		$this->assignRef('authordescr_item_html' , $authordescr_item_html);
 		$this->assignRef('category' , 		$category);
 		$this->assignRef('limitstart' , 	$limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);

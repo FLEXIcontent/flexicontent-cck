@@ -170,3 +170,11 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `search_index` longtext NOT NULL,
   PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
+  `user_id` int(11) unsigned NOT NULL,
+  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY  (`user_id`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
