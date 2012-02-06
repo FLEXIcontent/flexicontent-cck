@@ -105,12 +105,12 @@
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" menu="hide" />
-			<field name="thumbinitemview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
+			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
 				<option value="1">Small</option>
 				<option value="2">Medium</option>
 				<option value="3">Large</option>
 			</field>
-			<field name="thumbincatview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
+			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
 				<option value="1">Small</option>
 				<option value="2">Medium</option>
 				<option value="3">Large</option>

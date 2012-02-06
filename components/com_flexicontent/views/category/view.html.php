@@ -52,12 +52,8 @@ class FlexicontentViewCategory extends JView
 		$uri 		= & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
 		$user		= & JFactory::getUser();
-		$aid		= (int) $user->get('aid');
+		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 
-		// Request variables
-		$limitstart		= JRequest::getInt('limitstart');
-		$format			= JRequest::getVar('format', null);
-		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -79,12 +75,17 @@ class FlexicontentViewCategory extends JView
 		$alpha	 	= & $this->get('Alphaindex');
 		$model		= & $this->getModel();
 		
+		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
+		$limitstart		= JRequest::getInt('limitstart');
+		$format			= JRequest::getVar('format', null);
+		
 		$cparams	=& $category->parameters;
 		$params->merge($cparams);
 
 		$total 		= & $this->get('Total');
 		
 		$authorid = JRequest::getInt('authorid', 0);
+		$layout = JRequest::getInt('layout', 0);
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
 			$authordescr_item = & $this->get('AuthorDescrItem');
@@ -93,7 +94,7 @@ class FlexicontentViewCategory extends JView
 		
 		// Bind Fields
 		if ($format != 'feed') {
-			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
+			$items 	= & FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
 		//Set layout
@@ -124,6 +125,16 @@ class FlexicontentViewCategory extends JView
 			}
 		} else {
 			$params->set('page_title',	$category->title);
+		}
+		
+		if (FLEXI_J16GE) {
+			// Add Site Name to page title
+			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+			}
+			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+				$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+			}
 		}
 		
 		// pathway construction @TODO try to find and automated solution
@@ -248,7 +259,12 @@ class FlexicontentViewCategory extends JView
 	
 			// Allow to trigger content plugins on category description
 			$category->text			= $category->description;
-			$results 				= $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			if (FLEXI_J16GE) {
+				$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
+			} else {
+				$results = $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			}
+			
 			$category->description 	= $category->text;
 		}
 
@@ -261,7 +277,7 @@ class FlexicontentViewCategory extends JView
 			$item->event 	= new stdClass();
 			$item->params 	= new JParameter($item->attribs);
 			
-			// !!! The triggering of the event onPrepareContent of content plugins
+			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
 			// !!! fields is handled by flexicontent.fields.php
 			// !!! Had serious performance impact
