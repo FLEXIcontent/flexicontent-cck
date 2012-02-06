@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 1072 2011-12-26 13:27:52Z ggppdk $
+ * @version 1.0 $Id: fcpagenav.php 1082 2012-01-03 01:52:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -41,8 +41,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		if($field->field_type != 'fcpagenav') return;
 
 		$mainframe =& JFactory::getApplication();
-		$view = JRequest::getString('view', 'item');
-		if ($view != 'item') return;
+		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
+		if ($view != FLEXI_ITEMVIEW) return;
 		
 		// Global parameters
 		$gparams 	=& $mainframe->getParams('com_flexicontent');
@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$cid		= JRequest::getInt('cid');
 		$id			= JRequest::getInt('id');
 	
-		if (($view == 'item') && ($option == 'com_flexicontent'))
+		if (($view == FLEXI_ITEMVIEW) && ($option == 'com_flexicontent'))
 		{
 
 			$html 		= '';
@@ -86,12 +86,11 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$date		=& JFactory::getDate();
 			$config 	= & JFactory::getConfig();
 			$now 		= $date->toMySQL();
-			$gid		= max ($user->getAuthorisedViewLevels());
 	
 			if ($use_tooltip)
 				JHTML::_('behavior.tooltip');
 			if ($load_css)
-				$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/fcpagenav/fcpagenav/fcpagenav.css');	
+				$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
 
 			// get active category ordering
 			$query 	= 'SELECT params FROM #__categories WHERE id = ' . ($cid ? $cid : $item->catid);
@@ -100,15 +99,22 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$cparams = new JParameter($catparams);
 			
 			// filter depending on permissions
-			if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (count(@$readperms['item']) > 0) {
-					$andaccess = ' AND ( a.access <= '.$gid.' OR a.id IN ('.implode(",", $readperms['item']).') )';
-				} else {
-					$andaccess = ' AND a.access <= '.$gid;
-				}
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess = ' AND a.access IN ('.$aid_list.')';
 			} else {
-				$andaccess = ' AND a.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if ( isset($readperms['item']) && count($readperms['item']) ) {
+						$andaccess = ' AND ( ( a.access <= '.$aid.' OR a.id IN ('.implode(",", $readperms['item']).') OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) ) )';
+					} else {
+						$andaccess = ' AND ( a.access <= '.$aid.' OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) )';
+					}
+				} else {
+					$andaccess = ' AND ( a.access <= '.$aid.' OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) )';
+				}
 			}
 
 			// Determine sort order
@@ -170,8 +176,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$db->setQuery($query);
 			$list = $db->loadObjectList('id');
 			if ($db->getErrorNum()) {
-				echo $query."<br/><br/>";
-				echo $db->getErrormsg()."<br/><br/>";
+				JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
 			}
 
 			// this check needed if incorrect Itemid is given resulting in an incorrect result
@@ -229,6 +234,17 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 
 				$html 	 = '<span class="pagination">';
 
+				if ($use_category_link)
+				{
+					$limit = $cparams->get('limit', 4);
+					$limit = $limit ? $limit : 4;
+					$start = floor($location / $limit)*$limit;
+					$html .= '
+					<span class="return_category">
+						<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
+					</span>';
+				}
+
 				if ($field->prev)
 				{
 					$prev_count = $show_prevnext_count ? '&nbsp;['.($location).']' : '';
@@ -238,18 +254,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					</span>'
 					;
 				}
-				if ($use_category_link)
-					{
-					$limit = $cparams->get('limit', 4);
-					$limit = $limit ? $limit : 4;
-					$start = floor($location / $limit)*$limit;
-					$html .= '
-					<span class="return_category">
-						<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
-					</span>';
-					
-					}
-			
+
 				if ($field->next)
 				{
 					$next_count = $show_prevnext_count ? '&nbsp;['.(count($list)-$location-1).']' : '';
