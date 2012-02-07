@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1035 2011-12-09 00:16:50Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1117 2012-01-21 15:48:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,6 +37,8 @@ $user =& JFactory::getUser();
 	
 	function adminFormPrepare(form) {
 		var extra_action = '';
+		var var_sep = form.action.match(/\?/) ? '&' : '?';
+		
 		for(i=0; i<form.elements.length; i++) {
 			
 			var element = form.elements[i];
@@ -47,7 +49,8 @@ $user =& JFactory::getUser();
 			
 			var matches = element.name.match(/(filter[.]*|letter)/);
 			if (matches && element.value != '') {
-			  extra_action += '&' + element.name + '=' + element.value;
+			  extra_action += var_sep + element.name + '=' + element.value;
+			  var_sep = '&';
 			}
 		}
 		form.action += extra_action;   //alert(extra_action);

@@ -37,6 +37,8 @@ $user =& JFactory::getUser();
 	
 	function adminFormPrepare(form) {
 		var extra_action = '';
+		var var_sep = form.action.match(/\?/) ? '&' : '?';
+		
 		for(i=0; i<form.elements.length; i++) {
 			
 			var element = form.elements[i];
@@ -47,7 +49,8 @@ $user =& JFactory::getUser();
 			
 			var matches = element.name.match(/(filter[.]*|letter)/);
 			if (matches && element.value != '') {
-			  extra_action += '&' + element.name + '=' + element.value;
+			  extra_action += var_sep + element.name + '=' + element.value;
+			  var_sep = '&';
 			}
 		}
 		form.action += extra_action;   //alert(extra_action);
