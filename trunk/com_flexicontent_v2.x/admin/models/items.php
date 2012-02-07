@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 964 2011-11-19 11:49:42Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1120 2012-01-25 08:19:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -167,8 +167,9 @@ class FlexicontentModelItems extends JModel
 	{
 		$status = array();
 		
-		$query 	= 'SELECT c.id FROM #__content as c JOIN #__categories as cat ON c.catid=cat.id'
-				. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
+		$query 	= 'SELECT c.id FROM #__content as c'
+					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -199,10 +200,6 @@ class FlexicontentModelItems extends JModel
 		$status['allcat'] 		= $allcat;
 		$status['nocat'] 		= array_diff($allids,$allcat);
 		$status['countnocat'] 	= count($status['nocat']);
-//		$status['allfi'] 		= $allfi;
-//		$status['nofi'] 		= array_diff($allids,$allfi);
-//		$status['countnofi'] 	= count($status['nofi']);
-//		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat'],$status['nofi']));
 		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
 		$status['countno'] 		= count($status['no']);
 		
@@ -221,9 +218,11 @@ class FlexicontentModelItems extends JModel
 
 		if ($status['no']) {
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
-			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state, c.language FROM #__content as c'
-					. ' JOIN #__categories as cat ON c.catid=cat.id' 
-					. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" '
+			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state'
+					. (FLEXI_J16GE ? ', c.language' : '')
+					. ' FROM #__content as c'
+					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -272,7 +271,8 @@ class FlexicontentModelItems extends JModel
 		$itemext = array();
 		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-			$ilang = $row->language ? $row->language : $lang;
+			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $lang;
+			else $ilang = $lang;  // J1.5 has no language setting
 			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
 			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
@@ -331,7 +331,7 @@ class FlexicontentModelItems extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$lang		= /*FLEXI_FISH ?*/ 'ie.language AS lang, ' /*: ''*/;
+		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
 		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
@@ -405,9 +405,9 @@ class FlexicontentModelItems extends JModel
 		$filter_subcats		= JRequest::getInt('filter_subcats', 0, 'post');
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
-		//}
+		}
 		$filter_authors 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'int' );
 		$scope			 	= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', '', 'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', '', 'string' );
@@ -515,11 +515,11 @@ class FlexicontentModelItems extends JModel
 			$where[] = 'i.id = ' . $filter_id;
 			}
 
-		//if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ( $filter_lang ) {
 				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
 			}
-		//}
+		}
 		
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
@@ -842,7 +842,8 @@ class FlexicontentModelItems extends JModel
 			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle from #__content AS c'
 					. ' LEFT JOIN #__categories AS cat on cat.id = c.catid'
 					. ' WHERE c.state = -4'
-					. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" AND c.created_by = ' . (int) $user->get('id')
+					. ' AND c.created_by = ' . (int) $user->get('id')
+					. (FLEXI_J16GE ? ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 					. ' AND c.id IN ( '. implode(',', $cid).' )'
 					. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
 					;
@@ -1198,7 +1199,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function candelete($cid = array()) {
+	function candelete($cid = array())
+	{
 		$user = JFactory::getUser();
 
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -1206,7 +1208,8 @@ class FlexicontentModelItems extends JModel
 		if($permission->CanConfig) return true;
 
 		$n		= count( $cid );
-		if ($n) {
+		if ($n)
+		{
 			$query = 'SELECT id, catid, created_by FROM #__content'
 			. ' WHERE id IN ( '. implode(',', $cid) . ' )'
 			;
@@ -1333,7 +1336,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function saveaccess($id, $access) {
+	function saveaccess($id, $access)
+	{
 		$mainframe = &JFactory::getApplication();
 		$row =& JTable::getInstance('flexicontent_items', '');
 
@@ -1365,7 +1369,8 @@ class FlexicontentModelItems extends JModel
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND rel.itemid = '.(int)$id
+				. ' WHERE rel.itemid = '.(int)$id
+					. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 				;
 	
 		$this->_db->setQuery( $query );
@@ -1490,7 +1495,8 @@ class FlexicontentModelItems extends JModel
 	 * @since 1.5
 	 */
 	 
-	function import() {
+	function import()
+	{
 		jimport('joomla.utilities.simplexml');
 		// Get the site default language
 		$languages =& JComponentHelper::getParams('com_languages');

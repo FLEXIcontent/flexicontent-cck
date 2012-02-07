@@ -836,7 +836,6 @@ class ParentClassItem extends JModelAdmin {
 		}
 		if ($fields) {
 			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
-			//$files		= $data['files'];
 			$searchindex = '';
 			
 			// SET THE real name of categories. The name is categories not cid
@@ -845,9 +844,17 @@ class ParentClassItem extends JModelAdmin {
 			$data['custom'] = JRequest::getVar('custom', array(), 'post', 'array');
 			
 			foreach($fields as $field) {
+				// Field's posted data have different location if not CORE (aka custom field)
+				if ($field->iscore) {
+					$postdata = & $data;
+				} else {
+					$postdata = & $data['custom'];
+				}
+				
 				// process field mambots onBeforeSaveField
-				$fkey = $field->iscore?'jform':'custom';
-				$results = $mainframe->triggerEvent('onBeforeSaveField', array( &$field, &$data[$fkey][$field->name], &$files[$field->name] ));
+				//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField',array( $field, &$postdata[$field->name], &$files[$field->name] ));
 
 				// add the new values to the database 
 				if (is_array(@$data[$field->name])) {
@@ -871,7 +878,9 @@ class ParentClassItem extends JModelAdmin {
 					$this->saveFieldItem($item->id, $field->id, $data['custom'][$field->name], $isnew, $field->iscore, ($data['vstate']==2));
 				}
 				// process field mambots onAfterSaveField
-				$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$data[$field->name], &$files['jform'][$field->name] ));
+				//$results	 = $dispatcher->trigger('onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField',array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				$searchindex 	.= @$field->search;
 			}
 			

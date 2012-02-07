@@ -254,10 +254,10 @@ div.flexi_edit .flexi_buttons {
 	float: right;
 }
 div.flexi_edit .flexi_label {
-	width: 9em;
 	display: block;
 	float: left;
 	vertical-align: middle;
+	width: 9em;
 }
 div.flexi_edit .flexi_label.invalid {
 	font-weight: bold;
@@ -300,9 +300,9 @@ div.flexi_box_right {
 /* Access */
 fieldset.flexiaccess legend {
 	background: url(../../../../administrator/components/com_flexicontent/assets/images/toggle_blue.png) no-repeat 98% 50%;
-	cursor: pointer;
-	line-height: 18px;
 	padding-right: 22px;
+	line-height: 18px;
+	cursor: pointer;
 }
 
 
@@ -525,6 +525,7 @@ div.current dd {
 }
 
 /* Alpha Index */
+
 #fc_alpha {
 	clear: both;
 	float: left;
@@ -543,11 +544,13 @@ div.current dd {
 	position: relative;
 }
 
+/* default alpha character group classes */
 #fc_alpha .letters, #fc_alpha .numbers {
 }
- 
+   
+/* class of individual alpha characters */
 #fc_alpha .fc_alpha_index {
-	background: #efefef; /* class of individual alpha characters */
+	background: #efefef;
 	border: 1px solid #c0c0c0;
 	float: left;
 	margin-right: 2px;
@@ -584,18 +587,18 @@ div.current dd {
 }
 
 .empty_image {
-	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
-	border: 1px solid silver;
 	display: block;
-	margin-bottom: 3px;
+	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
+	border:1px solid silver;
+	margin-bottom:3px;
 }
 
 /* Buttons */
 .button-add a {
-	background: #efefef;
-	border: 1px solid #ccc;
 	display: inline-block;
 	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
 }
 .button-add a,
 .button-add a:visited,
@@ -606,24 +609,24 @@ div.current dd {
 }
 
 #fc_alpha .fc_alpha_index.current {
+	margin-left:12px;
+	margin-right:12px;
 	color: darkred;
-	margin-left: 12px;
-	margin-right: 12px;
 }
 
 .fc_img_tooltip_title {
-	font-weight: bold;
-	line-height: 1em;
+	line-height:1em;
+	font-weight:bold;
 }
 .fc_img_tooltip_desc {
 	line-height:1em;
 }
 
 .fc_search_label_cell {
-	background-color: #eeeeee;
-	font-weight: bold;
+	text-align:right;
 	padding: 4px 6px 4px 4px;
-	text-align: right;
+	font-weight:bold;
+	background-color:#eeeeee;
 }
 
 .fc_search_option_cell {
@@ -641,8 +644,8 @@ div.current dd {
 
 fieldset.fc_search_set {
 	border: 1px outset black;
-	margin-top: 12px;
 	padding: 8px 8px 8px 16px;
+	margin-top:12px;
 }
 
 fieldset.fc_search_set legend {
@@ -672,12 +675,12 @@ fieldset#fc_search_set_search_behavior legend {
 }
 
 button.fc_button {
+	margin: 1px solid gray;
+	padding: 2px;
+	margin: 0px;
+	overflow: visible;
 	font-size: 90%;
 	font-weight: bold;
-	margin: 0px;
-	margin: 1px solid gray;
-	overflow: visible;
-	padding: 2px;
 }
 
 

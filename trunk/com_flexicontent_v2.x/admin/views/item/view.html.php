@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 896 2011-09-10 07:59:35Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1088 2012-01-08 16:40:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -126,8 +126,11 @@ class FlexicontentViewItem extends JView {
 		}
 
 		// Add html to field object trought plugins
-		foreach ($fields as $field) {
-			$results = $dispatcher->trigger('onDisplayField', array( &$field, &$form ));
+		foreach ($fields as $field)
+		{
+			//$results = $dispatcher->trigger('onDisplayField', array( &$field, &$form ));
+			$fieldname = $field->iscore ? 'core' : $field->field_type;
+			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayField', array( &$field, &$form ));
 		}
 		
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -148,9 +151,9 @@ class FlexicontentViewItem extends JView {
 				//$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $form->getValue("catid"));
 				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
 				$canEdit 		= in_array('edit', $rights);
-				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
+				$canEditOwn		= (in_array('editown', $rights) && ($form->getValue("created_by") == $user->id));
 				$canPublish 	= in_array('publish', $rights);
-				$canPublishOwn	= (in_array('publishown', $rights) && ($row->created_by == $user->id));
+				$canPublishOwn	= (in_array('publishown', $rights) && ($form->getValue("created_by") == $user->id));
 
 				// check if the user can really edit the item
 				if ($canEdit || $canEditOwn || ($lastversion < 3)) {

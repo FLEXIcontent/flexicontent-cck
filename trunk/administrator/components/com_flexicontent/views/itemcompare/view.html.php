@@ -31,7 +31,8 @@ class FlexicontentViewItemcompare extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db			= & JFactory::getDBO();
