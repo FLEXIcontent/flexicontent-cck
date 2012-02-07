@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.pdf.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.pdf.php 896 2011-09-10 07:59:35Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -47,7 +47,11 @@ class FlexicontentViewItems extends JView
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
-		$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
+		if (!FLEXI_J16GE) {
+			$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
+		} else {
+			$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
+		}
 
 		$document = &JFactory::getDocument();
 
@@ -63,10 +67,17 @@ class FlexicontentViewItems extends JView
 		foreach ($fields as $field) {
 			if ($field->iscore == 1 || $field->field_type == ('image' || 'file')) {
 /*
-				$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+				if ($field->iscore) {
+					//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+				} else {
+					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+				}
 */
 			} else {
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
+				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
 				echo $field->label . ': ';
 				echo $field->display . '<br />';
 			}

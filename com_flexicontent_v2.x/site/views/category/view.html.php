@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1109 2012-01-16 01:05:22Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1134 2012-02-06 09:17:43Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -384,8 +384,9 @@ class FlexicontentViewCategory extends JView
 			{
 				//$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
 				$value 	= JRequest::getString('filter_'.$filtre->id, '', 'request');
-				JPluginHelper::importPlugin('flexicontent_fields', ($filtre->iscore ? 'core' : $filtre->field_type) );
-				$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
+				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
+				$fieldname = $filtre->iscore ? 'core' : $filtre->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filtre, $value ) );
 				$lists['filter_' . $filtre->id] = $value;
 			}
 		}

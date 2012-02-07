@@ -31,7 +31,7 @@ class FlexicontentViewItems extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$dispatcher	=& JDispatcher::getInstance();
 
@@ -47,7 +47,11 @@ class FlexicontentViewItems extends JView
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
-		$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
+		if (!FLEXI_J16GE) {
+			$dispatcher->trigger('onPrepareContent', array (& $item, & $params, 0));
+		} else {
+			$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
+		}
 
 		$document = &JFactory::getDocument();
 

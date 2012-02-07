@@ -70,23 +70,19 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	}
 	function index() {
 		@ob_end_clean();
-		//$fieldid = JRequest::getVar('fieldid', 0);
-		//$itemid = JRequest::getVar('itemid', 0);
-
 		$items_per_call = JRequest::getVar('items_per_call', 50);
 		$itemcnt = JRequest::getVar('itemcnt', 0);
 		$itemmodel = $this->getModel('items');
 		$fields = & $itemmodel->getAdvSearchFields('id');
 		$fieldid_arr = array_keys($fields);
 		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);
-		
+
 		$db = &JFactory::getDBO();
 		$fields = array();
 		for($cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++) {
 			if ($cnt >= count($itemid_arr)) break;
 			$itemid = $itemid_arr[$cnt];
 			foreach($fieldid_arr as $fieldid) {
-				
 				if(!isset($fields[$fieldid])) {
 					$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
 					$db->setQuery($query);

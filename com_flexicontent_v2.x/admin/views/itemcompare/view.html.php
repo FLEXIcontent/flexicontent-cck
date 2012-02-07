@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 896 2011-09-10 07:59:35Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -29,7 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewItemcompare extends JView {
 
-	function display($tpl = null) {
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -63,12 +64,16 @@ class FlexicontentViewItemcompare extends JView {
 		foreach ($fields as $field)
 		{
 			if ($field->value) {
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row ));
 			} else {
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 			if ($field->version) {
-				$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
 			} else {
 				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}

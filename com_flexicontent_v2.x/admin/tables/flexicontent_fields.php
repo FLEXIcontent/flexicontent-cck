@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_fields.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: flexicontent_fields.php 1035 2011-12-09 00:16:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
 jimport('joomla.database.tableasset');
 jimport('joomla.access.rules');
 /**
@@ -63,6 +64,7 @@ class flexicontent_fields extends JTable
 	var $access 			= 0;
 	/** @var int */
 	var $ordering 			= null;
+	/** @var boolean */
 	var $_trackAssets 		= true;
 
 	function flexicontent_fields(& $db) {
@@ -78,15 +80,16 @@ class flexicontent_fields extends JTable
 			JError::raiseWarning('SOME_ERROR_CODE', $this->_error );
 			return false;
 		}
-
+				
 		//$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
+
 		$pattern = '/^[a-z_]+[a-z_0-9]+$/i';
 		$matches = NULL;
 		$false = !preg_match($pattern, $this->name, $matches);
 		if((empty($this->name) || $false) && $this->iscore != 1 ) {
 			$name = $this->name;
-			$this->name = 'field' . ($this->_getLastId()+1);//newname
-			$msg = "Your field name is not correct, it was changed from '{$name}' to be {$this->name} already.";
+			$this->name = 'field' . ($this->id ? $this->id : $this->_getLastId()+1); //newname
+			$msg = JText::sprintf('FLEXI_WARN_FIELD_NAME_CORRECTED', $name, $this->name);
 			JError::raiseWarning(100, $msg);
 		}
 

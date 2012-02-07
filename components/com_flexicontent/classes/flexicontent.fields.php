@@ -278,6 +278,7 @@ class FlexicontentFields
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
 		{
+			// CORE field
 			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
 			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ) );
 
@@ -287,15 +288,20 @@ class FlexicontentFields
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
-				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
-					foreach ($field->parameters->get('plugins') as $plg) {
+					if (FLEXI_J16GE) {
+						$plg_arr = explode('|',$field->parameters->get('plugins'));
+					} else if ( !is_array($field->parameters->get('plugins')) ) {
+						$plg_arr = array($field->parameters->get('plugins'));
+					} else {
+						$plg_arr = $field->parameters->get('plugins');
+					}
+					foreach ($plg_arr as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
 				$field->slug = $item->slug;
-				$field->sectionid = $item->sectionid;
+				$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
 				$field->catid = $item->catid;
 				$field->catslug = @$item->categoryslug;
 				$field->fieldid = $field->id;
@@ -310,8 +316,13 @@ class FlexicontentFields
 				JRequest::setVar("isflexicontent", "yes");
 				
 				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
-				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) 
-					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) {
+					if (!FLEXI_J16GE) {
+						$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+					} else {
+						$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
+					}
+				}
 				
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == FLEXI_ITEMVIEW) {
@@ -325,6 +336,7 @@ class FlexicontentFields
 		}
 		else
 		{
+			// NON CORE field
 			//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
 			
@@ -334,15 +346,20 @@ class FlexicontentFields
 				// need now to reduce the scope through a parameter to avoid conflicts
 				if (!$field->parameters->get('plugins')) {
 					JPluginHelper::importPlugin('content');
-				} else if (!is_array($field->parameters->get('plugins'))) {
-					JPluginHelper::importPlugin('content', $field->parameters->get('plugins'));
 				} else {
-					foreach ($field->parameters->get('plugins') as $plg) {
+					if (FLEXI_J16GE) {
+						$plg_arr = explode('|',$field->parameters->get('plugins'));
+					} else if ( !is_array($field->parameters->get('plugins')) ) {
+						$plg_arr = array($field->parameters->get('plugins'));
+					} else {
+						$plg_arr = $field->parameters->get('plugins');
+					}
+					foreach ($plg_arr as $plg) {
 						JPluginHelper::importPlugin('content', $plg);
 					}
 				}
 				$field->slug = $item->slug;
-				$field->sectionid = $item->sectionid;
+				$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
 				$field->catid = $item->catid;
 				$field->catslug = $item->categoryslug;
 				$field->fieldid = $field->id;
@@ -355,7 +372,11 @@ class FlexicontentFields
 				  JRequest::setVar('option', 'com_content');
 				}
 				JRequest::setVar("isflexicontent", "yes");
-				$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				if (!FLEXI_J16GE) {
+					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
+				} else {
+					$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
+				}
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == FLEXI_ITEMVIEW) {
 				  JRequest::setVar('view', FLEXI_ITEMVIEW);

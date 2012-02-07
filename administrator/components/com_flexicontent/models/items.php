@@ -67,7 +67,8 @@ class FlexicontentModelItems extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.items.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
@@ -169,8 +170,9 @@ class FlexicontentModelItems extends JModel
 	{
 		$status = array();
 		
-		$query 	= 'SELECT id FROM #__content'
-				. ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION)
+		$query 	= 'SELECT c.id FROM #__content as c'
+					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
@@ -218,9 +220,12 @@ class FlexicontentModelItems extends JModel
 		$status = $this->getExtdataStatus();
 
 		if ($status['no']) {
-			$and = ' AND id IN ( ' . implode(',', $status['no']) . ' )';
-			$query 	= 'SELECT id, title, introtext, `fulltext`, catid, created, created_by, modified, modified_by, version, state FROM #__content'
-					. ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION)
+			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
+			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state'
+					. (FLEXI_J16GE ? ', c.language' : '')
+					. ' FROM #__content as c'
+					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -269,7 +274,9 @@ class FlexicontentModelItems extends JModel
 		$itemext = array();
 		$typeid = JRequest::getVar('typeid',1);
 		foreach ($rows as $row) {
-			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($lang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
+			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $lang;
+			else $ilang = $lang;  // J1.5 has no language setting
+			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
 			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
 			$this->_db->query();
@@ -322,12 +329,12 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _buildQuery()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$lang		= FLEXI_FISH ? 'ie.language AS lang, ' : '';
+		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
 		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
@@ -358,7 +365,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
@@ -388,7 +396,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$nullDate = $this->_db->getNullDate();
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
@@ -396,7 +405,7 @@ class FlexicontentModelItems extends JModel
 		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
 		}
 		$filter_authors 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'int' );
@@ -508,7 +517,7 @@ class FlexicontentModelItems extends JModel
 			$where[] = 'i.id = ' . $filter_id;
 			}
 
-		if (FLEXI_FISH) {
+		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ( $filter_lang ) {
 				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
 			}
@@ -836,6 +845,7 @@ class FlexicontentModelItems extends JModel
 					. ' LEFT JOIN #__categories AS cat on cat.id = c.catid'
 					. ' WHERE c.state = -4'
 					. ' AND c.created_by = ' . (int) $user->get('id')
+					. (FLEXI_J16GE ? ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 					. ' AND c.id IN ( '. implode(',', $cid).' )'
 					. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
 					;
@@ -962,7 +972,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function move($direction)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 
@@ -1076,7 +1087,8 @@ class FlexicontentModelItems extends JModel
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
@@ -1216,7 +1228,7 @@ class FlexicontentModelItems extends JModel
 				
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}
-		return true;
+			return true;
 		}
 	}
 
@@ -1331,7 +1343,7 @@ class FlexicontentModelItems extends JModel
 	}
 	
 	/**
-	 * Method to set the access level of the items
+	 * Method to save the access level of the items
 	 *
 	 * @access	public
 	 * @param 	integer id of the category
@@ -1341,7 +1353,7 @@ class FlexicontentModelItems extends JModel
 	 */
 	function access($id, $access)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		$row =& JTable::getInstance('flexicontent_items', '');
 
 		$row->load( $this->_id );
@@ -1373,6 +1385,7 @@ class FlexicontentModelItems extends JModel
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int)$id
+					. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 				;
 	
 		$this->_db->setQuery( $query );

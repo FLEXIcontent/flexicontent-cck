@@ -84,8 +84,8 @@ class flexicontent_fields extends JTable
 		$false = !preg_match($pattern, $this->name, $matches);
 		if((empty($this->name) || $false) && $this->iscore != 1 ) {
 			$name = $this->name;
-			$this->name = 'field' . ($this->_getLastId()+1);//newname
-			$msg = "Your field name is not correct, it was changed from '{$name}' to be {$this->name} already.";
+			$this->name = 'field' . ($this->id ? $this->id : $this->_getLastId()+1); //newname
+			$msg = JText::sprintf('FLEXI_WARN_FIELD_NAME_CORRECTED', $name, $this->name);
 			JError::raiseWarning(100, $msg);
 		}
 
