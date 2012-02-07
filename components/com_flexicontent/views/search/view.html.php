@@ -34,7 +34,7 @@ class FLEXIcontentViewSearch extends JView
 	function display($tpl = null)
 	{
 		$mainframe = &JFactory::getApplication();
-
+		jimport( 'joomla.html.parameter' );
 		require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
 		// Initialize some variables
@@ -52,7 +52,7 @@ class FLEXIcontentViewSearch extends JView
 		$state 		= &$this->get('state');
 		$searchword = $state->get('keyword');
 
-		$params = JComponentHelper::getParams('com_flexicontent');
+		$params = &$mainframe->getParams();
 		//$params->bind($params->_raw);
 		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 
@@ -65,13 +65,18 @@ class FLEXIcontentViewSearch extends JView
 		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
 		//JRequest::setVar('typeid', $typeid_for_advsearch, '', 'int');
 		
-		if(!($itemmodel = $this->getModel('items'))) {
-			require_once(JPATH_COMPONENT.DS.'models'.DS.'items.php');
-			$itemmodel = new FlexicontentModelItems();
+		if(!($itemmodel = @$this->getModel(FLEXI_ITEMVIEW))) {
+			require_once(JPATH_COMPONENT.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
+			$itemmodel = !FLEXI_J16GE ? new FlexicontentModelItems() : new FlexicontentModelItem();
 		}
-		//$item = &$itemmodel->getItem();
-		$item = new stdClass;
-		$item->version = 0;
+		
+		if (!FLEXI_J16GE) {
+			$item = new stdClass;
+			$item->version = 0;
+		} else {
+			$item = new JForm('item');
+			$item->setValue('version', 0);
+		}
 
 		$search_fields = $params->get('search_fields', '');
 		$search_fields = explode(",", $search_fields);
@@ -82,6 +87,7 @@ class FLEXIcontentViewSearch extends JView
 		JPluginHelper::importPlugin('flexicontent_fields');
 		
 		// Add html to field object trought plugins
+		$custom = FLEXI_J16GE ? JRequest::getVar('custom', array()) : false;
 		foreach ($fields as $field) {
 			$field->parameters->set( 'use_html', 0 );
 			$field->parameters->set( 'allow_multiple', 0 );
@@ -89,7 +95,7 @@ class FLEXIcontentViewSearch extends JView
 				$field->field_type = 'text';
 			}
 			$label = $field->label;
-			$fieldsearch = JRequest::getVar($field->name, array());
+			$fieldsearch = !FLEXI_J16GE ? JRequest::getVar($field->name, array()) : @$custom[$field->name];
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
 			$field->value = isset($fieldsearch[0])?$fieldsearch:array();
 			
@@ -114,6 +120,16 @@ class FLEXIcontentViewSearch extends JView
 			$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
 		}
 
+		if (FLEXI_J16GE) {  // Not available in J1.5
+			// Add Site Name to page title
+			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+			}
+			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+				$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+			}
+		}
+		
 		$document	= &JFactory::getDocument();
 		$document->setTitle( $params->get( 'page_title' ) );
 
