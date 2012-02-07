@@ -229,7 +229,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			}
 	
 			// output
-			if ($field->prev || $field->next)
+			if ($field->prev || $field->next || $use_category_link)
 			{
 
 				$html 	 = '<span class="pagination">';
@@ -241,7 +241,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					$start = floor($location / $limit)*$limit;
 					$html .= '
 					<span class="return_category">
-						<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
+						<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'&start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
 					</span>';
 				}
 
