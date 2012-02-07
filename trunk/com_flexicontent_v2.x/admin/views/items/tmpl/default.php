@@ -273,12 +273,12 @@ window.addEvent('domready', function() {
 				if ($this->filter_cats == '' || $this->filter_cats == 0) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
 					if ($this->permission->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'items.saveorder' ) : '';
 					endif;
 				else :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
 					if ($this->permission->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'items.saveorder' ) : '';
 					endif;
 				endif;
 				?>

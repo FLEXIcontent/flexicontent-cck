@@ -305,7 +305,7 @@ class FlexicontentModelCategories extends JModel
 		// execute updateOrder for each parent group
 		$groupings = array_unique( $groupings );
 		foreach ($groupings as $group){
-			$row->reorder('parent_id = '.$group.' AND section = '.FLEXI_SECTION);
+			$row->reorder('parent_id = '.$group.(!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ') );
 		}
 
 		return true;
@@ -319,8 +319,9 @@ class FlexicontentModelCategories extends JModel
 	 * @since	1.0
 	 */
 	function delete($cids)
-	{		
+	{
 		$params = & JComponentHelper::getParams('com_flexicontent');
+		$table  =& $this->getTable('flexicontent_categories', '');
 		
 		// Add all children to the list
 		foreach ($cids as $id)
@@ -391,7 +392,7 @@ class FlexicontentModelCategories extends JModel
 			} else {
 	    		$msg 	= JText::sprintf( 'FLEXI_ITEMS_ASSIGNED_CATEGORY', $cids );
 			}
-    		return $msg;
+			return $msg;
 		} else {
 			$total 	= count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_CATEGORIES_DELETED' );
@@ -409,7 +410,7 @@ class FlexicontentModelCategories extends JModel
 	 * @since	1.0
 	 */
 	function access($id, $access)
-	{				
+	{
 		$category  =& $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
@@ -494,8 +495,8 @@ class FlexicontentModelCategories extends JModel
 
 		// Get all rows with parent of $id
 		$query = 'SELECT '.$get
-				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION
+				. ' FROM #__categories as c'
+				. ' WHERE'.(!FLEXI_J16GE ? ' c.section = '.FLEXI_SECTION : ' c.extension="'.FLEXI_CAT_EXTENSION.'" ')
 				. ' AND '.$source.' = '.(int) $id;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
