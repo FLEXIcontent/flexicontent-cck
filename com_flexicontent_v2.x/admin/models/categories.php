@@ -28,7 +28,8 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategories extends JModelList{
+class FlexicontentModelCategories extends JModelList
+{
 	/**
 	 * Categorie id
 	 *
@@ -41,7 +42,8 @@ class FlexicontentModelCategories extends JModelList{
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -55,7 +57,8 @@ class FlexicontentModelCategories extends JModelList{
 	 * @access	public
 	 * @param	int Category identifier
 	 */
-	function setId($id) {
+	function setId($id)
+	{
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
@@ -119,7 +122,8 @@ class FlexicontentModelCategories extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function publish($cid = array(), $publish = 1) {
+	function publish($cid = array(), $publish = 1)
+	{
 		$user 	=& JFactory::getUser();
 
 		if (count( $cid ))
@@ -140,10 +144,10 @@ class FlexicontentModelCategories extends JModelList{
 						
 			$cids = implode( ',', $cid );
 
-			$query = 'UPDATE #__categories as c'
+			$query = 'UPDATE #__categories'
 				. ' SET published = ' . (int) $publish
 				. ' WHERE id IN ('. $cids .')'
-				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'  // fx_cat_ext not needed but ...
+				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
 			if (!$this->_db->query()) {
@@ -212,7 +216,7 @@ class FlexicontentModelCategories extends JModelList{
 		// execute updateOrder for each parent group
 		$groupings = array_unique( $groupings );
 		foreach ($groupings as $group){
-			$row->reorder('parent_id = '.$group.' AND extension = "'.FLEXI_CAT_EXTENSION.'"');
+			$row->reorder('parent_id = '.$group.(!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ') );
 		}
 
 		return true;
@@ -225,22 +229,23 @@ class FlexicontentModelCategories extends JModelList{
 	 * @return	string $msg
 	 * @since	1.0
 	 */
-	function delete($cids) {
+	function delete($cids)
+	{
 		$params = & JComponentHelper::getParams('com_flexicontent');
 		$table  =& $this->getTable('flexicontent_categories', '');
-
+		
 		// Add all children to the list
-		$allcids = $cids;
-		foreach ($allcids as $id) {
-			$this->_addCategories($id, $allcids);
+		foreach ($cids as $id)
+		{
+			$this->_addCategories($id, $cids);
 		}
-
-		$allcids = implode( ',', $allcids );
+				
+		$cids = implode( ',', $cids );
 
 		$query = 'SELECT c.id, c.parent_id, c.title, COUNT( e.catid ) AS numcat'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS e ON e.catid = c.id'
-				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.id IN ('. $allcids .')'  // fx_cat_ext not needed but ...
+				. ' WHERE c.id IN ('. $cids .')'
 				. ' GROUP BY c.id'
 				;
 		$this->_db->setQuery( $query );
@@ -249,10 +254,10 @@ class FlexicontentModelCategories extends JModelList{
 			JError::raiseError( 500, $this->_db->stderr() );
 			return false;
 		}
-
+		
 		$err = array();
 		$cid = array();
-
+		
 		//TODO: Categories and its childs without assigned items will not be deleted if another tree has any item entry 
 		foreach ($rows as $row) {
 			if ($row->numcat == 0) {				
@@ -261,8 +266,10 @@ class FlexicontentModelCategories extends JModelList{
 				$err[] = $row->title;
 			}
 		}
-
-		if (count( $cid ) && count($err) == 0) {
+		
+		if (count( $cid ) && count($err) == 0)
+		{
+		$cids = $cid;
 			foreach ($cids as $id) {
 				$table-> id = $id;
 				$table->delete($id);
@@ -276,7 +283,7 @@ class FlexicontentModelCategories extends JModelList{
 			} else {
 	    		$msg 	= JText::sprintf( 'FLEXI_ITEMS_ASSIGNED_CATEGORY', $cids );
 			}
-    			return $msg;
+			return $msg;
 		} else {
 			$total 	= count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_CATEGORIES_DELETED' );
@@ -293,15 +300,19 @@ class FlexicontentModelCategories extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveaccess($id, $access) {
+	function saveaccess($id, $access)
+	{
 		$category  =& $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
 		$cids = array();
 		$cids[] = $id;
 		$this->_addCategories($id, $cids);
+		
 		foreach ($cids as $cid) {
+			
 			$category->load( (int)$cid );
+			
 			if ($category->access < $access) {				
 				$category->access = $access;
 			} else {
@@ -360,7 +371,8 @@ class FlexicontentModelCategories extends JModelList{
 	 * 
 	 * @since 1.0
 	 */
-	function _addCategories($id, &$list, $type = 'children') {
+	function _addCategories($id, &$list, $type = 'children')
+	{
 		// Initialize variables
 		$return = true;
 		
@@ -375,8 +387,7 @@ class FlexicontentModelCategories extends JModelList{
 		// Get all rows with parent of $id
 		$query = 'SELECT '.$get
 				. ' FROM #__categories as c'
-				. ' WHERE lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY)
-				. ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" AND rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)  // fx_cat_ext not needed but ...
+				. ' WHERE'.(!FLEXI_J16GE ? ' c.section = '.FLEXI_SECTION : ' c.extension="'.FLEXI_CAT_EXTENSION.'" ')
 				. ' AND '.$source.' = '.(int) $id;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
