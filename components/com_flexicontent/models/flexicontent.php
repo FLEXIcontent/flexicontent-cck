@@ -256,7 +256,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. ' AND c.section = '.FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				. ' AND c.parent_id = ' . $rootcat
 				. $and
 				;

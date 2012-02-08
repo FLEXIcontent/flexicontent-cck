@@ -41,9 +41,15 @@ class JFormFieldFcimage extends JFormFieldImageList
 		$images 	= array();
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
-		$db = JFactory::getDBO();
+		$db =& JFactory::getDBO();
+		$node = &$this->element;
 		
-		$query = 'SELECT id AS value, label AS text'
+		$valcolumn = 'id';
+		if ($node->getAttribute('valcolumn')) {
+			$valcolumn = $node->getAttribute('valcolumn');
+		}
+		
+		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
 		. ' AND field_type = ' . $db->Quote('image')

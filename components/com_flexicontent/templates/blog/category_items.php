@@ -216,7 +216,10 @@ if ($this->limitstart == 0) :
 	    				$aoe	= '&amp;aoe=1';
 	    				$q		= '&amp;q=95';
 	    				$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
-	    				$conf	= $w . $h . $aoe . $q . $zc;
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+							
     					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
     					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :
@@ -466,7 +469,10 @@ if ($this->limitstart == 0) :
 	    				$aoe	= '&amp;aoe=1';
 	    				$q		= '&amp;q=95';
 	    				$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
-	    				$conf	= $w . $h . $aoe . $q . $zc;
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+							
     					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
     					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :

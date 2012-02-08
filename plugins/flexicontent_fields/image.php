@@ -593,7 +593,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$phpThumb->setParameter('zc', 1);
 		}
-
+		
+		$ext = pathinfo($filename, PATHINFO_EXTENSION);
+		if ( in_array( $ext, array('png', 'ico', 'gif') ) )
+		{
+			$phpThumb->setParameter('f', $ext);
+		}
+		
 		$output_filename = $destpath . $prefix . $filename ;
 
 		if ($phpThumb->GenerateThumbnail())

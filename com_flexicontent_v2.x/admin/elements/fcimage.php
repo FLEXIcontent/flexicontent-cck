@@ -35,19 +35,26 @@ jimport('joomla.form.formfield');
 	 */
 	protected $type = 'Fcimage';
 
-	public function getOptions() {
+	public function getOptions()
+	{
 
 		$images 	= array();
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
 		$db =& JFactory::getDBO();
-
-		$query = 'SELECT name AS value, label AS text'
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE published = 1'
-			. ' AND field_type = ' . $db->Quote('image')
-			. ' ORDER BY label ASC, id ASC'
-			;
+		$node = &$this->element;
+		
+		$valcolumn = 'name';
+		if ($node->getAttribute('valcolumn')) {
+			$valcolumn = $node->getAttribute('valcolumn');
+		}
+		
+		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
+		. ' FROM #__flexicontent_fields'
+		. ' WHERE published = 1'
+		. ' AND field_type = ' . $db->Quote('image')
+		. ' ORDER BY label ASC, id ASC'
+		;
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();

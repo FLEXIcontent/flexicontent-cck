@@ -48,6 +48,15 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+$mod_width_feat 	= (int)$params->get('mod_width', 110);
+$mod_height_feat 	= (int)$params->get('mod_height', 110);
+$mod_width 				= (int)$params->get('mod_width', 80);
+$mod_height 			= (int)$params->get('mod_height', 80);
+
+$force_width_feat="width='$mod_width_feat'";
+$force_height_feat="height='$mod_height_feat'";
+$force_width="width='$mod_width'";
+$force_height="height='$mod_height'";
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
@@ -127,9 +136,9 @@ defined('_JEXEC') or die('Restricted access');
 				
 				<span class="image_featured">
 					<?php if ($mod_link_image_feat) : ?>
-						<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
 					<?php else : ?>
-						<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</span>
 				
@@ -236,9 +245,9 @@ defined('_JEXEC') or die('Restricted access');
 				
 				<span class="image_standard">
 					<?php if ($mod_link_image) : ?>
-						<a href="<?php echo $item->link; ?>"><img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
 					<?php else : ?>
-						<img src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</span>
 				
@@ -266,9 +275,9 @@ defined('_JEXEC') or die('Restricted access');
 					<?php endif; ?>
 					
 					<?php if ($display_text && $item->text) : ?>
-					<span class="news_text">
+					<p class="news_text">
 						<?php echo $item->text; ?>
-					</span>
+					</p>
 					<?php endif; ?>
 					
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
@@ -287,8 +296,10 @@ defined('_JEXEC') or die('Restricted access');
 					<?php endif; ?>
 					
 					<?php if ($mod_readmore) : ?>
-					<span class="news_readon">
-						<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+					<span class="fc_block">
+						<span class="news_readon">
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+						</span>
 					</span>
 					<?php endif; ?>
 

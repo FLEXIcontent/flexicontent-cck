@@ -126,7 +126,7 @@ class FLEXIcontentViewSearch extends JView
 				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
 			}
 		}
 		

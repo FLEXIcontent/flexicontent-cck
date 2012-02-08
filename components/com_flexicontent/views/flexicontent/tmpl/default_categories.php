@@ -91,13 +91,13 @@ switch ($cols)
 ?>
 
 <div class="fccatcolumn "<?php echo $style; ?>>
-<?php foreach ($this->categories as $sub) : ?>
+<?php foreach ($this->categories as $cat) : ?>
 
   <?php
-	$sub->params = new JParameter($sub->params);
+	$cat->params = new JParameter($cat->params);
   if ($this->params->get('hide_empty_cats')) {
     $subcats_are_empty = 1;
-    if (!$sub->assigneditems) foreach($sub->subcats as $subcat) {
+    if (!$cat->assigneditems) foreach($cat->subcats as $subcat) {
       if ($subcat->assignedcats || $subcat->assignedsubitems) {
         $subcats_are_empty = 0;
         break;
@@ -111,55 +111,59 @@ switch ($cols)
 
 <div class="floattext">
     
-	<h2 class="fccat_title_box cat<?php echo $sub->id; ?>">
-		<a class="fccat_title" href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>">
-			<?php echo $this->escape($sub->title); ?>
+	<h2 class="fccat_title_box cat<?php echo $cat->id; ?>">
+		<a class="fccat_title" href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ); ?>">
+			<?php echo $this->escape($cat->title); ?>
 			<?php if ($showassignated) : ?>
-			<span class="fccat_assigned small"><?php echo $sub->assigneditems != null ? '('.$sub->assigneditems.')' : '(0)'; ?></span>
+			<span class="fccat_assigned small"><?php echo $cat->assigneditems != null ? '('.$cat->assigneditems.')' : '(0)'; ?></span>
 			<?php endif; ?>
 		</a>
 	</h2>
 	
 	<?php
 	// category image
-	$sub->image = FLEXI_J16GE ? $sub->params->get('image') : $sub->image;
+	$cat->image = FLEXI_J16GE ? $cat->params->get('image') : $cat->image;
 	$image = "";
 	if ($show_cat_image) {
 		$image = "";
-		$sub->introtext = & $sub->description;
-		$sub->fulltext = "";
+		$cat->introtext = & $cat->description;
+		$cat->fulltext = "";
 		
-		if ( $cat_image_source && $sub->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $sub->image ) ) {
-			$src = JURI::base(true)."/".$joomla_image_path."/".$sub->image;
+		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $cat->image ) ) {
+			$src = JURI::base(true)."/".$joomla_image_path."/".$cat->image;
 	
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-			$conf	= $w . $h . $aoe . $q . $zc;
+			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
 			$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($sub) ) {
+		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-			$conf	= $w . $h . $aoe . $q . $zc;
+			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 			$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		if ($image) {
-			$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($sub->title).'" title="'.$this->escape($sub->title).'"/>';
+			$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
 		} else {
 			//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
 		}
 		if ($cat_link_image && $image) {
-			$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ).'">'.$image.'</a>';
+			$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 		}
 	}
 	?>
@@ -168,17 +172,17 @@ switch ($cols)
 	<span class="fccat_image_box"><?php echo $image; ?></span>
 	<?php endif; ?>
 	
-	<?php if ($show_cat_descr && $sub->description) : ?>
-	<span class="fccat_descr"><?php echo flexicontent_html::striptagsandcut( $sub->description, $cat_descr_cut); ?></span>
+	<?php if ($show_cat_descr && $cat->description) : ?>
+	<span class="fccat_descr"><?php echo flexicontent_html::striptagsandcut( $cat->description, $cat_descr_cut); ?></span>
 	<?php endif; ?>
 	
 	<div class='clear'></div>
 	
-	<ul class="fcsubcats_list cat<?php echo $sub->id; ?>" >
+	<ul class="fcsubcats_list cat<?php echo $cat->id; ?>" >
 		
 		<?php $oddeven = ''; ?>
 		
-		<?php foreach ($sub->subcats as $subcat) : ?>
+		<?php foreach ($cat->subcats as $subcat) : ?>
 			<?php
 			$subcat->params = new JParameter($subcat->params);
 			$oddeven = $oddeven=='even' ? 'odd' : 'even';
@@ -211,7 +215,9 @@ switch ($cols)
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
-					$conf	= $w . $h . $aoe . $q . $zc;
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
 					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				} else if ( $subcat_image_source!=1 && $src = flexicontent_html::extractimagesrc($subcat) ) {
@@ -221,7 +227,9 @@ switch ($cols)
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
-					$conf	= $w . $h . $aoe . $q . $zc;
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

@@ -47,6 +47,22 @@
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 	 	</param>
+		<param name="cat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+			<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+			<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+			<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+		</param>
+		<param name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+			<option value="0">FLEXI_SCALE</option>
+			<option value="1">FLEXI_CROP</option>
+		</param>		
+		<param name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+		<param name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+
 	 	<param name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>

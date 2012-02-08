@@ -36,27 +36,33 @@ class JElementFCcheckbox extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		// Make value an array if value is not already array
-		if (!is_array($value))
-			$value = strlen($value) ? array($value) : array();
-			
-		// Get options and values
-		$checkoptions = explode(",", $node->attributes('checkoptions'));
-		$checkvals = explode(",", $node->attributes('checkvals'));
+		$split_char = ",";
 		
+		// Get options and values
+		$checkoptions = explode($split_char, $node->attributes('checkoptions'));
+		$checkvals = explode($split_char, $node->attributes('checkvals'));
+		$defaultvals = explode($split_char, $node->attributes('defaultvals'));
+		
+		// Make value an array if value is not already array, also load defaults, if field parameter never saved
+		if (!is_array($value) || count($value)==0)
+			$value = (!is_array($value) && strlen($value))  ? array($value) : $defaultvals;
+			
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
 		
 		// Create checkboxes
+		$fieldname = $control_name.'['.$name.'][]';
+		$element_id = $control_name.$name;
 		$html = "";
 		foreach($checkoptions as $i => $o) {
-			$element_id = $control_name.$name.$i;
-			$fieldname = $control_name.'['.$name.'][]';
-			$html .= '<input id="'.$control_name.$name.$i.'" type="checkbox"';
+			$curr_element_id = $element_id.$i;
+			$html .= '<input id="'.$curr_element_id.'" type="checkbox"';
 			$html .= in_array($checkvals[$i], $value) ? ' checked="checked"' : '' ;
-			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">'.JText::_($checkoptions[$i]).' &nbsp; ';
+			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
+			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label> &nbsp; ';
 		}
+		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" /> ';
 		
 		return $html;
 	}

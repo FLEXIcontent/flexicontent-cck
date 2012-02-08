@@ -178,10 +178,6 @@
 			
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_LIST_LIMIT" description="FLEXI_LIST_LIMIT_DESC" menu="hide"/>
 			<field name="catlimit" type="text" size="4" default="100" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" menu="hide"/>
-			<field name="feed_summary" type="radio" default="0" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" menu="hide">
-				<option value="0">FLEXI_INTRO_TEXT</option>
-				<option value="1">FLEXI_FULL_TEXT</option>
-			</field>
 			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" menu="hide">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -191,6 +187,31 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" />
+
+
+			<field name="SEP_CATS_FEED_CONF" label="" type="separator" default="FLEXI_CATS_FEED_CONF" level="level1" menu="hide" />
+		
+			<field name="feed_summary" type="radio" default="0" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" menu="hide">
+				<option value="0">FLEXI_INTRO_TEXT</option>
+				<option value="1">FLEXI_FULL_TEXT</option>
+			</field>
+			<field name="feed_summary_cut" type="text" size="4" default="200" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" menu="hide"/>
+			<field name="feed_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="feed_image_source" type="fcimage" valcolumn="id" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+			<field name="feed_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="feed_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>		
+			<field name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+
 		
 			<field name="separator9" label="" type="separator" default="FLEXI_FILES_CONF" level="level1" menu="hide" />
 			

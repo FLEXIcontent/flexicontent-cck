@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 892 2011-09-07 22:16:02Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1088 2012-01-08 16:40:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -75,13 +75,15 @@ class FlexicontentViewFavourites extends JView
 		} else {
 			$params->set('page_title',	JText::_( 'FLEXI_MY_FAVOURITES' ));
 		}
-
-		// Add Site Name to page title
-		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
-		}
-		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		
+		if (FLEXI_J16GE) {  // Not available in J1.5
+			// Add Site Name to page title
+			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+			}
+			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+			}
 		}
 		
 		$document->setTitle($params->get('page_title'));
