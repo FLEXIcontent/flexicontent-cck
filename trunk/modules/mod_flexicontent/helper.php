@@ -71,7 +71,8 @@ class modFlexicontentHelper
 		$mod_do_stripcat	= $params->get('mod_do_stripcat', 1);
 		$mod_use_image 		= $params->get('mod_use_image');
 		$mod_image 				= $params->get('mod_image');
-		$mod_image_custom_source 		= $params->get('mod_image_custom_source');
+		$mod_image_custom_display	= $params->get('mod_image_custom_display');
+		$mod_image_custom_source	= $params->get('mod_image_custom_source');
 		$mod_link_image		= $params->get('mod_link_image');
 		$mod_width 				= (int)$params->get('mod_width', 80);
 		$mod_height 			= (int)$params->get('mod_height', 80);
@@ -90,6 +91,21 @@ class modFlexicontentHelper
 		$mod_width_feat 		= (int)$params->get('mod_width_feat', 140);
 		$mod_height_feat 		= (int)$params->get('mod_height_feat', 140);
 		$mod_method_feat 		= (int)$params->get('mod_method_feat', 1);
+
+		// Retrieve default image for the image field
+		if ($mod_image) {
+			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
+			$db->setQuery($query);
+			$midata = new stdClass();
+			$midata->params = $db->loadResult();
+			$midata->params = new JParameter($midata->params);
+			
+			$midata->default_image = $midata->params->get( 'default_image', '');
+			if ( $midata->default_image !== '' ) {
+				$midata->default_image_filepath = JPATH_BASE.DS.$midata->default_image;
+				$midata->default_image_filename = basename($midata->default_image);
+			}
+		}
 
 		// get module fields parameters
 		$use_fields 			= $params->get('use_fields', 1);
@@ -115,7 +131,7 @@ class modFlexicontentHelper
 		$fields_feat = array_map( 'trim', explode(',', $params->get('fields_feat')) );
 		if ($fields_feat[0]=='') $fields_feat = array();
 
-		$rows_arr = array();
+		$cat_items_arr = array();
 		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
 		foreach ($ordering as $ord) {
 			$items_arr = modFlexicontentHelper::getItems($params, $ord);
@@ -124,7 +140,7 @@ class modFlexicontentHelper
 				for ($i=0; $i<count($items); $i++) {
 					$items[$i]->featured = ($i < $featured) ? 1 : 0;
 					$items[$i]->fetching = $ord;
-					$rows_arr[$cat_counter][] = $items[$i];
+					$cat_items_arr[$cat_counter][] = $items[$i];
 				}
 			}
 		}
@@ -135,69 +151,67 @@ class modFlexicontentHelper
 		// We need to create the display of the fields before examining if they are empty.
 		// The hardcoded limit of max items skipped is 100.
 		if ( $skip_items && count($skiponempty_fields) ) {
-			// 0. Add skipfields to the list of fields to be rendered
+			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
 			$params->set('fields',$fields_list);
 			
-			foreach($rows_arr as $rows) {
+			foreach($cat_items_arr as $cat_items) {
 				
 				// 1. The filtered rows
 				$filtered_rows = array();
 				
-				// 2. Get fields values for the items
-				$items = & FlexicontentFields::getFields($rows, 'module', $params);
+				// 2. Render values of skip fields only
+				$cat_items = & FlexicontentFields::getFields($cat_items, 'module', $params);
 				
 				// 3. Skip Items with empty fields (if this filter is enabled)
-				foreach($items as $item) {
+				foreach($cat_items as $item) {
 					if (!isset($order_count[$item->fetching]))    // Check to initialize counter for this ordering 
 						$order_count[$item->fetching] = 0;
 					if ($order_count[$item->fetching] >= $count)   // Check if enough encountered for this ordering 
 						continue;
 					
 					// Now check for empty values on field that when empty, the item must be skipped
-					if ($skip_items) {
-						// Construct display values array
-						$field_val = array();
-						foreach($skiponempty_fields as $skipfieldname) {
-							$field_val[$skipfieldname] = $item->fields[$skipfieldname]->display;
-						}
-						
-						if ($onempty_fields_combination == 'any')
-							$skip_item = 0;
-						else //if ($skip_items && $onempty_fields_combination == 'all')
-							$skip_item = 1;		    
-						
-						foreach($skiponempty_fields as $skipfieldname) {
-							$val = $field_val[$skipfieldname];
-							if ($striptags_onempty_fields) $val = strip_tags ($field_val[$skipfieldname]) ;
-							$val = trim($val);
-							if ( !$val) {
-								if ($onempty_fields_combination=='any') {
-									$skip_item = 1;
-									break;
-								}
-							} else {
-								if ($onempty_fields_combination == 'all') {
-									$skip_item = 0;
-									break;
-								}
+					// Construct display values array
+					$field_val = array();
+					foreach($skiponempty_fields as $skipfieldname) {
+						$field_val[$skipfieldname] = @$item->fields[$skipfieldname]->display;
+					}
+					
+					if ($onempty_fields_combination == 'any')
+						$skip_curritem = 0;
+					else //if ($skip_items && $onempty_fields_combination == 'all')
+						$skip_curritem = 1;		    
+					
+					foreach($skiponempty_fields as $skipfieldname) {
+						$val = $field_val[$skipfieldname];
+						if ($striptags_onempty_fields) $val = strip_tags ($field_val[$skipfieldname]) ;
+						$val = trim($val);
+						if ( !$val) {
+							if ($onempty_fields_combination=='any') {
+								$skip_curritem = 1;
+								break;
+							}
+						} else {
+							if ($onempty_fields_combination == 'all') {
+								$skip_curritem = 0;
+								break;
 							}
 						}
-						if ($skip_item && count($skiponempty_fields)) {
-							if(!isset($order_skipcount[$item->fetching]) ) $order_skipcount[$item->fetching] = 0;
-							$order_skipcount[$item->fetching]++;
-							continue;
-						}
+					}
+					if ($skip_curritem) {
+						if(!isset($order_skipcount[$item->fetching]) ) $order_skipcount[$item->fetching] = 0;
+						$order_skipcount[$item->fetching]++;
+						continue;
 					}
 					
 					// 4. Increment counter for item's ordering and Add item to list of displayed items
 					$order_count[$item->fetching]++;
-					$filtered_rows[] = & $item;
+					$filtered_rows[] =  $item;
 				}
 				$filtered_rows_arr[] = & $filtered_rows;
 			}
 		} else {
-			$filtered_rows_arr = & $rows_arr;
+			$filtered_rows_arr = & $cat_items_arr;
 		}
 		
 		// *** OPTIMIZATION: we only render the fields after skipping unwanted items
@@ -244,26 +258,46 @@ class modFlexicontentHelper
 					$thumb = '';
 					$thumb_rendered = '';
 					if ($mod_use_image_feat) {
-						if ($mod_image_custom_source) {
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_source);
+						if ($mod_image_custom_display) {
+							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
-							$thumb = '';
+						} else if ($mod_image_custom_source) {
+							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_source);
+							$fieldname = trim($fieldname); $varname = trim($varname);
+							$src =  JURI::base(true) . '/' .FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							
+							$h		= '&amp;h=' . $mod_height_feat;
+							$w		= '&amp;w=' . $mod_width_feat;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else if ($mod_image) {
-							if (isset($row->image)) {
+						
+							$src = '';
+							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
 								$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
-	
+							} else if (!empty($midata->default_image_filepath)) {
+								$src	= $midata->default_image_filepath;
+							}
+							
+							if ($src) {
 								$h		= '&amp;h=' . $mod_height_feat;
 								$w		= '&amp;w=' . $mod_width_feat;
 								$aoe	= '&amp;aoe=1';
 								$q		= '&amp;q=95';
 								$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
-								$conf	= $w . $h . $aoe . $q . $zc;
+								$ext = pathinfo($src, PATHINFO_EXTENSION);
+								$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+								$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
 								$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-							} else {
-								$thumb	= '';
 							}
 						} else {
 							$articleimage = flexicontent_html::extractimagesrc($row);
@@ -275,12 +309,12 @@ class modFlexicontentHelper
 								$aoe	= '&amp;aoe=1';
 								$q		= '&amp;q=95';
 								$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
-								$conf	= $w . $h . $aoe . $q . $zc;
+								$ext = pathinfo($src, PATHINFO_EXTENSION);
+								$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+								$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
 	    					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 	    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-			    		} else {
-			    		  $thumb = '';
 			    		}
 						}
 					}
@@ -331,26 +365,46 @@ class modFlexicontentHelper
 					$thumb = '';
 					$thumb_rendered = '';
 					if ($mod_use_image) {
-						if ($mod_image_custom_source) {
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_source);
+						if ($mod_image_custom_display) {
+							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
-							$thumb = '';
+						} else if ($mod_image_custom_source) {
+							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_source);
+							$fieldname = trim($fieldname); $varname = trim($varname);
+							$src =  JURI::base(true) . '/' .FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							
+							$h		= '&amp;h=' . $mod_height_feat;
+							$w		= '&amp;w=' . $mod_width_feat;
+							$aoe	= '&amp;aoe=1';
+							$q		= '&amp;q=95';
+							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+
+							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else if ($mod_image) {
-							if (isset($row->image)) {
+							
+							$src = '';
+							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
 								$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
-	
+							} else if (!empty($midata->default_image_filepath)) {
+								$src	= $midata->default_image_filepath;
+							}
+							
+							if ($src) {
 								$h		= '&amp;h=' . $mod_height;
 								$w		= '&amp;w=' . $mod_width;
 								$aoe	= '&amp;aoe=1';
 								$q		= '&amp;q=95';
 								$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
-								$conf	= $w . $h . $aoe . $q . $zc;
+								$ext = pathinfo($src, PATHINFO_EXTENSION);
+								$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+								$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
 								$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-							} else {
-								$thumb	= '';
 							}
 						} else {
 							$articleimage = flexicontent_html::extractimagesrc($row);
@@ -362,12 +416,12 @@ class modFlexicontentHelper
 								$aoe	= '&amp;aoe=1';
 								$q		= '&amp;q=95';
 								$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
-								$conf	= $w . $h . $aoe . $q . $zc;
+								$ext = pathinfo($src, PATHINFO_EXTENSION);
+								$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+								$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
 	    					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 	    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-			    		} else {
-			    		  $thumb = '';
 			    		}
 						}
 					}
@@ -1066,10 +1120,10 @@ class modFlexicontentHelper
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
-			$rows_arr[] = $rows;
+			$cat_items_arr[] = $rows;
 		}
 
-		return $rows_arr;
+		return $cat_items_arr;
 	}
 
 	function getCategoryData(&$params) {
@@ -1158,9 +1212,6 @@ class modFlexicontentHelper
 			$catimage = "";
 			if ($catconf->show_image) {
 				
-				$catdata->introtext = & $catdata->description;
-				$catdata->fulltext = "";
-				
 				if ( $catconf->image_source && $catdata->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image ) ) {
 					$src = JURI::base(true)."/".$joomla_image_path."/".$catdata->image;
 			
@@ -1169,7 +1220,9 @@ class modFlexicontentHelper
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$conf	= $w . $h . $aoe . $q . $zc;
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
 					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				} else if ( $catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata) ) {
@@ -1179,7 +1232,9 @@ class modFlexicontentHelper
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$conf	= $w . $h . $aoe . $q . $zc;
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

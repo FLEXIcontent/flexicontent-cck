@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1108 2012-01-15 04:06:31Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1109 2012-01-16 01:05:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -85,12 +85,14 @@ class FlexicontentViewFlexicontent extends JView
 			$params->set('page_title',	JText::_( 'FLEXICONTENT_MAIN' ));
 		}
 
-		// Add Site Name to page title
-		if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-			$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
-		}
-		elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-			$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+		if (FLEXI_J16GE) {  // Not available in J1.5
+			// Add Site Name to page title
+			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
+				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+			}
+			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
+				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+			}
 		}
 
 		/*

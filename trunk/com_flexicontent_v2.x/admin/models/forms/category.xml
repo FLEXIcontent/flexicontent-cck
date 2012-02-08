@@ -74,14 +74,30 @@
 			
 			<field name="sep_cat_info" type="separator" hr="false" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
 			<field name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			<field name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
+			<field name="cat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</field>
+			<field name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>		
+			<field name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
 			<field name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -136,16 +152,11 @@
 			</field>
 			
 			<field name="sep_items_retrieval" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
-			<field name="@spacer1" type="spacer" default="" label="" description="" />
 			<field name="display_subcategories_items" type="list" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
 				<option value="0">FLEXI_NO</option> 
 				<option value="1">1st sublevel</option> 
 				<option value="2">All sublevels</option> 
 			</field>
-			<field name="display_subcategories_fields" type="radio" default="1" label="FLEXI_DISPLAY_SUBCATS_FIELDS" description="FLEXI_DISPLAY_SUBCATS_FIELDS_DESC"> 
-				<option value="0">FLEXI_NO</option> 
-				<option value="1">FLEXI_YES</option> 
-			</field> 
 			<field name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
 				<option value="">Use Global</option>
 				<option value="0">FLEXI_No</option>
@@ -202,7 +213,6 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-	<!-- 		<field name="fields" type="fields" size="10" default="0" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" /> -->
 	
 			<field name="sep_search_and_filter" type="separator" hr="false" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" menu="hide" />
 			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">

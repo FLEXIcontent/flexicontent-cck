@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1128 2012-01-30 03:53:24Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1142 2012-02-07 05:27:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -216,7 +216,10 @@ if ($this->limitstart == 0) :
 	    				$aoe	= '&amp;aoe=1';
 	    				$q		= '&amp;q=95';
 	    				$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
-	    				$conf	= $w . $h . $aoe . $q . $zc;
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+							
     					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
     					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :
@@ -466,7 +469,10 @@ if ($this->limitstart == 0) :
 	    				$aoe	= '&amp;aoe=1';
 	    				$q		= '&amp;q=95';
 	    				$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
-	    				$conf	= $w . $h . $aoe . $q . $zc;
+							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+							$conf	= $w . $h . $aoe . $q . $zc . $f;
+							
     					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
     					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
     				else :

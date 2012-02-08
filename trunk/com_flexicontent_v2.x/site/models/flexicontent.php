@@ -375,7 +375,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. (FLEXI_J16GE ? '' : ' AND c.sectionid = ' . FLEXI_SECTION)
+				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
 				. ' AND c.parent_id = '.(int)$id
 				. $and
 				. ' ORDER BY '.$ordering
@@ -437,7 +437,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 				. ' WHERE c.published = 1'
-				. (FLEXI_J16GE ? '' : ' AND c.sectionid = ' . FLEXI_SECTION)
+				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
 				. ' AND c.access <= '.$gid
 				. $and
 				. ' AND i.state IN (1, -5)'

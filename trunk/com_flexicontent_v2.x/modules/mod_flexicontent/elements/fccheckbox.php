@@ -37,30 +37,37 @@ class JFormFieldFccheckbox extends JFormField
 	
 	function getInput()
 	{
-		// Make value an array if value is not already array
-		$value = & $this->value;
-		if (!is_array($value))
-			$value = strlen($value) ? array($value) : array();
-			
-		// Get options and values
+		$split_char = "|";
 		$node = & $this->element;
+		$value = explode($split_char, $this->value);
+		$value = ($value[0]=='') ? array() : $value;
 		
-		$checkoptions = explode(",", $node->getAttribute('checkoptions'));
-		$checkvals = explode(",", $node->getAttribute('checkvals'));
-		
+		// Get options and values
+		$checkoptions = explode($split_char, $node->getAttribute('checkoptions'));
+		$checkvals = explode($split_char, $node->getAttribute('checkvals'));
+		$defaultvals = explode($split_char, $node->getAttribute('defaultvals'));
+
+		// Make value an array if value is not already array, also load defaults, if field parameter never saved
+		if (!is_array($value) || count($value)==0)
+			$value = (!is_array($value) && strlen($value)) ? array($value) : $defaultvals;
+
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
 		
 		// Create checkboxes
-		$html = "";
+		$fieldname = $this->name.'[]';
+		$element_id = $this->id;
+		$html = '<fieldset id="'.$this->id.'" class="radio">';
 		foreach($checkoptions as $i => $o) {
-			$element_id = $this->id.$i;
-			$fieldname = $this->name.'[]';
-			$html .= '<span style="display:inline-block;float:left;"><input id="'.$control_name.$name.$i.'" type="checkbox"';
+			$curr_element_id = $element_id.$i;
+			$html .= '<input id="'.$curr_element_id.'" type="checkbox"';
 			$html .= in_array($checkvals[$i], $value) ? ' checked="checked"' : '' ;
-			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">'.JText::_($checkoptions[$i]).'</span> &nbsp; ';
+			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
+			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>';
 		}
+		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" /> ';
+		$html .= '</fieldset>';
 		
 		return $html;
 	}

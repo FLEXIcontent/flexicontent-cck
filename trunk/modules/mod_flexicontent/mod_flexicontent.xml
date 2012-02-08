@@ -235,8 +235,10 @@
 		
 		<param name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
 		<param name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-		<param name="mod_image_custom_source" type="text" size="48" default="" label="Custom Image Source" description=
-			"You can use any custom field in place of image. -- Leave blank: to use above field, -- Note:image size and other parameters are not used,  -- Write: like fieldname##varname e.g. mycustomgal##display" />
+		<param name="mod_image_custom_display" type="text" size="48" default="" label="Field HTML as Image" description=
+			"You can use the HTML produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- Note: image size and other parameters are not used,&lt;br&gt; -- Write: like fieldname##varname e.g. mycustomgal##display" />
+		<param name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
+			"You can use the URL produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- Note: image size and other parameters are applied to the given URL,&lt;br&gt; -- Write: like fieldname##varname e.g. mycustomgal##src_medium" />
 		<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 		<param name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
@@ -279,7 +281,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="date_fields" type="fccheckbox" default=""
-				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 		/>
 		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
@@ -302,7 +304,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="date_fields_feat" type="fccheckbox" default=""
-				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="1,2"
+				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 		/>
 		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
@@ -405,7 +407,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="currcat_cuttitle" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
+		<param name="currcat_cuttitle" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
 		<param name="currcat_showdescr" type="list" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

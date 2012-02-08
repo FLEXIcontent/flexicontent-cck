@@ -354,32 +354,49 @@ class FlexicontentModelCategory extends JModelList{
 	 * @access public
 	 * @return string
 	 */
-	function _buildQuery() {
-		// Get the WHERE and ORDER BY clauses for the query
-		$where			= $this->_buildItemWhere();
-		$orderby		= $this->_buildItemOrderBy();
+	function _buildQuery()
+	{
+		static $query;
+		if(!$query) {
+			// Get the WHERE and ORDER BY clauses for the query
+			$where			= $this->_buildItemWhere();
+			$orderby		= $this->_buildItemOrderBy();
+			$params = $this->_category->parameters;
 
-		$field_item = '';
-		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-		$params = $this->_category->parameters;
-		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
+			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+			$order_field_join = '';
+			if ($params->get('orderbycustomfieldid', 0) != 0) {
+				$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+			}
+			
+			// Add image field used as item image in RSS feed
+			$feed_image_source = 0;
+			if (JRequest::getVar("type", "") == "rss") {
+				$feed_image_source = (int) $params->get('feed_image_source', '');
+			}
+			$feed_img_join= '';
+			$feed_img_col = '';
+			if ($feed_image_source) {
+				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
+				$feed_img_col = ' img.value as image,';
+			}
+			
+			$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'.$feed_img_col 
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. $feed_img_join
+			. $order_field_join
+		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
+			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. $where
+			. $orderby
+			;
 		}
-		
-		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. $field_item
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		. $where
-		. $orderby
-		;
-		
 		return $query;
 	}
 

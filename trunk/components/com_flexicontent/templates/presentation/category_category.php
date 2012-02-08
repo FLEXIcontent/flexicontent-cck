@@ -26,9 +26,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	</h2>
 	<?php endif; ?>
 
-	<?php if (!empty($this->category->image) && $this->params->get('show_description_image', 1)) : ?>
+	<?php if (!empty($this->category->image)) : ?>
 	<div class="catimg">
-		<?php echo JHTML::_('image.site', $this->category->image, 'images/stories/', NULL, NULL, $this->escape($this->category->title)); ?>
+		<?php echo $this->category->image; ?>
 	</div>
 	<?php endif; ?>
 	

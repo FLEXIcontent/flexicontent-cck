@@ -43,7 +43,12 @@ class JElementFcimage extends JElement
 
 		$db =& JFactory::getDBO();
 		
-		$query = 'SELECT name AS value, label AS text'
+		$valcolumn = 'name';
+		if ($node->attributes('valcolumn')) {
+			$valcolumn = $node->attributes('valcolumn');
+		}
+		
+		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
 		. ' AND field_type = ' . $db->Quote('image')

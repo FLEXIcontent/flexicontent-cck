@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1079 2012-01-02 00:18:34Z ggppdk $
+ * @version 1.0 $Id: image.php 1128 2012-01-30 03:53:24Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -609,7 +609,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$phpThumb->setParameter('zc', 1);
 		}
-
+		
+		$ext = pathinfo($filename, PATHINFO_EXTENSION);
+		if ( in_array( $ext, array('png', 'ico', 'gif') ) )
+		{
+			$phpThumb->setParameter('f', $ext);
+		}
+		
 		$output_filename = $destpath . $prefix . $filename ;
 
 		if ($phpThumb->GenerateThumbnail())

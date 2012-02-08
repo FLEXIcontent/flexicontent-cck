@@ -127,13 +127,13 @@ class FlexicontentViewCategory extends JView
 			$params->set('page_title',	$category->title);
 		}
 		
-		if (FLEXI_J16GE) {
+		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
 				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $$params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
 			}
 		}
 		
@@ -199,6 +199,7 @@ class FlexicontentViewCategory extends JView
 			
 			// start capturing output into a buffer
 			$this->item = & $authordescr_item; 
+			$this->params_saved = $this->params;
 			$this->params = & $authordescr_item->params;
 			$this->tmpl = '.item.'.$ilayout;
 			$this->print_link = JRoute::_('index.php?view=items&id='.$authordescr_item->slug.'&pop=1&tmpl=component');
@@ -217,6 +218,7 @@ class FlexicontentViewCategory extends JView
 			// clear it.
 			$authordescr_item_html = ob_get_contents();
 			ob_end_clean();
+			$this->params = $this->params_saved;
 		}
 		//echo $authordescr_item_html; exit();
 		
@@ -352,6 +354,65 @@ class FlexicontentViewCategory extends JView
 			$item->fields['text']->display = & $item->text;
 			
 		}
+		
+		// category image
+		$show_cat_image = $params->get('show_description_image', 0);  // bad named maybe
+		$cat_image_source = $params->get('cat_image_source', 0);
+		$cat_link_image = $params->get('cat_link_image', 1);
+		$cat_image_method = $params->get('cat_image_method', 1);
+		$cat_image_width = $params->get('cat_image_width', 80);
+		$cat_image_height = $params->get('cat_image_height', 80);
+		
+		// category image
+		$cat 		= & $category;
+		$config	=& JFactory::getConfig();
+		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
+		
+		$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
+		$image = "";
+		if ($show_cat_image) {
+			$image = "";
+			$cat->introtext = & $cat->description;
+			$cat->fulltext = "";
+			
+			if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $cat->image ) ) {
+				$src = JURI::base(true)."/".$joomla_image_path."/".$cat->image;
+		
+				$h		= '&amp;h=' . $cat_image_height;
+				$w		= '&amp;w=' . $cat_image_width;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $zc . $f;
+		
+				$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
+	
+				$h		= '&amp;h=' . $cat_image_height;
+				$w		= '&amp;w=' . $cat_image_width;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $zc . $f;
+	
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+				$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			}
+			
+			if ($image) {
+				$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
+			} else {
+				//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
+			}
+			if ($cat_link_image && $image) {
+				$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+			}
+		}
+		$cat->image = $image;
 		
 		// remove previous alpha index filter
 		$uri->delVar('letter');
