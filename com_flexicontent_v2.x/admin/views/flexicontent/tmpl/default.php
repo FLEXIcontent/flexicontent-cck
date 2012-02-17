@@ -31,7 +31,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 //$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 ?>
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">

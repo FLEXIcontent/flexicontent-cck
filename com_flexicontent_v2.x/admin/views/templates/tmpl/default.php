@@ -22,7 +22,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
  $basetemplates = array('default', 'blog', 'faq', 'presentation');
 ?>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminlist" cellspacing="1">
 	<thead>
