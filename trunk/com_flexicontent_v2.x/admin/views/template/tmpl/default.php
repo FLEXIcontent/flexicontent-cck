@@ -24,7 +24,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	}
 </script>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellpadding="0" cellspacing="0" width="100%">
 		<tr>

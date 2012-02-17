@@ -223,7 +223,7 @@ function deleteTag(obj) {
     </h1>
     <?php endif; ?>
 
-	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
+	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
 		<div class="flexi_buttons">
 			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');?>" target="_blank">
 				<button type="button" class="button" onclick="javascript:;">

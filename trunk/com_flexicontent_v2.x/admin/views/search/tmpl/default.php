@@ -1,6 +1,6 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
 <?php	/*<div class="form-filter" style="float: left;">
 		<label for="filter_search"><?php echo JText::sprintf('FINDER_SEARCH_LABEL', JText::_('FINDER_ITEMS')); ?></label>
 		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->get('filter.search'); ?>" class="text_area" onchange="document.adminForm.submit();" />
