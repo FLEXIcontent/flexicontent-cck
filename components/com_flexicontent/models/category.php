@@ -507,7 +507,6 @@ class FlexicontentModelCategory extends JModel{
 		}
 		
 		$filters = $this->getFilters();
-
 		if ($filters)
 		{
 			foreach ($filters as $filtre)
@@ -980,8 +979,8 @@ class FlexicontentModelCategory extends JModel{
 	 */
 	function getFilters()
 	{
-		$mainframe = &JFactory::getApplication();
-		
+		static $filters;
+		if($filters) return $filters;
 		$user		= &JFactory::getUser();
 		$params	= $this->_loadCategoryParams($this->_id);
 		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
@@ -1007,16 +1006,15 @@ class FlexicontentModelCategory extends JModel{
 		}
 		
 		$query  = 'SELECT fi.*'
-				. ' FROM #__flexicontent_fields AS fi'
-				. ' WHERE fi.published = 1'
-				. ' AND fi.isfilter = 1'
-				. $where
-				. $scope
-				. ' ORDER BY fi.ordering, fi.name'
-				;
-			$this->_db->setQuery($query);
-			$filters = $this->_db->loadObjectList('name');
-
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' WHERE fi.published = 1'
+			. ' AND fi.isfilter = 1'
+			. $where
+			. $scope
+			. ' ORDER BY fi.ordering, fi.name'
+		;
+		$this->_db->setQuery($query);
+		$filters = $this->_db->loadObjectList('name');
 		foreach ($filters as $filter)
 		{
 			$filter->parameters = new JParameter($filter->attribs);
@@ -1079,7 +1077,7 @@ class FlexicontentModelCategory extends JModel{
 				. ' AND value LIKE ' . $this->_db->Quote($value)
 				. ' GROUP BY item_id'
 				;
-			$this->_db->setQuery($query);
+				$this->_db->setQuery($query);
 				$filtered = $this->_db->loadResultArray();
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break; 

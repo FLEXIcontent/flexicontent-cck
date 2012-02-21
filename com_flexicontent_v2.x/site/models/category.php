@@ -1128,8 +1128,8 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function getFilters()
 	{
-		$mainframe = &JFactory::getApplication();
-		
+		static $filters;
+		if($filters) return $filters;
 		$user		= &JFactory::getUser();
 		$params	= $this->_loadCategoryParams($this->_id);
 		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
