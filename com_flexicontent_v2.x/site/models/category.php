@@ -1155,16 +1155,15 @@ class FlexicontentModelCategory extends JModelList{
 		}
 		
 		$query  = 'SELECT fi.*'
-				. ' FROM #__flexicontent_fields AS fi'
-				. ' WHERE fi.published = 1'
-				. ' AND fi.isfilter = 1'
-				. $where
-				. $scope
-				. ' ORDER BY fi.ordering, fi.name'
-				;
-			$this->_db->setQuery($query);
-			$filters = $this->_db->loadObjectList('name');
-
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' WHERE fi.published = 1'
+			. ' AND fi.isfilter = 1'
+			. $where
+			. $scope
+			. ' ORDER BY fi.ordering, fi.name'
+		;
+		$this->_db->setQuery($query);
+		$filters = $this->_db->loadObjectList('name');
 		foreach ($filters as $filter)
 		{
 			$filter->parameters = new JParameter($filter->attribs);
@@ -1210,6 +1209,26 @@ class FlexicontentModelCategory extends JModelList{
 				}
 			break;
 			
+			case 'categories':
+				$_group_cats = array_intersect(array($value), $this->_group_cats);
+				$_group_cats = "'".implode("','", $_group_cats)."'";
+				$where = ' catid IN ('.$_group_cats.')';
+				$query  = 'SELECT id'
+					. ' FROM #__content'
+					. ' WHERE ' . $where
+					;
+				$this->_db->setQuery($query);
+				$filtered1 = $this->_db->loadResultArray();
+				$query  = 'SELECT itemid'
+					. ' FROM #__flexicontent_cats_item_relations'
+					. ' WHERE ' . $where
+					;
+				$this->_db->setQuery($query);
+				$filtered2 = $this->_db->loadResultArray();
+				$filtered = array_unique(array_merge($filtered1, $filtered2));
+				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+			break;
+			
 			case 'tags':
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
@@ -1227,7 +1246,7 @@ class FlexicontentModelCategory extends JModelList{
 				. ' AND value LIKE ' . $this->_db->Quote($value)
 				. ' GROUP BY item_id'
 				;
-			$this->_db->setQuery($query);
+				$this->_db->setQuery($query);
 				$filtered = $this->_db->loadResultArray();
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break; 

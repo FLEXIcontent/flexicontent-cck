@@ -115,13 +115,14 @@
 		</param>
 		<param name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
 	</params>
-	<params group="group-categories"><!-- categories -->
+	<params group="group-categories" addpath="/administrator/components/com_flexicontent/elements"><!-- categories -->
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
 			<option value="1">FLEXI_LINE_BREAK</option>
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
 		</param>
+		<param name="rootcatid" type="flexicategories" top="2" required="false" onclick="javascript:;" multiple="0" size="1" default="" label="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING" description="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING_DESC" />
 	</params>
 	<params group="group-tags"><!-- tags -->
 		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">

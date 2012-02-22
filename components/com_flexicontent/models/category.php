@@ -1060,6 +1060,26 @@ class FlexicontentModelCategory extends JModel{
 				}
 			break;
 			
+			case 'categories':
+				$_group_cats = array_intersect(array($value), $this->_group_cats);
+				$_group_cats = "'".implode("','", $_group_cats)."'";
+				$where = ' catid IN ('.$_group_cats.')';
+				$query  = 'SELECT id'
+					. ' FROM #__content'
+					. ' WHERE ' . $where
+					;
+				$this->_db->setQuery($query);
+				$filtered1 = $this->_db->loadResultArray();
+				$query  = 'SELECT itemid'
+					. ' FROM #__flexicontent_cats_item_relations'
+					. ' WHERE ' . $where
+					;
+				$this->_db->setQuery($query);
+				$filtered2 = $this->_db->loadResultArray();
+				$filtered = array_unique(array_merge($filtered1, $filtered2));
+				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+			break;
+			
 			case 'tags':
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'

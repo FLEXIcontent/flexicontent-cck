@@ -67,8 +67,16 @@ class JElementFlexicategories extends JElement
 		if ( $node->attributes('required') && $node->attributes('required')=='false' ) {
 			$required='';
 		}
-		
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox '.$required.' validate-cid" multiple="multiple" '.$attribs, true);
+
+		if ($node->attributes('multiple')=='0') {
+		}else{
+			$attribs .= ' multiple="multiple"';
+		}
+		if ($top = $node->attributes('top')) {
+		}else{
+			$top = false;
+		}
+		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, $top, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox '.$required.' validate-cid" '.$attribs, true);
 		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
 		return $html;
 	}
