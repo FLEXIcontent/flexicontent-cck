@@ -360,12 +360,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$text_select = JText::_('All');
 				
 				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__users AS u'
-						. ' ON i.modified_by = u.id'
-						. ' WHERE i.modified_by <> 0'
-						. ' ORDER BY u.name ASC'
-						;
+					. ' FROM #__content AS i'
+					. ' LEFT JOIN #__users AS u'
+					. ' ON i.modified_by = u.id'
+					. ' WHERE i.modified_by <> 0'
+					. ' ORDER BY u.name ASC'
+					;
 				$db->setQuery($query);
 				$lists = $db->loadObjectList();
 				
@@ -420,6 +420,34 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$options[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
 				$options[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 				
+				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+				
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			break;
+
+			case 'categories': // Categories
+				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
+				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
+				if ($label_filter == 2) 
+					$text_select = $filter->label; 
+				else 
+					$text_select = JText::_('All');
+
+				global $globalcats;
+
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				if($rootcatid) {
+					$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
+					foreach ($globalcats[$rootcatid]->childrenarray as $k=>$list) {
+						$options[] = JHTML::_('select.option', $list->id, $list->treename); 
+					}
+				}else{
+					foreach ($globalcats as $k=>$list) {
+						$options[] = JHTML::_('select.option', $list->id, $list->treename); 
+					}
+				}
+
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
 				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);

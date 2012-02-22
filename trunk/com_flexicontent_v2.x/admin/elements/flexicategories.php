@@ -41,6 +41,7 @@ class JFormFieldFlexicategories extends JFormField
 	
 	function getInput() {
 		$doc 		=& JFactory::getDocument();
+		$node		=& $this->element;
 		
 		//var_dump($this->value);
 		if ( ! is_array( $this->value ) ) {
@@ -62,7 +63,26 @@ class JFormFieldFlexicategories extends JFormField
 			//document.getElementById('a_id').value = values;
 		}";
 		$doc->addScriptDeclaration($js);
-		$html = flexicontent_cats::buildcatselect($tree, $this->name, $values, false, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" multiple="multiple" size="8"', true);
+		$attribs = '';
+		if ($node->getAttribute('size')) {
+			$attribs .= ' size="'.$node->getAttribute('size').'" ';
+		} else {
+			$attribs .= ' size="8" ';
+		}
+		$required=' required';
+		if ( $node->getAttribute('required') && $node->getAttribute('required')=='false' ) {
+			$required='';
+		}
+
+		if ($node->getAttribute('multiple')=='0') {
+		}else{
+			$attribs .= ' multiple="multiple"';
+		}
+		if ($top = $node->getAttribute('top')) {
+		}else{
+			$top = false;
+		}
+		$html = flexicontent_cats::buildcatselect($tree, $this->name, $values, $top, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox validate-cid" '.$required.$attribs, true);
 		//$html = flexicontent_cats::buildcatselect($tree, $this->name, $this->value, false, ' class="inputbox validate-cid" multiple="multiple" size="8"', true);
 		//$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"jform[request][".$this->element["name"]."]\" value=\"".implode(",", $values)."\" />";
 		return $html;
