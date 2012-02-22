@@ -586,7 +586,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<tr>
 				<td style="padding-top: 5px;">
-					<label for="cid">
+					<label for="jform_cid" id="jform_cid-lbl">
 					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
 					</label>
 				</td>
@@ -596,7 +596,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<tr>
 				<td style="padding-top: 5px;">
-					<label for="catid">
+					<label for="jform_catid" id="jform_catid-lbl">
 					<strong><?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?></strong>
 					</label>
 				</td>

@@ -201,7 +201,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$fieldsearch = JRequest::getVar($field->name, array());
 		$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
 		if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
-			$foundfields[$field->id] = array();
+			$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
 			$fieldsearch = $fieldsearch[0];
 			//echo $fieldsearch ."<br>";
 			$fieldsearch = explode(" ", $fieldsearch);
@@ -268,8 +268,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
 		. ' ORDER BY '. $order
 	;
-	//$db->setQuery( $query, $limitstart, $limit );
-	$db->setQuery( $query );
+	$db->setQuery( $query, $limitstart, $limit );
+	//$db->setQuery( $query );
 	$list = $db->loadObjectList();
 	if(isset($list)) {
 		foreach($list as $key => $row) {

@@ -746,7 +746,7 @@ class FlexicontentModelItems extends JModel
 
 		//At least one category needs to be assigned
 		if (!is_array( $seccats ) || count( $seccats ) < 1) {
-			$this->setError('FLEXI_SELECT_CATEGORY');
+			$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
 		}
 		
@@ -1219,10 +1219,9 @@ class FlexicontentModelItems extends JModel
 			foreach ($items as $item)
 			{
 				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
-				$canDelete 		= in_array('delete', $rights) || ($permission->CanDelete);
-				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id));
+				$canDelete 		= in_array('delete', $rights) || (in_array('delete', $rights) && $item->created_by == $user->id);
 				
-				if (!$canDelete && !$canDeleteOwn) return false;
+				if (!$canDelete) return false;
 			}
 			return true;
 		}

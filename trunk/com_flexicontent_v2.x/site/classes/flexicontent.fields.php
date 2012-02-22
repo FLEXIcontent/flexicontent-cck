@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1133 2012-02-01 05:33:21Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1138 2012-02-07 03:01:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -212,7 +212,8 @@ class FlexicontentFields
 	  if (!isset($item->fields)) {
 	  	// This if will succeed once per item ... because getFields will retrieve all values
 	  	// getFields() will not render the display of fields because we passed no params variable ...
-	  	FlexicontentFields::getFields(array(&$item));
+			$items = array(&$item);
+	  	FlexicontentFields::getFields($items);
 	  }
 
 	  // Check if we have already created the display and return it
@@ -404,8 +405,11 @@ class FlexicontentFields
 		if (!$items) return;
 		if (!$params) return $items;
 		
-		if ($view == 'category')	$layout = 'clayout';
-		if ($view == FLEXI_ITEMVIEW) 		$layout = 'ilayout';
+		if ($view == 'category')			$layout = 'clayout';
+		if ($view == FLEXI_ITEMVIEW)	$layout = 'ilayout';
+		
+		// field's source code, can use this JRequest variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
+		JRequest::setVar("flexi_callview", $view);
 
 		if ($view == 'category' || $view == FLEXI_ITEMVIEW) {
 		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
@@ -684,5 +688,80 @@ class FlexicontentFields
 		
 		return $votes;
 	}
+	
+	
+	function getTypeCustomize(&$field, &$item) {
+		static $tparams = array();
+		static $lang;
+		
+		$lang = JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+		$db =& JFactory::getDBO();
+		
+		$typename = isset($item->typename) ? $item->typename : "notype";
+		if (!isset($tparams[$typename])) {
+			$query = 'SELECT t.attribs'
+					. ' FROM #__flexicontent_types AS t'
+					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+					. ' WHERE ie.item_id = ' . (int)$item->id
+					;
+			$db->setQuery($query);
+			$tparams[$typename] = $db->loadResult();
+			$tparams[$typename] = new JParameter($tparams[$typename]);
+		}
+		
+		// -- SET a type specific label for the current field
+		// a. Try field label to get for current language
+		$field_label_type = $tparams[$typename]->get($field->name.'_label', '');
+		$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
+		if ($result) {
+			$field->label = $matches[2];
+		} else if ($field_label_type) {
+			// b. Try to get default for all languages
+			$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
+			if ($result) {
+				$field->label = $matches[2];
+			} else {
+				// c. Check that no languages specific string are defined
+				$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
+				if (!$result) {
+					$field->label = $field_label_type;
+				}
+			}
+		} else {
+			// Maintain field 's default label
+		}
+		
+		// -- SET a type specific description for the current field
+		$field->description = '';
+		// a. Try field description to get for current language
+		$field_desc_type = $tparams[$typename]->get($field->name.'_desc', '');
+		$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
+		if ($result) {
+			$field->description = $matches[2];
+		} else if ($field_label_type) {
+			// b. Try to get default for all languages
+			$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
+			if ($result) {
+				$field->description = $matches[2];
+			} else {
+				// c. Check that no languages specific string are defined
+				$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
+				if (!$result) {
+					$field->description = $field_desc_type;
+				}
+			}
+		} else {
+			// Maintain field 's default description
+		}
+		
+		return $field;
+	}
+	
 }
 ?>

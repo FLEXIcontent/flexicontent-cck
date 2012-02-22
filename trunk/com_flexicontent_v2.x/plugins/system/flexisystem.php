@@ -355,5 +355,40 @@ class plgSystemFlexisystem extends JPlugin
 
 		return;
 	}
+
+	// Function by decide type of user
+	function getUserType() {
+    
+    // Joomla default user groups
+    $author_grp = 3;
+    $editor_grp = 4;
+    $publisher_grp = 5;
+    $manager_grp = 6;
+    $admin_grp = 7;
+    $super_admin_grp = 8;
+    
+    $user = &JFactory::getUser();
+    $coreUserGroups = $user->getAuthorisedGroups();
+    // $coreViewLevels = $user->getAuthorisedViewLevels();
+    $aid = max ($user->getAuthorisedViewLevels());
+    
+    $access = '';
+    if ($aid == 1)
+    	$access = 'public'; // public
+    if ($aid == 2 || $aid > 3)
+    	$access = 'registered'; // registered user or member of custom joomla group
+    if ($aid == 3
+    	|| in_array($author_grp,$coreUserGroups)  	|| in_array($editor_grp,$coreUserGroups)
+    	|| in_array($publisher_grp,$coreUserGroups)	|| in_array($manager_grp,$coreUserGroups)
+    	|| max($coreUserGroups)>8
+    )
+    	$access = 'special'; // special user
+    if (in_array($admin_grp,$coreUserGroups))
+    	$access = 'admin'; // is admin user
+    if (in_array($super_admin_grp,$coreUserGroups))
+    	$access = 'superadmin'; // is super admin user
+    
+    return $access;
+  }
 	
 }

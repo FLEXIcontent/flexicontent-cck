@@ -73,14 +73,14 @@ $userId		= $user->get('id');
 		foreach ($this->rows as $row) {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
-			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
+			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
-			
-			$canEdit	= $user->authorise('core.edit', 'flexicontent');
-			$canEditOwn	= $user->authorise('core.edit.own', 'flexicontent'.'.category.'.$row->id) && ($row->created_user_id == $userId);
-			$canCheckin	= $user->authorise('core.admin', 'checkin') || ($row->checked_out == $userId) || ($row->checked_out == 0);
-			$canChange	= $user->authorise('core.edit.state',	'flexicontent'.'.category.'.$row->id) && $canCheckin;
+			$extension = 'com_content';
+			$canEdit	= $user->authorise('core.edit', $extension.'.category.'.$row->id);
+			$canCheckin	= $user->authorise('core.admin', 'checkin') || $row->checked_out == $userId || $row->checked_out == 0;
+			$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $userId;
+			$canChange	= $user->authorise('core.edit.state',	$extension.'.category.'.$row->id) && $canCheckin;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
    		?>
 		<tr class="<?php echo "row$k"; ?>">

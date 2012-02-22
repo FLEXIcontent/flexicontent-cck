@@ -74,48 +74,13 @@ class FlexicontentModelItem extends ParentClassItem
 
 	function setId($id)
 	{
-		// Set new item id
-		$this->_id			= $id;
-		$this->_item		= null;
+		// Set item id and wipe data
+		if ($this->_id != $id) {
+			$this->_item		= null;
+		}
+		$this->_id = $id;
 	}
-
-	/**
-	 * Overridden get method to get properties from the item
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.5
-	 */
-	/*function get($property, $default=null)
-	{
-		if ($this->_loadItem()) {
-			if(isset($this->_item->$property)) {
-				return $this->_item->$property;
-			}
-		}
-		return $default;
-	}*/
 	
-	/**
-	 * Overridden set method to pass properties on to the item
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	/*function set( $property, $value=null )
-	{
-		if ($this->_loadItem()) {
-			$this->_item->$property = $value;
-			return true;
-		} else {
-			return false;
-		}
-	}*/
 
 	/**
 	 * Method to get data for the itemview
@@ -131,6 +96,7 @@ class FlexicontentModelItem extends ParentClassItem
 			return $this->_item;
 		}
 		// Initialise variables.
+		$pk		= (!empty($pk)) ? $pk : $this->_id;
 		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
 
 		$preview = JRequest::getVar('preview');
@@ -233,18 +199,24 @@ class FlexicontentModelItem extends ParentClassItem
 
 				$data = $db->loadObject();
 				
-		if($preview) {
-			$user	= & JFactory::getUser();
-			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $data->id);
-	
-			// TODO: correct individual item access check
-			if ( !($permission->CanEdit || ($permission->CanEditOwn && $data->created_by == $user->get('id')) || in_array('edit', $rights)) ) {
-				//cannot edit
-				JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-				return;
-			}
-			$data = $this->loadUnapprovedVersion($data, $lversion);
-		}
+				if($preview) {
+					$user	= & JFactory::getUser();
+
+					$asset = 'com_content.article.' . $data->id;
+					$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $data->created_by == $user->get('id'));
+					// ALTERNATIVE 1
+					//$has_edit = $this->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+					// ALTERNATIVE 2
+					//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $data->id);
+					//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $data->created_by == $user->get('id')) ;
+					
+					if ( !$has_edit ) {
+						//cannot edit
+						JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
+						return;
+					}
+					$data = $this->loadUnapprovedVersion($data, $lversion);
+				}
 
 				if ($error = $db->getErrorMsg()) {
 					throw new Exception($error);
@@ -528,63 +500,6 @@ class FlexicontentModelItem extends ParentClassItem
 
 
 	/**
-	 * Method to calculate Item Access Permissions
-	 *
-	 * @access	private
-	 * @return	void
-	 * @since	1.5
-	 */
-	function _getItemAccess() {
-		// Convert parameter fields to objects.
-		/*$registry = new JRegistry;
-		$registry->loadString($this->_item->attribs);
-		$iparams_extra = clone $this->getState('params');
-		$iparams_extra->merge($registry);*/
-		$iparams_extra = new JRegistry;
-		
-		// Compute selected asset permissions.
-		$user	= JFactory::getUser();
-		
-		// Technically guest could edit an article, but lets not check that to improve performance a little.
-		if (!$user->get('guest')) {
-			$userId	= $user->get('id');
-			$asset	= 'com_content.article.'.$this->_item->id;
-		
-			// Check general edit permission first.
-			if ($user->authorise('core.edit', $asset)) {
-				$iparams_extra->set('access-edit', true);
-			}
-			// Now check if edit.own is available.
-			else if (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
-				// Check for a valid user and that they are the owner.
-				if ($userId == $this->_item->created_by) {
-					$iparams_extra->set('access-edit', true);
-				}
-			}
-		}
-		
-		// Compute view access permissions.
-		if ($access = $this->getState('filter.access')) {
-			// If the access filter has been set, we already know this user can view.
-			$iparams_extra->set('access-view', true);
-		}
-		else {
-			// If no access filter is set, the layout takes some responsibility for display of limited information.
-			$user = JFactory::getUser();
-			$groups = $user->getAuthorisedViewLevels();
-		
-			if ($this->_item->catid == 0 || $this->_item->category_access === null) {
-				$iparams_extra->set('access-view', in_array($this->_item->access, $groups));
-			}
-			else {
-				$iparams_extra->set('access-view', in_array($this->_item->access, $groups) && in_array($this->_item->category_access, $groups));
-			}
-		}
-		
-		return $iparams_extra;
-	}
-
-	/**
 	 * Method to load content article parameters
 	 *
 	 * @access	private
@@ -632,7 +547,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$params->merge($itemparams);
 
 		// Merge ACCESS permissions into the page configuration (Priority 0)
-		$accessperms = $this->_getItemAccess();
+		$accessperms = $this->getItemAccess();
 		$params->merge($accessperms);
 
 //		// Set the popup configuration option based on the request
@@ -719,9 +634,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @since	1.0
 	 */
 	function hit() {
-		$mainframe =& JFactory::getApplication();
-
-		if ($this->_id)
+		if ( $this->_id )
 		{
 			$item = & JTable::getInstance('flexicontent_items', '');
 			$item->hit($this->_id);
@@ -737,463 +650,6 @@ class FlexicontentModelItem extends ParentClassItem
 		return $tags;
 	}
 
-
-	/**
-	 * Method to checkin/unlock the item
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	/*function checkin()
-	{
-		if ($this->_id)
-		{
-			$item = & JTable::getInstance('flexicontent_items', '');
-			return $item->checkin($this->_id);
-		}
-		return false;
-	}*/
-
-	/**
-	 * Method to checkout/lock the item
-	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	/*function checkout($uid = null)
-	{
-		if ($this->_id)
-		{
-			// Make sure we have a user id to checkout the item with
-			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
-				$uid	= $user->get('id');
-			}
-			// Lets get to it and checkout the thing...
-			$item = & JTable::getInstance('flexicontent_items', '');
-			return $item->checkout($uid, $this->_id);
-		}
-		return false;
-	}*/
-	
-	/**
-	 * Method to store the item
-	 *
-	 * @access	public
-	 * @since	1.0
-	 */
-	/*function store($data) {
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$mainframe = &JFactory::getApplication();
-		$dispatcher = & JDispatcher::getInstance();
-		$item  	=& $this->getTable('flexicontent_items', '');
-		$user	=& JFactory::getUser();
-		
-		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
-		$details 		= array();
-		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
-		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
-		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$post['vstate'] = @(int)$post['vstate'];
-		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
-
-		// bind it to the table
-		if (!$item->bind($data)) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		$item->bind($details);
-
-		// sanitise id field
-		$item->id = (int) $item->id;
-		
-		$nullDate	= $this->_db->getNullDate();
-
-		$version = FLEXIUtilities::getLastVersions($item->id, true);
-		$version = is_array($version)?0:$version;
-		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$isnew = false;
-		$tags = array_unique($tags);
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
-		
-		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
-
-			$config =& JFactory::getConfig();
-			$tzoffset = $config->getValue('config.offset');
-
-			if ($isnew = !$item->id) {
-				$item->modified 	= $nullDate;
-				$item->modified_by 	= 0;
-			} else {
-				$mdate =& JFactory::getDate();
-				$item->modified 	= $mdate->toMySQL();
-				$item->modified_by 	= (int)$user->id;
-			}
-			// Are we saving from an item edit?
-			// This code comes directly from the com_content
-
-			$item->created_by 	= $item->created_by ? $item->created_by : $user->get('id');
-
-			if ($item->created && strlen(trim( $item->created )) <= 10) {
-				$item->created 	.= ' 00:00:00';
-			}
-
-			if ($isnew) {
-				$date =& JFactory::getDate($item->created, $tzoffset);
-				$item->created = $date->toMySQL();
-			}
-
-			if ($item->publish_up) {
-				// Append time if not added to publish date
-				if (strlen(trim($item->publish_up)) <= 10) {
-					$item->publish_up .= ' 00:00:00';
-				}
-			} else {
-				$date =& JFactory::getDate($item->created, $tzoffset);
-				$item->publish_up = $date->toMySQL();
-			}
-
-			// Handle never unpublish date
-			if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
-			{
-				$item->publish_down = $nullDate;
-			}
-			else
-			{
-				if (strlen(trim( $item->publish_down )) <= 10) {
-					$item->publish_down .= ' 00:00:00';
-				}
-				$date =& JFactory::getDate($item->publish_down, $tzoffset);
-				$item->publish_down = $date->toMySQL();
-			}
-
-
-			// auto assign the main category if none selected
-			if (!$item->catid) {
-				$item->catid 		= $cats[0];
-			}
-			
-			// auto assign the section
-			//$item->sectionid 	= 0;
-
-			// set type and language
- 			$item->type_id 		= (int)$typeid;
- 			$item->language		= $item->language ? $item->language : flexicontent_html::getSiteDefaultLang();			
-			
-			// Get a state and parameter variables from the request
-			$item->state	= JRequest::getVar( 'state', 0, '', 'int' );
-			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
-			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
-
-			// Build parameter INI string
-			if (is_array($params))
-			{
-				$txt = array ();
-				foreach ($params as $k => $v) {
-					if (is_array($v)) {
-						$v = implode('|', $v);
-					}
-					$txt[] = "$k=$v";
-				}
-				$item->attribs = implode("\n", $txt);
-			}
-
-			// Get metadata string
-			$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
-			if (is_array($params))
-			{
-				$txt = array();
-				foreach ($metadata as $k => $v) {
-					if ($k == 'description') {
-						$item->metadesc = $v;
-					} elseif ($k == 'keywords') {
-						$item->metakey = $v;
-					} else {
-						$txt[] = "$k=$v";
-					}
-				}
-				$item->metadata = implode("\n", $txt);
-			}
-					
-			// Clean text for xhtml transitional compliance
-			$text = str_replace('<br>', '<br />', $data['text']);
-			
-			// Search for the {readmore} tag and split the text up accordingly.
-			$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
-			$tagPos	= preg_match($pattern, $text);
-
-			if ($tagPos == 0)	{
-				$item->introtext	= $text;
-			} else 	{
-				list($item->introtext, $item->fulltext) = preg_split($pattern, $text, 2);
-			}
-			
-			if (!$item->id) {
-				$item->ordering = $item->getNextOrder();
-			}
-			
-			// Make sure the data is valid
-			if (!$item->check()) {
-				$this->setError($item->getError());
-				return false;
-			}
-			if(!$use_versioning) {
-				$item->version = $isnew?1:($current_version+1);
-			}else{
-				$item->version = $isnew?1:(($post['vstate']==2)?($version+1):$current_version);
-			}
-			// process field mambots onBeforeSaveItem
-			$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
-			if((count($result)>0) && in_array(false, $result)) return false;
-			// Store it in the db
-			if (!$item->store()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			//if (FLEXI_ACCESS) {//commented by enjoyman, I don't understand these lines.
-			//	$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			//	$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
-			//	if ($canRight) FAccess::saveaccess( $item, 'item' );
-			//}
-
-			$this->_item	=& $item;
-
-			//if($post['vstate']==2) {
-				//store tag relation
-				$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-				foreach($tags as $tag)
-				{
-					$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
-					$this->_db->setQuery($query);
-					$this->_db->query();
-				}
-			//}
-
-			// Store categories to item relations
-
-			// Add the primary cat to the array if it's not already in
-			if (!in_array($item->catid, $cats)) {
-				$cats[] = $item->catid;
-			}
-
-			//At least one category needs to be assigned
-			if (!is_array( $cats ) || count( $cats ) < 1) {
-				$this->setError('FLEXI_SELECT_CATEGORY');
-				return false;
-			}
-
-			//if($isnew || $post['vstate']==2) {
-			// delete only relations which are not part of the categories array anymore to avoid loosing ordering
-			$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
-					. ' WHERE itemid = '.$item->id
-					. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-
-			// draw an array of the used categories
-			$query 	= 'SELECT catid'
-					. ' FROM #__flexicontent_cats_item_relations'
-					. ' WHERE itemid = '.$item->id
-					;
-			$this->_db->setQuery($query);
-			$used = $this->_db->loadResultArray();
-
-			foreach($cats as $cat) {
-				// insert only the new records
-				if (!in_array($cat, $used)) {
-					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-							.' VALUES(' . $cat . ',' . $item->id . ')'
-							;
-					$this->_db->setQuery($query);
-					$this->_db->query();
-				}
-			}
-			//}
-		} else {
-			$datenow =& JFactory::getDate();
-			$item->modified 		= $datenow->toMySQL();
-			$item->modified_by 		= $user->get('id');
-			// Add the primary cat to the array if it's not already in
-			if (!in_array($item->catid, $cats)) {
-				$cats[] = $item->catid;
-			}
-
-			//At least one category needs to be assigned
-			if (!is_array( $cats ) || count( $cats ) < 1) {
-				$this->setError('FLEXI_SELECT_CATEGORY');
-				return false;
-			}
-		}
-		$post['categories'][0] = $cats;
-		$post['tags'][0] = $tags;
-		///////////////////////////////
-		// store extra fields values //
-		///////////////////////////////
-		
-		// get the field object
-		$this->_id 	= $item->id;	
-		$fields		= $this->getExtrafields();
-		
-		// NOTE: This event is used by 'flexinotify' plugin, and possibly others in a near future
-		$results = $dispatcher->trigger('onAfterSaveItem', array( $item, &$post ));
-		
-		// versioning backup procedure
-		// first see if versioning feature is enabled
-		if ($use_versioning) {
-			$v = new stdClass();
-			$v->item_id 		= (int)$item->id;
-			$v->version_id		= (int)$version+1;
-			$v->modified		= $item->modified;
-			$v->modified_by		= $item->modified_by;
-			$v->created 		= $item->created;
-			$v->created_by 		= $item->created_by;
-		}
-		if($post['vstate']==2) {
-			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-		}
-		if ($fields) {
-			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
-			$searchindex = '';
-			$jcorefields = flexicontent_html::getJCoreFields();
-			foreach($fields as $key=>$field) {
-			    JPluginHelper::importPlugin('flexicontent_fields', ($field->iscore ? 'core' : $field->field_type) );
-			    
-				// process field mambots onBeforeSaveField
-				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
-				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ) );
-
-				// add the new values to the database 
-				if (is_array($post[$field->name])) {
-					$postvalues = $post[$field->name];
-					$i = 1;
-					foreach ($postvalues as $postvalue) {
-						$obj = new stdClass();
-						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $item->id;
-						$obj->valueorder	= $i;
-						$obj->version		= (int)$version+1;
-						// @TODO : move to the plugin code
-						if (is_array($postvalue)) {
-							$obj->value			= serialize($postvalue);
-						} else {
-							$obj->value			= $postvalue;
-						}
-						$fields[$key]->value[] = $obj->value;
-						if ($use_versioning)
-							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-						if(
-							($isnew || ($post['vstate']==2) )
-							&& !isset($jcorefields[$field->name])
-							&& !in_array($field->field_type, $jcorefields)
-							&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-							&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-						) {
-							unset($obj->version);
-							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-						}
-						$i++;
-					}
-				} else if (isset($post[$field->name])) {
-					$obj = new stdClass();
-					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $item->id;
-					$obj->valueorder	= 1;
-					$obj->version		= (int)$version+1;
-					// @TODO : move in the plugin code
-					if (is_array($post[$field->name])) {
-						$obj->value			= serialize($post[$field->name]);
-					} else {
-						$obj->value			= $post[$field->name];
-					}
-					$fields[$key]->value[] = $obj->value;
-					if($use_versioning)
-						$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-					if(
-						($isnew || ($post['vstate']==2) )
-						&& !isset($jcorefields[$field->name])
-						&& !in_array($field->field_type, $jcorefields)
-						&& ( ($field->field_type!='categories') || ($field->name!='categories') )
-						&& ( ($field->field_type!='tags') || ($field->name!='tags') )
-					) {
-						unset($obj->version);
-						$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-					}
-				}
-				// process field mambots onAfterSaveField
-				//$results		 = $dispatcher->trigger('onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ));
-				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$post[$field->name], &$files[$field->name] ) );
-				$searchindex 	.= @$field->search;
-			}
-	
-			// store the extended data if the version is approved
-			if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
-				$item->search_index = $searchindex;
-				// Make sure the data is valid
-				if (!$item->check()) {
-					$this->setError($item->getError());
-					return false;
-				}
-				// Store it in the db
-				if (!$item->store()) {
-					$this->setError($this->_db->getErrorMsg());
-					return false;
-				}
-			}
-		}
-		if ($use_versioning) {
-			if ($v->modified != $nullDate) {
-				$v->created 	= $v->modified;
-				$v->created_by 	= $v->modified_by;
-			}
-			
-			$v->comment		= isset($post['versioncomment'])?htmlspecialchars($post['versioncomment'], ENT_QUOTES):'';
-			unset($v->modified);
-			unset($v->modified_by);
-			$this->_db->insertObject('#__flexicontent_versions', $v);
-		}
-		
-		// delete old versions
-		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
-		$vmax	= $cparams->get('nr_versions', 10);
-
-		if ($vcount > ($vmax+1)) {
-			$deleted_version = FLEXIUtilities::getFirstVersion($this->_id, $vmax, $current_version);
-			// on efface les versions en trop
-			$query = 'DELETE'
-					.' FROM #__flexicontent_items_versions'
-					.' WHERE item_id = ' . (int)$this->_id
-					.' AND version <' . $deleted_version
-					.' AND version!=' . (int)$current_version
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-
-			$query = 'DELETE'
-					.' FROM #__flexicontent_versions'
-					.' WHERE item_id = ' . (int)$this->_id
-					.' AND version_id <' . $deleted_version
-					.' AND version_id!=' . (int)$current_version
-					;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-		}
-		// process field mambots onCompleteSaveItem
-		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
-		return true;
-	}*/
 
 	/**
 	 * Method to store a vote
@@ -1223,22 +679,7 @@ class FlexicontentModelItem extends ParentClassItem
 		return true;
 	}*/
 
-	/**
-	 * Method to get the categories an item is assigned to
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	/*function getCatsselected()
-	{
-		if(!@$this->_item->categories) {
-			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
-			$this->_db->setQuery($query);
-			$this->_item->categories = $this->_db->loadResultArray();
-		}
-		return $this->_item->categories;
-	}*/
+
 
 	/**
 	 * Method to store the tag
@@ -1387,31 +828,7 @@ class FlexicontentModelItem extends ParentClassItem
 		return true;
 	}*/
 
-	/**
-	 * Method to get the type parameters of an item
-	 * 
-	 * @return string
-	 * @since 1.5
-	 */
-	/*function getTypeparams ()
-	{
-		$query	= 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t';
 
-		if ($this->_id == null) {
-			$type_id = JRequest::getInt('typeid', 0);
-			$query .= ' WHERE t.id = ' . (int)$type_id;
-		} else {
-			$query .= ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					. ' WHERE ie.item_id = ' . (int)$this->_id
-					;
-		}
-		$this->_db->setQuery($query);
-		$tparams = $this->_db->loadResult();
-		return $tparams;
-	}*/
-
-		
 	/**
 	 * Method to get advanced search fields which belongs to the item type
 	 * 

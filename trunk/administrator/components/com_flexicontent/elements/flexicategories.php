@@ -39,22 +39,31 @@ class JElementFlexicategories extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
+		static $function_added = false;
+		
 		$doc 		=& JFactory::getDocument();
 		$fieldName	= $control_name.'['.$name.']';
-		$values = explode(",", $value);
+		$values = $value;
+		//var_dump($values);
+		if ( ! is_array( $values ) ) {
+			$values = explode(",", $values);
+		}
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
-		$js = "
-		function FLEXIClickCategory(obj) {
-			values=new Array();
-			for(i=0,j=0;i<obj.options.length;i++) {
-				if(obj.options[i].selected==true)
-					values[j++] = obj.options[i].value;
-			}
-			values = values.concat();
-			document.getElementById('a_id').value = values;
-		}";
-		$doc->addScriptDeclaration($js);
+		/*if (!$function_added) {
+			$function_added = true;
+			$js = "
+			function FLEXIClickCategory(obj, name) {
+				values=new Array();
+				for(i=0,j=0;i<obj.options.length;i++) {
+					if(obj.options[i].selected==true)
+						values[j++] = obj.options[i].value;
+				}
+				values = values.concat();
+				document.getElementById('a_id_'+name).value = values;
+			}";
+			$doc->addScriptDeclaration($js);
+		}*/
 		
 		$attribs = '';
 		if ($node->attributes('size')) {
@@ -62,22 +71,30 @@ class JElementFlexicategories extends JElement
 		} else {
 			$attribs .= ' size="8" ';
 		}
-		
-		$required='required';
-		if ( $node->attributes('required') && $node->attributes('required')=='false' ) {
-			$required='';
+		if ( $node->attributes('multiple') && $node->attributes('multiple')=='true' ) {
+			$attribs .=' multiple="multiple"';
+			$fieldName .= "[]";
 		}
 
-		if ($node->attributes('multiple')=='0') {
-		}else{
-			$attribs .= ' multiple="multiple"';
+		$classes = '';
+		if ( $node->attributes('required') && $node->attributes('required')=='true' ) {
+			$classes .= ' required';
 		}
-		if ($top = $node->attributes('top')) {
-		}else{
-			$top = false;
+		if ( $node->attributes('validation_class') ) {
+			$classes .= ' '.$node->attributes('validation_class');
 		}
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, $top, ' onClick="javascript:FLEXIClickCategory(this);" class="inputbox '.$required.' validate-cid" '.$attribs, true);
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
+		
+		$top = false;
+		if ( $node->attributes('top') ) {
+			$top = $node->attributes('top');
+		}
+		
+		$ffname = $node->attributes('name');
+		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, $top,
+			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
+			' class="inputbox '.$classes.'" '.$attribs,
+			false, true, $actions_allowed=array('core.create') );
+		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldName\" value=\"$value\" />";
 		return $html;
 	}
 }

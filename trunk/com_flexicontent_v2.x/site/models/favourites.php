@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: favourites.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: favourites.php 892 2011-09-07 22:16:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -43,7 +43,7 @@ class FlexicontentModelFavourites extends JModel
 	 * @var integer
 	 */
 	var $_total = null;
-	
+
 	/**
 	 * parameters
 	 *
@@ -62,17 +62,20 @@ class FlexicontentModelFavourites extends JModel
 		
 		$mainframe =& JFactory::getApplication();
 
-		// Get the paramaters of the active menu item
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-		if (is_object( $menu )) {
-			jimport( 'joomla.html.parameter' );
-			$menu_params = new JParameter( $menu->params );
-			$params->merge($menu_params);
+		// Get the PAGE/COMPONENT parameters
+		$params = clone( $mainframe->getParams('com_flexicontent') );
+		
+		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
 		}
+		
 		$this->_params = $params;
-
+		
 		//get the number of events from database
 		$limit			= JRequest::getInt('limit', $params->get('limit'));
 		$limitstart		= JRequest::getInt('limitstart');
@@ -128,30 +131,34 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildQuery()
 	{   	
-		$mainframe =& JFactory::getApplication();
-
 		$user		= & JFactory::getUser();
-		$gid		= max ($user->getAuthorisedViewLevels());
-        // Get the WHERE and ORDER BY clauses for the query
-		$params 	=  $this->_params;
+		$params = $this->_params;
+		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		$joinaccess = $andaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-				$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $gid . ')';
-				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess = ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
 			} else {
-				//$andaccess   = ' AND mc.access <= '.$gid;
-				//$andaccess  .= ' AND i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
+				} else {
+					$andaccess   = ' AND mc.access <= '.$aid;
+					$andaccess  .= ' AND i.access <= '.$aid;
+				}
 			}
 		}
 
-        // Get the WHERE and ORDER BY clauses for the query
+		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
 
@@ -198,17 +205,17 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildItemWhere( )
 	{
-		$mainframe =& JFactory::getApplication();
-
 		$user		= & JFactory::getUser();
-		$gid		= max ($user->getAuthorisedViewLevels());
-		$params 	=  $this->_params;
+		$gid		= (int) $user->get('aid');
+		$params	=  $this->_params;
 
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE f.userid = '.(int)$user->get('id');
 		
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
+
+		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause

@@ -256,9 +256,16 @@ div.flexi_edit .flexi_buttons {
 div.flexi_edit .flexi_label {
 	display: block;
 	float: left;
-	vertical-align: middle;
-	width: 9em;
+  background-color: #F6F6F6;
+  border-bottom: 1px solid #E9E9E9;
+  border-right: 1px solid #E9E9E9;
+  font-weight: bold;
+  text-align: right;
+  width: 140px;
+  margin:2px;
+  padding:3px;
 }
+
 div.flexi_edit .flexi_label.invalid {
 	font-weight: bold;
 }
@@ -269,6 +276,7 @@ div.flexi_edit .flexi_formblock {
 div.flexi_edit fieldset {
 	border: 1px solid #dddddd;
 	margin-bottom: 1em;
+	padding: 4px;
 }
 
 div.flexi_edit form input,
@@ -278,8 +286,8 @@ div.flexi_edit form textarea {
 	background-color: #ffffff;
 	border: 1px solid #dddddd;
 	cursor: pointer;
-	margin: 0 0 0.5em 0;
-	padding: 0.2em;
+	margin: 0.1em 0 0.1em 0;
+	padding: 0.1em 0.4em 0.1em 0.2em;
 }
 
 div.flexi_edit form input.invalid,
@@ -303,6 +311,11 @@ fieldset.flexiaccess legend {
 	padding-right: 22px;
 	line-height: 18px;
 	cursor: pointer;
+}
+
+fieldset.flexiaccess {
+	margin: 4px 0px 4px 0px!important;
+	padding: 5px!important;
 }
 
 
@@ -838,4 +851,48 @@ div#flexicontent.directory .fcsubcat_image {
 }
 
 div#flexicontent.directory .fcsubcat_descr {
+}
+
+/***********************************************/
+/* JCE EDITOR FIXES (most frontend templates?) */
+/***********************************************/
+
+/* Fixes for JCE EDITOR BUTTONS */
+div#flexicontent #editor-xtd-buttons a {
+	margin:0px !important;
+	padding:0 24px 0 6px !important;
+	border:0 none !important;
+	background:none !important;
+	font-weight: normal !important;
+}
+
+div#flexicontent #editor-xtd-buttons .button2-left {
+	margin:4px 0px 0px 4px !important;
+}
+
+/***********************/
+/* CSS FIXES FOR J1.6+ */
+/***********************/
+div#flexicontent .pane-slider ul.adminformlist, div#flexicontent ul#rules, div#flexicontent ul#rules ul {
+	list-style-type: none !important;
+	margin: 0px !important;
+	padding: 2px !important;
+}
+
+div#flexicontent table.admintable td {
+	margin: 0px;
+	padding: 0.2em 0.4em;
+}
+
+div#flexicontent table.admintable table td {
+	margin: 0px;
+	padding: 0px;
+}
+
+div#flexicontent table.admintable td.paramlist_key {
+	padding: 0px 4px 0px 4px;
+}
+
+div#flexicontent .panel h3 a {
+	padding:0px 0px 4px 0px;
 }

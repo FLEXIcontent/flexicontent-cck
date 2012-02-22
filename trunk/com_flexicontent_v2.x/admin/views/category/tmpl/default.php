@@ -99,7 +99,7 @@ dump($this->row);
 				</table>
 									
 				<?php
-				if ($this->permission->CanCats) :
+				if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');

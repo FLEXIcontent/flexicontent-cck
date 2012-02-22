@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1093 2012-01-10 04:48:00Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1125 2012-01-26 12:38:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,6 @@ class flexicontent_html
 	 * @access	protected
 	 * @var		string
 	 */
-	static private $_icondir = 'media/system/images/';
 	
 	/**
 	 * Strip html tags and cut after x characters
@@ -119,10 +118,15 @@ class flexicontent_html
 			} else {
 				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
 			}
+			// Fix for J1.7+ format variable removed from URL and added as URL suffix
+			if (!preg_match('/format\=feed/',$link)) {
+				$link .= "&amp;format=feed";
+			}
+			
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'livemarks.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_FEED' ));
+				$image = JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
 			}
@@ -152,7 +156,7 @@ class flexicontent_html
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
-				$image = JHTML::_('image.site', 'printButton.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
+				$image = JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -204,7 +208,7 @@ class flexicontent_html
 			$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'emailButton.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+				$image = JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
 			}
@@ -231,7 +235,7 @@ class flexicontent_html
 		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'pdf_button.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				$image = JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -256,44 +260,39 @@ class flexicontent_html
 	function editbutton( $item, &$params)
 	{
 		$user	= & JFactory::getUser();
-		$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-		$permission = FlexicontentHelperPerm::getPerm();
 		
-		// TODO: correct individual item access check
-		if ( $permission->CanEdit || ( $permission->CanEditOwn && $item->created_by == $user->get('id') ) || in_array('edit', $rights) )
-		{
+		// Determine if current user can edit the given item
+		$has_edit = false;
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $item->id;
+			$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+			// ALTERNATIVE 1
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+			//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $item->created_by == $user->get('id')) ;
+		} else {
+			$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id'));
+		}
+		
+		// Create the edit button and return it
+		if ($has_edit) {
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'edit.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+				$image = JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
 			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 			$text 		= JText::_( 'FLEXI_EDIT' );
 
-			$link 	= 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug
+						.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
 		}
-		/* else {
-
-			if ($user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id')) ) 
-			{
-				if ( $params->get('show_icons') ) {
-					$image = JHTML::_('image.site', 'edit.png', self::$_icondir, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
-				} else {
-					$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-				}
-				$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
-				$text 		= JText::_( 'FLEXI_EDIT' );
-	
-				$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
-				$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-	
-				return $output;
-			}
-		}*/
-
+		
 		return;
 	}
 
@@ -1206,6 +1205,8 @@ class flexicontent_html
 		
 		return $types;
 	}
+	
+	
 	/**
 	 * Displays a list of the available access view levels
 	 *
@@ -1901,7 +1902,7 @@ class FLEXIUtilities {
 		}
 	}
 	
-	/* !!! FUNCTION NOT ADAPTED YET FOR J1.7 */
+	/* !!! FUNCTION NOT DONE YET */
 	function call_Content_Plg_Func( $fieldname, $func, $args=null ) {
 		static $content_plgs;
 		
@@ -2030,15 +2031,16 @@ class FLEXIUtilities {
 		return($ords);
 	}
 
-	function count_new_hit(&$params) // If needed to modify params then clone them !! ??
+	function count_new_hit(&$item) // If needed to modify params then clone them !! ??
 	{
+		$mainframe =& JFactory::getApplication();
+		$params = $mainframe->getParams('com_flexicontent');
 		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 		
 		$db =& JFactory::getDBO();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
-		$item_id = JRequest::getInt("id",0);
-		if ($item_id==0) {
+		if ($item->id==0) {
 			$jAp=& JFactory::getApplication();
 			$jAp->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
 			return 1; // Invalid item id ?? (do not try to decrement hits in content table)
@@ -2078,38 +2080,57 @@ class FLEXIUtilities {
 			}
 		}
 		
-		
-		// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
-		$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
-		
-		// Try to find matching records for visitor's IP, that is within time limit of unique hit
-		$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
-		$db->setQuery($query);
-		$result = $db->query();
-		if ($db->getErrorNum()) {
-			$select_error_msg = $db->getErrorMsg();
-			$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
-			$db->setQuery($query_create);
-			$result = $db->query();
-			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$select_error_msg."\n"),'error');
+		// CHECK RULE 3: item hit does not exist in current session
+		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
+		if ($hit_method == 'use_session') {
+			$session 	=& JFactory::getSession();
+			$hit_accounted = false;
+			$hit_arr = array();
+			if ($session->has('hit', 'flexicontent')) {
+				$hit_arr 	= $session->get('hit', array(), 'flexicontent');
+				$hit_accounted = isset($hit_arr[$item->id]);
 			}
-			return 1; // on select error e.g. table created, count a new hit
-		}
-		$count = $db->loadResult();
-		
-		// Log the visit into the hits logging db table
-		if(empty($count))
-		{
-			$query = "REPLACE INTO #__flexicontent_hits_log (item_id, timestamp, ip) VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")";
+			if (!$hit_accounted) {
+				//add hit to session hit array
+				$hit_arr[$item->id] = $timestamp = time();  // Current time as seconds since Unix epoc;
+				$session->set('hit', $hit_arr, 'flexicontent');
+				return 1;
+			}
+			
+		} else {  // ALTERNATIVE METHOD (above is better, this will be removed?), by using db table to account hits, instead of user session
+			
+			// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
+			$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
+			
+			// Try to find matching records for visitor's IP, that is within time limit of unique hit
+			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item->id;
 			$db->setQuery($query);
 			$result = $db->query();
 			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+				$select_error_msg = $db->getErrorMsg();
+				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
+				$db->setQuery($query_create);
+				$result = $db->query();
+				if ($db->getErrorNum()) {
+					$jAp=& JFactory::getApplication();
+					$jAp->enqueueMessage(nl2br($query."\n".$select_error_msg."\n"),'error');
+				}
+				return 1; // on select error e.g. table created, count a new hit
 			}
-			return 1;  // last visit not found or is beyond time limit, count a new hit
+			$count = $db->loadResult();
+			
+			// Log the visit into the hits logging db table
+			if(empty($count))
+			{
+				$query = "REPLACE INTO #__flexicontent_hits_log (item_id, timestamp, ip) VALUES (".$db->quote($item->id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")";
+				$db->setQuery($query);
+				$result = $db->query();
+				if ($db->getErrorNum()) {
+					$jAp=& JFactory::getApplication();
+					$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+				}
+				return 1;  // last visit not found or is beyond time limit, count a new hit
+			}
 		}
 		
 		// Last visit within time limit, do not count new hit

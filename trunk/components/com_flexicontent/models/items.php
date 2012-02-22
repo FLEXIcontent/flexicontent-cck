@@ -130,8 +130,8 @@ class FlexicontentModelItems extends JModel
 		* Load the Item data
 		*/
 		if ($this->_loadItem()) {
-			// Get the paramaters of the active menu item
-			$params = & $mainframe->getParams('com_flexicontent');
+			// Get the page/component configuration (current menu item parameters are already merged in J1.5)
+			$params = clone ( $mainframe->getParams('com_flexicontent') );
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
 			$gid	= (int) $user->get('gid');
@@ -235,21 +235,6 @@ class FlexicontentModelItems extends JModel
 				$this->_item->modified = null;
 			}
 
-			//check session if uservisit already recorded
-			$session 	=& JFactory::getSession();
-			$hitcheck = false;
-			if ($session->has('hit', 'flexicontent')) {
-				$hitcheck 	= $session->get('hit', 0, 'flexicontent');
-				$hitcheck 	= in_array($this->_item->id, $hitcheck);
-			}
-			if (!$hitcheck) {
-				//record hit
-				$this->hit();
-
-				$stamp = array();
-				$stamp[] = $this->_item->id;
-				$session->set('hit', $stamp, 'flexicontent');
-			}
 			//we show the introtext and fulltext (chr(13) = carriage return)
 			//$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
 
@@ -559,13 +544,16 @@ class FlexicontentModelItems extends JModel
 	 */
 	function _loadItemParams()
 	{
+		if (!empty($this->_item->parameters)) return;
+		
 		global $mainframe;
 
 		// Get the page/component configuration (Priority 4)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
-		// Merge parameters from current category
+		// Merge parameters from current category (Priority 3)
 		if ($cid = JRequest::getVar( 'cid', 0 ) ) {
+			// Retrieve ...
 			$query = 'SELECT c.params'
 					. ' FROM #__categories AS c'
 					. ' WHERE c.id = ' . (int)$cid
@@ -577,7 +565,7 @@ class FlexicontentModelItems extends JModel
 			// Prevent some params from propagating ...
 			$catparams->set('show_title', '');
 			
-			// Merge categories parameters (Priority 3)
+			// Merge ...
 			$params->merge($catparams);
 		}
 		
@@ -682,9 +670,7 @@ class FlexicontentModelItems extends JModel
 	 * @since	1.0
 	 */
 	function hit() {
-		global $mainframe;
-
-		if ($this->_id)
+		if ( $this->_id )
 		{
 			$item = & JTable::getInstance('flexicontent_items', '');
 			$item->hit($this->_id);
@@ -800,6 +786,26 @@ class FlexicontentModelItems extends JModel
 		$post['vstate'] = @(int)$post['vstate'];
 		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
+		// BOF: Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
+		if (is_array($data['text'])) {
+			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($data['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$data['text'] = & $tabs_text;
+		}
+		if (is_array($post['text'])) {
+			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($post['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$post['text'] = & $tabs_text;
+		}
+		//print_r($data['text']); exit();
+		// EOF: Reconstruct (main)text field
+		
 		// bind it to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
@@ -866,10 +872,9 @@ class FlexicontentModelItems extends JModel
 				$item->publish_down = $date->toMySQL();
 			}
 
-
 			// auto assign the main category if none selected
 			if (!$item->catid) {
-				$item->catid 		= $cats[0];
+				$item->catid 		= @$data['catid'] ? $data['catid'] : $cats[0];
 			}
 			
 			// auto assign the section

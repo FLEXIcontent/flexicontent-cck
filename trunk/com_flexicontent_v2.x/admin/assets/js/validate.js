@@ -231,6 +231,7 @@ var JFormValidator = new Class({
 		// Validate form fields
 		for (var i=0;i < form.elements.length; i++) {
 			if (this.validate(form.elements[i]) == false) {
+				//alert(form.elements[i].name);
 				valid = false;
 			}
 		}
@@ -251,7 +252,7 @@ var JFormValidator = new Class({
 		if (!(el.labelref)) {
 			var labels = $$('label');
 			labels.each(function(label){
-				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for')+'[]' == el.getProperty('name')) {
+				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for') == el.getProperty('id') || label.getProperty('for')+'[]' == el.getProperty('name')) {
 					el.labelref = label;
 				}
 			});

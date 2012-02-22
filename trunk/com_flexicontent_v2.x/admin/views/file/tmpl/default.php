@@ -95,6 +95,7 @@ function submitbutton(pressbutton) {
 
 
 <?php
+if ($this->permission->CanConfig) :
 $this->document->addScriptDeclaration("
 	window.addEvent('domready', function() {
 	var slideaccess = new Fx.Slide('tabacces');
@@ -120,6 +121,7 @@ $this->document->addScriptDeclaration("
 	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 </div>
 </fieldset>
+<?php endif; ?>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>

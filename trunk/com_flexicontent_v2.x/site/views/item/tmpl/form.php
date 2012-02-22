@@ -21,12 +21,19 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
 // Added to allow the user to choose some of the pre-selected categories
-$cids = $this->params->get("cid");  // categories FIELD is READONLY ?
+$cid = $this->params->get("cid");
+$maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
+// Check user permission for submitting to multiple categories
+if (!$this->perms['multicat']) {
+	if ($postcats==2) $postcats = 1;
+}
 
-if ($cids) :
+if ($cid) :
 	global $globalcats;
-	//$cids 		= explode(",", $cids);
+	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
+	if (!in_array($maincatid, $cids)) $cids[] = $maincatid;
 	$cids_kv 	= array();
 	$options 	= array();
 	foreach ($cids as $cat) {
@@ -34,24 +41,33 @@ if ($cids) :
 	}
 	
 	switch($postcats) {
-		case 0:
+		case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
 		default:
+			$in_single_cat = ( count($cids)==1 );
 			$fixedcats = implode(', ', $cids_kv);
 			foreach ($cids_kv as $k => $v) {
 				$fixedcats .= '<input type="hidden" name="jform[cid][]" value="'.$k.'" />';
 			}
+			$fixedmaincat = $globalcats[$maincatid]->title;
+			$fixedmaincat .= '<input type="hidden" name="jform[catid]" value="'.$maincatid.'" />';
 			break;
-		case 1:
+		case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
+			$in_single_cat = true;
+			$options[] = JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' );
 			foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', '', 'value', 'text', '' );
+			$fixedcats = '';
+			$fixedmaincat = JHTML::_('select.genericlist', $options, 'jform[catid]', ' class="required" ', 'value', 'text', $maincatid, 'jform_catid' );
 			break;
-		case 2:
+		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
+			$in_single_cat = false;
 			foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', 'multiple="multiple" size="6"', 'value', 'text', '' );
+			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', 'multiple="multiple" size="6"', 'value', 'text', '', 'jform_cid' );
+			array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
+			$fixedmaincat = JHTML::_('select.genericlist', $options, 'jform[catid]', ' class="required" ', 'value', 'text', $maincatid, 'jform_catid' );
 			break;
 	}
 endif;
@@ -66,11 +82,12 @@ if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
 }
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+$this->document->addStyleSheet('administrator/templates/bluestork/css/template.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
 
-if ($this->perms['canusetags']) {
+if ($this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -168,45 +185,16 @@ function addtag(id, tagname) {
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
-function submitbutton( pressbutton ) {
-	if (pressbutton == 'cancel') {
-		submitform( pressbutton );
-		return false;
-	}
-
-	var form = document.adminForm;
-	var validator = document.formvalidator;
-	var title = form.jform_title.value;
-	title.replace(/\s/g,'');
-	//if(!validator.checkRequired()) return false;
-	if ( title.length==0 ) {
-		/*alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");*/ // commented out because each type may have custom name for title via an template override, and it will be confusing
-		validator.handleResponse(false,form.jform_title);
-		var invalid = $$('.invalid');
-		new Fx.Scroll(window).toElement(invalid[0]);
-		invalid[0].focus();
-		//form.title.focus();
-		return false;
-	} else if ( typeof form.jformcid != 'undefined' && typeof form.jformcid.selectedIndex != 'undefined' && form.jformcid.selectedIndex == -1 ) {
-		/*alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");*/  // commented out because each type may have custom name for categories via an template override, and it will be confusing
-		validator.handleResponse(false,form.jformcid);
-		var invalid = $$('.invalid');
-		new Fx.Scroll(window).toElement(invalid[0]);
-		invalid[0].focus();
-		return false;
+Joomla.submitbutton = function (task){
+	if (task == 'cancel' || document.formvalidator.isValid(document.id('adminForm'))) {
+		<?php echo $this->editor->getContent( 'jform_text' ); ?>
+		submitform(task);
 	} else {
-		<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) : ?>
-			// commented out because each type may have custom name for description via type configutation, and it will be confusing
-			/*var text = <?php echo $this->editor->getContent( 'jform_text' ); ?>
-			if (text == '') {
-				alert ( "<?php echo JText::_( 'Article must have some text', true ); ?>");
-				return false;
-			}*/
-		<?php endif; ?>
+		var invalid = $$('.invalid');
+		new Fx.Scroll(window).toElement(invalid[0]);
+		invalid[0].focus();
 	}
-	
-	submitform(pressbutton);
-	return true;
+	return false;
 }
 
 function deleteTag(obj) {
@@ -223,29 +211,29 @@ function deleteTag(obj) {
     </h1>
     <?php endif; ?>
 
-	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
+	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons">
 			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');?>" target="_blank">
 				<button type="button" class="button" onclick="javascript:;">
 					<?php echo JText::_( 'FLEXI_PREVIEW' ) ?>
 				</button>
 			</a>
-			<button type="submit" class="button" onclick="javascript:return submitbutton('save_a_preview');">
+			<button type="submit" class="button" onclick="javascript: return Joomla.submitbutton('save_a_preview');">
 				<?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?>
 			</button>
-			<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
+			<button type="submit" class="button" onclick="javascript: return Joomla.submitbutton('save')">
 				<?php echo JText::_( 'FLEXI_SAVE' ) ?>
 			</button>
-			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
+			<button type="reset" class="button" onclick="javascript: return Joomla.submitbutton('cancel')">
 				<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
 			</button>
 		</div>
          
 		<br class="clear" />
 		
-	<table cellspacing="0" cellpadding="0" border="0" width="100%">
+	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
-			<td>
+			<td class="key">
 				<?php echo $this->item->getLabel('title');?>
 			</td>
 			<td>
@@ -253,7 +241,7 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td class="key">
 				<?php echo $this->item->getLabel('alias');?>
 			</td>
 			<td>
@@ -261,31 +249,58 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		
-<?php if ($cids) : ?>
+<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
+		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 		<tr>
-			<td>
-				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
+			<td class="key">
+				<label id="jform_cid-lbl" for="jform_cid">
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
 				</label>
+				<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+					</span>
+				<?php endif; ?>
 			</td>
 			<td>
 				<?php echo $fixedcats; ?>
 			</td>
 		</tr>
-<?php else : ?>
+		<?php endif; ?>
 		<tr>
-			<td>
-				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
-					<?php if ($this->perms['multicat']) : ?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
-					</span>
-					<?php endif; ?>
+			<td class="key">
+				<label id="jform_catid-lbl" for="jform_catid">
+					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
 			</td>
 			<td>
-          		<?php echo $this->lists['cid']; ?>
+				<?php echo $fixedmaincat; ?>
+			</td>
+		</tr>
+<?php else : ?>
+		<?php if ($this->perms['multicat']) : ?>
+		<tr>
+			<td class="key">
+				<label id="jform_cid-lbl" for="jform_cid">
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+					</span>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['cid']; ?>
+			</td>
+		</tr>
+		<?php endif; ?>
+		<tr>
+			<td class="key">
+				<label id="jform_catid-lbl" for="jform_catid">
+					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['catid']; ?>
 			</td>
 		</tr>
 <?php endif; ?>
@@ -302,7 +317,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 	<?php if (!$autopublished && $canpublish) : ?>
 	
 		<tr>
-			<td>
+			<td class="key">
 				<?php echo $this->item->getLabel('state').':';?>
 			</td>
 			<td>
@@ -315,10 +330,8 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		
 		<?php	if (!$cparams->get('auto_approve', 0)) :	?>
 		<tr>
-			<td>
-				<label for="vstate" class="flexi_label">
+			<td class="key">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
-				</label>
 			</td>
 			<td>
 				<?php echo $this->lists['vstate']; ?>
@@ -329,7 +342,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 	<?php elseif (!$autopublished && !$canpublish) : ?>
 	
 		<tr>
-			<td>
+			<td class="key">
 				<?php echo $this->item->getLabel('state').':';?>
 			</td>
 			<td>
@@ -343,7 +356,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 	<?php endif; ?>
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<tr>
-			<td>
+			<td class="key">
 				<?php echo $this->item->getLabel('language'); ?>
 			</td>
 			<td>
@@ -352,10 +365,12 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		</tr>
 		<?php endif; ?>
 		<tr>
-			<td>
-			<?php echo $this->item->getLabel('featured'); ?>
+			<td class="key">
+				<?php echo $this->item->getLabel('featured'); ?>
 			</td>
-			<td><?php echo $this->item->getInput('featured');?></td>
+			<td>
+				<?php echo $this->item->getInput('featured');?>
+			</td>
 		</tr>
 		<?php 
 		if ($this->perms['canconfig']) :
@@ -374,21 +389,24 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		?>
 		<tr>
 			<td colspan="2">
-			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-			<table id="tabacces" class="admintable" width="100%">
-				<tr>
-					<td>
-						<div id="accessrules"><?php echo $this->item->getInput('rules'); ?></div>
-					</td>
-				</tr>
-			</table>
-			<div id="notabacces">
-			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-			</div>
+				<fieldset class="flexiaccess" style="font-size:80%;">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+					<table id="tabacces" class="admintable" width="100%">
+						<tr>
+							<td>
+								<div id="accessrules"><?php echo $this->item->getInput('rules'); ?></div>
+							</td>
+						</tr>
+					</table>
+					<div id="notabacces">
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					</div>
+				</fieldset>
+			</td>
 		</tr>
 		<?php endif; ?>
 		<tr>
-			<td>
+			<td class="key">
 				<label><?php echo JText::_( 'FLEXI_TAGS' ); ?></label>
 			</td>
 			<td>
@@ -396,7 +414,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					<ul id="ultagbox">
 					<?php
 						foreach($this->usedtags as $tag) {
-								if ($this->perms['canusetags']) {
+								if ($this->perms['cantags']) {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 								} else {
@@ -410,9 +428,9 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				</div>
 			</td>
 		</tr>
-		<?php if ($this->perms['canusetags']) : ?>
+		<?php if ($this->perms['cantags']) : ?>
 		<tr>
-			<td>
+			<td class="key">
 				<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?></label>
 			</td>
 			<td>

@@ -129,6 +129,18 @@ class flexicontent_categories extends JTableNested
 			if ($result = $db->loadResult()) {
 				$assetId = (int) $result;
 			}
+		} else {
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('id');
+			$query->from('#__assets');
+			$query->where('name= "com_flexicontent"');
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
 		}
 
 		// Return the asset id.

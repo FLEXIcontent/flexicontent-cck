@@ -115,8 +115,7 @@ class FlexicontentViewCategory extends JView
 			}
 		}
 		
-		// because the application sets a default page title, we need to get it
-		// right from the menu item itself
+		// Because the application sets a default page title, we need to get title right from the menu item itself
 		if (is_object( $menu )) {
 			$menu_params = new JParameter( $menu->params );		
 			
@@ -161,17 +160,33 @@ class FlexicontentViewCategory extends JView
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
-
-		if (!FLEXI_J16GE) {
+		
+		if (FLEXI_J16GE) {
+			if ($category->metadesc) {
+				$document->setDescription( $category->metadesc );
+			}
+			
+			if ($category->metakey) {
+				$document->setMetadata('keywords', $category->metakey);
+			}
+			
+			$meta_params = new JParameter($category->metadata);
+			
 			if ($mainframe->getCfg('MetaTitle') == '1') {
-					$mainframe->addMetaTag('title', $category->title);
+				$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
+				$document->setMetaData('title', $meta_title);
+			}
+			
+			if ($mainframe->getCfg('MetaAuthor') == '1') {
+				$meta_author = $meta_params->get('author') ? $meta_params->get('author') : JFactory::getUser($category->created_user_id)->name;
+				$document->setMetaData('author', $meta_author);
 			}
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') {
-					$document->setMetaData('title', $category->title);
+			if ($mainframe->getCfg('MetaTitle') == '1') {
+				$document->setMetaData('title', $category->title);
 			}
 		}
-		
+
 		if ($params->get('show_feed_link', 1) == 1) {
 			//add alternate feed link
 			$link	= '&format=feed';
@@ -368,9 +383,9 @@ class FlexicontentViewCategory extends JView
 		$config	=& JFactory::getConfig();
 		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
 		
-		$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
 		$image = "";
 		if ($show_cat_image) {
+			$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
 			$image = "";
 			$cat->introtext = & $cat->description;
 			$cat->fulltext = "";
@@ -453,26 +468,26 @@ class FlexicontentViewCategory extends JView
 		}
 
 		// Create the pagination object
-		jimport('joomla.html.pagination');
-
-		$pageNav 	= new JPagination($total, $limitstart, $limit);
+		$pageNav = $model->getPagination();
+		$resultsCounter = $model->getResultsCounter();
 
 		$this->assign('action', 			$uri->toString());
 
 		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		
 		$this->assignRef('params' , 		$params);
-		$this->assignRef('categories' , 	$categories);
+		$this->assignRef('categories' , $categories);
 		$this->assignRef('items' , 			$items);
 		$this->assignRef('authordescr_item_html' , $authordescr_item_html);
-		$this->assignRef('category' , 		$category);
-		$this->assignRef('limitstart' , 	$limitstart);
+		$this->assignRef('category' , 	$category);
+		$this->assignRef('limitstart' , $limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);
+		$this->assignRef('resultsCounter' ,	$resultsCounter);
 		$this->assignRef('filters' ,	 	$filters);
 		$this->assignRef('lists' ,	 		$lists);
 		$this->assignRef('alpha' ,	 		$alpha);
-		$this->assignRef('tmpl' ,			$tmpl);
-		$this->assignRef('print_link' ,		$print_link);
+		$this->assignRef('tmpl' ,				$tmpl);
+		$this->assignRef('print_link' ,	$print_link);
 
 		/*
 		 * Set template paths : this procedure is issued from K2 component

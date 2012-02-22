@@ -44,8 +44,6 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	public function __construct($config = array())
 	{
-		
-		$this->extension = 'com_content';
 		parent::__construct($config);
 
 		// Guess the JText message prefix. Defaults to the option.
@@ -53,12 +51,29 @@ class FlexicontentControllerCategory extends JControllerForm
 			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
 		
-		$this->registerTask( 'add'  ,		'add' );
 		$this->registerTask( 'apply'  ,		'save' );
 		$this->registerTask( 'save2new',	'save' );
 		$this->registerTask( 'save2copy', 'save' );
 	}
 
+	function add() {
+		parent::add();
+	}
+	
+	function edit() {
+		$cid = JRequest::getVar('cid', array(), 'get', 'array');
+		if (count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
+		parent::edit();
+	}
+
+	function save() {
+		parent::save();
+	}
+	
+	function cancel() {
+		parent::cancel();
+	}
+	
 	/**
 	 * Method to check if you can add a new record.
 	 *
@@ -73,29 +88,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	{
 		return JFactory::getUser()->authorise('core.create', $this->extension);
 	}
-	
-	function edit() {
-		$cid		= JRequest::getVar('cid', array(), 'get', 'array');
-		if(count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
-		parent::edit();
-	}
 
-	function add() {
-		parent::add();
-	}
-	
-	function save() {
-		parent::save();
-	}
-	
-	function save2new() {
-		parent::save2new();
-	}
-	
-	function save2copy() {
-		parent::save2copy();
-	}
-	
 	/**
 	 * Method to check if you can edit a record.
 	 *
@@ -119,14 +112,14 @@ class FlexicontentControllerCategory extends JControllerForm
 			return true;
 		}
 
-		// Check specific edit permission of specific category
-		if ($user->authorise('core.edit', $this->extension.'.category.'.$recordId)) {
+		// Check specific edit permission.
+		if ($user->authorise('core.edit', 'com_content.category.'.$recordId)) {
 			return true;
 		}
 
 		// Fallback on edit.own.
 		// First test if the permission is available.
-		if ($user->authorise('core.edit.own', $this->extension.'.category.'.$recordId) || $user->authorise('core.edit.own', $this->extension)) {
+		if ($user->authorise('core.edit.own', 'com_content.category.'.$recordId) || $user->authorise('core.edit.own', $this->extension)) {
 			// Now test the owner is the user.
 			$ownerId	= (int) isset($data['created_user_id']) ? $data['created_user_id'] : 0;
 			if (empty($ownerId) && $recordId) {

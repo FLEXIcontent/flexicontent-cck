@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1058 2011-12-17 04:48:12Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1119 2012-01-24 11:02:06Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

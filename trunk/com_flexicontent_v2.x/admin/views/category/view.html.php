@@ -52,7 +52,7 @@ class FlexicontentViewCategory extends JView {
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
+		$cid = JRequest::getVar( 'id' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');

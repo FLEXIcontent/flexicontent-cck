@@ -29,7 +29,7 @@ defined('_JEXEC') or die('Restricted access');
 
 class JElementTag extends JElement
 {
-   /**
+/**
 	* Element name
 	*
 	* @access	protected
@@ -38,7 +38,7 @@ class JElementTag extends JElement
 	var	$_name = 'Name';
 
 	function fetchElement($name, $value, &$node, $control_name)
-	{	
+	{
 		$doc 		=& JFactory::getDocument();
 		$fieldName	= $control_name.'['.$name.']';
 

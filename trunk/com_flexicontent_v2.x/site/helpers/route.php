@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 922 2011-10-05 17:42:58Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1114 2012-01-18 14:07:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -47,7 +47,7 @@ class FlexicontentHelperRoute
 		// Get menu items pointing to the Flexicontent component
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 		$menus	= &JApplication::getMenu('site', array());
-		$_component_menuitems	= $menus->getItems('component_id', $component->id);
+		$_component_menuitems	= $menus->getItems(!FLEXI_J16GE ? 'componentid' : 'component_id', $component->id);
 		$_component_menuitems = $_component_menuitems ? $_component_menuitems : array();
 		
 		return $_component_menuitems;
@@ -81,12 +81,17 @@ class FlexicontentHelperRoute
 				$activemenuItemId = $activemenuItem->id;
 				
 				$db 	=& JFactory::getDBO();
-				$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
+				if (FLEXI_J16GE) {
+					$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
+				} else {
+					$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+				}
 				$flexi_comp_id = $db->loadResult();	
 				
 				$query 	= 'SELECT COUNT( m.id )'
 					. ' FROM #__menu as m'
-					. ' WHERE m.published=1 AND m.id="'.$activemenuItemId.'" AND m.component_id="'.$flexi_comp_id.'"'
+					. ' WHERE m.published=1 AND m.id="'.$activemenuItemId
+					.(!FLEXI_J16GE ? '" AND m.componentid="'.$flexi_comp_id.'"' : '" AND m.component_id="'.$flexi_comp_id.'"')
 					;
 				$db->setQuery( $query );
 				$count = $db->loadResult();
@@ -122,12 +127,12 @@ class FlexicontentHelperRoute
 	function getItemRoute($id, $catid = 0, $Itemid = 0)	{
 		
 		$needles = array(
-			'item'  => (int) $id,
+			FLEXI_ITEMVIEW  => (int) $id,
 			'category' => (int) $catid
 		);
 
 		//Create the link
-		$link = 'index.php?option=com_flexicontent&view=item';
+		$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
 
 		if($catid) {
 			$link .= '&cid='.$catid;
@@ -200,8 +205,8 @@ class FlexicontentHelperRoute
 		
 		foreach($component_menuitems as $menuitem)
 		{								
-			if ((@$menuitem->query['view'] == 'item') && (@$menuitem->query['id'] == $needles['item'])) {
-				if ((@$menuitem->query['view'] == 'item') && (@$menuitem->query['cid'] == $needles['category'])) {
+			if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW])) {
+				if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['cid'] == $needles['category'])) {
 					$matches[1] = $menuitem; // priority 1: item id+cid
 					break;
 				} else {

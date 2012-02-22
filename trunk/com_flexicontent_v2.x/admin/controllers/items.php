@@ -611,24 +611,29 @@ class FlexicontentControllerItems extends JController
 
 		$model 	= $this->getModel('item');
 		$user	=& JFactory::getUser();
+		$cid 	= JRequest::getVar( 'cid', array(0) );
+		$itemid = $cid[0];
+		$isnew = !$itemid;
 
-		// Error if no edition rights
-		if (!$model->canAdd()) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS' ) );
+		// Check if user can create in at least one category
+		if ($isnew && !$model->getItemAccess()->get('access-create')) {
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			return;
 		}
 
-		if (!$model->canEdit()) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS' ) );
+		// Check if user can edit current item
+		if (!$isnew && !$model->getItemAccess()->get('access-edit')) {
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
 			return;
 		}
 
-		// Error if checked out by another administrator
+		// Check if item is checked by other editor
 		if ($model->isCheckedOut( $user->get('id') )) {
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
 			return;
 		}
-
+		
+		// Checkout the item and proceed to edit form
 		$model->checkout( $user->get('id') );
 
 		parent::display();
@@ -655,7 +660,7 @@ class FlexicontentControllerItems extends JController
 			$used = array();
 		}
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTag : 1;
+		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTags : 1;
 		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 1;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';

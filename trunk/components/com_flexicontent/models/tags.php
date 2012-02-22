@@ -52,6 +52,13 @@ class FlexicontentModelTags extends JModel
 	var $_total = null;
 
 	/**
+	 * parameters
+	 *
+	 * @var object
+	 */
+	var $_params = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -60,10 +67,9 @@ class FlexicontentModelTags extends JModel
 	{
 		parent::__construct();
 		
-		global $mainframe;
-
-		// Get the paramaters of the active menu item
-		$params = & $mainframe->getParams('com_flexicontent');
+		// Load parameters
+		$this->_params = $this->_loadTagParams();
+		$params = $this->_params;
 
 		//get the number of events from database
 		$limit			= JRequest::getInt('limit', $params->get('limit'));
@@ -94,6 +100,44 @@ class FlexicontentModelTags extends JModel
 	}
 
 	/**
+	 * Overridden get method to get properties from the tag
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return 	mixed 				The value of the property
+	 * @since	1.5
+	 */
+	function get($property, $default=null)
+	{
+		if ( $this->_tag || $this->_tag = $this->getTag() ) {
+			if(isset($this->_tag->$property)) {
+				return $this->_tag->$property;
+			}
+		}
+		return $default;
+	}
+	
+	/**
+	 * Overridden set method to pass properties on to the tag
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function set( $property, $value=null )
+	{
+		if ( $this->_tag || $this->_tag = $this->getTag() ) {
+			$this->_tag->$property = $value;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
 	 * Method to get Data
 	 *
 	 * @access public
@@ -106,9 +150,9 @@ class FlexicontentModelTags extends JModel
 		{		
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
-			if ($this->_db->getErrorNum()) {
-				echo $query."<br>";
-				echo $this->_db->getErrorMsg()."<br>";
+			if ( $this->_db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			}
 		}
 		
@@ -141,26 +185,31 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildQuery()
 	{   	
-		global $mainframe;
-
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$params = $this->_loadTagParams();
+		$params = $this->_params;
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-				$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $gid . ')';
-				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess	= ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
+				$joinaccess	= '';
 			} else {
-				$joinaccess	 = '';
-				$andaccess   = ' AND mc.access <= '.$gid;
-				$andaccess  .= ' AND i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
+				} else {
+					$joinaccess	 = '';
+					$andaccess   = ' AND mc.access <= '.$aid;
+					$andaccess  .= ' AND i.access <= '.$aid;
+				}
 			}
 		} else {
 			$joinaccess	 = '';
@@ -204,7 +253,7 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
-		$params = $this->_loadTagParams();
+		$params = $this->_params;
 				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
@@ -293,11 +342,13 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemWhere( )
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
+		$params = $this->_params;
 
 		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$now		= $mainframe->get('requestTime');
+		$nullDate	= $this->_db->getNullDate();
+		
 		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
 		if(empty($lang)){
@@ -311,15 +362,27 @@ class FlexicontentModelTags extends JModel
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE t.tid = '.$this->_id;
 		
-		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtertag) {
+		// Filter the tag view with the active language
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
 
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
+		// Limit to published items. Exceptions when: (a) user is editor, item is created by or modified by the user
+		// THE ABOVE MENTIONED EXCEPTIONS WILL NOT OVERRIDE ACCESS
+		if (FLEXI_J16GE) {
+			$isEditor = $user->authorize('core.edit', 'com_flexicontent') || $user->authorize('core.edit.state', 'com_flexicontent');
+		} else {
+			$isEditor = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
+		}
 
-		$where .= ' AND i.sectionid = '.FLEXI_SECTION;
+		$states = $isEditor ? '1, -5, 0, -3, -4' : '1, -5';
+		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		
+		// Limit by publication date. Exception: when displaying personal user items or items modified by the user
+		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+
+		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause
@@ -327,13 +390,15 @@ class FlexicontentModelTags extends JModel
 		 */
 		if ($params->get('use_search'))
 		{
-			$filter 		= JRequest::getString('filter', '', 'request');
+			$filter		= JRequest::getVar('filter', NULL, 'request');
+			/*if($filter===NULL) {
+				$filter =  $session->get($option.'.category.filter');
+			} else {
+				$session->set($option.'.category.filter', $filter);
+			}*/
 
 			if ($filter)
 			{
-				// clean filter variables
-				// $filter			= $this->_db->getEscaped( trim(JString::strtolower( $filter ) ) );
-				// $where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $filter, true ).'%', false );
 				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
 			}
 		}
@@ -352,7 +417,7 @@ class FlexicontentModelTags extends JModel
 		$query = 'SELECT t.name, t.id,'
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
-				. ' WHERE t.id = '.$this->_id
+				. ' WHERE t.id = '.(int)$this->_id
 				. ' AND t.published = 1'
 				;
 
@@ -372,23 +437,21 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _loadTagParams()
 	{
-		global $mainframe;
-		static $_params = null;
+		$mainframe =& JFactory::getApplication();
+
+		// Get the PAGE/COMPONENT parameters
+		$params = clone( $mainframe->getParams('com_flexicontent') );
 		
-		if ($_params) return $_params;
+		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
 		
-		// a. Get the PAGE/COMPONENT parameters
-		$params 	= & $mainframe->getParams('com_flexicontent');
-		
-		// Get menu
-		$menu =& JSite::getMenu();
-		$item =& $menu->getActive();
-		$mparams = (!$item) ? new JParameter("") : new JParameter($item->params);
-		
-		// b. Merge menu parameters
-		$params->merge($mparams);
-		
-		// c. Higher Priority: prefer from http request than menu item
+		// Higher Priority: prefer from http request than menu item
 		if (JRequest::getVar('orderby', '' )) {
 			$params->set('orderby', JRequest::getVar('orderby') );
 		}
@@ -402,9 +465,7 @@ class FlexicontentModelTags extends JModel
 			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
 		}
 		
-		$_params = $params;
-		
-		return $_params;
+		return $params;
 	}	
 	
 	/**
@@ -451,7 +512,6 @@ class FlexicontentModelTags extends JModel
 		$obj->name	 	= $name;
 		$obj->published	= 1;
 
-		//$this->storetag($obj);
 		if($this->storetag($obj)) {
 			return true;
 		}

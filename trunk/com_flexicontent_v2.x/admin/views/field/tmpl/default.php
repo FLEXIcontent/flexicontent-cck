@@ -154,7 +154,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 					</div>
-               			</fieldset>
+				</fieldset>
 			<?php endif; ?>
 		</td>
 
