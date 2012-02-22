@@ -109,8 +109,7 @@ class FLEXIcontentViewSearch extends JView
 		$menus	= &JSite::getMenu();
 		$menu	= $menus->getActive();
 
-		// because the application sets a default page title, we need to get it
-		// right from the menu item itself
+		// Because the application sets a default page title, we need to get title right from the menu item itself
 		if (is_object( $menu )) {
 			$menu_params = new JParameter( $menu->params );
 			if (!$menu_params->get( 'page_title')) {

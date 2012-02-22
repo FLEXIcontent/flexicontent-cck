@@ -20,11 +20,18 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
+$maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
+// Check user permission for submitting to multiple categories
+if (!$this->perms['multicat']) {
+	if ($postcats==2) $postcats = 1;
+}
 
 if ($cid) :
 	global $globalcats;
-	$cids 		= explode(",", $cid);
+	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
+	if (!in_array($maincatid, $cids)) $cids[] = $maincatid;
 	$cids_kv 	= array();
 	$options 	= array();
 	foreach ($cids as $cat) {
@@ -32,24 +39,33 @@ if ($cid) :
 	}
 	
 	switch($postcats) {
-		case 0:
+		case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
 		default:
+			$in_single_cat = ( count($cids)==1 );
 			$fixedcats = implode(', ', $cids_kv);
 			foreach ($cids_kv as $k => $v) {
 				$fixedcats .= '<input type="hidden" name="cid[]" value="'.$k.'" />';
 			}
+			$fixedmaincat = $globalcats[$maincatid]->title;
+			$fixedmaincat .= '<input type="hidden" name="catid" value="'.$maincatid.'" />';
 			break;
-		case 1:
+		case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
+			$in_single_cat = true;
+			$options[] = JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' );
 			foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', '', 'value', 'text', '' );
+			$fixedcats = '';
+			$fixedmaincat = JHTML::_('select.genericlist', $options, 'catid', ' class="required" ', 'value', 'text', $maincatid );
 			break;
-		case 2:
+		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
+			$in_single_cat = false;
 			foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
 			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', 'multiple="multiple" size="6"', 'value', 'text', '' );
+			array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
+			$fixedmaincat = JHTML::_('select.genericlist', $options, 'catid', ' class="required" ', 'value', 'text', $maincatid );
 			break;
 	}
 endif;
@@ -57,6 +73,7 @@ endif;
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	JHTML::_('behavior.mootools');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.4.min.js');
+	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
 }
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
@@ -66,6 +83,9 @@ $this->document->addStyleSheet('administrator/components/com_flexicontent/assets
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
+$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
+$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
+
 if (@$this->fields['tags'] && $this->perms['cantags']) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
@@ -164,46 +184,6 @@ function addtag(id, tagname) {
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
-function submitbutton( pressbutton ) {
-	if (pressbutton == 'cancel') {
-		submitform( pressbutton );
-		return false;
-	}
-
-	var form = document.adminForm;
-	var validator = document.formvalidator;
-	var title = $(form.title).getValue();
-	title.replace(/\s/g,'');
-	//if(!validator.checkRequired()) return false;
-	if ( title.length==0 ) {
-		/*alert("<?php echo JText::_( 'FLEXI_ADD_TITLE', true ); ?>");*/ // commented out because each type may have custom name for title via an template override, and it will be confusing
-		validator.handleResponse(false,form.title);
-		var invalid = $$('.invalid');
-		new Fx.Scroll(window).toElement(invalid[0]);
-		invalid[0].focus();
-		//form.title.focus();
-		return false;
-	} else if ( typeof form.cid != 'undefined' && typeof form.cid.selectedIndex != 'undefined' && form.cid.selectedIndex == -1 ) {
-		/*alert("<?php echo JText::_( 'FLEXI_SELECT_CATEGORY', true ); ?>");*/  // commented out because each type may have custom name for categories via an template override, and it will be confusing
-		validator.handleResponse(false,form.cid);
-		var invalid = $$('.invalid');
-		new Fx.Scroll(window).toElement(invalid[0]);
-		invalid[0].focus();
-		return false;
-	} else {
-		<?php if (!$this->tparams->get('hide_html', 0) && !$this->tparams->get('hide_maintext')) : ?>
-			// commented out because each type may have custom name for description via type configutation, and it will be confusing
-			/*var text = <?php echo $this->editor->getContent( 'text' ); ?>
-			if (text == '') {
-				alert ( "<?php echo JText::_( 'Article must have some text', true ); ?>");
-				return false;
-			}*/
-		<?php endif; ?>
-	}
-	
-	submitform(pressbutton);
-	return true;
-}
 
 function deleteTag(obj) {
 	if (navigator.appVersion.indexOf("MSIE") == -1) {
@@ -227,9 +207,7 @@ function deleteTag(obj) {
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
 		<div class="flexi_buttons">
-			<button type="submit" class="button" onclick="javascript:return submitbutton('save')">
-				<?php echo JText::_( 'FLEXI_SAVE' ) ?>
-			</button>
+			<input type="button" class="button" onclick="javascript:submitbutton('save')" value="<?php echo JText::_( 'FLEXI_SAVE' ) ?>" />
 			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
 				<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
 			</button>
@@ -245,24 +223,46 @@ function deleteTag(obj) {
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
+<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
+		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
-<?php if ($cid) : ?>
 				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
+					<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
+						<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+							<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+						</span>
+					<?php endif; ?>
 				</label>
 				<?php echo $fixedcats; ?>
+			</div>
+		<?php endif; ?>
+		<div class="flexi_formblock">
+			<label for="catid" class="flexi_label">
+				<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+			</label>
+			<?php echo $fixedmaincat; ?>
+		</div>
 <?php else : ?>
+		<?php if ($this->perms['multicat']) : ?>
+			<div class="flexi_formblock">
 				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_CATEGORIES' ).':';?>
-					<?php if ($this->perms['multicat']) : ?>
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
 					</span>
-					<?php endif; ?>
 				</label>
-          		<?php echo $this->lists['cid']; ?>
-<?php endif; ?>
+				<?php echo $this->lists['cid']; ?>
 			</div>
+		<?php endif; ?>
+		
+			<div class="flexi_formblock">
+				<label for="catid" class="flexi_label">
+					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				</label>
+				<?php echo $this->lists['catid']; ?>
+			</div>
+<?php endif; ?>
 
 			<?php
 			if ($autopublished = $this->params->get('autopublished', 0)) : 
@@ -347,13 +347,13 @@ function deleteTag(obj) {
 					<ul id="ultagbox">
 					<?php
 						foreach( $this->tags as $tag ) {
-							if(in_array($tag->id, $this->used)) {
+							if(in_array($tag->id, $this->usedtags)) {
 								if ($this->perms['cantags']) {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 								} else {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="#" class="deletetag" align="right"></a></li>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
 								}
 							}
 						}
@@ -408,6 +408,32 @@ function deleteTag(obj) {
 					) 
 				{
 					
+					// Check for type specific parameters for core fields
+					if ($field->iscore && isset($this->item->typealias)) {
+						$typealias = $this->item->typealias;
+						$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field->name."_".$typealias."'";
+						//echo $query;
+						$db =& JFactory::getDBO();
+						$db->setQuery($query);
+						$data = $db->loadObject();
+						//print_r($data);
+						if ($db->getErrorNum()) {
+							echo $query."<br /><br />".$db->getErrorMsg()."<br />";
+						} else if (@$data->published) {
+							echo "Please unpublish plugin with name: ".$field->name."_".$typealias;
+						}
+						
+						// merge field parameter with the type specific parameters ones
+						if ($data) {
+							$ts_params = new JParameter($data->attribs);
+							$field->parameters->merge($ts_params);
+						} else {
+							$field->parameters->set( 'use_html',  !$this->tparams->get('hide_html', 0) ) ;
+						}
+					}
+					
+					FlexicontentFields::getTypeCustomize($field, $this->item);
+					
 					// set a type specific label, description for the main text field
 					if ($field->field_type == 'maintext')
 					{
@@ -415,38 +441,75 @@ function deleteTag(obj) {
 						$field->description = $this->tparams->get('maintext_desc', $field->description);
 						//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
 						$maintext = $this->item->text;
-						if ($this->tparams->get('hide_html', 0))
-						{
-							$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
-						} else {
-							$height = $this->tparams->get('height', 400);
-							$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20' ) ;
-						}
+						
+						// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+						$maintext = html_entity_decode($maintext, ENT_QUOTES, 'UTF-8');
+						$field->maintext = & $maintext;
+						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$this->item) );
 					}
-			?>
-			<tr>
-				<td class="key">
-				<?php if ($field->description) : ?>
-					<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-						<?php echo $field->label; ?>
-					</label>
-				<?php else : ?>
-					<label for="<?php echo $field->name; ?>">
-						<?php echo $field->label; ?>
-					</label>
-				<?php endif; ?>
-				</td>
-				<td>
-					<?php
-					$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-					if(isset($field->html)){
-						echo $field->html;
-					} else {
-						echo $noplugin;
-					}
-					?>
-				</td>
-			</tr>
+					
+								// -- Tooltip for the current field
+								$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+							?>
+							<?php	if ( !is_array($field->html) ) : ?>
+								<tr>
+									<td class="key">
+										<label for="<?php echo $field->name; ?>" <?php echo $field_tooltip; ?> >
+											<?php echo $field->label; ?>
+										</label>
+									</td>
+									<td>
+										<?php
+											$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+											if(isset($field->html)){
+												echo $field->html;
+											} else {
+												echo $noplugin;
+											}
+										?>
+									</td>
+								</tr>
+								
+							<?php else : ?>
+						
+								<tr>
+									<td colspan="2">
+										
+										<?php $not_in_tabs = ""; ?>
+										
+										<div class="fctabber">
+										<?php foreach ($field->html as $i => $field_html): ?>
+											<?php
+											if (!isset($field->tab_labels[$i])) {
+												if (isset($field->html[$i])) $not_in_tabs .= "<div style='display:none!important'>".$field->html[$i]."</div>";
+												continue;
+											}
+											?>
+											<div class="tabbertab">
+												<h3>
+													<?php echo $field->tab_labels[$i]; ?>
+												</h3>
+											<?php
+												$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+												echo $not_in_tabs;
+												$not_in_tabs = ""; // reset
+												if(isset($field->html[$i])){
+													echo $field->html[$i];
+												} else {
+													echo $noplugin;
+												}
+											?>
+											</div>
+										<?php endforeach; ?>
+										</div>
+										
+										<?php echo $not_in_tabs; ?>
+										
+									</td>
+								</tr>
+								
+							<?php endif; ?>
+			
 			<?php
 				}
 			}
@@ -465,36 +528,60 @@ function deleteTag(obj) {
 	}
 	?>
 
-	<?php if ($this->perms['canparams']) : ?>
-	<?php if($this->params->get('usemetadata', 1)) {?>
-    	<fieldset class="flexi_meta">
-       	<legend><?php echo JText::_( 'FLEXI_METADATA_INFORMATION' ); ?></legend>
-
-            <div class="flexi_box_left">
-              	<label for="metadesc"><?php echo JText::_( 'FLEXI_META_DESCRIPTION' ); ?></label>
-          		<textarea class="inputbox" cols="20" rows="5" name="metadesc" id="metadesc" style="width:100%;"><?php echo $this->item->metadesc; ?></textarea>
-            </div>
-
-            <div class="flexi_box_right">
-        		<label for="metakey"><?php echo JText::_( 'FLEXI_META_KEYWORDS' ); ?></label>
-        		<textarea class="inputbox" cols="20" rows="5" name="metakey" id="metakey" style="width:100%;"><?php echo $this->item->metakey; ?></textarea>
-            </div>
-      	</fieldset>
-		<?php }else{?>
+	<?php
+		echo "<br/ >";
+		echo $this->pane->startPane( 'det-pane' );
+		if($this->params->get('usemetadata', 1)) {
+			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
+			echo $this->pane->startPanel( $title, "metadata-page" );
+			echo $this->form->render('meta', 'metadata');
+			echo $this->pane->endPanel();
+		} else {
+			?>
 			<input type="hidden" name="metadesc" value="<?php echo @$this->item->metadesc; ?>" />
 			<input type="hidden" name="metakey" value="<?php echo @$this->item->metakey; ?>" />
-		<?php }?>
-		<?php endif; ?>
+			<?php
+		}
+	?>
+	<?php if ($this->perms['canparams'] || $this->perms['isSuperAdmin']) : ?>
+	<?php
+
+		if ($this->perms['isSuperAdmin']) {
+			$title = JText::_( 'FLEXI_DETAILS' );
+			echo $this->pane->startPanel( $title, 'details' );
+			echo $this->form->render('details');
+			echo $this->pane->endPanel();
+		}
+		
+		if ($this->perms['cantemplates']) {
+			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
+			echo $this->pane->startPanel( $title, "params-page" );
+			echo $this->form->render('params', 'advanced');
+			echo $this->pane->endPanel();
+	
+			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+			foreach ($this->tmpls as $tmpl) {
+				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
+				echo $tmpl->params->render();
+				echo $this->pane->endPanel();
+			}
+		}
+		
+		?>
+	<?php endif; ?>
+	<?php 
+		echo $this->pane->endPane();
+	?>
 
 		<br class="clear" />
-        
+		<?php echo JHTML::_( 'form.token' ); ?>
 		<input type="hidden" name="created" value="<?php echo $this->item->created; ?>" />
+		<input type="hidden" name="task" id="task" value="" />
+		<input type="hidden" name="option" value="com_flexicontent" />
+		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
 		<input type="hidden" name="created_by" value="<?php echo $this->item->created_by; ?>" />
 		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-    	<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
-    	<?php echo JHTML::_( 'form.token' ); ?>
-    	<input type="hidden" name="task" value="" />
-		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="views" value="items" />
 
 	</form>

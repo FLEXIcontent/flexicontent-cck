@@ -45,6 +45,13 @@ class FlexicontentModelFlexicontent extends JModel
 	var $_total = null;
 
 	/**
+	 * parameters
+	 *
+	 * @var object
+	 */
+	var $_params = null;
+	
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -52,20 +59,21 @@ class FlexicontentModelFlexicontent extends JModel
 	function __construct()
 	{
 		parent::__construct();
+		$mainframe =& JFactory::getApplication();
 
-		if (!FLEXI_J16GE) {
-			global $mainframe;
-			// Get the components parameters
-			$params 	=& $mainframe->getParams('com_flexicontent');
-		} else {
-			// Get the components parameters
-			$params = & JComponentHelper::getParams('com_flexicontent');
+		// Get the PAGE/COMPONENT parameters
+		$params = clone( $mainframe->getParams('com_flexicontent') );
+		
+		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
 			$menuParams = new JRegistry;
 			if ($menu = JSite::getMenu()->getActive()) {
 				$menuParams->loadJSON($menu->params);
 			}
 			$params->merge($menuParams);
 		}
+		
+		$this->_params = $params;
 		
 		//set limits
 		$limit 			= $params->def('catlimit', 5);
@@ -114,22 +122,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQuery()
 	{
-		if (!FLEXI_J16GE) {
-			global $mainframe;
-			// Get the components parameters
-			$params 	=& $mainframe->getParams('com_flexicontent');
-		} else {
-			// Get the components parameters
-			$params = & JComponentHelper::getParams('com_flexicontent');
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
+		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$gid = !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
 
 		// Get the root category from this directory
@@ -162,24 +157,26 @@ class FlexicontentModelFlexicontent extends JModel
 		$where .= ' AND i.state IN ('.$states.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
-		$subjoin 	= '';
-		$suband 	= '';
-		$join 		= '';
-		$and 		= '';
+		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
-				$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
-				$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int)$gid . ')';
-				$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int)$gid . ')';
-				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$suband	= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
+				$and		= ' AND c.access IN ('.$aid_list.')';
 			} else {
-				$subjoin  = '';
-				$suband   = ' AND cc.access <= '.(int)$gid;
-				$suband  .= ' AND i.access <= '.(int)$gid;
-				$join	  = '';
-				$and   	  = ' AND c.access <= '.(int)$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
+					$suband   = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
+					$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
+					$join     = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$and      = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				} else {
+					$suband   = ' AND cc.access <= '.$aid.' AND i.access <= '.$aid;
+					$and      = ' AND c.access <= '.$aid;
+				}
 			}
 		}
 
@@ -216,22 +213,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _buildQueryTotal()
 	{
-		if (!FLEXI_J16GE) {
-			global $mainframe;
-			// Get the components parameters
-			$params 	=& $mainframe->getParams('com_flexicontent');
-		} else {
-			// Get the components parameters
-			$params = & JComponentHelper::getParams('com_flexicontent');
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
+		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		
 		// Get the root category from this directory
 		$rootcat = JRequest::getVar('rootcat',false);
@@ -240,15 +224,20 @@ class FlexicontentModelFlexicontent extends JModel
 		$show_noauth = $params->get('show_noauth', 0);
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
-		$join 		= '';
-		$and 		= '';
+		$join = $and = '';
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$and		= ' AND c.access IN ('.$aid_list.')';
 			} else {
-				$join	  = '';
-				$and   	  = ' AND c.access <= '.(int)$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$join  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$and   = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				} else {
+					$and   = ' AND c.access <= '.$aid;
+				}
 			}
 		}
 
@@ -290,22 +279,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function _getsubs($id)
 	{
-		if (!FLEXI_J16GE) {
-			global $mainframe;
-			// Get the components parameters
-			$params 	=& $mainframe->getParams('com_flexicontent');
-		} else {
-			// Get the components parameters
-			$params = & JComponentHelper::getParams('com_flexicontent');
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
+		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
 		
 		// Shortcode of the site active language (joomfish)
@@ -333,22 +309,27 @@ class FlexicontentModelFlexicontent extends JModel
 		$where .= ' AND i.state IN ('.$states.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
-		$subjoin 	= '';
-		$suband 	= '';
-		$join 		= '';
-		$and 		= '';
+		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
-				$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
-				$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int)$gid . ')';
-				$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int)$gid . ')';
-				$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int)$gid . ')';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$suband	= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
+				$and		= ' AND c.access IN ('.$aid_list.')';
 			} else {
-				$suband   = ' AND cc.access <= '.(int)$gid;
-				$suband  .= ' AND i.access <= '.(int)$gid;
-				$and   	  = ' AND c.access <= '.(int)$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
+					$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
+					$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
+					$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				} else {
+					$suband   = ' AND cc.access <= '.$aid;
+					$suband  .= ' AND i.access <= '.$aid;
+					$and   	  = ' AND c.access <= '.$aid;
+				}
 			}
 		}
 
@@ -375,7 +356,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__categories AS c'
 				. $join
 				. ' WHERE c.published = 1'
-				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				. ' AND c.parent_id = '.(int)$id
 				. $and
 				. ' ORDER BY '.$ordering
@@ -395,22 +376,9 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getFeed()
 	{
-		if (!FLEXI_J16GE) {
-			global $mainframe;
-			// Get the components parameters
-			$params 	=& $mainframe->getParams('com_flexicontent');
-		} else {
-			// Get the components parameters
-			$params = & JComponentHelper::getParams('com_flexicontent');
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
+		$params = $this->_params;
 
 		$user = &JFactory::getUser();
-		$gid		= !FLEXI_J16GE ? (int) $user->get('aid') : max($user->getAuthorisedViewLevels()) ;
 		$limit 		= JRequest::getVar('limit', 10);
 		
 		// shortcode of the site active language (joomfish)
@@ -428,6 +396,16 @@ class FlexicontentModelFlexicontent extends JModel
 		if (FLEXI_FISH && $filtercat) {
 			$and = ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
+		
+		// WE DO NOT show_noauth parameter in FEEDs ... we only list authorised ...
+		if (FLEXI_J16GE) {
+			$aid_arr  = $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			$andaccess  = ' AND c.access IN ('.$aid_list.')';
+		} else {
+			$aid = (int) $user->get('aid');
+			$andaccess  = ' AND c.access <= '.$aid;
+		}
 
 		$query 	= 'SELECT DISTINCT i.*, ie.*, c.title AS cattitle,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
@@ -437,8 +415,8 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 				. ' WHERE c.published = 1'
-				. (FLEXI_J16GE ? '' : ' AND c.section = ' . FLEXI_SECTION)
-				. ' AND c.access <= '.$gid
+				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
+				. $andaccess
 				. $and
 				. ' AND i.state IN (1, -5)'
 				. ' LIMIT '. $limit

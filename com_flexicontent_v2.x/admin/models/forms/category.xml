@@ -30,7 +30,7 @@
 	<field name="language" type="contentlanguage" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" class="inputbox">
 		<option value="*">JALL</option>
 	</field>
-	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_content" section="category" />
+	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_flexicontent" section="category" />
 	<fields name="params">
 		<fieldset name="basic">
 			<field name="target" type="componentlayout" label="JFIELD_ALT_LAYOUT_LABEL" description="JFIELD_ALT_COMPONENT_LAYOUT_DESC" view="categories" />
@@ -177,7 +177,7 @@
 				<option value="rhits">Least Hits</option>
 				<option value="order">Ordering</option>
 			</field>
-			<field name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfieldid" type="fields" field_type="text" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>

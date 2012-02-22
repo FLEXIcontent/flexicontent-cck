@@ -81,8 +81,10 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	function setId($id, $currcatid=0) {
 		// Set item id and wipe data
-		$this->_id	    = $id;
-		$this->_item		= null;
+		if ($this->_id != $id) {
+			$this->_item		= null;
+		}
+		$this->_id = $id;
 		$this->_currentcatid = $currcatid;
 	}
 	
@@ -95,6 +97,46 @@ class ParentClassItem extends JModelAdmin {
 	function getId() {
 		return $this->_id;
 	}
+
+
+	/**
+	 * Overridden get method to get properties from the item
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return 	mixed 				The value of the property
+	 * @since	1.5
+	 */
+	function get($property, $default=null)
+	{
+		if ( $this->_item || $this->_item = $this->getItem() ) {
+			if(isset($this->_item->$property)) {
+				return $this->_item->$property;
+			}
+		}
+		return $default;
+	}
+	
+	/**
+	 * Overridden set method to pass properties on to the item
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function set( $property, $value=null )
+	{
+		if ( $this->_item || $this->_item = $this->getItem() ) {
+			$this->_item->$property = $value;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	
 	/**
 	 * Method to get the row form.
@@ -169,7 +211,7 @@ class ParentClassItem extends JModelAdmin {
 	 *
 	 * @return	mixed	Object on success, false on failure.
 	 */
-	public function getItem($pk = null, $isform = false) {
+	public function &getItem($pk = null, $isform = false) {
 		static $item;
 		static $unapproved_version_notice;
 		$task=JRequest::getVar('task',false);
@@ -183,7 +225,8 @@ class ParentClassItem extends JModelAdmin {
 			$pk		= (!empty($pk)) ? $pk : $this->_id;
 			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
 
-			if ($item = parent::getItem($pk)) {
+			if ($item = parent::getItem($pk))
+			{
 				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 				
 				if($isform && $use_versioning) {
@@ -211,6 +254,13 @@ class ParentClassItem extends JModelAdmin {
 
 				$item->text = trim($item->fulltext) != '' ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
 				$item->_currentversion = $item->version;
+				$query = 'SELECT access'
+					. ' FROM #__categories'
+					. ' WHERE id = '. (int) $item->catid
+					;
+				$this->_db->setQuery($query);
+				$item->category_access = $this->_db->loadResult();
+
 				$query = 'SELECT name'
 					. ' FROM #__users'
 					. ' WHERE id = '. (int) $item->created_by
@@ -249,11 +299,19 @@ class ParentClassItem extends JModelAdmin {
 					$item->score = 0;
 				}
 			}
-			if($pk <= 0) {
+			
+			else if ($pk > 0)
+			{
+				return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
+			}
+			
+			else
+			{		
 				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 				$item->state				= $cparams->get('new_item_state', -4);
 				//$item->language			= flexicontent_html::getSiteDefaultLang();
 			}
+			
 			$used = $this->getTypesselected();
 			$item->type_id = $used->id;
 		}
@@ -267,31 +325,25 @@ class ParentClassItem extends JModelAdmin {
 	 * @since	1.6
 	 */
 	protected function populateState() {
-		// Try to get ITEM primary key (pk) 
+		$app = &JFactory::getApplication();
 		
-		// a. from edit form
-		$data = JRequest::get( 'post' );
-		$pk = @$data['id'];
-		$curcatid = 0;
-		
-		// b. from variable 'id' of the http request (e.g. item view)
-		if(!$pk) {
-			$pk = JRequest::getVar('id', 0, '', 'int');
-			$curcatid = JRequest::getVar('cid', 0, '', 'int');
-		}
-		
-		// c. from variable 'cid[]' of the http request (e.g. edit item TASK)
-		if(!$pk) {
-			$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
+		// get ITEM's primary key (pk) 
+		if (!$app->isAdmin()) {
+			// FRONTEND, use "id" from request
+			$pk = JRequest::getVar('id', 0, 'default', 'int');
+			$curcatid = JRequest::getVar('cid', 0, $hash='default', 'int');
+		} else {
+			// BACKEND, use "cid" array from request
+			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
 			$pk = $cid[0];
+			$curcatid = 0;
 		}
 		
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $pk);
-		$this->setId($pk, $curcatid);
+		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
 
-		// Load the parameters.
+		// Load global parameters
 		$value = JComponentHelper::getParams($this->option);
 		$this->setState('params', $value);
 	}
@@ -355,11 +407,11 @@ class ParentClassItem extends JModelAdmin {
 	 * @since	1.0
 	 */
 	function isCheckedOut( $uid=0 ) {
-		if ($item = $this->getItem()) {
+		if ( $this->_item || $this->_item = $this->getItem() ) {
 			if ($uid) {
-				return ($item->checked_out && $item->checked_out != $uid);
+				return ($this->_item->checked_out && $this->_item->checked_out != $uid);
 			} else {
-				return $item->checked_out;
+				return $this->_item->checked_out;
 			}
 		} elseif ($this->_id < 1) {
 			return false;
@@ -369,130 +421,133 @@ class ParentClassItem extends JModelAdmin {
 		}
 	}
 	
+	
 	/**
-	 * Method override to check if you can add a new record.
+	 * Method to calculate Item Access Permissions
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function getItemAccess($create_cats=array()) {
+		$iparams_extra = new JRegistry;
+		$user		= JFactory::getUser();
+		$asset	= 'com_content.article.'.$this->_id;
+		$permission	= FlexicontentHelperPerm::getPerm();
+		
+		// Compute CREATE access permissions.
+		if ( !$this->_id ) {
+			// first check if general create permission is missing, to avoid unneeded checking of creation in individual categories
+			if (!$user->authorise('core.create', 'com_flexicontent')) {
+				$iparams_extra->set('access-create', false);
+			} else {
+				// check that user can create item in at least one category
+				$usercats = FlexicontentHelperPerm::getCats(array('core.create'));
+				$iparams_extra->set('access-create', count($usercats));
+			}
+			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
+		}
+		
+		// Not a new item retrieve item if not already done
+		if ( empty($this->_item) ) {
+			$this->_item = $this->getItem();
+		}
+
+		// Compute EDIT access permissions.
+		if ( $this->_id ) {
+			// first check edit permission on the item
+			if ($user->authorise('core.edit', $asset)) {
+				$iparams_extra->set('access-edit', true);
+			}
+			// now check if edit.own is available for this item
+			else if ( !$user->get('guest') && $user->authorise('core.edit.own', $asset)) {
+				// Check ownership (this maybe needed since ownership may have changed ? and above permission maybe invalid? )
+				if ($user->get('id') == $this->_item->created_by) {
+					$iparams_extra->set('access-edit', true);
+				}
+			}
+		}
+
+		// Compute DELETE access permissions.
+		if ( $this->_id ) {
+		
+			// first check delete permission on the item
+			if ($user->authorise('core.delete', $asset)) {
+				$iparams_extra->set('access-delete', true);
+			}
+			// now check if delete own permission if the item is owned by the user
+			else if ( !$user->get('guest') && $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by ) {
+				// Check ownership
+				if ($user->get('id') == $this->_item->created_by) {
+					$iparams_extra->set('access-delete', true);
+				}
+			}
+		}
+		
+		// Compute VIEW access permissions.
+		if ($access = $this->getState('filter.access')) {
+			// If the access filter has been set, we already know this user can view.
+			$iparams_extra->set('access-view', true);
+		}
+		else {
+			// If no access filter is set, the layout takes some responsibility for display of limited information.
+			$user = JFactory::getUser();
+			$groups = $user->getAuthorisedViewLevels();
+			
+			// If no category info available, then use only item access level
+			if ($this->_item->catid == 0 || $this->_item->category_access === null) {
+				$iparams_extra->set('access-view', in_array($this->_item->access, $groups));
+			}
+			// Require both item and category access level
+			else {
+				$iparams_extra->set('access-view', in_array($this->_item->access, $groups) && in_array($this->_item->category_access, $groups));
+			}
+		}
+
+		return $iparams_extra;
+	}
+
+
+
+	/**
+	 * Method to check if you can assign a (new/existing) item in the specified categories
 	 *
 	 * @param	array	An array of input data.
 	 *
 	 * @return	boolean
 	 * @since	1.6
 	 */
-	protected function allowAdd($data = array())
+	protected function itemAllowedInCats($data = array())
 	{
 		// Initialise variables.
 		$user		= JFactory::getUser();
 		
-		//$categoryId	= JArrayHelper::getValue($data, 'cid', JRequest::getInt('filter_category_id'), 'int');
-		$categoryId	= $this->_currentcatid;
-		$allow		= null;
-
-		if ($categoryId) {
-			// If the category has been passed in the data or URL check it.
-			$allow	= $user->authorise('core.create', 'com_content.category.'.$categoryId);
+		$cats = isset($data['cid']) ? $data['cid'] : array();
+		if ( !empty($data['catid']) && !in_array($data['catid'], $cats) ) {
+			$cats[] =  $data['catid'];
 		}
-
+		
+		$allow = null;
+		if (count($cats)) {
+			$allow = true;
+			foreach ($cats as $curcatid) {
+				// If the category has been passed in the data or URL check it.
+				$cat_allowed = $user->authorise('core.create', 'com_content.category.'.$curcatid);
+				if (!$cat_allowed) {
+					return JError::raiseWarning( 500, "No access to add item to category with id ".$curcatid );
+				}
+				$allow &= $cat_allowed;
+			}
+		}
+		
 		if ($allow === null) {
-			// In the absense of better information, revert to the component permissions.
-			return parent::allowAdd();
+			// no categories specified, revert to the component permissions.
+			$allow	= $user->authorize('core.create', 'com_flexicontent');
 		}
-		else {
-			return $allow;
-		}
-	}
-
-	/**
-	 * Method override to check if you can edit an existing record.
-	 *
-	 * @param	array	$data	An array of input data.
-	 * @param	string	$key	The name of the key for the primary key.
-	 *
-	 * @return	boolean
-	 * @since	1.6
-	 */
-	protected function allowEdit($data = array(), $key = 'id')
-	{
-		// Initialise variables.
-		$recordId	= (int) isset($data[$key]) ? $data[$key] : $this->_id;
-		$user		= JFactory::getUser();
-		$userId		= $user->get('id');
-
-		// Check general edit permission first.
-		if ($user->authorise('core.edit', 'com_content.article.'.$recordId)) {
-			return true;
-		}
-
-		// Fallback on edit.own.
-		// First test if the permission is available.
-		if ($user->authorise('core.edit.own', 'com_content.article.'.$recordId)) {
-			// Now test the owner is the user.
-			$ownerId	= (int) isset($data['created_by']) ? $data['created_by'] : 0;
-			if (empty($ownerId) && $recordId) {
-				// Need to do a lookup from the model.
-				$record		= $this->getModel()->getItem($recordId);
-
-				if (empty($record)) {
-					return false;
-				}
-
-				$ownerId = $record->created_by;
-			}
-
-			// If the owner matches 'me' then do the test.
-			if ($ownerId == $userId) {
-				return true;
-			}
-		}
-
-		// Since there is no asset tracking, revert to the component permissions.
-		return parent::allowEdit($data, $key);
-	}
-
-
-
-	
-	/**
-	 * Method to check if the user can an item anywhere
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canAdd() {
-		// MAYBE possible to use allowAdd()
 		
-		$user	=& JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		if(!$permission->CanAdd) return false;
-		return true;
+		return $allow;
 	}
 
-	/**
-	 * Method to check if the user can edit the item
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canEdit() {
-		// MAYBE possible to use allowEdit()
-		
-		$user	=& JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		if (!$permission->CanConfig) {
-				if ($this->_id) {
-					$rights 	= FlexicontentHelperPerm::checkAllItemAccess($uid, 'item', $id);
-					$canEdit 	= in_array('core.edit', $rights) || $permission->CanEdit;
-					$canEditOwn	= (in_array('core.edit.own', $rights) && ($item->created_by == $user->id));
-					/*echo "<pre>"; print_r($rights); echo "</pre>";
-					echo "canEdit: $canEdit<br>\n";
-					echo "canEditOwn: $canEditOwn<br>\n";
-					die("here");*/
-					if ($canEdit || $canEditOwn) return true;
-					return false;
-				}
-		}
-		return true;
-	}
 
 	/**
 	 * Method to store the item
@@ -539,9 +594,20 @@ class ParentClassItem extends JModelAdmin {
 		$data['vstate']		= (int)$data['vstate'];
 		
 		if( $isnew || ($data['vstate']==2) ) {
+			// auto assign the main category if none selected
+			if ( empty($data['catid']) && !empty($cats[0]) ) {
+				$data['catid'] = $cats[0];
+			}
+			
 			// Add the primary cat to the array if it's not already in
-			if (!in_array($data['catid'], $cats) &&  $data['catid']) {
+			if ( @$data['catid'] && !in_array($data['catid'], $cats) ) {
 				$cats[] =  $data['catid'];
+			}
+			
+			//At least one category needs to be assigned
+			if (!is_array( $cats ) || count( $cats ) < 1) {
+				$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
+				return false;
 			}
 			
 			// Set back the altered categories and tags to the form data
@@ -564,19 +630,19 @@ class ParentClassItem extends JModelAdmin {
 			$item->modified_by 		= $user->get('id');
 			
 			// Add the primary cat to the array if it's not already in
-			if (!in_array($item->catid, $cats)) {
-				$cats[] = $item->catid;
+			if ( !empty($data['catid']) && !in_array($data['catid'], $cats) ) {
+				$cats[] =  $data['catid'];
+			}
+			
+			//At least one category needs to be assigned
+			if (!is_array( $cats ) || count( $cats ) < 1) {
+				$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
+				return false;
 			}
 			
 			// Set back the altered categories and tags to the form data
 			$data['cid'] = $cats;
 			$data['tags'] = $tags;
-
-			//At least one category needs to be assigned
-			if (!is_array( $cats ) || count( $cats ) < 1) {
-				$this->setError('FLEXI_SELECT_CATEGORY');
-				return false;
-			}
 		}
 		
 		$dispatcher = & JDispatcher::getInstance();
@@ -636,7 +702,8 @@ class ParentClassItem extends JModelAdmin {
 		return true;
 	}
 	
-	function applyCurrentVersion(&$item, &$data) {
+	function applyCurrentVersion(&$item, &$data)
+	{
 		$isnew = !$item->id;
 		$nullDate	= $this->_db->getNullDate();
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
@@ -782,7 +849,7 @@ class ParentClassItem extends JModelAdmin {
 
 		//At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
-			$this->setError('FLEXI_SELECT_CATEGORY');
+			$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
 		}
 
@@ -1224,9 +1291,21 @@ class ParentClassItem extends JModelAdmin {
 		}
 		return $used;
 	}
-	function getCoreFieldValue(&$field, $version = 0) {
-		if(isset($this->_item)) $item=&$this->_item;
-		else $item = $this->getItem();
+	
+	
+	/**
+	 * Method to retrieve the value of a core field for a specified item version
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getCoreFieldValue(&$field, $version = 0)
+	{
+		if(isset($this->_item)) {
+			$item = & $this->_item;
+		} else {
+			$item = $this->getItem();
+		}
 		switch ($field->field_type) {
 			case 'created': // created
 			$field->value = array($item->created);
@@ -1297,6 +1376,8 @@ class ParentClassItem extends JModelAdmin {
 		}
 		return array();
 	}
+	
+	
 	/**
 	 * Method to get the values of an extrafield
 	 * 

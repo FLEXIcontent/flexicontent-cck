@@ -83,9 +83,12 @@ function FLEXIcontentBuildRoute(&$query)
 	// 4. Handle known views formulating segments of SEF URL appropriately
 	$view = isset($query['view']) ? $query['view'] : '';
 	switch ($view) {	
-	case 'items':
+	/*case 'search':
+		//TODO something if needed
+		break;*/
+	case FLEXI_ITEMVIEW:
 		if (isset($query['cid']))	{
-			// IMPLY view = 'items' when count($segments) == 2
+			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
 			$segments[] = $query['cid'];
 			$segments[] = @$query['id'];  // Required ... 
 			unset($query['cid']);
@@ -169,9 +172,9 @@ function FLEXIcontentParseRoute($segments)
 	
 	// 4. *** Cases that VIEW is provided (expicitly given) ***
 	
-	// 4.a 'items' view
+	// 4.a 'item(s)' view
 	if($segments[0] == 'item' || $segments[0] == 'items') {
-		$vars['view'] = 'items';
+		$vars['view'] = FLEXI_ITEMVIEW;
 		if ($count==2) {  // no cid provided
 			$vars['id'] = $segments[1];
 		} else if ($count==3) {  // also cid provided
@@ -236,9 +239,9 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 
-	// 5.c Segments Length 2 is 'items' view
+	// 5.c Segments Length 2 is 'item(s)' view
 	if($count == 2) {
-		$vars['view'] = 'items';
+		$vars['view'] = FLEXI_ITEMVIEW;
 		$vars['cid'] 	= $segments[0];
 		$vars['id'] 	= $segments[1];
 		return $vars;

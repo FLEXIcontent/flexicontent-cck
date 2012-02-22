@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
+jimport('joomla.application.component.controlleradmin');
 
 /**
  * FLEXIcontent Component Categories Controller
@@ -27,7 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerCategories extends FlexicontentController
+class FlexicontentControllerCategories extends JControllerAdmin
 {
 	/**
 	 * Constructor
@@ -36,12 +36,13 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function __construct()
 	{
+		$this->text_prefix = 'com_content';
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		 	'edit' );
+		$this->registerTask( 'add'  ,		 		'edit' );
 		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
+		$this->registerTask( 'saveandnew',	'save' );
 		$this->registerTask( 'params', 			'params' );
 	}
 
@@ -122,31 +123,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function publish()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
-		} else {
-
-			$model = $this->getModel('categories');
-
-			if(!$model->publish($cid, 1)) {
-				JError::raiseError(500, $model->getError());
-			}
-
-			$msg 	= JText::_( 'FLEXI_CATEGORY_PUBLISHED' );
-		
-			$cache 		=& JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-			$catscache->clean();
-		}
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+		//self::changestate(1);
+		parent::publish();
 	}
 
 	/**
@@ -158,32 +136,60 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function unpublish()
 	{
+		parent::unpublish();
+		//self::changestate(0);
+	}
+
+	/**
+	 * Logic to unpublish categories
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function changestate($state=1)
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$user = JFactory::getUser();
+		$permission = FlexicontentHelperPerm::getPerm();
+		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$msg = '';
 
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-		} else {
-
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			// no category selected
+			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+		}
+		else if (!$permission->CanCats)
+		{
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+		}
+		else
+		{
+			// try to change state
 			$model = $this->getModel('categories');
-
-			if(!$model->publish($cid, 0)) {
-				JError::raiseError(500, $model->getError());
+			if( !$model->publish($cid, $state) ) {
+				JError::raiseWarning(500, $model->getError());
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+				return;
 			}
-
-			$msg 	= JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
-		
+			
+			// set message
+			$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
+			
+			// clean cache
 			$cache 		=& JFactory::getCache('com_flexicontent');
 			$cache->clean();
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
-		
+
+		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
+
 
 	/**
 	 * Logic to orderup a category
@@ -252,6 +258,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			JError::raiseWarning(500, $model->getError());
 		}
 		
+		// clean cache
 		$cache 		=& JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
@@ -272,53 +279,40 @@ class FlexicontentControllerCategories extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
+		$permission = FlexicontentHelperPerm::getPerm();
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$msg = '';
 
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			// no category selected
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-		} else {
-
+		}
+		else if (!$permission->CanCats)
+		{
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+		}
+		else
+		{
+			// try to delete the category and clean cache
 			$model = $this->getModel('categories');
-
 			$msg = $model->delete($cid);
-
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			if (!$msg) {
+				JError::raiseWarning(500, $model->getError());
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+				return;
+			}
+			
+			// clean cache
+			$cache =& JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache =& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		
+		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
-	}
-
-	/**
-	 * logic for cancel an action
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function cancel()
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		$user = &JFactory::getUser();
-		
-		// define the rights for correct redirecting the save task
-		$permission = FlexicontentHelperPerm::getPerm();
-		$user =& JFactory::getUser();
-		$CanCats	= (!$permission->CanConfig) ? $permission->CanCats : 1;
-		$category = & JTable::getInstance('flexicontent_categories','');
-		$category->bind(JRequest::get('post'));
-		$category->checkin();
-
-		if ($CanCats) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories' );
-		} else {
-			$this->setRedirect( 'index.php?option=com_flexicontent' );
-		}
 	}
 
 	/**
@@ -337,10 +331,16 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
 		$access = $accesses[$id];
 
+		$user = JFactory::getUser();
 		$model = $this->getModel('categories');
 		
-		if(!$model->saveaccess( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+		if (!$user->authorise('core.edit', 'com_content.category.'.$id)) {
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			// redirect to categories management tab
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+		} else if(!$model->saveaccess( $id, $access )) {
+			JError::raiseWarning(500, $model->getError());
 		} else {
 			$cache 		=& JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -350,73 +350,10 @@ class FlexicontentControllerCategories extends FlexicontentController
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=categories' );
 	}
-
-	/**
-	 * Logic to create the view for the edit categoryscreen
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	/*function edit( )
-	{
-		// Check for request forgeries
-		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		JRequest::setVar( 'view', 'category' );
-		JRequest::setVar( 'hidemainmenu', 1 );
-
-		$model 	= $this->getModel('category');
-		$user	=& JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
-		}
-
-		$model->checkout( $user->get('id') );
-		parent::display();
-	}*/
-
-	/**
-	 * Logic to copy params from one category to others
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function params( )
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$copyid		= JRequest::getInt( 'copycid', '', 'post' );
-		$destid		= JRequest::getVar( 'destcid', null, 'post', 'array' );
-		$task		= JRequest::getVar( 'task' );
-
-		$model 	= $this->getModel('category');		
-		$params = $model->getParams($copyid);
-		
-		if (!$destid) {
-			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TARGET' ).'</div>';
-			print_r($destid);
-			return;
-		}
-		if ($copyid)
-		{
-			$y = 0;
-			$n = 0;
-			foreach ($destid as $id)
-			{
-				if ($model->copyParams($id, $params)) {
-					$y++;
-				} else {
-					$n++;				
-				}
-			}
-			echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
-		} else {
-			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
-		}
+	
+	function getModel() {
+		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'categories.php');
+		$model = new FlexicontentModelCategories();
+		return $model;
 	}
 }

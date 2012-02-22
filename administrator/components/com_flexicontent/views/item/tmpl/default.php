@@ -608,18 +608,19 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</table>
 
 		<?php
-			$title = JText::_( 'FLEXI_DETAILS' );
 			echo $this->pane->startPane( 'det-pane' );
+			
+			$title = JText::_( 'FLEXI_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
 			echo $this->form->render('details');
+			echo $this->pane->endPanel();
 
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
-			echo $this->pane->endPanel();
 			echo $this->pane->startPanel( $title, "metadata-page" );
 			echo $this->form->render('meta', 'metadata');
+			echo $this->pane->endPanel();
 			
 			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-			echo $this->pane->endPanel();
 			echo $this->pane->startPanel( $title, "params-page" );
 			echo $this->form->render('params', 'advanced');
 			echo $this->pane->endPanel();

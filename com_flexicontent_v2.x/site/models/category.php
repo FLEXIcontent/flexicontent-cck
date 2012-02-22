@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1082 2012-01-03 01:52:51Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1133 2012-02-01 05:33:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.modellist');
+jimport('joomla.application.component.model');
 
 /**
  * FLEXIcontent Component Model
@@ -28,7 +28,7 @@ jimport('joomla.application.component.modellist');
  * @subpackage Flexicontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModelList{
+class FlexicontentModelCategory extends JModel {
 	/**
 	 * Category id
 	 *
@@ -63,6 +63,13 @@ class FlexicontentModelCategory extends JModelList{
 	 * @var integer
 	 */
 	var $_total = null;
+
+	/**
+	 * parameters
+	 *
+	 * @var object
+	 */
+	var $_params = null;
 	
 	/**
 	 * Group Categories
@@ -72,7 +79,7 @@ class FlexicontentModelCategory extends JModelList{
 	var $_group_cats = array();
 
 	/**
-	 * Category author (used for author pseudo-view)
+	 * Category author (used by AUTHOR layout)
 	 *
 	 * @var integer
 	 */
@@ -91,36 +98,24 @@ class FlexicontentModelCategory extends JModelList{
 	 *
 	 * @since 1.0
 	 */
-	public function __construct($config = array())
+	public function __construct()
 	{
-		if (empty($config['filter_fields'])) {
-			$config['filter_fields'] = array(
-				'id', 'a.id',
-				'title', 'a.title',
-				'alias', 'a.alias',
-				'checked_out', 'a.checked_out',
-				'checked_out_time', 'a.checked_out_time',
-				'catid', 'a.catid', 'category_title',
-				'state', 'a.state',
-				'access', 'a.access', 'access_level',
-				'created', 'a.created',
-				'created_by', 'a.created_by',
-				'ordering', 'a.ordering',
-				'featured', 'a.featured',
-				'language', 'a.language',
-				'hits', 'a.hits',
-				'publish_up', 'a.publish_up',
-				'publish_down', 'a.publish_down',
-				'author', 'a.author'
-			);
-		}
+		// Set category id and call constrcuctor
+		$cid		= JRequest::getInt('cid', 0);
+		$this->setId((int)$cid);  // This will set the category id and clear all member variables
+		parent::__construct();
 		
-		// Get category id and call constrcuctor
-		$mainframe = &JFactory::getApplication();
-		$cid			= JRequest::getInt('cid', 0);
-		$this->setId((int)$cid);
-		parent::__construct($config);
-
+		// Populate state data, if category id is changed this function must be called again
+		$this->populateCategoryState();
+	}
+	
+	/**
+	 * Method to populate the categry model state.
+	 *
+	 * return	void
+	 * @since	1.5
+	 */
+	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getVar('layout', 'category');
 		
 		if ($this->_layout=='author') {
@@ -132,126 +127,26 @@ class FlexicontentModelCategory extends JModelList{
 			}
 			$this->_authorid = $user->id;
 		}
-
-		// we need to merge parameters here to get the correct page limit value
-		$params = $this->_loadCategoryParams($cid);
-
-		//get the number of entries from session
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.category'.$cid.'.limit', 'limit', $params->def('limit', 0), 'int');
-		$limitstart		= JRequest::getInt('limitstart');
 		
-		// set pagination limit variables
+		// Set layout and authorid variables into state
+		$this->setState('layout', $this->_layout);
+		$this->setState('authorid', $this->_authorid);
+
+		// We need to merge parameters here to get the correct page limit value, we must call this after populating layput and author variables
+		$this->_params = $this->_loadCategoryParams($this->_id);
+		$params = $this->_params;
+
+		// Set the pagination variables into state (We get them from http request OR use default category parameters)
+		$limit			= JRequest::getVar('limit', $params->get('limit'), '', 'int');
+		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
-		// Set filter order variables
+		// Set filter order variables into state
 		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
 	}
-	
-	/**
-	 * Method to auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * return	void
-	 * @since	1.6
-	 */
-	protected function populateState($ordering = null, $direction = null) {
-		// Initiliase variables.
-		$app	= JFactory::getApplication('site');
-		$pk		= JRequest::getInt('cid');
 
-		$this->setState('category.id', $pk);
-
-		// Load the parameters. Merge Global and Menu Item params into new object
-		//$params = $app->getParams();//core joomla
-		// we need to merge parameters here to get the correct page limit value
-		$params = $this->_loadCategoryParams($pk);//flexicontent
-		$menuParams = new JRegistry;
-
-		if ($menu = $app->getMenu()->getActive()) {
-			$menuParams->loadJSON($menu->params);
-		}
-
-		$mergedParams = clone $menuParams;
-		$mergedParams->merge($params);
-
-		$this->setState('params', $mergedParams);
-		$user		= JFactory::getUser();
-				// Create a new query object.
-		$db		= $this->getDbo();
-		$query	= $db->getQuery(true);
-		$groups	= implode(',', $user->getAuthorisedViewLevels());
-
-		if ((!$user->authorise('core.edit.state', 'com_flexicontent')) &&  (!$user->authorise('core.edit', 'com_flexicontent'))){
-			// limit to published for people who can't edit or edit.state.
-			$this->setState('filter.published', 1);
-			// Filter by start and end dates.
-			$nullDate = $db->Quote($db->getNullDate());
-			$nowDate = $db->Quote(JFactory::getDate()->toMySQL());
-
-			$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
-			$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
-		}
-
-		// process show_noauth parameter
-		if (!$params->get('show_noauth')) {
-			$this->setState('filter.access', true);
-		} else {
-			$this->setState('filter.access', false);
-		}
-
-		// Optional filter text
-		$this->setState('list.filter', JRequest::getString('filter-search'));
-
-		// filter.order
-		$itemid = JRequest::getInt('cid', 0) . ':' . JRequest::getInt('Itemid', 0);
-		$orderCol = $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order', 'filter_order', 'a.ordering', 'string');
-		// Get the filter request variables
-		//$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
-		//$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
-		if (!in_array($orderCol, $this->filter_fields)) {
-			$orderCol = 'a.ordering';
-		}
-		$this->setState('list.ordering', $orderCol);
-
-		$listOrder = $app->getUserStateFromRequest('com_flexicontent.category.list.' . $itemid . '.filter_order_Dir',
-			'filter_order_Dir', 'ASC', 'cmd');
-		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', ''))) {
-			$listOrder = 'ASC';
-		}
-		$this->setState('list.direction', $listOrder);
-
-		$this->setState('list.start', JRequest::getVar('limitstart', 0, '', 'int'));
-		
-		// set limit for query. If list, use parameter. If blog, add blog parameters for limit.
-		/*if ((JRequest::getCmd('layout') == 'blog') || $params->get('layout_type') == 'blog') {
-			$limit = $params->get('num_leading_articles') + $params->get('num_intro_articles') + $params->get('num_links');
-			$this->setState('list.links', $params->get('num_links'));
-		}
-		else {*/
-			//$limit = $app->getUserStateFromRequest('com_content.category.list.' . $itemid . '.limit', 'limit', $params->get('display_num'));
-			$limit = $app->getUserStateFromRequest('com_flexicontent.category'.$pk.'.limit', 'limit', $params->def('limit', 0), 'int');
-		//}
-
-		$limitstart = JRequest::getInt('limitstart');
-		$this->setId((int)$pk);
-		/*$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
-		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));*/
-
-		// set the depth of the category query based on parameter
-		//$showSubcategories = $params->get('show_subcategory_content', '0');
-
-		/*if ($showSubcategories) {
-			$this->setState('filter.max_category_levels', $params->get('show_subcategory_content', '1'));
-			$this->setState('filter.subcategories', true);
-		}*/
-		$this->setState('filter.language',$app->getLanguageFilter());
-		$this->setState('layout', JRequest::getCmd('layout'));
-	}
 
 	/**
 	 * Method to set the category id
@@ -262,22 +157,13 @@ class FlexicontentModelCategory extends JModelList{
 	function setId($cid)
 	{
 		// Set new category ID and wipe data
-		$this->_id			= $cid;
-		//$this->_data		= null;
+		if ($this->_id != $cid) {
+			$this->_data = $this->_childs = $this->_category = $this->_total = $this->_params = null;
+			$this->_group_cats = array();
+		}
+		$this->_id = $cid;
 	}		
 
-	/**
-	 * Method to get the category pagination
-	 *
-	 * @access	public
-	 * @return	string
-	 */
-	public function getPagination() {
-		if (empty($this->_pagination)) {
-			return null;
-		}
-		return $this->_pagination;
-	}
 
 	/**
 	 * Method to get Data
@@ -335,16 +221,53 @@ class FlexicontentModelCategory extends JModelList{
 		return $this->_total;
 	}
 	
+	
 	/**
-	 * Total nr of Categories
+	 * Method to get the category pagination
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function getPagination() {
+		// Load the content if it doesn't already exist
+		if (empty($this->_pagination)) {
+			jimport('joomla.html.pagination');
+			$this->_pagination = new JPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		}
+		return $this->_pagination;
+	}
+	
+	/**
+	 * Create and return the pagination result set counter string
+	 *
+	 * @access	public
+	 * @return	string	Pagination result set counter string
+	 * @since	1.5
+	 */
+	function getResultsCounter() {
+		// If this code is copied to the template then $this must be replaced with $this->getModel()
+		$currstart = $this->getState('limitstart') + 1;
+		$currend = $this->getState('limitstart') + $this->getState('limit');
+		$currend = ($currend > $this->getTotal()) ? $this->getTotal() : $currend;
+		
+		return $html =
+			 "<span class='item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
+			."<span class='item_total_value'>".$this->getTotal() ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
+			."<span class='item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
+			."<span class='item_total_value'>".$currstart ." - " .$currend ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
+			;
+	}	
+	
+	
+	/**
+	 * Returns category parameters (merged in order: component, menu item, category and author overidden params)
 	 *
 	 * @access public
 	 * @return integer
 	 */
 	function & getParams()
 	{
-		$params = & $this->_loadCategoryParams($this->_id);
-		return $params;
+		return $this->_params;
 	}
 
 
@@ -361,7 +284,7 @@ class FlexicontentModelCategory extends JModelList{
 			// Get the WHERE and ORDER BY clauses for the query
 			$where			= $this->_buildItemWhere();
 			$orderby		= $this->_buildItemOrderBy();
-			$params = $this->_category->parameters;
+			$params = $this->_params;
 
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$order_field_join = '';
@@ -407,7 +330,7 @@ class FlexicontentModelCategory extends JModelList{
 	 * @return string
 	 */
 	function getAuthorDescrItem() {
-		$params = $this->_category->parameters;
+		$params = $this->_params;
 		$authordescr_itemid = $params->get('authordescr_itemid', 0);
 		if (!$authordescr_itemid) return false;
 		
@@ -438,7 +361,7 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _buildItemOrderBy()
 	{
-		$params = $this->_category->parameters;
+		$params = $this->_params;
 		
 		$filter_order		= $this->getState('filter_order', 'i.title');
 		$filter_order_dir	= $this->getState('filter_order_dir', 'ASC');
@@ -519,12 +442,8 @@ class FlexicontentModelCategory extends JModelList{
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
-		//Get active menu parameters.
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-		
 		// Get the category parameters
-		$cparams 	= $this->_category->parameters;
+		$cparams = $this->_params;
 
 		if ($this->_id) {
 			// display sub-categories
@@ -558,8 +477,9 @@ class FlexicontentModelCategory extends JModelList{
 			$lang = substr($tagLang ,0,2);
 		}
 
-		// content language parameter UNUSED
-		$filterlang = $cparams->get('language', '');
+		// category language parameter, currently UNUSED
+		$catlang = $cparams->get('language', '');
+		// filter items using currently selected language
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
@@ -576,7 +496,7 @@ class FlexicontentModelCategory extends JModelList{
 		// Limit to published items. Exceptions when: (a) user is editor, item is created by or modified by the user
 		// THE ABOVE MENTIONED EXCEPTIONS WILL NOT OVERRIDE ACCESS
 		if (FLEXI_J16GE) {
-			$isEditor = $user->authorize('core.edit', 'com_flexicontent');
+			$isEditor = $user->authorize('core.edit', 'com_flexicontent') || $user->authorize('core.edit.state', 'com_flexicontent');
 		} else {
 			$isEditor = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
 		}
@@ -588,9 +508,9 @@ class FlexicontentModelCategory extends JModelList{
 		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
-		// Filter the category view with the active active language
+		// Filter the category view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -616,31 +536,25 @@ class FlexicontentModelCategory extends JModelList{
 			}
 		}
 
+		// Get session
+		$session  =& JFactory::getSession();
+		
 		/*
 		 * If we have a filter, and this is enabled... lets tack the AND clause
 		 * for the filter onto the WHERE clause of the item query.
 		 */
 		if ( $cparams->get('use_filters') || $cparams->get('use_search') )
 		{
-			$filter 		= JRequest::getString('filter', '', 'request');
+			$filter		= JRequest::getVar('filter', NULL, 'request');
+			/*if($filter===NULL) {
+				$filter =  $session->get($option.'.category.filter');
+			} else {
+				$session->set($option.'.category.filter', $filter);
+			}*/
 
 			if ($filter)
 			{
-				// clean filter variables
-				$filter			= $this->_db->getEscaped( trim(JString::strtolower( $filter ) ) );
-
-				$where .= ' AND (';
-				$filters = explode(' ', $filter);
-				$i = 0;
-				foreach ($filters as $pattern) {
-					if ($i == 0) {
-						$where .= 'LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $pattern, true ).'%', false);
-						$i = 1;
-					} else {
-						$where .= ' AND LOWER( i.title ) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $pattern, true ).'%', false);
-					}
-				}
-				$where .= ') ';
+				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
 			}
 		}
 		
@@ -658,15 +572,14 @@ class FlexicontentModelCategory extends JModelList{
 			}
 		}
 		
-		$session  =& JFactory::getSession();
-		$alpha = JRequest::getVar('letter');
-		if($alpha===NULL) {
+		$alpha = JRequest::getVar('letter', NULL, 'request');
+		/*if($alpha===NULL) {
 			$alpha =  $session->get($option.'.category.letter');
 		} else {
 			$session->set($option.'.category.letter', $alpha);
-		}
+		}*/
 		
-		// WARNING DO THIS because utf8 is multibyte and MySQL regexp doesnot support so we cannot use [] with utf8
+		// WARNING DO THIS because utf8 is multibyte and MySQL regexp doesnot support multibyte, so we cannot use [] with utf8
 		$range = explode("-", $alpha);
 		
 		$regexp='';
@@ -745,7 +658,7 @@ class FlexicontentModelCategory extends JModelList{
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
 		// Get the category parameters
-		$cparams 	= $this->_category->parameters;
+		$cparams = $this->_params;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
 		
@@ -795,7 +708,7 @@ class FlexicontentModelCategory extends JModelList{
 		$user 		= &JFactory::getUser();
 
 		// Get the category parameters
-		$cparams 	= $this->_category->parameters;
+		$cparams = $this->_params;
 		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
 		if(empty($lang)){
@@ -804,8 +717,10 @@ class FlexicontentModelCategory extends JModelList{
 			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
 			$lang = substr($tagLang ,0,2);
 		}
-		// content language parameter UNUSED
-		$filterlang = $cparams->get('language', '');
+		
+		// category language parameter, currently UNUSED
+		$catlang = $cparams->get('language', '');
+		// filter items using currently selected language
 		$filtercat  = $cparams->get('filtercat', 0);
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
@@ -881,7 +796,7 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _getsubs($id)
 	{
-		$cparams 	= $this->_category->parameters;
+		$cparams = $this->_params;
 		$show_noauth	= $cparams->get('show_noauth', 0);
 		$user			= &JFactory::getUser();
 
@@ -986,7 +901,7 @@ class FlexicontentModelCategory extends JModelList{
 		} else if ($this->_authorid) {
 			$this->_category = new stdClass;
 			$this->_category->published = 1;
-			$this->_category->id = 0;
+			$this->_category->id = $this->_id;  // zero
 			$this->_category->title = '';
 			$this->_category->description = '';
 			$this->_category->slug = '';
@@ -1001,8 +916,9 @@ class FlexicontentModelCategory extends JModelList{
 			return false;
 		}
 		
-		$this->_category->parameters =& $this->_loadCategoryParams($this->_category->id);
-		$cparams = $this->_category->parameters;
+		// Set category parameters, these have already been loaded
+		$this->_category->parameters = & $this->_params;
+		$cparams = $this->_params;
 
 		//check whether category access level allows access
 		$canread = true;
@@ -1026,7 +942,7 @@ class FlexicontentModelCategory extends JModelList{
 				$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
 				$url .= '&return='.base64_encode($return);
 
-				JError::raiseWarning( 403, JText::_("FLEXI_LOGIN_TO_ACCESS"));
+				JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
 				$mainframe->redirect( $url );
 			} else {
 				if ($cparams->get('unauthorized_page', '')) {
@@ -1050,13 +966,11 @@ class FlexicontentModelCategory extends JModelList{
 	 */
 	function _loadCategoryParams($cid)
 	{
-		static $params;
-		
-		if ($params === NULL) {
+		if ($this->_params === NULL) {
 			jimport("joomla.html.parameter");
 			$mainframe = &JFactory::getApplication();
 			
-			// Retrieve author parameters if using displaying AUTHOR pseudo-view
+			// Retrieve author parameters if using displaying AUTHOR layout
 			$author_basicparams = '';
 			$author_catparams = '';
 			if ($this->_authorid!=0) {
@@ -1084,7 +998,16 @@ class FlexicontentModelCategory extends JModelList{
 			
 			// a. Get the PAGE/COMPONENT parameters
 			$params = clone($mainframe->getParams('com_flexicontent'));
-	
+			
+			// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) {
+				$menuParams = new JRegistry;
+				if ($menu = JSite::getMenu()->getActive()) {
+					$menuParams->loadJSON($menu->params);
+				}
+				$params->merge($menuParams);
+			}
+			
 			// b. Merge category parameters
 			$cparams = new JParameter($catparams);
 			$params->merge($cparams);
@@ -1105,13 +1028,15 @@ class FlexicontentModelCategory extends JModelList{
 			}
 			
 			// Bugs of v2.0 RC2
-			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
-				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
-				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
-			}
-			if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
-				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
-				$cparams->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
+			if (FLEXI_J16GE) {
+				if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
+					JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
+					$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+				}
+				if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
+					JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
+					$cparams->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
+				}
 			}
 		}
 		
@@ -1130,8 +1055,9 @@ class FlexicontentModelCategory extends JModelList{
 	{
 		static $filters;
 		if($filters) return $filters;
+		
 		$user		= &JFactory::getUser();
-		$params	= $this->_loadCategoryParams($this->_id);
+		$params = $this->_params;
 		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
 		$filters	= null;
 		

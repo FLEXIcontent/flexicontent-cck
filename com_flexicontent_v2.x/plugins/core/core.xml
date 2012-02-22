@@ -117,14 +117,14 @@
 			</field>
 			<field name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
 		</fieldset>
-		<fieldset name="group-categories"><!-- categories -->
+		<fieldset name="group-categories" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- categories -->
 			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 			</field>
-			<field name="rootcatid" type="flexicategories" top="2" required="false" onclick="javascript:;" multiple="0" size="1" default="" label="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING" description="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING_DESC" />
+			<field name="rootcatid" type="flexicategories" top="2" required="false" onclick="javascript:;" multiple="false" size="1" default="" label="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING" description="FLEXI_FIELD_ROOT_CATEGORY_FOR_FILTERING_DESC" />
 		</fieldset>
 		<fieldset name="group-tags"><!-- tags -->
 			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">

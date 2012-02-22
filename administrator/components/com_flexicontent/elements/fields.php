@@ -53,12 +53,12 @@ class JElementFields extends JElement
 		}
 		
 		$isadvsearch = $node->attributes('isadvsearch');
-		if($isadvsearch!==NULL) {
+		if($isadvsearch) {
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
 		
 		$field_type = $node->attributes('field_type');
-		if($field_type!==NULL) {
+		if($field_type) {
 			$and .= " AND field_type='{$field_type}'";
 		}
 		
@@ -71,6 +71,10 @@ class JElementFields extends JElement
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
+		if ( $db->getErrorNum() ) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+		}
 		
 		$attribs = "";
 		if ((boolean)$node->attributes('multiple')) {

@@ -43,10 +43,10 @@
 
 		<field name="cid" type="categorytree"
 			label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC"
-			class="required mcat" required="true" multiple="true" />
+			class="mcat" multiple="true" />
 		<field name="catid" type="categorytree"
 			label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC"
-			class="scat" top="2" />
+			class="scat" required="true" top="2" />
 		<field
 			name="buttonspacer"
 			description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION"
@@ -197,7 +197,7 @@
 			size="20" />
 
 		<field name="rights" type="textarea" label="FLEXI_META_RIGHTS_LABEL"
-			description="FLEXI_META_RIGHTS_DESC" required="" filter="string"
+			description="FLEXI_META_RIGHTS_DESC" filter="string"
 			cols="30" rows="2" />
 		<field name="xreference" type="text"
 			label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC"

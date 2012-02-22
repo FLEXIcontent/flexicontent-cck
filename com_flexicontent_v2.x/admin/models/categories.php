@@ -141,7 +141,18 @@ class FlexicontentModelCategories extends JModelList
 					$this->_addCategories($id, $cid, 'parents');
 				}
 			}
-						
+			
+			// Check access to change state of categories
+			foreach ($cid as $catid) {
+				if (!$user->authorise('core.edit.state', 'com_content.category.'.$catid)) {
+					$this->setError(
+						'You are not authorised to change state of category with id: '. $catid
+						.'<br />NOTE: when publishing a category the parent categories will get published'
+						.'<br />NOTE: when unpublishing a category the children categories will get unpublished'
+					);
+					return false;
+				}
+			}
 			$cids = implode( ',', $cid );
 
 			$query = 'UPDATE #__categories'
@@ -239,7 +250,7 @@ class FlexicontentModelCategories extends JModelList
 		{
 			$this->_addCategories($id, $cids);
 		}
-				
+		
 		$cids = implode( ',', $cids );
 
 		$query = 'SELECT c.id, c.parent_id, c.title, COUNT( e.catid ) AS numcat'
@@ -257,6 +268,19 @@ class FlexicontentModelCategories extends JModelList
 		
 		$err = array();
 		$cid = array();
+		
+		// Check access to delete of categories
+		foreach ($rows as $row) {
+			$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
+			$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');
+			if	( !$canDelete && !$canDeleteOwn ) {
+				$this->setError(
+					'You are not authorised to delete category with id: '. $row->id
+					.'<br />NOTE: when deleting a category the children categories will get deleted too'
+				);
+				return false;
+			}
+		}
 		
 		//TODO: Categories and its childs without assigned items will not be deleted if another tree has any item entry 
 		foreach ($rows as $row) {
@@ -307,18 +331,12 @@ class FlexicontentModelCategories extends JModelList
 		//handle childs
 		$cids = array();
 		$cids[] = $id;
-		$this->_addCategories($id, $cids);
+		//$this->_addCategories($id, $cids);   // Propagate access level to children ??? !!! ???
 		
 		foreach ($cids as $cid) {
 			
 			$category->load( (int)$cid );
-			
-			if ($category->access < $access) {				
-				$category->access = $access;
-			} else {
-				$category->load( $id );
-				$category->access = $access;
-			}
+			$category->access = $access;
 			
 			if ( !$category->check() ) {
 				$this->setError($this->_db->getErrorMsg());

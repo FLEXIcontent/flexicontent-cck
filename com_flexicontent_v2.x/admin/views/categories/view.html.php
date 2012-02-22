@@ -45,15 +45,19 @@ class FlexicontentViewCategories extends JView {
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$permission = FlexicontentHelperPerm::getPerm();
+
+		if (!$permission->CanCats) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
 		//Create Submenu
 		FLEXISubmenu('CanCats');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );
-		if($permission->CanConfig) {
-			$toolbar =&JToolBar::getInstance('toolbar');
-			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 400);
-		}
+		
+		$toolbar =&JToolBar::getInstance('toolbar');
+		$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 440);
+		
 		JToolBarHelper::spacer();
 		JToolBarHelper::publishList('categories.publish');
 		JToolBarHelper::unpublishList('categories.unpublish');
@@ -75,8 +79,8 @@ class FlexicontentViewCategories extends JView {
 		}
 		
 		$categories = $globalcats;
-		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
-		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
+		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, true, $actions_allowed=array('core.edit'));
+		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, true, $actions_allowed=array('core.edit'));
 
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );

@@ -501,63 +501,65 @@ table.adminlist thead #filter_cats {
 
 /* Tags list autocomplete */
 ul#ultagbox{
-	min-height: 26px!important;
-	margin: 0!important;
-	padding: 0!important;
+	min-height: 26px !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 ul#ultagbox li{
-	list-style-type:none;
-	display:block;
-	float:left;
+	list-style-type:none !important;
+	display:block !important;
+	float:left !important;
 	margin: 2px !important;
+	line-height: 100% !important;
 }
 .tagitem {
-	border: 1px solid silver;
-	padding: 4px 1px 3px 6px;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50%;
-	margin: 2px;
+	border: 1px solid silver !important;
+	padding: 4px 1px 3px 6px !important;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50% !important;
+	margin: 2px !important;
 }
 .deletetag {
-	display: block;
-	width: 18px;
-	height:13px;
-	float: right;
-	margin-left: 5px;
-	outline: none;
+	display: block !important;
+	width: 18px !important;
+	height:14px !important;
+	float: right !important;
+	margin-left: 5px !important;
+	outline: none !important;
+	background-color: transparent !important;
 }
 /** tag selection */
 div#tags {
-	margin: 4px 0px!important;
-	padding:0px!important;
+	margin: 4px 0px !important;
+	padding:0px !important;
 }
 div#tags #input-tags {
-	margin: 4px!important;
+	margin: 4px !important;
 }
 .qf_tagbox {
-	display: block;
-	max-height: 170px;
-  	overflow: auto;
-  	border: 1px dashed silver;
-  	background: #fff;
-  	margin: 0px 4px 4px 0px;	
+	display: block !important;
+	max-height: 170px !important;
+  	overflow: auto !important;
+  	border: 1px dashed silver !important;
+  	background: #fff !important;
+  	margin: 0px 4px 4px 0px !important;
 }
 
 .qf_tagidbox {
-	width: 20px;
-	display: block;
-	float: left;
-	margin-top: -4px;
+	width: 20px !important;
+	display: block !important;
+	float: left !important;
+	margin-top: -4px !important;
 }
 
 .qf_addtag { 
-	margin-top: 10px;
+	margin-top: 10px !important;
 }
 
 .qf_centerimg {
-	text-align: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 0px;
+	text-align: center !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    padding: 0px !important;
 }
 
 .clear

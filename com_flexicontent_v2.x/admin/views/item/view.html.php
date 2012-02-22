@@ -53,7 +53,8 @@ class FlexicontentViewItem extends JView {
 		}
 		// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
 		//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-
+		
+		//JHTML::_('behavior.formvalidation'); // we use custom validation class
 		JHTML::_('behavior.tooltip');
 
 		$nullDate 		= $db->getNullDate();

@@ -71,8 +71,7 @@ class FlexicontentViewFlexicontent extends JView
 		$categories	= & $this->get('Data');
 		$categories	= !is_array($categories)?array():$categories;
 
-		// because the application sets a default page title, we need to get it
-		// right from the menu item itself
+		// Because the application sets a default page title, we need to get title right from the menu item itself
 		if (is_object( $menu )) {
 			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		

@@ -62,6 +62,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$destid		= JRequest::getVar( 'destcid', null, 'post', 'array' );
 		$task		= JRequest::getVar( 'task' );
 
+		$user = JFactory::getUser();
 		$model 	= $this->getModel('category');		
 		$params = $model->getParams($copyid);
 		
@@ -74,15 +75,21 @@ class FlexicontentControllerCategories extends FlexicontentController
 		{
 			$y = 0;
 			$n = 0;
+			$unauthorized = array();
 			foreach ($destid as $id)
 			{
-				if ($model->copyParams($id, $params)) {
-					$y++;
+				if ($user->authorise('core.edit', 'com_content.category.'.$id)) {
+					if ($model->copyParams($id, $params)) {
+						$y++;
+					} else {
+						$n++;				
+					}
 				} else {
-					$n++;				
+					$unauthorized[] = $id;
 				}
 			}
 			echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
+			if (count($unauthorized)) echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
 		} else {
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
 		}

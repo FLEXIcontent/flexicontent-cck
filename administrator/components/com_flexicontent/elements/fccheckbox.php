@@ -42,11 +42,11 @@ class JElementFCcheckbox extends JElement
 		$checkoptions = explode($split_char, $node->attributes('checkoptions'));
 		$checkvals = explode($split_char, $node->attributes('checkvals'));
 		$defaultvals = explode($split_char, $node->attributes('defaultvals'));
-		
+
 		// Make value an array if value is not already array, also load defaults, if field parameter never saved
 		if (!is_array($value) || count($value)==0)
-			$value = (!is_array($value) && strlen($value))  ? array($value) : $defaultvals;
-			
+			$value = (!is_array($value) && strlen($value)) ? array($value) : $defaultvals;
+
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";

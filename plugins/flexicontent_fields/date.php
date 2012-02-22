@@ -139,6 +139,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$css = '
 			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
+				clear:both;
 				list-style: none;
 				height: 20px;
 				width:500px;

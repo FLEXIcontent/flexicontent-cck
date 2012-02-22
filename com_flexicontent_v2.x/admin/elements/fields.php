@@ -56,12 +56,12 @@ class JFormFieldFields extends JFormField
 		}
 		
 		$isadvsearch = $node->getAttribute('isadvsearch');
-		if($isadvsearch!==NULL) {
+		if($isadvsearch) {
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
 		
 		$field_type = $node->getAttribute('field_type');
-		if($field_type!==NULL) {
+		if($field_type) {
 			$and .= " AND field_type='{$field_type}'";
 		}
 		
@@ -74,6 +74,10 @@ class JFormFieldFields extends JFormField
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
+		if ( $db->getErrorNum() ) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+		}
 		
 		$attribs = "";
 		if ((boolean)$node->getAttribute('multiple')) {

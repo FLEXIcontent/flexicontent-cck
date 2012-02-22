@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 713 2011-07-29 05:55:06Z ggppdk $
+ * @version 1.5 stable $Id: router.php 892 2011-09-07 22:16:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -86,9 +86,9 @@ function FLEXIcontentBuildRoute(&$query)
 	/*case 'search':
 		//TODO something if needed
 		break;*/
-	case 'item':
+	case FLEXI_ITEMVIEW:
 		if (isset($query['cid']))	{
-			// IMPLY view = 'item' when count($segments) == 2
+			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
 			$segments[] = $query['cid'];
 			$segments[] = @$query['id'];  // Required ... 
 			unset($query['cid']);
@@ -172,9 +172,9 @@ function FLEXIcontentParseRoute($segments)
 	
 	// 4. *** Cases that VIEW is provided (expicitly given) ***
 	
-	// 4.a 'item' view
-	if($segments[0] == 'item' || $segments[0] == 'item') {
-		$vars['view'] = 'item';
+	// 4.a 'item(s)' view
+	if($segments[0] == 'item' || $segments[0] == 'items') {
+		$vars['view'] = FLEXI_ITEMVIEW;
 		if ($count==2) {  // no cid provided
 			$vars['id'] = $segments[1];
 		} else if ($count==3) {  // also cid provided
@@ -239,9 +239,9 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 
-	// 5.c Segments Length 2 is 'item' view
+	// 5.c Segments Length 2 is 'item(s)' view
 	if($count == 2) {
-		$vars['view'] = 'item';
+		$vars['view'] = FLEXI_ITEMVIEW;
 		$vars['cid'] 	= $segments[0];
 		$vars['id'] 	= $segments[1];
 		return $vars;

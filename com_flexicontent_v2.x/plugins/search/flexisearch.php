@@ -17,12 +17,12 @@
  */
 
 // no direct access
-defined('_JEXEC') or die;
-
+defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('joomla.plugin.plugin');
 
-require_once JPATH_SITE.'/components/com_flexicontent/router.php';
-
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 /**
  * Content Search plugin
  *
@@ -37,8 +37,9 @@ class plgSearchFlexisearch extends JPlugin
 		parent::__construct($subject, $config);
 		$this->loadLanguage();
 	}
+	
 	function _getAreas(){
-		$params = & $this->params;
+		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
 		
 		$areas = array();
 		if ($params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
@@ -52,8 +53,9 @@ class plgSearchFlexisearch extends JPlugin
 	}
 
 	function _getContentTypes(){
+		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
 	
-		$typeIds = $this->params->get('search_types',	'');
+		$typeIds = $params->get('search_types',	'');
 		$typesarray = array();
 		preg_match_all('/\b\d+\b/',$typeIds, $typesarray);
 		$wheres=array();
@@ -91,7 +93,9 @@ class plgSearchFlexisearch extends JPlugin
 	{
 		static $areas = array();
 		
-		$areas = $this->params->get('search_select_types',	1) ? $this->_getAreas() + $this->_getContentTypes() :  $this->_getAreas();
+		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
+		
+		$areas = $params->get('search_select_types',	1) ? $this->_getAreas() + $this->_getContentTypes() :  $this->_getAreas();
 		return $areas;			
 	}
 
@@ -103,20 +107,35 @@ class plgSearchFlexisearch extends JPlugin
 	 * @param string Target search string
 	 * @param string mathcing option, exact|any|all
 	 * @param string ordering option, newest|oldest|popular|alpha|category
-	 * @param mixed An array if the search it to be restricted to areas, null if search all
+	 * @param mixed An array if restricted to areas, null if search all
 	 */
 	function onContentSearch($text, $phrase='', $ordering='', $areas=null)
 	{
+		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
+		
 		$db		= JFactory::getDbo();
 		$app	= JFactory::getApplication();
 		$user	= JFactory::getUser();
-		$groups	= implode(',', $user->getAuthorisedViewLevels());
-		$tag = JFactory::getLanguage()->getTag();
+		
+		// Get language, joomfish or J1.7+ language selector will append lang variable to the URL
+		$lang = JRequest::getWord('lang', '' );
+		if(empty($lang)){
+			$langFactory= JFactory::getLanguage();
+			$tagLang = $langFactory->getTag();
+			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
+			$lang = substr($tagLang ,0,2);
+		}
+	    
+	  // COMPONENT PARAMETERS
+		$cparams 	= & $app->getParams('com_flexicontent');
+		if (!defined('FLEXI_SECTION'))
+			define('FLEXI_SECTION', $cparams->get('flexi_section'));		// define section
+		$show_noauth = $cparams->get('show_noauth', 0);		// items the user cannot see ...
 
 		$searchText = $text;
 		
-		$AllAreas=array_keys($this->_getAreas());
-		$AllTypes=array_keys($this->_getContentTypes());
+		$AllAreas=array_keys(FLEXI_J16GE ? $this->_getAreas() : _getAreas());
+		$AllTypes=array_keys(FLEXI_J16GE ? $this->_getContentTypes() : _getContentTypes());
 			
 		if (is_array($areas)) {
 			// search in selected areas
@@ -140,11 +159,12 @@ class plgSearchFlexisearch extends JPlugin
 		
 		$types= implode(', ',$searchTypes);
 
-		$filter_lang	= $this->params->get('filter_lang',	1);
-		$limit			= $this->params->def('search_limit',50);
+		$filter_lang	= $params->def('filter_lang',	1);
+		$limit				= $params->def('search_limit', 50);
 
+		// Dates for publish up & down items
 		$nullDate		= $db->getNullDate();
-		$date = JFactory::getDate();
+		$date =& JFactory::getDate();
 		$now = $date->toMySQL();
 
 		$text = trim($text);
@@ -157,13 +177,11 @@ class plgSearchFlexisearch extends JPlugin
 			case 'exact':
 				$text		= $db->Quote('%'.$db->getEscaped($text, true).'%', false);
 				$wheres2	= array();
-				if (in_array('FlexisearchTitle', $searchAreas))	{$wheres2[]	= 'a.title LIKE '.$text;}
-				if (in_array('FlexisearchDesc', $searchAreas))	{$wheres2[]	= 'a.introtext LIKE '.$text;
-																	 $wheres2[]	= 'a.fulltext LIKE '.$text;}
-				if (in_array('FlexisearchMeta', $searchAreas))	{$wheres2[]	= 'a.metakey LIKE '.$text;
-																	 $wheres2[]	= 'a.metadesc LIKE '.$text;}
+				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$text;}
+				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$text;	$wheres2[]	= 'a.fulltext LIKE '.$text;}
+				if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$text;		$wheres2[]	= 'a.metadesc LIKE '.$text;}
 				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
-				if (in_array('FlexisearchTags', $searchAreas))	{$wheres2[]	= 't.name LIKE '.$text;}
+				if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$text;}
 				$where		= '(' . implode(') OR (', $wheres2) . ')';
 				break;
 			case 'all':
@@ -174,13 +192,11 @@ class plgSearchFlexisearch extends JPlugin
 				foreach ($words as $word) {
 					$word		= $db->Quote('%'.$db->getEscaped($word, true).'%', false);
 					$wheres2	= array();
-					if (in_array('FlexisearchTitle', $searchAreas)) 	{$wheres2[]	= 'a.title LIKE '.$word;}
-					if (in_array('FlexisearchDesc', $searchAreas)) 	{$wheres2[]	= 'a.introtext LIKE '.$word;
-																		 $wheres2[]	= 'a.fulltext LIKE '.$word;}
-					if (in_array('FlexisearchMeta', $searchAreas))	{$wheres2[]	= 'a.metakey LIKE '.$word;
-																		 $wheres2[]	= 'a.metadesc LIKE '.$word;}
+					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$word;}
+					if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$word;	$wheres2[]	= 'a.fulltext LIKE '.$word;}
+					if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$word;		$wheres2[]	= 'a.metadesc LIKE '.$word;}
 					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
-					if (in_array('FlexisearchTags', $searchAreas))	{$wheres2[]	= 't.name LIKE '.$word;}
+					if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$word;}
 					$wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
 				}
 				$where = '(' . implode(($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
@@ -211,54 +227,91 @@ class plgSearchFlexisearch extends JPlugin
 				break;
 		}
 
-		$rows = array();
-		$query	= $db->getQuery(true);
-
+		// Select only items user has access to if he is not allowed to show unauthorized items
+		$joinaccess	= '';
+		$andaccess	= '';
+		if (!$show_noauth) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess .= 'AND a.access IN ('.$aid_list.') ';
+				$andaccess .= 'AND c.access IN ('.$aid_list.') ';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $aid . ')';
+				} else {
+					$andaccess  .= ' AND c.access <= '.$aid;
+					$andaccess  .= ' AND a.access <= '.$aid;
+				}
+			}
+		}
+	
+		// filter by active language
+		$andlang = '';
+		if ($app->isSite() && $app->getLanguageFilter() && $filter_lang) {
+			$andlang .= ' AND a.language in (' . $db->Quote($tag) . ',' . $db->Quote('*') . ')';
+			$andlang .= ' AND c.language in (' . $db->Quote($tag) . ',' . $db->Quote('*') . ')';
+		}
+	
 		// search articles
 		$results = array();
 		if ( $limit > 0)
 		{
+			$query	= $db->getQuery(true);
 			$query->clear();
 			$query->select(
-				' a.title AS title, '
+				' a.id as id, '
+				.'a.title AS title, '
 				.'a.metakey AS metakey, '
 				.'a.metadesc AS metadesc, '
-				.'a.modified AS created, '
+				.'a.modified AS created, '     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
 				.'t.name AS tagname, '
+				.'fir.value as field, '
 				.'CONCAT(a.introtext, a.fulltext) AS text, '
-				.'c.title AS section, '
+				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, a.title ) AS section, '
 				.'CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END AS slug, '
 				.'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug, '
-				.'"2" AS browsernav ');
-			$query->from('(#__content AS a '
+				.'"2" AS browsernav '
+				);
+			$query->from('#__content AS a '
 				.'LEFT JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id '
 				.'LEFT JOIN #__flexicontent_fields_item_relations AS fir ON a.id = fir.item_id '
 				.'LEFT JOIN #__categories AS c ON a.catid = c.id '
-				.'LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid) '
+				.'LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid '
 				.'LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id '
-				.'LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	');
-				//echo $where;
+				.'LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	'
+				. $joinaccess
+				);
 			$query->where(' ('. $where .') ' 
 				.'AND ie.type_id IN('.$types.') '
-				.'AND a.state=1 AND c.published = 1 AND a.access IN ('.$groups.') '
-				.'AND c.access IN ('.$groups.') '
+				.'AND a.state IN (1, -5) AND c.published = 1 '
 				.'AND (a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).') '
-				.'AND (a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).') '); 
-// Filter by language
-			if ($app->isSite() && $app->getLanguageFilter() && $filter_lang) {
-				$query->where('a.language in (' . $db->Quote($tag) . ',' . $db->Quote('*') . ')');
-				$query->where('c.language in (' . $db->Quote($tag) . ',' . $db->Quote('*') . ')');
-			}
+				.'AND (a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).') '
+				. $andaccess
+				// Filter by language
+				. $andlang
+				); 
 			$query->group('a.id');
 			$query->order($order);
 			
 			$db->setQuery($query, 0, $limit);
 			$list = $db->loadObjectList();
-			if (isset($list)){
-				foreach($list as $key => $item){
-					$list[$key]->href = FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug);
-					if (searchHelper::checkNoHTML($item, $searchText, array('text', 'title', 'metadesc', 'metakey', 'tagname'))) {
-						$results[] = $item;
+			if ( $db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			}
+			if (isset($list))
+			{
+				foreach($list as $key => $item)
+				{
+					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
+					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
+					if (searchHelper::checkNoHTML($item, $searchText, array('text', 'title', 'metadesc', 'metakey', 'tagname', 'field' ))) {
+						$results[$item->id] = $item;
 					}
 				}
 			}

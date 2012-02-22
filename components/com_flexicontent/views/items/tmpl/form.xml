@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_ITEM_SUBMISSION">
 		<message>
 			<![CDATA[FLEXICONTENT_ITEM_SUBMISSION_TIP]]>
@@ -13,8 +14,10 @@
 			<option value="1">Article</option> 
 		</param>
 		</url>
+		
 		<params addpath="/administrator/components/com_flexicontent/elements">
-			<param name="cid" type="flexicategories" multiple="true" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
+			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
+			<param name="maincatid" type="flexicategories" multiple="false" required="false" size="1" default="" label="Default Main Category" description="The category that will be selected as default main category on form load" />
 			<param name="postcats" type="list" default="0" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
 				<option value="0">ALL_CATS</option>
 				<option value="1">ONE_CAT</option>
@@ -35,4 +38,5 @@
 			<param name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" />
 		</params>
 	</state>
+		
 </metadata>

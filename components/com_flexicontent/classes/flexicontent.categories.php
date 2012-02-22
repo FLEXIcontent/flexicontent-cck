@@ -74,7 +74,7 @@ class flexicontent_cats
 					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
 					.' FROM #__categories'
 					.' WHERE id ='. $db->Quote((int)$cid)
-					.( !FLEXI_J16GE ? ' AND section = ' . FLEXI_SECTION : '' )
+					. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
 					.' AND published = 1'
 					;
 			$db->setQuery($query);
@@ -91,7 +91,9 @@ class flexicontent_cats
 	{
 		$db 		=& JFactory::getDBO();
 
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid .( !FLEXI_J16GE ? ' AND section = ' . FLEXI_SECTION : '' );
+		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid
+			. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' );
+		
 		$db->setQuery( $query );
 		$parents[$cid] = $db->loadResult();
 
@@ -133,8 +135,7 @@ class flexicontent_cats
 		if ($published) {
 			$where[] = 'published = 1';
 		}
-		if (!FLEXI_J16GE) $where[] = 'section = ' . FLEXI_SECTION;
-		if (FLEXI_J16GE)  $where[] = 'extension = "' . FLEXI_CAT_EXTENSION .'"';
+		$where[] = (!FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension="'.FLEXI_CAT_EXTENSION.'"' );
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		
@@ -231,7 +232,7 @@ class flexicontent_cats
 	 * Build a html select form field that displays a Category Tree
 	 *
 	 * The output is filtered (via FLEXIaccess or via J1.6+ permission) and has disabled specific categories
-	 * About Disabled categories:"
+	 * About Disabled categories:
 	 * - currently edited category is disabled
 	 * - if the user can view all categories then categories he has no permission are disabled !!!
 	 *
@@ -242,12 +243,20 @@ class flexicontent_cats
 	 * @param string $class
 	 * @return void
 	 */
-	function buildcatselect($list, $name, $selected, $top, $class = 'class="inputbox"', $published = false, $filter = true)
+	function buildcatselect($list, $name, $selected, $top,
+		$class = 'class="inputbox"', $published = false, $filter = true,
+		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own')   // For item edit this should be array('core.create')
+	)
 	{
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
-
-		if (FLEXI_ACCESS) {
+		
+		if (FLEXI_J16GE) {
+			require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+			$usercats 		= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
+			$viewallcats	= FlexicontentHelperPerm::getPerm()->CanUserCats;
+			$viewtree			= FlexicontentHelperPerm::getPerm()->CanViewTree;
+		} else if (FLEXI_ACCESS) {
 			$usercats 		= FAccess::checkUserCats($user->gmid);
 			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
 			$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
@@ -270,7 +279,11 @@ class flexicontent_cats
 				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 				} else if ($filter) {
-					if (FLEXI_ACCESS && (!in_array($item->id, $usercats)) && ($user->gid < 25)) {
+					$asset = 'com_content.category.'.$item->id;
+					if (
+					(FLEXI_J16GE && !in_array($item->id, $usercats) ) ||  // if user has 'core.admin' then all cats are allowed
+					(FLEXI_ACCESS && !in_array($item->id, $usercats) && ($user->gid < 25))
+					) {
 						if ($viewallcats) { // only disable cats in the list else don't show them at all
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
@@ -283,7 +296,9 @@ class flexicontent_cats
 				}
 			}
 		}
-		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected );
+		$idtag = preg_replace('/(\]|\[)+/', '_', $name);
+		$idtag = preg_replace('/_$/', '', $idtag);
+		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
 	}
 	
 	

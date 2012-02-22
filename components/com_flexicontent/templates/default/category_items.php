@@ -183,15 +183,8 @@ endif;
 		<!-- BOF items total-->
 		<?php if ($this->params->get('show_item_total', 1)) : ?>
 		<div id="item_total" class="item_total">
-			<?php
-				$currstart = $this->getModel()->_state->limitstart + 1;
-				$currend = $this->getModel()->_state->limitstart + $this->getModel()->_state->limit;
-				$currend = ($currend > $this->getModel()->_total) ? $this->getModel()->_total : $currend;
-			?>
-				<span class='item_total_label'><?php echo JText::_( 'FLEXI_TOTAL'); ?></span>
-				<span class='item_total_value'><?php echo $this->getModel()->_total ." " .JText::_( 'FLEXI_ITEM_S'); ?></span>
-				<span class='item_total_label'><?php echo JText::_( 'FLEXI_DISPLAYING'); ?></span>
-				<span class='item_total_value'><?php echo $currstart ." - " .$currend ." " .JText::_( 'FLEXI_ITEM_S'); ?></span>
+			<?php	//echo $this->pageNav->getResultsCounter(); // Alternative way of displaying total (via joomla pagination class) ?>
+			<?php echo $this->resultsCounter; // custom Results Counter ?>
 		</div>
 		<?php endif; ?>
 		<!-- BOF items total-->

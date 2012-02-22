@@ -975,7 +975,7 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		/*** Component assets ***/
 		
-		if (!$asset->loadByName($component_name)) {
+		if ($asset->loadByName($component_name)) {
 			// The assets entry already exists, we will check if it has rules for all component's actions 
 			$root = JTable::getInstance('asset');
 			$root->loadByName('root.1');
@@ -1156,6 +1156,9 @@ class FlexicontentModelFlexicontent extends JModel
 			if(JAccess::checkGroup($group->id, 'core.delete')) {
 				$rules['core.delete'][$group->id] = 1;//CanDelete
 			}
+			if(JAccess::checkGroup($group->id, 'core.delete.own')) {
+				$rules['core.delete.own'][$group->id] = 1;//CanDeleteOwn
+			}
 			if(JAccess::checkGroup($group->id, 'core.edit')) {
 				$rules['core.edit'][$group->id] = 1;//CanEdit
 			}
@@ -1165,7 +1168,7 @@ class FlexicontentModelFlexicontent extends JModel
 			if(JAccess::checkGroup($group->id, 'core.edit.own')) {
 				$rules['core.edit.own'][$group->id] = 1;//CanEditOwn
 			}
-			$rules['flexicontent.readfield'][$group->id] = 1;//CanViewField
+			//$rules['flexicontent.readfield'][$group->id] = 1;//CanViewField
 		}
 		
 		return $rules;

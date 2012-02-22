@@ -1,5 +1,5 @@
 /**
- * @version 1.5 stable $Id: CHANGELOG.php 922 2011-10-05 17:42:58Z ggppdk $
+ * @version 1.5 stable $Id: CHANGELOG.php 1079 2012-01-02 00:18:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -317,7 +317,7 @@ $ -> Language fix or change
 + Add a canonical tag to avoid duplicate contents with multi-mapping
 + Add the option to allow the user to choose some of the pre-selected categories when submiting items from frontend (issue99)
 + Add the new article toolbar plugin to the trunk
-+ Add the ability to sort category by the last modified items (for Mihaly)
++ Add the ability to sort category by the last modified items (for Mihàly)
 + Add display label with filter option in category views
 + Add the feature to route categories to a specific item type (requires the advanced route system plugin)
 + Add the advanced routing features to the category view. You can now exclude some categories from routing ;)

@@ -68,19 +68,18 @@ class FlexicontentViewTags extends JView
 			return JError::raiseError( 404, JText::sprintf( 'Tag #%d not found', $tid ) );
 		}
 		
-		// because the application sets a default page title, we need to get it
-		// right from the menu item itself
+		// Because the application sets a default page title, we need to get title right from the menu item itself
 		if (is_object( $menu )) {
 			jimport( 'joomla.html.parameter' );
 			$menu_params = new JParameter( $menu->params );		
 			$params->merge($menu_params);
 			
 			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	JText::_( FLEXI_TAGS).": ".JText::_( $tag->name ));
+				$params->set('page_title',	JText::_('FLEXI_TAGS').": ".JText::_( $tag->name ));
 			}
 			
 		} else {
-			$params->set('page_title',	JText::_( FLEXI_TAGS).": ".JText::_( $tag->name ));
+			$params->set('page_title',	JText::_('FLEXI_TAGS').": ".JText::_( $tag->name ));
 		}
 		
 		if (FLEXI_J16GE) {  // Not available in J1.5

@@ -239,10 +239,12 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					$limit = $cparams->get('limit', 4);
 					$limit = $limit ? $limit : 4;
 					$start = floor($location / $limit)*$limit;
-					$html .= '
-					<span class="return_category">
-						<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'&start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
-					</span>';
+					if (!empty($rows[$location]->catslug)) {
+						$html .= '
+						<span class="return_category">
+							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'&start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
+						</span>';
+					}
 				}
 
 				if ($field->prev)
