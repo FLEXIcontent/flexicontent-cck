@@ -328,7 +328,7 @@ class modFlexicontentHelper
 						$date_fields_feat = $params->get('date_fields_feat', array());
 	 			  	$date_fields_feat = !is_array($date_fields_feat) ? array($date_fields_feat) : $date_fields_feat;
 	 			  	$lists[$ord]['featured'][$i]->date_created = "";
-						if (in_array('crated', $date_fields_feat)) { // Created
+						if (in_array('created', $date_fields_feat)) { // Created
 							$lists[$ord]['featured'][$i]->date_created .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
 							$lists[$ord]['featured'][$i]->date_created .= '<span class="date_value_feat">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
 						}
@@ -435,7 +435,7 @@ class modFlexicontentHelper
 						$date_fields = $params->get('date_fields', array());
 	 			  	$date_fields = !is_array($date_fields) ? array($date_fields) : $date_fields;
 	 			  	$lists[$ord]['standard'][$i]->date_created = "";
-						if (in_array('crated', $date_fields)) { // Created
+						if (in_array('created', $date_fields)) { // Created
 							$lists[$ord]['standard'][$i]->date_created .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
 							$lists[$ord]['standard'][$i]->date_created .= '<span class="date_value">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
 						}
