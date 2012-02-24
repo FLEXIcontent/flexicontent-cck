@@ -49,5 +49,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/'
 
 // Version constants
 define('FLEXI_VERSION',	'2.0');
-define('FLEXI_RELEASE',	'preRC3 (r1110)');
+define('FLEXI_RELEASE',	'RC3 (r1151)');
 ?>
