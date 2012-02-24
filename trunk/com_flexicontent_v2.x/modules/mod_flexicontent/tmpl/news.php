@@ -62,7 +62,10 @@ $force_height="height='$mod_height'";
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
 	
 	<?php
-	// Display Category Information
+	// Display FavList Information (if enabled)
+	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/favlist.php');
+	
+	// Display Category Information (if enabled)
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/category.php');
 	
 	$ord_titles = array(
