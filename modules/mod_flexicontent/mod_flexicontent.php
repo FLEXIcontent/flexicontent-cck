@@ -85,9 +85,23 @@ $custom3 				= $params->get('custom3');
 $custom4 				= $params->get('custom4');
 $custom5 				= $params->get('custom5');
 
-//error_reporting(E_ALL);
-//ini_set('display_errors', TRUE);
-//ini_set('display_startup_errors', TRUE);
+// Calculate menu itemid for item links
+$menus				= & JApplication::getMenu('site', array());
+$itemid_force	= (int)$params->get('itemid_force', 1);
+if ($itemid_force==1) {
+	$Itemid					= JRequest::getInt('Itemid');
+	$menu						= & $menus->getItem($Itemid);
+	$component			= @$menu->query['option'] ? $menu->query['option'] : '';
+	$forced_itemid	= $component=="com_flexicontent" ? $Itemid : 0;
+} else if ($itemid_force==2) {
+	$itemid_force_value	= (int)$params->get('itemid_force_value', 0);
+	$menu								= & $menus->getItem($itemid_force_value);
+	$component					= @$menu->query['option'] ? $menu->query['option'] : '';
+	$forced_itemid			= $component=="com_flexicontent" ? $itemid_force_value : 0;
+} else {
+	$forced_itemid = 0;
+}
+$params->set('forced_itemid', $forced_itemid);
 
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');

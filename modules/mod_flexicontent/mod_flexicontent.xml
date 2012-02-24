@@ -32,18 +32,24 @@
 						description="FLEXI_CHOOSE_TMPL_DESC" 
 						directory="/modules/mod_flexicontent/tmpl" 
 						default="news" hide_default="1" hide_none="1" 
-						stripext="1" filter="\.php$" exclude="^_"
-		/> 
+						stripext="1" filter="\.php$" exclude="^_" />
+		
+		<param name="" type="separator" default="FLEXI_BEHAVIOUR" level="level1" menu="hide" />
 		<param name="apply_config_per_category" type="radio" default="0" label="FLEXI_MOD_APPLY_CON_PER_CAT" description="FLEXI_MOD_APPLY_CON_PER_CAT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-
-		<!--param name="force_curr_itemid" type="radio" default="1" label="FLEXI_FORCE_CURR_MENU_ITEMID" description="FLEXI_FORCE_CURR_MENU_ITEMID_DESC">
+		<param name="display_favlist" type="radio" default="0" label="FLEXI_MOD_RECENT_FAVOURITES_LIST" description="FLEXI_MOD_RECENT_FAVOURITES_LIST_DESC">
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="itemid_force" type="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
 			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param-->
-
+			<option value="1">FLEXI_MOD_CURRENT</option>
+			<option value="2">FLEXI_MOD_SPECIFIC</option>
+		</param>
+		<param name="itemid_force_value" type="text" default="" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" />
+		
 		<param name="" type="separator" default="FLEXI_FETCHING" level="level1" menu="hide" />
 		<param name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />

@@ -126,6 +126,14 @@
 	color: darkblue;
 }
 
+/* fav_list*/
+.mod_flexicontent_wrapper .news_favs_head { /* for label and value (contained inside) see more below */
+	font-size:12px;
+	border: 1px dashed gray;
+	font-weight: bold;
+	text-align: center;
+}
+
 
 /*******************/
 /* CSS HACKS START */

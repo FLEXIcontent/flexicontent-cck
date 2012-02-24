@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1125 2012-01-26 12:38:53Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -585,7 +585,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function favicon($field, $favoured)
+	function favicon($field, $favoured, & $item=false)
 	{
 		$live_path 	= JURI::base(true);
 		$user		= & JFactory::getUser();
@@ -616,7 +616,12 @@ class flexicontent_html
 			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
 			$link 		= 'javascript:void(null)';
 
-			$output		.= '<a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="editlinktip hasTip fcfav-reponse" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+			$output		.=
+				 '<span class="fcfav_delete">'
+				.' <a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="editlinktip hasTip fcfav-reponse" title="'.$text.'::'.$overlib.'">'.$image.'</a>'
+				.' <span class="fav_item_id" style="display:none;">'.$item->id.'</span>'
+				.' <span class="fav_item_title" style="display:none;">'.$item->title.'</span>'
+				.'</span>';
 		
 		}
 		elseif($user->id)
@@ -627,7 +632,12 @@ class flexicontent_html
 			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
 			$link 		= 'javascript:void(null)';
 
-			$output		.= '<a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="editlinktip hasTip fcfav-reponse" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+			$output		.=
+				 '<span class="fcfav_add">'
+				.' <a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="editlinktip hasTip fcfav-reponse" title="'.$text.'::'.$overlib.'">'.$image.'</a>'
+				.' <span class="fav_item_id" style="display:none;">'.$item->id.'</span>'
+				.' <span class="fav_item_title" style="display:none;">'.$item->title.'</span>'
+				.'</span>';
 		}
 		else
 		{
