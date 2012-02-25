@@ -21,8 +21,8 @@
 
 	<params>
 		<param name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
 	</params>

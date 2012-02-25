@@ -17,55 +17,55 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		<fieldset name="group-toolbar" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="display_print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="display_email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="display_voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
 			<field name="display_pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="display_social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USER" description="FLEXI_FIELD_TOOLBAR_USER_DESC" />
 			<field name="display_resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
 			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" menu="hide" />
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">
-				<option value="1">Yes</option>
-				<option value="0">No</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="spacer_size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
 <!-- 			<field name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" /> -->
 <!--			<field name="required" type="radio" default="0" label="Required" description="Required">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 -->
 		</fieldset>

@@ -16,8 +16,8 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-select" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -53,8 +53,8 @@
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 	</fields>

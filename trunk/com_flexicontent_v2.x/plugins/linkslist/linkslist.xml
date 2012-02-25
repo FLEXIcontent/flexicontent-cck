@@ -16,8 +16,8 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-linkslist">
@@ -44,8 +44,8 @@
 			<field name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
 			<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 	</fields>

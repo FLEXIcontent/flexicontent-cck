@@ -14,14 +14,14 @@
 	</files>
 	<params group="standard">
 		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 	<params group="group-extendedweblink">
 		<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 		<param name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
@@ -34,13 +34,13 @@
 		<param type="spacer" default="&lt;style type=&quot;text/css&quot;&gt; select#paramstarget{width: 150px}&lt;/style&gt;" />
 		<param name="default_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_TITLE" description="FLEXI_FIELD_DEFAULT_TITLE_DESC" />
 		<param name="use_title" type="radio" default="0" label="FLEXI_FIELD_USE_TITLE" description="FLEXI_FIELD_USE_TITLE_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="default_text" type="text" default="" label="FLEXI_FIELD_DEFAULT_TEXT" description="FLEXI_FIELD_DEFAULT_TEXT_DESC" />
 		<param name="use_text" type="radio" default="0" label="FLEXI_FIELD_USE_TEXT" description="FLEXI_FIELD_USE_TEXT_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="target" type="list" default="" label="FLEXI_FIELD_DEFAULT_TARGET" description="FLEXI_FIELD_DEFAULT_TARGET_DESC" >
 			<option value=""> - No target - </option>
@@ -51,17 +51,17 @@
 		</param>
 		<param name="default_class" type="text" default="" label="FLEXI_FIELD_DEFAULT_CLASS" description="FLEXI_FIELD_DEFAULT_CLASS_DESC" />
 		<param name="use_class" type="radio" default="0" label="FLEXI_FIELD_USE_CLASS" description="FLEXI_FIELD_USE_CLASS_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="default_id" type="text" default="" label="FLEXI_FIELD_DEFAULT_ID" description="FLEXI_FIELD_DEFAULT_CLASS_ID" />
 		<param name="use_id" type="radio" default="0" label="FLEXI_FIELD_USE_ID" description="FLEXI_FIELD_USE_ID_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 	<languages>
