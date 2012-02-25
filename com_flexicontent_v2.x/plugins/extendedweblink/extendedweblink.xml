@@ -16,14 +16,14 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-extendedweblink">
 			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
@@ -36,13 +36,13 @@
 			<field type="spacer" default="&lt;style type=&quot;text/css&quot;&gt; select#paramstarget{width: 150px}&lt;/style&gt;" />
 			<field name="default_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_TITLE" description="FLEXI_FIELD_DEFAULT_TITLE_DESC" />
 			<field name="use_title" type="radio" default="0" label="FLEXI_FIELD_USE_TITLE" description="FLEXI_FIELD_USE_TITLE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="default_text" type="text" default="" label="FLEXI_FIELD_DEFAULT_TEXT" description="FLEXI_FIELD_DEFAULT_TEXT_DESC" />
 			<field name="use_text" type="radio" default="0" label="FLEXI_FIELD_USE_TEXT" description="FLEXI_FIELD_USE_TEXT_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="target" type="list" default="" label="FLEXI_FIELD_DEFAULT_TARGET" description="FLEXI_FIELD_DEFAULT_TARGET_DESC" >
 				<option value=""> - No target - </option>
@@ -53,17 +53,17 @@
 			</field>
 			<field name="default_class" type="text" default="" label="FLEXI_FIELD_DEFAULT_CLASS" description="FLEXI_FIELD_DEFAULT_CLASS_DESC" />
 			<field name="use_class" type="radio" default="0" label="FLEXI_FIELD_USE_CLASS" description="FLEXI_FIELD_USE_CLASS_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="default_id" type="text" default="" label="FLEXI_FIELD_DEFAULT_ID" description="FLEXI_FIELD_DEFAULT_CLASS_ID" />
 			<field name="use_id" type="radio" default="0" label="FLEXI_FIELD_USE_ID" description="FLEXI_FIELD_USE_ID_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 	</fields>

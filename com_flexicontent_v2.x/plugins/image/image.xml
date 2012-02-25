@@ -21,8 +21,8 @@
 	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		<fieldset name="group-image" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -51,8 +51,8 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			<field name="use_watermark_l" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
@@ -64,8 +64,8 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			<field name="use_watermark_m" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
@@ -77,24 +77,24 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			<field name="use_watermark_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
 			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" menu="hide" />
 			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="legendinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS|FLEXI_CATEGORY" checkvals="item|category" defaultvals="item|category"
 				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 			<field name="" type="separator" default="FLEXI_IMGFIELD_POPUP_IMAGE" level="level2" menu="hide" />
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS|FLEXI_CATEGORY" checkvals="item|category" defaultvals="item|category"
@@ -117,17 +117,17 @@
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" menu="hide" />
 			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" menu="hide" />
 			<field name="linkto_url" type="radio" default="0" label="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="url_target" type="list" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC">
 				<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
@@ -135,24 +135,24 @@
 				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
 			</field>
 			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="list_all_media_files" type="radio" default="0" label="FLEXI_LIST_ALL_MEDIA_FILES" description="FLEXI_LIST_ALL_MEDIA_FILES_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="always_allow_removal" type="radio" default="0" label="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL" description="FLEXI_ALWAYS_ALLOW_IMAGE_REMOVAL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_LIMIT_BY_UPLOADER" description="FLEXI_LIMIT_BY_UPLOADER_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
 	</fields>

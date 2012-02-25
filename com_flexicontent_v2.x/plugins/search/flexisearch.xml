@@ -23,33 +23,33 @@
 	<fields name="params">
 		<fieldset name="basic">
 			<field name="filter_lang" type="radio" default="1" label="FLEXI_STDSEARCH_LANG" description="FLEXI_STDSEARCH_LANG_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_STDSEARCH_LIMIT" description="FLEXI_STDSEARCH_LIMIT_DESC"/>
 			<field name="search_title" type="radio" default="1" label="FLEXI_STDSEARCH_TITLE" description="FLEXI_STDSEARCH_TITLE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_desc" type="radio" default="1" label="FLEXI_STDSEARCH_DESC" description="FLEXI_STDSEARCH_DESC_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_fields" type="radio" default="1" label="FLEXI_STDSEARCH_FIELDS" description="FLEXI_STDSEARCH_FIELDS_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_meta" type="radio" default="1" label="FLEXI_STDSEARCH_META" description="FLEXI_STDSEARCH_META_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_tags" type="radio" default="1" label="FLEXI_STDSEARCH_TAGS" description="FLEXI_STDSEARCH_TAGS_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_select_types" type="radio" default="1" label="FLEXI_STDSEARCH_SELECT_TYPES" description="FLEXI_STDSEARCH_SELECT_TYPES_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="search_types" type="text" size="40" default="" label="FLEXI_STDSEARCH_TYPES" description="FLEXI_STDSEARCH_TYPES_DESC"/>
 		</fieldset>
