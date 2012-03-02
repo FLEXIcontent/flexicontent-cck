@@ -365,6 +365,7 @@ window.addEvent('domready', function() {
 			<?php endif; ?>
 			<td class="left"></td>
 			<td class="left"></td>
+			<td class="left"></td>
 			<td class="left col_cats">
 				<label for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
