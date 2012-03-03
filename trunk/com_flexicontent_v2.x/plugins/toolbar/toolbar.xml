@@ -3,7 +3,7 @@
 	<name>FLEXIcontent - Article toolbar</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2011</creationDate>
-	<copyright>Copyright (C) 2009-2011 Emmanuel Danan</copyright>
+	<copyright>Copyright (C) 2009-2012 Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
@@ -12,9 +12,7 @@
 	<files>
 		<filename plugin="toolbar">toolbar.php</filename>
 		<folder plugin="toolbar">toolbar</folder>
-	</files>
-	<config>
-	<fields name="attribs">
+	</files>	<config>	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -69,11 +67,8 @@
 			</field>
 -->
 		</fieldset>
-	</fields>
-	</config>
-	<languages>
+	</fields>	</config>	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_toolbar.ini</language>
-		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_toolbar.ini</language>
-		<language tag="de-DE">de-DE.plg_flexicontent_fields_toolbar.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_toolbar.ini</language>		<language tag="de-DE">de-DE.plg_flexicontent_fields_toolbar.ini</language>
 	</languages>
 </install>
