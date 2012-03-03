@@ -362,7 +362,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
-					<p>Copyright &copy; 2009-2011
+					<p>Copyright &copy; 2009-2012
 					<br />
 					Emmanuel Danan<br />
 					<a class="hasTip" href="http://www.vistamedia.fr" target="_blank" title="Vistamedia.fr::Professional Joomla! Development and Integration">www.vistamedia.fr</a> - <a class="hasTip" href="http://www.joomla.fr" target="_blank" title="Joomla.fr::The official French support portal">www.joomla.fr</a>
