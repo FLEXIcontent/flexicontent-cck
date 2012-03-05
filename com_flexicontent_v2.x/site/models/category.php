@@ -1166,14 +1166,23 @@ class FlexicontentModelCategory extends JModel {
 			break;
 			
 			default:
-			$query  = 'SELECT item_id'
-				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id = ' . $field_id
-				. ' AND value LIKE ' . $this->_db->Quote($value)
-				. ' GROUP BY item_id'
-				;
-				$this->_db->setQuery($query);
-				$filtered = $this->_db->loadResultArray();
+				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).DS.strtolower($field_type).'.php';
+				if(file_exists($path)) require_once($path);
+				require_once($path);
+				$mexists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");
+				if($mexists) {
+					$filtered = array();
+					FLEXIUtilities::call_FC_Field_Func($field_type, 'getFiltered', array( &$field_id, &$value, &$filtered ));
+				}else{
+					$query  = 'SELECT item_id'
+						. ' FROM #__flexicontent_fields_item_relations'
+						. ' WHERE field_id = ' . $field_id
+						. ' AND value LIKE ' . $this->_db->Quote($value)
+						. ' GROUP BY item_id'
+					;
+					$this->_db->setQuery($query);
+					$filtered = $this->_db->loadResultArray();
+				}
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break; 
 		}
