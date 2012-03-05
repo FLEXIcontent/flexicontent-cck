@@ -38,7 +38,7 @@ class FLEXIcontentViewSearch extends JView
 		FLEXISubmenu('notvariable');
 		
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), 'searchtext.png' );
+		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), 'searchindex' );
 		
 		// Configure the toolbar.
 		$this->setToolbar();

@@ -62,7 +62,7 @@ class FlexicontentViewImport extends JView {
 		FLEXISubmenu('notvariable');
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );
+		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'import' );
 		JToolBarHelper::save('importcsv');
 		JToolBarHelper::cancel();
 		
