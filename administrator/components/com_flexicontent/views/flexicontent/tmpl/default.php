@@ -96,10 +96,10 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 
 						if ($this->dopostinstall && $this->CanAuthors)
 						{
-							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users&amp;task=add';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'person2_f2.png', "<br>".JText::_( 'FLEXI_ADD_AUTHOR' ) );
 							$link = 'index.php?option='.$option.'&amp;view=users';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-user.png', JText::_( 'FLEXI_AUTHORS' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-authors.png', JText::_( 'FLEXI_AUTHORS' ) );
+							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users&amp;task=add';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_AUTHOR' ) );
 						}
 
 						if ($this->dopostinstall && $this->CanArchives)
@@ -111,19 +111,19 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 						if ($this->dopostinstall && $this->CanFiles)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-file.png', JText::_( 'FLEXI_FILEMANAGER' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
 						
 						if ($this->dopostinstall && $this->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editcss.png', JText::_( 'FLEXI_TEMPLATES' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-templates.png', JText::_( 'FLEXI_TEMPLATES' ) );
 						}
 
 						if ($this->dopostinstall && $this->CanStats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=stats';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-stats.png', JText::_( 'FLEXI_STATISTICS' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 						}
 
 						if ($this->dopostinstall && $this->CanPlugins)
@@ -146,14 +146,14 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							if ($this->CanRights)
 							{
 								$link = 'index.php?option=com_flexiaccess';
-								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editacl.png', JText::_( 'FLEXI_EDIT_ACL' ) );
+								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-permissions.png', JText::_( 'FLEXI_EDIT_ACL' ) );
 							}
 						}
 						
 						if ($this->dopostinstall && $this->params->get('support_url'))
 						{
 							$link = $this->params->get('support_url');
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-support.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 						}
 						?>
 						</div>

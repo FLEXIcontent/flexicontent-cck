@@ -54,23 +54,25 @@ function submitbutton(task) {
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td value="top" colspan="2">
-				<label for="type_id">
-					<?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;">*</span>
+			<fieldset>
+			<legend><?php echo JText::_( '1°- Choose the type of the items you wish to import' ); ?></legend>
+				<label class="fcimport" for="type_id">
+					<?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span>
 				</label>
 				<?php echo $this->lists['type_id'];?>
+			</fieldset>
 			</td>
 		</tr>
 		<tr>
 			<td valign="top" width="50%">
 			<fieldset>
-			<legend><?php echo JText::_( 'FLEXI_CATEGORY' ); ?></legend>
+			<legend><?php echo JText::_( '2°- Choose the category(ies) you wish to import the items in' ); ?></legend>
 				<table>
 					<tr valign="top">
-						<td class="key"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?><!--span style="color:red;">*</span!---></td>
-						<td>
-							<?php echo $this->lists['maincat']; ?>
-						</td>
-						<td class="key"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></td>
+						<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
+						<td><?php echo $this->lists['maincat']; ?></td>
+						<td>&nbsp;</td>
+						<td class="key"><label class="fcimport" for="seccat"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
 						<td><?php echo $this->lists['seccats']; ?></td>
 					</tr>
 				</table>
@@ -80,12 +82,13 @@ function submitbutton(task) {
 		<tr>
 			<td valign="top">
 			<fieldset>
-			<legend><?php echo JText::_( 'FLEXI_IMPORT_FILE' ); ?></legend>
+			<legend><?php // echo JText::_( 'FLEXI_IMPORT_FILE' ); ?><?php echo JText::_( '3°- Upload your csv file' ); ?></legend>
 				<table>
 					<tr>
 						<td class="key">
-							<?php echo JText::_( 'FLEXI_CSVFILE' ); ?>
-							<span style="color:red;">*</span>
+							<label class="fcimport" for="csvfile"><?php echo JText::_( 'FLEXI_CSVFILE' ); ?>
+							<span style="color:red;"> *</span>
+							</label>
 						</td>
 						<td>
 							<input type="file" name="csvfile" id="csvfile" value="" />

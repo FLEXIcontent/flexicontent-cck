@@ -51,9 +51,9 @@ class FlexicontentViewUser extends JView
 
 		//create the toolbar
 		if ( $edit ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_AUTHOR' ), 'useredit' );
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_AUTHOR' ), 'authoredit' );
 		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_AUTHOR' ), 'useradd' );
+			JToolBarHelper::title( JText::_( 'FLEXI_ADD_AUTHOR' ), 'authoradd' );
 		}
 		JToolBarHelper::apply();
 		JToolBarHelper::save();

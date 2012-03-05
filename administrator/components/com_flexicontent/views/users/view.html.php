@@ -92,8 +92,8 @@ class FlexicontentViewUsers extends JView
 		FLEXISubmenu('CanAuthors');
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'users' );
-		JToolBarHelper::title( JText::_( 'User Manager' ), 'user.png' );
+		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'authors' );
+//		JToolBarHelper::title( JText::_( 'User Manager' ), 'user.png' );
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		JToolBarHelper::deleteList();
 		JToolBarHelper::editListX();

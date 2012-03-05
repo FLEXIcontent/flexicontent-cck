@@ -1,5 +1,5 @@
 /** header icons **/
-.icon-48-flexicontent		{ background-image: url(../images/icon-48-flexicontent.png); }
+.icon-48-flexicontent		{ background-image: url(../images/icon-48-dashboard.png); }
 .icon-48-items				{ background-image: url(../images/icon-48-items.png); }
 .icon-48-itemadd			{ background-image: url(../images/icon-48-item-add.png); }
 .icon-48-itemedit			{ background-image: url(../images/icon-48-item-edit.png); }
@@ -16,22 +16,28 @@
 .icon-48-fc_categoryadd		{ background-image: url(../images/icon-48-category-add.png); }
 .icon-48-fc_categoryedit	{ background-image: url(../images/icon-48-category-edit.png); }
 .icon-48-archive			{ background-image: url(../images/icon-48-archive.png); }
-.icon-48-editacl			{ background-image: url(../images/icon-48-editacl.png); }
-.icon-48-files				{ background-image: url(../images/icon-48-file.png); }
+.icon-48-editacl			{ background-image: url(../images/icon-48-permissions.png); }
+.icon-48-files				{ background-image: url(../images/icon-48-files.png); }
 .icon-48-fileedit			{ background-image: url(../images/icon-48-file-edit.png); }
-.icon-48-stats				{ background-image: url(../images/icon-48-stats.png); }
-.icon-48-templates			{ background-image: url(../images/icon-48-editcss.png); }
+.icon-48-stats				{ background-image: url(../images/icon-48-statistics.png); }
+.icon-48-templates			{ background-image: url(../images/icon-48-templates.png); }
+
+.icon-48-authors			{ background-image: url(../images/icon-48-authors.png); }
+.icon-48-authoradd			{ background-image: url(../images/icon-48-author-add.png); }
+.icon-48-authoredit			{ background-image: url(../images/icon-48-author-edit.png); }
+.icon-48-import				{ background-image: url(../images/icon-48-import.png); }
+.icon-48-searchindex		{ background-image: url(../images/icon-48-searchindex.png); }
 
 /* Toolbar icons */
 .icon-32-person2			{ background-image: url(../images/person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/savenew.png); }
-.icon-32-go						{ background-image: url(../../../../images/go_f2.png); }
+.icon-32-go					{ background-image: url(../../../../images/go_f2.png); }
 .icon-32-download			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-export.png); }
 .icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
 .icon-32-import				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-upload.png); }
-.icon-32-duplicate		{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
+.icon-32-duplicate			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
 .icon-32-preview			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-preview.png); }
-.icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
+.icon-32-translate			{ background-image: url(../images/icon-32-country-flags.png); }
 
 /* Buttons */
 .button-add a {
@@ -594,3 +600,9 @@ div label.lang_box {
 	white-space:nowrap; display:inline-block!important; float:none!important; margin:0px 2px 0px 0px !important; padding:0px!important;
 }
 
+/* Import view */
+.fcimport {
+	width: 120px;
+	display: block;
+	float: left;
+}

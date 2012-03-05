@@ -161,7 +161,7 @@ class FlexicontentViewFlexicontent extends JView
 			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
 			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
 			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanAuthors = ($user->gid < 25) ? FAccess::checkComponentAccess('com_users', 'manage', 'users', $user->gmid) : 1;
+			$CanAuthors 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_users', 'manage', 'users', $user->gmid) : 1;
 			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
 			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
@@ -237,7 +237,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('CanTypes'		, $CanTypes);
 		$this->assignRef('CanFields'	, $CanFields);
 		$this->assignRef('CanTags'		, $CanTags);
-		$this->assignRef('CanAuthors'		, $CanAuthors);
+		$this->assignRef('CanAuthors'	, $CanAuthors);
 		$this->assignRef('CanArchives'	, $CanArchives);
 		$this->assignRef('CanFiles'		, $CanFiles);
 		$this->assignRef('CanTemplates'	, $CanTemplates);
