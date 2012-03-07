@@ -129,7 +129,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->existversions) : ?>
 		$('existversions').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createversionstable&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+			var url = "index.php?option=com_flexicontent&task=createversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existversions-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -150,7 +150,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if(!$this->existversionsdata) : ?>
 		$('existversionsdata').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=populateversionstable&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+			var url = "index.php?option=com_flexicontent&task=populateversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existversionsdata-log').set('html', ajaxloader);
 				new Request.HTML({
@@ -171,7 +171,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if (!$this->existauthors) : ?>
 		$('existauthors').addEvent('click', function(e) {
 			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createauthorstable&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+			var url = "index.php?option=com_flexicontent&task=createauthorstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
 			if(MooTools.version>="1.2.4") {
 				$('existauthors-log').set('html', ajaxloader);
 				new Request.HTML({

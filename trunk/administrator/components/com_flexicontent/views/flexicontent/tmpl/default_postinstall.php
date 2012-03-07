@@ -116,7 +116,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existversions-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createversionstbl&<?php echo JUtility::getToken();?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -134,7 +134,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existversionsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=populateversionstable&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=populateversionstbl&<?php echo JUtility::getToken();?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -152,7 +152,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existauthors-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createauthorstable&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createauthorstbl&<?php echo JUtility::getToken();?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',

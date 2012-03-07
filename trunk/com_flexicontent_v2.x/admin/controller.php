@@ -76,9 +76,9 @@ class FlexicontentController extends JController
 		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
 		$this->registerTask( 'publishplugins'			, 'publishplugins' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
-		$this->registerTask( 'createversionstable'		, 'createVersionsTable' );
-		$this->registerTask( 'populateversionstable'	, 'populateVersionsTable' );
-		$this->registerTask( 'createauthorstable'		, 'createauthorstable' );
+		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
+		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
+		$this->registerTask( 'createauthorstbl'		, 'createauthorstable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
