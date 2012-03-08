@@ -24,19 +24,19 @@
 					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'Field', 'l.title', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_INDEX', 'l.title', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="20%">
 					<?php echo JHTML::_('grid.sort', 'Item', 'l.state', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'Extra Table', 'l.type_id', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_EXTRA_TABLE', 'l.type_id', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="5%">
-					<?php echo JHTML::_('grid.sort', 'Extra PK ID', 'l.url', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_EXTRA_PK_ID', 'l.url', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap">
-					<?php echo JHTML::_('grid.sort', 'Search Index', 'l.indexdate', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_SEARCH_INDEX', 'l.indexdate', 'ASC', 'f.field_id'); ?>
 				</th>
 			</tr>
 		</thead>
@@ -46,7 +46,7 @@
 				<td align="center" colspan="7">
 					<?php
 					if ($this->total == 0) {
-						echo JText::_('NO DATA');
+						echo JText::_('FLEXI_NO_DATA');
 						//echo JText::_('FINDER_INDEX_TIP');
 					} else {
 						echo JText::_('FINDER_INDEX_NO_CONTENT');
