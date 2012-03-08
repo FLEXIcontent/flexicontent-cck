@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: copy.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: import.php 171 2010-03-20 00:44:02Z emmanuel.danan $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -55,7 +55,7 @@ function submitbutton(task) {
 		<tr>
 			<td value="top" colspan="2">
 			<fieldset>
-			<legend><?php echo JText::_( '1°- Choose the type of the items you wish to import' ); ?></legend>
+			<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE' ); ?></legend>
 				<label class="fcimport" for="type_id">
 					<?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span>
 				</label>
@@ -66,7 +66,7 @@ function submitbutton(task) {
 		<tr>
 			<td valign="top" width="50%">
 			<fieldset>
-			<legend><?php echo JText::_( '2°- Choose the category(ies) you wish to import the items in' ); ?></legend>
+			<legend><?php echo JText::_( 'FLEXI_IMPORT_CATS' ); ?></legend>
 				<table>
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
@@ -82,7 +82,7 @@ function submitbutton(task) {
 		<tr>
 			<td valign="top">
 			<fieldset>
-			<legend><?php // echo JText::_( 'FLEXI_IMPORT_FILE' ); ?><?php echo JText::_( '3°- Upload your csv file' ); ?></legend>
+			<legend><?php // echo JText::_( 'FLEXI_IMPORT_FILE' ); ?><?php echo JText::_( 'FLEXI_IMPORT_CSV' ); ?></legend>
 				<table>
 					<tr>
 						<td class="key">

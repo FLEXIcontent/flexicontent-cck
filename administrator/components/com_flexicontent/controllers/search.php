@@ -133,7 +133,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	function purge() {
 		$model = $this->getModel('search');
 		$model->purge();
-		$msg = 'The item(s) were purged.';
+		$msg = 'FLEXI_ITEMS_PURGED';
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 }

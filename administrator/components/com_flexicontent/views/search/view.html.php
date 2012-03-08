@@ -64,8 +64,8 @@ class FLEXIcontentViewSearch extends JView
 	function setToolbar() {
 		$toolbar = &JToolBar::getInstance('toolbar');
 
-		$toolbar->appendButton('Popup', 'archive', 'Index', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component', 500, 210);
-		$toolbar->appendButton('Confirm', 'Are you sure you want to delete ALL items from the index? This can take a long time on large sites.', 'trash', 'Purge', 'purge', false);
+		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_START', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component', 500, 210);
+		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_PURGE_INDEX', 'purge', false);
 		/*$toolbar->appendButton('Separator', 'divider');
 
 		JToolBarHelper::publishList('index.publish', 'Publish');
