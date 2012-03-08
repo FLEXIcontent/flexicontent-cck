@@ -207,6 +207,7 @@ window.addEvent('domready', function(){
 			<td class="left" class="col_items">
 				<?php echo $this->lists['filter_itemscount']; ?>
 			</td>
+			<td class="left"></td>
 			<td class="left col_logged">
 				<?php echo $this->lists['filter_logged']; ?>
 			</td>
@@ -214,7 +215,6 @@ window.addEvent('domready', function(){
 			<td class="left col_type">
 				<?php echo $this->lists['filter_type']; ?>
 			</td>
-			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left col_registered col_visited" colspan="2">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>
