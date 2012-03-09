@@ -90,34 +90,42 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @since 1.0
 	 */
 	function &getItem($pk=null, $isform=true) {
+		global $globalcats;
+		$mainframe =& JFactory::getApplication();
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
+		
 		if($isform) {
 			$item = parent::getItem($pk);
 			$this->_item = &$item;
 			return $this->_item;
 		}
+		
+		// Cache items retrieved, we can retrieve multiple items, for this purpose
+		// use function setId($pk) to change primary key and then call getItem()
+		static $items = array();
+		if (isset ($items[@$this->_item->id])) {
+			return $items[@$this->_item->id];
+		}
+		
 		// Initialise variables.
 		$pk		= (!empty($pk)) ? $pk : $this->_id;
 		$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-
+		$cid	= JRequest::getInt('cid');  // CURRENT CATEGORY
+		
+		// when previewing SET item version and also set a warning message to warn the user that the previewing version is not CURRENT
 		$preview = JRequest::getVar('preview');
 		if($preview) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			if ( !($permission->CanEdit || $permission->CanEditOwn) ) {
-				//cannot edit
-				JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-				return;
-			}
 			$lversion = JRequest::getVar('version');//loaded version
 			$lversion = $lversion?$lversion:FLEXIUtilities::getLastVersions($pk, true);//latest version
 			$cversion = FLEXIUtilities::getCurrentVersions($pk, true);
 			if($lversion!=$cversion) {
-				$warning = "This version of the document IS NOT YET CURRENT, the administrator must approved it before it becomes current and visible to the public";
+				$warning = "This version --$lversion-- of the document is not yet current. Current document version is: --$cversion--<br>A privileged user (e.g. admin) must approved it, before it becomes current and visible to the public";
 				JError::raiseWarning(403, $warning);
 			}
 			JRequest::setVar('lversion', $lversion);
 		}
 
-		if (!isset($this->_item[$pk])) {
+		if (!isset($this->_item)) {
 
 			try {
 				$db = $this->getDbo();
@@ -136,7 +144,7 @@ class FlexicontentModelItem extends ParentClassItem
 				);
 				$query->from('#__content AS a');
 				
-				$query->select('ie.*,ty.name AS typename,c.lft,c.rgt');
+				$query->select('ie.*, ty.name AS typename, ty.alias as typealias, c.lft,c.rgt');
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = a.id');
 				$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id');
@@ -196,25 +204,10 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 
 				$db->setQuery($query);
-
 				$data = $db->loadObject();
 				
-				if($preview) {
-					$user	= & JFactory::getUser();
-
-					$asset = 'com_content.article.' . $data->id;
-					$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $data->created_by == $user->get('id'));
-					// ALTERNATIVE 1
-					//$has_edit = $this->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-					// ALTERNATIVE 2
-					//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $data->id);
-					//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $data->created_by == $user->get('id')) ;
-					
-					if ( !$has_edit ) {
-						//cannot edit
-						JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
-						return;
-					}
+				if ($preview) {
+					// When previewing load the specified item version
 					$data = $this->loadUnapprovedVersion($data, $lversion);
 				}
 
@@ -236,9 +229,79 @@ class FlexicontentModelItem extends ParentClassItem
 				$registry->loadString($data->metadata);
 				$data->metadata = $registry;
 
-				//$this->_item[$pk] = $data;
 				$this->_item = $data;
 				$this->_loadItemParams();
+				$params = & $this->_item->parameters;
+
+				$user	= & JFactory::getUser();
+				$asset = 'com_content.article.' . $data->id;
+				
+				// ********************************************************************************************
+				// CHECK item's -VIEWING- ACCESS, this could be moved to the controller, if we do this, then we
+				// must check the view variable, because DISPLAY() CONTROLLER TASK is shared among all views)
+				// ... or create a separate FRONTEND controller for the ITEM VIEW
+				// ********************************************************************************************
+				
+				if (@$this->_item->id)
+				{
+					// Calculate edit access ... we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
+					$canedititem = $params->get('access-edit');
+					
+					// Do not allow item's VERSION PREVIEWING unless the user can edit the item
+					if ($preview && !$canedititem) {
+						JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR')."<br />You cannot preview an item that you cannot edit.");
+					}
+					
+					// Check that current category is published (only if item cannot be edited)
+					if ( !$canedititem && $cid) {
+						if (!$globalcats[$cid]->published) {
+							JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
+						}
+					}
+					
+					// Check that the item is published
+					if ($this->_item->state != 1 && $this->_item->state != -5)
+					{
+						// ITEM NOT PUBLISHED, 
+						$canreaditem = false;
+						
+						// (a) Set warning that the item is unpublished
+						$mainframe->enqueueMessage('The item is not published','message');
+						// (b) Set warning to the editors, that they are viewing unpublished content
+						if ( $canedititem && !JRequest::getVar('task', false) ) {
+							$mainframe->enqueueMessage('Viewing access allowed because you can edit the item', 'message');
+						}
+						
+					} else {
+						// ITEM PUBLISHED, check for standard view access
+						$canreaditem = $params->get('access-view');
+					}
+				
+					// REDIRECT TO APPROPRIATE PAGES IF ACCESS IS ALLOWED
+					if (!$canreaditem && !$canedititem)
+					{
+						if($user->guest) {
+							// Redirect to login
+							$uri		= JFactory::getURI();
+							$return		= $uri->toString();
+							$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+							$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+							$url .= '&return='.base64_encode($return);
+			
+							JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+							$mainframe->redirect( $url );
+						} else {
+							if ($cparams->get('unauthorized_page', '')) {
+								$mainframe->redirect($cparams->get('unauthorized_page'));				
+							} else {
+								JError::raiseWarning( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
+								$mainframe->redirect( 'index.php' );
+							}
+						}
+					} else if (!$canreaditem && !JRequest::getVar('task', false) ) {
+						$mainframe->enqueueMessage('You do not have view access.<br /> Viewing access allowed because you can edit the item', 'message');
+					}
+				}
 			}
 			catch (JException $e)
 			{
@@ -248,13 +311,12 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 				else {
 					$this->setError($e);
-					//$this->_item[$pk] = false;
 					$this->_item = false;
 				}
 			}
 		}
 
-		//return $this->_item[$pk];
+		$items[@$this->_item->id] = & $this->_item;
 		return $this->_item;
 	}
 	
@@ -510,8 +572,18 @@ class FlexicontentModelItem extends ParentClassItem
 		$mainframe = &JFactory::getApplication();
 		jimport('joomla.html.parameter');
 
-		// Get the page/component configuration (Priority 4)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		// Get the page/component configuration  (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
+		$params = & $cparams;
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+				$params->merge($menuParams);
+			}
+		}
 
 		// Merge parameters from current category
 		if ($cid = JRequest::getVar( 'cid', 0 ) ) {
@@ -549,18 +621,6 @@ class FlexicontentModelItem extends ParentClassItem
 		// Merge ACCESS permissions into the page configuration (Priority 0)
 		$accessperms = $this->getItemAccess();
 		$params->merge($accessperms);
-
-//		// Set the popup configuration option based on the request
-//		$pop = JRequest::getVar('pop', 0, '', 'int');
-//		$params->set('popup', $pop);
-//
-//		// Are we showing introtext with the article
-//		if (!$params->get('show_intro') && !empty($this->_article->fulltext)) {
-//			$this->_article->text = $this->_article->fulltext;
-//		} else {
-//			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
-//		}
-
 
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;

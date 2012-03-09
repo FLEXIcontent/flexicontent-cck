@@ -29,6 +29,13 @@ jimport('joomla.application.component.modeladmin');
  */
 class ParentClassItem extends JModelAdmin {
 	/**
+	 * Component parameters
+	 *
+	 * @var object
+	 */
+	var $_cparams = null;
+	
+	/**
 	 * Item id
 	 *
 	 * @var int
@@ -36,14 +43,14 @@ class ParentClassItem extends JModelAdmin {
 	var $_id = 0;
 	
 	/**
-	 * Details data in details array
+	 * Item data
 	 *
-	 * @var array
+	 * @var object
 	 */
 	var $_item = null;
 	
 	/**
-	 * tags in array
+	 * Item tags
 	 *
 	 * @var array
 	 */
@@ -52,15 +59,15 @@ class ParentClassItem extends JModelAdmin {
 	/**
 	 * Item current version
 	 *
-	 * @var object
+	 * @var int
 	 */
 	var $_currentversion = -1;
 
 	
 	/**
-	 * Item current version
+	 * Item current category id
 	 *
-	 * @var object
+	 * @var int
 	 */
 	var $_currentcatid = 0;
 
@@ -71,6 +78,8 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	function __construct() {
 		parent::__construct();
+		
+		$this->_cparams = & JComponentHelper::getParams( 'com_flexicontent' );
 	}
 
 	/**
@@ -82,7 +91,7 @@ class ParentClassItem extends JModelAdmin {
 	function setId($id, $currcatid=0) {
 		// Set item id and wipe data
 		if ($this->_id != $id) {
-			$this->_item		= null;
+			$this->_item = null;
 		}
 		$this->_id = $id;
 		$this->_currentcatid = $currcatid;
@@ -214,12 +223,12 @@ class ParentClassItem extends JModelAdmin {
 	public function &getItem($pk = null, $isform = false) {
 		static $item;
 		static $unapproved_version_notice;
-		$task=JRequest::getVar('task',false);
-		$option=JRequest::getVar('option',false);
-		if ($isform===false) $isform = ($task!=false);
 		
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
+		$task = JRequest::getVar('task',false);
+		$option = JRequest::getVar('option',false);
+		$isform = ($isform===false) ? ($task!=false) : $isform;
+
 		if(!$item) {
 			// Initialise variables.
 			$pk		= (!empty($pk)) ? $pk : $this->_id;
@@ -298,6 +307,7 @@ class ParentClassItem extends JModelAdmin {
 				}else{
 					$item->score = 0;
 				}
+				
 			}
 			
 			else if ($pk > 0)
@@ -307,13 +317,11 @@ class ParentClassItem extends JModelAdmin {
 			
 			else
 			{		
-				$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-				$item->state				= $cparams->get('new_item_state', -4);
-				//$item->language			= flexicontent_html::getSiteDefaultLang();
+				$item->state = $this->_cparams->get('new_item_state', -4);
+				//$item->language = flexicontent_html::getSiteDefaultLang();
 			}
 			
-			$used = $this->getTypesselected();
-			$item->type_id = $used->id;
+			$item->type_id = $this->getTypesselected()->id;
 		}
 		return $item;
 	}
@@ -344,8 +352,7 @@ class ParentClassItem extends JModelAdmin {
 		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
 
 		// Load global parameters
-		$value = JComponentHelper::getParams($this->option);
-		$this->setState('params', $value);
+		$this->setState('params', $this->_cparams);
 	}
 	
 	/**
@@ -433,15 +440,19 @@ class ParentClassItem extends JModelAdmin {
 		$iparams_extra = new JRegistry;
 		$user		= JFactory::getUser();
 		$asset	= 'com_content.article.'.$this->_id;
-		$permission	= FlexicontentHelperPerm::getPerm();
+		$permission	= FlexicontentHelperPerm::getPerm();  // Global component permissions
+		
+		// NOTE, technically in J1.6+ a guest may edit able to edit/delete an item, so we commented out the guest check bellow,
+		// this applies for creating item, but flexicontent already allows create to guests via menu item too, so no check there too
 		
 		// Compute CREATE access permissions.
 		if ( !$this->_id ) {
 			// first check if general create permission is missing, to avoid unneeded checking of creation in individual categories
-			if (!$user->authorise('core.create', 'com_flexicontent')) {
+			if ( !$user->authorise('core.create', 'com_flexicontent') ) {
 				$iparams_extra->set('access-create', false);
-			} else {
-				// check that user can create item in at least one category
+			}
+			// general permission is present, check that user can create item in at least one category
+			else {
 				$usercats = FlexicontentHelperPerm::getCats(array('core.create'));
 				$iparams_extra->set('access-create', count($usercats));
 			}
@@ -459,8 +470,8 @@ class ParentClassItem extends JModelAdmin {
 			if ($user->authorise('core.edit', $asset)) {
 				$iparams_extra->set('access-edit', true);
 			}
-			// now check if edit.own is available for this item
-			else if ( !$user->get('guest') && $user->authorise('core.edit.own', $asset)) {
+			// no edit permission, check if edit.own is available for this item
+			else if ( $user->authorise('core.edit.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ ) {
 				// Check ownership (this maybe needed since ownership may have changed ? and above permission maybe invalid? )
 				if ($user->get('id') == $this->_item->created_by) {
 					$iparams_extra->set('access-edit', true);
@@ -475,8 +486,8 @@ class ParentClassItem extends JModelAdmin {
 			if ($user->authorise('core.delete', $asset)) {
 				$iparams_extra->set('access-delete', true);
 			}
-			// now check if delete own permission if the item is owned by the user
-			else if ( !$user->get('guest') && $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by ) {
+			// no delete permission, chekc delete.own permission if the item is owned by the user
+			else if ( $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ ) {
 				// Check ownership
 				if ($user->get('id') == $this->_item->created_by) {
 					$iparams_extra->set('access-delete', true);
@@ -542,7 +553,7 @@ class ParentClassItem extends JModelAdmin {
 		
 		if ($allow === null) {
 			// no categories specified, revert to the component permissions.
-			$allow	= $user->authorize('core.create', 'com_flexicontent');
+			$allow	= $user->authorise('core.create', 'com_flexicontent');
 		}
 		
 		return $allow;
@@ -581,8 +592,7 @@ class ParentClassItem extends JModelAdmin {
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
 		// Item Rules ?
 		//$item->setRules($data['rules']);
@@ -592,6 +602,25 @@ class ParentClassItem extends JModelAdmin {
 		
 		// vstate = 2 is approve version then save item to #__content table.
 		$data['vstate']		= (int)$data['vstate'];
+		
+		// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
+		if (is_array($data['text'])) {
+			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($data['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$data['text'] = & $tabs_text;
+		}
+		/*if (is_array($post['text'])) {
+			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($post['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$post['text'] = & $tabs_text;
+		}*/
+		//print_r($data['text']); exit();
 		
 		if( $isnew || ($data['vstate']==2) ) {
 			// auto assign the main category if none selected
@@ -675,7 +704,7 @@ class ParentClassItem extends JModelAdmin {
 		
 		// delete old versions
 		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
-		$vmax	= $cparams->get('nr_versions', 10);
+		$vmax	= $this->_cparams->get('nr_versions', 10);
 
 		if ($vcount > ($vmax+1)) {
 			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version);
@@ -709,8 +738,7 @@ class ParentClassItem extends JModelAdmin {
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		$user	=& JFactory::getUser();
 		$cats = $data['cid'];
 		$tags = $data['tags'];
@@ -970,8 +998,7 @@ class ParentClassItem extends JModelAdmin {
 	}
 	
 	function saveFieldItem($itemid, $fieldid, $value, $isnew, $iscore, $isapproveversion, $valueorder=1) {
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		$version = FLEXIUtilities::getLastVersions($itemid, true);
 		$version = is_array($version)?0:$version;
 		$obj = new stdClass();
@@ -1274,14 +1301,14 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	function getTypesselected($force = false) {
 		static $used;
-		if(!$used || $force) {
-			if($this->_id) {
+		if (!$used || $force) {
+			if ($this->_id) {
 				$query = 'SELECT ie.type_id as id,t.name FROM #__flexicontent_items_ext as ie'
 					. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
 					. ' WHERE ie.item_id = ' . (int)$this->_id;
 				$this->_db->setQuery($query);
 				$used = $this->_db->loadObject();
-			}else{
+			} else {
 				$typeid = (int)JRequest::getInt('typeid', 1);
 				$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
 					. ' WHERE t.id = ' . (int)$typeid;

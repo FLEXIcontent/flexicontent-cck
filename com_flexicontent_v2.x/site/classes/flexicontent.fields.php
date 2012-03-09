@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1138 2012-02-07 03:01:38Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -35,11 +35,11 @@ class FlexicontentFields
 	 */
 	function & getFields(&$items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0)
 	{
+		if (!$items) return $items;
 		if (!is_array($items)) {
 			$rows[] = $items;
 			$items	= $rows;
 		}
-		if (!$items) return $items;
 
 		$user 		= &JFactory::getUser();
 
@@ -71,18 +71,10 @@ class FlexicontentFields
 			$var['typenames']	= isset($vars['typenames'][$items[$i]->id]) 	? $vars['typenames'][$items[$i]->id] 		: '';
 			$var['votes']		= isset($vars['votes'][$items[$i]->id]) 		? $vars['votes'][$items[$i]->id] 			: '';
 			
-			$items[$i]->cats	= array();
-			foreach ($catlist as $cat) {
-				if ($cat->itemid == $items[$i]->id) {
-					$items[$i]->cats[] = $cat;
-				}
-			}
-			$items[$i]->tags	= array();
-			foreach ($taglist as $tag) {
-				if ($tag->itemid == $items[$i]->id) {
-					$items[$i]->tags[] = $tag;
-				}
-			}
+			// Assign precalculated tags and cats lists
+			$item_id = $items[$i]->id;
+			$items[$i]->cats = isset($catlists[$item_id]) ? $catlists[$item_id] : array();
+			$items[$i]->tags = isset($taglists[$item_id]) ? $taglists[$item_id] : array();
 			
 			// Apply the fields cache to public or just registered users
 			$apply_cache = true;
@@ -107,7 +99,7 @@ class FlexicontentFields
 			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
 			$flexiview = JRequest::getVar('view', false);
 			// 0: never, 1: always, 2: only in item view 
-			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview=='items') ) {
+			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview==FLEXI_ITEMVIEW) ) {
 				if ($items[$i]->fields)
 				{
 					foreach ($items[$i]->fields as $field)
@@ -236,7 +228,7 @@ class FlexicontentFields
 	  	$item->onDemandFields[$fieldname]->{$method} = "not found for this type of item or no access";
 	  	return $item->onDemandFields[$fieldname]->{$method};
 	  }
-	  	  
+	  
 	  // Get field's values
 	  if ($values===null) {
 	  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
@@ -272,9 +264,11 @@ class FlexicontentFields
 		// we append some values to the field object
 		$field->item_id 	= (int)$item->id;
 		$field->value 		= $values;
-		$field->parameters 	= new JParameter( $field->attribs );
-		$params				= $item->parameters;
-		$flexiview 			= JRequest::getVar('view');
+		$params			= $item->parameters;
+		$flexiview	= JRequest::getVar('view');
+		
+		// Create field parameters in an optimized way, and also apply Type Customization for CORE fields
+		FlexicontentFields::loadFieldConfig($field, $item);
 		
 		// and append html trought the field plugins
 		if ($field->iscore == 1)
@@ -426,6 +420,7 @@ class FlexicontentFields
 		for ($i=0; $i < sizeof($items); $i++)
 		{
 			if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
+				
 			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 			  if ($view == 'category') {
 			    $field = $items[$i]->fields['text'];
@@ -441,20 +436,26 @@ class FlexicontentFields
 				}
 		  }
 		  
-		  // render fields if they are present in a template position (or dummy position ...)
+		  // RENDER fields if they are present in a template position (or in a dummy template position ... e.g. when called by module)
 			foreach ($fbypos as $pos) {
 				foreach ($pos->fields as $f) {
-					if (!isset($items[$i]->fields[$f])) {
-						// Field with name: $f does not exist for the type of current item, we simply skip it
+					// Check that field with given name: $f exists, (this will handle deleted fields, that still exist in a template position)
+					if (!isset($items[$i]->fields[$f])) {	
 						continue;
 					}
 					$field = $items[$i]->fields[$f];
+					
+					// Set field values
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+					
+					// Render field (if already rendered above, the function will return result immediately)
 					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					
+					// Set template position field data
 					if (isset($field->display) && $field->display) {
-						$items[$i]->positions[$pos->position]->{$f}->id 		= $field->id;
-						$items[$i]->positions[$pos->position]->{$f}->name 		= $field->name;
-						$items[$i]->positions[$pos->position]->{$f}->label 		= $field->parameters->get('display_label') ? $field->label : '';
+						$items[$i]->positions[$pos->position]->{$f}->id				= $field->id;
+						$items[$i]->positions[$pos->position]->{$f}->name			= $field->name;
+						$items[$i]->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';
 						$items[$i]->positions[$pos->position]->{$f}->display	= $field->display;
 					}
 				}
@@ -520,8 +521,13 @@ class FlexicontentFields
 				;
 		$db->setQuery( $query );
 		$tags = $db->loadObjectList();
-
-		return $tags;
+		
+		// improve performance by doing a single pass of tags to aggregate them per item
+		$taglists = array();
+		foreach ($tags as $tag) {
+			$taglists[$tag->itemid][] = $tag;
+		}
+		return $taglists;
 	}
 
 	/**
@@ -546,7 +552,12 @@ class FlexicontentFields
 		$db->setQuery( $query );
 		$cats = $db->loadObjectList();
 
-		return $cats;
+		// improve performance by doing a single pass of cats to aggregate them per item
+		$catlists = array();
+		foreach ($cats as $cat) {
+			$catlists[$cat->itemid][] = $cat;
+		}
+		return $catlists;
 	}
 
 	/**
@@ -690,75 +701,154 @@ class FlexicontentFields
 	}
 	
 	
-	function getTypeCustomize(&$field, &$item) {
+	// 
+	/**
+	 * Method to create field parameters in an optimized way, and also apply Type Customization for CORE fields
+	 *
+	 * @access	_private
+	 * @return	object
+	 * @since	1.5
+	 */
+	function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
 		static $tparams = array();
-		static $lang;
+		static $fdata = array();
+		static $lang=null;
 		
-		$lang = JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
+		if (@$item->id) {
+			$item_id = (int)$item->id;
+		} else {
+			$item_id = (int)$item->getValue('id');
 		}
-		$db =& JFactory::getDBO();
+		$typename = @$item->typename ? $item->typename : "__NOT_SET__";
+		$typealias = @$item->typealias ? $item->typealias : "__NOT_SET__";
 		
-		$typename = isset($item->typename) ? $item->typename : "notype";
+		// Create basic field data if no field given
+		if (!empty($name)) {
+			$field->iscore = $iscore;
+			$field->name = $name;
+			$field->field_type = $field_type;
+			$field->label = $label; 
+			$field->description = $desc;
+			$field->attribs = '';
+		}
+		
+		if (empty($lang)) {
+			$lang = JRequest::getWord('lang', '' );
+			if(empty($lang)){
+				$langFactory= JFactory::getLanguage();
+				$tagLang = $langFactory->getTag();
+				$lang = substr($tagLang ,0,2);
+			}
+		}
+		
 		if (!isset($tparams[$typename])) {
-			$query = 'SELECT t.attribs'
+			$query = 'SELECT t.attribs, t.name, t.alias'
 					. ' FROM #__flexicontent_types AS t'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					. ' WHERE ie.item_id = ' . (int)$item->id
+					. ' WHERE ie.item_id = ' . $item_id
 					;
+			$db =& JFactory::getDBO();
 			$db->setQuery($query);
-			$tparams[$typename] = $db->loadResult();
-			$tparams[$typename] = new JParameter($tparams[$typename]);
+			$typedata = $db->loadObject();
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			}
+			$typename = $typedata->name;  // workaround for J1.6+  form not having typename property
+			$typealias = $typedata->alias;  // workaround for J1.6+  form not having typealias property
+			$tparams[$typename] = new JParameter($typedata->attribs);
 		}
 		
-		// -- SET a type specific label for the current field
-		// a. Try field label to get for current language
-		$field_label_type = $tparams[$typename]->get($field->name.'_label', '');
-		$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
-		if ($result) {
-			$field->label = $matches[2];
-		} else if ($field_label_type) {
-			// b. Try to get default for all languages
-			$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
+		// Custom LABELs and DESCRIPTIONs
+		if ($field->iscore && !isset($fdata[$field->name])) {
+			$fdata[$field->name] = new stdClass();
+			
+			// -- SET a type specific label for the current field
+			// a. Try field label to get for current language
+			$field_label_type = $tparams[$typename]->get($field->field_type.'_label', '');
+			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
 			if ($result) {
-				$field->label = $matches[2];
-			} else {
-				// c. Check that no languages specific string are defined
-				$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
-				if (!$result) {
-					$field->label = $field_label_type;
+				$fdata[$field->name]->label = $matches[2];
+			} else if ($field_label_type) {
+				// b. Try to get default for all languages
+				$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
+				if ($result) {
+					$fdata[$field->name]->label = $matches[2];
+				} else {
+					// c. Check that no languages specific string are defined
+					$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
+					if (!$result) {
+						$fdata[$field->name]->label = $field_label_type;
+					}
 				}
+			} else {
+				// Maintain field 's default label
 			}
-		} else {
-			// Maintain field 's default label
+			
+			// -- SET a type specific description for the current field
+			// a. Try field description to get for current language
+			$field_desc_type = $tparams[$typename]->get($field->field_type.'_desc', '');
+			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
+			if ($result) {
+				$fdata[$field->name]->description = $matches[2];
+			} else if ($field_label_type) {
+				// b. Try to get default for all languages
+				$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
+				if ($result) {
+					$fdata[$field->name]->description = $matches[2];
+				} else {
+					// c. Check that no languages specific string are defined
+					$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
+					if (!$result) {
+						$fdata[$field->name]->description = $field_desc_type;
+					}
+				}
+			} else {
+				// Maintain field 's default description
+			}
+			
+			// Create parameters
+		 $fdata[$field->name]->parameters = new JParameter($field->attribs);
+			
+			// Check for type specific parameters
+			$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field->name."_".$typealias."'";
+			//echo $query;
+			$db =& JFactory::getDBO();
+			$db->setQuery($query);
+			$data = $db->loadObject();
+			//print_r($data);
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			} else if (@$data->published) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
+			}
+			
+			// merge field parameter with the type specific parameters ones
+			if ($data) {
+				$ts_params = new JParameter($data->attribs);
+				$fdata[$field->name]->parameters->merge($ts_params);
+			} else if ($field->field_type=='maintext') {
+				$fdata[$field->name]->parameters->set( 'use_html',  !$tparams[$typename]->get('hide_html', 0) ) ;
+			}
+			
+		} else if ( !isset($fdata[$field->name]) ) {
+			$fdata[$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
-		// -- SET a type specific description for the current field
-		$field->description = '';
-		// a. Try field description to get for current language
-		$field_desc_type = $tparams[$typename]->get($field->name.'_desc', '');
-		$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
-		if ($result) {
-			$field->description = $matches[2];
-		} else if ($field_label_type) {
-			// b. Try to get default for all languages
-			$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
-			if ($result) {
-				$field->description = $matches[2];
-			} else {
-				// c. Check that no languages specific string are defined
-				$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
-				if (!$result) {
-					$field->description = $field_desc_type;
-				}
-			}
-		} else {
-			// Maintain field 's default description
+		// Set custom label or maintain default
+		if (isset($fdata[$field->name]->label)) {
+			$field->label = $fdata[$field->name]->label;
 		}
+		// Set custom description or maintain default
+		if (isset($fdata[$field->name]->description)) {
+			$field->description = $fdata[$field->name]->description;
+		} else if (!$field->description) {
+			$field->description = '';
+		}
+		// field's parameters, to clone ... or not to clone, better clone to allow customizations for individual item fields ...
+		$field->parameters = clone($fdata[$field->name]->parameters);
 		
 		return $field;
 	}

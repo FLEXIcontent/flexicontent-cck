@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.categories.php 1095 2012-01-10 06:07:58Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.categories.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -35,9 +35,9 @@ class flexicontent_cats
 	 *
 	 * @var array
 	 */
-	var $parentcats = array();	// ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
+	var $parentcats_ids  = array();  // ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
 	
-	var $category = array();		// data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
+	var $parentcats_data = array();  // data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
 	
 	/**
 	 * Constructor
@@ -53,22 +53,25 @@ class flexicontent_cats
 	function flexicontent_cats($cid)
 	{
 		$this->id = $cid;
-		$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats'
+		$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats_ids'
 		$this->getParentCats();							// Get basic data for ancestors (id,title,categoryslug) and set them in member array variable 'category'
 	}
     
 	/**
 	 * Retrieves parent categories (anscestors) of category until the category
-	 * and sets this parent in the member variable 'parentcats'
+	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
 	function getParentCats()
 	{
 		$db			=& JFactory::getDBO();
+		global $globaltypes, $globalnoroute;
+		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
+		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 		
-		$this->parentcats = array_reverse($this->parentcats);
+		$this->parentcats_ids = array_reverse($this->parentcats_ids);
 				
-		foreach($this->parentcats as $cid) {
+		foreach($this->parentcats_ids as $cid) {
 			
 			$query = 'SELECT id, title,'
 					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
@@ -78,13 +81,14 @@ class flexicontent_cats
 					.' AND published = 1'
 					;
 			$db->setQuery($query);
-			$this->category[] 	= $db->loadObject();
+			$cat = $db->loadObject();
+			if ($cat && !in_array($cat->id, $globalnoroute) )	$this->parentcats_data[] = $cat;
 		}
 	}
 	
 	/**
 	 * Retrieves parent categories (anscestors) of category until the category
-	 * and sets this parent in the member variable 'parentcats'
+	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
 	function buildParentCats($cid)
@@ -97,12 +101,10 @@ class flexicontent_cats
 		$db->setQuery( $query );
 		$parents[$cid] = $db->loadResult();
 
-		if ( (!FLEXI_J16GE && $parents[$cid] != 0 )  ||  (FLEXI_J16GE && $parents[$cid] > 1) ) {
-			array_push($this->parentcats, $cid);
-		}
+		array_push($this->parentcats_ids, $cid);
 
 		//if we still have results
-		if(sizeof($parents[$cid]) != 0) {
+		if ( (!FLEXI_J16GE && $parents[$cid] > 0 )  ||  (FLEXI_J16GE && $parents[$cid] > 1) ) {
 			$this->buildParentCats($parents[$cid]);
 		}
 	}
@@ -113,7 +115,7 @@ class flexicontent_cats
 	 */
 	function getParentlist()
 	{
-		return $this->category;
+		return $this->parentcats_data;
 	}
 	
 	/**
