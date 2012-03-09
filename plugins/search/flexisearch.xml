@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="search" method="upgrade">
-	<name>Search - FLEXIcontent</name>
-	<author>Emmanuel Danan</author>
-	<creationDate>June 2009</creationDate>
-	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
+	<name>PLG_SEARCH_FLEXISEARCH</name>
+	<author>Emmanuel Danan, Aazam</author>
+	<creationDate>oct 2011</creationDate>
+	<copyright>Copyright (C) 2011 Aazam, Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>
-	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
-	<authorUrl>www.vistamedia.fr</authorUrl>
-	<version>1.0</version>
+	<authorEmail>aazam@yandex.ru, emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>aazam.narod.ru,www.vistamedia.fr</authorUrl>
+	<version>1.1</version>
 	<description>FLEXI_SEARCH_PLUGIN</description>
 	<files>
 		<filename plugin="flexisearch">flexisearch.php</filename>
@@ -25,6 +25,31 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+		<param name="search_title" type="radio" default="1" label="FLEXI_STDSEARCH_TITLE" description="FLEXI_STDSEARCH_TITLE_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_desc" type="radio" default="1" label="FLEXI_STDSEARCH_DESC" description="FLEXI_STDSEARCH_DESC_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_fields" type="radio" default="1" label="FLEXI_STDSEARCH_FIELDS" description="FLEXI_STDSEARCH_FIELDS_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_meta" type="radio" default="1" label="FLEXI_STDSEARCH_META" description="FLEXI_STDSEARCH_META_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_tags" type="radio" default="1" label="FLEXI_STDSEARCH_TAGS" description="FLEXI_STDSEARCH_TAGS_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_select_types" type="radio" default="1" label="FLEXI_STDSEARCH_SELECT_TYPES" description="FLEXI_STDSEARCH_SELECT_TYPES_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="search_types" type="text" size="40" default="" label="FLEXI_STDSEARCH_TYPES" description="FLEXI_STDSEARCH_TYPES_DESC"/>
 	</params>
 
 </install>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: radioimage.php 1059 2011-12-20 07:18:32Z ggppdk $
+ * @version 1.0 $Id: radioimage.php 1127 2012-01-29 23:51:31Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.radioimage
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 		$data	= JRequest::getVar('jform', array(), 'post', 'array');
 		if($field->isadvsearch && $data['vstate']==2) {
-			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
+			plgFlexicontent_fieldsRadioimage::onIndexAdvSearch($field, $advsearchindex_values);
 		}
 	}
 	

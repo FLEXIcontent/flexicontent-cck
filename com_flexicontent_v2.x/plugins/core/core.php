@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 1050 2011-12-12 02:02:58Z ggppdk $
+ * @version 1.0 $Id: core.php 1146 2012-02-22 06:52:39Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
-		$view = JRequest::setVar('view', JRequest::getVar('view', 'item'));
+		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		$values = $values ? $values : $field->value;
 
@@ -143,7 +143,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
 			$field->display = '
 			<span class="fav-block">
-				'.flexicontent_html::favicon( $field, $favoured ).'
+				'.flexicontent_html::favicon( $field, $favoured, $item ).'
 				<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
 					<small>'.$favs.'</small>
 				</span>
@@ -360,12 +360,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$text_select = JText::_('All');
 				
 				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__users AS u'
-						. ' ON i.modified_by = u.id'
-						. ' WHERE i.modified_by <> 0'
-						. ' ORDER BY u.name ASC'
-						;
+					. ' FROM #__content AS i'
+					. ' LEFT JOIN #__users AS u'
+					. ' ON i.modified_by = u.id'
+					. ' WHERE i.modified_by <> 0'
+					. ' ORDER BY u.name ASC'
+					;
 				$db->setQuery($query);
 				$lists = $db->loadObjectList();
 				
@@ -424,8 +424,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
-			
-			
+
 			case 'categories': // Categories
 				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
 				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;

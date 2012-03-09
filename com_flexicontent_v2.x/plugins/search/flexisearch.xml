@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.7" type="plugin" group="search" >
 	<name>PLG_SEARCH_FLEXISEARCH</name>
-	<author>Aazam</author>
+	<author>Emmanuel Danan, Aazam</author>
 	<creationDate>oct 2011</creationDate>
-	<copyright>Copyright (C) 2011 Aazam</copyright>
+	<copyright>Copyright (C) 2011 Aazam, Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>
-	<authorEmail>aazam@yandex.ru</authorEmail>
-	<authorUrl>aazam.narod.ru</authorUrl>
+	<authorEmail>aazam@yandex.ru, emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>aazam.narod.ru,www.vistamedia.fr</authorUrl>
 	<version>1.1</version>
 	<description>PLG_SEARCH_FLEXISEARCH_DESCRIPTION</description>
 	<files>

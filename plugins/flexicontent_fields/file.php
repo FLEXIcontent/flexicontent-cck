@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		function qfSelectFile".$field->id."(id, file) {
 		  value_counter++;
-		  var req_container = $('{$field->name}_req_container');
+		  var req_container = $('req_container_{$field->id}');
 		  req_container.innerHTML = '';
 		  
 			var name 	= 'a_name'+id;
@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		}
 		function deleteField".$field->id."(el) {
-		  var req_container = $('{$field->name}_req_container');
+		  var req_container = $('req_container_{$field->id}');
 		  value_counter--;
 		  if (value_counter<=0)
 		    req_container.innerHTML = req_container_innerHTML;
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -158,7 +158,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-	  $field->html = "<span id='{$field->name}_req_container'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
+		$field->html = "<span id='req_container_{$field->id}'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
 		$field->html .= '<ul id="sortables_'.$field->id.'">';
 		if($field->value) {
@@ -194,7 +194,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
 		$separatorf			= $field->parameters->get( 'separatorf', 3 ) ;
@@ -239,7 +239,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 				if($usebutton) {
 					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
-						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('Download').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
+						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
 					$str .= '</form>';
 					$field->{$prop}[] = $str;
 				}else
@@ -257,7 +257,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($field->field_type != 'file') return;
 		if(!$post) return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$newpost = array();
 		

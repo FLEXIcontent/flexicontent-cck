@@ -81,7 +81,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -93,7 +93,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					thisNewField.getFirst().setProperty('value','');
 
 					thisNewField.injectAfter(thisField);

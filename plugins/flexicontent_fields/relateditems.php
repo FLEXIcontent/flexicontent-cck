@@ -37,13 +37,24 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// SCOPE OPTIONS
 		// categories scope parameters
-		$method_cat 		= $field->parameters->get('method_cat', 1);
-		$catids 			= $field->parameters->get('catids', array());
+		$method_cat = $field->parameters->get('method_cat', 1);
+		if (FLEXI_J16GE) {
+			$catids = $field->parameters->get('catids', '');
+			$catids = explode("|", $catids);
+		} else {
+			$catids = $field->parameters->get('catids', array());
+		}
 		$usesubcats 			= $field->parameters->get('usesubcats', 0 );
 				
 		// types scope parameters
-		$method_types 		= $field->parameters->get('method_types', 1);
-		$types				= $field->parameters->get('types', array() );
+		$method_types = $field->parameters->get('method_types', 1);
+		if (FLEXI_J16GE) {
+			$types = $field->parameters->get('types', '' );
+			$types = explode("|", $types);
+		} else {
+			$types = $field->parameters->get('types', array() );
+		}
+		
 		// other limits of scope parameters
 		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
 		$onlypublished = $field->parameters->get( 'onlypublished', 1 );

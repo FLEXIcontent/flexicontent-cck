@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 	function plgFlexicontent_fieldsFcloadmodule( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-  	JPlugin::loadLanguage('plg_flexicontent_fields_fcloadmodule', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_fcloadmodule', JPATH_ADMINISTRATOR);
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
 		plgFlexicontent_fieldsFcloadmodule::onDisplayField($field, $item);
@@ -41,7 +41,8 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$mainframe =& JFactory::getApplication();
 		
 		// parameters shortcuts
-		$module_method	= $field->parameters->get('module_method', 1);
+		$module_method_oldname = $field->parameters->get('module-method', 1);
+		$module_method	= $field->parameters->get('module_method', $module_method_oldname );
 		$mymodule		= $field->parameters->get('modules', '');
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 1082 2012-01-03 01:52:51Z ggppdk $
+ * @version 1.0 $Id: fcpagenav.php 1140 2012-02-07 03:42:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -242,7 +242,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					if (!empty($rows[$location]->catslug)) {
 						$html .= '
 						<span class="return_category">
-							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'&start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
+							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES) . '</a>
 						</span>';
 					}
 				}
