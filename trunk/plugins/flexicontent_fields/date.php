@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "
@@ -140,8 +140,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
 				clear:both;
-				list-style: none;
-				height: 20px;
+				list-style:none;
+				height:20px;
 				width:500px;
 				}
 			#sortables_'.$field->id.' li.sortabledisabled {
@@ -278,7 +278,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			// We must use timezone offset ZERO, because the date(-time) value is stored in its final value
 			// AND NOT as GMT-0 which would need to be converted to localtime, if not specified the JHTML-date
 			// will convert to local time using a timezone offset, giving erroneous output
-			$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat), $timezone_offset=0 ) : JText::_( 'FLEXI_NO_VALUE' );
+			if (!FLEXI_J16GE) {
+				$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat), $timezone_offset=0 ) : JText::_( 'FLEXI_NO_VALUE' );
+			} else {
+				// J1.6+  CANNOT USE 0 as $timezone_offset, also it is not needed ... commented out it ...
+				$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat)/*, $timezone_offset=0*/ ) : JText::_( 'FLEXI_NO_VALUE' );
+			}
 			$n++;
 		}
 		$field->{$prop} = implode($separatorf, $field->{$prop});	

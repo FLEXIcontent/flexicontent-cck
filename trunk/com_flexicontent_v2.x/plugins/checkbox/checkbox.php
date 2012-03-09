@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: checkbox.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
+ * @version 1.0 $Id: checkbox.php 1059 2011-12-20 07:18:32Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.checkbox
@@ -204,7 +204,6 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			$listarrays[] = explode("::", $listelement);
 			}
 
-		$i = 0;
 		$display = array();
 		foreach ($listarrays as $listarray) {
 			for($n=0, $c=count($values); $n<$c; $n++) {

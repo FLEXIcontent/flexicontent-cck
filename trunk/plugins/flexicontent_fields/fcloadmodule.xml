@@ -21,7 +21,7 @@
 		<param name="backend_hidden" type="hidden" default="1" />
 	</params>
 	<params group="group-fcloadmodule">
-		<param name="module-method" type="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC">
+		<param name="module_method" type="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC">
 			<option value="1">FLEXI_FIELD_MODULE_UNIQUE</option>
 			<option value="2">FLEXI_FIELD_MODULE_POSITION</option>
 		</param>

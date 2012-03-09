@@ -238,7 +238,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					if (!empty($rows[$location]->catslug)) {
 						$html .= '
 						<span class="return_category">
-							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' .  htmlspecialchars($category_label, ENT_NOQUOTES)  . '</a>
+							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES) . '</a>
 						</span>';
 					}
 				}

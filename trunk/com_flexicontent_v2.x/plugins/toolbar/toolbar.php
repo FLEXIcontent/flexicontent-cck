@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: toolbar.php 926 2011-10-13 22:13:08Z ggppdk $
+ * @version 1.0 $Id: toolbar.php 1054 2011-12-14 06:09:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -39,8 +39,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		if(JRequest::getCmd('print')) return;
 
 		global $mainframe, $addthis;
-		$view		= JRequest::getString('view', 'item');
-		if ($view != 'item') return;
+		$view		= JRequest::getString('view', FLEXI_ITEMVIEW);
+		if ($view != FLEXI_ITEMVIEW) return;
 		$document	= & JFactory::getDocument();
 		$lang       = $document->getLanguage();
 		if(FLEXI_FISH) {

@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
-		$view = JRequest::setVar('view', JRequest::getVar('view', 'items'));
+		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		$values = $values ? $values : $field->value;
 
@@ -143,7 +143,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
 			$field->display = '
 			<span class="fav-block">
-				'.flexicontent_html::favicon( $field, $favoured ).'
+				'.flexicontent_html::favicon( $field, $favoured, $item ).'
 				<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
 					<small>'.$favs.'</small>
 				</span>
@@ -471,7 +471,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 				foreach ($lists as $list) {
 					$options[] = JHTML::_('select.option', $list->value, $list->text); 
-					}			
+				}			
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				

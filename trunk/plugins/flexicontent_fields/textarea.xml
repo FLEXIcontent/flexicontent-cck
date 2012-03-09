@@ -39,6 +39,46 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="adv_size" type="text" default="30" size="2" label="Adv. search field size" description="Advanced search field size" />
+		
+		<param name="" type="separator" default="Textarea Tabbing Parameters" level="level1" menu="hide" />
+		
+		<param name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; DO NOT ENABLE AS IT MAY LEAD TO DATA LOSS.  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level2" menu="hide" />
+	
+		<param name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="allow_tab_insertion" type="radio" default="0" label="Allow insertion of tabs" description="...">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="allow_tabs_code_editing" type="radio" default="1" label="Allow edit of tabs code" description="Display the code of tabs in editable areas so that it can be changed">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="force_beforetabs" type="radio" default="1" label="Force before tabs editor textarea" description="Display editor area even if no text exists">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="force_aftertabs" type="radio" default="1" label="Force after tabs editor textarea" description="Display editor area even if no text exists">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		
+		<param name="start_of_tabs_pattern" type="text" default="" size="80" label="Start of tabs pattern" description="..." />
+		<param name="start_of_tabs_default_text" type="textarea" default="" cols="45" rows="4" label="start of tabs default text" description="..." />
+		<param name="start_of_tab_pattern" type="text" default="" size="80" label="Start of tab pattern" description="..." />
+		
+		<param name="title_tab_pattern" type="text" default="" size="80" label="Tab title pattern" description="..." />
+		<param name="default_tab_list" type="textarea" default="" cols="45" rows="4" label="Default tab list" description="..." />
+		
+		<param name="end_of_tab_pattern" type="text" default="" size="80" label="End of tab" description="Can be empty for some type of tabs" />
+		<param name="end_of_tabs_pattern" type="text" default="" size="80" label="End of tabs" description="..." />
+		
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>

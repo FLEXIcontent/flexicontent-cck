@@ -89,7 +89,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="legendinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS|FLEXI_CATEGORY" checkvals="item|category" defaultvals="item|category"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY" checkvals="item,category" defaultvals="item,category"
 				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 			<field name="" type="separator" default="FLEXI_IMGFIELD_POPUP_IMAGE" level="level2" menu="hide" />
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
@@ -97,7 +97,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="popupinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS|FLEXI_CATEGORY" checkvals="item|category" defaultvals="item|category"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY" checkvals="item,category" defaultvals="item,category"
 				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>

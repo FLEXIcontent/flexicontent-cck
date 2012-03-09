@@ -86,7 +86,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
-			//hid.name = '".$field->name."['+ixid+']';
 			hid.name = '".$field->name."[]';
 			hid.value = id;
 			hid.id = ixid;
@@ -133,7 +132,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					});			
 				});
 			";
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -207,7 +206,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
@@ -241,20 +240,35 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			break;
 		}
 
-	  static $js_and_css_added = false;
+		
+		static $js_and_css_added = false;
+		
 	  
 		if ($values)
 		{
 			if (!$js_and_css_added) {
-			  $document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/minigallery.css');
+				if (FLEXI_J16GE) {
+					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/css/minigallery.css');
+				  JHTML::_('behavior.mootools');
+				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.js');
+				  if($slideshowtype!='slideshow') {
+				  	$document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+				  	$slideshowClass .= '.'.$slideshowtype;
+				  }
+				} else {
+					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/minigallery.css');
+				  JHTML::_('behavior.mootools');
+				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/backgroundslider.js');
+				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/slideshow.js');
+				}
 			  // this allows you to override the default css files
-			  $document->addStyleSheet(JURI::root().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
-			  JHTML::_('behavior.mootools');
-			  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/backgroundslider.js');
-			  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/slideshow.js');
+			  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
+			  if(file_exists($csspath)) {
+					$document->addStyleSheet(JURI::root().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+			  }
 			}
-		  $js_and_css_added = true;
-			
+			$js_and_css_added = true;
+
 			$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
 			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
 			$thumbbox_id = "slideshowThumbbox_".$field->name."_".$item->id;
@@ -280,7 +294,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$document->addScriptDeclaration($js);
 			
 			$css = "
-			.$htmltag_id {
+			#$htmltag_id {
 				width: ".$w_l."px;
 				height: ".$h_l."px;
 				margin-".$marginpos.": 5px;
@@ -326,15 +340,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if ($filename) {
 					$img_path = $filename->filename;
 					if(substr($filename->filename,0,7)!='http://') {
-						$img_path = JURI::base(true) .'/'. $mediapath . '/' . $filename->filename;
+						$img_path = JURI::base(true) . '/' . $mediapath . '/' . $filename->filename;
 					}
-					$srcs 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-					$srcb 		= 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+					$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+					$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 					
 					$display[]	= '<a href="'.$srcb.'" class="'.$slidethumb.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
+					$n++;
 				}
-				$n++;
-				}
+			}
+			
 			$field->{$prop} .= implode(' ', $display);
 			$field->{$prop} .= '</div>';
 			if ($thumbposition < 3) {
@@ -351,7 +366,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if($field->field_type != 'minigallery') return;
 		if(!$post) return;
 
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		
 		$post = array_unique($post);
 	}

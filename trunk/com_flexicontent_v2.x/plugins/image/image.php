@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1128 2012-01-30 03:53:24Z ggppdk $
+ * @version 1.0 $Id: image.php 1143 2012-02-08 06:25:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -188,13 +188,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Check and disable 'uselegend'
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
-  	$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
+		if (FLEXI_J16GE && !is_array($legendinview)) {
+			$legendinview = explode("|", $legendinview);
+			$legendinview = ($legendinview[0]=='') ? array() : $legendinview;
+		} else {
+  		$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
+  	}
   	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
   	if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
 		
 		// Check and disable 'usepopup'
 		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category'));
-  	$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
+		if (FLEXI_J16GE && !is_array($popupinview)) {
+			$popupinview = explode("|", $popupinview);
+			$popupinview = ($popupinview[0]=='') ? array() : $popupinview;
+		} else {
+	  	$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
+	  }
   	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
   	if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
 		
@@ -225,57 +235,82 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// load the tooltip library if redquired
 			if ($uselegend) JHTML::_('behavior.tooltip');
 			
-			if ( $mainframe->isSite() && !$multiboxadded &&
-						(
-							($linkto_url && $url_target=='multibox') ||
-							($usepopup && $popuptype == 1)
-						)
-					)
+			if ( $mainframe->isSite()
+						&& !$multiboxadded
+						&&	(  ($linkto_url && $url_target=='multibox')  ||  ($usepopup && $popuptype == 1)  )
+				 )
 			{
-				// Multibox integration 
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
-				
-				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
-				}  // This is the new code for new multibox version, old multibox hack is the following lines
-				/*$csshack = '
-				<!--[if lte IE 6]>
-				<style type="text/css">
-				.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
-					behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
-				}
-				</style>
-				<![endif]-->
-				';
-				$document->addCustomTag($csshack);*/
-
 				JHTML::_('behavior.mootools');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
-
-				$box = "
-					window.addEvent('domready', function(){
-						//call multiBox
-						var initMultiBox = new multiBox({
-							mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
-							container: $(document.body),//where to inject multiBox
-							descClassName: 'multiBoxDesc',//the class name of the description divs
-							path: './Files/',//path to mp3 and flv players
-							useOverlay: true,//use a semi-transparent background. default: false;
-							maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
-							addDownload: false,//do you want the files to be downloadable?
-							pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
-							addRollover: true,//add rollover fade to each multibox link
-							addOverlayIcon: true,//adds overlay icons to images within multibox links
-							addChain: true,//cycle through all images fading them out then in
-							recalcTop: true,//subtract the height of controls panel from top position
-							addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
-							autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
+				
+				// Multibox integration use different version for FC v2x
+				if (FLEXI_J16GE) {
+					
+					// Include MultiBox CSS files
+					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
+					
+					// NEW ie6 hack
+					if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
+						$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+					}  // This is the new code for new multibox version, old multibox hack is the following lines
+					
+					// Include MultiBox Javascript files
+					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
+					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
+					
+					// Add js code for creating a multibox instance
+					$box = "
+						window.addEvent('domready', function(){
+							//call multiBox
+							var initMultiBox = new multiBox({
+								mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
+								container: $(document.body),//where to inject multiBox
+								descClassName: 'multiBoxDesc',//the class name of the description divs
+								path: './Files/',//path to mp3 and flv players
+								useOverlay: true,//use a semi-transparent background. default: false;
+								maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
+								addDownload: false,//do you want the files to be downloadable?
+								pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
+								addRollover: true,//add rollover fade to each multibox link
+								addOverlayIcon: true,//adds overlay icons to images within multibox links
+								addChain: true,//cycle through all images fading them out then in
+								recalcTop: true,//subtract the height of controls panel from top position
+								addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
+								autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
+							});
 						});
-					});
-				";
-				$document->addScriptDeclaration($box);
-			
+					";
+					$document->addScriptDeclaration($box);
+				} else {
+					
+					// Include MultiBox CSS files
+					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/multibox.css');
+					
+					// OLD ie6 hack
+					$csshack = '
+					<!--[if lte IE 6]>
+					<style type="text/css">
+					.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
+						behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
+					}
+					</style>
+					<![endif]-->
+					';
+					$document->addCustomTag($csshack);
+					
+					// Include MultiBox Javascript files
+					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/overlay.js');
+					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/multibox.js');
+					
+					// Add js code for creating a multibox instance
+					$box = "
+						var box = {};
+						window.addEvent('domready', function(){
+							box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true});
+						});
+					";
+					$document->addScriptDeclaration($box);
+				}
+
 				$multiboxadded = 1;
 			}
 			

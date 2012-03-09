@@ -70,7 +70,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					});			
 				});
 			";
-			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$js = "

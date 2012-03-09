@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 887 2011-08-31 15:59:15Z ggppdk $
+ * @version 1.0 $Id: file.php 1056 2011-12-16 18:36:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					});			
 				});
 			";
-			//$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
 			$css = '
@@ -239,7 +239,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 				if($usebutton) {
 					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
-						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('Download').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
+						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
 					$str .= '</form>';
 					$field->{$prop}[] = $str;
 				}else
