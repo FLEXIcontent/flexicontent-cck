@@ -47,12 +47,23 @@ class FlexicontentController extends JController
 	 */
 	function display()
 	{
-		// View caching logic -- simple... are we logged in?
-		$user = &JFactory::getUser();
-		if ($user->get('id')) {
-			parent::display(false);
+		// Debuging message
+		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
+		
+		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
+			// Force add() TASK if layout is form, this way we will check permissions
+			JRequest::setVar('task', 'add');
+			$this->add();
 		} else {
-			parent::display(true);
+			// Display Item
+			if (JFactory::getUser()->get('id')) {
+				// WITHOUT CACHING (logged users)
+				parent::display(false);
+			} else {
+				// WITH CACHING (guests)
+				parent::display(true);
+			}
+			
 		}
 	}
 
@@ -65,13 +76,14 @@ class FlexicontentController extends JController
 	function edit()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );		
+		// Debuging message
+		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
+		
+		// Retrieve current logged user info
 		$user	=& JFactory::getUser();
-
 		// Create the view
 		$view = & $this->getView(FLEXI_ITEMVIEW, 'html');
-
 		// Get/Create the model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
 
@@ -131,19 +143,22 @@ class FlexicontentController extends JController
 	*/
 	function add()
 	{
-		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		// Debuging message
+		//JError::raiseNotice(500, 'IN ADD()'); // TOREMOVE
 
+		// Retrieve current logged user info
 		$user	=& JFactory::getUser();
-
 		// Create the view
 		$view = & $this->getView(FLEXI_ITEMVIEW, 'html');
+		// Get/Create the model
+		$model = & $this->getModel(FLEXI_ITEMVIEW);
 
 		//general access check
 		if (FLEXI_J16GE) {
-			$canAdd	= $user->authorize('core.create', 'com_flexicontent');
-			$canAddCat = $user->authorize('flexicontent.createcat', 'com_flexicontent');
-			$not_authorised = !($canAdd || $canAddCat);
+			$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
+			// ALTERNATIVE 1
+			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
+			$not_authorised = !$canAdd;
 		} else if (FLEXI_ACCESS) {
 			$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
 			$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
@@ -201,12 +216,45 @@ class FlexicontentController extends JController
 		//$diff_arr = array_diff_assoc ( $data, $post);
 		//echo "<pre>"; print_r($diff_arr); exit();
 		
-		//perform access checks
+		// PERFORM ACCESS CHECKS, NOTE: we need to check access again,
+		// despite having checked them on edit form load, because user may have tampered with the form ... 
 		$isNew = ((int) $post['id'] < 1);
 		$allowunauthorize = JFactory::getApplication()->getParams('com_flexicontent')->get('allowunauthorize', 0);
 
-		// Must be logged in
-		if (!$allowunauthorize &&  ($user->get('id') < 1) ) {
+		if(!$isNew) {
+			if (FLEXI_J16GE) {
+				$asset = 'com_content.article.' . $item->id;
+				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+				// ALTERNATIVE 1
+				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				// ALTERNATIVE 2
+				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if (FLEXI_ACCESS) {
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else {
+				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+			}
+		} else {
+			if (FLEXI_J16GE) {
+				$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
+				// ALTERNATIVE 1
+				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
+				$not_authorised = !$canAdd;
+			} else if (FLEXI_ACCESS) {
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
+			} else {
+				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+				$not_authorised = ! $canAdd;
+			}
+			if ( $allowunauthorize) $canAdd = true;
+		}
+
+
+		// Check for new content
+		if ( ($isNew && !$canAdd) || (!$isNew && !$has_edit)) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
 		}

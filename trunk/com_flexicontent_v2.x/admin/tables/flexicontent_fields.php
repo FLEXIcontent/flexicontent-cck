@@ -121,6 +121,25 @@ class flexicontent_fields extends JTable
 		$k = $this->_tbl_key;
 		return 'com_flexicontent.field.'.(int) $this->$k;
 	}
+
+	/**
+	 * Get the parent asset id for the record
+	 *
+	 * @param   JTable   $table  A JTable object for the asset parent.
+	 * @param   integer  $id     The id for the asset
+	 *
+	 * @return  integer  The id of the asset's parent
+	 *
+	 * @since   11.1
+	 */
+	protected function _getAssetParentId($table = null, $id = null)
+	{
+		$asset = JTable::getInstance('Asset');
+		$asset->loadByName('com_flexicontent');
+		return $asset->id;
+		//return 0;
+	}
+
 	
 	/**
 	 * Overloaded bind function.
@@ -256,6 +275,7 @@ class flexicontent_fields extends JTable
 
 		return true;
 	}*/
+	
 	private function _getLastId()
 	{
 		$query  = 'SELECT MAX(id)'

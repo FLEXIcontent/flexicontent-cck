@@ -33,10 +33,6 @@ class FlexicontentViewCategory extends JView {
 		$mainframe = &JFactory::getApplication();
 		$permission = FlexicontentHelperPerm::getPerm();
 
-		if (!$permission->CanCats && !$permission->CanAddCats) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-		}
-		
 		$iform		= $this->get('Form');
 		$formid		= $iform->getValue('id');
 		$isNew		= ($formid == 0);
@@ -87,10 +83,6 @@ class FlexicontentViewCategory extends JView {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $iform->getValue("title").' '.JText::_( 'FLEXI_EDITED BY ANOTHER ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
-			}
-		} else {
-			if (!$permission->CanAddCats) {
-				$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 			}
 		}
 		

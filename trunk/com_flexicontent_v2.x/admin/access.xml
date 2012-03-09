@@ -5,18 +5,19 @@
 		<action name="core.admin" title="JAction_Admin" description="JAction_Admin_Component_Desc" />
 		<action name="core.manage" title="JAction_Manage" description="JAction_Manage_Component_Desc" />
 		
-		<!-- ITEMs/CATEGORIES: category-inherited permissions -->
-		<action name="core.create" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; create" description="Allow users in the group to CREATE new items/categories in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
-		<action name="core.delete" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete" description="Allow users in the group to DELETE items/categories (any item) in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
-		<action name="core.delete.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete own" description="Allow users in the group to DELETE OWNED items/categories (any item) in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
-		<action name="core.edit" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit" description="Allow users in the group to EDIT (all) items/categories in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
-		<action name="core.edit.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit own" description="Allow users in the group to EDIT OWNED items/categories in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
-		<action name="core.edit.state" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit state" description="Allow users in the group to ALTER the PUBLICATION STATE of items/categories in any category. NOTE: You can explicitly deny per category, but if set to deny here, you cannot explicitly allow per category." />
+		<!-- Items/Categories: category-inherited permissions -->
+		<action name="core.create" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; create" description="Allow users in the group to CREATE new Items/Categories in any category. NOTE: You can explicitely deny per category. but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.delete" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete" description="Allow users in the group to DELETE Items/Categories (any item) in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.delete.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete own" description="Allow users in the group to DELETE OWNED Items/Categories in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit" description="Allow users in the group to EDIT (all) Items/Categories in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit own" description="Allow users in the group to EDIT OWNED Items/Categories in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit.state" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit state" description="Allow users in the group to ALTER the PUBLICATION STATE of Items/Categories in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
+		<action name="core.edit.state.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; edit state own" description="Allow users in the group to ALTER the PUBLICATION STATE of OWNED Items/Categories in any category. NOTE: You can explicitely deny per category, but if set to deny here, you cann't expicitely allow per category." />
 		
 		<!-- ITEMs: component controlled permissions -->
 		<action name="flexicontent.displayallitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Display all" description="Allow users in the group to list all Items (in items management), otherwise the user will only see the items that he/she can edit." />
 		<action name="flexicontent.copyitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Item Copy Task (in items management)" />
-		<action name="flexicontent.order" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
+		<action name="flexicontent.orderitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
 		<action name="flexicontent.paramsitem" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; set params" description="Allow users in the group to change the parameters of editable items." />
 		<action name="flexicontent.versioning" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; use versions" description="Allow users in the group to use multiple Versions per Item" />
 		
@@ -25,9 +26,6 @@
 		<action name="flexicontent.usercats" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; View unauthorized categories" description="Allow users in the group to view the categories which they cannot assign to items" />
 		<action name="flexicontent.viewtree" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; View categories as tree" description="Allow users in the group to view categories as tree instead of flat list" />
 		<action name="flexicontent.multicat" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; Assign multiple categories to items" description="Allow users in the group to assign multiple categories to items" />
-		<!-- UNUSED, TODO: maybe add the use of them -->
-		<!--action name="flexicontent.deleteowncat" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; delete own" description="Allow users in the group to delete owned categories" /-->
-		<!--action name="flexicontent.ordercat" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; reoder" description="Allow users in the group to reorder the categories" /-->
 		
 		<!-- TAGs: management tab and usage -->
 		<action name="flexicontent.managetags" title="&lt;b&gt;Tags: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Tags Management" />
@@ -36,15 +34,24 @@
 		
 		<!-- VARIOUS management tabs -->
 		<action name="flexicontent.managetypes" title="&lt;b&gt;Types: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the Types Management. NOTE: There are more permissions that control what the user can do with types." />
-		<action name="flexicontent.managefields" title="&lt;b&gt;Fields: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Fields Management" />
 		<action name="flexicontent.managearchives" title="&lt;b&gt;Archives: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Archives Management" />
 		<action name="flexicontent.managetemplates" title="&lt;b&gt;Templates: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Templates Management" />
 		<action name="flexicontent.managestats" title="&lt;b&gt;Statistics: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Statistics Management" />
+		
+		<!-- FIELDs: management tab -->
+		<action name="flexicontent.managefields" title="&lt;b&gt;Fields: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Fields Management" />
+		<action name="flexicontent.acclevelfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of fields (in fields management)" />
+		<action name="flexicontent.copyfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Field Copy Task (in fields management)" />
+		<action name="flexicontent.orderfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of fields (in fields management)" />
+		<action name="flexicontent.createfield" title="&lt;b&gt;Fields:&lt;/b&gt; create" description="Allow users in the group to create fields" />
+		<action name="flexicontent.editfield" title="&lt;b&gt;Fields:&lt;/b&gt; edit" description="Allow users in the group to edit fields" />
+		<action name="flexicontent.deletefield" title="&lt;b&gt;Fields:&lt;/b&gt; delete" description="Allow users in the group to delete fields" />
 		
 		<!-- FILEs: management tab -->
 		<action name="flexicontent.managefile" title="&lt;b&gt;Files: -- manage --&lt;/b&gt;" description="-- manage -- files" />
 		<action name="flexicontent.uploadfiles" title="&lt;b&gt;Files (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Upload files" description="Allow users in the group to upload New Files" />
 		<action name="flexicontent.viewallfiles" title="&lt;b&gt;Files (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; View All files" description="Allow users in the group to view all existing files" />
+
 	</section>
 
 	<section name="category">
@@ -61,11 +68,12 @@
 		<action name="core.delete.own" title="Delete this item if owned" description="This item can be deleted by the user that owns it" />
 		<action name="core.edit" title="Edit this item" description="This item can be edited by members of this user group" />
 		<action name="core.edit.state" title="Publish this item" description="This item can have its publication state altered by members of this user group" />
+		<action name="core.edit.state.own" title="Publish this item if owned" description="This item can have its publication state altered by the user that owns it" />
 	</section>
 	
-	<!--section name="fields"-->
-		<!-- NOT USED/NOT NEEDED since it is implemented via access level -->
-		<!-- action name="flexicontent.readfield" title="Can view field" description="Allow users in the group to view this field in the website frontend" /-->
-	<!--/section-->
+	<section name="field">
+		<action name="flexicontent.editfield" title="edit" description="This field can be edited by members of this user group" />
+		<action name="flexicontent.deletefield" title="delete" description="This field can be deleted by members of this user group" />
+	</section>
 	
 </access>
