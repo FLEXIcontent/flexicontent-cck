@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1143 2012-02-08 06:25:02Z ggppdk $
+ * @version 1.2 $Id: helper.php 1150 2012-02-24 03:26:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -315,8 +315,9 @@ class modFlexicontentHelper
 						if($dateformat == JText::_('custom'))
 							$dateformat = $params->get('custom_date_format_feat', JText::_('DATE_FORMAT_LC3'));
 						
-						$date_fields_feat = $params->get('date_fields_feat', array());
-	 			  	$date_fields_feat = !is_array($date_fields_feat) ? array($date_fields_feat) : $date_fields_feat;
+						$date_fields_feat = $params->get('date_fields_feat', array('created'));
+						$date_fields_feat = !is_array($date_fields_feat) ? array($date_fields_feat) : $date_fields_feat;
+		 			  
 	 			  	$lists[$ord]['featured'][$i]->date_created = "";
 						if (in_array('created',$date_fields_feat)) { // Created
 							$lists[$ord]['featured'][$i]->date_created .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
@@ -330,10 +331,10 @@ class modFlexicontentHelper
 						}
 					}
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
-					$lists[$ord]['featured'][$i]->image 	= $thumb;
-					$lists[$ord]['featured'][$i]->hits = $row->hits;
-					$lists[$ord]['featured'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['featured'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle_feat);
+					$lists[$ord]['featured'][$i]->image = $thumb;
+					$lists[$ord]['featured'][$i]->hits	= $row->hits;
+					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 					$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
 					$lists[$ord]['featured'][$i]->typename 	= $row->typename;
@@ -368,7 +369,7 @@ class modFlexicontentHelper
 							$w		= '&amp;w=' . $mod_width_feat;
 							$aoe	= '&amp;aoe=1';
 							$q		= '&amp;q=95';
-							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+							$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
 							$ext = pathinfo($src, PATHINFO_EXTENSION);
 							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
@@ -422,8 +423,9 @@ class modFlexicontentHelper
 						if($dateformat == JText::_('custom'))
 							$dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 							
-						$date_fields = $params->get('date_fields', array());
-	 			  	$date_fields = !is_array($date_fields) ? array($date_fields) : $date_fields;
+						$date_fields = $params->get('date_fields', array('created'));
+						$date_fields = !is_array($date_fields) ? array($date_fields) : $date_fields;
+		 			  
 	 			  	$lists[$ord]['standard'][$i]->date_created = "";
 						if (in_array('created',$date_fields)) { // Created
 							$lists[$ord]['standard'][$i]->date_created .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').':</span> ' : '';
@@ -437,10 +439,10 @@ class modFlexicontentHelper
 						}
 					}
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
-					$lists[$ord]['standard'][$i]->image 	= $thumb;
-					$lists[$ord]['standard'][$i]->hits = $row->hits;
-					$lists[$ord]['standard'][$i]->link 		= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['standard'][$i]->title 	= flexicontent_html::striptagsandcut($row->title, $cuttitle);
+					$lists[$ord]['standard'][$i]->image	= $thumb;
+					$lists[$ord]['standard'][$i]->hits	= $row->hits;
+					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 					$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
 					$lists[$ord]['standard'][$i]->typename 	= $row->typename;
@@ -614,7 +616,7 @@ class modFlexicontentHelper
 			}
 			$idate 	= explode(' ', $idate);
 			$cdate 	= $idate[0] . ' 00:00:00';
-			$curritemcats = $idate 	= explode(',', $curitem->itemcats);
+			$curritemcats = explode(',', $curitem->itemcats);
 		}
 
 
