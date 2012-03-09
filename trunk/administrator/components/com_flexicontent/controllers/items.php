@@ -1030,7 +1030,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		exit;
 	}
 	
-	function getversionlist() {
+	function getversionlist()
+	{
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 		@ob_end_clean();
@@ -1056,10 +1057,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		$limitstart = ($page-1)*$versionsperpage;
 		$versions = $model->getVersionList();
 		$versions	= & $model->getVersionList($limitstart, $versionsperpage);
+		
+		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS') ? "%d/%m %H:%M" : $date_format;
 		foreach($versions as $v) {
 			$class = ($v->nr == $active) ? ' class="active-version"' : '';
 			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>
-				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' ))."</td>
+				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format )."</td>
 				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
 				<td class='versions' align='center'><a href='#' class='hasTip' title='Comment::".$v->comment."'>".$comment."</a>";
 				if((int)$v->nr==(int)$currentversion) {//is current version?

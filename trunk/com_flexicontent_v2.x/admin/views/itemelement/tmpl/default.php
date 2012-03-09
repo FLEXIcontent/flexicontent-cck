@@ -113,7 +113,7 @@ defined('_JEXEC') or die('Restricted access');
 			<td align="center"><?php echo $row->lang; ?></td>
 			<?php endif; ?>
 			<td align="center">
-				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>"  title="<?php echo $alt; ?>" />
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>

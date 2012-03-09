@@ -40,6 +40,25 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	
 	function getLabel()
 	{
+		static $css_added = false;
+		if (!$css_added) {
+			$document = & JFactory::getDocument();
+			$css="
+			div.current ul.config-option-list li label.hasTip {
+				display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: bold;
+				background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
+			}
+			div.current ul.config-option-list li ul#rules label.hasTip {
+				display:inherit; padding: inherit; margin: inherit; text-align: inherit;	width: inherit; font-weight: inherit;
+				background-color: inherit; border-width: 0px; color: inherit;
+			}
+			div.current ul.config-option-list li select { margin-bottom: 0px;}
+			div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
+			";
+			$document->addStyleDeclaration($css);
+			$css_added = true;
+		}
+		
 		$document 	=& JFactory::getDocument();
 		//$document->addStyleSheet('../tmpl/params.css');
 		
@@ -51,7 +70,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		} else if ($level == 'level3') {
 			$style = 'padding: 4px 6% 4px 6%; font-weight: bold; clear:both; width:100%; display: block; float: left;';
 		} else {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #777; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left;';
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: darkgreen; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left;';
 		}
 		
 		$class = ""; $title = "";

@@ -47,28 +47,28 @@
 			<field name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; DO NOT ENABLE AS IT MAY LEAD TO DATA LOSS.  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level2" menu="hide" />
 		
 			<field name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="allow_tab_insertion" type="radio" default="0" label="Allow insertion of tabs" description="...">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="allow_tabs_code_editing" type="radio" default="1" label="Allow edit of tabs code" description="Display the code of tabs in editable areas so that it can be changed">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="force_beforetabs" type="radio" default="1" label="Force before tabs editor textarea" description="Display editor area even if no text exists">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="force_aftertabs" type="radio" default="1" label="Force after tabs editor textarea" description="Display editor area even if no text exists">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="start_of_tabs_pattern" type="text" default="" size="80" label="Start of tabs pattern" description="..." />

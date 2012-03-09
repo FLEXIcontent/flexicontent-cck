@@ -417,7 +417,8 @@ window.addEvent('domready', function() {
 		$canPublishAll 		= $this->permission->CanPublish;
 		$canPublishOwnAll	= true;//I(enjoyman) not sure in this line.
 		$check = $this->permission->CanConfig;
-		
+		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
+
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
@@ -436,7 +437,7 @@ window.addEvent('domready', function() {
 			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 
 			if ($this->permission->CanConfig) {
-				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');
 			}else $access = $this->escape($row->access_level);
 
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
@@ -667,10 +668,10 @@ window.addEvent('domready', function() {
 				<?php echo $row->author; ?>
 			</td>
 			<td nowrap="nowrap" class="col_created">
-				<?php echo JHTML::_('date',  $row->created, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' ) ); ?>
+				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
 			</td>
 			<td nowrap="nowrap" class="col_revised">
-				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, JText::_('FLEXI_DATE_FORMAT_FLEXI_ITEMS')) : JText::_('FLEXI_NEVER'); ?>
+				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, $date_format ) : JText::_('FLEXI_NEVER'); ?>
 			</td>
 			<td align="center">
 				<?php echo $row->hits; ?>

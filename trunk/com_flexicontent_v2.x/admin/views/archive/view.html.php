@@ -63,8 +63,8 @@ class FlexicontentViewArchive extends JView {
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows			= & $this->get( 'Data');
+		$pageNav	= & $this->get( 'Pagination' );
 		
 		// search filter
 		$lists['search']= $search;

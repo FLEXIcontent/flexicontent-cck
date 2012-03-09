@@ -184,17 +184,11 @@ function addtag(id, tagname) {
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
 }
 
-
 function deleteTag(obj) {
-	if (navigator.appVersion.indexOf("MSIE") == -1) {
-		var parent = $($(obj).getParent());
-		parent.remove();
-	} else {
-		var parent = obj.parentNode;
-		parent.innerHTML = "";
-		parent.removeNode(true);
-	}
+	parent = jQuery(jQuery(obj).getParent());
+	jQuery(parent).remove();
 }
+
 </script>
 
 <div id="flexicontent" class="adminForm flexi_edit">
@@ -205,7 +199,7 @@ function deleteTag(obj) {
     </h1>
     <?php endif; ?>
 
-	<form action="<?php echo $this->action ?>" method="post" name="adminForm" enctype="multipart/form-data">
+	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons">
 			<input type="button" class="button" onclick="javascript:submitbutton('save')" value="<?php echo JText::_( 'FLEXI_SAVE' ) ?>" />
 			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
@@ -218,12 +212,25 @@ function deleteTag(obj) {
 		<fieldset class="flexi_general">
 			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
 			<div class="flexi_formblock">
-				<label for="title" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+				<?php
+					$field = $this->fields['title'];
+					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+				?>
+				<label for="title" <?php echo $field_tooltip; ?> >
+					<?php echo $field->label.':'; ?>
+					<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
-<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
+			<?php /*
+			<div class="flexi_formblock">
+				<label for="alias" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+				</label>
+				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->item->alias; ?>" size="65" maxlength="254" />
+			</div>
+			*/ ?>
+	<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
 				<label for="cid" class="flexi_label">
@@ -243,7 +250,7 @@ function deleteTag(obj) {
 			</label>
 			<?php echo $fixedmaincat; ?>
 		</div>
-<?php else : ?>
+	<?php else : ?>
 		<?php if ($this->perms['multicat']) : ?>
 			<div class="flexi_formblock">
 				<label for="cid" class="flexi_label">
@@ -262,7 +269,7 @@ function deleteTag(obj) {
 				</label>
 				<?php echo $this->lists['catid']; ?>
 			</div>
-<?php endif; ?>
+	<?php endif; ?>
 
 			<?php
 			if ($autopublished = $this->params->get('autopublished', 0)) : 
@@ -273,10 +280,15 @@ function deleteTag(obj) {
 			elseif ($this->perms['canpublish']) :
 			?>
 			<div class="flexi_formblock">
-          		<label for="state" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_STATE' ).':';?>
+				<?php
+					$field = $this->fields['state'];
+					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+				?>
+				<label for="title" <?php echo $field_tooltip; ?> >
+					<?php echo $field->label.':'; ?>
+					<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 				</label>
-          		<?php echo $this->lists['state']; ?>
+				<?php echo $this->lists['state']; ?>
 			</div>
 				<?php
 				if (!$this->params->get('auto_approve', 1)) :
@@ -400,118 +412,87 @@ function deleteTag(obj) {
 			);
 			
 			foreach ($this->fields as $field) {
-				// used to hide the core fields and the hidden fields from this listing
-				if 	(
-						(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
-						&& 
-						(!$field->parameters->get('frontend_hidden') && !in_array($field->field_type, $hidden)) 
-					) 
+				
+				// SKIP frontend hidden fields from this listing
+				if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('frontend_hidden')  ||  in_array($field->field_type, $hidden) ) continue;
+				
+				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+				
+				// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+				if ($field->field_type == 'maintext')
 				{
-					
-					// Check for type specific parameters for core fields
-					if ($field->iscore && isset($this->item->typealias)) {
-						$typealias = $this->item->typealias;
-						$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field->name."_".$typealias."'";
-						//echo $query;
-						$db =& JFactory::getDBO();
-						$db->setQuery($query);
-						$data = $db->loadObject();
-						//print_r($data);
-						if ($db->getErrorNum()) {
-							echo $query."<br /><br />".$db->getErrorMsg()."<br />";
-						} else if (@$data->published) {
-							echo "Please unpublish plugin with name: ".$field->name."_".$typealias;
-						}
-						
-						// merge field parameter with the type specific parameters ones
-						if ($data) {
-							$ts_params = new JParameter($data->attribs);
-							$field->parameters->merge($ts_params);
-						} else {
-							$field->parameters->set( 'use_html',  !$this->tparams->get('hide_html', 0) ) ;
-						}
-					}
-					
-					FlexicontentFields::getTypeCustomize($field, $this->item);
-					
-					// set a type specific label, description for the main text field
-					if ($field->field_type == 'maintext')
-					{
-						$field->label = $this->tparams->get('maintext_label', $field->label);
-						$field->description = $this->tparams->get('maintext_desc', $field->description);
-						//$maintext = ($this->version!=$this->item->version)?@$field->value[0]:$this->item->text;
-						$maintext = $this->item->text;
-						
-						// Create main text field, via calling the display function of the textarea field (will also check for tabs)
-						$maintext = html_entity_decode($maintext, ENT_QUOTES, 'UTF-8');
-						$field->maintext = & $maintext;
-						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$this->item) );
-					}
-					
-								// -- Tooltip for the current field
-								$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+					$maintext = $this->item->text;
+					$maintext = html_entity_decode($maintext, ENT_QUOTES, 'UTF-8');
+					$field->maintext = & $maintext;
+					FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$this->item) );
+				}
+				
+				// -- Tooltip for the current field
+				$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				
+				<?php	if ( !is_array($field->html) ) : ?>
+					<tr>
+						<td class="key">
+							<label for="<?php echo $field->name; ?>" <?php echo $field_tooltip; ?> >
+								<?php echo $field->label; ?>
+							</label>
+						</td>
+						<td>
+							<?php
+								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+								if(isset($field->html)){
+									echo $field->html;
+								} else {
+									echo $noplugin;
+								}
 							?>
-							<?php	if ( !is_array($field->html) ) : ?>
-								<tr>
-									<td class="key">
-										<label for="<?php echo $field->name; ?>" <?php echo $field_tooltip; ?> >
-											<?php echo $field->label; ?>
-										</label>
-									</td>
-									<td>
-										<?php
-											$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-											if(isset($field->html)){
-												echo $field->html;
-											} else {
-												echo $noplugin;
-											}
-										?>
-									</td>
-								</tr>
-								
-							<?php else : ?>
-						
-								<tr>
-									<td colspan="2">
-										
-										<?php $not_in_tabs = ""; ?>
-										
-										<div class="fctabber">
-										<?php foreach ($field->html as $i => $field_html): ?>
-											<?php
-											if (!isset($field->tab_labels[$i])) {
-												if (isset($field->html[$i])) $not_in_tabs .= "<div style='display:none!important'>".$field->html[$i]."</div>";
-												continue;
-											}
-											?>
-											<div class="tabbertab">
-												<h3>
-													<?php echo $field->tab_labels[$i]; ?>
-												</h3>
-											<?php
-												$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-												echo $not_in_tabs;
-												$not_in_tabs = ""; // reset
-												if(isset($field->html[$i])){
-													echo $field->html[$i];
-												} else {
-													echo $noplugin;
-												}
-											?>
-											</div>
-										<?php endforeach; ?>
-										</div>
-										
-										<?php echo $not_in_tabs; ?>
-										
-									</td>
-								</tr>
-								
-							<?php endif; ?>
+						</td>
+					</tr>
+					
+				<?php else : ?>
+			
+					<tr>
+						<td colspan="2">
+							
+							<?php $not_in_tabs = ""; ?>
+							
+							<div class="fctabber">
+							<?php foreach ($field->html as $i => $field_html): ?>
+								<?php
+								if (!isset($field->tab_labels[$i])) {
+									if (isset($field->html[$i])) $not_in_tabs .= "<div style='display:none!important'>".$field->html[$i]."</div>";
+									continue;
+								}
+								?>
+								<div class="tabbertab">
+									<h3>
+										<?php echo $field->tab_labels[$i]; ?>
+									</h3>
+								<?php
+									$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+									echo $not_in_tabs;
+									$not_in_tabs = ""; // reset
+									if(isset($field->html[$i])){
+										echo $field->html[$i];
+									} else {
+										echo $noplugin;
+									}
+								?>
+								</div>
+							<?php endforeach; ?>
+							</div>
+							
+							<?php echo $not_in_tabs; ?>
+							
+						</td>
+					</tr>
+					
+				<?php endif; ?>
 			
 			<?php
-				}
 			}
 			?>
 		</table>
@@ -534,7 +515,7 @@ function deleteTag(obj) {
 		if($this->params->get('usemetadata', 1)) {
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
 			echo $this->pane->startPanel( $title, "metadata-page" );
-			echo $this->form->render('meta', 'metadata');
+			echo $this->formparams->render('meta', 'metadata');
 			echo $this->pane->endPanel();
 		} else {
 			?>
@@ -549,14 +530,14 @@ function deleteTag(obj) {
 		if ($this->perms['isSuperAdmin']) {
 			$title = JText::_( 'FLEXI_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
-			echo $this->form->render('details');
+			echo $this->formparams->render('details');
 			echo $this->pane->endPanel();
 		}
 		
 		if ($this->perms['cantemplates']) {
 			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
 			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->form->render('params', 'advanced');
+			echo $this->formparams->render('params', 'advanced');
 			echo $this->pane->endPanel();
 	
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
