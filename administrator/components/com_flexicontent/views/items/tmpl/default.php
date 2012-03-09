@@ -415,6 +415,7 @@ window.addEvent('domready', function() {
 		$config		=& JFactory::getConfig();
 		$nullDate 	= $db->getNullDate();
 		$user 		=& $this->user;
+		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
 		
 		if (FLEXI_ACCESS) {
 			$canEditAll 		= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
@@ -685,10 +686,10 @@ window.addEvent('domready', function() {
 				<?php echo $row->author; ?>
 			</td>
 			<td nowrap="nowrap" class="col_created">
-				<?php echo JHTML::_('date',  $row->created, JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' ) ); ?>
+				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
 			</td>
 			<td nowrap="nowrap" class="col_revised">
-				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, JText::_('FLEXI_DATE_FORMAT_FLEXI_ITEMS')) : JText::_('FLEXI_NEVER'); ?>
+				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, $date_format) : JText::_('FLEXI_NEVER'); ?>
 			</td>
 			<td align="center">
 				<?php echo $row->hits; ?>

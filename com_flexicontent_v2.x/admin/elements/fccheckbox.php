@@ -37,10 +37,11 @@ class JFormFieldFccheckbox extends JFormField
 	
 	function getInput()
 	{
-		$split_char = "|";
 		$node = & $this->element;
-		$value = explode($split_char, $this->value);
+		$value = explode("|", $this->value);
 		$value = ($value[0]=='') ? array() : $value;
+		
+		$split_char = ",";
 		
 		// Get options and values
 		$checkoptions = explode($split_char, $node->getAttribute('checkoptions'));

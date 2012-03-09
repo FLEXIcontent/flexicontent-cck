@@ -151,7 +151,7 @@ class FlexicontentViewItems extends JView {
 			$toolbar->appendButton('Popup', 'new', 'JTOOLBAR_NEW', JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
 			
 			if ($permission->CanCopy) {
-				JToolBarHelper::customX( 'items.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+				JToolBarHelper::customX( 'items.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
 			}
 		}
 		if ($permission->CanEdit) {

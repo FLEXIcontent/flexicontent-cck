@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 892 2011-09-07 22:16:02Z ggppdk $
+ * @version 1.5 stable $Id: router.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

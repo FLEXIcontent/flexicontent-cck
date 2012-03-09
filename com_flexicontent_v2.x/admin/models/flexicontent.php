@@ -1102,7 +1102,7 @@ class FlexicontentModelFlexicontent extends JModel
 					$asset->name		= $name;
 					$asset->title		= $field->name;
 					
-					$actions	= JAccess::getActions($component_name, 'fields');
+					$actions	= JAccess::getActions($component_name, 'field');
 					$rules 		= json_decode($component_asset->rules);		
 					foreach ($actions as $action) {
 						$fieldrules[$action->name] = $rules->{$action->name};
@@ -1165,10 +1165,12 @@ class FlexicontentModelFlexicontent extends JModel
 			if(JAccess::checkGroup($group->id, 'core.edit.state')) {
 				$rules['core.edit.state'][$group->id] = 1;//CanPublish
 			}
+			if(JAccess::checkGroup($group->id, 'core.edit.state.own')) {
+				$rules['core.edit.state.own'][$group->id] = 1;//CanPublishOwn
+			}
 			if(JAccess::checkGroup($group->id, 'core.edit.own')) {
 				$rules['core.edit.own'][$group->id] = 1;//CanEditOwn
 			}
-			//$rules['flexicontent.readfield'][$group->id] = 1;//CanViewField
 		}
 		
 		return $rules;

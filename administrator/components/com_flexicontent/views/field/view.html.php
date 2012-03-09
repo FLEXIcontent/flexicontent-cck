@@ -81,7 +81,11 @@ class FlexicontentViewField extends JView {
 		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date');
 		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories');
 		if($row->field_type) {
-			JPlugin::loadLanguage('plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type), JPATH_ADMINISTRATOR);
+			// load language file
+			//JPlugin::loadLanguage('plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type), JPATH_ADMINISTRATOR);
+			$jlang =& JFactory::getLanguage();
+			$jlang->load('plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type')), JPATH_ADMINISTRATOR);
+			
 			$classname	= 'plgFlexicontent_fields'.($row->iscore ? 'core' : $row->field_type);
 			$classmethods	= get_class_methods($classname);
 			if($row->iscore) {

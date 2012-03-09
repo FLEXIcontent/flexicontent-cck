@@ -30,24 +30,31 @@ jimport('joomla.application.component.model');
 class FlexicontentModelItems extends JModel
 {
 	/**
-	 * Details data in details array
+	 * Component parameters
 	 *
-	 * @var array
+	 * @var object
+	 */
+	var $_cparams = null;
+	
+	/**
+	 * Item data
+	 *
+	 * @var object
 	 */
 	var $_item = null;
 
 
 	/**
-	 * tags in array
+	 * Item tags
 	 *
 	 * @var array
 	 */
 	var $_tags = null;
 
 	/**
-	 * id
+	 * Item primary key
 	 *
-	 * @var array
+	 * @var int
 	 */
 	var $_id = null;
 	
@@ -60,8 +67,10 @@ class FlexicontentModelItems extends JModel
 	{
 		parent::__construct();
 
-		$id 	= JRequest::getVar('id', 0, '', 'int');
+		$id = JRequest::getVar('id', 0, '', 'int');
 		$this->setId((int)$id);
+		
+		$this->_cparams = & JComponentHelper::getParams( 'com_flexicontent' );
 	}
 
 	/**
@@ -73,9 +82,11 @@ class FlexicontentModelItems extends JModel
 
 	function setId($id)
 	{
-		// Set new item id
-		$this->_id			= $id;
-		$this->_item		= null;
+		// Set new item ID and wipe data
+		if ($this->_id != $id) {
+			$this->_item = null;
+		}
+		$this->_id = $id;
 	}
 
 	/**
@@ -124,79 +135,107 @@ class FlexicontentModelItems extends JModel
 	 * @since 1.0
 	 */
 	function &getItem() {
-		global $mainframe, $globalcats;
+		// Cache items retrieved, we can retrieve multiple items, for this purpose
+		// use function setId($pk) to change primary key and then call getItem()
+		static $items = array();
+		if (isset ($items[@$this->_item->id])) {
+			return $items[@$this->_item->id];
+		}
+
+		global $globalcats;
+		$mainframe =& JFactory::getApplication();
+		$cparams =& $this->_cparams;
+		$preview = JRequest::getVar('preview');    // TODO MORE ... in order to enable vewrsion previewing
 		
 		/*
 		* Load the Item data
 		*/
 		if ($this->_loadItem()) {
+			$items[@$this->_item->id] = & $this->_item;
+			
 			// Get the page/component configuration (current menu item parameters are already merged in J1.5)
-			$params = clone ( $mainframe->getParams('com_flexicontent') );
 			$user	= & JFactory::getUser();
 			$aid	= (int) $user->get('aid');
 			$gid	= (int) $user->get('gid');
 			$cid	= JRequest::getInt('cid');
 
 			// Create the return parameter
-			$return = array (
+			/*$return = array (
 				'id' 	=> @$this->_item->id,
 				'cid'	=> $cid
 			);
-			$return = serialize($return); 
-
-			// Allow users to see their own content whatever the state is
-			if ($this->_item->created_by != $user->id && $this->_item->modified_by != $user->id) 
+			$return = serialize($return);*/
+						
+			// *************************************************************************************
+			// CHECK ITEM ACCESS, it could be moved to the controller, if we do this, then we must
+			// check the view variable, because DISPLAY() CONTROLLER TASK is shared among all views)
+			// ... or create a separate FRONTEND controller for the ITEM VIEW
+			// *************************************************************************************
+			
+			if (@$this->_item->id)
 			{
-
-			// Is the category published?
-			if ($cid) {
-				if (!$globalcats[$cid]->published) {
-					JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
-				}
-			}
-
-			// Do we have access to the content itself
-			if (@$this->_item->id && $this->_item->state != 1 && $this->_item->state != -5 && $gid < 20 ) // access the workflow for editors or more
-			{
-				if (!$aid) {
-					// Redirect to login
-					$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
-					$url .= '&return='.base64_encode($return);
-	
-					$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+				// Calculate edit access ... we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
+				if (FLEXI_ACCESS) {
+					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $cid);
+					$canedititem = in_array('edit', $rights) || (in_array('editown', $rights) && $this->_item->created_by == $user->get('id'));
 				} else {
-					// Redirect to unauthorized page or 403
-					if ($params->get('unauthorized_page', '')) {
-						$mainframe->redirect($params->get('unauthorized_page'));				
-					} else {
-						JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-						return false;
+					$canedititem = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				}
+				
+				// Do not allow item's VERSION PREVIEWING unless the user can edit the item
+				if ($preview && !$canedittem) {
+					JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR')."<br />You cannot preview an item that you cannot edit.");
+				}
+				
+				// Check that current category is published (only if item cannot be edited)
+				if ( !$canedititem && $cid) {
+					if (!$globalcats[$cid]->published) {
+						JError::raiseError( 404, JText::_("FLEXI_CATEGORY_NOT_PUBLISHED") );
 					}
 				}
-			} else if (@$this->_item->id) { // otherwise check for the standard states
-				$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
-				if (!@$canreaditem)
+				
+				// Check that the item is published
+				if ($this->_item->state != 1 && $this->_item->state != -5)
 				{
-					if (!$aid) {
+					// ITEM NOT PUBLISHED, 
+					$canreaditem = false;
+					
+					// (a) Set warning that the item is unpublished
+					$mainframe->enqueueMessage('The item is not published','message');
+					// (b) Set warning to the editors, that they are viewing unpublished content
+					if ( $canedititem && !JRequest::getVar('task', false) ) {
+						$mainframe->enqueueMessage('Viewing access allowed because you can edit the item', 'message');
+					}
+					
+				} else {
+					// ITEM PUBLISHED, check for standard view access
+					$canreaditem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				}
+				
+				// REDIRECT TO APPROPRIATE PAGES IF ACCESS IS ALLOWED
+				if (!$canreaditem && !$canedititem)
+				{
+					if($user->guest) {
 						// Redirect to login
-						$url  = $params->get('login_page', 'index.php?option=com_user&view=login');
+						$uri		= JFactory::getURI();
+						$return		= $uri->toString();
+						$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+						$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
 						$url .= '&return='.base64_encode($return);
 		
-						$mainframe->redirect($url, JText::_('FLEXI_LOGIN_FIRST') );
+						JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+						$mainframe->redirect( $url );
 					} else {
-						// Redirect to unauthorized page or 403
-						if ($params->get('unauthorized_page', '')) {
-							$url  = $params->get('unauthorized_page');
-							$url .= '&return='.base64_encode($return);
-		
-							$mainframe->redirect($url);				
+						if ($cparams->get('unauthorized_page', '')) {
+							$mainframe->redirect($cparams->get('unauthorized_page'));				
 						} else {
-							JError::raiseError(403, JText::_("ALERTNOTAUTH"));
-							return false;
+							JError::raiseWarning( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
+							$mainframe->redirect( 'index.php' );
 						}
 					}
+				} else if ( !$canreaditem && !JRequest::getVar('task', false) ) {
+					$mainframe->enqueueMessage('You do not have view access.<br /> Viewing access allowed because you can edit the item', 'message');
 				}
-			}
 			}
 
 			//add the author email in order to display the gravatar
@@ -234,10 +273,8 @@ class FlexicontentModelItems extends JModel
 			if ($this->_item->modified == $this->_db->getNulldate()) {
 				$this->_item->modified = null;
 			}
-
-			//we show the introtext and fulltext (chr(13) = carriage return)
-			//$this->_item->text = $this->_item->introtext . chr(13).chr(13) . $this->_item->fulltext;
-
+			
+			// load item parameters
 			$this->_loadItemParams();
 		}
 		else
@@ -273,11 +310,11 @@ class FlexicontentModelItems extends JModel
 		static $unapproved_version_notice;
 		$task=JRequest::getVar('task',false);
 		$option=JRequest::getVar('option',false);
+		$cparams =& $this->_cparams;
 		
 		$loadcurrent = JRequest::getVar('loadcurrent', false, 'request', 'boolean');
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item)) {
-			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 			$use_versioning = $cparams->get('use_versioning', 1);
 
 			$where	= $this->_buildItemWhere();
@@ -546,10 +583,11 @@ class FlexicontentModelItems extends JModel
 	{
 		if (!empty($this->_item->parameters)) return;
 		
-		global $mainframe;
+		$mainframe = & JFactory::getApplication();
 
-		// Get the page/component configuration (Priority 4)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		// Get the page/component configuration (Priority 4) (WARNING: merges menu parameters in J1.5 but not in J1.6+)
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
+		$params = & $cparams;
 		
 		// Merge parameters from current category (Priority 3)
 		if ($cid = JRequest::getVar( 'cid', 0 ) ) {
@@ -584,19 +622,6 @@ class FlexicontentModelItems extends JModel
 		// Merge item parameters into the page configuration (Priority 1)
 		$iparams = new JParameter($this->_item->attribs);
 		$params->merge($iparams);
-
-/*
-		// Set the popup configuration option based on the request
-		$pop = JRequest::getVar('pop', 0, '', 'int');
-		$params->set('popup', $pop);
-
-		// Are we showing introtext with the article
-		if (!$params->get('show_intro') && !empty($this->_article->fulltext)) {
-			$this->_article->text = $this->_article->fulltext;
-		} else {
-			$this->_article->text = $this->_article->introtext . chr(13).chr(13) . $this->_article->fulltext;
-		}
-*/
 
 		// Set the article object's parameters
 		$this->_item->parameters = & $params;
@@ -777,6 +802,7 @@ class FlexicontentModelItems extends JModel
 		$dispatcher = & JDispatcher::getInstance();
 		$item  	=& $this->getTable('flexicontent_items', '');
 		$user	=& JFactory::getUser();
+		$cparams =& $this->_cparams;
 		
 		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
 		$details 		= array();
@@ -823,7 +849,6 @@ class FlexicontentModelItems extends JModel
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$isnew = false;
 		$tags = array_unique($tags);
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
@@ -956,7 +981,7 @@ class FlexicontentModelItems extends JModel
 			}
 			if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
+				$canRight 	= (in_array('right', $rights) || $user->gid > 24);
 				if ($canRight) FAccess::saveaccess( $item, 'item' );
 			}
 
@@ -1398,7 +1423,8 @@ class FlexicontentModelItems extends JModel
 	{
 		$id = (int)$this->_id;
 		if(!$id) return array();
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$cparams =& $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$query = 'SELECT value'
 			.((($version<=0) || !$use_versioning)?' FROM #__flexicontent_fields_item_relations AS fv':' FROM #__flexicontent_items_versions AS fv')

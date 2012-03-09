@@ -188,8 +188,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
 					} else {
 						$canEdit	= 1;
 						$canEditOwn	= 1;
@@ -234,8 +234,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
 					} else {
 						$canEdit	= 1;
 						$canEditOwn	= 1;
@@ -280,8 +280,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
 					} else {
 						$canEdit	= 1;
 						$canEditOwn	= 1;
@@ -326,8 +326,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					if (FLEXI_ACCESS) {
 						$user =& JFactory::getUser();
 						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid >= 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid >= 24);
+						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
 					} else {
 						$canEdit	= 1;
 						$canEditOwn	= 1;
