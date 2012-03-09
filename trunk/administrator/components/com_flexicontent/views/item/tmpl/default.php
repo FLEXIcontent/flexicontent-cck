@@ -18,9 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
+$this->document->addScript('components/com_flexicontent/assets/js/tabber-minimized.js');
 if ($this->CanUseTags || $this->CanVersion) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
@@ -29,6 +28,7 @@ if ($this->CanUseTags || $this->CanVersion) {
 	
 	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
+	$this->document->addStyleSheet('components/com_flexicontent/assets/css/tabber.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
@@ -177,8 +177,13 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
-										<label for="title">
-										<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+										<?php
+											$field = $this->fields['title'];
+											$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+										?>
+										<label for="title" <?php echo $field_tooltip; ?> >
+											<?php echo $field->label.':'; ?>
+											<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
 										</label>
 									</td>
 									<td>
@@ -197,18 +202,28 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 								</tr>
 								<tr>
 									<td>
-										<label for="type_id">
-										<?php echo JText::_( 'FLEXI_TYPE' ).':'; ?>
+										<?php
+											$field = $this->fields['document_type'];
+											$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+										?>
+										<label for="type_id" <?php echo $field_tooltip; ?> >
+											<?php echo $field->label.':'; ?>
+											<?php /*echo JText::_( 'FLEXI_TYPE' ).':';*/ ?>
 										</label>
 									</td>
 									<td>
-									<?php echo $this->lists['type']; ?>
+										<?php echo $this->lists['type']; ?>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<label for="published">
-										<?php echo JText::_( 'FLEXI_STATE' ).':'; ?>
+										<?php
+											$field = $this->fields['state'];
+											$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+										?>
+										<label for="published" <?php echo $field_tooltip; ?> >
+											<?php echo $field->label.':'; ?>
+											<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 										</label>
 									</td>
 									<td>
@@ -279,7 +294,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									}
 									?>
 								</ul>
-<!-- 								<br class="clear" /> -->
 							</div>
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
@@ -347,54 +361,89 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 							'fcpagenav',
 							'toolbar'
 						);
+						
 						foreach ($this->fields as $field) {
-							// used to hide the core fields and the hidden fields from this listing
-							if 	(
-									(!$field->iscore || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext')))) 
-									&& 
-									(!$field->parameters->get('backend_hidden') && !in_array($field->field_type, $hidden)) 
-								) 
+							
+							// SKIP backend hidden fields from this listing
+							if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('backend_hidden')  ||  in_array($field->field_type, $hidden) ) continue;
+							
+							// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+							if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+							
+							// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+							if ($field->field_type == 'maintext')
 							{
-							// set the specific label for the maintext field
-								if ($field->field_type == 'maintext')
-								{
-									$field->label = $this->tparams->get('maintext_label', $field->label);
-									$field->description = $this->tparams->get('maintext_desc', $field->description);
-									$maintext = ($this->version!=$this->row->version)?@$field->value[0]:$this->row->text;
-									if ($this->tparams->get('hide_html', 0))
-									{
-										$field->html = '<textarea name="text" rows="20" cols="75">'.$maintext.'</textarea>';
-									} else {
-										$height = $this->tparams->get('height', 400);
-										$field->html = $this->editor->display( 'text', $maintext, '100%', $height, '75', '20' ) ;
-									}
-								}
-						?>
-						<tr>
-							<td class="key">
-							<?php if ($field->description) : ?>
-								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-									<?php echo $field->label; ?>
-								</label>
-							<?php else : ?>
-								<label for="<?php echo $field->name; ?>">
-									<?php echo $field->label; ?>
-								</label>
-							<?php endif; ?>
-							</td>
-							<td>
-								<?php
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-								if(isset($field->html)){
-									echo $field->html;
-								} else {
-									echo $noplugin;
-								}
-								?>
-							</td>
-						</tr>
-						<?php
+								// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+								$maintext = ($this->version != $this->row->version) ? @$field->value[0] : $this->row->text;
+								$maintext = html_entity_decode($maintext, ENT_QUOTES, 'UTF-8');
+								$field->maintext = & $maintext;
+								FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$this->row) );
 							}
+							
+							// -- Tooltip for the current field
+							$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+							?>
+							
+							<?php	if ( !is_array($field->html) ) : ?>
+								<tr>
+									<td class="key">
+										<label for="<?php echo $field->name; ?>" <?php echo $field_tooltip; ?> >
+											<?php echo $field->label; ?>
+										</label>
+									</td>
+									<td>
+										<?php
+											$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+											if(isset($field->html)){
+												echo $field->html;
+											} else {
+												echo $noplugin;
+											}
+										?>
+									</td>
+								</tr>
+								
+							<?php else : ?>
+						
+								<tr>
+									<td colspan="2">
+										
+										<?php $not_in_tabs = ""; ?>
+										
+										<div class="fctabber">
+										<?php foreach ($field->html as $i => $field_html): ?>
+											<?php
+											if (!isset($field->tab_labels[$i])) {
+												if (isset($field->html[$i])) $not_in_tabs .= "<div style='display:none!important'>".$field->html[$i]."</div>";
+												continue;
+											}
+											?>
+											<div class="tabbertab">
+												<h3>
+													<?php echo $field->tab_labels[$i]; ?>
+												</h3>
+											<?php
+												$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+												echo $not_in_tabs;
+												$not_in_tabs = ""; // reset
+												if(isset($field->html[$i])){
+													echo $field->html[$i];
+												} else {
+													echo $noplugin;
+												}
+											?>
+											</div>
+										<?php endforeach; ?>
+										</div>
+										
+										<?php echo $not_in_tabs; ?>
+										
+									</td>
+								</tr>
+								
+							<?php endif; ?>
+							
+						<?php
 						}
 						?>
 					</table>
@@ -445,7 +494,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		?>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_STATE' ); ?></strong>
+				<?php
+					$field = $this->fields['state'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_STATE' ) */ ?></strong>
 			</td>
 			<td>
 				<?php echo $this->published;?>
@@ -453,10 +506,14 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_HITS' ); ?></strong>
+				<?php
+					$field = $this->fields['hits'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_HITS' ) */ ?></strong>
 			</td>
 			<td>
-				<div id="hits"></div>
+				<div id="hits" style="display:none;"></div><input id="hits" type="text" name="hits" size="6" value="<?php echo $this->row->hits; ?>" />
 				<span <?php echo $visibility; ?>>
 					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
@@ -464,10 +521,14 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_SCORE' ); ?></strong>
+				<?php
+					$field = $this->fields['voting'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_SCORE' ) */ ?></strong>
 			</td>
 			<td>
-				<div id="votes"></div>
+				<div id="votes" style="float:left;"></div>
 				<span <?php echo $visibility2; ?>>
 					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>
@@ -475,7 +536,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_REVISED' ); ?></strong>
+				<?php
+					$field = $this->fields['modified'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_REVISED' ) */ ?></strong>
 			</td>
 			<td>
 				<?php echo $this->lastversion;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
@@ -499,7 +564,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_CREATED' ); ?></strong>
+				<?php
+					$field = $this->fields['created'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_CREATED' ) */ ?></strong>
 			</td>
 			<td>
 				<?php
@@ -513,7 +582,11 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_MODIFIED' ); ?></strong>
+				<?php
+					$field = $this->fields['modified'];
+					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				?>
+				<strong <?php echo $field_tooltip; ?>><?php echo $field->label; /* JText::_( 'FLEXI_MODIFIED' ) */ ?></strong>
 			</td>
 			<td>
 				<?php
@@ -549,13 +622,14 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<?php
 			else :
 			JHTML::_('behavior.modal', 'a.modal-versions');
+			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS') ? "%d/%m %H:%M" : $date_format;
 			foreach ($this->versions as $version) :
 				$class = ($version->nr == $this->version) ? ' class="active-version"' : '';
 				if ((int)$version->nr > 0) :
 			?>
 			<tr<?php echo $class; ?>>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="#" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
 				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
@@ -612,21 +686,20 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			
 			$title = JText::_( 'FLEXI_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
-			echo $this->form->render('details');
+			echo $this->formparams->render('details');
 			echo $this->pane->endPanel();
 
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
 			echo $this->pane->startPanel( $title, "metadata-page" );
-			echo $this->form->render('meta', 'metadata');
+			echo $this->formparams->render('meta', 'metadata');
 			echo $this->pane->endPanel();
 			
 			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
 			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->form->render('params', 'advanced');
+			echo $this->formparams->render('params', 'advanced');
 			echo $this->pane->endPanel();
 
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-
 			foreach ($this->tmpls as $tmpl) {
 				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
 				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
@@ -635,7 +708,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			}
 
 			echo $this->pane->endPane();
-			?>
+		?>
 		</td>
 	</tr>
 </table>
@@ -645,7 +718,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
-<input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
+<!--input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" /-->
 <input type="hidden" name="oldtitle" value="<?php echo $this->row->title; ?>" />
 <input type="hidden" name="oldtext" value="<?php echo $this->row->text; ?>" />
 <input type="hidden" name="oldstate" value="<?php echo $this->row->state; ?>" />

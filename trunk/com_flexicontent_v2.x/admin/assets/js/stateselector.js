@@ -29,7 +29,8 @@ var stateselector = {
 	}
 };
 
-var processstate = new Class({  
+var processstate = new Class(  
+{  
 	options:  {
 		id: "",
 		script_url: "index.php?option=com_flexicontent&tmpl=component",
@@ -47,12 +48,14 @@ var processstate = new Class({
 		new Request.HTML({
 			url: url,
 			method: 'get',
-			update: $('row' + id),
-			evalScripts: false
+			evalScripts: false,
+			update: $('row' + id)
+			//,onComplete: hider
 		}).send();
-	//	function hider(response) {
-			//alert(response);
-	//	}
+		
+		//function hider(response) {
+		//	alert(response);
+		//}
 	}
 });
 

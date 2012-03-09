@@ -65,35 +65,33 @@ var JFormValidator = new Class({
 		this.setHandler('radio',
 			function (par) {
 				var nl, i;
-				if(par.parentNode == null){
-				   return true;
-				}else{
-				   var options = par.parentNode.getElementsByTagName('input');
-
-				   for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked)
-				 		return true;
-				   }
-				
-				return false;
+				if (par.parentNode == null) {
+					return true;
+				} else {
+					var options = par.parentNode.getElementsByTagName('input');
+			
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].checked) return true;
+					}
+			
+					return false;
 				}
 			}
 		);
-		
+
 		this.setHandler('checkbox',
 			function (par) {
 				var nl, i;
-				if(par.parentNode == null){
-				   return true;
-				}else{
-				   var options = par.parentNode.getElementsByTagName('input');
-
-				   for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked)
-						return true;
-				   }
-					
-				   return false;
+				if (par.parentNode == null) {
+					return true;
+				} else {
+					var options = par.parentNode.getElementsByTagName('input');
+			
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].checked) return true;
+					}
+			
+					return false;
 				}
 			}
 		);
@@ -101,23 +99,19 @@ var JFormValidator = new Class({
 		this.setHandler('checkbox2',
 			function (par) {
 				var nl, i;
-				if(par.parentNode == null){
-				   return true;
-				}else{
-				   var options = par.parentNode.getElementsByTagName('input');
-
-				   var count = 0;
-				   for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked)
-						count++;
-				   }
-				   
-				   //exactly 2 options
-				   if(count == 2){
-				   	return true;
-				   }
-					
-				   return false;
+				if (par.parentNode == null) {
+					return true;
+				} else {
+					var options = par.parentNode.getElementsByTagName('input');
+			
+					var count = 0;
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].checked) count++;
+					}
+			
+					//exactly 2 options
+					if(count == 2) return true;
+					return false;
 				}
 			}
 		);
@@ -125,27 +119,42 @@ var JFormValidator = new Class({
 		this.setHandler('checkbox3',
 			function (par) {
 				var nl, i;
-				if(par.parentNode == null){
-				   return true;
-				}else{
-				   var options = par.parentNode.getElementsByTagName('input');
-
-				   var count = 0;
-				   for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked)
-						count++;
-				   }
-				   
-				   //exactly 3 options
-				   if(count == 3){
-				   	return true;
-				   }
-					
-				   return false;
+				if (par.parentNode == null) {
+					return true;
+				} else {
+					var options = par.parentNode.getElementsByTagName('input');
+			
+					var count = 0;
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].checked) count++;
+					}
+			
+					//exactly 3 options
+					if(count == 3) return true;
+					return false;
 				}
 			}
 		);
 
+		this.setHandler('selmul',
+			function (par) {
+				var nl, i;
+				if (par.parentNode == null) {
+					return true;
+				} else {
+					var options = par.parentNode.getElementsByTagName('option');
+			
+					var count = 0;
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].selected) count++;
+					}
+			
+					// Check maximum number of selected options
+					if(count <= max_sel) return true;
+					return false;
+				}
+			}
+		);
 
 		// Attach to forms with class 'form-validate'
 		var forms = $$('form.form-validate');
@@ -251,7 +260,7 @@ var JFormValidator = new Class({
 		if (!(el.labelref)) {
 			var labels = $$('label');
 			labels.each(function(label){
-				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for')+'[]' == el.getProperty('name')) {
+				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for') == el.getProperty('id') || label.getProperty('for')+'[]' == el.getProperty('name')) {
 					el.labelref = label;
 				}
 			});

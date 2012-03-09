@@ -423,7 +423,7 @@ class FlexicontentModelItem extends JModel {
 	}
 	
 	/**
-	 * Method to check if the user can an item anywhere
+	 * Method to check if the user can add an item anywhere
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -488,6 +488,25 @@ class FlexicontentModelItem extends JModel {
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
 		$post['vstate'] = (int)$post['vstate'];
 
+		// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
+		if (is_array($data['text'])) {
+			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($data['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$data['text'] = & $tabs_text;
+		}
+		if (is_array($post['text'])) {
+			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
+			$tabs_text = '';
+			foreach($post['text'] as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$post['text'] = & $tabs_text;
+		}
+		//print_r($data['text']); exit();
+		
 		// bind it to the table
 		if (!$item->bind($data)) {
 			$this->setError($this->_db->getErrorMsg());
@@ -635,7 +654,7 @@ class FlexicontentModelItem extends JModel {
 			}
 			if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canRight 	= (in_array('right', $rights) || $user->gid >= 24);
+				$canRight 	= (in_array('right', $rights) || $user->gid > 24);
 				if ($canRight) FAccess::saveaccess( $item, 'item' );
 			}
 

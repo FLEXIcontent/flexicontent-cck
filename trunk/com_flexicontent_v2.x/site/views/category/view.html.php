@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1134 2012-02-06 09:17:43Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -48,12 +48,21 @@ class FlexicontentViewCategory extends JView
 		$document 	= & JFactory::getDocument();
 		$menus		= & JSite::getMenu();
 		$menu    	= $menus->getActive();
-		$params 	= & $mainframe->getParams('com_flexicontent');
 		$uri 		= & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
 		$user		= & JFactory::getUser();
 		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 
+		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
+			$menuParams = new JRegistry;
+			$menuParams->loadJSON($menu->params);
+			$params->merge($menuParams);
+		}
+		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -63,10 +72,7 @@ class FlexicontentViewCategory extends JView
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
 		}
-
-		//pathway
-		$pathway 	= & $mainframe->getPathWay();
-
+		
 		// Get data from the model		
 		$category 	= & $this->get('Category');
 		$categories	= & $this->get('Childs');
@@ -79,9 +85,9 @@ class FlexicontentViewCategory extends JView
 		$limitstart		= JRequest::getInt('limitstart');
 		$format			= JRequest::getVar('format', null);
 		
-		$cparams	=& $category->parameters;
-		$params->merge($cparams);
-
+		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
+		$params	= & $category->parameters;
+		
 		$total 		= & $this->get('Total');
 		
 		$authorid = JRequest::getInt('authorid', 0);
@@ -136,8 +142,23 @@ class FlexicontentViewCategory extends JView
 			}
 		}
 		
-		// pathway construction @TODO try to find and automated solution
-		for($p=$params->get('item_depth', 0); $p<count($parents); $p++) {
+		// ********************************************************************************************
+		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
+		// ********************************************************************************************
+		$pathway 	=& $mainframe->getPathWay();
+		
+		// Clear pathway, if automatic pathways are enabled
+		if ( $params->get('automatic_pathways', 0) ) {
+			$pathway_arr = $pathway->getPathway();
+			$pathway->setPathway( array() );
+			$pathway->set('_count', 0);
+			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
+		} else {
+			$item_depth = $params->get('item_depth', 0);
+		}
+		
+		// Respect menut item depth, defined in menu item
+		for ($p=$item_depth; $p<count($parents); $p++) {
 			// Do not add the above and root categories when coming from a directory view
 			if (isset($allroots)) {
 				if (!in_array($parents[$p]->id, $roots)) {
@@ -147,7 +168,6 @@ class FlexicontentViewCategory extends JView
 				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
 			}
 		}
-
 
 		$document->setTitle( $params->get( 'page_title' ) );
 

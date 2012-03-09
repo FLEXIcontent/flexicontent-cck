@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1150 2012-02-24 03:26:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -463,24 +463,24 @@ class flexicontent_html
  	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
 	{
 		$document =& JFactory::getDocument();
-		$live_path = JURI::base(true);
 		
 		$counter 	= $field->parameters->get( 'counter', 1 );
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim		= $field->parameters->get( 'dimension', 25 );    	
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
 		$class 		= $field->name;
-		$img_path	= $live_path .'/'. $image;
+		$img_path	= JURI::base(true) .'/'. $image;
 	
 		$percent = 0;
 		$stars = '';
 		
-		global $VoteAddScript;
+		static $js_and_css_added = false;
 		
-	 	if (!$VoteAddScript)
-	 	{ 
-			$css 	= $live_path .'/components/com_flexicontent/assets/css/fcvote.css';
-			$js		= $live_path .'/components/com_flexicontent/assets/js/fcvote.js';
+	 	if (!$js_and_css_added)
+	 	{
+	 		JHTML::_('behavior.tooltip');
+			$css 	= JURI::base(true) .'/components/com_flexicontent/assets/css/fcvote.css';
+			$js		= JURI::base(true) .'/components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
 			$document->addScript($js);
 		
@@ -494,7 +494,7 @@ class flexicontent_html
 			';
 			$document->addStyleDeclaration($css);
 
-			$VoteAddScript = 1;
+			$js_and_css_added = true;
 	 	}
 		
 		if ($rating_count != 0) {
@@ -587,27 +587,34 @@ class flexicontent_html
 	 */
 	function favicon($field, $favoured, & $item=false)
 	{
-		$live_path 	= JURI::base(true);
-		$user		= & JFactory::getUser();
-		$document 	= & JFactory::getDocument();
-		$js			= $live_path .'/components/com_flexicontent/assets/js/fcfav.js';
-		$document->addScript($js);
+		$user			= & JFactory::getUser();
+		$document	= & JFactory::getDocument();
 		
-         	$output = "
-			<script type=\"text/javascript\" language=\"javascript\">
-			<!--
-			var sfolder = '".JURI::base(true)."';
-			var fcfav_text=Array(
-				'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX' )."',
-				'".JText::_( 'FLEXI_LOADING' )."',
-				'".JText::_( 'FLEXI_ADDED_TO_YOUR_FAVOURITES' )."',
-				'".JText::_( 'FLEXI_YOU_NEED_TO_LOGIN' )."',
-				'".JText::_( 'FLEXI_REMOVED_FROM_YOUR_FAVOURITES' )."',
-				'".JText::_( 'FLEXI_USERS' )."'
-				);
-			-->
-			</script>";
-
+		static $js_and_css_added = false;
+		
+	 	if (!$js_and_css_added)
+	 	{
+			$document->addScript( JURI::base(true) .'/components/com_flexicontent/assets/js/fcfav.js' );
+			JHTML::_('behavior.tooltip');
+			
+			$js = "
+				var sfolder = '".JURI::base(true)."';
+				var fcfav_text=Array(
+					'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX' )."',
+					'".JText::_( 'FLEXI_LOADING' )."',
+					'".JText::_( 'FLEXI_ADDED_TO_YOUR_FAVOURITES' )."',
+					'".JText::_( 'FLEXI_YOU_NEED_TO_LOGIN' )."',
+					'".JText::_( 'FLEXI_REMOVED_FROM_YOUR_FAVOURITES' )."',
+					'".JText::_( 'FLEXI_USERS' )."'
+					);
+				";
+			$document->addScriptDeclaration($js);
+			
+			$js_and_css_added = true;
+		}
+		
+		$output = "";
+		
 		if ($user->id && $favoured)
 		{
 			$image 		= JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' ));
@@ -1228,13 +1235,16 @@ class flexicontent_html
 	 *
 	 * @return	string	The required HTML for the SELECT tag.
 	 */
-	public static function userlevel($name, $selected, $attribs = '', $params = true, $id = false) {
+	public static function userlevel($name, $selected, $attribs = '', $params = true, $id = false, $createlist = true) {
 		static $options;
 		if(!$options) {
 			$db		= JFactory::getDbo();
 			$query	= $db->getQuery(true);
 			$query->select('a.id AS value, a.title AS text');
 			$query->from('#__viewlevels AS a');
+			if (!$createlist) {
+				$query->where('a.id="'.$selected.'"');
+			}
 			$query->group('a.id');
 			$query->order('a.ordering ASC');
 			$query->order('`title` ASC');
@@ -1248,7 +1258,11 @@ class flexicontent_html
 				JError::raiseWarning(500, $db->getErrorMsg());
 				return null;
 			}
-
+			
+			if (!$createlist) {
+				return $options[0]->text;  // return ACCESS LEVEL NAME
+			}
+			
 			// If params is an array, push these options to the array
 			if (is_array($params)) {
 				$options = array_merge($params,$options);
