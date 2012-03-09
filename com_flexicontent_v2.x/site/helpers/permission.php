@@ -24,14 +24,16 @@ class FlexicontentHelperPerm {
 		
 		if(!$permission || $force) {
 			// handle jcomments integration
-			$CanComments 	= JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments');
+			$Comments_Enabled 	= JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments');
 			
 			$user =& JFactory::getUser();
-			$core_admin = JAccess::check($user->id, 'core.admin', 'root.1');
 			$permission = new stdClass;
 			
-			// !!! This is the Super User Privelege (can do anything, all other permissions are ignored)
-			$permission->CanConfig 		= $user->authorise('core.admin', 			'com_flexicontent');	
+			// !!! This is the Super User Privelege of GLOBAL Configuration		(==> core.admin ACTION allowed on ROOT ASSET: 'root.1')
+			$permission->SuperAdmin = JAccess::check($user->id, 'core.admin', 'root.1');
+			
+			//!!! ALLOWs USERS to change component's CONFIGURATION						(==> core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
+			$permission->CanConfig 		= $user->authorise('core.admin', 				'com_flexicontent');
 					
 			//!!! ALLOWs USERS in JOOMLA BACKEND :
 			//   (a) to view the FLEXIcontent menu item in Components Menu and
@@ -42,63 +44,57 @@ class FlexicontentHelperPerm {
 			// ITEMS/CATEGORIES: category-inherited permissions, (NOTE: these are the global settings, so:)
 			// *** 1. the action permissions of individual items are checked seperately per item
 			// *** 2. the view permission is checked via the access level of each item
-			$permission->CanAdd 			= $user->authorise('core.create', 		'com_flexicontent');
-			$permission->CanDelete 		= $user->authorise('core.delete', 		'com_flexicontent');
-			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 'com_flexicontent');
-			$permission->CanEdit 			= $user->authorise('core.edit', 			'com_flexicontent');
-			$permission->CanEditOwn 	= $user->authorise('core.edit.own', 	'com_flexicontent');
-			$permission->CanPublish 	= $user->authorise('core.edit.state', 'com_flexicontent');
+			$permission->CanAdd 			= $user->authorise('core.create', 				'com_flexicontent');
+			$permission->CanDelete 		= $user->authorise('core.delete', 				'com_flexicontent');
+			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
+			$permission->CanEdit 			= $user->authorise('core.edit', 					'com_flexicontent');
+			$permission->CanEditOwn 	= $user->authorise('core.edit.own', 			'com_flexicontent');
+			$permission->CanPublish 	= $user->authorise('core.edit.state',			'com_flexicontent');
+			$permission->CanPublishOwn= $user->authorise('core.edit.state.own',	'com_flexicontent');
 			
 			// ITEMS: component controlled permissions
-			$permission->DisplayAllItems	= $user->authorise('flexicontent.displayallitems',	'com_flexicontent');		// List items (in backend) that can be edited
-			$permission->CanCopy				 	= $user->authorise('flexicontent.copyitems',				'com_flexicontent');		// Multiple Copy Item Task
-			$permission->CanOrder	 				= $user->authorise('flexicontent.order', 						'com_flexicontent');		// Reorder items inside the category
-			$permission->CanParams				= $user->authorise('flexicontent.paramsitem', 			'com_flexicontent');		// Edit item parameters like meta data and template parameters
-			$permission->CanVersion				= $user->authorise('flexicontent.versioning',				'com_flexicontent');		// Use item versioning
+			$permission->DisplayAllItems	= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
+			$permission->CanCopy				 	= $user->authorise('flexicontent.copyitems',			'com_flexicontent'); // (backend) Item Copy Task
+			$permission->CanOrder	 				= $user->authorise('flexicontent.orderitems', 		'com_flexicontent'); // (backend) Reorder items inside the category
+			$permission->CanParams				= $user->authorise('flexicontent.paramsitem', 		'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
+			$permission->CanVersion				= $user->authorise('flexicontent.versioning',			'com_flexicontent'); // (backend) Use item versioning
 			
 			// CATEGORIES: management tab and usage
-			$permission->CanCats 					= $user->authorise('flexicontent.managecats',				'com_flexicontent');
-			$permission->CanUserCats 			= $user->authorise('flexicontent.usercats',					'com_flexicontent');
-			$permission->CanViewTree 			= $user->authorise('flexicontent.viewtree',					'com_flexicontent');
-			$permission->MultiCat					= $user->authorise('flexicontent.multicat',					'com_flexicontent');
-			// !!! new ... TODO: add the use of them
-			//$permission->CanOrderCat	= $user->authorise('flexicontent.deleteowncat',		'com_flexicontent');
-			//$permission->CanDeleteOwnCat	= $user->authorise('flexicontent.deleteowncat',		'com_flexicontent');
+			$permission->CanCats 					= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+			$permission->CanUserCats 			= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+			$permission->CanViewTree 			= $user->authorise('flexicontent.viewtree',		'com_flexicontent'); // (item edit form) view categories as tree instead of flat list
+			$permission->MultiCat					= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign each item to multiple categories
 			
 			// TAGS: management tab and usage
-			$permission->CanTags 			= $user->authorise('flexicontent.managetags',	'com_flexicontent');  // allow tags management
-			$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent');  // edit already assigned Tags of items
-			$permission->CanNewTags		= $user->authorise('flexicontent.newtags',		'com_flexicontent');  // add new Tags to items
+			$permission->CanTags 			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
+			$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit already assigned Tags of items
+			$permission->CanNewTags		= $user->authorise('flexicontent.newtags',		'com_flexicontent'); // add new Tags to items
 			
-			// VARIOUS management TABS: types, fields, archives, statistics, templates, tags
-			$permission->CanTypes 		= $user->authorise('flexicontent.managetypes',			'com_flexicontent');
-			// UNUSED ... TODO: add the use of them
-			//$permission->CanAddType 		= $user->authorise('flexicontent.createtype',			'com_flexicontent');
-			//$permission->CanDeleteType 	= $user->authorise('flexicontent.deletetype',			'com_flexicontent');
-			//$permission->CanEditType 		= $user->authorise('flexicontent.edittype',				'com_flexicontent');
-			//$permission->CanPublishType	= $user->authorise('flexicontent.edittype.state',	'com_flexicontent');
-			$permission->CanFields 		= $user->authorise('flexicontent.managefields', 		'com_flexicontent');
-			$permission->CanArchives 	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent');
-			$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates', 	'com_flexicontent');
-			$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent');
+			// VARIOUS management TABS: types, archives, statistics, templates, tags
+			$permission->CanTypes 		= $user->authorise('flexicontent.managetypes',			'com_flexicontent'); // (backend) Allow management of Item Types
+			$permission->CanArchives 	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent'); // (backend) Allow management of Archives
+			$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates', 	'com_flexicontent'); // (backend) Allow management of Templates
+			$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
+			
+			// FIELDS: management tab
+			$permission->CanFields 				= $user->authorise('flexicontent.managefields', 	'com_flexicontent'); // (backend) Allow management of Fields
+			$permission->CanAccLevelFields= $user->authorise('flexicontent.acclevelfields',	'com_flexicontent'); // (backend) Change Field Access Level
+			$permission->CanCopyFields 		= $user->authorise('flexicontent.copyfields', 		'com_flexicontent'); // (backend) Field Copy Task
+			$permission->CanOrderFields 	= $user->authorise('flexicontent.orderfields', 		'com_flexicontent'); // (backend) Reorder fields inside each item type
+			$permission->CanAddField			= $user->authorise('flexicontent.createfield', 	'com_flexicontent'); // (backend) Create fields
+			$permission->CanEditField			= $user->authorise('flexicontent.editfield', 		'com_flexicontent'); // (backend) Edit fields
+			$permission->CanDeleteField		= $user->authorise('flexicontent.deletefield', 	'com_flexicontent'); // (backend) Delete fields
 			
 			// FILES: management tab
-			$permission->CanFiles	 				= $user->authorise('flexicontent.managefiles', 		'com_flexicontent');
-			$permission->CanUpload	 			= $user->authorise('flexicontent.uploadfiles', 		'com_flexicontent');
-			$permission->CanViewAllFiles	= $user->authorise('flexicontent.viewallfiles',		'com_flexicontent');
+			$permission->CanFiles	 				= $user->authorise('flexicontent.managefiles', 		'com_flexicontent'); // (backend) Allow management of Files
+			$permission->CanUpload	 			= $user->authorise('flexicontent.uploadfiles', 		'com_flexicontent'); // allow user to upload Files
+			$permission->CanViewAllFiles	= $user->authorise('flexicontent.viewallfiles',		'com_flexicontent'); // allow user to view all Files
 			
 			// OTHER components permissions
 			$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
-			$permission->CanComments 	= $CanComments && $user->authorise('core.manage', 'com_jcomments');
+			$permission->CanComments 	= $Comments_Enabled && $user->authorise('core.manage', 'com_jcomments');
 		}
 		
-		// Config permission overrides the other
-		if ($permission->CanConfig) {
-			foreach($permission as $key => $value) {
-				$permission->{$key} = 1;
-			}
-		}
-
 		return $permission;
 	}
 	
@@ -111,29 +107,31 @@ class FlexicontentHelperPerm {
 	 * @param	string		$section	The SECTION for which to lookup SECTION ids
 	 * @param	boolean		$force		Forces the recalculation of SECTION ids
 	 *
-	 * @return array							The array of SECTION ids (categories, items, fields ...)
+	 * @return array							The array of SECTION ids (category ids OR item ids OR fields ids ...)
 	 * @since	2.0
 	 * 
 	 */
 	function checkUserElementsAccess($uid, $action, $section, $force=false)
 	{
 		// $elements[$uid][$section][$action] is an array of SECTION id(s)
-		// that the USER with ID {$uid} can perform the given ACTION {$action}
+		// that the USER with ID {$uid} can perform the specified ACTION {$action}
 		static $elements = array();
 		
 		// For compatibility reasons, we use 'com_content' assets for both categories and items section
 		$extension = ($section == 'category' || $section == 'item' ) ? 'com_content' : 'com_flexicontent';
 		
-		// For compatibility reasons, we use 'article' assets for both items
+		// For compatibility reasons, we use 'article' assets for items
 		$dbsection = ($section == 'item') ? 'article' : $section;
 		
 		// Create the PARTIAL asset NAME excluding the final id part
 		$asset_partial = "{$extension}.{$dbsection}";
 		
 		if(!isset($elements[$uid][$section][$action]) || $force) {
+			// Get database and use objects
 			$db = &JFactory::getDBO();
 			$user = &JFactory::getUser($uid);
-			$elements[$uid][$section][$action] = array();
+			
+			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
 			$db->setQuery($query);
 			$names = $db->loadResultArray();
@@ -141,7 +139,11 @@ class FlexicontentHelperPerm {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
+			
+			// Create an empty array that will contain the sections on which the user can perform the given action
 			$elements[$uid][$section][$action] = array();
+			
+			// Find all section ids (e.g. item ids) that user can perform the given action
 			foreach($names as $name) {
 				$id = str_replace("{$extension}.{$dbsection}.",  "", $name);
 				if($user->authorize($action, $name)) {
@@ -149,7 +151,8 @@ class FlexicontentHelperPerm {
 				}
 			}
 		}
-		return $elements[$uid][$section][$action];
+		
+		return $elements[$uid][$section][$action];  // RETURN the ids
 	}
 	
 	
@@ -176,15 +179,62 @@ class FlexicontentHelperPerm {
 		// For compatibility reasons, we use 'com_content' assets for both categories and items section
 		$extension = ($section == 'category' || $section == 'item' ) ? 'com_content' : 'com_flexicontent';
 		
-		// For compatibility reasons, we use 'article' assets for both items
+		// For compatibility reasons, we use 'article' assets for items
+		$dbsection = ($section == 'item') ? 'article' : $section;
+		
+		// Create the asset name
+		$asset = "{$extension}.{$dbsection}.{$id}";
+		
+			
+		if(!isset($actions[$uid][$asset]) || $force) {
+			// Get user object
+			$user = &JFactory::getUser($uid);
+			
+			// This string will be removed from action names to make them shorter e.g. will make 'core.edit.own' to be 'edit.own'
+			$action_start = ($dbsection == 'category' || $dbsection == 'article' ) ? 'core.' : 'flexicontent.';
+			
+			// Create an empty array that will contain the actions allowed on the asset
+			$actions[$uid][$asset] = array();
+			
+			// Retrieve all available user actions for the section
+			$actions_arr = JAccess::getActions('com_flexicontent', $dbsection);
+			
+			// Find all allowed user actions on the asset
+			foreach($actions_arr as $action_data) {
+				$action_name = $action_data->name;
+				if( $user->authorise($action_name, $asset) ) {
+					$action_shortname = str_replace($action_start, "", $action_name);
+					$actions[$uid][$asset][] = $action_shortname;
+				}
+			}
+		}
+		
+		return $actions[$uid][$asset];  // RETURN the (shortened) action names
+	}
+	
+	
+	//*******************************************************************************
+	// THIS function implementation  works properly too, but the above is more proper
+	//*******************************************************************************
+	
+	/*function checkAllItemAccess($uid, $section, $id, $force=false, $recursive = false)
+	{
+		// $actions[$uid][$asset] is an array of ACTION names
+		// allowed for USER with ID {$uid} on the ASSET with name {$asset}
+		static $actions = array();
+		
+		// For compatibility reasons, we use 'com_content' assets for both categories and items section
+		$extension = ($section == 'category' || $section == 'item' ) ? 'com_content' : 'com_flexicontent';
+		
+		// For compatibility reasons, we use 'article' assets for items
 		$dbsection = ($section == 'item') ? 'article' : $section;
 		
 		// Create the asset name
 		$asset = "{$extension}.{$dbsection}.{$id}";
 		
 		if(!isset($actions[$uid][$asset]) || $force) {
-			$db = &JFactory::getDBO();
 			$user = &JFactory::getUser($uid);
+			$db = &JFactory::getDBO();
 			
 			// Build the database query to get the rules for the asset.
 			$query	= $db->getQuery(true);
@@ -200,36 +250,39 @@ class FlexicontentHelperPerm {
 			
 			// Execute the query and load the rules from the result.
 			$db->setQuery($query);
-			$result	= $db->loadColumn();
+			$rules_string	= $db->loadResult(); // $db->loadColumn();
 			if ($db->getErrorNum()) {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
-			$rules_arr = array();
-			foreach ($result as $rule_string) {
-				$rule_string = str_replace($dbsection, $section, $rule_string);
-				$rules_arr[] = $rule_string;
-			}
-
+			
 			// Instantiate a JRules object for the asset rules
-			$rules	= new JRules;
-			$rules->mergeCollection($rules_arr);
+			$rules = new JRules($rules_string);       //SAME AS: $rules = new JRules(); $rules->merge($rules_string);
 			
 			// Get user's groups (user identities)
 			$groups = $user->getAuthorisedGroups();   //SAME AS: $groups = JAccess::getGroupsByUser($uid, $recursive);
 			
-			// Populate allowed user actions on the asset
+			// This string will be removed from action names to make them shorter e.g. will make 'core.edit.own' to be 'edit.own'
+			$action_start = ($dbsection == 'category' || $dbsection == 'article' ) ? 'core.' : 'flexicontent.';
+			
+			// Create an empty array that will contain the actions allowed on the asset
 			$actions[$uid][$asset] = array();
-			$action_start = ($section == 'category' || $section == 'item' ) ? 'core.' : 'flexicontent.';
-			foreach($rules->getData() as $action=>$data) {
-				if($user->authorize('core.admin', 'com_flexicontent') || $rules->allow($action, $groups)) {
-					$action_shortname = str_replace($action_start, "", $action);
+			
+			// Retrieve all available user actions for the section
+			$actions_arr = JAccess::getActions('com_flexicontent', $dbsection);
+			
+			// Find all allowed user actions on the asset
+			foreach($actions_arr as $action_data) {
+				$action_name = $action_data->name;
+				if($rules->allow($action_name, $groups) || $user->authorise($action_name, 'com_flexicontent') ) {
+					$action_shortname = str_replace($action_start, "", $action_name);
 					$actions[$uid][$asset][] = $action_shortname;
 				}
 			}
 		}
 		return $actions[$uid][$asset];
-	}
+	}*/
+	
 	
 	/**
 	 * Lookups the categories (their IDs), that the user has access to perforn the specified action(s)

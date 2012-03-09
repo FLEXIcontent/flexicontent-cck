@@ -70,12 +70,20 @@ class FlexicontentViewFields extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
-		JToolBarHelper::customX( 'fields.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		if ($permission->CanCopyFields) {
+			JToolBarHelper::customX( 'fields.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		}
 		JToolBarHelper::publishList('fields.publish');
 		JToolBarHelper::unpublishList('fields.unpublish');
-		JToolBarHelper::addNew('fields.add');
-		JToolBarHelper::editList('fields.edit');
-		JToolBarHelper::deleteList('Are you sure?', 'fields.remove');
+		if ($permission->CanAddField) {
+			JToolBarHelper::addNew('fields.add');
+		}
+		if ($permission->CanEditField) {
+			JToolBarHelper::editList('fields.edit');
+		}
+		if ($permission->CanDeleteField) {
+			JToolBarHelper::deleteList('Are you sure?', 'fields.remove');
+		}
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
@@ -124,6 +132,7 @@ class FlexicontentViewFields extends JView {
 		}
 
 		//assign data to template
+		$this->assignRef('permission'		, $permission);
 		$this->assignRef('filter_type'  , $filter_type);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);

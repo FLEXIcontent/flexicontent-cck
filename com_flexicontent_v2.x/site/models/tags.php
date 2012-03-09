@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 999 2011-11-28 06:27:07Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -366,16 +366,21 @@ class FlexicontentModelTags extends JModel
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
-
-		// Limit to published items. Exceptions when: (a) user is editor, item is created by or modified by the user
-		// THE ABOVE MENTIONED EXCEPTIONS WILL NOT OVERRIDE ACCESS
+		
+		// Limit to published items. Exception when user can edit item
+		// but NO CLEAN WAY OF CHECKING individual item EDIT ACTION while creating this query !!!
+		// *** so we will rely only on item created or modified by the user ***
+		// when view is created the edit button will check individual item EDIT ACTION
+		// NOTE: *** THE ABOVE MENTIONED EXCEPTION WILL NOT OVERRIDE ACCESS
 		if (FLEXI_J16GE) {
-			$isEditor = $user->authorize('core.edit', 'com_flexicontent') || $user->authorize('core.edit.state', 'com_flexicontent');
+			$ignoreState = $user->authorise('core.admin', 'com_flexicontent');  // Super user privelege, can edit all for sure
+		} else if (FLEXI_ACCESS) {
+			$ignoreState = (int)$user->gid >= 25;  // Super admin, can edit all for sure
 		} else {
-			$isEditor = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
+			$ignoreState = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
 		}
-
-		$states = $isEditor ? '1, -5, 0, -3, -4' : '1, -5';
+		
+		$states = $ignoreState ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 		// Limit by publication date. Exception: when displaying personal user items or items modified by the user

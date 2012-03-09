@@ -33,16 +33,20 @@
 				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</field>
-			<field name="separator2" type="separator" default="SEF Options" level="level1" menu="hide" />
+			<field name="separator2" type="separator" default="FLEXI_SEF_URL_PATHWAY_OPTIONS" level="level1" menu="hide" />
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
 			<field name="default_menuitem_preference" type="list" default="1" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
-				<option value="2">FLEXI_DMI_ID_YES</option>
-				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 				<option value="0">FLEXI_DMI_ID_NO</option>
+				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
+				<option value="2">FLEXI_DMI_ID_YES</option>
 			</field>
-			<field name="default_menuitem_nopathway" type="list" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
-				<option value="1">FLEXI_YES</option>
+			<field name="default_menuitem_nopathway" type="radio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -79,7 +83,7 @@
 				<option value="10">FLEXI_10</option>
 				<option value="20">FLEXI_20</option>
 				<option value="50">FLEXI_50</option>
-				<option value="100">FLEXI_100_not_recommended</option>
+				<option value="100">FLEXI_100_NOT_RECOMMENDED</option>
 			</field>
 			<field name="versionsperpage" type="radio" default="5" label="FLEXI_VERSION_PER_PAGE" description="FLEXI_VERSION_PER_PAGE_DESC" menu="hide">
 				<option value="5">FLEXI_5</option>
@@ -243,7 +247,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="hits_mins_to_unique" type="text" size="5" default="10" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
+			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
 			<field name="hits_skip_ips" type="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

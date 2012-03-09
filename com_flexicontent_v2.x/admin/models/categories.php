@@ -142,9 +142,20 @@ class FlexicontentModelCategories extends JModelList
 				}
 			}
 			
+			$user	=& JFactory::getUser();
+			
+			// Get the owner of all categories
+			$query = 'SELECT id, created_user_id'
+					. ' FROM #__categories as c'
+					. ' WHERE'.(!FLEXI_J16GE ? ' c.section = '.FLEXI_SECTION : ' c.extension="'.FLEXI_CAT_EXTENSION.'" ');
+			$this->_db->setQuery( $query );
+			$cats = $this->_db->loadObjectList('id');
+
 			// Check access to change state of categories
 			foreach ($cid as $catid) {
-				if (!$user->authorise('core.edit.state', 'com_content.category.'.$catid)) {
+				$hasEditState			= $user->authorise('core.edit.state', 'com_content.category.'.$catid);
+				$hasEditStateOwn	= $user->authorise('core.edit.state.own', 'com_content.category.'.$catid) && $cats[$catid]->created_user_id==$user->get('id');
+				if (!$hasEditState && !$hasEditStateOwn) {
 					$this->setError(
 						'You are not authorised to change state of category with id: '. $catid
 						.'<br />NOTE: when publishing a category the parent categories will get published'

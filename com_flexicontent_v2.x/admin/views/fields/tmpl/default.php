@@ -53,17 +53,23 @@ defined('_JEXEC') or die('Restricted access');
 			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-		<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
-			<th width="90">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : ''; ?>
+			<th width="<?php echo $this->permission->CanOrderFields ? '90' : '60'; ?>" class="center">
+				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php
+					if ($this->permission->CanOrderFields) :
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : '';
+					endif;
+					?>
+				<?php else : ?>
+					<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php
+					if ($this->permission->CanOrderFields) :
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : '';
+					endif;
+					?>
+				<?php endif; ?>
 			</th>
-		<?php else : ?>
-			<th width="90">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : ''; ?>
-			</th>
-		<?php endif; ?>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
@@ -106,7 +112,11 @@ defined('_JEXEC') or die('Restricted access');
 			}else{
 				$isadvsearch = "publish_x.png";
 			}
-			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'access\')"');
+			if ($this->permission->CanAccLevelFields) {
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'fields.access\')"');
+			} else {
+				$access = flexicontent_html::userlevel('', $row->access, '', false, $createlist=false);
+			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
@@ -157,6 +167,7 @@ defined('_JEXEC') or die('Restricted access');
 			<td align="center">
 				<?php echo $published; ?>
 			</td>
+			<?php if ($this->permission->CanOrderFields) : ?>
 			<td class="order">
 				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'fields.orderup', 'Move Up', $this->ordering ); ?></span>
 
@@ -169,6 +180,17 @@ defined('_JEXEC') or die('Restricted access');
 				<input type="text" name="order[]" size="5" value="<?php echo $row->typeordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
 				<?php endif; ?>
 			</td>
+			<?php else : ?>
+			<td align="center">
+				<?php
+				if ($this->filter_type == '' || $this->filter_type == 0) {
+					echo $row->ordering;
+				} else {
+					echo $row->typeordering;
+				}
+				?>
+			</td>
+			<?php endif; ?>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; $i++;} ?>

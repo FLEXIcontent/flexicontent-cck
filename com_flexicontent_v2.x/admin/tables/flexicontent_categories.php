@@ -116,8 +116,8 @@ class flexicontent_categories extends JTableNested
 		$assetId = null;
 		$db		= $this->getDbo();
 
-		// This is a category under a category.
 		if ($this->parent_id > 1) {
+			// This is a category under a category.
 			// Build the query to get the asset id for the parent category.
 			$query	= $db->getQuery(true);
 			$query->select('asset_id');
@@ -129,8 +129,10 @@ class flexicontent_categories extends JTableNested
 			if ($result = $db->loadResult()) {
 				$assetId = (int) $result;
 			}
+		
 		} else {
-			// Build the query to get the asset id for the parent category.
+			// This is root category.
+			// Build the query to get the asset id of component.
 			$query	= $db->getQuery(true);
 			$query->select('id');
 			$query->from('#__assets');
