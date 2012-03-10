@@ -306,7 +306,7 @@
 						echo $this->pane->endPanel();
 						
 						$title = JText::_( 'FLEXI_ACCESS' );
-						if (!FLEXI_ACCESS) :
+						if (FLEXI_ACCESS) :
 						echo $this->pane->startPanel( $title, 'access' );
 						?>
 						<table>
@@ -317,7 +317,7 @@
 									</label>
 								</td>
 								<td>
-									<?php echo $this->Lists['access']; ?>
+									<?php echo $this->lists['access']; ?>
 								</td>
 							</tr>
 						</table>
