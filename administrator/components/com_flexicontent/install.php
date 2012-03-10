@@ -37,9 +37,9 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 	$document =& JFactory::getDocument(); 
 	$document->addStyleSheet($css);	
 	
-	// we use the static loadLanguage() method in the JPlugin class - a little tricky
-	jimport('joomla.plugin.plugin');
-	JPlugin::loadLanguage('com_flexicontent', JPATH_ADMINISTRATOR);
+	// load english language file for 'com_flexicontent' component then override with current language file
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 	echo '<div class="fc-error">';
 	echo JText::_( 'FLEXI_UPGRADE_PHP' ) . '<br />';

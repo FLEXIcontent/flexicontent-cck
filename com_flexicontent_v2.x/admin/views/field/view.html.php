@@ -73,18 +73,20 @@ class FlexicontentViewField extends JView {
 		$this->supportfilter = false;
 		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date');
 		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories');
-		if($form->getValue('field_type')) {
-			// load language file
-			//JPlugin::loadLanguage('plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type')), JPATH_ADMINISTRATOR);
-			$jlang =& JFactory::getLanguage();
-			$jlang->load('plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type')), JPATH_ADMINISTRATOR);
+		
+		if($form->getValue('field_type'))
+		{
+			// load plugin's english language file then override with current language file
+			$extension_name = 'plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type'));
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
 			
 			$classname	= 'plgFlexicontent_fields'.($form->getValue("iscore") ? 'core' : $form->getValue('field_type'));
 			$classmethods	= get_class_methods($classname);
-			if($form->getValue("iscore")) {
+			if ($form->getValue("iscore")) {
 				$this->supportadvsearch = in_array($form->getValue('field_type'), $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
 				$this->supportfilter = in_array($form->getValue('field_type'), $core_filters);
-			}else{
+			} else {
 				$this->supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
 				$this->supportfilter = in_array('onDisplayFilter', $classmethods);
 			}
