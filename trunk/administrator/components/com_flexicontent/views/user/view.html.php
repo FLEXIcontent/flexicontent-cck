@@ -167,6 +167,35 @@ class FlexicontentViewUser extends JView
 		}
 		else if ( $userGroupName == $myGroupName && $myGroupName == 'administrator' ) {
 		*/
+		if (FLEXI_ACCESS) 
+		{
+			// Create the list of all groups except public and registered
+			$query	= 'SELECT id AS value, name AS text, level, ordering'
+					. ' FROM #__flexiaccess_groups'
+					. ' WHERE level > 1'
+					. ' ORDER BY ordering ASC'
+					;
+			$db->setQuery( $query );
+			$allgroups = $db->loadObjectList();
+
+			if ( $user->get('id'))
+			{
+				// get all the groups from the user
+				$query = 'SELECT group_id'
+				. ' FROM #__flexiaccess_members'
+				. ' WHERE member_id = '.(int) $cid[0]
+				;
+				$db->setQuery( $query );
+				$usergroups = $db->loadResultArray();
+	
+				$lists['access'] 	= JHTML::_('select.genericlist',   $allgroups, 'groups[]', 'size="10" multiple="multiple"', 'value', 'text', $usergroups );		
+			}
+			else
+			{
+				$lists['access'] 	= 'Please create the user first';
+			}
+
+		}
 
 		if ( $userGroupName == $myGroupName && $myGroupName == 'administrator' )
 		{
@@ -189,6 +218,7 @@ class FlexicontentViewUser extends JView
 
 			$lists['gid'] 	= JHTML::_('select.genericlist',   $gtree, 'gid', 'size="10"', 'value', 'text', $user->get('gid') );
 		}
+		
 
 		// build the html select list
 		$lists['block'] 	= JHTML::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $user->get('block') );

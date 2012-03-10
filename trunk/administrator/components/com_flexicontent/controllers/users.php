@@ -99,6 +99,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		$post['username']	= JRequest::getVar('username', '', 'post', 'username');
 		$post['password']	= JRequest::getVar('password', '', 'post', 'string', JREQUEST_ALLOWRAW);
 		$post['password2']	= JRequest::getVar('password2', '', 'post', 'string', JREQUEST_ALLOWRAW);
+		
 
 		if (!$user->bind($post))
 		{
@@ -140,6 +141,26 @@ class FlexicontentControllerusers extends FlexicontentController
 		$isNew 	= ($user->get('id') < 1);
 		if (!$isNew)
 		{
+			if (FLEXI_ACCESS)
+			{
+				// Delete old records
+				$query	= 'DELETE FROM #__flexiaccess_members'
+						. ' WHERE member_id = ' . (int)$user->get('id')
+						;
+				$db->setQuery( $query );
+				$db->query();
+				
+				// Save new records
+				foreach ($post['groups'] as $group)
+				{			
+					$query = 'INSERT INTO #__flexiaccess_members'
+							. ' SET `group_id` = ' . (int)$group . ', `member_id` = ' . (int)$user->get('id')
+							;
+					$db->setQuery( $query );
+					$db->query();
+				}
+			}
+
 			// if group has been changed and where original group was a Super Admin
 			if ( $user->get('gid') != $original_gid && $original_gid == 25 )
 			{
