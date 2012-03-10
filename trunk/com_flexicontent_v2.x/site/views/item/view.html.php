@@ -341,8 +341,12 @@ class FlexicontentViewItem extends JView
 		jimport( 'joomla.html.parameter' );
 		
 		// ... we use some strings from administrator part
-		JPlugin::loadLanguage('com_flexicontent', JPATH_ADMINISTRATOR);
-		JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
+		// load english language file for 'com_content' component then override with current language file
+		JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+		// load english language file for 'com_flexicontent' component then override with current language file
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 		// Initialize variables
 		$mainframe	= & JFactory::getApplication();

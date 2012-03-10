@@ -36,8 +36,10 @@ JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
 if (!FLEXI_ONDEMAND)
 	JPluginHelper::importPlugin('flexicontent_fields');
 JPluginHelper::importPlugin('flexicontent');
-//load language file com_content component
-JPlugin::loadLanguage('com_content', JPATH_ADMINISTRATOR);
+
+// load english language file for 'com_content' component then override with current language file
+JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($variable, $dopostinstall=true) {
