@@ -203,5 +203,6 @@
 			<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
 		</param>
 		<param name="filters" type="filters" size="10" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+		<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
 	</params> 
 </form>
