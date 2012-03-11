@@ -169,6 +169,8 @@ class FlexicontentViewFlexicontent extends JView
 			$CanPlugins	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_plugins', 'manage', 'users', $user->gmid) : 1;
 			$CanComments 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_jcomments', 'manage', 'users', $user->gmid) : $CanComments;
 			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
+			$CanImport		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'import', 'users', $user->gmid) : 1;
+			$CanIndex		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'index', 'users', $user->gmid) : 1;
 		} else {
 			$CanAdd			= 1;
 			$CanAddCats 	= 1;
@@ -176,13 +178,15 @@ class FlexicontentViewFlexicontent extends JView
 			$CanTypes 		= 1;
 			$CanFields		= 1;
 			$CanTags 		= 1;
-			$CanAuthors	= 1;
+			$CanAuthors		= 1;
 			$CanArchives	= 1;
 			$CanFiles		= 1;
 			$CanStats		= 1;
 			$CanRights		= 1;
 			$CanPlugins		= 1;
 			$CanTemplates	= 1;
+			$CanImport		= 1;
+			$CanIndex		= 1;
 		}
 		
 		$dopostinstall = $session->get('flexicontent.postinstall');
@@ -212,8 +216,8 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('params'		, $params);
 
 		// install check
-		$this->assignRef('dopostinstall', $dopostinstall);
-		$this->assignRef('allplgpublish', $allplgpublish);
+		$this->assignRef('dopostinstall'		, $dopostinstall);
+		$this->assignRef('allplgpublish'		, $allplgpublish);
 		$this->assignRef('existmenuitems'		, $existmenuitems);
 		$this->assignRef('existtype'			, $existtype);
 		$this->assignRef('existfields'			, $existfields);
@@ -223,12 +227,12 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata'	, $existversionsdata);
-		$this->assignRef('existauthors'		, $existauthors);
+		$this->assignRef('existauthors'			, $existauthors);
 		//$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
-		//$this->assignRef('initialpermission'		, $initialpermission);
+		//$this->assignRef('initialpermission'	, $initialpermission);
 
 		// assign Rights to the template
 		$this->assignRef('CanAdd'		, $CanAdd);
@@ -245,6 +249,8 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('CanRights'	, $CanRights);
 		$this->assignRef('CanPlugins'	, $CanPlugins);
 		$this->assignRef('CanComments'	, $CanComments);
+		$this->assignRef('CanImport'	, $CanImport);
+		$this->assignRef('CanIndex'		, $CanIndex);
 
 		parent::display($tpl);
 
