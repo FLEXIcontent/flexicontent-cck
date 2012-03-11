@@ -187,14 +187,12 @@ class FlexicontentViewUser extends JView
 				;
 				$db->setQuery( $query );
 				$usergroups = $db->loadResultArray();
-	
-				$lists['access'] 	= JHTML::_('select.genericlist',   $allgroups, 'groups[]', 'size="10" multiple="multiple"', 'value', 'text', $usergroups );		
 			}
 			else
 			{
-				$lists['access'] 	= 'Please create the user first';
+				$usergroups = array();
 			}
-
+			$lists['access'] 	= JHTML::_('select.genericlist',   $allgroups, 'groups[]', 'size="10" multiple="multiple"', 'value', 'text', $usergroups );		
 		}
 
 		if ( $userGroupName == $myGroupName && $myGroupName == 'administrator' )

@@ -141,6 +141,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		$isNew 	= ($user->get('id') < 1);
 		if (!$isNew)
 		{
+/*
 			if (FLEXI_ACCESS)
 			{
 				// Delete old records
@@ -160,6 +161,7 @@ class FlexicontentControllerusers extends FlexicontentController
 					$db->query();
 				}
 			}
+*/
 
 			// if group has been changed and where original group was a Super Admin
 			if ( $user->get('gid') != $original_gid && $original_gid == 25 )
@@ -192,7 +194,29 @@ class FlexicontentControllerusers extends FlexicontentController
 			JError::raiseWarning(0, $user->getError());
 			return $this->execute('edit');
 		}
-		
+
+		// *** BOF FLEXIACCESS INTEGRATION *** //		
+		if (FLEXI_ACCESS)
+		{
+			// Delete old records
+			$query	= 'DELETE FROM #__flexiaccess_members'
+					. ' WHERE member_id = ' . (int)$user->get('id')
+					;
+			$db->setQuery( $query );
+			$db->query();
+			
+			// Save new records
+			foreach ($post['groups'] as $group)
+			{			
+				$query = 'INSERT INTO #__flexiaccess_members'
+						. ' SET `group_id` = ' . (int)$group . ', `member_id` = ' . (int)$user->get('id')
+						;
+				$db->setQuery( $query );
+				$db->query();
+			}
+		}
+		// *** EOF FLEXIACCESS INTEGRATION *** //		
+
 		
 		// *** BOF AUTHOR EXTENDED DATA ***
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');

@@ -305,15 +305,15 @@
 						echo $this->form_authorbasic->render('authorbasicparams', 'author_ext_config');
 						echo $this->pane->endPanel();
 						
-						$title = JText::_( 'FLEXI_ACCESS' );
 						if (FLEXI_ACCESS) :
+						$title = JText::_( 'FLEXIACCESS_MGROUPE' );
 						echo $this->pane->startPanel( $title, 'access' );
 						?>
 						<table>
 							<tr>
 								<td>
 									<label for="access">
-										<?php echo JText::_( 'FLEXI_ACCESS' ).':'; ?>
+										<?php echo JText::_( 'FLEXIACCESS_MGROUPE' ).':'; ?>
 									</label>
 								</td>
 								<td>
