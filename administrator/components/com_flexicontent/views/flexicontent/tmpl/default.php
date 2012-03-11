@@ -113,11 +113,23 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
+
+						if ($this->dopostinstall && $this->CanIndex)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=search';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-searchindex.png', JText::_( 'FLEXI_SEARCH_INDEX' ) );
+						}
 						
 						if ($this->dopostinstall && $this->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-templates.png', JText::_( 'FLEXI_TEMPLATES' ) );
+						}
+
+						if ($this->dopostinstall && $this->CanImport)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=import';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-import.png', JText::_( 'FLEXI_IMPORT' ) );
 						}
 
 						if ($this->dopostinstall && $this->CanStats)
