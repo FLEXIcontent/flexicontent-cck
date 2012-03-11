@@ -143,6 +143,8 @@ class FlexicontentViewItems extends JView {
 			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
 			$CanOrder	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
 			$CanCopy	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid) : 1;
+			$CanImport		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'import', 'users', $user->gmid) : 1;
+			$CanIndex		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'index', 'users', $user->gmid) : 1;
 		} else {
 			$CanAdd 		= 1;
 			$CanEdit		= 1;
@@ -159,6 +161,8 @@ class FlexicontentViewItems extends JView {
 			$CanRights		= 1;
 			$CanOrder		= 1;
 			$CanCopy		= 1;
+			$CanImport		= 1;
+			$CanIndex		= 1;
 		}
 		FLEXISubmenu('notvariable');
 
