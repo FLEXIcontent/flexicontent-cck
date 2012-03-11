@@ -104,6 +104,8 @@ var Overlay = new Class({
 		this.fade.start({
 			visibility: 'visible',
 			opacity: this.options.opacity
+		}).chain(function() {
+			visibility: 'hidden'
 		});
 	},
 	
@@ -111,7 +113,7 @@ var Overlay = new Class({
 		this.fade.start({
 			opacity: 0
 		}).chain(function() {
-			$('OverlayContainer').style.visibility='hidden';
+			visibility: 'hidden'
 		});
 	}
 });
