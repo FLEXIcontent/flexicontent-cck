@@ -1160,7 +1160,7 @@ class FlexicontentModelItem extends JModel {
 	{
 		$typeid = JRequest::getVar('typeid', 0, '', 'int');
 		$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE ie.item_id = ' . (int)$this->_id;
+		$where = $typeid?' WHERE ftrel.type_id='.(int)$typeid:' WHERE fi.iscore=1 OR ie.item_id = ' . (int)$this->_id;
 		$query = 'SELECT fi.*'
 				.' FROM #__flexicontent_fields AS fi'
 				.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'

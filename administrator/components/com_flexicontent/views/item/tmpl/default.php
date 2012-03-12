@@ -166,6 +166,11 @@ $view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/image
 $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
 ?>
 
+<?php  /* echo "Version: ". $this->row->version."<br>\n"; */?>
+<?php /* echo "id: ". $this->row->id."<br>\n"; */?>
+<?php /* echo "type_id: ". @$this->row->type_id."<br>\n"; */?>
+
+
 <div class="flexicontent">
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm" autocomplete="off">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -337,7 +342,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 				<?php endif; ?>
 
 				<?php
-				if ($this->fields) {
+				if ($this->fields && $this->row->id) {
 					$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						$$('#type_id').addEvent('change', function(ev) {

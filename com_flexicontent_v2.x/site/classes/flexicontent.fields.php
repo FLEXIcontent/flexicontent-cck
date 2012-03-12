@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1169 2012-03-09 04:17:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -714,10 +714,12 @@ class FlexicontentFields
 		static $fdata = array();
 		static $lang=null;
 		
-		if (@$item->id) {
+		if (@$item->id || !FLEXI_J16GE) {
 			$item_id = (int)$item->id;
+			$type_id = @(int)$item->type_id;
 		} else {
 			$item_id = (int)$item->getValue('id');
+			$type_id = (int)$item->getValue('type_id');
 		}
 		$typename = @$item->typename ? $item->typename : "__NOT_SET__";
 		$typealias = @$item->typealias ? $item->typealias : "__NOT_SET__";
@@ -740,12 +742,13 @@ class FlexicontentFields
 				$lang = substr($tagLang ,0,2);
 			}
 		}
-		
-		if (!isset($tparams[$typename])) {
+
+		if (!isset($tparams[$typename]) && $type_id) {
 			$query = 'SELECT t.attribs, t.name, t.alias'
 					. ' FROM #__flexicontent_types AS t'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					. ' WHERE ie.item_id = ' . $item_id
+					. ' WHERE t.id = ' . $type_id
+					//. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+					//. ' WHERE ie.item_id = ' . $item_id
 					;
 			$db =& JFactory::getDBO();
 			$db->setQuery($query);
@@ -757,6 +760,8 @@ class FlexicontentFields
 			$typename = $typedata->name;  // workaround for J1.6+  form not having typename property
 			$typealias = $typedata->alias;  // workaround for J1.6+  form not having typealias property
 			$tparams[$typename] = new JParameter($typedata->attribs);
+		} if (!isset($tparams[$typename])) {
+			$tparams[$typename] = new JParameter("");
 		}
 		
 		// Custom LABELs and DESCRIPTIONs
