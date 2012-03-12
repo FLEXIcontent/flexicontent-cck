@@ -925,6 +925,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function checkInitialPermission() {
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
+		$component_name = 'com_flexicontent';
 		
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
@@ -936,17 +937,26 @@ class FlexicontentModelFlexicontent extends JModel
 		$db->setQuery($query);
 		$db->query();
 		
-		// COUNT Component Section Actions, to check if we have in assets DB table the same number of actions as in access.xml file
-		$query = $db->getQuery(true)
-			->select('rules')
-			->from('#__assets')
-			->where('name = ' . $db->quote(JRequest::getCmd('option')));
-		$db->setQuery($query);
-		$rules = $db->loadResult();
-		$rule = new JRules($rules);
-		$comp_section = count($rule->getData()) == count(JAccess::getActions('com_flexicontent', 'component')) ? 1 : 0;
+		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
+		$asset	= JTable::getInstance('asset');
+		if ($comp_section = $asset->loadByName($component_name)) {  // Try to load component asset, if missing it returns false
+			// ok, component asset not missing, proceed to cross check for deleted / added actions
+			$rules = new JRules($asset->rules);
+			$rules_data = $rules->getData();
+			$component_actions = JAccess::getActions($component_name, 'component');
+			
+			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
+			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
+			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
+			$added_actions   =  array_diff($file_action_names, $db_action_names  );
+			
+			$comp_section = ! ( count($deleted_actions) || count($added_actions) );  // false if deleted or addeded actions exist
+		}
 		
-		// CHECK if some categories don't have permissions set
+		echo ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
+		echo count(JAccess::getActions('com_flexicontent', 'component')) . "<br />";
+		
+		// CHECK if some categories don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
@@ -955,7 +965,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$result = $db->loadObjectList();
 		$category_section = count($result) == 0 ? 1 : 0;
 
-		// CHECK if some fields don't have permissions set
+		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
 			->select('se.id')
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
@@ -964,6 +974,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$result = $db->loadObjectList();
 		$field_section = count($result) == 0 ? 1 : 0;
 		
+		echo "$comp_section && $category_section && $field_section<br>";
+		
 		return ($comp_section && $category_section && $field_section);
 	}
 	
@@ -971,41 +983,68 @@ class FlexicontentModelFlexicontent extends JModel
 		jimport('joomla.access.rules');
 		$component_name	= JRequest::getCmd('option');
 		$db 		= JFactory::getDBO();
-		$asset	= JTable::getInstance('asset');
+		$asset	= JTable::getInstance('asset');   // Create an asset object
 		
 		/*** Component assets ***/
 		
-		if ($asset->loadByName($component_name)) {
-			// The assets entry already exists, we will check if it has rules for all component's actions 
+		if (!$asset->loadByName($component_name)) {
+			// The assets entry does not exist: We will create initial rules for all component's actions
+			
+			// Get root asset
 			$root = JTable::getInstance('asset');
 			$root->loadByName('root.1');
+			
+			// Initialize component asset
 			$asset->name = $component_name;
 			$asset->title = $component_name;
-			$asset->setLocation($root->id,'last-child');
-						
-			$groups 	= $this->_getUserGroups();
-			$actions	= JAccess::getActions($component_name, 'component');
-			$rules 		= $this->_initRules($component_name);
+			$asset->setLocation($root->id,'last-child');  // father of compontent asset it the root asset
 			
-			$rules = new JRules(json_encode($rules));
-			$asset->rules = $rules->__toString();
-
+			// Create initial component rules and set them into the asset
+			$initial_rules = $this->_createComponentRules($component_name);
+			$component_rules = new JRules(json_encode($initial_rules));
+			$asset->rules = $component_rules->__toString();
+			
+			// Save the asset into the DB
 			if (!$asset->check() || !$asset->store()) {
 				echo $asset->getError();
 				$this->setError($asset->getError());
 				return false;
 			}
 		} else {
-			// The assets entry does not exist, we will add default rules for all component's actions 
-			$rules = new JRules($asset->rules);
-			if (count($rules->getData()) != count(JAccess::getActions('com_flexicontent', 'component'))) {
-				$initerules = $this->_initRules($component_name);
-				$initerules = new JRules(json_encode($initerules));
+			// The assets entry already exists: We will check if it has exactly the actions specified in component's access.xml file
+			
+			// Get existing DB rules and component's actions from the access.xml file
+			$existing_rules = new JRules($asset->rules);
+			$rules_data = $existing_rules->getData();
+			$component_actions = JAccess::getActions('com_flexicontent', 'component');
+			
+			// Find any deleted / added actions ...
+			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
+			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
+			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
+			$added_actions   =  array_diff($file_action_names, $db_action_names  );
+			
+			if ( count($deleted_actions) || count($added_actions) ) {
+				// We have changes in the component actions
 				
-				$rules->merge($initerules);
-						
-				$asset->rules = $rules->__toString();
-
+				// First merge the existing component (db) rules into the initial rules
+				$initial_rules = $this->_createComponentRules($component_name);
+				$component_rules = new JRules(json_encode($initial_rules));
+				$component_rules->merge($existing_rules);
+				
+				// Second, check if obsolete rules are contained in the existing component (db) rules, if so create a new rules object without the obsolete rules
+				if ($deleted_actions) {
+					$rules_data = $component_rules->getData();
+					foreach($deleted_actions as $action_name) {
+						unset($rules_data[$action_name]);
+					}
+					$component_rules = new JRules($rules_data);
+				}
+				
+				// Set asset rules
+				$asset->rules = $component_rules->__toString();
+				
+				// Save the asset
 				if (!$asset->check() || !$asset->store()) {
 					echo $asset->getError();
 					$this->setError($asset->getError());
@@ -1018,14 +1057,13 @@ class FlexicontentModelFlexicontent extends JModel
 		$component_asset = JTable::getInstance('asset');
 		$component_asset->loadByName($component_name);
 		
-		/*** CATEGORY assets ***/ /*** THESE MAY NO LONGER BE NEEDED ? ***/
+		/*** CATEGORY assets ***/
 		
-		// Get a list com_content categories that do not have assets
+		// Get a list com_content categories that do not have assets (or have wrong asset names)
 		$query = $db->getQuery(true)
-			->select('c.id, c.parent_id, c.title')
-			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id')
-			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'))
-			->order('c.lft ASC');
+			->select('c.id, c.parent_id, c.title, c.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
+			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
 		
@@ -1037,12 +1075,20 @@ class FlexicontentModelFlexicontent extends JModel
 				
 				// Test if an asset for the current CATEGORY ID already exists and load it instead of creating a new asset
 				if ( ! $asset->loadByName($name) ) {
-				
+					if ($category->asset_id) {
+						// asset name not found but category has an asset id set ?, we could delete it here
+						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
+					}
+					
+					// Initialize category asset
 					$asset->id 		= null;
-					$asset->setLocation($parentId, 'last-child');
 					$asset->name	= $name;
 					$asset->title	= $category->title;
-
+					$asset->setLocation($parentId, 'last-child');     // Permissions of categories are inherited by parent category, or from component if no parent category exists
+					
+					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
+					$asset->rules = new JRules();
+					/*
 					if ($parentId == $component_asset->id) {				
 						$actions	= JAccess::getActions($component_name, 'category');
 						$rules 		= json_decode($component_asset->rules);		
@@ -1056,7 +1102,9 @@ class FlexicontentModelFlexicontent extends JModel
 						$parent->load($parentId);
 						$asset->rules = $parent->rules;
 					}
+					*/
 					
+					// Save the asset
 					if (!$asset->check() || !$asset->store(false)) {
 						echo $asset->getError();
 						$this->setError($asset->getError());
@@ -1064,6 +1112,7 @@ class FlexicontentModelFlexicontent extends JModel
 					}
 				}
 				
+				// Assign the asset to the category
 				$query = $db->getQuery(true)
 					->update('#__categories')
 					->set('asset_id = ' . (int)$asset->id)
@@ -1083,8 +1132,8 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		// Get a list flexicontent fields that do not have assets
 		$query = $db->getQuery(true)
-			->select('ff.id, ff.name')
-			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name= concat("com_flexicontent.field.",ff.id)')
+			->select('ff.id, ff.name, ff.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
@@ -1096,12 +1145,20 @@ class FlexicontentModelFlexicontent extends JModel
 				
 				// Test if an asset for the current FIELD ID already exists and load it instead of creating a new asset
 				if ( ! $asset->loadByName($name) ) {
+					if ($field->asset_id) {
+						// asset name not found but field has an asset id set ?, we could delete it here
+						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
+					}
 
+					// Initialize field asset
 					$asset->id = null;
-					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
 					$asset->name		= $name;
 					$asset->title		= $field->name;
+					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
 					
+					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
+					$asset->rules = new JRules();
+					/*
 					$actions	= JAccess::getActions($component_name, 'field');
 					$rules 		= json_decode($component_asset->rules);		
 					foreach ($actions as $action) {
@@ -1109,7 +1166,9 @@ class FlexicontentModelFlexicontent extends JModel
 					}
 					$rules = new JRules(json_encode($fieldrules));
 					$asset->rules = $rules->__toString();
+					*/
 					
+					// Save the asset
 					if (!$asset->check() || !$asset->store(false)) {
 						echo $asset->getError();
 						$this->setError($asset->getError());
@@ -1117,6 +1176,7 @@ class FlexicontentModelFlexicontent extends JModel
 					}
 				}
 				
+				// Assign the asset to the field
 				$query = $db->getQuery(true)
 					->update('#__flexicontent_fields')
 					->set('asset_id = ' . (int)$asset->id)
@@ -1133,47 +1193,71 @@ class FlexicontentModelFlexicontent extends JModel
 
 		return true;
 	}
-
-	protected function _initRules($component) {
+	
+	
+	/**
+	 * Creates initial component actions based on global config and on some ... logic
+	 *
+	 * @return  array
+	 * @since   11.1
+	 */
+	protected function _createComponentRules($component) {
+		
 		$groups 	= $this->_getUserGroups();
-		$actions	= JAccess::getActions($component, 'component');
-		$rules 		= array();
-
+		
+		// Get flexicontent ACTION names, and initialize flexicontent rules to empty *
+		$flexi_actions	= JAccess::getActions($component, 'component');
+		$flexi_rules		= array();
+		foreach($flexi_actions as $action) {
+			$flexi_rules[$action->name] = array();  // * WE NEED THIS (even if it remains empty), because we will compare COMPONENT actions in DB when checking initial permissions
+			$flexi_action_names[] = $action->name;  // Create an array of all COMPONENT actions names
+		}
+		
+		// Get Joomla ACTION names
+		$root = JTable::getInstance('asset');
+		$root->loadByName('root.1');
+		$joomla_rules = new JRules( $root->rules );
+		foreach ($joomla_rules->getData() as $action_name => $data) {
+			$joomla_action_names[] = $action_name;
+		}
+		//echo "<pre>"; print_r($rules->getData()); echo "</pre>";
+		
+		
+		// Decide the actions to grant (give) to each user group
 		foreach($groups as $group) {
-			if(JAccess::checkGroup($group->id, 'core.admin')) { // Super User Privelege (can do anything, all other permissions are ignored)
-				$rules['core.admin'][$group->id] = 1;  //CanConfig
-			}
-			if(JAccess::checkGroup($group->id, 'core.manage')) { // Backend Access Privelege (can access/manage the component in the backend)
-				$rules['core.manage'][$group->id] = 1;  //CanManage
-				foreach($actions as $action) {   // INITIALLY , WE WILL GIVE ALL PERMISSIONS TO ANYONE THAT CAN MANAGE THE COMPONENT
-					if ($action->name == 'core.admin') continue;
-					$rules[$action->name][$group->id] = 1;
+			
+			// STEP 1: we will -grant- all NON-STANDARD component ACTIONS to any user group, that has 'core.manage' ACTION in the Global Configuration
+			// NOTE (a): if some user group has the --Super Admin-- Global Configuration ACTION (aka 'core.admin' for asset root.1), then it also has 'core.manage'
+			// NOTE (b):  The STANDARD Joomla ACTIONs will not be set thus they will default to value -INHERIT- (=value "")
+			if(JAccess::checkGroup($group->id, 'core.manage')) {
+				//$flexi_rules['core.manage'][$group->id] = 1;
+				foreach($flexi_action_names as $action_name) {
+					//if ($action_name == 'core.admin') continue;  // component CONFIGURE action, skip it, this will can only be granted by STEP 2
+					if (in_array($action_name, $joomla_action_names)) continue;  // Skip Joomla STANDARD rules allowing them to inherit
+					$flexi_rules[$action_name][$group->id] = 1;
 				}
 			}
-			if(JAccess::checkGroup($group->id, 'core.create')) {
-				$rules['core.create'][$group->id] = 1;//CanAdd
+			
+			// STEP 2: we will set ACTIONS already granted in GLOBAL CONFIGURATION (this include the COMPONENT CONFIGURE 'core.admin' action)
+			// NOTE that actions that do not exist in global configuration, will not be set here, so they will default to the the setting received by STEP 1
+			/*foreach($flexi_action_names as $action_name) {
+				if (JAccess::checkGroup($group->id, $action_name)) {
+					$flexi_rules[$action_name][$group->id] = 1;
+				}
+			}*/
+			
+			// STEP 3: Handle some special case of custom-added ACTIONs
+			// e.g. Grant --OWNED-- actions if they have the corresponding --GENERAL-- actions
+			if( !empty($flexi_rules['core.delete'][$group->id]) ) {
+				if (in_array('core.delete.own', $flexi_action_names)) $flexi_rules['core.delete.own'][$group->id] = 1;          //CanDeleteOwn
 			}
-			if(JAccess::checkGroup($group->id, 'core.delete')) {
-				$rules['core.delete'][$group->id] = 1;//CanDelete
-			}
-			if(JAccess::checkGroup($group->id, 'core.delete.own')) {
-				$rules['core.delete.own'][$group->id] = 1;//CanDeleteOwn
-			}
-			if(JAccess::checkGroup($group->id, 'core.edit')) {
-				$rules['core.edit'][$group->id] = 1;//CanEdit
-			}
-			if(JAccess::checkGroup($group->id, 'core.edit.state')) {
-				$rules['core.edit.state'][$group->id] = 1;//CanPublish
-			}
-			if(JAccess::checkGroup($group->id, 'core.edit.state.own')) {
-				$rules['core.edit.state.own'][$group->id] = 1;//CanPublishOwn
-			}
-			if(JAccess::checkGroup($group->id, 'core.edit.own')) {
-				$rules['core.edit.own'][$group->id] = 1;//CanEditOwn
+			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
+				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
 		}
 		
-		return $rules;
+		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...
+		return $flexi_rules;
 	}
 	
 	/**

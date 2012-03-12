@@ -61,6 +61,7 @@
 		<action name="core.edit" title="edit" description="Allow users in the group to edit (all) items in this category. Note item must have this category as main category." />
 		<action name="core.edit.own" title="edit own" description="Allow users in the group to edit their (owned) items in this category. Note item must have this category as main category." />
 		<action name="core.edit.state" title="edit state" description="Allow users in the group to alter the publication state of items in this category. Note item must have this category as main category." />
+		<action name="core.edit.state.own" title="edit state own" description="Allow users in the group to alter the publication state of their (owned) items in this category. Note item must have this category as main category." />
 	</section>
 
 	<section name="article">
