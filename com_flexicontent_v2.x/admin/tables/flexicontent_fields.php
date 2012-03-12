@@ -123,6 +123,18 @@ class flexicontent_fields extends JTable
 	}
 
 	/**
+	 * Method to return the title to use for the asset table.
+	 *
+	 * @return  string
+	 *
+	 * @since   11.1
+	 */
+	protected function _getAssetTitle()
+	{
+		return $this->label;
+	}
+	
+	/**
 	 * Get the parent asset id for the record
 	 *
 	 * @param   JTable   $table  A JTable object for the asset parent.
@@ -163,10 +175,20 @@ class flexicontent_fields extends JTable
 
 		// Bind the rules.
 		if (isset($array['rules']) && is_array($array['rules'])) {
+			// (a) prepare the rules, for some reason empty group id (=inherit), are not removed from action ACTIONS, we do it manually
+			foreach($array['rules'] as $action_name => $identities) {
+				foreach($identities as $grpid => $val) {
+					if ($val==="") {
+						unset($array['rules'][$action_name][$grpid]);
+					}
+				}
+			}
+			
+			// (b) Assign the rules
 			$rules = new JRules($array['rules']);
 			$this->setRules($rules);
 		}
-
+		
 		return parent::bind($array, $ignore);
 	}
 	
@@ -177,12 +199,15 @@ class flexicontent_fields extends JTable
 	 * a new row will be inserted into the database with the properties from the
 	 * JTable instance.
 	 *
-	 * @param	boolean True to update fields even if they are null.
-	 * @return	boolean	True on success.
-	 * @since	1.0
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 *
 	 * @link	http://docs.joomla.org/JTable/store
+	 * @since   11.1
 	 */
-	/*public function store($updateNulls = false) {
+	/*public function store($updateNulls = false)
+	{
 		// Initialise variables.
 		$k = $this->_tbl_key;
 
@@ -205,7 +230,6 @@ class flexicontent_fields extends JTable
 			$this->setError($e);
 			return false;
 		}
-		$this->load($this->id);
 
 		// If the table is not set to track assets return true.
 		if (!$this->_trackAssets) {
@@ -228,8 +252,7 @@ class flexicontent_fields extends JTable
 		$asset->loadByName($name);
 
 		// Re-inject the asset id.
-		//$this->asset_id = $asset->id;
-		$asset_id = $asset->id;
+		$this->asset_id = $asset->id;
 
 		// Check for an error.
 		if ($error = $asset->getError()) {
@@ -238,7 +261,7 @@ class flexicontent_fields extends JTable
 		}
 
 		// Specify how a new or moved node asset is inserted into the tree.
-		if (empty($asset_id) || $asset->parent_id != $parentId) {
+		if (empty($this->asset_id) || $asset->parent_id != $parentId) {
 			$asset->setLocation($parentId, 'last-child');
 		}
 
@@ -256,14 +279,14 @@ class flexicontent_fields extends JTable
 			return false;
 		}
 
-		if ($asset->id && empty($this->asset_id)) {
+		if (empty($this->asset_id)) {
 			// Update the asset_id field in this table.
 			$this->asset_id = (int) $asset->id;
 
 			$query = $this->_db->getQuery(true);
-			$query->update($this->_db->nameQuote($this->_tbl));
+			$query->update($this->_db->quoteName($this->_tbl));
 			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where($this->_db->nameQuote($k).' = '.(int) $this->$k);
+			$query->where($this->_db->quoteName($k).' = '.(int) $this->$k);
 			$this->_db->setQuery($query);
 
 			if (!$this->_db->query()) {
