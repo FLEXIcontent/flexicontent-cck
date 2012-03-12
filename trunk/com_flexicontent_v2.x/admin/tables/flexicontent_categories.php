@@ -35,7 +35,7 @@ class flexicontent_categories extends JTableNested
 	var $level			= null;
 	/** @var string */
 	var $path			= null;
-	var $extension= null;
+	var $extension= 'com_content';
 	/** @var string The menu title for the category (a short name)*/
 	var $title				= null;
 	/** @var string The the alias for the category*/
@@ -83,9 +83,9 @@ class flexicontent_categories extends JTableNested
 	 */
 	protected function _getAssetName()
 	{
-		// we use 'com_content' inside $this->extension instead of 'com_flexicontent'
+		// we use 'com_content' instead of $this->extension which contains 'com_flexicontent'
 		$k = $this->_tbl_key;
-		return $this->extension.'.category.'.(int) $this->$k;
+		return 'com_content.category.'.(int) $this->$k;
 	}
 
 	/**
@@ -210,6 +210,8 @@ class flexicontent_categories extends JTableNested
 	 */
 	public function bind($array, $ignore = '')
 	{
+		$this->extension = 'com_content';
+		
 		if (isset($array['params']) && is_array($array['params'])) {
 			$registry = new JRegistry;
 			$registry->loadArray($array['params']);
@@ -224,10 +226,19 @@ class flexicontent_categories extends JTableNested
 
 		// Bind the rules.
 		if (isset($array['rules']) && is_array($array['rules'])) {
+		
+			// Make sure that empty group ids (=inherit) are removed from actions, (not needed this should already be done)
+			foreach($array['rules'] as $action_name => $identities) {
+				foreach($identities as $grpid => $val) {
+					if ($val==="") {
+						unset($array['rules'][$action_name][$grpid]);
+					}
+				}
+			}
 			$rules = new JRules($array['rules']);
 			$this->setRules($rules);
 		}
-
+		
 		return parent::bind($array, $ignore);
 	}
 	
@@ -249,12 +260,15 @@ class flexicontent_categories extends JTableNested
 			// Existing category
 			$this->modified_time	= $date->toMySQL();
 			$this->modified_user_id	= $user->get('id');
+			$is_new = false;
 		} else {
 			// New category
 			$this->created_time		= $date->toMySQL();
 			$this->created_user_id	= $user->get('id');
+			$is_new = true;
 		}
-	// Verify that the alias is unique
+		
+		// Verify that the alias is unique
 		$table = JTable::getInstance('flexicontent_categories','');
 		if ($table->load(array('alias'=>$this->alias,'parent_id'=>$this->parent_id,'extension'=>$this->extension)) && ($table->id != $this->id || $this->id==0)) {
 
@@ -262,7 +276,8 @@ class flexicontent_categories extends JTableNested
 			return false;
 		}
 		
-		if (isset($this->asset_id)) {
+		// NOT NEEDED handle by parent::store()
+		/*if (isset($this->asset_id)) {
 			$asset	= JTable::getInstance('Asset');
 			if (!$asset->load($this->asset_id)) {
 				$name = $this->_getAssetName();
@@ -280,8 +295,26 @@ class flexicontent_categories extends JTableNested
 					return false;
 				}
 			}
+		}*/
+		
+		$result = parent::store($updateNulls);
+			
+		// Force com_content extension for new categories ... and for existing ones, just to make sure ...
+		if ($is_new || !$is_new)
+		{
+			$query 	= 'UPDATE #__categories'
+				. ' SET extension = "com_content" '
+				. ' WHERE id = ' . (int)$this->id;
+				;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			if (!$this->_db->query()) {
+				$e = new JException(JText::sprintf($this->_db->getErrorMsg()));
+				$this->setError($e);
+				return false;
+			}
 		}
 		
-		return parent::store($updateNulls);
+		return $result;
 	}
 }

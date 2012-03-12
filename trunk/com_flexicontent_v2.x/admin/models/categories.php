@@ -254,7 +254,8 @@ class FlexicontentModelCategories extends JModelList
 	function delete($cids)
 	{
 		$params = & JComponentHelper::getParams('com_flexicontent');
-		$table  =& $this->getTable('flexicontent_categories', '');
+		$table  = & $this->getTable('flexicontent_categories', '');
+		$user 	= & JFactory::getUser();
 		
 		// Add all children to the list
 		foreach ($cids as $id)
@@ -280,7 +281,7 @@ class FlexicontentModelCategories extends JModelList
 		$err = array();
 		$cid = array();
 		
-		// Check access to delete of categories
+		// Check access to delete of categories, this may seem redundant, but it is a security check in case user manipulates the backend adminform ...
 		foreach ($rows as $row) {
 			$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
 			$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');

@@ -270,8 +270,6 @@ class FlexicontentModelCategory extends JModelAdmin
 			}
 		}
 
-		//$category->setRules($data['rules']);
-		
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		//$params			= $data["params"];
 		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
@@ -288,11 +286,25 @@ class FlexicontentModelCategory extends JModelAdmin
 		if ($copyparams) {
 			$category->params = $this->getParams($copyparams);
 		}
+		
 		// Bind the rules.
-		if (isset($data['rules'])) {
+		/*if (isset($data['rules'])) {
+			foreach($data['rules'] as $action_name => $identities) {
+				foreach($identities as $grpid => $val) {
+					if ($val==="") {
+						unset($data['rules'][$action_name][$grpid]);
+					}
+				}
+			}
 			$rules = new JRules($data['rules']);
 			$category->setRules($rules);
 		}
+		echo "<pre>";
+		print_r($data['rules']);
+		print_r($rules);
+		echo "</pre>";*/
+		//die('die() in model');
+		
 
 		// Make sure the data is valid
 		if (!$category->check()) {
@@ -312,7 +324,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$this->setError(500, $this->_db->getErrorMsg() );
 			return false;
 		}
-
+		
 		// Trigger the onContentAfterSave event.
 		$dispatcher->trigger($this->event_after_save, array($this->option.'.'.$this->name, &$table, $isNew));
 
@@ -328,7 +340,15 @@ class FlexicontentModelCategory extends JModelAdmin
 			return false;
 		}
 		$this->setState($this->getName().'.id', $category->id);
-
+		
+		if ($category->id)
+		{
+			$query 	= 'UPDATE #__categories'
+				. ' SET extension = "com_content" '
+				. ' WHERE id = ' . (int)$category->id;
+				;
+		}
+		
 		// Clear the cache
 		$this->cleanCache();
 		//$category->checkin();
