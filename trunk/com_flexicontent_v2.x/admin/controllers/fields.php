@@ -366,7 +366,7 @@ class FlexicontentControllerFields extends FlexicontentController{
 	 */
 	function orderdown()
 	{
-		$model->reorder($dir=1);
+		$this->reorder($dir=1);
 	}
 
 	/**

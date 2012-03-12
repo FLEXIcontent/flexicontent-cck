@@ -448,15 +448,14 @@ class FlexicontentModelField extends JModelAdmin{
 			$this->setError($field->getError() );
 			return false;
 		}
-		$field->setRules($data['jform']['rules']);
-		$field->_trackAssets = true;
+		
 		// Store it in the db
 		if (!$field->store()) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
 		//work
-		$query = "SELECT asset_id FROM #__flexicontent_fields WHERE id='{$field->id}';";
+		/*$query = "SELECT asset_id FROM #__flexicontent_fields WHERE id='{$field->id}';";
 		$this->_db->setQuery($query);
 		$asset_id = $this->_db->loadResult();
 		if($field->asset_id && !$asset_id) {
@@ -466,7 +465,7 @@ class FlexicontentModelField extends JModelAdmin{
 			$query->where($this->_db->nameQuote('id').' = '.(int) $field->id);
 			$this->_db->setQuery($query);
 			$this->_db->query();
-		}
+		}*/
 		// Add the id to the name if it's a new field only
 		// I know it's a little tricky but it functions
 /*
