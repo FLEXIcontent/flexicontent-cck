@@ -953,8 +953,8 @@ class FlexicontentModelFlexicontent extends JModel
 			$comp_section = ! ( count($deleted_actions) || count($added_actions) );  // false if deleted or addeded actions exist
 		}
 		
-		echo ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
-		echo count(JAccess::getActions('com_flexicontent', 'component')) . "<br />";
+		//echo ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
+		//echo count(JAccess::getActions('com_flexicontent', 'component')) . "<br />";
 		
 		// CHECK if some categories don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
@@ -974,7 +974,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$result = $db->loadObjectList();
 		$field_section = count($result) == 0 ? 1 : 0;
 		
-		echo "$comp_section && $category_section && $field_section<br>";
+		//echo "$comp_section && $category_section && $field_section<br>";
 		
 		return ($comp_section && $category_section && $field_section);
 	}

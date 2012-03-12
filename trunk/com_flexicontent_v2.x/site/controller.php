@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1172 2012-03-09 04:57:04Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,7 +51,7 @@ class FlexicontentController extends JController
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
 		
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
-			// Force add() TASK if layout is form, this way we will check permissions
+			// Force add() TASK if layout is form
 			JRequest::setVar('task', 'add');
 			$this->add();
 		} else {
@@ -152,9 +152,13 @@ class FlexicontentController extends JController
 		$view = & $this->getView(FLEXI_ITEMVIEW, 'html');
 		// Get/Create the model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
-
+		
+		// Access checking for item ADD and item DISPLAY WAS MOVED TO THE items model,
+		// and also the access because of the fact that the display task is used by other views too
+		// in future it maybe moved back here to the controller, create a special task item_display() for item viewing
+		
 		//general access check
-		if (FLEXI_J16GE) {
+		/*if (FLEXI_J16GE) {
 			$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
 			// ALTERNATIVE 1
 			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
@@ -170,10 +174,7 @@ class FlexicontentController extends JController
 		if ($not_authorised) {
 			// user isn't authorize to add ANY content
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-		}
-
-		// Get/Create the model
-		$model = & $this->getModel(FLEXI_ITEMVIEW);
+		}*/
 
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
