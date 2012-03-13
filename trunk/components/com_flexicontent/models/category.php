@@ -1176,7 +1176,7 @@ class FlexicontentModelCategory extends JModel {
 			break;
 			
 			default:
-				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).'.php';
+				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).(FLEXI_J16GE ? DS.strtolower($field_type) : "").'.php';
 				if(file_exists($path)) require_once($path);
 				require_once($path);
 				$mexists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");

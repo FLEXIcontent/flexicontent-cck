@@ -258,12 +258,8 @@ class FlexicontentViewItems extends JView {
 
 		// search filter
 		$extdata = array();
-		$extdata[] = JHTML::_('select.option', 5, 	'5 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 30, 	'30 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 50, 	'50 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$extdata[] = JHTML::_('select.option', 100, '100 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 200, '200 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 300, '300 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$extdata[] = JHTML::_('select.option', 250, '200 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$extdata[] = JHTML::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$extdata[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$extdata[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
