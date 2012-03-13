@@ -380,6 +380,7 @@ window.addEvent('domready', function() {
 				<span class="radio"><?php echo $this->lists['date']; ?></span>
 				<?php echo $this->lists['startdate']; ?>&nbsp;<?php echo $this->lists['enddate']; ?>
 			</td>
+			<td class="left"></td>
 			<td class="left col_id">
 				<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
 			</td>
