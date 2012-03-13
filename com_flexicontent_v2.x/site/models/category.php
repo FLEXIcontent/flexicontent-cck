@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1171 2012-03-09 04:53:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1176,7 +1176,7 @@ class FlexicontentModelCategory extends JModel {
 			break;
 			
 			default:
-				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).DS.strtolower($field_type).'.php';
+				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).(FLEXI_J16GE ? DS.strtolower($field_type) : "").'.php';
 				if(file_exists($path)) require_once($path);
 				require_once($path);
 				$mexists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");

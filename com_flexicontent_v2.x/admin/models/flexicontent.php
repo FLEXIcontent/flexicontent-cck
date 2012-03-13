@@ -945,6 +945,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$rules_data = $rules->getData();
 			$component_actions = JAccess::getActions($component_name, 'component');
 			
+			$db_action_names = array();
 			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
 			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
@@ -1019,6 +1020,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$component_actions = JAccess::getActions('com_flexicontent', 'component');
 			
 			// Find any deleted / added actions ...
+			$db_action_names = array();
 			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
 			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
