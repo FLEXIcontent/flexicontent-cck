@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 19343 2010-11-03 18:12:02Z ian $
+* @version		$Id$
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -86,8 +86,6 @@ class FlexicontentViewUsers extends JView
 		}
 		$js .= "});";
 		$document->addScriptDeclaration($js);
-
-
 
 		FLEXISubmenu('CanAuthors');
 
