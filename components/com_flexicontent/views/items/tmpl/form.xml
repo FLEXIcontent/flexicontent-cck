@@ -10,18 +10,16 @@
 		<name>FLEXICONTENT_ITEM_SUBMISSION</name>
 		<description>FLEXICONTENT_ITEM_SUBMISSION_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-		<param name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC"> 
-			<option value="1">Article</option> 
-		</param>
+		<param name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> 
 		</url>
 		
 		<params addpath="/administrator/components/com_flexicontent/elements">
 			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
 			<param name="maincatid" type="flexicategories" multiple="false" required="false" size="1" default="" label="Default Main Category" description="The category that will be selected as default main category on form load" />
-			<param name="postcats" type="list" default="0" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
-				<option value="0">ALL_CATS</option>
-				<option value="1">ONE_CAT</option>
-				<option value="2">MULTIPLE_CATS</option>
+			<param name="postcats" type="list" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
+				<option value="0">SUBMIT_IN_EXACT_CATS</option>
+				<option value="1">SUBMIT_IN_ONE_CAT</option>
+				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
 			</param>
 			<param name="allowunauthorize" type="radio" default="0" label="Allow unauthorized users" description="Allow unauthorized users to add article.">
 				<option value="0">NO</option>

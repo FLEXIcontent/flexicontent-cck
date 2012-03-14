@@ -201,9 +201,21 @@ function deleteTag(obj) {
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons">
-			<input type="button" class="button" onclick="javascript:submitbutton('save')" value="<?php echo JText::_( 'FLEXI_SAVE' ) ?>" />
-			<button type="reset" class="button" onclick="javascript:submitbutton('cancel')">
-				<?php echo JText::_( 'FLEXI_CANCEL' ) ?>
+			<button class="button" onclick="javascript:submitbutton('save')">
+				<span class="fcbutton_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE' : 'FLEXI_ADD' ) ?></span>
+			</button>
+		<!--
+			<button type="button" class="button" onclick="javascript: submitbutton('save_a_preview');">
+				<span class="fcbutton_preview_save"><?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?></span>
+			</button>
+			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid).'&preview=1');?>" target="_blank" style="text-decoration:none!important;">
+				<button type="button" class="button" onclick="javascript:;">
+					<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
+				</button>
+			</a>
+		-->
+			<button class="button" onclick="javascript:submitbutton('cancel')">
+				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 		</div>
          
@@ -222,14 +234,12 @@ function deleteTag(obj) {
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
-			<?php /*
 			<div class="flexi_formblock">
 				<label for="alias" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 				</label>
 				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->item->alias; ?>" size="65" maxlength="254" />
 			</div>
-			*/ ?>
 	<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
