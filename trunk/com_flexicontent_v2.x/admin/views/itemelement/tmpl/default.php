@@ -95,6 +95,8 @@ defined('_JEXEC') or die('Restricted access');
 					$img = 'publish_g.png';
 					$alt = JText::_( 'FLEXI_IN_PROGRESS' );
 					$state = -5;
+				} else {
+					$img = '';
 				}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
@@ -113,7 +115,9 @@ defined('_JEXEC') or die('Restricted access');
 			<td align="center"><?php echo $row->lang; ?></td>
 			<?php endif; ?>
 			<td align="center">
-				<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>"  title="<?php echo $alt; ?>" />
+				<?php if ($img) : ?>
+					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>"  title="<?php echo $alt; ?>" />
+				<?php endif; ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>

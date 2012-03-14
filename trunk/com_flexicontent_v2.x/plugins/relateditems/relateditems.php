@@ -129,6 +129,8 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
     } else if (!$viewallcats) {
     	$allowed_cats = $usercats;
     }
+		if ( $allowed_cats && ( !count($allowed_cats) || empty($allowed_cats[0]) ) ) $allowed_cats = false;
+		if ( $disallowed_cats && ( !count($disallowed_cats) || empty($disallowed_cats[0]) ) ) $disallowed_cats = false;
     
 		if ( $allowed_cats ) {
 			$where .= ($where=="") ? "" : " AND ";

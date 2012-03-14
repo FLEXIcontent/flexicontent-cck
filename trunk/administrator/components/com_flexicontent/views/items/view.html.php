@@ -188,7 +188,7 @@ class FlexicontentViewItems extends JView {
 			
 			JToolBarHelper::addNew();
 			if ($CanCopy) {
-				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY/MOVE' );
+				JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
 			}
 		}
 		if ($CanEdit) {

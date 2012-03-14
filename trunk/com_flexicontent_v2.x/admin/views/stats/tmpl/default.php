@@ -275,7 +275,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 		<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_#' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -312,7 +312,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 		<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_#' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
