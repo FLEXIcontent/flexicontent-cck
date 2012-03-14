@@ -31,7 +31,7 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 class FlexicontentViewItem extends JView
 {
 	var $_type='';
-	var $_name='Item';
+	var $_name='item';
 	
 	/**
 	 * Creates the item page
