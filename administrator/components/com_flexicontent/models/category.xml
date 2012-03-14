@@ -87,7 +87,7 @@
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
-		<param name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_Show/Hide_the_items_title">
+		<param name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE">
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>

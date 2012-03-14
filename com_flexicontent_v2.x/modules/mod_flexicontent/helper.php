@@ -333,6 +333,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
+					$lists[$ord]['featured'][$i]->catid = $row-> catid; 
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
@@ -441,6 +442,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
+					$lists[$ord][ 'standard'][$i]->catid = $row-> catid;
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;

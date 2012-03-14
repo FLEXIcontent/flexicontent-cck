@@ -362,8 +362,9 @@ class FlexicontentController extends JController
 		}
 		$task = JRequest::getVar('task');
 		if($task=='save_a_preview') {
+			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
-			$this->setRedirect($link);
+			$this->setRedirect($link, $msg);
 			return;
 		}
 		if ($user->authorize('com_flexicontent', 'state') )

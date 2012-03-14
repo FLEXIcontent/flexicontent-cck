@@ -104,6 +104,12 @@ class plgSystemFlexisystem extends JPlugin
 				// url to redirect
 				$urlItems = 'index.php?option=com_flexicontent';
 
+				$layout = JRequest::getCMD('layout');
+				$function = JRequest::getCMD('function');
+				
+				// Selecting Joomla article for menu item
+				if ($layout=="modal" && $function="jSelectArticle_jform_request_id") return false;
+
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
 					$cid = $cid ? $cid : JRequest::getVar('cid');
