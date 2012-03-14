@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		$Id: controller.php 15176 2010-03-04 21:49:55Z ian $
+ * @version		$Id$
  * @package		Joomla
  * @subpackage	Users
  * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -238,6 +238,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		{
 			// Get an ACL object
 			$acl = &JFactory::getACL();
+			$mainframe =& JFactory::getApplication();
 
 			// Get the user group from the ACL
 			$grp = $acl->getAroGroup($user->get('id'));
@@ -254,9 +255,18 @@ class FlexicontentControllerusers extends FlexicontentController
 
 			// Set the usertype based on the ACL group name
 			$user->set('usertype', $grp->name);
+			
+			// Add FLEXIaccess JUser parameters to the session
+			// @TODO: find a more generic solution that would trigger the onLogin event
+			if (FLEXI_ACCESS) 
+			{
+				$user->set('gmid', $me->get('gmid'));
+				$user->set('level', $me->get('level'));
+			}
 
 			$session = &JFactory::getSession();
 			$session->set('user', $user);
+			
 		}
 		
 		
@@ -516,4 +526,5 @@ class FlexicontentControllerusers extends FlexicontentController
 		$contact_id = JRequest::getVar( 'contact_id', '', 'post', 'int' );
 		$this->setRedirect( 'index.php?option=com_contact&task=edit&cid[]='. $contact_id );
 	}
+
 }

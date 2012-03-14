@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 14401 2010-01-26 14:10:00Z louis $
+* @version		$Id$
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -181,7 +181,7 @@ class FlexicontentViewUser extends JView
 			if ( $user->get('id'))
 			{
 				// get all the groups from the user
-				$query = 'SELECT group_id'
+				$query 	= 'SELECT group_id'
 				. ' FROM #__flexiaccess_members'
 				. ' WHERE member_id = '.(int) $cid[0]
 				;
