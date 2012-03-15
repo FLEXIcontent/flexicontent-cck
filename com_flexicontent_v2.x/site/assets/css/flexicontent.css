@@ -270,10 +270,10 @@ div.flexi_edit .flexi_buttons button:hover {
 	display: inline-block !important;
 	min-height: 16px !important;
 }
-.fcbutton_save { background: url(../images/fam3-icons/accept.png) no-repeat !important; color: green !important; }
-.fcbutton_cancel { background: url(../images/fam3-icons/cancel.png) no-repeat !important;  color: red !important; }
-.fcbutton_preview { background: url(../images/fam3-icons/monitor.png) no-repeat !important; color: blue !important; }
-.fcbutton_preview_save { background: url(../images/fam3-icons/monitor_go.png) no-repeat !important;  color: magenta !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; color: green !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: blue !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: magenta !important; }
 
 
 div.flexi_edit .flexi_label {

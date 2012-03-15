@@ -14,24 +14,39 @@
 		</url>
 		
 		<params addpath="/administrator/components/com_flexicontent/elements">
-			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_SELECT_CATS" description="FLEXI_MENU_SELECT_CATS_DESC" />
-			<param name="maincatid" type="flexicategories" multiple="false" required="false" size="1" default="" label="Default Main Category" description="The category that will be selected as default main category on form load" />
-			<param name="postcats" type="list" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
-				<option value="0">SUBMIT_IN_EXACT_CATS</option>
+			<param name="maincatid" type="flexicategories" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" />			
+			
+			<param name="" label="" type="separator" default="FLEXI_OVERRIDE_USER_CATEGORY_PERMS" level="level2" menu="hide" />
+			
+			<param name="overridecatperms" type="radio" default="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+				
+			<param name="postcats" type="radio" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
+				<option value="0">SUBMIT_IN_ALL_DISPLAYED_CATS</option>
 				<option value="1">SUBMIT_IN_ONE_CAT</option>
 				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
 			</param>
-			<param name="allowunauthorize" type="radio" default="0" label="Allow unauthorized users" description="Allow unauthorized users to add article.">
-				<option value="0">NO</option>
-				<option value="1">YES</option>
+			
+			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" />
+			
+			<param name="" label="" type="separator" default="FLEXI_OVERRIDE_OTHER_PERMS" level="level2" menu="hide" />
+			
+			<param name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS" description="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_MENU_YES_EXCLUDE_GUESTS</option>
 			</param>
+			
 			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
-				<option value="0">NO</option>
-				<option value="1">YES</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
+			
 			<param name="autopublished" type="radio" default="0" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC">
-				<option value="0">NO</option>
-				<option value="1">YES</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" />
 		</params>
