@@ -113,20 +113,20 @@
 			<field name="separator6" label="" type="separator" default="FLEXI_ITEMS_CONF" level="level1" menu="hide" />
 
 			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" menu="hide">
-				<option value="">Default - Unordered</option>
-				<option value="lang">Language</option>
-				<option value="type_name">Content type</option>
-				<option value="i.access">Access scope</option>
-				<option value="i.title">Title</option>
-				<option value="i.ordering">Item ordering field</option>
-				<option value="i.created">Creation Date</option>
-				<option value="i.modified">Modification Date</option>
-				<option value="i.hits">Most Hits</option>
-				<option value="i.id">Item id</option>
+				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
+				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
+				<option value="type_name">FLEXI_ITEMS_MANAGER_ORDER_CONTENT_TYPE</option>
+				<option value="i.access">FLEXI_ITEMS_MANAGER_ORDER_ACCESS_SCOPE</option>
+				<option value="i.title">FLEXI_ITEMS_MANAGER_ORDER_TITLE</option>
+				<option value="i.ordering">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ORDERING_FIELD</option>
+				<option value="i.created">FLEXI_ITEMS_MANAGER_ORDER_CREATION_DATE</option>
+				<option value="i.modified">FLEXI_ITEMS_MANAGER_ORDER_MODIFICATION_DATE</option>
+				<option value="i.hits">FLEXI_ITEMS_MANAGER_ORDER_MOST_HITS</option>
+				<option value="i.id">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ID</option>
 			</field>
 			<field name="items_manager_order_dir" type="list" default="ASC" label="FLEXI_ITEMS_MANAGER_ORDER_DIR" description="FLEXI_ITEMS_MANAGER_ORDER_DIR_DESC" menu="hide">
-				<option value="ASC">Normal</option>
-				<option value="DESC">Reverse</option>
+				<option value="ASC">FLEXI_ITEMS_MANAGER_ORDER_DIR_NORMAL</option>
+				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
 			</field>
 			
 			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE" menu="hide">
