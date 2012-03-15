@@ -50,6 +50,9 @@ class FlexicontentController extends JController
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
 		
+		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
+		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
+		
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
 			// Force add() TASK if layout is form
 			JRequest::setVar('task', 'add');
@@ -80,6 +83,21 @@ class FlexicontentController extends JController
 		// Debuging message
 		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
 		
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		/*if (FLEXI_J16GE) {
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+				$cparams->merge($menuParams);
+			}
+		}*/
+		
+		//$overridecatperms	= $cparams->get("overridecatperms", 1);
+		//$allowunauthorize	= $cparams->get('allowunauthorize', 0);
+		//$notauthurl				= $cparams->get('notauthurl', '');          //  custom unauthorized page via menu item
+		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
+		
 		// Retrieve current logged user info
 		$user	=& JFactory::getUser();
 		// Create the view
@@ -106,8 +124,17 @@ class FlexicontentController extends JController
 			}
 			
 			if (!$has_edit) {
-				// user isn't authorize to edit THIS item
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				/*if ($notauthurl) {
+					//  custom unauthorized page via menu item
+					$mainframe->redirect($notauthurl);				
+				} else*/
+				if ($unauthorized_page) {
+					//  unauthorized page via global configuration
+					$mainframe->redirect($unauthorized_page);				
+				} else {
+					// user isn't authorize to edit this content
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				}
 			}
 		} else {
 			JError::raiseError( 500, 'Can not edit item, because item id is not set' );
@@ -145,7 +172,23 @@ class FlexicontentController extends JController
 	{
 		// Debuging message
 		//JError::raiseNotice(500, 'IN ADD()'); // TOREMOVE
-
+		
+		$mainframe = &JFactory::getApplication();
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+				$cparams->merge($menuParams);
+			}
+		}
+		
+		$overridecatperms	= $cparams->get("overridecatperms", 1);
+		$allowunauthorize	= $cparams->get('allowunauthorize', 0);
+		$notauthurl				= $cparams->get('notauthurl', '');          //  custom unauthorized page via menu item
+		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
+		
 		// Retrieve current logged user info
 		$user	=& JFactory::getUser();
 		// Create the view
@@ -153,13 +196,11 @@ class FlexicontentController extends JController
 		// Get/Create the model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
 		
-		// Access checking for item ADD and item DISPLAY WAS MOVED TO THE items model,
-		// and also the access because of the fact that the display task is used by other views too
-		// in future it maybe moved back here to the controller, create a special task item_display() for item viewing
+		//$user_cats_count = count( FlexicontentHelperPerm::getCats(array('core.create')) );
 		
 		//general access check
-		/*if (FLEXI_J16GE) {
-			$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
+		if (FLEXI_J16GE) {
+			$canAdd	= $user->authorize('core.create', 'com_flexicontent'); // && ( !$overridecatperms && $user_cats_count );
 			// ALTERNATIVE 1
 			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 			$not_authorised = !$canAdd;
@@ -171,10 +212,21 @@ class FlexicontentController extends JController
 			$not_authorised = ! $canAdd;
 		}
 		
-		if ($not_authorised) {
-			// user isn't authorize to add ANY content
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-		}*/
+		// Allow item submission by unauthorized users, ... even guests ...
+		if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
+		
+		if ($not_authorised && !$allowunauthorize) {
+			if ($notauthurl) {
+				//  custom unauthorized page via menu item
+				$mainframe->redirect($notauthurl);				
+			} else if ($unauthorized_page) {
+				//  unauthorized page via global configuration
+				$mainframe->redirect($unauthorized_page);				
+			} else {
+				// user isn't authorize to add ANY content
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			}
+		}
 
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
@@ -250,7 +302,7 @@ class FlexicontentController extends JController
 				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
 				$not_authorised = ! $canAdd;
 			}
-			if ( $allowunauthorize) $canAdd = true;
+			if ( $allowunauthorize ) $canAdd = true;
 		}
 
 

@@ -94,6 +94,15 @@ class FlexicontentModelItem extends ParentClassItem
 		$mainframe =& JFactory::getApplication();
 		$cparams = clone($mainframe->getParams('com_flexicontent'));
 		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+				$cparams->merge($menuParams);
+			}
+		}
+		
 		if($isform) {
 			$item = parent::getItem($pk);
 			$this->_item = &$item;

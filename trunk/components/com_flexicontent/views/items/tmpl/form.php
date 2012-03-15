@@ -22,12 +22,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $cid = $this->params->get("cid");
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
+$overridecatperms = $this->params->get("overridecatperms", 1);
 // Check user permission for submitting to multiple categories
 if (!$this->perms['multicat']) {
 	if ($postcats==2) $postcats = 1;
 }
 
-if ($cid) :
+if ($cid && $overridecatperms) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
 	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
@@ -240,7 +241,7 @@ function deleteTag(obj) {
 				</label>
 				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->item->alias; ?>" size="65" maxlength="254" />
 			</div>
-	<?php if ($cid) : /* MENU SPECIFIED categories subset */ ?>
+	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
 				<label for="cid" class="flexi_label">
