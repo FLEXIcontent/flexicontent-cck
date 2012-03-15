@@ -42,13 +42,13 @@
 			
 			<field name="sep_cat_extra" type="separator" hr="false" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
 				<option value="2">FLEXI_JOMCOMMENTS</option>
 			</field>
 			<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -57,22 +57,22 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
@@ -108,7 +108,7 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="trigger_onprepare_content_cat" type="radio" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -159,28 +159,28 @@
 			<field name="sep_items_retrieval" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
 			<field name="display_subcategories_items" type="list" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
 				<option value="0">FLEXI_NO</option> 
-				<option value="1">1st sublevel</option> 
-				<option value="2">All sublevels</option> 
+				<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
+				<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
 			</field>
 			<field name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
 			
 			<field name="sep_items_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
-				<option value="">Default</option>
-				<option value="date">Oldest first</option>
-				<option value="rdate">Most recent first</option>
-				<option value="modified">Last modified first</option>
-				<option value="alpha">Title Alphabetical</option>
-				<option value="ralpha">Title Reverse-Alphabetical</option>
-				<option value="author">Author Alphabetical</option>
-				<option value="rauthor">Author Reverse-Alphabetical</option>
-				<option value="hits">Most Hits</option>
-				<option value="rhits">Least Hits</option>
-				<option value="order">Ordering</option>
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_ORDERING</option>
 			</field>
 			<field name="orderbycustomfieldid" type="fields" field_type="text" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." >
