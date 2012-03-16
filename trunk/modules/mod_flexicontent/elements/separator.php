@@ -40,11 +40,11 @@ class JElementSeparator extends JElement
 		$level = $node->attributes('level');
 		
 		if ($level == 'level2') {
-			$style = 'padding: 4px 4px 4px 10px; background-color: #ccc; display: block; color: #000; font-weight: bold; margin-left:10px;';
+			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
-			$style = 'padding: 5px 4px 5px 5px; font-weight: bold;';
+			$style = 'padding: 4px 6% 4px 6%; font-weight: bold; clear:both; width:100%; display: block; float: left;';
 		} else {
-			$style = 'padding: 5px 4px 5px 10px; background-color: #777; display: block; color: #fff; font-weight: bold;';
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
 		}
 		
 		$class = ""; $title = "";

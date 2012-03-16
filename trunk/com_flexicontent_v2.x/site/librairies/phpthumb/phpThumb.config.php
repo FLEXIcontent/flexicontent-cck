@@ -158,7 +158,7 @@ $PHPTHUMB_CONFIG['nohotlink_erase_image']       = true;                         
 $PHPTHUMB_CONFIG['nohotlink_text_message']      = 'Off-server thumbnailing is not allowed'; // text of error message
 
 // * Off-server Linking Configuration:
-$PHPTHUMB_CONFIG['nooffsitelink_enabled']       = true;                                       // If false will allow thumbnails to be linked to from any domain, if true only domains listed below in 'nooffsitelink_valid_domains' will be allowed.
+$PHPTHUMB_CONFIG['nooffsitelink_enabled']       = false;                                       // If false will allow thumbnails to be linked to from any domain, if true only domains listed below in 'nooffsitelink_valid_domains' will be allowed.
 $PHPTHUMB_CONFIG['nooffsitelink_valid_domains'] = array(@$_SERVER['HTTP_HOST']);              // This is the list of domains for which thumbnails are allowed to be created. The default value of the current domain should be fine in most cases, but if neccesary you can add more domains in here, in the format 'www.example.com'
 $PHPTHUMB_CONFIG['nooffsitelink_require_refer'] = false;                                      // If false will allow standalone calls to phpThumb(). If true then only requests with a $_SERVER['HTTP_REFERER'] value in 'nooffsitelink_valid_domains' are allowed.
 $PHPTHUMB_CONFIG['nooffsitelink_erase_image']   = false;                                      // if true thumbnail is covered up with $PHPTHUMB_CONFIG['nohotlink_fill_color'] before text is applied, if false text is written over top of thumbnail

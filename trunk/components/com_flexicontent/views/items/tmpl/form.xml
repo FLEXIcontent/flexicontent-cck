@@ -14,41 +14,58 @@
 		</url>
 		
 		<params addpath="/administrator/components/com_flexicontent/elements">
-			<param name="maincatid" type="flexicategories" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" />			
-			
-			<param name="" label="" type="separator" default="FLEXI_OVERRIDE_USER_CATEGORY_PERMS" level="level2" menu="hide" />
-			
-			<param name="overridecatperms" type="radio" default="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-				
-			<param name="postcats" type="radio" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
-				<option value="0">SUBMIT_IN_ALL_DISPLAYED_CATS</option>
-				<option value="1">SUBMIT_IN_ONE_CAT</option>
-				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
-			</param>
-			
-			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" />
-			
-			<param name="" label="" type="separator" default="FLEXI_OVERRIDE_OTHER_PERMS" level="level2" menu="hide" />
-			
+
+			<param name="maincatid" type="flexicategories" top="2" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" />
+
+			<param name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level2" menu="hide" />
+
 			<param name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS" description="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_YES_EXCLUDE_GUESTS</option>
 			</param>
-			
-			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			
-			<param name="autopublished" type="radio" default="0" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
 			<param name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" />
+			<param name="autopublished" type="list" default="0" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC">
+				<option value="0">FLEXI_MENU_AUTOPUBLISH_NO_LET_USER_CHOOSE</option>
+				<option value="1">FLEXI_MENU_AUTOPUBLISH_YES_HIDE_STATE</option>
+			</param>
+
+			<param name="" label="" type="separator" default="FLEXI_OVERRIDE_USER_CATEGORY_TREE" level="level2" menu="hide" />
+
+			<param name="overridecatperms" type="radio" default="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="cid" type="flexicategories" multiple="true" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" />
+			<param name="postcats" type="radio" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
+				<option value="0">SUBMIT_IN_ALL_ABOVE_CATS</option>
+				<option value="1">SUBMIT_IN_ONE_CAT</option>
+				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
+			</param>
+
+			<param name="" label="" type="separator" default="FLEXI_SIMPLIFY_FORM" level="level2" menu="hide" />
+
+			<param name="usealias" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+			</param>
+			<param name="usepublicationdetails" type="radio" default="0" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+			</param>
+			<param name="usetemplateparams" type="radio" default="0" label="FLEXI_MENU_USE_TEMPLATE_PARAMS" description="FLEXI_MENU_USE_TEMPLATE_PARAMS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+			</param>
+
 		</params>
 	</state>
 		

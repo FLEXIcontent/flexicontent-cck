@@ -23,11 +23,13 @@ $cid = $this->params->get("cid");
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
-// Check user permission for submitting to multiple categories
+
+// DO NOT override user's  permission for submitting to multiple categories
 if (!$this->perms['multicat']) {
 	if ($postcats==2) $postcats = 1;
 }
 
+// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
 if ($cid && $overridecatperms) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
@@ -192,7 +194,7 @@ function deleteTag(obj) {
 
 </script>
 
-<div id="flexicontent" class="adminForm flexi_edit">
+<div id="flexicontent" class="adminForm flexi_edit" style="font-size:90%;">
 
     <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
     <h1 class="componentheading">
@@ -201,7 +203,7 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
-		<div class="flexi_buttons">
+		<div class="flexi_buttons" style="font-size:100%;">
 			<button class="button" onclick="javascript:submitbutton('save')">
 				<span class="fcbutton_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE' : 'FLEXI_ADD' ) ?></span>
 			</button>
@@ -209,11 +211,13 @@ function deleteTag(obj) {
 			<button type="button" class="button" onclick="javascript: submitbutton('save_a_preview');">
 				<span class="fcbutton_preview_save"><?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?></span>
 			</button>
-			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid).'&preview=1');?>" target="_blank" style="text-decoration:none!important;">
-				<button type="button" class="button" onclick="javascript:;">
-					<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
-				</button>
-			</a>
+			<?php
+				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
+				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid).'&preview=1');
+			?>
+			<button class="button" onclick="javascript: window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
+				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
+			</button>
 		-->
 			<button class="button" onclick="javascript:submitbutton('cancel')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
@@ -235,13 +239,19 @@ function deleteTag(obj) {
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
+			
+		<?php if($this->params->get('usealias', 1)) : ?>
+					
 			<div class="flexi_formblock">
 				<label for="alias" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 				</label>
 				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->item->alias; ?>" size="65" maxlength="254" />
 			</div>
-	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset */ ?>
+			
+		<?php endif; ?>
+			
+	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
 				<label for="cid" class="flexi_label">
@@ -283,19 +293,20 @@ function deleteTag(obj) {
 	<?php endif; ?>
 
 			<?php
-			if ($autopublished = $this->params->get('autopublished', 0)) : 
+			$autopublished = $this->params->get('autopublished', 0);
+			if ($autopublished) :        // autopublish enabled, hide state selection field
 			?>
 				<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
 				<input type="hidden" id="vstate" name="vstate" value="2" />
 			<?php 
-			elseif ($this->perms['canpublish']) :
+			elseif ($this->perms['canpublish']) :  // autopublished disabled, display state selection field to the user
 			?>
 			<div class="flexi_formblock">
 				<?php
 					$field = $this->fields['state'];
 					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label for="title" <?php echo $field_tooltip; ?> >
+				<label for="state" <?php echo $field_tooltip; ?> >
 					<?php echo $field->label.':'; ?>
 					<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 				</label>
@@ -523,7 +534,7 @@ function deleteTag(obj) {
 	<?php
 		echo "<br/ >";
 		echo $this->pane->startPane( 'det-pane' );
-		if($this->params->get('usemetadata', 1)) {
+		if($this->perms['canparams'] && $this->params->get('usemetadata', 1)) {
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
 			echo $this->pane->startPanel( $title, "metadata-page" );
 			echo $this->formparams->render('meta', 'metadata');
@@ -535,33 +546,33 @@ function deleteTag(obj) {
 			<?php
 		}
 	?>
-	<?php if ($this->perms['canparams'] || $this->perms['isSuperAdmin']) : ?>
-	<?php
-
-		if ($this->perms['isSuperAdmin']) {
-			$title = JText::_( 'FLEXI_DETAILS' );
-			echo $this->pane->startPanel( $title, 'details' );
-			echo $this->formparams->render('details');
-			echo $this->pane->endPanel();
-		}
-		
-		if ($this->perms['cantemplates']) {
-			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->formparams->render('params', 'advanced');
-			echo $this->pane->endPanel();
 	
-			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-			foreach ($this->tmpls as $tmpl) {
-				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-				echo $tmpl->params->render();
-				echo $this->pane->endPanel();
-			}
-		}
-		
+	<?php if ($this->perms['canparams'] && $this->params->get('usepublicationdetails')) : ?>
+		<?php
+		$title = JText::_( 'FLEXI_DETAILS' );
+		echo $this->pane->startPanel( $title, 'details' );
+		echo $this->formparams->render('details');
+		echo $this->pane->endPanel();
 		?>
 	<?php endif; ?>
+		
+	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
+		<?php
+		$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
+		echo $this->pane->startPanel( $title, "params-page" );
+		echo $this->formparams->render('params', 'advanced');
+		echo $this->pane->endPanel();
+
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+		foreach ($this->tmpls as $tmpl) {
+			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+			echo $this->pane->startPanel( $title, "params-".$tmpl->name );
+			echo $tmpl->params->render();
+			echo $this->pane->endPanel();
+		}
+		?>		
+	<?php endif; ?>
+	
 	<?php 
 		echo $this->pane->endPane();
 	?>

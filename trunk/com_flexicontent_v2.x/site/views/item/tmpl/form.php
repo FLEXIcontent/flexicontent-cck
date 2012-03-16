@@ -25,11 +25,13 @@ $cid = $this->params->get("cid");
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
-// Check user permission for submitting to multiple categories
+
+// DO NOT override user's  permission for submitting to multiple categories
 if (!$this->perms['multicat']) {
 	if ($postcats==2) $postcats = 1;
 }
 
+// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
 if ($cid && $overridecatperms) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
@@ -195,7 +197,7 @@ function deleteTag(obj) {
 
 </script>
 
-<div id="flexicontent" class="adminForm flexi_edit">
+<div id="flexicontent" class="adminForm flexi_edit" style="font-size:90%;">
 
     <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
     <h1 class="componentheading">
@@ -204,18 +206,20 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
-		<div class="flexi_buttons">
-			<button class="button" onclick="javascript: Joomla.submitbutton('save')">
+		<div class="flexi_buttons" style="font-size:90%;">
+			<button onclick="javascript: Joomla.submitbutton('save')">
 				<span class="fcbutton_save"><?php echo JText::_( $this->item->getValue('id') ? 'FLEXI_SAVE' : 'FLEXI_ADD' ) ?></span>
 			</button>
-			<button type="button" class="button" onclick="javascript: Joomla.submitbutton('save_a_preview');">
+			<button class="button" onclick="javascript: Joomla.submitbutton('save_a_preview');">
 				<span class="fcbutton_preview_save"><?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?></span>
 			</button>
-			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');?>" target="_blank">
-				<button type="button" class="button" onclick="javascript:;">
-					<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
-				</button>
-			</a>
+			<?php
+				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
+				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');
+			?>
+			<button class="button" onclick="javascript: window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
+				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
+			</button>
 			<button class="button" onclick="javascript: Joomla.submitbutton('cancel')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
@@ -239,6 +243,8 @@ function deleteTag(obj) {
 				<?php echo $this->item->getInput('title');?>
 			</td>
 		</tr>
+		
+	<?php if ($this->params->get('usealias', 1)) : ?>
 		<tr>
 			<td class="key">
 				<?php echo $this->item->getLabel('alias');?>
@@ -247,8 +253,9 @@ function deleteTag(obj) {
 				<?php echo $this->item->getInput('alias');?>
 			</td>
 		</tr>
+		<?php endif; ?>
 		
-	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset */ ?>
+	<?php if ($cid && $overridecatperms) :  /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 		<tr>
 			<td class="key">
@@ -321,20 +328,20 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					$field = $this->fields['state'];
 					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
-				<label id="jform_title-lbl" for="jform_title" <?php echo $field_tooltip; ?> >
+				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
 					<?php echo $field->label; ?>
 				</label>
 				<?php /*echo $this->item->getLabel('state'); */?>
 			</td>
 			<td>
 	  		<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
-	  		<?php	if ($cparams->get('auto_approve', 0)) : ?>
+	  		<?php	if ($autoapprove) : ?>
 	  			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 	  		<?php	endif;?>
 			</td>
 		</tr>
 		
-		<?php	if (!$cparams->get('auto_approve', 0)) :	?>
+		<?php	if (!$autoapprove) :	?>
 		<tr>
 			<td class="key">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' );?>
@@ -353,7 +360,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					$field = $this->fields['state'];
 					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
-				<label id="jform_title-lbl" for="jform_title" <?php echo $field_tooltip; ?> >
+				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
 					<?php echo $field->label; ?>
 				</label>
 				<?php /*echo $this->item->getLabel('state'); */?>
@@ -424,7 +431,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					$field = $this->fields['tags'];
 					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
-				<label id="jform_title-lbl" for="jform_title" <?php echo $field_tooltip; ?> >
+				<label id="jform_tags-lbl" for="jform_tags" <?php echo $field_tooltip; ?> >
 					<?php echo $field->label; ?>
 					<?php //echo JText::_( 'FLEXI_TAGS' ); ?>
 				</label>
@@ -588,8 +595,9 @@ $autoapprove = $cparams->get('auto_approve', 0);
 	}
 	?>
 
-	<?php if ($this->perms['canparams'] && $this->params->get('usemetadata', 1)) { ?>
 	<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+	
+	<?php if ($this->perms['canparams'] && $this->params->get('usemetadata', 1)) { ?>
 	<?php
 		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
 		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
@@ -630,7 +638,6 @@ $autoapprove = $cparams->get('auto_approve', 0);
 			<?php endforeach; ?>
 			</table>
 		</fieldset>
-		<?php echo JHtml::_('sliders.end'); ?>
 	<?php }else{?>
 		<input type="hidden" name="jform[metadata][metadesc]" value="<?php echo @$this->item->getValue('metadesc'); ?>" />
 		<input type="hidden" name="jform[metadata][metakey]" value="<?php echo @$this->item->getValue('metakey'); ?>" />
@@ -638,11 +645,11 @@ $autoapprove = $cparams->get('auto_approve', 0);
 			<input type="hidden" name="<?php echo $field->name;?>" value="<?php echo @$field->value; ?>" />
 		<?php endforeach; ?>
 	<?php } ?>
-	<?php if($this->perms['canparams']) {?>
-		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
-		<?php
-		echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
-		?>
+
+
+	<?php if($this->perms['canparams'] && $this->params->get('usepublicationdetails', 1)) : ?>
+
+		<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options'); ?>
 		<fieldset class="panelform">
 		<ul class="adminformlist">
 			<li><?php echo $this->item->getLabel('access');?>
@@ -672,11 +679,18 @@ $autoapprove = $cparams->get('auto_approve', 0);
 					<?php echo $field->input; ?>
 				<?php endforeach; ?>
 			</fieldset>
-		<?php endforeach;
-		?>
+		<?php endforeach; ?>
 
+		<?php echo JHtml::_('sliders.end'); ?>
+		
+	<?php endif; ?>
+		
+	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
+		
+		<?php	echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';?>
+		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+		
 		<?php
-		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
 		foreach ($this->tmpls as $tmpl) {
 			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
 			echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
@@ -691,7 +705,9 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		}
 		?>
 		<?php echo JHtml::_('sliders.end'); ?>
-	<?php } ?>
+		
+	<?php endif; ?>
+
 
 		<br class="clear" />
 		<?php echo JHTML::_( 'form.token' ); ?>
