@@ -252,6 +252,7 @@ div#flexicontent .filter .filter_field {
  
 div.flexi_edit .flexi_buttons {
 	float: right;
+	margin: 2px 2px 8px;
 }
 
 div.flexi_edit .flexi_buttons button {

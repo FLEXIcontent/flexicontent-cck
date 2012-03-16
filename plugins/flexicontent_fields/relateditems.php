@@ -129,8 +129,8 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
     } else if (!$viewallcats) {
     	$allowed_cats = $usercats;
     }
-    if ( $allowed_cats && count($allowed_cats) && empty($allowed_cats[0]) ) $allowed_cats = false;
-    if ( $disallowed_cats && count($disallowed_cats) && empty($disallowed_cats[0]) ) $disallowed_cats = false;
+		if ( $allowed_cats && ( !count($allowed_cats) || empty($allowed_cats[0]) ) ) $allowed_cats = false;
+		if ( $disallowed_cats && ( !count($disallowed_cats) || empty($disallowed_cats[0]) ) ) $disallowed_cats = false;
     
 		if ( $allowed_cats ) {
 			$where .= ($where=="") ? "" : " AND ";
@@ -253,8 +253,8 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 
 			$field->html.=	'
 				<br /><input id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="20" />
-				<br /><input type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_FIELD_FILTER').'" style="margin-top:6px;" />
-				<input type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_FIELD_RESET').'" style="margin-top:6px;" />
+				<br /><input type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" style="margin-top:6px;" />
+				<input type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" style="margin-top:6px;" />
 				
 				<script type="text/javascript">
 				<!--

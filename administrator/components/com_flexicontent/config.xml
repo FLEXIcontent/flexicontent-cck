@@ -254,7 +254,26 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
-		
+
+		<param name="" type="separator" default="FLEXI_SIMPLIFY_FRONTEND_FORM" level="level1" menu="hide" />
+
+		<param name="usealias" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+		</param>
+		<param name="usepublicationdetails" type="radio" default="0" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+		</param>
+		<param name="usetemplateparams" type="radio" default="0" label="FLEXI_MENU_USE_TEMPLATE_PARAMS" description="FLEXI_MENU_USE_TEMPLATE_PARAMS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+		</param>
+			
 		<param name="" type="separator" default="FLEXI_CACHE_CONF" level="level1" menu="hide" />
 		
 		<param name="advcache" type="radio" default="1" label="FLEXI_ADV_CACHE" description="FLEXI_ADV_CACHE_DESC" menu="hide">

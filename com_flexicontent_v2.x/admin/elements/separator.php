@@ -52,6 +52,16 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				display:inherit; padding: inherit; margin: inherit; text-align: inherit;	width: inherit; font-weight: inherit;
 				background-color: inherit; border-width: 0px; color: inherit;
 			}
+			form#item-form div.pane-sliders ul.adminformlist li label.hasTip {
+				display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:160px; font-weight: bold;
+				background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
+			}
+			div fieldset.adminform fieldset.radio label, div fieldset.panelform fieldset.radio label {
+				min-width:10px; padding: 0px 12px 0px 0px; margin: 5px 0px 0px 0px;
+			}
+			div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }
+			div fieldset select { margin:0px; }
+			
 			div.current ul.config-option-list li select { margin-bottom: 0px;}
 			div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
 			";
@@ -66,11 +76,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 		$level = $this->element['level'];
 		if ($level == 'level2') {
-			$style = 'padding: 1px 0% 1px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 2px 2% 2px 6%; width:84%; display: block; float: left; text-align: center;';
+			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 2px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
 			$style = 'padding: 4px 6% 4px 6%; font-weight: bold; clear:both; width:100%; display: block; float: left;';
 		} else {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: darkgreen; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left;';
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
 		}
 		
 		$class = ""; $title = "";
