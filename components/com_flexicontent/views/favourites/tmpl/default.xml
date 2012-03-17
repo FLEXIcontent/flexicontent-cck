@@ -10,12 +10,12 @@
 		<description>FLEXICONTENT_FAVOURITES_DESC</description>
 		<params>
 			<param name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-	 			<option value="0">No</option>
-	 			<option value="1">Yes</option>
+	 			<option value="0">FLEXI_NO</option>
+	 			<option value="1">FLEXI_YES</option>
 		 	</param>
 			<param name="show_modify_date" type="radio" default="1" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC">
 				<option value="0">Hide</option>

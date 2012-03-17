@@ -10,8 +10,8 @@
 	<params addpath="/administrator/components/com_flexicontent/elements">
 		<param name="show_field_labels_row" type="list" default="1" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC">
 			<option value="">Use Global</option>
-			<option value="0">No</option>
-			<option value="1">Yes</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 	<fieldgroups>
