@@ -15,12 +15,12 @@
 			
 			<param name="" type="separator" hr="false" default="Appearance" description="" level="level2" menu="hide" />
 			<param name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-	 			<option value="0">No</option>
-	 			<option value="1">Yes</option>
+	 			<option value="0">FLEXI_NO</option>
+	 			<option value="1">FLEXI_YES</option>
 		 	</param>
 		 	
 			<param name="" type="separator" hr="false" default="Pages" description="" level="level2" menu="hide" />
