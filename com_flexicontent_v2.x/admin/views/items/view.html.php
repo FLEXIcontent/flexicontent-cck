@@ -132,13 +132,13 @@ class FlexicontentViewItems extends JView {
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
 		$toolbar =&JToolBar::getInstance('toolbar');
 		
-		if ($permission->CanPublish) {
+		if ( $permission->CanPublish || $permission->CanPublishOwn ) {
 			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw', 840, 200);
+			JToolBarHelper::spacer();
+			JToolBarHelper::divider();
+			JToolBarHelper::spacer();
 		}
 		
-		JToolBarHelper::spacer();
-		JToolBarHelper::divider();
-		JToolBarHelper::spacer();
 		if ($permission->CanAdd) {
 			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
@@ -161,17 +161,21 @@ class FlexicontentViewItems extends JView {
 			JToolBarHelper::deleteList('Are you sure?', 'items.remove');
 		}
 		
-		JToolBarHelper::spacer();
-		JToolBarHelper::divider();
-		JToolBarHelper::spacer();
-		if (!$permission->CanPublish) {
+		if ( !$permission->CanPublish && !$permission->CanPublishOwn) {
+			JToolBarHelper::spacer();
+			JToolBarHelper::divider();
+			JToolBarHelper::spacer();
 			JToolBarHelper::customX( 'items.approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 		
+		if($permission->CanConfig) {
+			JToolBarHelper::spacer();
+			JToolBarHelper::divider();
+			JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 		JToolBarHelper::spacer();
-		JToolBarHelper::divider();
 		JToolBarHelper::spacer();
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
 		$rows      		= & $this->get( 'Data');

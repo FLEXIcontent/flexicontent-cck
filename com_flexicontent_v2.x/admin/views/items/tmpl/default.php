@@ -414,11 +414,6 @@ window.addEvent('domready', function() {
 		$config		=& JFactory::getConfig();
 		$nullDate 	= $db->getNullDate();
 		$user 		=& $this->user;
-		$canEditAll 		= $this->permission->CanEdit;
-		$canEditOwnAll	= true;//I(enjoyman) not sure in this line.
-		$canPublishAll 		= $this->permission->CanPublish;
-		$canPublishOwnAll	= true;//I(enjoyman) not sure in this line.
-		$check = $this->permission->CanConfig;
 		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
 
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
@@ -426,10 +421,10 @@ window.addEvent('domready', function() {
 
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 				
-			$canEdit 			= $canEditAll || in_array('edit', $rights) || $check;
-			$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || $check;
-			$canPublish 		= $canPublishAll || in_array('publish', $rights) || $check;
-			$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || $check;
+			$canEdit 			 = in_array('edit', $rights);
+			$canEditOwn		 = in_array('edit.own', $rights) && $row->created_by == $user->id;
+			$canPublish 	 = in_array('edit.state', $rights);
+			$canPublishOwn = in_array('edit.state.own', $rights) && $row->created_by == $user->id;
 
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
@@ -438,59 +433,59 @@ window.addEvent('domready', function() {
 
 			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 
-			if ($this->permission->CanConfig) {
+			if ($this->permission->CanAccLevelItems && ($canPublish || $canPublishOwn) ) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');
-			}else $access = $this->escape($row->access_level);
+			} else $access = $this->escape($row->access_level);
 
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
-				$alt = "";
-				if ( $row->state == 1 ) {
-					$img = 'tick.png';
-					$alt = JText::_( 'FLEXI_PUBLISHED' );
-					$state = 1;
-				} else if ( $row->state == 0 ) {
-					$img = 'publish_x.png';
-					$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-					$state = 0;
-				} else if ( $row->state == -1 ) {
-					$img = 'disabled.png';
-					$alt = JText::_( 'FLEXI_ARCHIVED' );
-					$state = -1;
-				} else if ( $row->state == -3 ) {
-					$img = 'publish_r.png';
-					$alt = JText::_( 'FLEXI_PENDING' );
-					$state = -3;
-				} else if ( $row->state == -4 ) {
-					$img = 'publish_y.png';
-					$alt = JText::_( 'FLEXI_TO_WRITE' );
-					$state = -4;
-				} else if ( $row->state == -5 ) {
-					$img = 'publish_g.png';
-					$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-					$state = -5;
-				}
+			$cid_checkbox = JHTML::_('grid.checkedout', $row, $i );
+			$alt = "";
+			if ( $row->state == 1 ) {
+				$img = 'tick.png';
+				$alt = JText::_( 'FLEXI_PUBLISHED' );
+				$state = 1;
+			} else if ( $row->state == 0 ) {
+				$img = 'publish_x.png';
+				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
+				$state = 0;
+			} else if ( $row->state == -1 ) {
+				$img = 'disabled.png';
+				$alt = JText::_( 'FLEXI_ARCHIVED' );
+				$state = -1;
+			} else if ( $row->state == -3 ) {
+				$img = 'publish_r.png';
+				$alt = JText::_( 'FLEXI_PENDING' );
+				$state = -3;
+			} else if ( $row->state == -4 ) {
+				$img = 'publish_y.png';
+				$alt = JText::_( 'FLEXI_TO_WRITE' );
+				$state = -4;
+			} else if ( $row->state == -5 ) {
+				$img = 'publish_g.png';
+				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
+				$state = -5;
+			}
 
-				$times = '';
-				if (isset($row->publish_up)) {
-					if ($row->publish_up == $nullDate) {
-						$times .= JText::_( 'FLEXI_START_ALWAYS' );
-					} else {
-						$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
-					}
+			$times = '';
+			if (isset($row->publish_up)) {
+				if ($row->publish_up == $nullDate) {
+					$times .= JText::_( 'FLEXI_START_ALWAYS' );
+				} else {
+					$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
 				}
-				if (isset($row->publish_down)) {
-					if ($row->publish_down == $nullDate) {
-						$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-					} else {
-						$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
-					}
+			}
+			if (isset($row->publish_down)) {
+				if ($row->publish_down == $nullDate) {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+				} else {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
 				}
-				$lang_default = !FLEXI_J16GE ? '' : '*';
-				$row->lang = @$row->lang ? $row->lang : $lang_default;
+			}
+			$lang_default = !FLEXI_J16GE ? '' : '*';
+			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
-			<td width="7"><?php echo $checked; ?></td>
+			<td width="7"><?php echo $cid_checkbox; ?></td>
 			<td align="left" class="col_title">
 				<?php
 				if ( ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) || ((!$canEdit) && (!$canEditOwn)) ) {
