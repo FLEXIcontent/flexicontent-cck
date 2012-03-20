@@ -221,7 +221,7 @@ class FlexicontentViewFlexicontent extends JView
 		$model = $this->getModel('flexicontent');
 		$lists['missing_lang'] = $model->processlanguagefiles();
 
-		// Get the default copyright values
+		// Get the default copyright values to populate the form automatically
 		$config =& JFactory::getConfig();
 		$mailfrom 	= $config->getValue('config.mailfrom');
 		$fromname 	= $config->getValue('config.fromname');

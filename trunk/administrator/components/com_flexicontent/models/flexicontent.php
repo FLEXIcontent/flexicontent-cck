@@ -1034,14 +1034,12 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		if ($method == 'zip') 
 		{
-			$config =& JFactory::getConfig();
-			$mailfrom 	= $config->getValue('config.mailfrom');
-			$fromname 	= $config->getValue('config.fromname');
-			$website 	= $config->getValue('config.live_site');
+			$mailfrom 	= @$params['email']	? $params['email']	: 'emmanuel.danan@gmail.com';
+			$fromname 	= @$params['name'] 	? $params['name'] 	: 'Emmanuel Danan';
+			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
 				
 			// prepare the manifest of the language archive
 			$date =& JFactory::getDate();
-			$sdate = $date->toMySQL();
 		
 			$xmlfile = JPATH_SITE.DS.'tmp'.DS.$code.DS.'install.xml';
 			
@@ -1049,11 +1047,11 @@ class FlexicontentModelFlexicontent extends JModel
 			<install type="language" version="1.5" client="both" method="upgrade">
 			    <name>FLEXIcontent '.$code.'</name>
 			    <tag>'.$code.'</tag>
-			    <creationDate>'.$sdate.'</creationDate>
+			    <creationDate>'.$date->toFormat("%Y-%m-%d").'</creationDate>
 			    <author>'.$fromname.'</author>
 			    <authorEmail>'.$mailfrom.'</authorEmail>
 			    <authorUrl>'.$website.'</authorUrl>
-			    <copyright>(C) 2009 '.$fromname.'</copyright>
+			    <copyright>(C) '.$date->toFormat("%Y").' '.$fromname.'</copyright>
 			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 			    <description>'.$code.' language pack for FLEXIcontent</description>
 			    <administration>
