@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="search" method="upgrade">
-	<name>ADV Search - FLEXIcontent</name>
+	<name>Search - Advanced Search for FLEXIcontent</name>
 	<author>Suriya Kaewmungmuang</author>
 	<creationDate>29 June 2011</creationDate>
 	<copyright>Copyright (C) 2011 flexicontent.org</copyright>

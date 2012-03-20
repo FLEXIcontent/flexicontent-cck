@@ -270,10 +270,6 @@
 		<copy file="administrator/language/ru-RU/ru-RU.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/ru-RU.plg_search_flexisearch.ini" />
 		<copy file="administrator/language/de-DE/de-DE.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/de-DE.plg_search_flexisearch.ini" />
 		
-		<copy file="plugins/search/flexiadvsearch.php" tofile="flexipack/plugins/search/flexiadvsearch.php" />
-		<copy file="plugins/search/flexiadvsearch.xml" tofile="flexipack/plugins/search/flexiadvsearch.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexiadvsearch.ini" />
-		
 		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/system/flexisystem.php" />
 		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
