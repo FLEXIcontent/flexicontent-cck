@@ -141,19 +141,28 @@ class FlexicontentModelItem extends JModel {
 		if (empty($this->_item)) {
 			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 			$use_versioning = $cparams->get('use_versioning', 1);
+			
 			$item =& $this->getTable('flexicontent_items', '');
 			$item->load($this->_id);
-			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the last one
-			$isnew = (($this->_id <= 0) || !$this->_id);
-			$current_version = $item->version;
-			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$lastversion = $use_versioning?FLEXIUtilities::getLastVersions($this->_id, true):$current_version;
-			if($version==0) 
-				JRequest::setVar( 'version', $version = ($loadcurrent?$current_version:$lastversion));
 			
-			// -- If loading not the current one, then raise a notice to inform the user
-			if($current_version != $version && ($task=='edit' || !$task) && $option=='com_flexicontent' && !$unapproved_version_notice) {
-				$unapproved_version_notice = 1;  //  While we are in edit form, we catch cases such as modules loading items , or someone querying priviledges of items, etc
+			$isnew = (($this->_id <= 0) || !$this->_id);
+			
+			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the last one
+			$version = JRequest::getVar( 'version', 0, 'request', 'int' ); // Get version to load from URL
+			$current_version = $item->version;                             // Get current version (stored in content db table)
+			$lastversion = FLEXIUtilities::getLastVersions($this->_id, true);  // Get last version (=latest one saved, highest version id), 
+			$lastversion = $use_versioning ? $lastversion : $current_version;  // if not using versioning the current one is forced as last
+						
+			// check that version to load was given in URL, we will use $loadcurrent variable to set it to either current one or last (latest) one
+			if ( $version==0 ) {
+				// version to load is not set in request URL, set it as described above and also set in the url
+				$version = $loadcurrent ? $current_version : $lastversion;
+				JRequest::setVar( 'version', $version );
+			}
+			
+			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
+			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;
 				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
 			}
 

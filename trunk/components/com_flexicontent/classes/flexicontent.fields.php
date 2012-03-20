@@ -73,8 +73,8 @@ class FlexicontentFields
 			
 			// Assign precalculated tags and cats lists
 			$item_id = $items[$i]->id;
-			$items[$i]->cats = isset($catlists[$item_id]) ? $catlists[$item_id] : array();
-			$items[$i]->tags = isset($taglists[$item_id]) ? $taglists[$item_id] : array();
+			$items[$i]->cats = isset($catlist[$item_id]) ? $catlist[$item_id] : array();
+			$items[$i]->tags = isset($taglist[$item_id]) ? $taglist[$item_id] : array();
 			
 			// Apply the fields cache to public or just registered users
 			$apply_cache = true;
@@ -186,7 +186,7 @@ class FlexicontentFields
 		$item->vote			= @$vote 				? $vote 			: '';
 		
 		if ($item->fields) {
-			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, isset($item->version_id)?$item->version_id:$item->version);
+			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, isset($item->version_id) ? $item->version_id : $item->version);
 		}
 		
 		return $item;
@@ -475,13 +475,13 @@ class FlexicontentFields
 	{
 		$preview = JRequest::getVar('preview');
 		if($preview) {
-			$lversion = $version?$version:JRequest::setVar('lversion');
+			$version = $version ? $version : JRequest::setVar('version');
 		}
 		$db =& JFactory::getDBO();
 		$query = 'SELECT field_id, value'
 				.($preview?' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id = ' . (int)$item
-				.($preview?' AND version=' . (int)$lversion:'')
+				.($preview?' AND version=' . (int)$version:'')
 				.' ORDER BY field_id, valueorder'
 				;
 		$db->setQuery($query);

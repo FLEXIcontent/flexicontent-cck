@@ -207,20 +207,20 @@ function deleteTag(obj) {
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons" style="font-size:90%;">
-			<button onclick="javascript: Joomla.submitbutton('save')">
+			<button class="button" type="button" onclick="return Joomla.submitbutton('save')">
 				<span class="fcbutton_save"><?php echo JText::_( $this->item->getValue('id') ? 'FLEXI_SAVE' : 'FLEXI_ADD' ) ?></span>
 			</button>
-			<button class="button" onclick="javascript: Joomla.submitbutton('save_a_preview');">
+			<button class="button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
 				<span class="fcbutton_preview_save"><?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?></span>
 			</button>
 			<?php
 				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
 				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');
 			?>
-			<button class="button" onclick="javascript: window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
+			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
 			</button>
-			<button class="button" onclick="javascript: Joomla.submitbutton('cancel')">
+			<button class="button" type="button" onclick="return Joomla.submitbutton('cancel')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 		</div>

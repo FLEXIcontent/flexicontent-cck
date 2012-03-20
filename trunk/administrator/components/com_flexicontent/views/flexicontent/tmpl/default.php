@@ -491,9 +491,9 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					<br />
 					Marvelic Engine<br />
 					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.">www.marvelic.co.th</a>
-					<br />
+					<br /><br />
 					Georgios Papadakis<br />
-					<a class="hasTip" href="mailto:ggppdk@gmail.com" title="Send me an email::Please no support request!!!">ggppdk AT gmail.com</a>
+					<a class="hasTip" href="mailto:ggppdk@..." title="Send me an email::Please no support request!!!">ggppdk AT ...com</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a></p>
