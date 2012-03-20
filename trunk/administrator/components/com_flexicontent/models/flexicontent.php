@@ -1073,7 +1073,11 @@ class FlexicontentModelFlexicontent extends JModel
 			JArchive::create(JPATH_SITE.DS.'tmp'.DS.$code.'.com_flexicontent.tar.gz', $fileslist, 'gz', '', JPATH_SITE.DS.'tmp'.DS.$code);
 		}
 		
-		return (count($missing) > 0) ? $missing : '<h3 class="lang-success">'.JText::_('FLEXI_SEND_LANGUAGE_NO_MISSING').'</h3>';
+		// messages
+		if ($method == 'zip') {
+			return '<h3 class="lang-success">' . JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';
+		}
+		return (count($missing) > 0) ? $missing : '<h3 class="lang-success">'. JText::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</h3>';
 	}
 
 }
