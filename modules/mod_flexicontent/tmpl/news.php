@@ -53,10 +53,10 @@ $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
 
-$force_width_feat="width='$mod_width_feat'";
-$force_height_feat="height='$mod_height_feat'";
-$force_width="width='$mod_width'";
-$force_height="height='$mod_height'";
+$force_width_feat='';//"width='$mod_width_feat'";
+$force_height_feat='';//"height='$mod_height_feat'";
+$force_width='';//"width='$mod_width'";
+$force_height='';//"height='$mod_height'";
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
