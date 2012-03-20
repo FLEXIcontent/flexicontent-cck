@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 931 2011-10-17 06:09:03Z ggppdk $
+ * @version 1.0 $Id: textarea.php 1167 2012-03-09 03:25:01Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -146,7 +146,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->html[0]	 = '<textarea name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
 			} else {
 				$field_value = htmlspecialchars( $field_value, ENT_NOQUOTES, 'UTF-8' );
-				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $skip_buttons_arr, $field_idtag ) ;
+				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr );
 			}
 			$field->html = $field->html[0];
 		}
@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$beforetabs.'</textarea>'."\n";
 				} else {
 					$beforetabs = htmlspecialchars( $beforetabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $beforetabs, '100%', $height, $cols, $skip_buttons_arr) ;
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $beforetabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}
@@ -192,7 +192,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$tab_content.'</textarea>'."\n";
 				} else {
 					$tab_content = htmlspecialchars( $tab_content, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $tab_content, '100%', $height, $cols, '' ) ;
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $tab_content, '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 				
@@ -221,7 +221,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$aftertabs.'</textarea>'."\n";
 				} else {
 					$aftertabs = htmlspecialchars( $aftertabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $aftertabs, '100%', $height, $cols, '' ) ;
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $aftertabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}
