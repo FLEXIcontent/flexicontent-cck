@@ -77,11 +77,40 @@ class FlexicontentController extends JController
 		$this->registerTask( 'publishplugins'			, 'publishplugins' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
-		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
-		$this->registerTask( 'createauthorstbl'		, 'createauthorstable' );
+		$this->registerTask( 'populateversionstbl'		, 'populateVersionsTable' );
+		$this->registerTask( 'createauthorstbl'			, 'createauthorstable' );
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
+		$this->registerTask( 'checklangfiles'			, 'checkLangFiles' );
+	}
+	
+	function checkLangFiles() 
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		
+		$code = JRequest::getVar('code');
+		$model = $this->getModel('flexicontent');
+
+		$missing =& $model->checkLanguageFiles($code);
+		
+		if (is_array($missing)) {
+			if ($missing['admin']) {
+				echo '<h3>'.JText::_('Folder: administrator/languages/').$code.'/</h3>';
+				foreach ($missing['admin'] as $a) {
+					echo '<p>'.$code.'.'.$a.'.ini'.'</p>';
+				}
+			}
+			if ($missing['site']) {
+				echo '<h3>'.JText::_('Folder: languages/').$code.'/</h3>';
+				foreach ($missing['site'] as $s) {
+					echo '<p>'.$code.'.'.$s.'.ini'.'</p>';
+				}
+			}
+		} else {
+			echo $missing;
+		}
 	}
 
 	function getPostinstallState() {

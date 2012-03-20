@@ -33,6 +33,7 @@
 .icon-32-savenew			{ background-image: url(../images/savenew.png); }
 .icon-32-go					{ background-image: url(../../../../images/go_f2.png); }
 .icon-32-download			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-export.png); }
+.icon-32-language			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-html.png); }
 .icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
 .icon-32-import				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-upload.png); }
 .icon-32-duplicate			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }

@@ -945,5 +945,132 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 	}
+
+	function checkLanguageFiles($code = 'en-GB', $method = '')
+	{
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.archive');
+		
+		$prefix 	= $code . '.';
+		$suffix 	= '.ini';
+		$missing 	= array();
+		$archivea	= array();
+		$archives	= array();
+
+		$adminpath 	= JPATH_ADMINISTRATOR.DS.'language'.DS.$code.DS;
+		$adminfiles = array(
+			'com_flexicontent',
+			'plg_flexicontent_fields_checkbox',
+			'plg_flexicontent_fields_checkboximage',
+			'plg_flexicontent_fields_core',
+			'plg_flexicontent_fields_date',
+			'plg_flexicontent_fields_email',
+			'plg_flexicontent_fields_extendedweblink',
+			'plg_flexicontent_fields_fcloadmodule',
+			'plg_flexicontent_fields_fcpagenav',
+			'plg_flexicontent_fields_file',
+			'plg_flexicontent_fields_image',
+			'plg_flexicontent_fields_linkslist',
+			'plg_flexicontent_fields_minigallery',
+			'plg_flexicontent_fields_radio',
+			'plg_flexicontent_fields_radioimage',
+			'plg_flexicontent_fields_relateditems',
+			'plg_flexicontent_fields_select',
+			'plg_flexicontent_fields_selectmultiple',
+			'plg_flexicontent_fields_text',
+			'plg_flexicontent_fields_textarea',
+			'plg_flexicontent_fields_textselect',
+			'plg_flexicontent_fields_toolbar',
+			'plg_flexicontent_fields_weblink',
+			'plg_flexicontent_flexinotify',
+			'plg_search_flexiadvsearch',
+			'plg_search_flexisearch',
+			'plg_system_flexiadvroute',
+			'plg_system_flexisystem'
+		);
+
+		$sitepath 	= JPATH_SITE.DS.'language'.DS.$code.DS;
+		$sitefiles 	= array(
+			'com_flexicontent',
+			'mod_flexiadvsearch',
+			'mod_flexicontent',
+			'mod_flexitagcloud'
+		);
+		
+		if ($method == 'zip') {
+			if (count($adminfiles))
+				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin', 0775);
+			if (count($sitefiles))
+				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'site', 0775);
+		}
+		
+		foreach ($adminfiles as $file) {
+			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
+				$missing['admin'][] = $file;
+			} else {
+				//$archivea[] = $adminpath.$prefix.$file.$suffix;
+				if ($method == 'zip') {
+					JFile::copy($adminpath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin'.DS.$prefix.$file.$suffix);
+					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+				}
+			}
+		}
+		foreach ($sitefiles as $file) {
+			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
+				$missing['site'][] = $file;
+			} else {
+				//$archives[] = $sitepath.$prefix.$file.$suffix;
+				if ($method == 'zip') {
+					JFile::copy($sitepath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'site'.DS.$prefix.$file.$suffix);
+					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+				}
+			}
+		}
+		
+		if ($method == 'zip') 
+		{
+			$config =& JFactory::getConfig();
+			$mailfrom = $config->getValue('config.mailfrom');
+			$fromname = $config->getValue('config.fromname');
+				
+			// prepare the manifest of the language archive
+			$date =& JFactory::getDate();
+			$sdate = $date->toMySQL();
+		
+			$xmlfile = JPATH_SITE.DS.'tmp'.DS.$code.DS.'install.xml';
+			
+			$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+			<install type="language" version="1.5" client="both" method="upgrade">
+			    <name>FLEXIcontent '.$code.'</name>
+			    <tag>'.$code.'</tag>
+			    <creationDate>'.$sdate.'</creationDate>
+			    <author>'.$fromname.'</author>
+			    <authorEmail>'.$mailfrom.'</authorEmail>
+			    <authorUrl>http://www.flexicontent.org</authorUrl>
+			    <copyright>(C) 2009 '.$fromname.'</copyright>
+			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+			    <description>'.$code.' language pack for FLEXIcontent</description>
+			    <administration>
+			        <files folder="admin">
+			'.$namea.'
+			        </files>
+			    </administration>
+			    <site>
+			        <files folder="site">
+			'.$names.'
+			        </files>
+			    </site>
+			</install>'
+			   ;
+			// save xml manifest
+			JFile::write($xmlfile, $xml);
+
+			$fileslist = JFolder::files(JPATH_SITE.DS.'tmp'.DS.$code, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
+			JArchive::create(JPATH_SITE.DS.'tmp'.DS.$code.'.com_flexicontent.tar.gz', $fileslist, 'gz', '', JPATH_SITE.DS.'tmp'.DS.$code);
+		}
+		
+		return (count($missing) > 0) ? $missing : JText::_('FLEXI_SEND_LANGUAGE_NO_MISSING');
+	}
+
 }
 ?>
