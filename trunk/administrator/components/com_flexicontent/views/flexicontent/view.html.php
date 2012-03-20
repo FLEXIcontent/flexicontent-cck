@@ -219,7 +219,13 @@ class FlexicontentViewFlexicontent extends JView
 
 		// Missing files
 		$model = $this->getModel('flexicontent');
-		$lists['missing_lang'] = $model->checkLanguageFiles();
+		$lists['missing_lang'] = $model->processlanguagefiles();
+
+		// Get the default copyright values
+		$config =& JFactory::getConfig();
+		$mailfrom 	= $config->getValue('config.mailfrom');
+		$fromname 	= $config->getValue('config.fromname');
+		$website 	= $config->getValue('config.live_site');
 
 				
 		$this->assignRef('pane'			, $pane);
@@ -235,6 +241,9 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('params'		, $params);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('activelang'	, $activelang);
+		$this->assignRef('mailfrom'		, $mailfrom);
+		$this->assignRef('fromname'		, $fromname);
+		$this->assignRef('website'		, $website);
 
 		// install check
 		$this->assignRef('dopostinstall'		, $dopostinstall);
