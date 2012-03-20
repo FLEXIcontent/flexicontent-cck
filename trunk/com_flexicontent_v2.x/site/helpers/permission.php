@@ -54,6 +54,7 @@ class FlexicontentHelperPerm {
 			
 			// ITEMS: component controlled permissions
 			$permission->DisplayAllItems	= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
+			$permission->CanAccLevelItems = $user->authorise('flexicontent.acclevelitems',	'com_flexicontent'); // (backend) Change Item Access Level
 			$permission->CanCopy				 	= $user->authorise('flexicontent.copyitems',			'com_flexicontent'); // (backend) Item Copy Task
 			$permission->CanOrder	 				= $user->authorise('flexicontent.orderitems', 		'com_flexicontent'); // (backend) Reorder items inside the category
 			$permission->CanParams				= $user->authorise('flexicontent.paramsitem', 		'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
