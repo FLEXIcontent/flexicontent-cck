@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
-			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span> Checking files integrity...</span></p>');
+			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
 			e = new Event(e).stop();
 
 			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
@@ -30,11 +30,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				method: 'get',
 				update: $('log')
 			});
-			ajax.request.delay(800, ajax);
+			ajax.request.delay(1000, ajax);
 		});
 
 		$('missing').addEvent('click', function(e) {
-			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span> Creating the missing files...</span></p>');
+			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
 			e = new Event(e).stop();
 
 			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
@@ -43,7 +43,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				method: 'get',
 				update: $('log')
 			});
-			ajax.request.delay(800, ajax);
+			ajax.request.delay(1000, ajax);
 		});
 
 		$('archive').addEvent('click', function(e) {
@@ -62,7 +62,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			params 		+= '&web=' + web;
 			params 		+= '&message=' + message;
 			
-			$('log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
 			e = new Event(e).stop();
 
 			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
@@ -71,7 +71,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				method: 'get',
 				update: $('log')
 			});
-			ajax.request.delay(600, ajax);
+			ajax.request.delay(1000, ajax);
 		});
 	}); 
 </script>
@@ -166,7 +166,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					</tr>
 					<tr>
 						<td>
-							<div id="log" style="width:300px; display:block;"><?php echo $this->lists['missing_lang']; ?></div>
+							<div id="log" style="width:330px; display:block;"><?php echo $this->lists['missing_lang']; ?></div>
 							<input id="missing" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
 						</td>
 					</tr>

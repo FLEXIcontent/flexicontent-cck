@@ -105,15 +105,9 @@ class FlexicontentController extends JController
 		
 		$model 	= $this->getModel('flexicontent');		
 
-/*
-echo '<pre>';
-print_r($date->toFormat("%Y-%m-%d"));
-echo '</pre>';
-*/
-
 		$missing =& $model->processLanguageFiles($code, $method, $formparams);
 		
-		if (is_array($missing)) {
+		if (is_array($missing) && $method != 'zip') {
 			if (@$missing['admin']) {
 				echo '<h3>'.JText::_('Folder: administrator/languages/').$code.'/</h3>';
 				foreach ($missing['admin'] as $a) {
