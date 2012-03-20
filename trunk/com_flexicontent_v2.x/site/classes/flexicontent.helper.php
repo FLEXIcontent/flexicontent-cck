@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1150 2012-02-24 03:26:18Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1169 2012-03-09 04:17:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -249,7 +249,158 @@ class flexicontent_html
 		}
 		return;
 	}
+	
+	
+	/**
+	 * Creates the state selector button
+	 *
+	 * @param int $id
+	 * @param array $params
+	 * @since 1.0
+	 */
+	function statebutton( $item, &$params)
+	{
+		$user	= & JFactory::getUser();
+		$db 	=& JFactory::getDBO();
+		$config		=& JFactory::getConfig();
+		$document		= & JFactory::getDocument();
+		$nullDate = $db->getNullDate();
+		
+		// Determine if current user can edit state of the given item
+		$has_edit_state = false;
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $item->id;
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+			// ALTERNATIVE 1
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+			//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+		} else {
+			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+		}
+		
+		static $js_and_css_added = false;
+		
+	 	if (!$js_and_css_added)
+	 	{
+	 		$js ='
+				if(MooTools.version>="1.2.4") {
+					window.addEvent("domready", function() {stateselector.init()});
+				}else{
+					window.onDomReady(stateselector.init.bind(stateselector));
+				}
+				function dostate(state, id)
+				{
+					var change = new processstate();
+					change.dostate( state, id );
+				}';
+			$document->addScriptDeclaration($js);
+			$js_and_css_added = true;
+	 	}
+	 	
+		// Create the state selector button and return it
+		if ($has_edit_state) {
+			
+			$publish_up =& JFactory::getDate($item->publish_up);
+			$publish_down =& JFactory::getDate($item->publish_down);
+			$publish_up->setOffset($config->getValue('config.offset'));
+			$publish_down->setOffset($config->getValue('config.offset'));
 
+			$alt = "";
+			if ( $item->state == 1 ) {
+				$img = 'tick.png';
+				$alt = JText::_( 'FLEXI_PUBLISHED' );
+				$state = 1;
+			} else if ( $item->state == 0 ) {
+				$img = 'publish_x.png';
+				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
+				$state = 0;
+			} else if ( $item->state == -1 ) {
+				$img = 'disabled.png';
+				$alt = JText::_( 'FLEXI_ARCHIVED' );
+				$state = -1;
+			} else if ( $item->state == -3 ) {
+				$img = 'publish_r.png';
+				$alt = JText::_( 'FLEXI_PENDING' );
+				$state = -3;
+			} else if ( $item->state == -4 ) {
+				$img = 'publish_y.png';
+				$alt = JText::_( 'FLEXI_TO_WRITE' );
+				$state = -4;
+			} else if ( $item->state == -5 ) {
+				$img = 'publish_g.png';
+				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
+				$state = -5;
+			}
+
+			$times = '';
+			if (isset($item->publish_up)) {
+				if ($item->publish_up == $nullDate) {
+					$times .= JText::_( 'FLEXI_START_ALWAYS' );
+				} else {
+					$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
+				}
+			}
+			if (isset($item->publish_down)) {
+				if ($item->publish_down == $nullDate) {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+				} else {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
+				}
+			}
+			
+			$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
+			
+			$state_ids = array(1, 0, -1, -3, -4 , -5);
+			$state_names = array('FLEXI_PUBLISHED', 'FLEXI_UNPUBLISHED', 'FLEXI_ARCHIVED', 'FLEXI_PENDING', 'FLEXI_TO_WRITE', 'FLEXI_IN_PROGRESS');
+			$state_descrs = array('FLEXI_PUBLISH_THIS_ITEM', 'FLEXI_UNPUBLISH_THIS_ITEM', 'FLEXI_ARCHIVE_THIS_ITEM', 'FLEXI_SET_ITEM_PENDING', 'FLEXI_SET_ITEM_TO_WRITE', 'FLEXI_SET_ITEM_IN_PROGRESS');
+			$state_imgs = array('tick.png', 'publish_x.png', 'disabled.png', 'publish_r.png', 'publish_y.png', 'publish_g.png');			
+			
+			if ($has_edit_state) {
+			$output ='
+			<ul class="statetoggler">
+				<li class="topLevel">
+					<a href="javascript:void(0);" class="opener" style="outline:none;">
+					<div id="row'.$item->id.'">
+						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$times.'">
+							<img src="'.$img_path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />
+						</span>
+					</div>
+					</a>
+					<div class="options" style="width:160px; position:absolute;left:-68px;">
+						<ul>';
+						
+				foreach ($state_ids as $i => $state_id) {
+					$output .='
+							<li>
+								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer hasTip" title="'.JText::_( 'FLEXI_ACTION' ).'::'.JText::_( $state_descrs[$i] ).'">
+									<img src="'.$img_path.$state_imgs[$i].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$i] ).'" />
+								</a>
+							</li>';
+				}
+				$output .='
+						</ul>
+					</div>
+				</li>
+			</ul>';
+			} else {
+				$output = '';/* '
+					<div id="row'.$item->id.'">
+						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$times.'">
+							<img src="'.$img_path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />
+						</span>
+					</div>';*/
+			}
+			
+			return $output;
+		}
+		
+		return;
+	}
+	
+	
 	/**
 	 * Creates the edit button
 	 *
@@ -1136,7 +1287,8 @@ class flexicontent_html
 	function getJCoreFields($ffield=NULL, $mapcorefield=false, $swap=false) {
 		if(!$swap) {//core field=>flexicontent field
 			$flexifield = array(
-				'catid'=>'categories',
+				//'categories'=>'categories',
+				//'tags'=>'tags',
 				'text'=>'maintext',
 				'created'=>'created',
 				'created_by'=>'createdby',
@@ -1153,7 +1305,8 @@ class flexicontent_html
 			}
 		}else{//flexicontent field=>core field
 			$flexifield = array(
-				'categories'=>'catid',
+				//'categories'=>'categories',
+				//'tags'=>'tags',
 				'maintext'=>'text',
 				'created'=>'created',
 				'createdby'=>'created_by',
@@ -1738,18 +1891,27 @@ class flexicontent_images
 	}
 
 }
-class FLEXIUtilities {
+
+
+class FLEXIUtilities
+{
+	
 	/**
 	 * Method to get the last version kept
 	 * 
 	 * @return int
 	 * @since 1.5
 	 */
-	function &getLastVersions($id=NULL, $justvalue=false, $force=false) {
-		static $g_lastversions;
-		if( ($g_lastversions==NULL) || ($force) ) {
+	function &getLastVersions ($id=NULL, $justvalue=false, $force=false)
+	{
+		static $g_lastversions;  // cache ...
+		
+		if( $g_lastversions==NULL || $force )
+		{
 			$db =& JFactory::getDBO();
-			$query = "SELECT item_id as id,max(version_id) as version FROM #__flexicontent_versions WHERE 1 GROUP BY item_id;";
+			$query = "SELECT item_id as id, max(version_id) as version"
+									." FROM #__flexicontent_versions"
+									." WHERE 1 GROUP BY item_id";
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
 			$g_lastversions =  array();
@@ -1758,21 +1920,32 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
-		if(!$id && $justvalue) {$v=0;return $v;}
-		if($id) {
-			$return = $justvalue?(@$g_lastversions[$id]['version']):@$g_lastversions[$id];
+		
+		// Special case (version number of new item): return version zero
+		if (!$id && $justvalue) { $v = 0; return $v; }
+		
+		// an item id was given return item specific data
+		if ($id) {
+			$return = $justvalue ? @$g_lastversions[$id]['version'] : @$g_lastversions[$id];
 			return $return;
 		}
+		
+		// no item id was given return all version data
 		return $g_lastversions;
 	}
-	function &getCurrentVersions($id=NULL, $justvalue=false, $force=false) {
-		static $g_currentversions;
-		if( ($g_currentversions==NULL) || ($force) ) {
+	
+	
+	function &getCurrentVersions ($id=NULL, $justvalue=false, $force=false)
+	{
+		static $g_currentversions;  // cache ...
+		
+		if( $g_currentversions==NULL || $force )
+		{
 			$db =& JFactory::getDBO();
 			if (!FLEXI_J16GE) {
-				$query = "SELECT id,version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+				$query = "SELECT id, version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
 			} else {
-				$query = "SELECT c.id,c.version FROM #__content as c"
+				$query = "SELECT c.id, c.version FROM #__content as c"
 						. " JOIN #__categories as cat ON c.catid=cat.id"
 						. " WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";
 			}
@@ -1784,14 +1957,23 @@ class FLEXIUtilities {
 			}
 			unset($rows);
 		}
-		if(!$id && $justvalue) {$v=0;return $v;}
+		
+		// Special case (version number of new item): return version zero
+		if (!$id && $justvalue) { $v = 0; return $v; }
+		
+		// an item id was given return item specific data
 		if($id) {
-			$return = $justvalue?(@$g_currentversions[$id]['version']):@$g_currentversions[$id];
+			$return = $justvalue ? @$g_currentversions[$id]['version'] : @$g_currentversions[$id];
 			return $return;
 		}
+		
+		// no item id was given return all version data
 		return $g_currentversions;
 	}
-	function &getLastItemVersion($id) {
+	
+	
+	function &getLastItemVersion($id)
+	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
@@ -1802,7 +1984,10 @@ class FLEXIUtilities {
 		
 		return (int)$lastversion;
 	}
-	function &currentMissing() {
+	
+	
+	function &currentMissing()
+	{
 		static $status;
 		if(!$status) {
 			$db =& JFactory::getDBO();
@@ -1823,6 +2008,8 @@ class FLEXIUtilities {
 		}
 		return $status;
 	}
+	
+	
 	/**
 	 * Method to get the first version kept
 	 * 
@@ -1842,6 +2029,8 @@ class FLEXIUtilities {
 		$firstversion = $db->loadResult();
 		return $firstversion;
 	}
+	
+	
 	/**
 	 * Method to get the versions count
 	 * 
@@ -1861,7 +2050,9 @@ class FLEXIUtilities {
 		return $versionscount;
 	}
 	
-	function doPlgAct() {
+	
+	function doPlgAct()
+	{
 		$plg = JRequest::getVar('plg');
 		$act = JRequest::getVar('act');
 		if($plg && $act) {
@@ -1876,7 +2067,9 @@ class FLEXIUtilities {
 		}
 	}
 	
-	function getCache($group='', $client=0) {
+	
+	function getCache($group='', $client=0)
+	{
 		$conf = JFactory::getConfig();
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
@@ -1892,7 +2085,8 @@ class FLEXIUtilities {
 	}
 	
 	
-	function call_FC_Field_Func( $fieldname, $func, $args=null ) {
+	function call_FC_Field_Func( $fieldname, $func, $args=null )
+	{
 		static $fc_plgs;
 		
 		if ( !isset( $fc_plgs[$fieldname] ) ) {
@@ -1926,8 +2120,10 @@ class FLEXIUtilities {
 		}
 	}
 	
+	
 	/* !!! FUNCTION NOT DONE YET */
-	function call_Content_Plg_Func( $fieldname, $func, $args=null ) {
+	function call_Content_Plg_Func( $fieldname, $func, $args=null )
+	{
 		static $content_plgs;
 		
 		if ( !isset( $content_plgs[$fieldname] ) ) {
@@ -1961,6 +2157,7 @@ class FLEXIUtilities {
 		}
 	}
 	
+	
 	/**
 	 * Return unicode char by its code
 	 * Credits: ?
@@ -1981,6 +2178,7 @@ class FLEXIUtilities {
 	  }
 	  return $utf;
 	}
+	
 	
 	/**
 	 * Return unicode code of a utf8 char
@@ -2009,6 +2207,7 @@ class FLEXIUtilities {
 		}
 	}
 	
+	
 	/**
 	 * Return unicode string when giving an array of utf8 ords
 	 * Credits: Darien Hager
@@ -2029,6 +2228,7 @@ class FLEXIUtilities {
 		return($str);
 	}
 	
+	
 	/**
 	 * Return unicode string when giving an array of utf8 ords
 	 * Credits: Darien Hager
@@ -2036,7 +2236,8 @@ class FLEXIUtilities {
 	 * @param  $str    utf8 string
 	 * @return $ords   utf8 ord arrray
 	 */
-	function unistr_to_ords($str, $encoding = 'UTF-8'){
+	function unistr_to_ords($str, $encoding = 'UTF-8')
+	{
 		// Turns a string of unicode characters into an array of ordinal values,
 		// Even if some of those characters are multibyte.
 		$str = mb_convert_encoding($str,"UCS-4BE",$encoding);
@@ -2054,7 +2255,8 @@ class FLEXIUtilities {
 		}
 		return($ords);
 	}
-
+	
+	
 	function count_new_hit(&$item) // If needed to modify params then clone them !! ??
 	{
 		$mainframe =& JFactory::getApplication();
@@ -2160,7 +2362,8 @@ class FLEXIUtilities {
 		// Last visit within time limit, do not count new hit
 		return 0;
 	}
-
+	
+	
 	function isSqlValidDate($date)
 	{
 		$db = & JFactory::getDBO();
@@ -2171,6 +2374,7 @@ class FLEXIUtilities {
 		return $valid;
 	}
 }
+
 
 if(!function_exists('diff_version')) {
 	function diff_version(&$array1, &$array2) {

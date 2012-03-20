@@ -42,7 +42,10 @@ div#flexicontent .label {
  * print, pdf, ...
  */
 div#flexicontent .buttons {
+	display: block;
 	float: right;
+	margin: 0px;
+	padding: 0px;
 }
 
 div#flexicontent .buttons img {
@@ -398,26 +401,6 @@ div#flexicontent .qf_ratingbar {
 	display: block;
 	height: 10px;
 }
-
-/* state toggler */
-.qf_statetoggler{
-	list-style: none;
-	padding: 0;
-	width: 10px;
-}
-
-.options {
-	position: absolute;
-}
-
-.statetoggler li ul li {
-	background-color: #ffffff;
-	border: #dddddd 1px solid;
-	color: #000000;
-	list-style: none;
-	padding: 2px;
-}
-
 
 
 /* Favourites */
@@ -919,4 +902,41 @@ div#flexicontent table.admintable td.paramlist_key {
 
 div#flexicontent .panel h3 a {
 	padding:0px 0px 4px 0px;
+}
+
+/** state toggler */
+.statetoggler {
+	float: right !important;
+	display: inline-block !important;
+	list-style: none !important;
+	margin: 0px 0px 0px 0px !important;
+	padding: 0 !important;
+	width: 26px !important;
+}
+
+.statetoggler .options {
+	position: relative !important;
+}
+
+.statetoggler .options ul {
+	padding: 0 !important;
+	margin: 0 !important;
+	background: white !important;
+	border: 1px solid silver !important;
+}
+
+.statetoggler li ul li {
+	width: 20px !important;
+	min-height: 20px !important;
+	display: -moz-inline-stack !important;
+	display: inline-block !important;
+	vertical-align: top !important;
+	margin: 1px !important;
+	zoom: 1 !important;
+	*display: inline !important;
+	_height: 20px !important;
+}
+
+.statetoggler li ul li img {
+	padding: 2px !important;
 }
