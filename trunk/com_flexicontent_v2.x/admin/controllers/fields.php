@@ -452,9 +452,10 @@ class FlexicontentControllerFields extends FlexicontentController{
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
 		// check access of copy task
-		if ( $user->authorise('flexicontent.copyfields', 'com_flexicontent') ) {
+		if ( ! $user->authorise('flexicontent.copyfields', 'com_flexicontent') ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=fields');
+			return;
 		}
 		
 		// Remove core fields
