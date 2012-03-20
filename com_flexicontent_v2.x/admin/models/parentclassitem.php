@@ -471,14 +471,25 @@ class ParentClassItem extends JModelAdmin {
 				$iparams_extra->set('access-edit', true);
 			}
 			// no edit permission, check if edit.own is available for this item
-			else if ( $user->authorise('core.edit.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ ) {
-				// Check ownership (this maybe needed since ownership may have changed ? and above permission maybe invalid? )
-				if ($user->get('id') == $this->_item->created_by) {
-					$iparams_extra->set('access-edit', true);
-				}
+			else if ( $user->authorise('core.edit.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			{
+				$iparams_extra->set('access-edit', true);
 			}
 		}
 
+		// Compute EDIT STATE access permissions.
+		if ( $this->_id ) {
+			// first check edit.state permission on the item
+			if ($user->authorise('core.edit.state', $asset)) {
+				$iparams_extra->set('access-edit-state', true);
+			}
+			// no edit.state permission, check if edit.state.own is available for this item
+			else if ( $user->authorise('core.edit.state.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			{
+				$iparams_extra->set('access-edit-state', true);
+			}
+		}
+		
 		// Compute DELETE access permissions.
 		if ( $this->_id ) {
 		
@@ -487,11 +498,9 @@ class ParentClassItem extends JModelAdmin {
 				$iparams_extra->set('access-delete', true);
 			}
 			// no delete permission, chekc delete.own permission if the item is owned by the user
-			else if ( $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ ) {
-				// Check ownership
-				if ($user->get('id') == $this->_item->created_by) {
-					$iparams_extra->set('access-delete', true);
-				}
+			else if ( $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			{
+				$iparams_extra->set('access-delete', true);
 			}
 		}
 		
@@ -510,7 +519,8 @@ class ParentClassItem extends JModelAdmin {
 				$iparams_extra->set('access-view', in_array($this->_item->access, $groups));
 			}
 			// Require both item and category access level
-			else {
+			else
+			{
 				$iparams_extra->set('access-view', in_array($this->_item->access, $groups) && in_array($this->_item->category_access, $groups));
 			}
 		}
@@ -635,7 +645,7 @@ class ParentClassItem extends JModelAdmin {
 			
 			//At least one category needs to be assigned
 			if (!is_array( $cats ) || count( $cats ) < 1) {
-				$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
+				$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
 				return false;
 			}
 			
@@ -665,7 +675,7 @@ class ParentClassItem extends JModelAdmin {
 			
 			//At least one category needs to be assigned
 			if (!is_array( $cats ) || count( $cats ) < 1) {
-				$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
+				$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
 				return false;
 			}
 			
@@ -877,7 +887,7 @@ class ParentClassItem extends JModelAdmin {
 
 		//At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
-			$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
+			$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
 		}
 
@@ -1106,6 +1116,7 @@ class ParentClassItem extends JModelAdmin {
 		$this->_db->query();
 	}
 	
+	
 	/**
 	 * Method to get the tags
 	 *
@@ -1144,6 +1155,7 @@ class ParentClassItem extends JModelAdmin {
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
 	}
+	
 	
 	/**
 	 * Method to fetch used tags IDs as an array when performing an edit action

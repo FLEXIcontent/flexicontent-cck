@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1184 2012-03-12 15:17:13Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -88,13 +88,25 @@ class FlexicontentViewItem extends JView
 		if ($params->get('disable_lang_select', 1)) {
 			$document->addStyleDeclaration($css);
 		}
-		
+		$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
+
 		//get item data
+		
+		// we are in display() task, so we will load the current item version by default
+		// 'preview' request variable will force last, and finally 'version' request variable will force specific
+		// NOTE: preview and version variables cannot be used by users that cannot edit the item
 		JRequest::setVar('loadcurrent', true);
 		if (FLEXI_J16GE) {
 			$item = & $model->getItem($model->getId(), false);
 		} else {
 			$item = & $model->getItem();
+		}
+		
+		// Check that item was loaded successfully, NOTE, this maybe unreachable if getItem() already has raised an ERROR ...
+		if ($item->id == 0)
+		{
+			$id	= JRequest::getInt('id', 0);
+			return JError::raiseError( 404, JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $id) );
 		}
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
@@ -103,18 +115,12 @@ class FlexicontentViewItem extends JView
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
 		$item	= $item[0];
-
+		
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
 		if ($params->get('use_panes', 1)) {
 			jimport('joomla.html.pane');
 			$pane = & JPane::getInstance('Tabs');
 			$this->assignRef('pane', $pane);
-		}
-
-		if ($item->id == 0)
-		{
-			$id	= JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf( 'ITEM #%d NOT FOUND', $id ) );
 		}
 		
 		$fields		=& $item->fields;
@@ -369,7 +375,7 @@ class FlexicontentViewItem extends JView
 		}
 		
 		// Initialiaze JRequest variables
-		JRequest::setVar('loadcurrent', false);
+		JRequest::setVar('loadcurrent', false);  // we are in edit() task, so we load the last item version by default
 		JRequest::setVar('typeid', @$menu->query['typeid'][0]);
 		
 		// Get item and model

@@ -83,19 +83,20 @@ class FlexicontentController extends JController
 		// Debuging message
 		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
 		
+		$mainframe = &JFactory::getApplication();
 		$cparams = clone($mainframe->getParams('com_flexicontent'));
 		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		/*if (FLEXI_J16GE) {
+		if (FLEXI_J16GE) {
 			if ($menu = JSite::getMenu()->getActive()) {
 				$menuParams = new JRegistry;
 				$menuParams->loadJSON($menu->params);
 				$cparams->merge($menuParams);
 			}
-		}*/
+		}
 		
 		//$overridecatperms	= $cparams->get("overridecatperms", 1);
 		//$allowunauthorize	= $cparams->get('allowunauthorize', 0);
-		//$notauthurl				= $cparams->get('notauthurl', '');          //  custom unauthorized page via menu item
+		//$notauthurl				= $cparams->get('notauthurl', '');        //  custom unauthorized page via menu item
 		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
 		
 		// Retrieve current logged user info
@@ -126,14 +127,15 @@ class FlexicontentController extends JController
 			if (!$has_edit) {
 				/*if ($notauthurl) {
 					//  custom unauthorized page via menu item
-					$mainframe->redirect($notauthurl);				
+					$mainframe->redirect(JRoute::_("index.php?Itemid=".$notauthurl));
 				} else*/
 				if ($unauthorized_page) {
 					//  unauthorized page via global configuration
+					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 					$mainframe->redirect($unauthorized_page);				
 				} else {
 					// user isn't authorize to edit this content
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 				}
 			}
 		} else {
@@ -218,13 +220,14 @@ class FlexicontentController extends JController
 		if ($not_authorised && !$allowunauthorize) {
 			if ($notauthurl) {
 				//  custom unauthorized page via menu item
-				$mainframe->redirect($notauthurl);				
+				$mainframe->redirect(JRoute::_("index.php?Itemid=".$notauthurl));
 			} else if ($unauthorized_page) {
 				//  unauthorized page via global configuration
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 				$mainframe->redirect($unauthorized_page);				
 			} else {
 				// user isn't authorize to add ANY content
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			}
 		}
 
@@ -813,21 +816,48 @@ class FlexicontentController extends JController
 	}
 
 	/**
-	 * Logic to change the state
+	 * Logic to change the state of an item, (copied from backend items controller)
+	 * TODO: enable this for the frontend, maybe by adding a state button like
 	 *
 	 * @access public
 	 * @return void
 	 * @since 1.0
 	 */
-	function setstate()
+	function setitemstate()
 	{
 		$id 	= JRequest::getInt( 'id', 0 );
-		$state 	= JRequest::getInt( 'state', 0 );
+		JRequest::setVar( 'cid', $id );
 
-		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$model = $this->getModel('item');
+		$item  = & $model->getItem($id);
+		$user  =& JFactory::getUser();
+		$state = JRequest::getVar( 'state', 0 );
+		@ob_end_clean();
+		
+		// Determine if current user can edit state of the given item
+		$has_edit_state = false;
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $item->id;
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+		} else {
+			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+		}
 
-		if(!$model->setitemstate($id, $state)) {
-			JError::raiseError( 500, $model->getError() );
+		// check if user can edit.state of the item
+		$access_msg = '';
+		if ( !$has_edit_state )
+		{
+			//echo JText::_( 'FLEXI_NO_ACCESS_CHANGE_STATE' );
+			$access_msg =  JText::_( 'FLEXI_DENIED' );   // must a few words
+		}
+		else if(!$model->setitemstate($id, $state)) 
+		{
+			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
+			echo $msg . ": " .$model->getError();
+			return;
 		}
 
 		if ( $state == 1 ) {
@@ -850,10 +880,12 @@ class FlexicontentController extends JController
 			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
 		}
 		
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
-
-		echo JHTML::image('components/com_flexicontent/assets/images/'.$img, $alt );
+		//$cache = &JFactory::getCache('com_flexicontent');
+		$cache = FLEXIUtilities::getCache();
+		$cache->clean('com_flexicontent_items');
+		$path = JURI::root().'components/com_flexicontent/assets/images/';
+		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />' . $access_msg;
+		exit;
 	}
 
 	/**
