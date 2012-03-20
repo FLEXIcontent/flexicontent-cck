@@ -828,7 +828,7 @@ class FlexicontentController extends JController
 		$id 	= JRequest::getInt( 'id', 0 );
 		JRequest::setVar( 'cid', $id );
 
-		$model = $this->getModel('item');
+		$model = $this->getModel(FLEXI_ITEMVIEW);
 		$item  = & $model->getItem($id);
 		$user  =& JFactory::getUser();
 		$state = JRequest::getVar( 'state', 0 );
