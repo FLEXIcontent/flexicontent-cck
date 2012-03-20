@@ -107,7 +107,7 @@ class FlexicontentController extends JController
 
 /*
 echo '<pre>';
-print_r($formparams);
+print_r($date->toFormat("%Y-%m-%d"));
 echo '</pre>';
 */
 
