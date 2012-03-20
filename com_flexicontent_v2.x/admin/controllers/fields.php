@@ -195,10 +195,10 @@ class FlexicontentControllerFields extends FlexicontentController{
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
+			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
 		} else if (!$model->candelete($cid)) {
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
+			JError::raiseNotice(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
 		} else {
 
 			$field_id		= (int)$cid[0];
@@ -207,7 +207,7 @@ class FlexicontentControllerFields extends FlexicontentController{
 			
 			if ( !$has_delete ) {
 				$msg = '';
-				JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			} else if (!$model->delete($cid)) {
 				$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
 				JError::raiseWarning( 500, $model->getError() );
@@ -292,15 +292,15 @@ class FlexicontentControllerFields extends FlexicontentController{
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
 			return;
 		}
 		
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
-			$msg = JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg);
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
 			return;
 		}
 
@@ -322,21 +322,21 @@ class FlexicontentControllerFields extends FlexicontentController{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$model 	= $this->getModel('fields');
-		$user	=& JFactory::getUser();
-
+		// Get variables: model, user, field id, new ordering
+		$model = $this->getModel('fields');
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		
 		// calculate access
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
-
+		
 		// check access
 		if ( !$is_authorised ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 		} else if ( $model->move($dir) ){
 			// success
 		} else {
-			$msg = JText::_( 'FLEXI_ERROR_REORDERING_FIELD' );
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
 			JError::raiseWarning( 500, $model->getError() );
 		}
 
@@ -381,11 +381,19 @@ class FlexicontentControllerFields extends FlexicontentController{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$order 	= JRequest::getVar( 'order', array(0), 'post', 'array' );
-		
+		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
-		if(!$model->saveorder($cid, $order)) {
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
+		
+		// calculate access
+		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+		} else if(!$model->saveorder($cid, $order)) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
@@ -438,30 +446,58 @@ class FlexicontentControllerFields extends FlexicontentController{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		// Get model, user, ids of copied fields
+		$model = $this->getModel('fields');
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
-		$cf = 0;
-		$ncf = 0;
+		// check access of copy task
+		if ( $user->authorise('flexicontent.copyfields', 'com_flexicontent') ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect('index.php?option=com_flexicontent&view=fields');
+		}
+		
+		// Remove core fields
+		$core_cid = array();
+		$non_core_cid = array();
+		
+		// Copying of core fields is not allowed
 		foreach ($cid as $id) {
 			if ($id < 15) {
-				$cf++;
+				$core_cid[] = $id;
 			} else {
-				$ncf++;
+				$non_core_cid[] = $id;
 			}
 		}
-
-		$model = $this->getModel('fields');
 		
-		if(!$model->copy( $cid )) {
+		// Remove uneditable fields
+		$auth_cid = array();
+		$non_auth_cid = array();
+		
+		// Cannot copy fields you cannot edit
+		foreach ($non_core_cid as $id) {
+			$asset = 'com_flexicontent.field.' . $id;
+			if ( $user->authorise('flexicontent.editfield', $asset) ) {
+				$auth_cid[] = $id;
+			} else {
+				$non_auth_cid[] = $id;
+			}
+		}
+		
+		// Try to copy fields
+		if(!$model->copy( $auth_cid )) {
 			$msg = JText::_( 'FLEXI_FIELDS_COPY_FAILED' );
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
 			$msg = '';
-			if ($ncf) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', $ncf) . ' ';
+			if (count($auth_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($auth_cid)) . ' ';
 			}
-			if ($cf) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', $cf);
+			if (count($core_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($core_cid)) . ' ';
+			}
+			if (count($non_auth_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
