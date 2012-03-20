@@ -946,7 +946,7 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 	}
 
-	function checkLanguageFiles($code = 'en-GB', $method = '')
+	function processLanguageFiles($code = 'en-GB', $method = '', $params = array())
 	{
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.archive');
@@ -954,10 +954,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
 		$missing 	= array();
-		$archivea	= array();
-		$archives	= array();
+		$namea		= '';
+		$names		= '';
 
-		$adminpath 	= JPATH_ADMINISTRATOR.DS.'language'.DS.$code.DS;
+		$adminpath 		= JPATH_ADMINISTRATOR.DS.'language'.DS.$code.DS;
+		$refadminpath 	= JPATH_ADMINISTRATOR.DS.'language'.DS.'en-GB'.DS;
+
 		$adminfiles = array(
 			'com_flexicontent',
 			'plg_flexicontent_fields_checkbox',
@@ -989,7 +991,8 @@ class FlexicontentModelFlexicontent extends JModel
 			'plg_system_flexisystem'
 		);
 
-		$sitepath 	= JPATH_SITE.DS.'language'.DS.$code.DS;
+		$sitepath 		= JPATH_SITE.DS.'language'.DS.$code.DS;
+		$refsitepath 	= JPATH_SITE.DS.'language'.DS.'en-GB'.DS;
 		$sitefiles 	= array(
 			'com_flexicontent',
 			'mod_flexiadvsearch',
@@ -1007,8 +1010,9 @@ class FlexicontentModelFlexicontent extends JModel
 		foreach ($adminfiles as $file) {
 			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
+				if ($method == 'create') 
+					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix); 
 			} else {
-				//$archivea[] = $adminpath.$prefix.$file.$suffix;
 				if ($method == 'zip') {
 					JFile::copy($adminpath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin'.DS.$prefix.$file.$suffix);
 					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
@@ -1018,8 +1022,9 @@ class FlexicontentModelFlexicontent extends JModel
 		foreach ($sitefiles as $file) {
 			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
+				if ($method == 'create') 
+					JFile::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
 			} else {
-				//$archives[] = $sitepath.$prefix.$file.$suffix;
 				if ($method == 'zip') {
 					JFile::copy($sitepath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'site'.DS.$prefix.$file.$suffix);
 					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
@@ -1030,8 +1035,9 @@ class FlexicontentModelFlexicontent extends JModel
 		if ($method == 'zip') 
 		{
 			$config =& JFactory::getConfig();
-			$mailfrom = $config->getValue('config.mailfrom');
-			$fromname = $config->getValue('config.fromname');
+			$mailfrom 	= $config->getValue('config.mailfrom');
+			$fromname 	= $config->getValue('config.fromname');
+			$website 	= $config->getValue('config.live_site');
 				
 			// prepare the manifest of the language archive
 			$date =& JFactory::getDate();
@@ -1046,7 +1052,7 @@ class FlexicontentModelFlexicontent extends JModel
 			    <creationDate>'.$sdate.'</creationDate>
 			    <author>'.$fromname.'</author>
 			    <authorEmail>'.$mailfrom.'</authorEmail>
-			    <authorUrl>http://www.flexicontent.org</authorUrl>
+			    <authorUrl>'.$website.'</authorUrl>
 			    <copyright>(C) 2009 '.$fromname.'</copyright>
 			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 			    <description>'.$code.' language pack for FLEXIcontent</description>
@@ -1069,7 +1075,7 @@ class FlexicontentModelFlexicontent extends JModel
 			JArchive::create(JPATH_SITE.DS.'tmp'.DS.$code.'.com_flexicontent.tar.gz', $fileslist, 'gz', '', JPATH_SITE.DS.'tmp'.DS.$code);
 		}
 		
-		return (count($missing) > 0) ? $missing : JText::_('FLEXI_SEND_LANGUAGE_NO_MISSING');
+		return (count($missing) > 0) ? $missing : '<h3 class="lang-success">'.JText::_('FLEXI_SEND_LANGUAGE_NO_MISSING').'</h3>';
 	}
 
 }

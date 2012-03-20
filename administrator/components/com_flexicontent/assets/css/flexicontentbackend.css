@@ -105,6 +105,24 @@ div .button2-left {	margin-left: 5px; }
     padding: 0px;
     height: 30px;
 }
+.spinner {
+	display: block;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    padding: 0px;
+    height: 30px;
+}
+.lang-success {
+	color: green;
+	font-weight: bold;
+}
+.lang-fail {
+	color: red;
+	font-weight: bold;
+}
+#missing {
+	display:none;
+}
 .button-close {
 	text-align: center;
 	margin: 20px 0px;

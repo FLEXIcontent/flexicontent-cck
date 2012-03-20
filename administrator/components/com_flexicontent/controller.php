@@ -82,34 +82,56 @@ class FlexicontentController extends JController
 		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
-		$this->registerTask( 'checklangfiles'			, 'checkLangFiles' );
+		$this->registerTask( 'langfiles'				, 'processLanguageFiles' );
 	}
 	
-	function checkLangFiles() 
+	function processLanguageFiles() 
 	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 		
-		$code = JRequest::getVar('code');
-		$model = $this->getModel('flexicontent');
+		$code 	= JRequest::getVar('code', 'en-GB');
+		$method = JRequest::getVar('method', '');
+		$name = JRequest::getVar('name', '');
+		$email = JRequest::getVar('email', '');
+		$web = JRequest::getVar('web', '');
+		$message = JRequest::getVar('message', '');
+		
+		$formparams = array();
+		$formparams['name'] 	= $name;
+		$formparams['email'] 	= $email;
+		$formparams['web'] 		= $web;
+		$formparams['message'] 	= $message;
+		
+		$model 	= $this->getModel('flexicontent');		
 
-		$missing =& $model->checkLanguageFiles($code);
+/*
+echo '<pre>';
+print_r($formparams);
+echo '</pre>';
+*/
+
+		$missing =& $model->processLanguageFiles($code, $method, $formparams);
 		
 		if (is_array($missing)) {
-			if ($missing['admin']) {
+			if (@$missing['admin']) {
 				echo '<h3>'.JText::_('Folder: administrator/languages/').$code.'/</h3>';
 				foreach ($missing['admin'] as $a) {
-					echo '<p>'.$code.'.'.$a.'.ini'.'</p>';
+					echo '<p>'.$code.'.'.$a.'.ini'.(($method == 'create') ? ' <span class="lang-success">created</span>' : ' <span class="lang-fail">is missing</span>').'</p>';
 				}
 			}
-			if ($missing['site']) {
+			if (@$missing['site']) {
 				echo '<h3>'.JText::_('Folder: languages/').$code.'/</h3>';
 				foreach ($missing['site'] as $s) {
-					echo '<p>'.$code.'.'.$s.'.ini'.'</p>';
+					echo '<p>'.$code.'.'.$s.'.ini'.(($method == 'create') ? ' <span class="lang-success">created</span>' : ' <span class="lang-fail">is missing</span>').'</p>';
 				}
+			}
+			if ($method != 'create') {
+				echo '<style>#missing {display:block;}</style>';
 			}
 		} else {
 			echo $missing;
+			echo '<style>#missing {display:none;}</style>';
 		}
 	}
 
