@@ -37,13 +37,15 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $this->item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {
+	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
 	?>
 	<p class="buttons">
 		<?php echo $pdfbutton; ?>
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
+		<?php echo $statebutton; ?>
 	</p>
 	<?php } ?>
 	<!-- EOF buttons -->

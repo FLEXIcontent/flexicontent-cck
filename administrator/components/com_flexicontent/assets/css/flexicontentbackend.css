@@ -132,11 +132,11 @@ ul.import-failed li {
 	width: 26px;
 }
 
-.options {
+.statetoggler .options {
 	position: relative;
 }
 
-.options ul {
+.statetoggler .options ul {
 	padding: 0;
 	margin: 0;
 	background: white;
