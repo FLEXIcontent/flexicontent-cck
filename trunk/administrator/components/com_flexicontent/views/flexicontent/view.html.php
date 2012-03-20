@@ -149,6 +149,7 @@ class FlexicontentViewFlexicontent extends JView
 			if ($user->gid > 24) {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
 			}
 			JToolBarHelper::preferences('com_flexicontent', '550', '650', 'Configuration');
 		}		
@@ -202,6 +203,24 @@ class FlexicontentViewFlexicontent extends JView
 		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
 		$this->assignRef('check'		, $check);
 		}
+		
+		// Lists
+		jimport('joomla.filesystem.folder');
+		$lists 		= array();
+		$options 	= array();
+		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
+   		$langs 		= JFolder::folders($folder);
+		$activelang =& JFactory::getLanguage()->_lang;
+
+		foreach ($langs as $lang) {
+			$options[] = JHTML::_('select.option', $lang, $lang);		
+		}
+   		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
+
+		// Missing files
+		$model = $this->getModel('flexicontent');
+		$lists['missing_lang'] = $model->checkLanguageFiles();
+
 				
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('pending'		, $pending);
@@ -214,6 +233,8 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);
+		$this->assignRef('lists'		, $lists);
+		$this->assignRef('activelang'	, $activelang);
 
 		// install check
 		$this->assignRef('dopostinstall'		, $dopostinstall);
