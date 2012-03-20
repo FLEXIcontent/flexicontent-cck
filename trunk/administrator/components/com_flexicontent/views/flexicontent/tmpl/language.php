@@ -21,21 +21,62 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
-			$('log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span> Checking files integrity...</span></p>');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=checklangfiles&code=" + lang.value;
+			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
  
 			var ajax = new Ajax(url, {
 				method: 'get',
 				update: $('log')
 			});
-			ajax.request.delay(300, ajax);
+			ajax.request.delay(800, ajax);
+		});
+
+		$('missing').addEvent('click', function(e) {
+			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span> Creating the missing files...</span></p>');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('log')
+			});
+			ajax.request.delay(800, ajax);
+		});
+
+		$('archive').addEvent('click', function(e) {
+
+			// Récupération des valeurs des champs de formulaire
+			var code 	= encodeURIComponent($('lang').value);
+			var name 	= encodeURIComponent($('myname').value);
+			var email 	= encodeURIComponent($('myemail').value);
+			var web 	= encodeURIComponent($('website').value);
+			var message = encodeURIComponent($('message').value);
+			
+			// Préparation des paramètres d'URL
+			var params 	 = '&code='+ code;
+			params 		+= '&name='+ name;
+			params 		+= '&email='+ email;
+			params 		+= '&web=' + web;
+			params 		+= '&message=' + message;
+			
+			$('log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('log')
+			});
+			ajax.request.delay(600, ajax);
 		});
 	}); 
 </script>
 
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<form action="" method="get" name="adminForm" id="adminForm">
 	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
@@ -55,6 +96,36 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					</tr>
 					<tr>
 						<td class="key">
+							<label for="myname">
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_NAME' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<input id="myname" name="myname" class="required" value="<?php echo $this->fromname; ?>" size="50" maxlength="100" />
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<label for="myemail">
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_EMAIL' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<input id="myemail" name="myemail" class="required" value="<?php echo $this->mailfrom; ?>" size="50" maxlength="100" />
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<label for="website">
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_WEBSITE' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<input id="website" name="website" class="required" value="<?php echo $this->website; ?>" size="50" maxlength="100" />
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
 							<label for="message">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MESSAGE' ).':'; ?>
 							</label>
@@ -63,6 +134,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 							<textarea id="message" name="message" cols="30" rows="10"></textarea>
 						</td>
 					</tr>
+<!--
 					<tr>
 						<td class="key">
 							<label for="published">
@@ -76,22 +148,32 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 							?>
 						</td>
 					</tr>
+-->
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td align="right"><input id="archive" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
+						<td align="left"><input id="send" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" /></td>
+					</tr>
 				</table>
 			</td>
 			<td valign="top">
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
-						<th style="text-align:left;"><h2><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?></h2></th>
+						<th style="text-align:left;"><h2>&nbsp;<?php // echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?></h2></th>
 					</tr>
 					<tr>
-						<td><div id="log"><?php echo $this->lists['missing_lang']; ?></div></td>
+						<td>
+							<div id="log" style="width:300px; display:block;"><?php echo $this->lists['missing_lang']; ?></div>
+							<input id="missing" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
+						</td>
 					</tr>
 				</table>
 			</td>
 		</tr>
 	</table>
-
-<?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="view" value="flexicontent" />
 </form>
@@ -100,17 +182,3 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //keep session alive while editing
 JHTML::_('behavior.keepalive');
 ?>
-<!--
-<div id="language">
-	<table width="100%">
-		<tr>
-			<td width="50%" align="right">
-				<input id="import" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_BUTTON' ); ?>" />
-			</td>
-			<td width="50%" align="left">
-				<input type="button" class="button" onclick="window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
-			</td>
-		</tr>
-	</table>
-</div>
--->
