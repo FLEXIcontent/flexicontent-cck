@@ -1,5 +1,5 @@
 /** header icons **/
-.icon-48-flexicontent		{ background-image: url(../images/icon-48-flexicontent.png); }
+.icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
 .icon-48-items				{ background-image: url(../images/icon-48-items.png); }
 .icon-48-itemadd			{ background-image: url(../images/icon-48-item-add.png); }
 .icon-48-itemedit			{ background-image: url(../images/icon-48-item-edit.png); }
@@ -8,25 +8,32 @@
 .icon-48-typeedit			{ background-image: url(../images/icon-48-type-edit.png); }
 .icon-48-fields				{ background-image: url(../images/icon-48-fields.png); }
 .icon-48-fieldadd			{ background-image: url(../images/icon-48-field-add.png); }
-.icon-48-fieldedit			{ background-image: url(../images/icon-48-field-edit.png); }
-.icon-48-tags				{ background-image: url(../images/icon-48-tags.png); }
+.icon-48-fieldedit		{ background-image: url(../images/icon-48-field-edit.png); }
+.icon-48-tags					{ background-image: url(../images/icon-48-tags.png); }
 .icon-48-tagadd				{ background-image: url(../images/icon-48-tag-add.png); }
 .icon-48-tagedit			{ background-image: url(../images/icon-48-tag-edit.png); }
 .icon-48-fc_categories		{ background-image: url(../images/icon-48-categories.png); }
 .icon-48-fc_categoryadd		{ background-image: url(../images/icon-48-category-add.png); }
 .icon-48-fc_categoryedit	{ background-image: url(../images/icon-48-category-edit.png); }
 .icon-48-archive			{ background-image: url(../images/icon-48-archive.png); }
-.icon-48-editacl			{ background-image: url(../images/icon-48-editacl.png); }
-.icon-48-files				{ background-image: url(../images/icon-48-file.png); }
+.icon-48-editacl			{ background-image: url(../images/icon-48-permissions.png); }
+.icon-48-files				{ background-image: url(../images/icon-48-files.png); }
 .icon-48-fileedit			{ background-image: url(../images/icon-48-file-edit.png); }
-.icon-48-stats				{ background-image: url(../images/icon-48-stats.png); }
-.icon-48-templates			{ background-image: url(../images/icon-48-editcss.png); }
+.icon-48-stats				{ background-image: url(../images/icon-48-statistics.png); }
+.icon-48-templates		{ background-image: url(../images/icon-48-templates.png); }
+
+.icon-48-authors			{ background-image: url(../images/icon-48-authors.png); }
+.icon-48-authoradd		{ background-image: url(../images/icon-48-author-add.png); }
+.icon-48-authoredit		{ background-image: url(../images/icon-48-author-edit.png); }
+.icon-48-import				{ background-image: url(../images/icon-48-import.png); }
+.icon-48-searchindex	{ background-image: url(../images/icon-48-searchindex.png); }
 
 /* Toolbar icons */
 .icon-32-person2			{ background-image: url(../images/person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/savenew.png); }
 .icon-32-go						{ background-image: url(../../../../images/go_f2.png); }
 .icon-32-download			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-export.png); }
+.icon-32-language			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-html.png); }
 .icon-32-params				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
 .icon-32-import				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-upload.png); }
 .icon-32-duplicate		{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
@@ -97,6 +104,24 @@ div .button2-left {	margin-left: 5px; }
     margin-bottom: 0px;
     padding: 0px;
     height: 30px;
+}
+.spinner {
+	display: block;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    padding: 0px;
+    height: 30px;
+}
+.lang-success {
+	color: green;
+	font-weight: bold;
+}
+.lang-fail {
+	color: red;
+	font-weight: bold;
+}
+#missing {
+	display:none;
 }
 .button-close {
 	text-align: center;
@@ -592,6 +617,13 @@ div#result table.versionlist th {
 
 div label.lang_box {
 	white-space:nowrap; display:inline-block!important; float:none!important; margin:0px 2px 0px 0px !important; padding:0px!important;
+}
+
+/* Import view */
+.fcimport {
+	width: 120px;
+	display: block;
+	float: left;
 }
 
 /******* END OF COMMON J1.5 / J1.7+ CSS ***********/

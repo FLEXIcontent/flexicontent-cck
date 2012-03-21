@@ -1999,6 +1999,10 @@ class FLEXIUtilities
 				." LIMIT 0,1";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage($db->getErrorMsg(),'error');
+			}
 			$rows = is_array($rows)?$rows:array();
 			$status = false;
 			if(count($rows)>0) {

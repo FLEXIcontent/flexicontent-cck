@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1015 2011-12-04 09:21:41Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1213 2012-03-20 14:44:27Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -31,22 +31,33 @@ class FlexicontentController extends JController
 	function __construct()
 	{
 		parent::__construct();
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
+		
+		// If configuration not saved REDIRECT TO DASHBOARD VIEW (will ask to save or import)
 		$view = JRequest::getVar('view');
-		if($view && !FLEXI_CAT_EXTENSION) {
-			$msg = JText::_( 'FLEXI_CONFIGURATION_NOT_SAVED' );
+		if($view && !$config_saved) {
 			$link 	= 'index.php?option=com_flexicontent';
-			$this->setRedirect($link, $msg);
+			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
 		$session  =& JFactory::getSession();
 		
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$dopostinstall =& $session->get('flexicontent.postinstall');
-		if(($dopostinstall===NULL) || ($dopostinstall===false)) {
+		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
+		if(($dopostinstall===NULL) || ($dopostinstall===false) || $recheck_aftersave) {
 			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
 			// false means it has been checked during current session, but has failed one or more tasks
 			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
+		}
+		
+		// SET recheck_aftersave FLAG to indicate rechecking of postinstall tasks after configuration save or article importing
+		if ($config_saved) {
+			$session->set('flexicontent.recheck_aftersave', !$dopostinstall);
+		} else {
+			$session->set('flexicontent.recheck_aftersave', true);
 		}
 
 		// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
@@ -69,19 +80,65 @@ class FlexicontentController extends JController
 		}
 		
 		// Register Extra task
-		$this->registerTask( 'apply'					, 'save' );
-		$this->registerTask( 'applyacl'					, 'saveacl' );
+		$this->registerTask( 'apply'								, 'save' );
+		$this->registerTask( 'applyacl'							, 'saveacl' );
 		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
-		$this->registerTask( 'createdefaultfields'		, 'createDefaultFields' );
-		$this->registerTask( 'publishplugins'			, 'publishplugins' );
+		$this->registerTask( 'createdefaultfields'	, 'createDefaultFields' );
+		$this->registerTask( 'publishplugins'				, 'publishplugins' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
-		$this->registerTask( 'createauthorstbl'		, 'createauthorstable' );
-		$this->registerTask( 'deleteoldfiles'			, 'deleteOldBetaFiles' );
+		$this->registerTask( 'createauthorstbl'			, 'createauthorstable' );
+		$this->registerTask( 'deleteoldfiles'				, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
-		$this->registerTask( 'addcurrentversiondata'	, 'addCurrentVersionData' );
+		$this->registerTask( 'addcurrentversiondata', 'addCurrentVersionData' );
+		$this->registerTask( 'langfiles'						, 'processLanguageFiles' );
+		
+	}
+	
+	function processLanguageFiles() 
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		
+		$code 	= JRequest::getVar('code', 'en-GB');
+		$method = JRequest::getVar('method', '');
+		$name = JRequest::getVar('name', '');
+		$email = JRequest::getVar('email', '');
+		$web = JRequest::getVar('web', '');
+		$message = JRequest::getVar('message', '');
+		
+		$formparams = array();
+		$formparams['name'] 	= $name;
+		$formparams['email'] 	= $email;
+		$formparams['web'] 		= $web;
+		$formparams['message'] 	= $message;
+		
+		$model 	= $this->getModel('flexicontent');		
+
+		$missing =& $model->processLanguageFiles($code, $method, $formparams);
+		
+		if (is_array($missing) && $method != 'zip') {
+			if (@$missing['admin']) {
+				echo '<h3>'.JText::_('Folder: administrator/languages/').$code.'/</h3>';
+				foreach ($missing['admin'] as $a) {
+					echo '<p>'.$code.'.'.$a.'.ini'.(($method == 'create') ? ' <span class="lang-success">created</span>' : ' <span class="lang-fail">is missing</span>').'</p>';
+				}
+			}
+			if (@$missing['site']) {
+				echo '<h3>'.JText::_('Folder: languages/').$code.'/</h3>';
+				foreach ($missing['site'] as $s) {
+					echo '<p>'.$code.'.'.$s.'.ini'.(($method == 'create') ? ' <span class="lang-success">created</span>' : ' <span class="lang-fail">is missing</span>').'</p>';
+				}
+			}
+			if ($method != 'create') {
+				echo '<style>#missing {display:block;}</style>';
+			}
+		} else {
+			echo $missing;
+			echo '<style>#missing {display:none;}</style>';
+		}
 	}
 
 	function getPostinstallState() {
@@ -416,15 +473,16 @@ VALUES
 		$db->setQuery($query);
 		$result = $db->query();
 		
-		// Set default language for items that do not have their language set
-		$query 	= 'UPDATE #__content i '
-				. " LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
-				. ' SET i.language = ie.language '
-				. " WHERE i.language <> ie.language "				
-				;
-		$db->setQuery($query);
-		$result &= $db->query();
-		
+		// Set default language in the content db table too
+		if (FLEXI_J16GE) {
+			$query 	= 'UPDATE #__content i '
+					. " LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
+					. ' SET i.language = ie.language '
+					. " WHERE i.language <> ie.language "				
+					;
+			$db->setQuery($query);
+			$result &= $db->query();
+		}
 		return $result;
 	}
 

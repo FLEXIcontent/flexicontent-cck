@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1169 2012-03-09 04:17:19Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1206 2012-03-20 04:53:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1999,6 +1999,10 @@ class FLEXIUtilities
 				." LIMIT 0,1";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage($db->getErrorMsg(),'error');
+			}
 			$rows = is_array($rows)?$rows:array();
 			$status = false;
 			if(count($rows)>0) {

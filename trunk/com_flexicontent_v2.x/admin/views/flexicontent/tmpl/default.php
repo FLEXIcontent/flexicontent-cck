@@ -107,19 +107,19 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 						if ($this->dopostinstall && $this->permission->CanFiles)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-file.png', JText::_( 'FLEXI_FILEMANAGER' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
 						
 						if ($this->dopostinstall && $this->permission->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-editcss.png', JText::_( 'FLEXI_TEMPLATES' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-templates.png', JText::_( 'FLEXI_TEMPLATES' ) );
 						}
 
 						if ($this->dopostinstall && $this->permission->CanStats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=stats';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-stats.png', JText::_( 'FLEXI_STATISTICS' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 						}
 
 						if ($this->dopostinstall && $this->permission->CanPlugins)

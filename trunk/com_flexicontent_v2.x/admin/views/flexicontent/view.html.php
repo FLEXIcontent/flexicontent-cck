@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 370 2010-07-21 04:55:46Z enjoyman $
+ * @version 1.5 stable $Id: view.html.php 1212 2012-03-20 13:33:31Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -158,17 +158,42 @@ class FlexicontentViewFlexicontent extends JView
 		$permission = FlexicontentHelperPerm::getPerm();
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			//if ($user->gid > 24) {
 			if($permission->CanConfig)  {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
+				JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 			}
-			if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+			
 		}
-		$permission = FlexicontentHelperPerm::getPerm();
+		
 		//Create Submenu
 		FLEXISubmenu('notvariable');
+		
+		// Lists
+		jimport('joomla.filesystem.folder');
+		$lists 		= array();
+		$options 	= array();
+		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
+   		$langs 		= JFolder::folders($folder);
+		$activelang =& JFactory::getLanguage()->_lang;
 
+		foreach ($langs as $lang) {
+			$options[] = JHTML::_('select.option', $lang, $lang);		
+		}
+   		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
+
+		// Missing files
+		$model = $this->getModel('flexicontent');
+		$lists['missing_lang'] = $model->processlanguagefiles();
+
+		// Get the default copyright values to populate the form automatically
+		$config =& JFactory::getConfig();
+		$mailfrom 	= $config->getValue('config.mailfrom');
+		$fromname 	= $config->getValue('config.fromname');
+		$website 	= $config->getValue('config.live_site');
+
+				
 		$this->assignRef('pane'			, $pane);
 		$this->assignRef('pending'		, $pending);
 		$this->assignRef('revised'		, $revised);
@@ -180,23 +205,28 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);
+		$this->assignRef('lists'		, $lists);
+		$this->assignRef('activelang'	, $activelang);
+		$this->assignRef('mailfrom'		, $mailfrom);
+		$this->assignRef('fromname'		, $fromname);
+		$this->assignRef('website'		, $website);
 
 		// install check
-		$this->assignRef('dopostinstall', $dopostinstall);
-		$this->assignRef('allplgpublish', $allplgpublish);
-		$this->assignRef('existmenuitems'		, $existmenuitems);
+		$this->assignRef('dopostinstall'	, $dopostinstall);
+		$this->assignRef('allplgpublish'	, $allplgpublish);
+		$this->assignRef('existmenuitems'	, $existmenuitems);
 		$this->assignRef('existtype'			, $existtype);
-		$this->assignRef('existfields'			, $existfields);
+		$this->assignRef('existfields'		, $existfields);
 		$this->assignRef('existfplg'			, $existfplg);
 		$this->assignRef('existseplg'			, $existseplg);
 		$this->assignRef('existsyplg'			, $existsyplg);
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
-		$this->assignRef('existversionsdata'	, $existversionsdata);
-		$this->assignRef('existauthors'		, $existauthors);
+		$this->assignRef('existversionsdata', $existversionsdata);
+		$this->assignRef('existauthors'			, $existauthors);
 		$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
-		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
+		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
 		$this->assignRef('initialpermission'		, $initialpermission);
 		
@@ -253,8 +283,7 @@ class FlexicontentViewFlexicontent extends JView
 	
 	function getUpdateComponent()
 	 {
-		//$url = 'http://www.flexicontent.org/flexicontent_update.xml';
-		$url = 'http://flexicontent.googlecode.com/files/latest_j16j17.xml';
+		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
@@ -290,10 +319,8 @@ class FlexicontentViewFlexicontent extends JView
 			$fsock = @fsockopen("flexicontent.googlecode.com", 80, $errno, $errstr, 5);
 		
 			if ($fsock) {
-				//@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
-				//@fputs($fsock, "HOST: www.flexicontent.org\r\n");
-				@fputs($fsock, "GET /files/latest_j16j17.xml HTTP/1.1\r\n");
-				@fputs($fsock, "HOST: flexicontent.googlecode.com\r\n");
+				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
+				@fputs($fsock, "HOST: www.flexicontent.org\r\n");
 				@fputs($fsock, "Connection: close\r\n\r\n");
         
 				//force stream timeout...
@@ -357,6 +384,7 @@ class FlexicontentViewFlexicontent extends JView
 		
 		return $check;
 	}
+	
 	function fversion(&$tpl, &$params) {
 		//updatecheck
 		if($params->get('show_updatecheck', 1) == 1) {
