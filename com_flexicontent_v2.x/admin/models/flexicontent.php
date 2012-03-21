@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 962 2011-11-19 07:39:57Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1213 2012-03-20 14:44:27Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -787,17 +787,24 @@ class FlexicontentModelFlexicontent extends JModel
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
+		
 		$diff_arrays = $this->getDiffVersions();
-		$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
-				. " JOIN #__categories as cat ON c.catid=cat.id "
-				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."' AND c.version > '1' AND iv.version IS NULL;";
+
+/*
+		// Remove this part at it seems to cause triple versions
+		// Additionnal check from Suriya is required
+		
+		$query 	= "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
+			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
+			" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL;";
 		$db->setQuery($query);
 		$newrows = $db->loadAssocList();
 		foreach($newrows as $r) {
 			$newrows[$r["id"]] = $r;
 		}
 		$diff_arrays = array_merge_recursive($diff_arrays, $newrows);
+*/
+
 		foreach($diff_arrays as $row) {
 			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
@@ -921,6 +928,141 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 		}
 	}
+
+	function processLanguageFiles($code = 'en-GB', $method = '', $params = array())
+	{
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.archive');
+		
+		$prefix 	= $code . '.';
+		$suffix 	= '.ini';
+		$missing 	= array();
+		$namea		= '';
+		$names		= '';
+
+		$adminpath 		= JPATH_ADMINISTRATOR.DS.'language'.DS.$code.DS;
+		$refadminpath 	= JPATH_ADMINISTRATOR.DS.'language'.DS.'en-GB'.DS;
+
+		$adminfiles = array(
+			'com_flexicontent',
+			'plg_flexicontent_fields_checkbox',
+			'plg_flexicontent_fields_checkboximage',
+			'plg_flexicontent_fields_core',
+			'plg_flexicontent_fields_date',
+			'plg_flexicontent_fields_email',
+			'plg_flexicontent_fields_extendedweblink',
+			'plg_flexicontent_fields_fcloadmodule',
+			'plg_flexicontent_fields_fcpagenav',
+			'plg_flexicontent_fields_file',
+			'plg_flexicontent_fields_image',
+			'plg_flexicontent_fields_linkslist',
+			'plg_flexicontent_fields_minigallery',
+			'plg_flexicontent_fields_radio',
+			'plg_flexicontent_fields_radioimage',
+			'plg_flexicontent_fields_relateditems',
+			'plg_flexicontent_fields_select',
+			'plg_flexicontent_fields_selectmultiple',
+			'plg_flexicontent_fields_text',
+			'plg_flexicontent_fields_textarea',
+			'plg_flexicontent_fields_textselect',
+			'plg_flexicontent_fields_toolbar',
+			'plg_flexicontent_fields_weblink',
+			'plg_flexicontent_flexinotify',
+			'plg_search_flexiadvsearch',
+			'plg_search_flexisearch',
+			'plg_system_flexiadvroute',
+			'plg_system_flexisystem'
+		);
+
+		$sitepath 		= JPATH_SITE.DS.'language'.DS.$code.DS;
+		$refsitepath 	= JPATH_SITE.DS.'language'.DS.'en-GB'.DS;
+		$sitefiles 	= array(
+			'com_flexicontent',
+			'mod_flexiadvsearch',
+			'mod_flexicontent',
+			'mod_flexitagcloud'
+		);
+		
+		if ($method == 'zip') {
+			if (count($adminfiles))
+				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin', 0775);
+			if (count($sitefiles))
+				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'site', 0775);
+		}
+		
+		foreach ($adminfiles as $file) {
+			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
+				$missing['admin'][] = $file;
+				if ($method == 'create') 
+					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix); 
+			} else {
+				if ($method == 'zip') {
+					JFile::copy($adminpath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin'.DS.$prefix.$file.$suffix);
+					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+				}
+			}
+		}
+		foreach ($sitefiles as $file) {
+			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
+				$missing['site'][] = $file;
+				if ($method == 'create') 
+					JFile::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
+			} else {
+				if ($method == 'zip') {
+					JFile::copy($sitepath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'site'.DS.$prefix.$file.$suffix);
+					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+				}
+			}
+		}
+		
+		if ($method == 'zip') 
+		{
+			$mailfrom 	= @$params['email']	? $params['email']	: 'emmanuel.danan@gmail.com';
+			$fromname 	= @$params['name'] 	? $params['name'] 	: 'Emmanuel Danan';
+			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
+				
+			// prepare the manifest of the language archive
+			$date =& JFactory::getDate();
+		
+			$xmlfile = JPATH_SITE.DS.'tmp'.DS.$code.DS.'install.xml';
+			
+			$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+			<install type="language" version="1.5" client="both" method="upgrade">
+			    <name>FLEXIcontent '.$code.'</name>
+			    <tag>'.$code.'</tag>
+			    <creationDate>'.$date->toFormat("%Y-%m-%d").'</creationDate>
+			    <author>'.$fromname.'</author>
+			    <authorEmail>'.$mailfrom.'</authorEmail>
+			    <authorUrl>'.$website.'</authorUrl>
+			    <copyright>(C) '.$date->toFormat("%Y").' '.$fromname.'</copyright>
+			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+			    <description>'.$code.' language pack for FLEXIcontent</description>
+			    <administration>
+			        <files folder="admin">
+			'.$namea.'
+			        </files>
+			    </administration>
+			    <site>
+			        <files folder="site">
+			'.$names.'
+			        </files>
+			    </site>
+			</install>'
+			   ;
+			// save xml manifest
+			JFile::write($xmlfile, $xml);
+
+			$fileslist = JFolder::files(JPATH_SITE.DS.'tmp'.DS.$code, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
+			JArchive::create(JPATH_SITE.DS.'tmp'.DS.$code.'.com_flexicontent.tar.gz', $fileslist, 'gz', '', JPATH_SITE.DS.'tmp'.DS.$code);
+		}
+		
+		// messages
+		if ($method == 'zip') {
+			return '<h3 class="lang-success">' . JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';
+		}
+		return (count($missing) > 0) ? $missing : '<h3 class="lang-success">'. JText::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</h3>';
+	}
+
 	
 	function checkInitialPermission() {
 		jimport('joomla.access.rules');

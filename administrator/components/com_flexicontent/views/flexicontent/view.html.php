@@ -145,15 +145,7 @@ class FlexicontentViewFlexicontent extends JView
 		$document->addStyleDeclaration($css);
 
 		$session  =& JFactory::getSession();
-		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			if ($user->gid > 24) {
-				$toolbar=&JToolBar::getInstance('toolbar');
-				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
-				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
-			}
-			JToolBarHelper::preferences('com_flexicontent', '550', '650', 'Configuration');
-		}		
-		
+
 		if (FLEXI_ACCESS) {
 			$user =& JFactory::getUser();
 			$CanAdd 		= ($user->gid < 25) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
@@ -189,7 +181,18 @@ class FlexicontentViewFlexicontent extends JView
 			$CanImport		= 1;
 			$CanIndex		= 1;
 		}
+
+		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
+			if ($user->gid > 24) {
+				$toolbar=&JToolBar::getInstance('toolbar');
+				$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
+				JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+			}
+			
+		}
 		
+		//Create Submenu
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
 		
@@ -246,21 +249,21 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('website'		, $website);
 
 		// install check
-		$this->assignRef('dopostinstall'		, $dopostinstall);
-		$this->assignRef('allplgpublish'		, $allplgpublish);
-		$this->assignRef('existmenuitems'		, $existmenuitems);
+		$this->assignRef('dopostinstall'	, $dopostinstall);
+		$this->assignRef('allplgpublish'	, $allplgpublish);
+		$this->assignRef('existmenuitems'	, $existmenuitems);
 		$this->assignRef('existtype'			, $existtype);
-		$this->assignRef('existfields'			, $existfields);
+		$this->assignRef('existfields'		, $existfields);
 		$this->assignRef('existfplg'			, $existfplg);
 		$this->assignRef('existseplg'			, $existseplg);
 		$this->assignRef('existsyplg'			, $existsyplg);
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
-		$this->assignRef('existversionsdata'	, $existversionsdata);
+		$this->assignRef('existversionsdata', $existversionsdata);
 		$this->assignRef('existauthors'			, $existauthors);
 		//$this->assignRef('cachethumb'			, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
-		$this->assignRef('nooldfieldsdata'		, $nooldfieldsdata);
+		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
 		//$this->assignRef('initialpermission'	, $initialpermission);
 
@@ -294,7 +297,7 @@ class FlexicontentViewFlexicontent extends JView
 	 * @param string $text image description
 	 * @param boolean $modal 1 for loading in modal
 	 */
-	function quickiconButton( $link, $image, $text, $modal = 0 )
+	function quickiconButton( $link, $image, $text, $modal = 0, $modaliframe = 1 )
 	{
 		//initialise variables
 		$lang 		= & JFactory::getLanguage();
@@ -305,8 +308,9 @@ class FlexicontentViewFlexicontent extends JView
 				<?php
 				if ($modal == 1) {
 					JHTML::_('behavior.modal');
+					$rel = $modaliframe?" rel=\"{handler: 'iframe', size: {x: 900, y: 500}}\"":'';
 				?>
-					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal" rel="{handler: 'iframe', size: {x: 900, y: 500}}">
+					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal"<?php echo $rel;?>>
 				<?php
 				} else {
 				?>
@@ -329,8 +333,7 @@ class FlexicontentViewFlexicontent extends JView
 	
 	function getUpdateComponent()
 	 {
-		//$url = 'http://www.flexicontent.org/flexicontent_update.xml';
-		$url = 'http://flexicontent.googlecode.com/files/latest_j15.xml';
+		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
@@ -366,10 +369,8 @@ class FlexicontentViewFlexicontent extends JView
 			$fsock = @fsockopen("flexicontent.googlecode.com", 80, $errno, $errstr, 5);
 		
 			if ($fsock) {
-				//@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
-				//@fputs($fsock, "HOST: www.flexicontent.org\r\n");
-				@fputs($fsock, "GET /files/latest_j15.xml HTTP/1.1\r\n");
-				@fputs($fsock, "HOST: flexicontent.googlecode.com\r\n");
+				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
+				@fputs($fsock, "HOST: www.flexicontent.org\r\n");
 				@fputs($fsock, "Connection: close\r\n\r\n");
         
 				//force stream timeout...
@@ -432,6 +433,18 @@ class FlexicontentViewFlexicontent extends JView
 		}
 		
 		return $check;
-	 }
+	}
+	
+	function fversion(&$tpl, &$params) {
+		//updatecheck
+		if($params->get('show_updatecheck', 1) == 1) {
+			$cache = & JFactory::getCache('com_flexicontent');
+			$cache->setCaching( 1 );
+			$cache->setLifeTime( 100 );
+			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
+			$this->assignRef('check'		, $check);
+		}
+		parent::display($tpl);
+	}
 }
 ?>
