@@ -175,13 +175,13 @@ class FlexicontentViewFlexicontent extends JView
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
-   		$langs 		= JFolder::folders($folder);
+		$langs 		= JFolder::folders($folder);
 		$activelang =& JFactory::getLanguage()->_lang;
 
 		foreach ($langs as $lang) {
 			$options[] = JHTML::_('select.option', $lang, $lang);		
 		}
-   		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
+		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files
 		$model = $this->getModel('flexicontent');

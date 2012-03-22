@@ -13,10 +13,6 @@
 		<filename plugin="flexiadvsearch">flexiadvsearch.php</filename>
 	</files>
 
-	<languages>
-		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.ini</language>
-	</languages>
-
 	<params>
 		<param name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
 			<option value="0">FLEXI_NO</option>
@@ -28,5 +24,10 @@
 			<option value="2">Open Same Window</option>
 		</param>
 	</params>
+
+	<languages>
+		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.ini</language>
+		<language tag="de-DE">de-DE.plg_search_flexiadvsearch.ini</language>
+	</languages>
 
 </install>

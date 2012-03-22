@@ -18,32 +18,67 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
+<!-- CSS fixes for J2.5.x -->
+<style>
+	form.lang_submit select#lang {  float:none;	margin:0px;  }
+</style>
+
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
-			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
-			e = new Event(e).stop();
+			if(MooTools.version>="1.2.4") {
+			
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
+				e = e.stop();
+				
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('log'),
+				}).send();
+				
+			} else {
+			
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
+				e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('log')
-			});
-			ajax.request.delay(1000, ajax);
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('log')
+				});
+				ajax.request.delay(1000, ajax);
+				
+ 			}
 		});
 
 		$('missing').addEvent('click', function(e) {
-			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
-			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('log')
-			});
-			ajax.request.delay(1000, ajax);
+			if(MooTools.version>="1.2.4") {
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
+				e = e.stop();
+				
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('log'),
+				}).send();
+				
+			} else {
+			
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
+				e = new Event(e).stop();
+
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('log')
+				});
+				ajax.request.delay(1000, ajax);
+				
+			}
 		});
 
 		$('archive').addEvent('click', function(e) {
@@ -62,21 +97,35 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			params 		+= '&web=' + web;
 			params 		+= '&message=' + message;
 			
-			$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
-			e = new Event(e).stop();
+			if(MooTools.version>="1.2.4") {
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
+				e = e.stop();
+				
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
+				new Request.HTML({
+					url: url,
+					method: 'get',
+					update: $('log'),
+				}).send();
+				
+			} else {
+			
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
+				e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
- 
-			var ajax = new Ajax(url, {
-				method: 'get',
-				update: $('log')
-			});
-			ajax.request.delay(1000, ajax);
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
+				var ajax = new Ajax(url, {
+					method: 'get',
+					update: $('log')
+				});
+				ajax.request.delay(1000, ajax);
+				
+			}
 		});
 	}); 
 </script>
 
-<form action="" method="get" name="adminForm" id="adminForm">
+<form action="" method="get" name="adminForm" id="adminForm" class="lang_submit">
 	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
@@ -155,7 +204,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					</tr>
 					<tr>
 						<td align="right"><input id="archive" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
-						<td align="left"><input id="send" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" /></td>
+						<td align="left"><input id="send" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" onclick="alert('NOT ALLOWED. Next revision will allow public usage or limit to authorized translators only')" /></td>
 					</tr>
 				</table>
 			</td>
