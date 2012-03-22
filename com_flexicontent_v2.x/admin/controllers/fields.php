@@ -59,7 +59,6 @@ class FlexicontentControllerFields extends FlexicontentController{
 		$model = $this->getModel('field');
 		$user	=& JFactory::getUser();
 
-
 		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
@@ -120,7 +119,20 @@ class FlexicontentControllerFields extends FlexicontentController{
 	 */
 	function publish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$user	=& JFactory::getUser();
+		
+		// calculate access
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
+		$asset = 'com_flexicontent.field.' . $field_id;
+		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -153,6 +165,8 @@ class FlexicontentControllerFields extends FlexicontentController{
 	 */
 	function unpublish()
 	{
+		$user	=& JFactory::getUser();
+		
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$model 		= $this->getModel('fields');
 
@@ -163,7 +177,14 @@ class FlexicontentControllerFields extends FlexicontentController{
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_FIELDS' ));
 		} else {
-			if(!$model->publish($cid, 0)) {
+			$field_id		= (int)$cid[0];
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			
+			if ( !$is_authorised ) {
+				$msg = '';
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			} else if(!$model->publish($cid, 0)) {
 				$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
 				JError::raiseWarning( 500, $model->getError() );
 			} else {
@@ -203,9 +224,9 @@ class FlexicontentControllerFields extends FlexicontentController{
 
 			$field_id		= (int)$cid[0];
 			$asset = 'com_flexicontent.field.' . $field_id;
-			$has_delete = $user->authorise('flexicontent.deletefield', $asset);
+			$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
 			
-			if ( !$has_delete ) {
+			if ( !$is_authorised ) {
 				$msg = '';
 				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			} else if (!$model->delete($cid)) {
@@ -414,15 +435,28 @@ class FlexicontentControllerFields extends FlexicontentController{
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+
+		$user	=& JFactory::getUser();
 		
+		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$id		= (int)$cid[0];
+		$field_id		= (int)$cid[0];
+		$asset = 'com_flexicontent.field.' . $field_id;
+		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
+
 		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-		$access = $accesses[$id];
+		$access = $accesses[$field_id];
 
 		$model = $this->getModel('fields');
 		
-		if(!$model->saveaccess( $id, $access )) {
+		if(!$model->saveaccess( $field_id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
 			JError::raiseWarning( 500, $model->getError() );
 		} else {

@@ -999,7 +999,7 @@ class FlexicontentModelFlexicontent extends JModel
 			} else {
 				if ($method == 'zip') {
 					JFile::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
-					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+					$namea .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
 		}
@@ -1011,7 +1011,7 @@ class FlexicontentModelFlexicontent extends JModel
 			} else {
 				if ($method == 'zip') {
 					JFile::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
-					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+					$names .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
 		}
@@ -1039,13 +1039,11 @@ class FlexicontentModelFlexicontent extends JModel
 			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 			    <description>'.$code.' language pack for FLEXIcontent</description>
 			    <administration>
-			        <files folder="admin">
-			'.$namea.'
+			        <files folder="admin">'.$namea.'
 			        </files>
 			    </administration>
 			    <site>
-			        <files folder="site">
-			'.$names.'
+			        <files folder="site">'.$names.'
 			        </files>
 			    </site>
 			</install>'

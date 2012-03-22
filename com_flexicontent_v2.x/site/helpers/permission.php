@@ -54,7 +54,7 @@ class FlexicontentHelperPerm {
 			
 			// ITEMS: component controlled permissions
 			$permission->DisplayAllItems	= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
-			$permission->CanAccLevelItems = $user->authorise('flexicontent.acclevelitems',	'com_flexicontent'); // (backend) Change Item Access Level
+			//$permission->CanAccLevelItems = $user->authorise('flexicontent.acclevelitems',	'com_flexicontent'); // (backend) Change Item Access Level
 			$permission->CanCopy				 	= $user->authorise('flexicontent.copyitems',			'com_flexicontent'); // (backend) Item Copy Task
 			$permission->CanOrder	 				= $user->authorise('flexicontent.orderitems', 		'com_flexicontent'); // (backend) Reorder items inside the category
 			$permission->CanParams				= $user->authorise('flexicontent.paramsitem', 		'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
@@ -79,12 +79,13 @@ class FlexicontentHelperPerm {
 			
 			// FIELDS: management tab
 			$permission->CanFields 				= $user->authorise('flexicontent.managefields', 	'com_flexicontent'); // (backend) Allow management of Fields
-			$permission->CanAccLevelFields= $user->authorise('flexicontent.acclevelfields',	'com_flexicontent'); // (backend) Change Field Access Level
+			//$permission->CanAccLevelFields= $user->authorise('flexicontent.acclevelfields',	'com_flexicontent'); // (backend) Change Field Access Level
 			$permission->CanCopyFields 		= $user->authorise('flexicontent.copyfields', 		'com_flexicontent'); // (backend) Field Copy Task
 			$permission->CanOrderFields 	= $user->authorise('flexicontent.orderfields', 		'com_flexicontent'); // (backend) Reorder fields inside each item type
 			$permission->CanAddField			= $user->authorise('flexicontent.createfield', 	'com_flexicontent'); // (backend) Create fields
 			$permission->CanEditField			= $user->authorise('flexicontent.editfield', 		'com_flexicontent'); // (backend) Edit fields
 			$permission->CanDeleteField		= $user->authorise('flexicontent.deletefield', 	'com_flexicontent'); // (backend) Delete fields
+			$permission->CanPublishField	= $user->authorise('flexicontent.publishfield', 'com_flexicontent'); // (backend) Publish fields
 			
 			// FILES: management tab
 			$permission->CanFiles	 				= $user->authorise('flexicontent.managefiles', 		'com_flexicontent'); // (backend) Allow management of Files
