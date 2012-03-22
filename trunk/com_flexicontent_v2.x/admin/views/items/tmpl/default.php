@@ -433,7 +433,7 @@ window.addEvent('domready', function() {
 
 			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 
-			if ($this->permission->CanAccLevelItems && ($canPublish || $canPublishOwn) ) {
+			if ($canPublish || $canPublishOwn) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');
 			} else $access = $this->escape($row->access_level);
 

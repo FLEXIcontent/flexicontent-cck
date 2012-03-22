@@ -47,9 +47,9 @@ defined('_JEXEC') or die('Restricted access');
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-<!--			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
+			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-<!--			<th width="1%"><?php // echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th> -->
+			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -86,37 +86,46 @@ defined('_JEXEC') or die('Restricted access');
 		<?php
 		$k = 0;
 		$i = 0;
+		$user =& $this->user;
 		$n = count($this->rows);
 		foreach($this->rows as $row) {
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
+				
+			$canEdit			= in_array('editfield', $rights);
+			$canPublish		= in_array('publishfield', $rights);
+			$canDelete		= in_array('deletefield', $rights);
+			
 			$link 		= 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;cid[]='. $row->id;
-			if ($row->id > 6) {
-				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'fields.' );
-			} else {
+			if ($row->id < 7) {  // First 6 core field are not unpublishable
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+			} else if (!$canPublish && $row->published) {   // No privilige published
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+			} else if (!$canPublish && !$row->published) {   // No privilige unpublished
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+			} else {
+				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'fields.' );
 			}
 			
 			if( $row->isfilter ) {
-				$isfilter = "tick.png";
+				$isfilter = "tick_f2.png";
 			}else{
-				$isfilter = "publish_x.png";
+				$isfilter = "publish_x_f2.png";
 			}
 			
 			if( $row->issearch ) {
-				$issearch = "tick.png";
+				$issearch = "tick_f2.png";
 			}else{
-				$issearch = "publish_x.png";
+				$issearch = "publish_x_f2.png";
 			}
 			
 			if( $row->isadvsearch ) {
-				$isadvsearch = "tick.png";
+				$isadvsearch = "tick_f2.png";
 			}else{
-				$isadvsearch = "publish_x.png";
+				$isadvsearch = "publish_x_f2.png";
 			}
-			if ($this->permission->CanAccLevelFields) {
+			if ($canPublish) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'fields.access\')"');
-			} else {
-				$access = flexicontent_html::userlevel('', $row->access, '', false, $createlist=false);
-			}
+			} else $access = $this->escape($row->access_level);
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
@@ -125,7 +134,10 @@ defined('_JEXEC') or die('Restricted access');
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
-				if ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) {
+				if (
+					( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) )
+					|| !$canEdit
+				 ) {
 					echo htmlspecialchars($row->label, ENT_QUOTES, 'UTF-8');
 				} else {
 				?>
@@ -157,9 +169,9 @@ defined('_JEXEC') or die('Restricted access');
 				}
 				?>
 			</td>
-<!--			<td align="center"><img src="components/com_flexicontent/assets/images/<?php // echo $isfilter;?>" width="16" height="16" border="0" alt="<?php // echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td> -->
+			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
 			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-<!--			<td align="center"><img src="components/com_flexicontent/assets/images/<?php // echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php // echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td> -->
+			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
 			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
 			<td align="center">
 				<?php echo $access; ?>

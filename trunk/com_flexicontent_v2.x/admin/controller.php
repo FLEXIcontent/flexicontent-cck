@@ -166,6 +166,12 @@ class FlexicontentController extends JController
 		
 		$initialpermission	= $model->checkInitialPermission();
 		
+		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
+		//echo "     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
+		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
+		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||<br>";
+		//echo "     (!$initialpermission)<br>";
+		     
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||

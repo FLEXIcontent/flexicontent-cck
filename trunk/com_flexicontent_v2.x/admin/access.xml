@@ -16,7 +16,7 @@
 		
 		<!-- ITEMs: component controlled permissions -->
 		<action name="flexicontent.displayallitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Display all" description="Allow users in the group to list all Items (in items management), otherwise the user will only see the items that he/she can edit." />
-		<action name="flexicontent.acclevelitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of items (in items management)" />
+		<!--action name="flexicontent.acclevelitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of items (in items management)" /-->
 		<action name="flexicontent.copyitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Item Copy Task (in items management)" />
 		<action name="flexicontent.orderitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
 		<action name="flexicontent.paramsitem" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; set params" description="Allow users in the group to change the parameters of editable items." />
@@ -41,12 +41,13 @@
 		
 		<!-- FIELDs: management tab -->
 		<action name="flexicontent.managefields" title="&lt;b&gt;Fields: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Fields Management" />
-		<action name="flexicontent.acclevelfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of fields (in fields management)" />
+		<!--action name="flexicontent.acclevelfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of fields (in fields management)" /-->
 		<action name="flexicontent.copyfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Field Copy Task (in fields management)" />
 		<action name="flexicontent.orderfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of fields (in fields management)" />
 		<action name="flexicontent.createfield" title="&lt;b&gt;Fields:&lt;/b&gt; create" description="Allow users in the group to create fields" />
 		<action name="flexicontent.editfield" title="&lt;b&gt;Fields:&lt;/b&gt; edit" description="Allow users in the group to edit fields" />
 		<action name="flexicontent.deletefield" title="&lt;b&gt;Fields:&lt;/b&gt; delete" description="Allow users in the group to delete fields" />
+		<action name="flexicontent.publishfield" title="&lt;b&gt;Fields:&lt;/b&gt; publish" description="Allow users in the group to publish fields" />
 		
 		<!-- FILEs: management tab -->
 		<action name="flexicontent.managefile" title="&lt;b&gt;Files: -- manage --&lt;/b&gt;" description="-- manage -- files" />
@@ -76,6 +77,7 @@
 	<section name="field">
 		<action name="flexicontent.editfield" title="edit" description="This field can be edited by members of this user group" />
 		<action name="flexicontent.deletefield" title="delete" description="This field can be deleted by members of this user group" />
+		<action name="flexicontent.publishfield" title="publish" description="This field can be publiished by members of this user group" />
 	</section>
 	
 </access>

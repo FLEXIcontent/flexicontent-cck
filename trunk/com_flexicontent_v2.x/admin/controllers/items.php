@@ -752,11 +752,7 @@ class FlexicontentControllerItems extends JController
 		$access = $accesses[$id];
 
 		// Check if user can set access level of the item
-		if ( !$user->authorise('flexicontent.acclevelitems', 'com_flexicontent') ) {
-			$msg_noauth = JText::_( 'FLEXI_CANNOT_CHANGE_ACCLEVEL_ASSETS' );
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_ACCLEVEL_PERMISSION' );
-		}
-		else if ( !$itemmodel->getItemAccess()->get('access-edit-state') ) {
+		if ( !$itemmodel->getItemAccess()->get('access-edit-state') ) {
 			$msg_noauth = JText::_( 'FLEXI_CANNOT_CHANGE_ACCLEVEL_ASSETS' );
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_PUBLISH_PERMISSION' );
 		}
