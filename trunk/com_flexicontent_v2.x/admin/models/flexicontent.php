@@ -982,12 +982,13 @@ class FlexicontentModelFlexicontent extends JModel
 			'mod_flexicontent',
 			'mod_flexitagcloud'
 		);
+		$targetfolder = JPATH_SITE.DS.'tmp'.DS.$code."_".time();
 		
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin', 0775);
+				JFolder::create($targetfolder.DS.'admin', 0775);
 			if (count($sitefiles))
-				JFolder::create(JPATH_SITE.DS.'tmp'.DS.$code.DS.'site', 0775);
+				JFolder::create($targetfolder.DS.'site', 0775);
 		}
 		
 		foreach ($adminfiles as $file) {
@@ -997,7 +998,7 @@ class FlexicontentModelFlexicontent extends JModel
 					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix); 
 			} else {
 				if ($method == 'zip') {
-					JFile::copy($adminpath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'admin'.DS.$prefix.$file.$suffix);
+					JFile::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
 					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
@@ -1009,7 +1010,7 @@ class FlexicontentModelFlexicontent extends JModel
 					JFile::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
-					JFile::copy($sitepath.$prefix.$file.$suffix, JPATH_SITE.DS.'tmp'.DS.$code.DS.'site'.DS.$prefix.$file.$suffix);
+					JFile::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
 					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
@@ -1024,7 +1025,7 @@ class FlexicontentModelFlexicontent extends JModel
 			// prepare the manifest of the language archive
 			$date =& JFactory::getDate();
 		
-			$xmlfile = JPATH_SITE.DS.'tmp'.DS.$code.DS.'install.xml';
+			$xmlfile = $targetfolder.DS.'install.xml';
 			
 			$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 			<install type="language" version="1.5" client="both" method="upgrade">
@@ -1051,9 +1052,33 @@ class FlexicontentModelFlexicontent extends JModel
 			   ;
 			// save xml manifest
 			JFile::write($xmlfile, $xml);
-
-			$fileslist = JFolder::files(JPATH_SITE.DS.'tmp'.DS.$code, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
-			JArchive::create(JPATH_SITE.DS.'tmp'.DS.$code.'.com_flexicontent.tar.gz', $fileslist, 'gz', '', JPATH_SITE.DS.'tmp'.DS.$code);
+			
+			
+			$fileslist  = JFolder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
+			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
+			
+			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
+			if (!FLEXI_J16GE) {
+				JArchive::create($archivename, $fileslist, 'gz', '', $targetfolder);
+			} else {
+				$app = JFactory::getApplication('administrator');
+				$files = array();
+				foreach ($fileslist as $i => $filename) {
+					$files[$i]=array();
+					$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetfolder, "", $filename) );  // STRIP PATH for filename inside zip
+					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
+					$files[$i]['time'] = time();
+				}
+				
+				$packager = JArchive::getAdapter('zip');
+				if (!$packager->create($archivename, $files)) {
+					echo JText::_('FLEXI_OPERATION_FAILED');
+					return false;
+				}
+				if (!JFolder::delete(($targetfolder)) ) {
+					echo JText::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
+				}
+			}
 		}
 		
 		// messages
