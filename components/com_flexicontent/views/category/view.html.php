@@ -181,32 +181,34 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 		
-		if (FLEXI_J16GE) {
-			if ($category->metadesc) {
-				$document->setDescription( $category->metadesc );
-			}
-			
-			if ($category->metakey) {
-				$document->setMetadata('keywords', $category->metakey);
-			}
-			
-			$meta_params = new JParameter($category->metadata);
-			
-			if ($mainframe->getCfg('MetaTitle') == '1') {
-				$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
-				$document->setMetaData('title', $meta_title);
-			}
-			
-			if ($mainframe->getCfg('MetaAuthor') == '1') {
-				$meta_author = $meta_params->get('author') ? $meta_params->get('author') : JFactory::getUser($category->created_user_id)->name;
-				$document->setMetaData('author', $meta_author);
-			}
-		} else {
-			if ($mainframe->getCfg('MetaTitle') == '1') {
-				$document->setMetaData('title', $category->title);
+		if ($category->id) {   // possibly not set for author items OR my items
+			if (FLEXI_J16GE) {
+				if ($category->metadesc) {
+					$document->setDescription( $category->metadesc );
+				}
+				
+				if ($category->metakey) {
+					$document->setMetadata('keywords', $category->metakey);
+				}
+				
+				$meta_params = new JParameter($category->metadata);
+				
+				if ($mainframe->getCfg('MetaTitle') == '1') {
+					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
+					$document->setMetaData('title', $meta_title);
+				}
+				
+				if ($mainframe->getCfg('MetaAuthor') == '1') {
+					$meta_author = $meta_params->get('author') ? $meta_params->get('author') : JFactory::getUser($category->created_user_id)->name;
+					$document->setMetaData('author', $meta_author);
+				}
+			} else {
+				if ($mainframe->getCfg('MetaTitle') == '1') {
+					$document->setMetaData('title', $category->title);
+				}
 			}
 		}
-
+		
 		if ($params->get('show_feed_link', 1) == 1) {
 			//add alternate feed link
 			$link	= '&format=feed';

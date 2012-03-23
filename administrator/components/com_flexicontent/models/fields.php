@@ -67,7 +67,7 @@ class FlexicontentModelFields extends JModel
 	{
 		parent::__construct();
 
-		global $option;
+		$option = JRequest::getVar('option');
 		$mainframe = &JFactory::getApplication();
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
@@ -110,6 +110,10 @@ class FlexicontentModelFields extends JModel
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 			$db =& JFactory::getDBO();
+			if ($db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage($db->getErrorMsg(),'error');
+			}
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
@@ -195,7 +199,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
@@ -222,24 +227,26 @@ class FlexicontentModelFields extends JModel
 	{
 		static $where;
 		if(!isset($where)) {
-			global $option;
+			$option = JRequest::getVar('option');
 			$mainframe = &JFactory::getApplication();
 	
 			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-			$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
+			$filter_fieldtype = $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
 			$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
 			$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 	
 			$where = array();
 	
-			if ( $filter_iscore ) {
-				if ( $filter_iscore == 'C' ) {
+			if ( $filter_fieldtype ) {
+				if ( $filter_fieldtype == 'C' ) {
 					$where[] = 't.iscore = 1';
-				} else if ($filter_iscore == 'NC' ) {
+				} else if ($filter_fieldtype == 'NC' ) {
 					$where[] = 't.iscore = 0';
-				} else if ($filter_iscore == 'BV' ) {
+				} else if ($filter_fieldtype == 'BV' ) {
 					$where[] = '(t.iscore = 0 OR t.id = 1)';
+				} else {
+					$where[] = 't.field_type = "'.$filter_fieldtype.'"';
 				}
 			}
 	
@@ -276,7 +283,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function _buildContentHaving()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -336,19 +344,19 @@ class FlexicontentModelFields extends JModel
 		{
 			for ($i = 0; $i < $n; $i++)
 			{
-			$query = 'SELECT COUNT( id )'
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE id = '. (int) $cid[$i]
-			. ' AND iscore = 1'
-			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			
-			if ($count > 0) {
-				return false;
+				$query = 'SELECT COUNT( id )'
+				. ' FROM #__flexicontent_fields'
+				. ' WHERE id = '. (int) $cid[$i]
+				. ' AND iscore = 1'
+				;
+				$this->_db->setQuery( $query );
+				$count = $this->_db->loadResult();
+				
+				if ($count > 0) {
+					return false;
 				}
 			}
-		return true;
+			return true;
 		}
 	}
 
@@ -368,10 +376,10 @@ class FlexicontentModelFields extends JModel
 			{
 				// the six first fields are needed for versioning, filtering and advanced search
 				if ($cid[$i] < 7) {
-				return false;
+					return false;
 				}
 			}
-		return true;
+			return true;
 		}
 	}
 
@@ -452,7 +460,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function access($id, $access)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$row =& JTable::getInstance('flexicontent_fields', '');
 
 		$row->load( $this->_id );
@@ -536,6 +545,26 @@ class FlexicontentModelFields extends JModel
 		return $types;	
 	}
 	
+	
+	/**
+	 * Method to get list of field types used
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getFieldTypes ()
+	{
+		$query = 'SELECT field_type, count(id) as assigned'
+				. ' FROM #__flexicontent_fields'
+				. ' WHERE iscore=0 '
+				. ' GROUP BY field_type'
+				;
+		$this->_db->setQuery($query);
+		$fieldtypes = $this->_db->loadObjectList('field_type');
+		return $fieldtypes;
+	}
+	
+	
 	/**
 	 * Method to build the list for types filter
 	 * 
@@ -565,7 +594,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function move($direction)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
@@ -678,7 +708,8 @@ class FlexicontentModelFields extends JModel
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 

@@ -31,7 +31,8 @@ class FlexicontentViewFields extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db  		= & JFactory::getDBO();
@@ -42,7 +43,7 @@ class FlexicontentViewFields extends JView {
 
 		//get vars
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 	'filter_assigned', 	'', 'word' );
-		$filter_iscore		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 	'filter_iscore', 	'', 'word' );
+		$filter_fieldtype		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 		'filter_state', 	'', 'word' );
 		$filter_type		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 		'filter_type', 		'', 'int' );
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
@@ -58,32 +59,70 @@ class FlexicontentViewFields extends JView {
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+		} else {
+			$permission = new stdClass();
+		
+			if (FLEXI_ACCESS) {
+				$permission->CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
+			} else {
+				$permission->CanFields = 1;
+			}
+			$permission->CanCopyFields = 1;
+			$permission->CanAddField = 1;
+			$permission->CanEditField = 1;
+			$permission->CanDeleteField = 1;
+			$permission->CanOrderFields = 1;
+			$permission->CanCopyFields = 1;
+		}
+		
+		if (!$permission->CanFields) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
+		
+		$contrl = FLEXI_J16GE ? "fields." : "";
+		
+		//Create Submenu
 		FLEXISubmenu('CanFields');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
-		JToolBarHelper::customX( 'copy', 'copy.png', 'copy_f2.png', 'Copy' );
-		JToolBarHelper::publishList();
-		JToolBarHelper::unpublishList();
-		JToolBarHelper::addNew();
-		JToolBarHelper::editList();
-		JToolBarHelper::deleteList();
+		if ($permission->CanCopyFields) {
+			JToolBarHelper::customX( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		}
+		JToolBarHelper::publishList($contrl.'publish');
+		JToolBarHelper::unpublishList($contrl.'unpublish');
+		if ($permission->CanAddField) {
+			JToolBarHelper::addNew($contrl.'add');
+		}
+		if ($permission->CanEditField) {
+			JToolBarHelper::editList($contrl.'edit');
+		}
+		if ($permission->CanDeleteField) {
+			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
+		}
+		if(FLEXI_J16GE && $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
+		$rows      	= & $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
 		$pageNav 	= & $this->get( 'Pagination' );
 		$types		= & $this->get( 'Typeslist' );
+		$fieldtypes = & $this->get( 'Fieldtypes' );
 
 		$lists = array();
 		
 		//build backend visible filter
-		$iscore 	= array();
-		$iscore[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS_TYPE' ) .' -' );
-		$iscore[] = JHTML::_('select.option',  'BV', JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$iscore[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$iscore[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+		$fftype 	= array();
+		$fftype[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS_TYPE' ) .' -' );
+		$fftype[] = JHTML::_('select.option',  'BV', JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$fftype[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$fftype[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+		foreach ($fieldtypes as $field_type => $ftdata) {
+			$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+		}
 
-		$lists['iscore'] = JHTML::_('select.genericlist', $iscore, 'filter_iscore', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_iscore );
+		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 
 		//build arphaned/assigned filter
 		$assigned 	= array();
@@ -115,6 +154,7 @@ class FlexicontentViewFields extends JView {
 		}
 
 		//assign data to template
+		$this->assignRef('permission'		, $permission);
 		$this->assignRef('filter_type'  , $filter_type);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);

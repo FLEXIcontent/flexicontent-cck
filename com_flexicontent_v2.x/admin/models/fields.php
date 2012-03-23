@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 798 2011-08-11 04:03:52Z ggppdk $
+ * @version 1.5 stable $Id: fields.php 1146 2012-02-22 06:52:39Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -197,19 +197,21 @@ class FlexicontentModelFields extends JModelList
 	
 			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-			$filter_iscore 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_iscore', 'filter_iscore', '', 'word' );
+			$filter_fieldtype = $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
 			$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
 			$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 	
 			$where = array();
 	
-			if ( $filter_iscore ) {
-				if ( $filter_iscore == 'C' ) {
+			if ( $filter_fieldtype ) {
+				if ( $filter_fieldtype == 'C' ) {
 					$where[] = 't.iscore = 1';
-				} else if ($filter_iscore == 'NC' ) {
+				} else if ($filter_fieldtype == 'NC' ) {
 					$where[] = 't.iscore = 0';
-				} else if ($filter_iscore == 'BV' ) {
+				} else if ($filter_fieldtype == 'BV' ) {
 					$where[] = '(t.iscore = 0 OR t.id = 1)';
+				} else {
+					$where[] = 't.field_type = "'.$filter_fieldtype.'"';
 				}
 			}
 	
@@ -421,7 +423,8 @@ class FlexicontentModelFields extends JModelList
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveaccess($id, $access) {
+	function saveaccess($id, $access)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$row =& JTable::getInstance('flexicontent_fields', '');
@@ -506,6 +509,26 @@ class FlexicontentModelFields extends JModelList
 		$types = $this->_db->loadObjectList();
 		return $types;	
 	}
+	
+	
+	/**
+	 * Method to get list of field types used
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getFieldTypes ()
+	{
+		$query = 'SELECT field_type, count(id) as assigned'
+				. ' FROM #__flexicontent_fields'
+				. ' WHERE iscore=0 '
+				. ' GROUP BY field_type'
+				;
+		$this->_db->setQuery($query);
+		$fieldtypes = $this->_db->loadObjectList('field_type');
+		return $fieldtypes;
+	}
+	
 	
 	/**
 	 * Method to build the list for types filter
