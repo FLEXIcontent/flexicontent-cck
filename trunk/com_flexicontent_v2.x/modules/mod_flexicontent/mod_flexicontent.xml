@@ -246,9 +246,9 @@
 		
 			<field name="FLEXI_IMAGE_PARAMS" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
 			<field name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-			<param name="mod_image_custom_display" type="text" size="48" default="" label="Field HTML as Image" description=
+			<field name="mod_image_custom_display" type="text" size="48" default="" label="Field HTML as Image" description=
 			"You can use the HTML produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- Note: image size and other parameters are not used,&lt;br&gt; -- Write: like fieldname##varname e.g. mycustomgal##display" />
-			<param name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
+			<field name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
 			"You can use the URL produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- Note: image size and other parameters are applied to the given URL,&lt;br&gt; -- Write: like fieldname##varname e.g. mycustomgal##src_medium" />
 			<field name="FLEXI_STD2" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
 			<field name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
@@ -396,10 +396,10 @@
 			</field>		
 			<field name="cats_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="cats_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-		<param name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 		 <field name="FLEXI_CURRCAT" type="separator" default="FLEXI_CURRCAT" level="level1" menu="hide" />
 		 
@@ -448,10 +448,10 @@
 			</field>		
 			<field name="currcat_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="currcat_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-		<param name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 		
 		</fieldset>
 

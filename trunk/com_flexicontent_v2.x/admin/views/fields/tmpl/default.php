@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 893 2011-09-08 23:50:07Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1125 2012-01-26 12:38:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$ctrl = FLEXI_J16GE ? 'fields.' : '';
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -31,7 +33,7 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 			<td nowrap="nowrap">
 				<?php echo $this->lists['assigned']; ?>
-				<?php echo $this->lists['iscore']; ?>
+				<?php echo $this->lists['fftype']; ?>
 				<?php echo $this->lists['filter_type']; ?>
 				<?php echo $this->lists['state']; ?>
 			</td>
@@ -58,14 +60,14 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					<?php
 					if ($this->permission->CanOrderFields) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
 					endif;
 					?>
 				<?php else : ?>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					<?php
 					if ($this->permission->CanOrderFields) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'fields.saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
 					endif;
 					?>
 				<?php endif; ?>
@@ -95,7 +97,7 @@ defined('_JEXEC') or die('Restricted access');
 			$canPublish		= in_array('publishfield', $rights);
 			$canDelete		= in_array('deletefield', $rights);
 			
-			$link 		= 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;cid[]='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			} else if (!$canPublish && $row->published) {   // No privilige published
@@ -103,7 +105,10 @@ defined('_JEXEC') or die('Restricted access');
 			} else if (!$canPublish && !$row->published) {   // No privilige unpublished
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			} else {
-				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'fields.' );
+				if (FLEXI_J16GE)
+					$published 	= JHTML::_('jgrid.published', $row->published, $i, $ctrl );
+				else
+					$published 	= JHTML::_('grid.published', $row, $i );
 			}
 			
 			if( $row->isfilter ) {
@@ -123,9 +128,12 @@ defined('_JEXEC') or die('Restricted access');
 			}else{
 				$isadvsearch = "publish_x_f2.png";
 			}
+			
 			if ($canPublish) {
-				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'fields.access\')"');
-			} else $access = $this->escape($row->access_level);
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"');
+			} else {
+				$access = $this->escape($row->access_level);
+			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
@@ -181,9 +189,9 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 			<?php if ($this->permission->CanOrderFields) : ?>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'fields.orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
 
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'fields.orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>

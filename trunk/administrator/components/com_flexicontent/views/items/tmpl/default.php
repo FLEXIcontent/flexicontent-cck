@@ -362,9 +362,6 @@ window.addEvent('domready', function() {
 			<td class="left col_state">
 				<?php echo $this->lists['filter_state']; ?>
 			</td>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<td class="left"></td>
-			<?php endif; ?>
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left"></td>

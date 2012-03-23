@@ -143,7 +143,7 @@ class FlexicontentViewField extends JView {
 		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
 		if (FLEXI_ACCESS) {
-			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
+			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
 		}
