@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1206 2012-03-20 04:53:28Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1215 2012-03-21 13:07:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -40,6 +40,7 @@ class flexicontent_html
 	function striptagsandcut( $text, $chars=null )
 	{
 		// first strip html tags
+		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8'); // Convert entiies to characters so that they will not be removed ... by strip_tags
 		$cleantext = strip_tags($text);
 
 		// clean additionnal plugin tags
@@ -999,7 +1000,7 @@ class flexicontent_html
 			array_unshift($languages, $lang_all);
 			
 			// Select language -ALL- if none selected
-			$selected = $selected ? $selected : '*';
+			//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
 			
 		} else if (isset($languages[0]->sef)) { // JoomFish v2.2+
 			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
