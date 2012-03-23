@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1184 2012-03-12 15:17:13Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1204 2012-03-20 04:48:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -223,9 +223,10 @@ class FlexicontentFields
 	  // Field not found, this is either due to no access or wrong name ...
 	  $item->onDemandFields[$fieldname]->noaccess = false;
 	  if ($field->name!=$fieldname) {
-		  $item->onDemandFields[$fieldname]->label = 'not found for this type of item';
+		  $item->onDemandFields[$fieldname]->label = '';
 	  	$item->onDemandFields[$fieldname]->noaccess = true;
-	  	$item->onDemandFields[$fieldname]->{$method} = "not found for this type of item or no access";
+	  	$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
+	  	$item->onDemandFields[$fieldname]->{$method} = '';
 	  	return $item->onDemandFields[$fieldname]->{$method};
 	  }
 	  
