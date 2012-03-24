@@ -872,8 +872,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	object
 	 * @since	1.5
 	 */
-	function isAllowedToSubmit($items)
-	{
+	/*function isAllowedToSubmit($items)
+	{ // INCOMPLETE MUST also check user->gid > 24,   also missing variables  ....
 		if ($items)
 		{
 			$CanEdit	= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
@@ -884,7 +884,7 @@ class FlexicontentModelItems extends JModel
 			}
 		}
 		return $cids;
-	}
+	}*/
 
 	/**
 	 * Method to find validators for an item
@@ -1224,7 +1224,7 @@ class FlexicontentModelItems extends JModel
 			{
 				$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$canDelete 		= in_array('delete', $rights) || (FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all'));
-				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id)) || ((FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all')) && ($item->created_by == $user->id));				
+				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id)) || ((FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all')) && ($item->created_by == $user->id));
 				
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}

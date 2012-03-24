@@ -202,6 +202,8 @@ class FlexicontentViewItem extends JView {
 				$canPublish		= in_array('edit.state', $rights);
 				$canPublishOwn= (in_array('edit.state.own', $rights) && ($form->getValue("created_by") == $user->id));
 				$canRight			= $permission->CanConfig;
+			} else if ($user->gid >= 25) {
+				$canEdit = $canEditOwn = $canPublish = $canPublishOwn	= $canRight = true;
 			} else if (FLEXI_ACCESS) {
 				$rights				= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
 				$canEdit			= in_array('edit', $rights);
