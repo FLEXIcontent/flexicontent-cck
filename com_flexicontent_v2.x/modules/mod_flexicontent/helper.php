@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1150 2012-02-24 03:26:18Z ggppdk $
+ * @version 1.2 $Id: helper.php 1189 2012-03-14 06:43:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -249,13 +249,16 @@ class modFlexicontentHelper
 					$thumb_rendered = '';
 					if ($mod_use_image_feat) {
 						if ($mod_image_custom_display) {
+
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							
 						} else if ($mod_image_custom_url) {
+							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$src =  JURI::base(true) . '/' .FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
 							
 							$h		= '&amp;h=' . $mod_height_feat;
 							$w		= '&amp;w=' . $mod_width_feat;
@@ -358,13 +361,16 @@ class modFlexicontentHelper
 					$thumb_rendered = '';
 					if ($mod_use_image) {
 						if ($mod_image_custom_display) {
+							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							
 						} else if ($mod_image_custom_url) {
+							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$src =  JURI::base(true) . '/' .FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
 							
 							$h		= '&amp;h=' . $mod_height_feat;
 							$w		= '&amp;w=' . $mod_width_feat;
@@ -442,7 +448,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
-					$lists[$ord][ 'standard'][$i]->catid = $row-> catid;
+					$lists[$ord]['standard'][$i]->catid = $row-> catid;
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;

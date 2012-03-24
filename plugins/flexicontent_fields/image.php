@@ -358,10 +358,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
-				$field->{"display_small"} = JURI::root() . $srcs;
-				$field->{"display_medium"} = JURI::root() . $srcm;
-				$field->{"display_large"} = JURI::root() . $srcb;    
+				$field->{"display_small_src"} = JURI::root().$srcs;
+				$field->{"display_medium_src"} = JURI::root().$srcm;
+				$field->{"display_large_src"} = JURI::root().$srcb;
+				$field->{"display_small"} = '<img src="'.JURI::root().$srcs.'" alt ="'.$alt.'"'.$legend.' />';
+				$field->{"display_medium"} = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'"'.$legend.' />';
+				$field->{"display_large"} = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'"'.$legend.' />';
 				
+				// Check if a custom variable (display) was requested and do not render default variable
+				if ( in_array($prop,
+						array("display_small","display_medium", "display_large",
+						"display_small_src","display_medium_src", "display_large_src") )
+				) {
+					return $field->{$prop};
+				}
+								
 				// first condition is for the display for the preview feature
 				if ($mainframe->isAdmin()) {
 					$field->{$prop} = '<img class="hasTip" src="../'.$srcs.'" alt ="'.$alt.'" title="'.$tip.'" />';

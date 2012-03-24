@@ -244,6 +244,8 @@ class FlexicontentModelItems extends JModel
 				// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
 				if (FLEXI_J16GE) {
 					$canedititem = $params->get('access-edit');
+				} else if ($user->gid >= 25) {
+					$canedititem = true;
 				} else if (FLEXI_ACCESS) {
 					$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid );
 					$canedititem = in_array('edit', $rights) || (in_array('editown', $rights) && $this->_item->created_by == $user->get('id'));

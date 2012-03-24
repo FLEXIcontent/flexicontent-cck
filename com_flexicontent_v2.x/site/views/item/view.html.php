@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1184 2012-03-12 15:17:13Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1204 2012-03-20 04:48:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -409,6 +409,8 @@ class FlexicontentViewItem extends JView
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
 				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->getValue('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner);

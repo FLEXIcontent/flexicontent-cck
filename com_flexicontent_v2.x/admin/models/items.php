@@ -870,8 +870,8 @@ class FlexicontentModelItems extends JModel
 	 * @return	object
 	 * @since	1.5
 	 */
-	function isAllowedToSubmit($items)
-	{
+	/*function isAllowedToSubmit($items)
+	{ // INCOMPLETE !!!
 		if ($items)
 		{
 			$CanEdit	= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
@@ -882,7 +882,7 @@ class FlexicontentModelItems extends JModel
 			}
 		}
 		return $cids;
-	}
+	}*/
 
 	/**
 	 * Method to find validators for an item

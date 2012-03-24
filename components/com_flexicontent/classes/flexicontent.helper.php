@@ -275,6 +275,8 @@ class flexicontent_html
 			// ALTERNATIVE 1
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 			//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
+		} else if ($user->gid >= 25) {
+			$has_edit_state = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
@@ -421,6 +423,8 @@ class flexicontent_html
 			// ALTERNATIVE 1
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
 			//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
+		} else if ($user->gid >= 25) {
+			$has_edit = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $item->created_by == $user->get('id')) ;

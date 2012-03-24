@@ -117,6 +117,8 @@ class FlexicontentController extends JController
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
@@ -286,6 +288,8 @@ class FlexicontentController extends JController
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
@@ -460,6 +464,8 @@ class FlexicontentController extends JController
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
@@ -839,6 +845,8 @@ class FlexicontentController extends JController
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $item->id;
 			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+		} else if ($user->gid >= 25) {
+			$has_edit_state = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
