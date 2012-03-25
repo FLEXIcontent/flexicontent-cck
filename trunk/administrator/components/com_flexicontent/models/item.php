@@ -484,7 +484,7 @@ class FlexicontentModelItem extends JModel {
 	 */
 	function store($data) {
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		//JRequest::checkToken() or jexit( 'Invalid Token' );//comment for flexible usage[enjoyman]
 		
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
