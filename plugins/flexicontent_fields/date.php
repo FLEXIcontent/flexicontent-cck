@@ -246,6 +246,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$customdate			= $field->parameters->get( 'custom_date', '%Y-%m-%d' ) ; 
 		$dateformat			= $field->parameters->get( 'date_format', $customdate ) ;
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		
 		switch($separatorf)
 		{
@@ -263,6 +265,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 			case 3:
 			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

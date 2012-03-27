@@ -99,6 +99,8 @@ class flexicontent_items extends JTable{
 	var $type_id			= null;
 	/** @var string */
 	var $language			= null;
+	/** @var int */
+	var $lang_parent_id		= null;
 	/** @var string */
 	/** @TODO : implement */
 	var $sub_items			= null;
@@ -135,6 +137,7 @@ class flexicontent_items extends JTable{
     var $_join_prop    		= array('item_id',
     								'type_id',
     								'language',
+    								'lang_parent_id',
     								'sub_items',
     								'sub_categories',
     								'related_items',
@@ -309,17 +312,32 @@ class flexicontent_items extends JTable{
 		$type_ext = & JTable::getInstance('flexicontent_items_ext', '');
 		$type_ext->_tbl = $this->_tbl_join;
 		$type_ext->_tbl_key = $this->_frn_key;
+		
 		foreach ($this->getProperties() as $p => $v) {
+		
 			// If the property is in the join properties array we add it to the items_ext object
-			if ($p == "language") {
-				$type->$p = $v;
-			}
 			if (in_array($p, $this->_join_prop)) {
 				$type_ext->$p = $v;
+				
+				// Catch case of new J1.6+ article language column
+				if (FLEXI_J16GE && $p == "language") {
+					//$jAp=& JFactory::getApplication();
+					//$jAp->enqueueMessage('setting content language to' . $v,'message');
+					$type->$p = $v;
+				}
+			
+				// Catch case of master item for (translation groups) not being set
+				if ($p == "lang_parent_id" && $v==0) {
+					//$jAp=& JFactory::getApplication();
+					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
+					$type_ext->$p = $type->id;
+				}
+				
 				// Else we add it to the type object
 			} else {
 				$type->$p = $v;
 			}
+
 		}
 
 		if( $this->$k )

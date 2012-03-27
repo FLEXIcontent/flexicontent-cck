@@ -95,6 +95,11 @@ class FlexicontentController extends JController
 		$this->registerTask( 'addcurrentversiondata', 'addCurrentVersionData' );
 		$this->registerTask( 'langfiles'						, 'processLanguageFiles' );
 		
+		$task = JRequest::getVar('task');
+		if (is_string($task) && $task=="translate") {
+			JRequest::setVar('task', 'copy');
+			JRequest::setVar('copy_behaviour', 'translate');
+		}
 	}
 	
 	function processLanguageFiles() 
@@ -166,6 +171,12 @@ class FlexicontentController extends JController
 		
 		//$initialpermission	= $model->checkInitialPermission();  // For J1.7
 		
+		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
+		//echo "     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
+		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
+		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||<br>";
+		//echo "     (!$initialpermission)<br>";
+		     
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
@@ -355,23 +366,24 @@ class FlexicontentController extends JController
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$db 	=& JFactory::getDBO();
-
+		
+		$acclevel = FLEXI_J16GE ? 1 : 0;
 		$query 	=	"INSERT INTO #__flexicontent_fields (`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
 VALUES
-	(1,'maintext','text','Description','The main description text (introtext/fulltext)',0,1,1,0,'description.items.default',1,'display_label=0\ntrigger_onprepare_content=0',0,'0000-00-00 00:00:00',0,2),
-	(2,'created','created','Created','Creation date',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,3),
-	(3,'createdby','created_by','Created by','Item author',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,4),
-	(4,'modified','modified','Last modified','Date of the last modification',0,1,1,0,'top.items.default',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,5),
-	(5,'modifiedby','modified_by','Revised by','Name of the user which last edited the item',0,1,1,0,'top.items.default',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,6),
-	(6,'title','title','Title','The item title',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',0,1),
-	(7,'hits','hits','Hits','Number of hits',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=views',0,'0000-00-00 00:00:00',0,7),
-	(8,'type','document_type','Document type','Document type',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,8),
-	(9,'version','version','Version','Number of version',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',0,9),
-	(10,'state','state','State','State',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',0,10),
-	(11,'voting','voting','Voting','The up and down voting buttons',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1\ndimension=16\nimage=components/com_flexicontent/assets/images/star-small.png',0,'0000-00-00 00:00:00',0,11),
-	(12,'favourites','favourites','Favourites','The add to favourites button',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1',0,'0000-00-00 00:00:00',0,12),
-	(13,'categories','categories','Categories','The categories assigned to this item',0,1,1,0,'top.items.default\nunder-description-line1.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',0,13),
-	(14,'tags','tags','Tags','The tags assigned to this item',0,1,1,0,'top.items.default\nunder-description-line2.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',0,14)" ;
+	(1,'maintext','text','Description','The main description text (introtext/fulltext)',0,1,1,0,'description.items.default',1,'display_label=0\ntrigger_onprepare_content=0',0,'0000-00-00 00:00:00',{$acclevel},2),
+	(2,'created','created','Created','Creation date',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},3),
+	(3,'createdby','created_by','Created by','Item author',0,1,1,0,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},4),
+	(4,'modified','modified','Last modified','Date of the last modification',0,1,1,0,'top.items.default',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},5),
+	(5,'modifiedby','modified_by','Revised by','Name of the user which last edited the item',0,1,1,0,'top.items.default',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},6),
+	(6,'title','title','Title','The item title',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',{$acclevel},1),
+	(7,'hits','hits','Hits','Number of hits',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=views',0,'0000-00-00 00:00:00',{$acclevel},7),
+	(8,'type','document_type','Document type','Document type',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},8),
+	(9,'version','version','Version','Number of version',0,1,1,0,'',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',{$acclevel},9),
+	(10,'state','state','State','State',0,1,1,0,'',1,'display_label=1',0,'0000-00-00 00:00:00',{$acclevel},10),
+	(11,'voting','voting','Voting','The up and down voting buttons',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1\ndimension=16\nimage=components/com_flexicontent/assets/images/star-small.png',0,'0000-00-00 00:00:00',{$acclevel},11),
+	(12,'favourites','favourites','Favourites','The add to favourites button',0,1,1,0,'top.items.default\nabove-description-line2-nolabel.category.blog',1,'display_label=1',0,'0000-00-00 00:00:00',{$acclevel},12),
+	(13,'categories','categories','Categories','The categories assigned to this item',0,1,1,0,'top.items.default\nunder-description-line1.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',{$acclevel},13),
+	(14,'tags','tags','Tags','The tags assigned to this item',0,1,1,0,'top.items.default\nunder-description-line2.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',{$acclevel},14)" ;
 		$db->setQuery($query);
 		if (!$db->query()) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
@@ -397,11 +409,13 @@ VALUES
 		
 		$query	= 'UPDATE #__plugins'
 				. ' SET published = 1'
-				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
+				. ' WHERE 1 '
+				. ' AND (folder = ' . $db->Quote('flexicontent_fields')
 				. ' OR element = ' . $db->Quote('flexisearch')
 				. ' OR element = ' . $db->Quote('flexisystem')
 				. ' OR element = ' . $db->Quote('flexiadvsearch')
 				. ' OR element = ' . $db->Quote('flexiadvroute')
+				. ')'
 				;
 		
 		$db->setQuery($query);
@@ -482,6 +496,14 @@ VALUES
 			$result &= $db->query();
 		}
 
+		// Set default translation group for items that don't have one
+		$query 	= 'UPDATE #__flexicontent_items_ext'
+				. ' SET lang_parent_id = item_id '
+				. ' WHERE lang_parent_id = 0'
+				;
+		$db->setQuery($query);
+		$result &= $db->query();
+		
 		return $result;
 	}
 
@@ -510,6 +532,15 @@ VALUES
 			if (!$result_lang_col) echo "Cannot add language column<br>";
 		} else $result_lang_col = true;
 
+		// Add translation group column
+		$lang_parent_id_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
+		if(!$lang_parent_id_col) {
+			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `lang_parent_id` INT NOT NULL DEFAULT 0 AFTER `language`" ;
+			$db->setQuery($query);
+			$result_tgrp_col = $db->query();
+			if (!$result_tgrp_col) echo "Cannot add translation group column<br>";
+		} else $result_tgrp_col = true;
+		
 		// Add default language for items that do not have one, and add translation group to items that do not have one set
 		$model = $this->getModel('flexicontent');
 		if ($model->getItemsNoLang()) {
@@ -521,6 +552,7 @@ VALUES
 		} else $result_items_default_lang = true;
 		
 		if (!$result_lang_col
+			|| !$result_tgrp_col
 			|| !$result_items_default_lang
 		) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existlanguagecolumn" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
@@ -727,7 +759,7 @@ VALUES
 			$db->setQuery($query);
 			$db->query();
 		}
-		$query = "SELECT id,version,created,created_by FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+		$query = "SELECT id,version,created,created_by FROM #__content " . (!FLEXI_J16GE ? "WHERE sectionid='".FLEXI_SECTION."'" : "");
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 

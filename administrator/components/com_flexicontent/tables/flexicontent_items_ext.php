@@ -32,6 +32,8 @@ class flexicontent_items_ext extends JTable{
 	var $type_id				= null;
 	/** @var string */
 	var $language				= null;
+	/** @var int */
+	var $lang_parent_id	= null;
 	/** @var string */
 	var $sub_items		= null;
 	/** @var string */

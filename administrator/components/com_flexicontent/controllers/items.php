@@ -191,10 +191,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		$suffix 	= JRequest::getVar( 'suffix', 1, 'post' );
 		$copynr 	= JRequest::getInt( 'copynr', 1 );
 		$maincat 	= JRequest::getInt( 'maincat', '' );
-		$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
+		$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
+		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
 		$lang	 	= JRequest::getVar( 'language', '', 'post' );
 		$state 		= JRequest::getInt( 'state', '');
-
+		
+		// Set $seccats to --null-- to indicate that we will maintain secondary categories
+		$seccats = $keepseccats ? null : $seccats;
+		
 		if ($task == 'copymove')
 		{
 			if ($method == 1) // copy only
@@ -758,7 +762,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @since 1.0
 	 */
 	function edit()
-	{		
+	{
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 

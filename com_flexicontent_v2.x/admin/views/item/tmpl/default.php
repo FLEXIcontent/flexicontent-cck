@@ -255,6 +255,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									</td>
 									<td>
 									<?php echo $this->lists['languages']; ?>
+									<?php echo $this->form->getInput('lang_parent_id'); ?>
 									</td>
 								</tr>
 								<?php endif; ?>

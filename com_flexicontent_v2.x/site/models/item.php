@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1171 2012-03-09 04:53:46Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1220 2012-03-24 07:00:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -172,7 +172,7 @@ class FlexicontentModelItem extends ParentClassItem
 		/*
 		* Load the Item data
 		*/
-		if ($this->_loadItem()) {
+		if ($this->_id && $this->_loadItem()) {
 			// Cache the retrieved item
 			$items[@$this->_item->id] = & $this->_item;
 			
@@ -207,6 +207,8 @@ class FlexicontentModelItem extends ParentClassItem
 				// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
 				if (FLEXI_J16GE) {
 					$canedititem = $params->get('access-edit');
+				} else if ($user->gid >= 25) {
+					$canedititem = true;
 				} else if (FLEXI_ACCESS) {
 					$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid );
 					$canedititem = in_array('edit', $rights) || (in_array('editown', $rights) && $this->_item->created_by == $user->get('id'));
@@ -237,14 +239,6 @@ class FlexicontentModelItem extends ParentClassItem
 						"Item id: ".$this->_item->id
 					);
 					$mainframe->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug)));
-				} else if ($version!=$current_version && $option=='com_flexicontent' && $view==FLEXI_ITEMVIEW && $itemid==$this->_id && !$unapproved_version_notice) {
-					// Set notices if not loading the current item version, (item display())
-					if (!$task || $task=='edit') {
-						$unapproved_version_notice = 1;
-						// notice for item view (for both display() and edit() controller tasks)
-						$mainframe->enqueueMessage(JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'), 'message');
-						JError::raiseNotice( 10, JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version) );
-					}
 				}
 				
 				// b2. Check that item is PUBLISHED (1,-5) or ARCHIVED (-1), if we are not editing the item, we raise 404 error
@@ -401,17 +395,18 @@ class FlexicontentModelItem extends ParentClassItem
 			if ($user->authorize('com_flexicontent', 'state'))	{
 				$item->state = 1;
 			}
-			$item->id					= 0;
+			$item->id						= 0;
 			$item->author				= null;
-			$item->created_by			= $user->get('id');
+			$item->created_by		= $user->get('id');
 			$item->text					= '';
 			$item->title				= null;
-			$item->metadesc				= '';
-			$item->metakey				= '';
-			$item->type_id				= JRequest::getVar('typeid', 0, '', 'int');
-			$item->typename				= null;
-			$item->search_index			= '';
-			$this->_item				= $item;
+			$item->metadesc			= '';
+			$item->metakey			= '';
+			$item->type_id			= JRequest::getVar('typeid', 0, '', 'int');
+			$item->typename			= null;
+			$item->search_index		= '';
+			$item->lang_parent_id = 0;
+			$this->_item					= $item;
 		}
 		return $this->_item;
 	}
@@ -489,6 +484,15 @@ class FlexicontentModelItem extends ParentClassItem
 				$version = ($loadcurrent && !$preview) ? $current_version : $last_version;
 			}
 			JRequest::setVar( 'version', $version );
+			
+			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
+			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
+			}
 			
 			try {
 				
@@ -582,6 +586,8 @@ class FlexicontentModelItem extends ParentClassItem
 					throw new Exception( nl2br($query."\n".$error()."\n") );
 				}
 				
+				if(!$item) return false; // item not found, return				
+				
 				// When previewing load the specified item version
 				if ($version!=$current_version) {
 					$item = $this->loadUnapprovedVersion($item, $version);
@@ -672,6 +678,15 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			JRequest::setVar( 'version', $version );
 			
+			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
+			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
+			}
+			
 			try {
 								
 				$jnow		=& JFactory::getDate();
@@ -707,6 +722,8 @@ class FlexicontentModelItem extends ParentClassItem
 					throw new Exception( nl2br($query."\n".$error()."\n") );
 				}
 				
+				if(!$data) return false; // item not found, return				
+				
 				// When previewing load the specified item version
 				if ($version!=$current_version) {
 					$data = $this->loadUnapprovedVersion($data, $version);
@@ -720,8 +737,6 @@ class FlexicontentModelItem extends ParentClassItem
 				$item = & $data;
 				//$item->introtext=""; $item->fulltext=""; $item->search_index=""; echo "<pre>"; print_r($item); echo "</pre>"; exit;
 				
-				$isnew = (($this->_id <= 0) || !$this->_id);
-	
 				// -- Get by (a) the table that contains versioned data, or by (b) the normal table (current version data only)
 				if ($use_versioning) 
 				{
@@ -830,21 +845,11 @@ class FlexicontentModelItem extends ParentClassItem
 					$item->score = 0;
 				}
 				
-				if ($isnew) {
-					$createdate = & JFactory::getDate();
-					$nullDate	= $this->_db->getNullDate();
-					$item->created 		= $createdate->toUnix();
-					$item->modified 	= $nullDate;
-					$item->publish_up 	= $createdate->toUnix();
-					$item->publish_down = JText::_( 'FLEXI_NEVER' );
-					$item->state 		= -4;
-				}
-				
 				// Assign to the item data member variable
 				$this->_item = &$item;
 				
 				// -- Detect if current version doesnot exist in version table and add it !!!
-				if ( !$isnew && $use_versioning && $current_version > $last_version ) {
+				if ( $use_versioning && $current_version > $last_version ) {
 					// Add current version.
 					$mainframe = &JFactory::getApplication();
 					$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1142 2012-02-07 05:27:16Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -190,7 +190,7 @@ if ($this->limitstart == 0) :
     			if ($this->params->get('lead_use_image', 1)) :
     				if ($this->params->get('lead_image')) :
     					FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('lead_image'), $values=null, $method='display');
-							if (isset($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
+							if (!empty($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
 								$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
 								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
 								$image{$i}	= $value{$i}['originalname'];
@@ -443,7 +443,7 @@ if ($this->limitstart == 0) :
     			if ($this->params->get('intro_use_image', 1)) :
     				if ($this->params->get('intro_image')) :
 							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('intro_image'), $values=null, $method='display');
-							if (isset($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
+							if (!empty($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
 								$dir{$i}	= $items[$i]->fields[$this->params->get('intro_image')]->parameters->get('dir');
 								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('intro_image')]->value[0]);
 								$image{$i}	= $value{$i}['originalname'];

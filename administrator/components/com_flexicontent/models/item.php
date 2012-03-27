@@ -36,6 +36,13 @@ class FlexicontentModelItem extends JModel {
 	var $_item = null;
 
 	/**
+	 * Item primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+	
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -58,8 +65,10 @@ class FlexicontentModelItem extends JModel {
 	function setId($id)
 	{
 		// Set item id and wipe data
-		$this->_id	    = $id;
-		$this->_item	= null;
+		if ($this->_id != $id) {
+			$this->_item = null;
+		}
+		$this->_id = $id;
 	}
 	
 	/**
@@ -157,13 +166,16 @@ class FlexicontentModelItem extends JModel {
 			if ( $version==0 ) {
 				// version to load is not set in request URL, set it as described above and also set in the url
 				$version = $loadcurrent ? $current_version : $lastversion;
-				JRequest::setVar( 'version', $version );
 			}
+			JRequest::setVar( 'version', $version );
 			
 			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
 			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
 				$unapproved_version_notice = 1;
-				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
 			}
 
 			// -- Get by (a) the table that contains versioned data, or by (b) the normal table (current version data only)
@@ -359,6 +371,7 @@ class FlexicontentModelItem extends JModel {
 			$item->images				= null;
 			$item->urls					= null;
 			$item->language				= flexicontent_html::getSiteDefaultLang();
+			$item->lang_parent_id = 0;
 			$this->_item				= $item;
 			return (boolean) $this->_item;
 		}
@@ -444,7 +457,12 @@ class FlexicontentModelItem extends JModel {
 
 		if (FLEXI_ACCESS && ($user->gid < 25))
 		{
-			if 	((!FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) && (!FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) return false;
+			$canSubmit = FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid);
+			$canAdd = FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all');
+			if 	(!$canSubmit && !$canAdd) return false;
+		} else {
+			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+			if (!$canAdd) return false;
 		}
 		return true;
 	}
@@ -459,18 +477,23 @@ class FlexicontentModelItem extends JModel {
 	function canEdit()
 	{
 		$user	=& JFactory::getUser();
-
-		if (FLEXI_ACCESS && $this->_loadItem() && ($user->gid < 25))
-		{
-				if ($this->_item->id && $this->_item->catid)
-				{
-					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid);
-					$canEdit 	= in_array('edit', $rights) || FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-					$canEditOwn	= ((in_array('editown', $rights) || FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) && ($this->_item->created_by == $user->id));
-				
-					if ($canEdit || $canEditOwn) return true;
-					return false;
-				}
+		
+		if (!$this->_loadItem() || $user->gid >= 25) {
+			return true;
+		} else if (FLEXI_ACCESS) {
+			// This should be used it bypassed individual item rights
+			//$canEditAll			= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
+			//$canEditOwnAll	= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
+			if ($this->_item->id && $this->_item->catid)
+			{
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid);
+				$canEdit 	= in_array('edit', $rights) /*|| $canEditAll*/;
+				$canEditOwn	= ( in_array('editown', $rights) /*|| $canEditOwnAll*/ ) && $this->_item->created_by == $user->id;
+				if (!$canEdit && !$canEditOwn) return false;
+			}
+		} else {
+			$canEdit= $user->authorize('com_content', 'edit', 'content', 'all');
+			if (!$canEdit) return false;
 		}
 		return true;
 	}
@@ -611,7 +634,7 @@ class FlexicontentModelItem extends JModel {
 
 			// Get metadata string
 			$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
-			if (is_array($params))
+			if (is_array($metadata))
 			{
 				$txt = array();
 				foreach ($metadata as $k => $v) {

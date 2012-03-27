@@ -209,7 +209,7 @@ class FlexicontentModelItems extends JModel
 		/*
 		* Load the Item data
 		*/
-		if ($this->_loadItem()) {
+		if ($this->_id && $this->_loadItem()) {
 			// Cache the retrieved item
 			$items[@$this->_item->id] = & $this->_item;
 			
@@ -276,14 +276,6 @@ class FlexicontentModelItems extends JModel
 						"Item id: ".$this->_item->id
 					);
 					$mainframe->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug)));
-				} else if ($version!=$current_version && $option=='com_flexicontent' && $view==FLEXI_ITEMVIEW && $itemid==$this->_id && !$unapproved_version_notice) {
-					// Set notices if not loading the current item version, (item display())
-					if (!$task || $task=='edit') {
-						$unapproved_version_notice = 1;
-						// notice for item view (for both display() and edit() controller tasks)
-						$mainframe->enqueueMessage(JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'), 'message');
-						JError::raiseNotice( 10, JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version) );
-					}
 				}
 				
 				// b2. Check that item is PUBLISHED (1,-5) or ARCHIVED (-1), if we are not editing the item, we raise 404 error
@@ -440,17 +432,18 @@ class FlexicontentModelItems extends JModel
 			if ($user->authorize('com_flexicontent', 'state'))	{
 				$item->state = 1;
 			}
-			$item->id					= 0;
+			$item->id						= 0;
 			$item->author				= null;
-			$item->created_by			= $user->get('id');
+			$item->created_by		= $user->get('id');
 			$item->text					= '';
 			$item->title				= null;
-			$item->metadesc				= '';
-			$item->metakey				= '';
-			$item->type_id				= JRequest::getVar('typeid', 0, '', 'int');
-			$item->typename				= null;
-			$item->search_index			= '';
-			$this->_item				= $item;
+			$item->metadesc			= '';
+			$item->metakey			= '';
+			$item->type_id			= JRequest::getVar('typeid', 0, '', 'int');
+			$item->typename			= null;
+			$item->search_index		= '';
+			$item->lang_parent_id = 0;
+			$this->_item					= $item;
 		}
 		return $this->_item;
 	}
@@ -528,6 +521,15 @@ class FlexicontentModelItems extends JModel
 				$version = ($loadcurrent && !$preview) ? $current_version : $last_version;
 			}
 			JRequest::setVar( 'version', $version );
+			
+			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
+			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
+			}
 			
 			try {
 				
@@ -621,6 +623,8 @@ class FlexicontentModelItems extends JModel
 					throw new Exception( nl2br($query."\n".$error()."\n") );
 				}
 				
+				if(!$item) return false; // item not found, return				
+				
 				// When previewing load the specified item version
 				if ($version!=$current_version) {
 					$item = $this->loadUnapprovedVersion($item, $version);
@@ -711,6 +715,15 @@ class FlexicontentModelItems extends JModel
 			}
 			JRequest::setVar( 'version', $version );
 			
+			// check if not loading the current version while we are in edit form, and raise a notice to inform the user
+			if ($current_version != $version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+				$unapproved_version_notice = 1;
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
+			}
+			
 			try {
 								
 				$jnow		=& JFactory::getDate();
@@ -746,6 +759,8 @@ class FlexicontentModelItems extends JModel
 					throw new Exception( nl2br($query."\n".$error()."\n") );
 				}
 				
+				if(!$data) return false; // item not found, return				
+				
 				// When previewing load the specified item version
 				if ($version!=$current_version) {
 					$data = $this->loadUnapprovedVersion($data, $version);
@@ -759,8 +774,6 @@ class FlexicontentModelItems extends JModel
 				$item = & $data;
 				//$item->introtext=""; $item->fulltext=""; $item->search_index=""; echo "<pre>"; print_r($item); echo "</pre>"; exit;
 				
-				$isnew = (($this->_id <= 0) || !$this->_id);
-	
 				// -- Get by (a) the table that contains versioned data, or by (b) the normal table (current version data only)
 				if ($use_versioning) 
 				{
@@ -869,21 +882,11 @@ class FlexicontentModelItems extends JModel
 					$item->score = 0;
 				}
 				
-				if ($isnew) {
-					$createdate = & JFactory::getDate();
-					$nullDate	= $this->_db->getNullDate();
-					$item->created 		= $createdate->toUnix();
-					$item->modified 	= $nullDate;
-					$item->publish_up 	= $createdate->toUnix();
-					$item->publish_down = JText::_( 'FLEXI_NEVER' );
-					$item->state 		= -4;
-				}
-				
 				// Assign to the item data member variable
 				$this->_item = &$item;
 				
 				// -- Detect if current version doesnot exist in version table and add it !!!
-				if ( !$isnew && $use_versioning && $current_version > $last_version ) {
+				if ( $use_versioning && $current_version > $last_version ) {
 					// Add current version.
 					$mainframe = &JFactory::getApplication();
 					$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
@@ -1322,16 +1325,16 @@ class FlexicontentModelItems extends JModel
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$isnew = false;
+		$isnew = !$item->id;
 		$tags = array_unique($tags);
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
-		if( ($isnew = !$item->id) || ($post['vstate']==2) ) {
-
+		if ( $isnew || $post['vstate']==2 )
+		{
 			$config =& JFactory::getConfig();
 			$tzoffset = $config->getValue('config.offset');
 
-			if ($isnew = !$item->id) {
+			if ($isnew) {
 				$item->modified 	= $nullDate;
 				$item->modified_by 	= 0;
 			} else {
@@ -1389,7 +1392,7 @@ class FlexicontentModelItems extends JModel
 			$oldstate		= JRequest::getVar( 'oldstate', 0, '', 'int' );
 			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 
-			// Build parameter INI string
+			// Build item attribs INI string (item parameters)
 			if (is_array($params))
 			{
 				$txt = array ();
@@ -1402,9 +1405,10 @@ class FlexicontentModelItems extends JModel
 				$item->attribs = implode("\n", $txt);
 			}
 
-			// Get metadata string
+			// Retrieve metadesc and metakey item's columns, and build item metadata INI string
 			$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
-			if (is_array($params))
+			
+			if (is_array($metadata))
 			{
 				$txt = array();
 				foreach ($metadata as $k => $v) {

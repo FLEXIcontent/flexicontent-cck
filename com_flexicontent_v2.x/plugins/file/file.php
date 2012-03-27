@@ -198,6 +198,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		// some parameter shortcuts
 		$separatorf			= $field->parameters->get( 'separatorf', 3 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		$useicon			= $field->parameters->get( 'useicon', 1 ) ;
 		$usebutton			= $field->parameters->get( 'usebutton', 0 ) ;
 		$display_filename			= $field->parameters->get( 'display_filename', 0 ) ;
@@ -218,6 +220,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 			case 3:
 			$separatorf = ', ';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

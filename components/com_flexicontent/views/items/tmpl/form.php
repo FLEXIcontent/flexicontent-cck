@@ -231,29 +231,29 @@ function deleteTag(obj) {
 					$field = $this->fields['title'];
 					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label for="title" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label.':'; ?>
-					<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
+				<label id="title-lbl" for="title" <?php echo $field_tooltip; ?> >
+					<?php echo $field->label; ?>
+					<?php /*echo JText::_( 'FLEXI_TITLE' );*/ ?>
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
-			
-		<?php if($this->params->get('usealias', 1)) : ?>
+		
+	<?php if ($this->params->get('usealias', 1)) : ?>
 					
 			<div class="flexi_formblock">
-				<label for="alias" class="flexi_label" >
-					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+				<label id="alias-lbl" for="alias" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
 				</label>
 				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->item->alias; ?>" size="65" maxlength="254" />
 			</div>
-			
-		<?php endif; ?>
-			
+	
+	<?php endif; ?>
+	
 	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
-				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
+				<label id="cid-lbl" for="cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
 						<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
 							<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
@@ -263,17 +263,17 @@ function deleteTag(obj) {
 				<?php echo $fixedcats; ?>
 			</div>
 		<?php endif; ?>
-		<div class="flexi_formblock">
-			<label for="catid" class="flexi_label">
-				<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
-			</label>
-			<?php echo $fixedmaincat; ?>
-		</div>
+			<div class="flexi_formblock">
+				<label id="catid-lbl" for="catid" class="flexi_label">
+					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				</label>
+				<?php echo $fixedmaincat; ?>
+			</div>
 	<?php else : ?>
 		<?php if ($this->perms['multicat']) : ?>
 			<div class="flexi_formblock">
-				<label for="cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ).':';?>
+				<label id="cid-lbl" for="cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
 					</span>
@@ -283,62 +283,74 @@ function deleteTag(obj) {
 		<?php endif; ?>
 		
 			<div class="flexi_formblock">
-				<label for="catid" class="flexi_label">
-					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ).':';  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				<label id="catid-lbl" for="catid" class="flexi_label">
+					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
 				<?php echo $this->lists['catid']; ?>
 			</div>
 	<?php endif; ?>
 
-			<?php
-			$autopublished = $this->params->get('autopublished', 0);
-			if ($autopublished) :        // autopublish enabled, hide state selection field
-			?>
-				<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
-				<input type="hidden" id="vstate" name="vstate" value="2" />
-			<?php 
-			elseif ($this->perms['canpublish']) :  // autopublished disabled, display state selection field to the user
-			?>
+	<?php
+	
+	$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
+	$canpublish = $this->perms['canpublish'];
+	$autoapprove = $this->params->get('auto_approve', 0);
+	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
+	//echo "Auto-Publish Parameter: $autopublished<br />";
+	//echo "Auto-Approve Parameter: $autoapprove<br />";
+	?>
+
+	<?php if (!$autopublished && $canpublish) : // autopublished disabled, display state selection field to the user that can publish ?>
+	
 			<div class="flexi_formblock">
 				<?php
 					$field = $this->fields['state'];
 					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label for="state" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label.':'; ?>
+				<label id="state-lbl" for="state" <?php echo $field_tooltip; ?> >
+					<?php echo $field->label; ?>
 					<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 				</label>
 				<?php echo $this->lists['state']; ?>
+	  		<?php	if ($autoapprove) : ?>
+	  			<input type="hidden" id="vstate" name="vstate" value="2" />
+	  		<?php	endif;?>
 			</div>
-				<?php
-				if (!$this->params->get('auto_approve', 1)) :
-				?>
+		
+		<?php	if (!$autoapprove) :	?>
 			<div class="flexi_formblock">
 				<label for="vstate" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' ).':';?>
+				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' );?>
 				</label>
 				<?php echo $this->lists['vstate']; ?>
 			</div>
+		<?php	endif; ?>
+		
+	<?php elseif (!$autopublished && !$canpublish) : ?>
+	
+			<div class="flexi_formblock">
 				<?php
-				else :
+					$field = $this->fields['state'];
+					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<input type="hidden" id="vstate" name="vstate" value="2" />
-				<?php
-				endif;
-				?>
-			<?php 
-			else :
-			?>
-			<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
-			<?php 
-			endif;
-			?>
+				<label id="state-lbl" for="state" <?php echo $field_tooltip; ?> >
+					<?php echo $field->label; ?>
+					<?php /*echo JText::_( 'FLEXI_STATE' );*/ ?>
+				</label>
+	  		<?php //echo JText::_( 'FLEXI_NEEDS_APPROVAL' );?>
+	  		<?php echo 'You cannot set state of this item, it will be reviewed by administrator'; ?>
+				<input type="hidden" id="state" name="state" value="<?php echo isset($this->item->state) ? $this->item->state : -4;?>" />
+				<input type="hidden" id="vstate" name="vstate" value="1" />
+			</div>
+	
+	<?php endif; ?>
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<div class="flexi_formblock">
 				<label for="languages" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_LANGUAGE' ).':';?>
+					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
 				</label>
 				<?php echo $this->lists['languages']; ?>
+				<input type="hidden" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->item->lang_parent_id; ?>" size="6" maxlength="20" />
 			</div>
 		<?php endif; ?>
 		</fieldset>
@@ -358,19 +370,19 @@ function deleteTag(obj) {
 			");
 
 		?>
-		<fieldset class="flexiaccess">
-			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-			<table id="tabacces" class="admintable" width="100%">
-				<tr>
-					<td>
-						<div id="access"><?php echo $this->lists['access']; ?></div>
-					</td>
-				</tr>
-			</table>
-			<div id="notabacces">
-			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-			</div>
-		</fieldset>
+				<fieldset class="flexiaccess">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+					<table id="tabacces" class="admintable" width="100%">
+						<tr>
+							<td>
+								<div id="access"><?php echo $this->lists['access']; ?></div>
+							</td>
+						</tr>
+					</table>
+					<div id="notabacces">
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					</div>
+				</fieldset>
 		<?php endif; ?>
 <?php if(@$this->fields['tags']) {?>
 	<fieldset class="flexi_tags">
@@ -394,11 +406,11 @@ function deleteTag(obj) {
 					<br class="clear" />
 				</div>
 		<?php if ($this->perms['cantags']) : ?>
-		<div id="tags">
-		<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-			<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
-		</label>
-		</div>
+				<div id="tags">
+					<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+					</label>
+				</div>
 		<?php endif; ?>
 	</fieldset>
 
@@ -532,16 +544,11 @@ function deleteTag(obj) {
 	<?php
 		echo "<br/ >";
 		echo $this->pane->startPane( 'det-pane' );
-		if($this->perms['canparams'] && $this->params->get('usemetadata', 1)) {
+		if( $this->params->get('usemetadata', 1) ) {
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
 			echo $this->pane->startPanel( $title, "metadata-page" );
 			echo $this->formparams->render('meta', 'metadata');
 			echo $this->pane->endPanel();
-		} else {
-			?>
-			<input type="hidden" name="metadesc" value="<?php echo @$this->item->metadesc; ?>" />
-			<input type="hidden" name="metakey" value="<?php echo @$this->item->metakey; ?>" />
-			<?php
 		}
 	?>
 	
@@ -558,7 +565,7 @@ function deleteTag(obj) {
 		<?php
 		$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
 		echo $this->pane->startPanel( $title, "params-page" );
-		echo $this->formparams->render('params', 'advanced');
+		echo $this->formparams->render('params', 'standard');
 		echo $this->pane->endPanel();
 
 		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
@@ -584,7 +591,12 @@ function deleteTag(obj) {
 		<input type="hidden" name="created_by" value="<?php echo $this->item->created_by; ?>" />
 		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 		<input type="hidden" name="views" value="items" />
-
+		
+		<?php if ($autopublished) : // autopublish enabled ?>
+			<input type="hidden" id="state" name="state" value="<?php echo $autopublished;?>" />
+			<input type="hidden" id="vstate" name="vstate" value="2" />
+		<?php	endif; ?>
+		
 	</form>
 </div>
 

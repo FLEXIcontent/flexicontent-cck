@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1204 2012-03-20 04:48:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,8 +17,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
@@ -77,7 +75,7 @@ endif;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	JHTML::_('behavior.mootools');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.4.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
 	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
 }
 // add extra css for the edit form
@@ -85,7 +83,6 @@ if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
 }
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
-
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
@@ -253,20 +250,20 @@ function deleteTag(obj) {
 				<?php echo $this->item->getInput('alias');?>
 			</td>
 		</tr>
-		<?php endif; ?>
-		
-	<?php if ($cid && $overridecatperms) :  /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+	<?php endif; ?>
+	
+	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 		<tr>
 			<td class="key">
 				<label id="jform_cid-lbl" for="jform_cid">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
+					<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
+						<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+							<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+						</span>
+					<?php endif; ?>
 				</label>
-				<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
-					</span>
-				<?php endif; ?>
 			</td>
 			<td>
 				<?php echo $fixedcats; ?>
@@ -311,16 +308,17 @@ function deleteTag(obj) {
 		</tr>
 	<?php endif; ?>
 
-<?php
+	<?php
+	
+	$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
+	$canpublish = $this->perms['canpublish'];
+	$autoapprove = $this->params->get('auto_approve', 0);
+	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
+	//echo "Auto-Publish Parameter: $autopublished<br />";
+	//echo "Auto-Approve Parameter: $autoapprove<br />";
+	?>
 
-$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
-$canpublish = $this->perms['canpublish'];
-$autoapprove = $cparams->get('auto_approve', 0);
-//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
-//echo "Auto-Publish Parameter: $autopublished<br />";
-//echo "Auto-Approve Parameter: $autoapprove<br />";
-?>
-	<?php if (!$autopublished && $canpublish) : ?>
+	<?php if (!$autopublished && $canpublish) : // autopublished disabled, display state selection field to the user that can publish ?>
 	
 		<tr>
 			<td class="key">
@@ -334,7 +332,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				<?php /*echo $this->item->getLabel('state'); */?>
 			</td>
 			<td>
-	  		<?php echo $this->item->getInput('state');//echo $this->lists['state']; ?>
+	  		<?php echo $this->item->getInput('state'); ?>
 	  		<?php	if ($autoapprove) : ?>
 	  			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 	  		<?php	endif;?>
@@ -372,7 +370,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				<input type="hidden" id="vstate" name="jform[vstate]" value="1" />
 			</td>
 		</tr>
-		
+	
 	<?php endif; ?>
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<tr>
@@ -381,6 +379,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 			</td>
 			<td>
 				<?php echo $this->lists['languages']; ?>
+				<?php echo $this->item->getInput('lang_parent_id'); ?>
 			</td>
 		</tr>
 		<?php endif; ?>
@@ -392,8 +391,8 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				<?php echo $this->item->getInput('featured');?>
 			</td>
 		</tr>
-		<?php 
-		if ($this->perms['canconfig']) :
+		<?php
+		if ($this->perms['canright']) :
 		$this->document->addScriptDeclaration("
 			window.addEvent('domready', function() {
 			var slideaccess = new Fx.Slide('tabacces');
@@ -409,7 +408,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		?>
 		<tr>
 			<td colspan="2">
-				<fieldset class="flexiaccess" style="font-size:80%;">
+				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
 						<tr>
@@ -501,7 +500,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				
 				// SKIP frontend hidden fields from this listing
 				if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('frontend_hidden')  ||  in_array($field->field_type, $hidden) ) continue;
-							
+				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
@@ -516,7 +515,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 				}
 				
 				// -- Tooltip for the current field
-				$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';	
+				$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
 				?>
 				
 				<?php	if ( !is_array($field->html) ) : ?>
@@ -597,11 +596,11 @@ $autoapprove = $cparams->get('auto_approve', 0);
 
 	<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
 	
-	<?php if ($this->perms['canparams'] && $this->params->get('usemetadata', 1)) { ?>
+	<?php if ( $this->params->get('usemetadata', 1) ) { ?>
 	<?php
 		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
 		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
-		?>
+	?>
 		<fieldset class="panelform">
 			<table>
 			<tr>
@@ -638,12 +637,6 @@ $autoapprove = $cparams->get('auto_approve', 0);
 			<?php endforeach; ?>
 			</table>
 		</fieldset>
-	<?php }else{?>
-		<input type="hidden" name="jform[metadata][metadesc]" value="<?php echo @$this->item->getValue('metadesc'); ?>" />
-		<input type="hidden" name="jform[metadata][metakey]" value="<?php echo @$this->item->getValue('metakey'); ?>" />
-		<?php foreach($this->item->getGroup('metadata') as $field): ?>
-			<input type="hidden" name="<?php echo $field->name;?>" value="<?php echo @$field->value; ?>" />
-		<?php endforeach; ?>
 	<?php } ?>
 
 
@@ -685,7 +678,7 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		
 	<?php endif; ?>
 		
-	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
+	<?php if ($this->perms['cantemplates'] && $this->params->get('usetemplateparams', 1)) : ?>
 		
 		<?php	echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';?>
 		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
@@ -717,19 +710,15 @@ $autoapprove = $cparams->get('auto_approve', 0);
 		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
 		<?php echo $this->item->getInput('id');?>
 		<input type="hidden" name="jform[type_id]" value="<?php echo $this->item->getValue('type_id'); ?>" />
-		<?php
-			if ($autopublished) :
-		?>
-				<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
-				<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
-		<?php
-			endif;
-			if (!$this->perms['canconfig']) {
-		?>
+		
+		<?php if ($autopublished) : // autopublish enabled ?>
+			<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
+			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
+		<?php	endif; ?>
+		
+		<?php if (!$this->perms['canright']) : ?>
 				<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
-		<?php
-			}
-		?>
+		<?php endif; ?>
 	</form>
 </div>
 

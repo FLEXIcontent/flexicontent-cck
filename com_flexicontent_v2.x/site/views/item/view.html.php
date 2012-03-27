@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1204 2012-03-20 04:48:05Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1220 2012-03-24 07:00:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -30,8 +30,8 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
  */
 class FlexicontentViewItem extends JView
 {
-	var $_type='';
-	var $_name='item';
+	var $_type = '';
+	var $_name = FLEXI_ITEMVIEW;
 	
 	/**
 	 * Creates the item page
@@ -486,7 +486,7 @@ class FlexicontentViewItem extends JView
 		// Load permissions (used by form template)
 		$perms 	= array();
 		if (FLEXI_J16GE) {
-			$perms['isSuperAdmin']= $user->authorise('core.admin', 'com_flexicontent');
+			$perms['isSuperAdmin']= $user->authorise('core.admin', 'root.1');
 			$permission = FlexicontentHelperPerm::getPerm();
 			$perms['multicat'] = $permission->MultiCat;
 			$perms['cantags'] = $permission->CanUseTags;
@@ -494,12 +494,18 @@ class FlexicontentViewItem extends JView
 			$perms['cantemplates']= $permission->CanTemplates;
 			
 			//item specific permissions
-			$asset = 'com_content.article.' . $item->getValue('id');
-			$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-			$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-			$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+			if ( $item->getValue('id') ) {
+				$asset = 'com_content.article.' . $item->getValue('id');
+				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
+				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+			} else {
+				$perms['canedit']			= $user->authorise('core.edit', 'com_flexicontent');
+				$perms['canpublish']	= $user->authorise('core.edit.state', 'com_flexicontent');
+				$perms['candelete']		= $user->authorise('core.delete', 'com_flexicontent');
+			}
 			
-			$perms['canconfig']		= $permission->CanConfig;
+			$perms['canright']		= $permission->CanConfig;
 		} else if (FLEXI_ACCESS) {
 			$perms['isSuperAdmin']= $user->gid >= 25;
 			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
@@ -582,6 +588,8 @@ class FlexicontentViewItem extends JView
 		$this->assignRef('lists',			$lists);
 		$this->assignRef('editor',		$editor);
 		$this->assignRef('user',			$user);
+		if (!FLEXI_J16GE)
+			$this->assignRef('tags',		$tags);
 		$this->assignRef('usedtags',	$usedtags);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('tparams',		$tparams);
@@ -589,17 +597,68 @@ class FlexicontentViewItem extends JView
 		$this->assignRef('document',	$document);
 		$this->assignRef('nullDate',	$nullDate);
 		
-		if($perms['cantemplates']) {
-			// Handle item templates parameters
-			$themes		= flexicontent_tmpl::getTemplates();
-			$tmpls		= $themes->items;
-			if (!FLEXI_J16GE ) {
-				foreach ($tmpls as $tmpl) {
-					$tmpl->params->loadINI($item->attribs);
-				}
+		// **************************************************************************************
+		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
+		// **************************************************************************************
+		
+		if (!FLEXI_J16GE) {
+			if (FLEXI_ACCESS) {
+				$formparams = new JParameter('', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item2.xml');
+			} else {
+				$formparams = new JParameter('', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.xml');
 			}
-			$this->assignRef('tmpls',		$tmpls);
 		}
+		
+		
+		// ****************************************************************
+		// SET INTO THE FORM, parameter values for various parameter groups
+		// ****************************************************************
+			
+		if (!FLEXI_J16GE) {
+			// Permissions (Access) Group
+			if (!FLEXI_ACCESS) {
+				$formparams->set('access', $item->access);
+			}
+			
+			// Set: (Publication) Details Group
+			$created_by = (intval($item->created_by) ? intval($item->created_by) : $user->get('id'));
+			$formparams->set('created_by', $created_by);
+			$formparams->set('created_by_alias', $item->created_by_alias);
+			$formparams->set('created', JHTML::_('date', $item->created, '%Y-%m-%d %H:%M:%S'));
+			$formparams->set('publish_up', JHTML::_('date', $item->publish_up, '%Y-%m-%d %H:%M:%S'));
+			if (JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $db->getNullDate()) {
+				$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
+			} else {
+				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
+			}
+			
+			// Set:  Standard (parameters) Group, (these are retrieved from the item table column 'attribs')
+			// (also contains templates parameters, but we will use these individual for every template ... see below)
+			$formparams->loadINI($item->attribs);
+	
+			// Set: Metadata (parameters) Group
+			// NOTE: (2 params from 2 item table columns, and then multiple params from item table column 'metadata')
+			$formparams->set('description', $item->metadesc);
+			$formparams->set('keywords', $item->metakey);
+			$formparams->loadINI($item->metadata);
+			
+			// Now create the sliders object,
+			// And also push the Form Parameters object into the template (Template Parameters object is seperate)
+			jimport('joomla.html.pane');
+			$pane = & JPane::getInstance('sliders');
+			$this->assignRef('pane'				, $pane);
+			$this->assignRef('formparams'	, $formparams);
+		}
+		
+		// Set: Templates (parameters) Group, by loading item's attribs for every template (these are ALSO saved in the table column 'attribs')
+		$themes		= flexicontent_tmpl::getTemplates();
+		$tmpls		= $themes->items;
+		if (!FLEXI_J16GE ) {
+			foreach ($tmpls as $tmpl) {
+				$tmpl->params->loadINI($item->attribs);
+			}
+		}
+		$this->assignRef('tmpls',		$tmpls);
 		
 		parent::display($tpl);
 	}

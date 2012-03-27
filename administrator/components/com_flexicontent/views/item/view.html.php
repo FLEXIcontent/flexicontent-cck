@@ -276,7 +276,6 @@ class FlexicontentViewItem extends JView {
 		$formparams->set('created_by_alias', $row->created_by_alias);
 		$formparams->set('created', JHTML::_('date', $row->created, '%Y-%m-%d %H:%M:%S'));
 		$formparams->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
-		$formparams->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
 		if (JHTML::_('date', $row->publish_down, '%Y') <= 1969 || $row->publish_down == $db->getNullDate()) {
 			$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
 		} else {

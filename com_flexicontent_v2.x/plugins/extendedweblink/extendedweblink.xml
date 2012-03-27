@@ -32,7 +32,10 @@
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
 			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
 			<field type="spacer" default="&lt;style type=&quot;text/css&quot;&gt; select#paramstarget{width: 150px}&lt;/style&gt;" />
 			<field name="default_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_TITLE" description="FLEXI_FIELD_DEFAULT_TITLE_DESC" />
 			<field name="use_title" type="radio" default="0" label="FLEXI_FIELD_USE_TITLE" description="FLEXI_FIELD_USE_TITLE_DESC">

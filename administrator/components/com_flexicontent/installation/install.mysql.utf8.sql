@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
   `type_id` int(11) unsigned NOT NULL,
   `language` varchar(11) NOT NULL default '',
+  `lang_parent_id` int(11) unsigned NOT NULL default 0,
   `sub_items` text NOT NULL,
   `sub_categories` text NOT NULL,
   `related_items` text NOT NULL,

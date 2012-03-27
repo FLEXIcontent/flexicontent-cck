@@ -224,6 +224,7 @@ class ParentClassItem extends JModelAdmin {
 		static $item;
 		static $unapproved_version_notice;
 		
+		$app = &JFactory::getApplication();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		$task = JRequest::getVar('task',false);
 		$option = JRequest::getVar('option',false);
@@ -315,7 +316,7 @@ class ParentClassItem extends JModelAdmin {
 				return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
 			}
 			
-			else
+			if ( $pk == 0 && $app->isAdmin() )  // Only apply to Backend
 			{		
 				$item->state = $this->_cparams->get('new_item_state', -4);
 				//$item->language = flexicontent_html::getSiteDefaultLang();
