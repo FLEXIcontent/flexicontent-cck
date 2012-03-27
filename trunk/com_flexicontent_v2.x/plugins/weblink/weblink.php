@@ -245,6 +245,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 		// some parameter shortcuts
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		$usetitle			= $field->parameters->get( 'use_title', 0 ) ;
 		$target				= $field->parameters->get( 'targetblank', 0 ) ? ' target="_blank"' : '';
 								
@@ -264,6 +266,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 			case 3:
 			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1213 2012-03-20 14:44:27Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: flexicontent.php 1216 2012-03-22 04:06:29Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,10 +46,17 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getPending() {
-		$permission = FlexicontentHelperPerm::getPerm();
-		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
+	function getPending()
+	{
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+		} else {
+			$allitems 	= 1;
+		}
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -74,9 +81,15 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getRevised()
 	{
-		$permission = FlexicontentHelperPerm::getPerm();
-		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+		} else {
+			$allitems 	= 1;
+		}
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
 				. ' FROM #__content AS c'
@@ -104,9 +117,15 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getDraft()
 	{
-		$permission = FlexicontentHelperPerm::getPerm();
-		$user	= &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+		} else {
+			$allitems 	= 1;
+		}
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -129,10 +148,17 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getInprogress() {
-		$permission = FlexicontentHelperPerm::getPerm();
-		$user = &JFactory::getUser();
-		$allitems	= !$permission->CanConfig ? $permission->DisplayAllItems : 1;
+	function getInprogress()
+	{
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
+			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
+		} else {
+			$allitems 	= 1;
+		}
 
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
 				. ' FROM #__content as c'
@@ -293,12 +319,15 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return === NULL) {
 			$query 	= 'SELECT COUNT( extension_id )'
-					. ' FROM #__extensions'
-					. ' WHERE `type`='.$this->_db->Quote('plugin').' AND ( folder = ' . $this->_db->Quote('flexicontent_fields')
-					. ' OR element = ' . $this->_db->Quote('flexisearch')
-					. ' OR element = ' . $this->_db->Quote('flexisystem') . ')'
-					. ' AND enabled <> 1'
-					;
+				. ' FROM #__extensions'
+				. ' WHERE `type`='.$this->_db->Quote('plugin').' AND '
+				. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
+				. ' OR element = ' . $this->_db->Quote('flexisearch')
+				. ' OR element = ' . $this->_db->Quote('flexisystem')
+				. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
+				. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
+				. ' AND enabled <> 1'
+				;
 			$this->_db->setQuery( $query );
 			$return = $this->_db->loadResult() ? false : true;
 		}
@@ -316,9 +345,10 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return === NULL) {
 			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-			$return = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+			$result_lang_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+			$result_tgrp_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
 		}
-		return $return;
+		return $result_lang_col && $result_tgrp_col;
 	}
 
 	/**
@@ -332,10 +362,13 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		static $return;
 		if($return === NULL) {
+			$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 			$db =& JFactory::getDBO();
 			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
-				. " LEFT JOIN #__content as i ON i.id=ie.item_id "
-				. " WHERE ie.language='' OR i.language<>ie.language "
+				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
+				. " WHERE ie.language='' "
+				. ($enable_language_groups ? " OR ie.lang_parent_id='0' " : "")
+				. (FLEXI_J16GE ? " OR i.language<>ie.language " : "")
 				;
 			$db->setQuery($query);
 			$return = $db->loadResult();
@@ -441,7 +474,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$cattmpl 	= JFolder::files($catdir);		
 			$ctmpl 		= array_diff($cattmpl,$files);
 			
-			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'item'.DS.'tmpl');
+			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
 			$itemtmpl 	= JFolder::files($itemdir);		
 			$itmpl 		= array_diff($itemtmpl,$files);
 			
@@ -468,8 +501,10 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		if ($fields) {
 			// create a temporary table to store the positions
+			$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
+			$this->_db->query();
 			$query = "
-					CREATE TABLE IF NOT EXISTS #__flexicontent_positions_tmp (
+					CREATE TABLE #__flexicontent_positions_tmp (
 					  `field` varchar(100) NOT NULL default '',
 					  `view` varchar(30) NOT NULL default '',
 					  `folder` varchar(100) NOT NULL default '',
@@ -510,7 +545,7 @@ class FlexicontentModelFlexicontent extends JModel
 							if ($fieldstopos) {
 								$field = implode(',', $fieldstopos);
 
-								$query = 'REPLACE INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
+								$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
 								$this->_db->setQuery($query);
 								$this->_db->query();
 							}
@@ -568,7 +603,8 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistcat() {
+	function getExistcat()
+	{
 		$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__categories as cat'
 				. ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" AND lft> ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND rgt<' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
@@ -583,7 +619,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if FLEXI_CAT_EXTENSION still exists
+	 * Method to check if FLEXI_SECTION (or FLEXI_CAT_EXTENSION for J1.6+) still exists
 	 *
 	 * @access public
 	 * @return	boolean	True on success
@@ -617,14 +653,16 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
-		// This code doesn't work as in J1.5 ...
-		/*$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('component_id', $component->id);*/
-		
-		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-		$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' ";
-		$this->_db->setQuery($query);
-		$count = $this->_db->loadResult();
+		if(FLEXI_J16GE) {
+			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' ";
+			$this->_db->setQuery($query);
+			$count = $this->_db->loadResult();
+		} else {
+			$menus	= &JApplication::getMenu('site', array());
+			$items	= $menus->getItems('componentid', $component->id);
+			$count = count($items);
+		}
 		
 		if ($count > 0) {
 			return true;
@@ -748,7 +786,9 @@ class FlexicontentModelFlexicontent extends JModel
 		return $check;
 	}
 	
-	function getDiffVersions($current_versions=array(), $last_versions=array()) {
+	
+	function getDiffVersions($current_versions=array(), $last_versions=array())
+	{
 		// check if the category was chosen to avoid adding data on static contents
 		if (!FLEXI_CAT_EXTENSION) return array();
 
@@ -768,7 +808,10 @@ class FlexicontentModelFlexicontent extends JModel
 		if (!FLEXI_CAT_EXTENSION) return false;
 		return FLEXIUtilities::currentMissing();
 	}
-	function addCurrentVersionData() {
+	
+	
+	function addCurrentVersionData()
+	{
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_CAT_EXTENSION) return true;
 

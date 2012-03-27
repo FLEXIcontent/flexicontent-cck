@@ -17,6 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 ?>
 
 <div class="flexicontent">
@@ -66,9 +68,39 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 			<td valign="top" width="33%">
 			<fieldset>
+			
+		<?php if ($copy_behaviour == 'translate') : ?>
+			<legend><?php echo JText::_( 'FLEXI_TRANSLATE_OPTIONS' ); ?></legend>
+		<?php else : ?>
 			<legend><?php echo JText::_( 'FLEXI_COPY_MOVE_OPTIONS' ); ?></legend>
+		<?php endif; ?>
+		
 				<table>
 					<tr>
+					
+					<?php if ($copy_behaviour == 'translate') : ?>
+						<td class="key"><?php echo JText::_( 'FLEXI_METHOD' ); ?></td>
+						<td>
+							<input type="hidden" name="method" value="99" /> <!-- METHOD number for traslate -->
+							<label for="method-duplicateoriginal">
+								<input id="method-duplicateoriginal" type="radio" name="translate_method" value="1" onclick="copyonly();" checked="checked" />
+								<?php echo JText::_( 'FLEXI_DUPLICATEORIGINAL' ); ?>
+							</label><br />
+							<label for="method-usejoomfish">
+								<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copyonly();" />
+								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
+							</label><br />
+							<label for="method-autotranslation">
+								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copyonly();" />
+								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
+							</label><br />
+							<label for="method-firstjf-thenauto">
+								<input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" />
+								<?php echo JText::_( 'FLEXI_FIRST_JF_THEN_AUTO' ); ?>
+							</label>
+						</td>
+					<?php else : ?>
+					
 						<td class="key"><?php echo JText::_( 'FLEXI_METHOD' ); ?></td>
 						<td>
 							<label for="menus-copy" class="lang_box" >
@@ -84,6 +116,9 @@ defined('_JEXEC') or die('Restricted access');
 								<?php echo JText::_( 'FLEXI_COPYMOVE' ); ?>
 							</label>
 						</td>
+						
+					<?php endif; ?>
+					
 					</tr>
 					<tr>
 						<td></td>
@@ -111,7 +146,11 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></td>
 						<td>
-							<input type="text" id="prefix" name="prefix" value="<?php echo JText::_( 'FLEXI_DEFAULT_PREFIX' ); ?>" size="15" />
+							<?php
+							if ($copy_behaviour == 'translate') $defprefix = JText::_( 'FLEXI_DEFAULT_TRANSLATE_PREFIX' );
+							else $defprefix = JText::_( 'FLEXI_DEFAULT_PREFIX');
+							?>
+							<input type="text" id="prefix" name="prefix" value="<?php echo $defprefix; ?>" size="15" />
 						</td>
 					</tr>
 					<tr>

@@ -16,7 +16,7 @@
 	
 	<fields name="attribs" >
 		<fieldset name="basic">
-			<field name="display_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_LABEL" description="FLEXI_RIFLD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -76,7 +76,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="required" type="radio" default="0" label="FLEXI_RIFLD_REQUIRED" description="FLEXI_RIFLD_REQUIRED_DESC">
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -85,28 +85,28 @@
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_FORMATING_THE_FIELD" level="level2" menu="hide" />
 			
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_RIFLD_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_RIFLD_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_RIFLD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_RIFLD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_RIFLD_REMOVE_SPACE" description="FLEXI_RIFLD_REMOVE_SPACE_DESC">
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="pretext" type="text" default="" label="FLEXI_RIFLD_PREFIX_TEXT" description="FLEXI_RIFLD_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" label="FLEXI_RIFLD_SUFFIX_TEXT" description="FLEXI_RIFLD_SUFFIX_TEXT_DESC" />
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_SEPARATING_ITEMS" level="level2" menu="hide" />
-			<field name="separatorf" type="list" default="1" label="FLEXI_RIFLD_SEPARATOR_FRONTEND" description="FLEXI_RIFLD_SEPARATOR_FRONTEND_DESC">
-				<option value="0">FLEXI_RIFLD_SPACE</option>
-				<option value="1">FLEXI_RIFLD_LINE_BREAK</option>
-				<option value="2">FLEXI_RIFLD_PIPE</option>
-				<option value="3">FLEXI_RIFLD_COMMA</option>
-				<option value="4">FLEXI_RIFLD_TAG_CUSTOM</option>
+			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
 			</field>
-			<field name="opentag" type="text" default="" label="FLEXI_RIFLD_TAG_OPEN" description="FLEXI_RIFLD_TAG_OPEN_DESC" />
-			<field name="closetag" type="text" default="" label="FLEXI_RIFLD_TAG_CLOSE" description="FLEXI_RIFLD_TAG_CLOSE_DESC" />
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
 		</fieldset>
 			
 	</fields>

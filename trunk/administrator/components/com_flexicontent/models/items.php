@@ -112,9 +112,10 @@ class FlexicontentModelItems extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $db->loadResult();
+			if (!FLEXI_J16GE) {
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total = $this->_db->loadResult();
+			}
 			
 			$k = 0;
 			$count = count($this->_data);
@@ -334,25 +335,30 @@ class FlexicontentModelItems extends JModel
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
-		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
+		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ie.lang_parent_id, ' : '';
 		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
+		
+		$nullDate = $this->_db->Quote($this->_db->getNullDate());
+		$nowDate = $this->_db->Quote(JFactory::getDate()->toMySQL());
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
-					. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
-					. ' FROM #__content AS i'
-					. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-					. ' LEFT JOIN #__groups AS g ON g.id = i.access'
-					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
-					. $where
-					. ' GROUP BY i.id'
-					. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
-					. $orderby
-					;
+				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
+				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired,'
+				. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
+				. ' FROM #__content AS i'
+				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' LEFT JOIN #__groups AS g ON g.id = i.access'
+				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+				. $where
+				. ' GROUP BY i.id'
+				. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
+				. $orderby
+				;
 		return $query;
 	}
 
@@ -382,7 +388,11 @@ class FlexicontentModelItems extends JModel
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
 
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+		if($filter_order == 'ie.lang_parent_id') {
+			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
+		} else {
+			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+		}
 
 		return $orderby;
 	}
@@ -426,9 +436,17 @@ class FlexicontentModelItems extends JModel
 		$where[] = ' i.state != -2';
 		$where[] = ' i.sectionid = ' . $this->_db->Quote(FLEXI_SECTION);
 
-		// if FLEXIaccess only authorize users to see their own items
-		if (FLEXI_ACCESS) {
-			$user 	=& JFactory::getUser();
+		$user 	=& JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$allitems	= $permission->DisplayAllItems;
+
+			if (!@$allitems) {				
+				$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'item');
+				$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');
+				$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'item');
+				$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');
+			}
+		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 				
 			if (!@$allitems) {				
@@ -436,6 +454,13 @@ class FlexicontentModelItems extends JModel
 				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
 				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
 
+			}
+		} else {
+			$allitems = 1;
+		}
+		
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			if (!@$allitems) {				
 				if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
 					if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
 						$allown = array();
@@ -591,6 +616,17 @@ class FlexicontentModelItems extends JModel
 	 */
 	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null)
 	{
+		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
+		if ($method == 99) {   // 
+			$translate_method = JRequest::getVar('translate_method',1);
+		} else {
+			$translate_method = 0;
+		}
+		// If translation method includes autotranslate ...
+		if ($translate_method==3 || $translate_method==4) {
+			require_once(JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'translator.php');
+		}
+		
 		foreach ($cid as $itemid)
 		{
 			for( $i=0; $i < $copynr; $i++ )
@@ -614,10 +650,86 @@ class FlexicontentModelItems extends JModel
 				$row->publish_up	= $datenow->toMySQL();
 				$row->modified 		= $nullDate = $this->_db->getNullDate();
 				$row->state			= $state ? $state : $row->state;
+				$lang_from			= substr($row->language,0,2);
 				$row->language	= $lang ? $lang : $row->language;
+				$lang_to				= substr($row->language,0,2);
+				
+				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = true;    // In case JF data is missing
+				if ($translate_method == 2 || $translate_method == 4) {
+					// a. Try to get joomfish translation from the item
+					$query = "SELECT c.* FROM `#__jf_content` AS c "
+					." LEFT JOIN #__languages AS lg ON c.language_id=lg.id "
+					."WHERE c.reference_table = 'content' AND lg.code='".$row->language."' AND c.reference_id = ". $sourceid;
+					$this->_db->setQuery($query);
+					$jfitemfields = $this->_db->loadObjectList();
+					
+					// b. if joomfish translation found set for the new item
+					if($jfitemfields) {
+						$jfitemdata = new stdClass();
+						foreach($jfitemfields as $jfitemfield) {
+							$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
+						}
+						
+						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>4){
+							$row->title = $jfitemdata->title;
+							$row->title = ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
+							$doauto['title'] = false;
+						}
+						
+						if (isset($jfitemdata->alias) && $jfitemdata->alias) {
+							$row->alias = $jfitemdata->alias;
+						}
+						
+						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>10) {
+							$row->introtext = $jfitemdata->introtext;
+							$doauto['introtext'] = false;
+						}
+						
+						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>10) {
+							$row->fulltext = $jfitemdata->fulltext;
+							$doauto['fulltext'] = false;
+						}
+					}
+				}
+				
+
+				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
+				if ($translate_method == 3 || $translate_method == 4) {
+					$translatables = array('title', 'introtext', 'fulltext');
+					
+					$fieldvalues_arr = array();
+					foreach($translatables as $translatable) {
+						if ($doauto[$translatable]) {
+							echo $translatable;
+							$fieldnames_arr[] = $translatable;
+							$translatable_obj = new stdClass(); 
+							$translatable_obj->originalValue = $row->{$translatable};
+							$translatable_obj->noTranslate = false;
+							$fieldvalues_arr[] = $translatable_obj;
+						}
+					}
+					
+					if (count($fieldvalues_arr)) {
+						$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+						
+						if (intval($result)) {
+							$i = 0;
+							foreach($fieldnames_arr as $fieldname) {
+								$row->{$fieldname} = $fieldvalues_arr[$i]->translationValue;
+								$i++;
+							}
+						}
+					}
+				}
 				
 				$row->store();
 				$copyid = (int)$row->id;
+				
+				// Not doing a translation, we start a new language group for the new item
+				if ($translate_method == 0) {
+					$row->lang_parent_id = $copyid;
+					$row->store();
+				}
 
 				// get the item fields
 				$query 	= 'SELECT *'
@@ -730,7 +842,7 @@ class FlexicontentModelItems extends JModel
 		$item->catid = $maincat;
 		$item->store();
 		
-		if (!$seccats[0])
+		if ($seccats === null)
 		{
 			// draw an array of the item categories
 			$query 	= 'SELECT catid'
@@ -748,7 +860,7 @@ class FlexicontentModelItems extends JModel
 
 		//At least one category needs to be assigned
 		if (!is_array( $seccats ) || count( $seccats ) < 1) {
-			$this->setError('FLEXI_SELECT_CATEGORY');
+			$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
 		}
 		
@@ -873,7 +985,7 @@ class FlexicontentModelItems extends JModel
 	 * @since	1.5
 	 */
 	/*function isAllowedToSubmit($items)
-	{ // INCOMPLETE MUST also check user->gid > 24,   also missing variables  ....
+	{ // INCOMPLETE MUST also check user->gid > 24 (J1.5),   also missing variables  ....
 		if ($items)
 		{
 			$CanEdit	= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
@@ -1220,11 +1332,14 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery( $query );
 			$items = $this->_db->loadObjectList();
 			
+			// This should be used it bypassed individual item rights
+			//$canDeleteAll			= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
+			//$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
 			foreach ($items as $item)
 			{
 				$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canDelete 		= in_array('delete', $rights) || (FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all'));
-				$canDeleteOwn	= (in_array('deleteown', $rights) && ($item->created_by == $user->id)) || ((FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all')) && ($item->created_by == $user->id));
+				$canDelete 		= in_array('delete', $rights) /*|| $canDeleteAll	*/;
+				$canDeleteOwn	= (in_array('deleteown', $rights) /*|| $canDeleteOwnAll*/) && $item->created_by == $user->id;
 				
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}

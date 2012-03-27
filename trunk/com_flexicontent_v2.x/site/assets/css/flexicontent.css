@@ -886,6 +886,36 @@ div#flexicontent .pane-slider ul.adminformlist, div#flexicontent ul#rules, div#f
 	padding: 2px !important;
 }
 
+div#flexicontent .pane-sliders .panel {
+	margin-top: 8px;
+}
+
+div#flexicontent .pane-sliders .panel h3 span {
+	padding: 4px;
+}
+
+div#flexicontent .pane-sliders .panel .pane-slider {
+	padding: 0px !important;
+}
+
+div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
+	margin: 4px !important;
+	border: 1px solid lightgray !important;
+}
+
+fieldset.adminform fieldset.radio, fieldset.panelform fieldset.radio, fieldset.adminform-legacy fieldset.radio {
+	border: 0 none;
+	float: left;
+	margin: 2px 0px 5px 2px;
+	padding: 0;
+}
+
+div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform select {
+	min-width: 200px;
+	font-size: 90%;
+}
+
+
 div#flexicontent table.admintable td {
 	margin: 0px;
 	padding: 0.2em 0.4em;

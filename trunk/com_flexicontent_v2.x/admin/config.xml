@@ -267,7 +267,7 @@
 			</field>
 			<field name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="usepublicationdetails" type="radio" default="0" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
 				<option value="0">FLEXI_NO</option>

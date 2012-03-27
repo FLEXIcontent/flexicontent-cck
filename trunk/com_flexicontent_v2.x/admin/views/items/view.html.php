@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1095 2012-01-10 06:07:58Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1189 2012-03-14 06:43:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -125,50 +125,108 @@ class FlexicontentViewItems extends JView {
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		
-		$permission = FlexicontentHelperPerm::getPerm();
+		if (FLEXI_J16GE) {
+			$permission 	= FlexicontentHelperPerm::getPerm();
+			$CanAdd				= $permission->CanAdd;
+			
+			$CanEdit			= $permission->CanEdit;
+			$CanPublish		= $permission->CanPublish;
+			$CanDelete		= $permission->CanDelete;
+			
+			$CanEditOwn			= $permission->CanEditOwn;
+			$CanPublishOwn	= $permission->CanPublishOwn;
+			$CanDeleteOwn		= $permission->CanDeleteOwn;
+			
+			$CanCats		= $permission->CanCats;
+			$CanRights	= $permission->CanConfig;
+			$CanOrder		= $permission->CanOrder;
+			$CanCopy		= $permission->CanCopy;
+			
+		} else if (FLEXI_ACCESS) {
+			$CanAdd			= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
+			
+			$CanEdit		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid)		: 1;
+			$CanPublish	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid)	: 1;
+			$CanDelete	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid)	: 1;
+			
+			$CanEditOwn			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)			: 1;
+			$CanPublishOwn	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)	: 1;
+			$CanDeleteOwn		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)		: 1;
+			
+			$CanCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid)	: 1;
+			$CanRights	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid)			: 1;
+			$CanOrder		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid)			: 1;
+			$CanCopy		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
+			
+		} else {
+			$CanAdd			= 1;
+			$CanEdit		= 1;
+			$CanPublish	= 1;
+			$CanDelete	= 1;
+			$CanCats		= 1;
+			$CanRights	= 1;
+			$CanOrder		= 1;
+			$CanCopy		= 1;
+		}
 		FLEXISubmenu('notvariable');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
 		$toolbar =&JToolBar::getInstance('toolbar');
 		
-		if ( $permission->CanPublish || $permission->CanPublishOwn ) {
-			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw', 840, 200);
+		if ( $CanPublish || $CanPublishOwn ) {
+			// Implementation of multiple-item state selector
+			$ctrl_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
+			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&format=raw', 840, 200);
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
 		}
 		
-		if ($permission->CanAdd) {
+		if ($CanAdd) {
+			$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
 			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
 			//$js .= "});";
 			//$document->addScriptDeclaration($js);
-			//JToolBarHelper::addNew('items.add');
+			//JToolBarHelper::addNew($ctrl_task);
 			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 			
-			$toolbar->appendButton('Popup', 'new', 'JTOOLBAR_NEW', JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
+			if (FLEXI_J16GE) {
+				$toolbar->appendButton('Popup', 'new', 'JTOOLBAR_NEW', JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
+			} else {
+				// TODO implement popup chooser for J1.5 like it is for J1.6+
+				JToolBarHelper::addNew($ctrl_task);
+			}
 			
-			if ($permission->CanCopy) {
-				JToolBarHelper::customX( 'items.copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+			if ($CanCopy) {
+				$ctrl_task = FLEXI_J16GE ? 'items.copy' : 'copy';
+				JToolBarHelper::customX( $ctrl_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+				$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+				if ($enable_language_groups) {
+					JToolBarHelper::customX( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
+				}
 			}
 		}
-		if ($permission->CanEdit) {
-			JToolBarHelper::editList('items.edit');
+		if ($CanEdit || $CanEditOwn) {
+			$ctrl_task = FLEXI_J16GE ? 'items.edit' : 'edit';
+			JToolBarHelper::editList($ctrl_task);
 		}
-		if ($permission->CanDelete) {
-			JToolBarHelper::deleteList('Are you sure?', 'items.remove');
+		if ($CanDelete || $CanDeleteOwn) {
+			$ctrl_task = FLEXI_J16GE ? 'items.remove' : 'remove';
+			JToolBarHelper::deleteList('Are you sure?', $ctrl_task);
 		}
 		
-		if ( !$permission->CanPublish && !$permission->CanPublishOwn) {
+		if ( (FLEXI_ACCESS || FLEXI_J16GE) && !$CanPublish && !$CanPublishOwn) {
+			$ctrl_task = FLEXI_J16GE ? 'items.approval' : 'approval';
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
-			JToolBarHelper::customX( 'items.approval', 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+			JToolBarHelper::customX( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 		
-		if($permission->CanConfig) {
+		if(FLEXI_J16GE && $permission->CanConfig) {
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
@@ -263,20 +321,22 @@ class FlexicontentViewItems extends JView {
 		}
 		
 		//assign data to template
-		$this->assignRef('db'  			, $db);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
+		$this->assignRef('db'				, $db);
+		$this->assignRef('lists'		, $lists);
+		$this->assignRef('rows'			, $rows);
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$this->assignRef('langs'    , $langs);
 		}
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('user'			, $user);
-		$this->assignRef('permission'		, $permission);
+		$this->assignRef('user'				, $user);
+		$this->assignRef('CanOrder'		, $CanOrder);
+		$this->assignRef('CanCats'		, $CanCats);
+		$this->assignRef('CanRights'	, $CanRights);
 		$this->assignRef('unassociated'	, $unassociated);
 		// filters
-		$this->assignRef('filter_id'		, $filter_id);
+		$this->assignRef('filter_id'			, $filter_id);
 		$this->assignRef('filter_state'		, $filter_state);
 		$this->assignRef('filter_authors'	, $filter_authors);
 		$this->assignRef('filter_type'		, $filter_type);
@@ -286,8 +346,8 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('scope'			, $scope);
 		$this->assignRef('search'			, $search);
 		$this->assignRef('date'				, $date);
-		$this->assignRef('startdate'		, $startdate);
-		$this->assignRef('enddate'			, $enddate);
+		$this->assignRef('startdate'	, $startdate);
+		$this->assignRef('enddate'		, $enddate);
 
 		parent::display($tpl);
 	}
@@ -313,13 +373,34 @@ class FlexicontentViewItems extends JView {
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-
-		$permission = FlexicontentHelperPerm::getPerm();
+		
+		if (FLEXI_J16GE) {
+			$permission 	= FlexicontentHelperPerm::getPerm();
+			$CanCats		= $permission->CanCats;
+			$CanRights	= $permission->CanConfig;
+			$CanOrder		= $permission->CanOrder;
+			
+		} else if (FLEXI_ACCESS) {
+			$CanCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid)	: 1;
+			$CanRights	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid)			: 1;
+			$CanOrder		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid)			: 1;
+			
+		} else {
+			$CanCats		= 1;
+			$CanRights	= 1;
+			$CanOrder		= 1;
+		}
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'itemadd' );
-		JToolBarHelper::save('items.copymove');
-		JToolBarHelper::cancel('items.cancel');
+		$copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
+		if ($copy_behaviour == 'translate') {
+			$page_title =  JText::_( 'FLEXI_TRANSLATE_ITEM' );
+		} else {
+			$page_title = JText::_( 'FLEXI_COPYMOVE_ITEM' );
+		}
+		JToolBarHelper::title( $page_title, 'itemadd' );
+		JToolBarHelper::save(FLEXI_J16GE ? 'items.copymove' : 'copymove');
+		JToolBarHelper::cancel(FLEXI_J16GE ? 'items.cancel' : 'cancel');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
@@ -335,7 +416,9 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('user'			, $user);
-		$this->assignRef('permission'		, $permission);
+		$this->assignRef('CanOrder'		, $CanOrder);
+		$this->assignRef('CanCats'		, $CanCats);
+		$this->assignRef('CanRights'	, $CanRights);
 
 		parent::display($tpl);
 	}

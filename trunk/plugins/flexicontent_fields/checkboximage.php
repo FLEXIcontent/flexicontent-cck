@@ -201,6 +201,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
 		$imagedir			= $field->parameters->get( 'imagedir' ) ;
 		$separatorf			= $field->parameters->get( 'separatorf' ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		$default_values		= $field->parameters->get( 'default_values', '' ) ;
 						
 		switch($separatorf)
@@ -219,6 +221,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 
 			case 3:
 			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

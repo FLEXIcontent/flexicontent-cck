@@ -503,25 +503,30 @@ class FlexicontentController extends JController
 		$vote		= JRequest::getInt('vote', 0);
 		$session 	=& JFactory::getSession();
 		$params 	= & $mainframe->getParams('com_flexicontent');
-
+		
+		// Check 1: try to retieve the user 's voting cookie, which is set per item id
 		$cookieName	= JUtility::getHash( $mainframe->getName() . 'flexicontentvote' . $id );
 		$voted = JRequest::getVar( $cookieName, '0', 'COOKIE', 'INT');
 
+		// Check 2: item id exists in our voting logging SESSION (array) variable 
+		$votestamp = array();
 		$votecheck = false;
-		if ($session->has('vote', 'flexicontent')) {
-			$votecheck = $session->get('vote', 0,'flexicontent');
-			$votecheck = in_array($id, $votecheck);
+		if ($session->has('votestamp', 'flexicontent')) {
+			$votestamp = $session->get('votestamp', array(),'flexicontent');
+			$votecheck = isset($votecheck[$id]);
 		}
 
 		if ( $voted || $votecheck )	{
 			JError::raiseWarning(JText::_( 'SOME_ERROR_CODE' ), JText::_( 'FLEXI_YOU_ALLREADY_VOTED' ));
 		} else {
+			// Set 1: he user 's voting cookie for current item id
 			setcookie( $cookieName, '1', time()+1*24*60*60*60 );
-
-			$stamp = array();
-			$stamp[] = $id;
-			$session->set('vote', $stamp, 'flexicontent');
-
+			
+			// Set 2: the current item id, in our voting logging SESSION (array) variable  
+			$votestamp[$id] = 1;
+			$session->set('votestamp', $votestamp, 'flexicontent');
+			
+			// Finally store the vote
 			$model 	= $this->getModel(FLEXI_ITEMVIEW);
 			if ($model->storevote($id, $vote)) {
 				$msg = JText::_( 'FLEXI_VOTE COUNTED' );
@@ -603,10 +608,21 @@ class FlexicontentController extends JController
 
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
+			// Check: item id exists in our voting logging SESSION (array) variable 
+			$votestamp = array();
+			$votecheck = false;
+			if ($session->has('votestamp', 'flexicontent')) {
+				$votestamp = $session->get('votestamp', array(),'flexicontent');
+				$votecheck = isset($votecheck[$id]);
+			}
+			// Set: the current item id, in our voting logging SESSION (array) variable  
+			$votestamp[$id] = 1;
+			$session->set('votestamp', $votestamp, 'flexicontent');
+		
 			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
 			$currip_quoted = $db->Quote( $currip );
-			$dbtbl = !(int)$xid ? '#__content_rating' : '#__content_extravote';
-			$and_extra_id = (int)$xid ? ' AND extra_id = '.(int)$xid : '';
+			$dbtbl = !(int)$xid ? '#__content_rating' : '#__content_extravote';  // Choose db table to store vote (normal or extra)
+			$and_extra_id = (int)$xid ? ' AND extra_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
 			
 			$query = ' SELECT *'
 				. ' FROM '.$dbtbl.' AS a '
@@ -629,9 +645,9 @@ class FlexicontentController extends JController
 				$result->ratingcount = 1;
 				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
 			} 
-			else 
+			else
 			{
-				if ($currip != ($votesdb->lastip))
+				if ( !$votecheck )   // it is not so good way to check using ip, since 2 users may have same IP, now using SESSION ////if ( $currip!=$votesdb->lastip ) 
 				{
 					$query = " UPDATE ".$dbtbl
 					. ' SET rating_count = rating_count + 1, '

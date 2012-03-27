@@ -13,17 +13,18 @@
 		<filename plugin="relateditems">relateditems.php</filename>
 	</files>
 	<params group="standard">
-		<param name="display_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_LABEL" description="FLEXI_RIFLD_DISPLAY_LABEL_DESC">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 	<params group="group-relateditems" addpath="/administrator/components/com_flexicontent/elements">
 		
-		<param name="" type="separator" default="FLEXI_RIFLD_SCOPE" level="level1" menu="hide" />
-		<param name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" level="level2" menu="hide" />
+		<param name="" type="separator" default="FLEXI_RIFLD_SCOPE" hr="false" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level2" menu="hide" />
 		<param name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
-		<param name="catids" type="flexicategories" required="false" size="10" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
+		<param name="catids" type="flexicategories" multiple="true" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
+		
 		<param name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -32,7 +33,7 @@
 		<param name="" type="separator" default="FLEXI_RIFLD_TYPES_SCOPE" level="level2" menu="hide" />
 		<param name="method_types" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
 		
-		<param name="types" type="types" multiple="multiple" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" />
+		<param name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" menu="hide" />
 		
@@ -61,7 +62,7 @@
 			<option value="order">FLEXI_RIFLD_ORDERING_ITEM_MANAGER</option>
 		</param>
 		
-		<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
+		<param name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
 		
 		<param name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" >
 			<option value="0">FLEXI_NO</option>
@@ -73,7 +74,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="required" type="radio" default="0" label="FLEXI_RIFLD_REQUIRED" description="FLEXI_RIFLD_REQUIRED_DESC">
+		<param name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
@@ -82,28 +83,28 @@
 		
 		<param name="" type="separator" default="FLEXI_RIFLD_FORMATING_THE_FIELD" level="level2" menu="hide" />
 		
-		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_RIFLD_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_RIFLD_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="plugins" type="pluginlist" label="FLEXI_RIFLD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_RIFLD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-		<param name="remove_space" type="radio" default="0" label="FLEXI_RIFLD_REMOVE_SPACE" description="FLEXI_RIFLD_REMOVE_SPACE_DESC">
+		<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+		<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="pretext" type="text" default="" label="FLEXI_RIFLD_PREFIX_TEXT" description="FLEXI_RIFLD_PREFIX_TEXT_DESC" />
-		<param name="posttext" type="text" default="" label="FLEXI_RIFLD_SUFFIX_TEXT" description="FLEXI_RIFLD_SUFFIX_TEXT_DESC" />
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_RIFLD_SEPARATING_ITEMS" level="level2" menu="hide" />
-		<param name="separatorf" type="list" default="1" label="FLEXI_RIFLD_SEPARATOR_FRONTEND" description="FLEXI_RIFLD_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_RIFLD_SPACE</option>
-			<option value="1">FLEXI_RIFLD_LINE_BREAK</option>
-			<option value="2">FLEXI_RIFLD_PIPE</option>
-			<option value="3">FLEXI_RIFLD_COMMA</option>
-			<option value="4">FLEXI_RIFLD_TAG_CUSTOM</option>
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+			<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
 		</param>
-		<param name="opentag" type="text" default="" label="FLEXI_RIFLD_TAG_OPEN" description="FLEXI_RIFLD_TAG_OPEN_DESC" />
-		<param name="closetag" type="text" default="" label="FLEXI_RIFLD_TAG_CLOSE" description="FLEXI_RIFLD_TAG_CLOSE_DESC" />
+		<param name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+		<param name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems.ini</language>

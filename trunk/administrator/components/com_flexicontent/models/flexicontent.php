@@ -48,8 +48,11 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getPending()
 	{
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
 			$allitems 	= 1;
@@ -77,8 +80,11 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getRevised()
 	{
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
 			$allitems 	= 1;
@@ -109,8 +115,11 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getDraft()
 	{
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
 			$allitems 	= 1;
@@ -138,8 +147,11 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getInprogress()
 	{
-		if (FLEXI_ACCESS) {
-			$user 		=& JFactory::getUser();
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$allitems	= $permission->DisplayAllItems;
+		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 		} else {
 			$allitems 	= 1;
@@ -304,10 +316,12 @@ class FlexicontentModelFlexicontent extends JModel
 		if($return === NULL) {
 			$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__plugins'
-				. ' WHERE ( folder = ' . $this->_db->Quote('flexicontent_fields')
+				. ' WHERE '
+				. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
 				. ' OR element = ' . $this->_db->Quote('flexisearch')
 				. ' OR element = ' . $this->_db->Quote('flexisystem')
-				. ' OR element = ' . $this->_db->Quote('flexiadvsearch') . ')'
+				. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
+				. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
 				. ' AND published <> 1'
 				;
 			$this->_db->setQuery( $query );
@@ -327,9 +341,10 @@ class FlexicontentModelFlexicontent extends JModel
 		static $return;
 		if($return === NULL) {
 			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-			$return = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+			$result_lang_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+			$result_tgrp_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
 		}
-		return $return;
+		return $result_lang_col && $result_tgrp_col;
 	}
 
 	/**
@@ -343,9 +358,13 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		static $return;
 		if($return === NULL) {
+			$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 			$db =& JFactory::getDBO();
 			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
+				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
 				. " WHERE ie.language='' "
+				. ($enable_language_groups ? " OR ie.lang_parent_id='0' " : "")
+				. (FLEXI_J16GE ? " OR i.language<>ie.language " : "")
 				;
 			$db->setQuery($query);
 			$return = $db->loadResult();
@@ -451,7 +470,7 @@ class FlexicontentModelFlexicontent extends JModel
 			$cattmpl 	= JFolder::files($catdir);		
 			$ctmpl 		= array_diff($cattmpl,$files);
 			
-			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
 			$itemtmpl 	= JFolder::files($itemdir);		
 			$itmpl 		= array_diff($itemtmpl,$files);
 			
@@ -478,6 +497,8 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		if ($fields) {
 			// create a temporary table to store the positions
+			$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
+			$this->_db->query();
 			$query = "
 					CREATE TABLE #__flexicontent_positions_tmp (
 					  `field` varchar(100) NOT NULL default '',
@@ -594,7 +615,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if FLEXI_SECTION still exists
+	 * Method to check if FLEXI_SECTION (or FLEXI_CAT_EXTENSION for J1.6+) still exists
 	 *
 	 * @access public
 	 * @return	boolean	True on success
@@ -641,10 +662,18 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 
-		$menus	= &JApplication::getMenu('site', array());
-		$items	= $menus->getItems('componentid', $component->id);
-			
-		if (count($items) > 0) {
+		if(FLEXI_J16GE) {
+			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' ";
+			$this->_db->setQuery($query);
+			$count = $this->_db->loadResult();
+		} else {
+			$menus	= &JApplication::getMenu('site', array());
+			$items	= $menus->getItems('componentid', $component->id);
+			$count = count($items);
+		}
+		
+		if ($count > 0) {
 			return true;
 		}
 		return false;
@@ -766,6 +795,7 @@ class FlexicontentModelFlexicontent extends JModel
 		return $check;
 	}
 	
+	
 	function getDiffVersions($current_versions=array(), $last_versions=array())
 	{
 		// check if the section was chosen to avoid adding data on static contents
@@ -787,6 +817,8 @@ class FlexicontentModelFlexicontent extends JModel
 		if (!FLEXI_SECTION) return false;
 		return FLEXIUtilities::currentMissing();
 	}
+	
+	
 	function addCurrentVersionData()
 	{
 		// check if the section was chosen to avoid adding data on static contents
@@ -1016,7 +1048,7 @@ class FlexicontentModelFlexicontent extends JModel
 			} else {
 				if ($method == 'zip') {
 					JFile::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
-					$namea .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+					$namea .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
 		}
@@ -1028,7 +1060,7 @@ class FlexicontentModelFlexicontent extends JModel
 			} else {
 				if ($method == 'zip') {
 					JFile::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
-					$names .= '            <filename>'.$prefix.$file.$suffix.'</filename>';
+					$names .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
 		}
@@ -1056,13 +1088,11 @@ class FlexicontentModelFlexicontent extends JModel
 			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 			    <description>'.$code.' language pack for FLEXIcontent</description>
 			    <administration>
-			        <files folder="admin">
-			'.$namea.'
+			        <files folder="admin">'.$namea.'
 			        </files>
 			    </administration>
 			    <site>
-			        <files folder="site">
-			'.$names.'
+			        <files folder="site">'.$names.'
 			        </files>
 			    </site>
 			</install>'

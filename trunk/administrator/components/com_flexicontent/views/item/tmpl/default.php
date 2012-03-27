@@ -261,6 +261,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 									</td>
 									<td>
 									<?php echo $this->lists['languages']; ?>
+									<input type="hidden" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->row->lang_parent_id; ?>" size="6" maxlength="20" />
 									</td>
 								</tr>
 								<?php endif; ?>
@@ -701,7 +702,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			
 			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
 			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->formparams->render('params', 'advanced');
+			echo $this->formparams->render('params', 'standard');
 			echo $this->pane->endPanel();
 
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';

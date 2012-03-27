@@ -174,6 +174,8 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
 		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 						
 		switch($separatorf)
 		{
@@ -191,6 +193,10 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 
 			case 3:
 			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

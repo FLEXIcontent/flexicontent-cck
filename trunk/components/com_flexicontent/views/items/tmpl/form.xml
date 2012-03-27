@@ -45,22 +45,22 @@
 
 			<param name="" label="" type="separator" default="FLEXI_SIMPLIFY_FORM" level="level2" menu="hide" />
 
-			<param name="usealias" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+			<param name="usealias" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+			<param name="usemetadata" type="radio" default="" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="usepublicationdetails" type="radio" default="" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
 			</param>
-			<param name="usepublicationdetails" type="radio" default="0" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
-			</param>
-			<param name="usetemplateparams" type="radio" default="0" label="FLEXI_MENU_USE_TEMPLATE_PARAMS" description="FLEXI_MENU_USE_TEMPLATE_PARAMS_DESC">
+			<param name="usetemplateparams" type="radio" default="" label="FLEXI_MENU_USE_TEMPLATE_PARAMS" description="FLEXI_MENU_USE_TEMPLATE_PARAMS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>

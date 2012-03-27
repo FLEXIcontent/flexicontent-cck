@@ -187,6 +187,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 		// some parameter shortcuts
 		$separatorf			= $field->parameters->get( 'separatorf' ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 						
 		switch($separatorf)
 		{
@@ -204,6 +206,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 			case 3:
 			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
 			break;
 
 			default:

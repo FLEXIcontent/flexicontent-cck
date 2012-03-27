@@ -587,12 +587,10 @@ div#tags #input-tags {
     padding: 0px !important;
 }
 
-.clear
-{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
+.clear { border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
 
-.mcat, .scat {
-	width: 235px;
-}
+.mcat, .scat { width: 235px; }
+.mcat { min-height: 400px; }
 
 div#result table.versionlist {
 	border: 1px dashed silver;

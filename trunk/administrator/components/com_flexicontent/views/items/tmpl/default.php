@@ -18,6 +18,19 @@
 
 defined('_JEXEC') or die('Restricted access');
 $limit = $this->pageNav->limit;
+$ctrl = FLEXI_J16GE ? 'items.' : '';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+$cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
+
+$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+
+$items_list_cols = 14;
+if ( FLEXI_J16GE || FLEXI_FISH ) {
+	$items_list_cols++;
+	if ( $enable_language_groups ) $items_list_cols++;
+}
+
+$image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 
 ?>
 <script language="javascript" type="text/javascript">
@@ -35,7 +48,7 @@ function dostate(state, id)
 
 function fetchcounter()
 {
-	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
+	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>getorphans&tmpl=component&format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
@@ -193,7 +206,7 @@ window.addEvent('domready', function() {
 <div class="flexicontent">
 
 <?php if ($this->unassociated) : ?>
-<form action="index.php?option=com_flexicontent&controller=items&task=bindextdata&format=raw" method="post" name="bindForm" id="bindForm">
+<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component&format=raw" method="post" name="bindForm" id="bindForm">
 	<div class="fc-error">
 	<table>
 		<tr>
@@ -270,17 +283,22 @@ window.addEvent('domready', function() {
 			<th width="" class="center">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
+			<?php if ( $enable_language_groups ) : ?>
+			<th width="" class="center">
+				<?php echo JHTML::_('grid.sort', 'Translation Group', 'ie.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+			<?php endif; ?>
 			<th width="<?php echo $this->CanOrder ? '90' : '60'; ?>" class="center">
 				<?php
 				if ($this->filter_cats == '' || $this->filter_cats == 0) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
 					if ($this->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
 					endif;
 				else :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
 					if ($this->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : '';
+						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
 					endif;
 				endif;
 				?>
@@ -363,6 +381,9 @@ window.addEvent('domready', function() {
 				<?php echo $this->lists['filter_state']; ?>
 			</td>
 			<td class="left"></td>
+		<?php if ( $enable_language_groups ) : ?>
+			<td class="left"></td>
+		<?php endif; ?>
 			<td class="left"></td>
 			<td class="left"></td>
 			<td class="left col_cats">
@@ -384,7 +405,7 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>" class="filterbuttons">
+			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<span style="float:right;">
@@ -401,7 +422,7 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo (FLEXI_FISH || FLEXI_J16GE) ? '15' : '14'; ?>">
+			<td colspan="<?php echo $items_list_cols; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -414,30 +435,43 @@ window.addEvent('domready', function() {
 		$config		=& JFactory::getConfig();
 		$nullDate 	= $db->getNullDate();
 		$user 		=& $this->user;
-		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
+		if (FLEXI_J16GE)
+			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
+		else
+			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
 		
-		if (FLEXI_ACCESS) {
+		// WHY IS THIS HERE ??? if we use general permissions the list will be displayed wrong or not?
+		/*if (FLEXI_ACCESS) {
 			$canEditAll 		= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
 			$canEditOwnAll		= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
 			$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
 			$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-		}
+		}*/
 		
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
-			if (FLEXI_ACCESS) {
+			if (FLEXI_J16GE) {
+				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+				
+				$canEdit 			 = in_array('edit', $rights);
+				$canEditOwn		 = in_array('edit.own', $rights) && $row->created_by == $user->id;
+				$canPublish 	 = in_array('edit.state', $rights);
+				$canPublishOwn = in_array('edit.state.own', $rights) && $row->created_by == $user->id;
+			} else if ($user->gid > 24) {
+				$canEdit = $canEditOwn = $canPublish = $canPublishOwn = 1;
+			} else if (FLEXI_ACCESS) {
 				$rights 			= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
 				
-				$canEdit 			= $canEditAll || in_array('edit', $rights) || ($user->gid > 24);
-				$canEditOwn			= ((in_array('editown', $rights) || $canEditOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
-				$canPublish 		= $canPublishAll || in_array('publish', $rights) || ($user->gid > 24);
-				$canPublishOwn		= ((in_array('publishown', $rights) || $canPublishOwnAll) && ($row->created_by == $user->id)) || ($user->gid > 24);
+				$canEdit 			= /*$canEditAll ||*/ in_array('edit', $rights);
+				$canEditOwn			= (in_array('editown', $rights) /*|| $canEditOwnAll)*/) && $row->created_by == $user->id;
+				$canPublish 		= /*$canPublishAll ||*/ in_array('publish', $rights);
+				$canPublishOwn		= (in_array('publishown', $rights) /*|| $canPublishOwnAll*/) && $row->created_by == $user->id;
 			} else {
-				$canEdit		= 1;
-				$canEditOwn		= 1;
-				$canPublish 	= 1;
-				$canPublishOwn	= 1;
+				$canEdit		= $user->authorize('com_content', 'edit', 'content', 'all');
+				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
+				$canPublish	=	$user->authorize('com_content', 'publish', 'content', 'all');
+				$canPublishOwn= 0;
 			}
 
 			$publish_up =& JFactory::getDate($row->publish_up);
@@ -445,9 +479,15 @@ window.addEvent('domready', function() {
 			$publish_up->setOffset($config->getValue('config.offset'));
 			$publish_down->setOffset($config->getValue('config.offset'));
 
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
 
-			if (FLEXI_ACCESS) {
+			if (FLEXI_J16GE) {
+				if ($canPublish || $canPublishOwn) {
+					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');
+				} else {
+					$access = $this->escape($row->access_level);
+				}
+			} else if (FLEXI_ACCESS) {
 				if ($this->CanRights) {
 					$access 	= FAccess::accessswitch('item', $row, $i);
 				} else {
@@ -457,55 +497,69 @@ window.addEvent('domready', function() {
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
 
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
-				$alt = "";
-				if ( $row->state == 1 ) {
-					$img = 'tick.png';
-					$alt = JText::_( 'FLEXI_PUBLISHED' );
-					$state = 1;
-				} else if ( $row->state == 0 ) {
-					$img = 'publish_x.png';
-					$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-					$state = 0;
-				} else if ( $row->state == -1 ) {
-					$img = 'disabled.png';
-					$alt = JText::_( 'FLEXI_ARCHIVED' );
-					$state = -1;
-				} else if ( $row->state == -3 ) {
-					$img = 'publish_r.png';
-					$alt = JText::_( 'FLEXI_PENDING' );
-					$state = -3;
-				} else if ( $row->state == -4 ) {
-					$img = 'publish_y.png';
-					$alt = JText::_( 'FLEXI_TO_WRITE' );
-					$state = -4;
-				} else if ( $row->state == -5 ) {
-					$img = 'publish_g.png';
-					$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-					$state = -5;
-				}
+			$cid_checkbox = JHTML::_('grid.checkedout', $row, $i );
+			$alt = "";
+			if ( $row->state == 1 ) {
+				$img = 'tick.png';
+				$alt = JText::_( 'FLEXI_PUBLISHED' );
+				$state = 1;
+			} else if ( $row->state == 0 ) {
+				$img = 'publish_x.png';
+				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
+				$state = 0;
+			} else if ( $row->state == -1 ) {
+				$img = 'disabled.png';
+				$alt = JText::_( 'FLEXI_ARCHIVED' );
+				$state = -1;
+			} else if ( $row->state == -3 ) {
+				$img = 'publish_r.png';
+				$alt = JText::_( 'FLEXI_PENDING' );
+				$state = -3;
+			} else if ( $row->state == -4 ) {
+				$img = 'publish_y.png';
+				$alt = JText::_( 'FLEXI_TO_WRITE' );
+				$state = -4;
+			} else if ( $row->state == -5 ) {
+				$img = 'publish_g.png';
+				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
+				$state = -5;
+			}
 
-				$times = '';
-				if (isset($row->publish_up)) {
-					if ($row->publish_up == $nullDate) {
-						$times .= JText::_( 'FLEXI_START_ALWAYS' );
-					} else {
-						$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
-					}
+			$times = '';
+			if (isset($row->publish_up)) {
+				if ($row->publish_up == $nullDate) {
+					$times .= JText::_( 'FLEXI_START_ALWAYS' );
+				} else {
+					$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
 				}
-				if (isset($row->publish_down)) {
-					if ($row->publish_down == $nullDate) {
-						$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-					} else {
-						$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
-					}
+			}
+			if (isset($row->publish_down)) {
+				if ($row->publish_down == $nullDate) {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+				} else {
+					$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
 				}
-				$lang_default = !FLEXI_J16GE ? '' : '*';
-				$row->lang = @$row->lang ? $row->lang : $lang_default;
+			}
+			
+			// Check publication START/FINISH dates (publication Scheduled / Expired)
+			$is_published = in_array( $row->state, array(1,-5,-1) );
+			$extra_img = $extra_alt = '';
+			
+			if ( $row->publication_scheduled && $is_published ) {
+				$extra_img = 'pushished_scheduled.png';
+				$extra_alt = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION' );
+			}
+			if ( $row->publication_expired && $is_published ) {
+				$extra_img = 'pushished_expired.png';
+				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED' );
+			}
+			
+			$lang_default = !FLEXI_J16GE ? '' : '*';
+			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
-			<td width="7"><?php echo $checked; ?></td>
+			<td width="7"><?php echo $cid_checkbox; ?></td>
 			<td align="left" class="col_title">
 				<?php
 				if ( ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) || ((!$canEdit) && (!$canEditOwn)) ) {
@@ -513,6 +567,11 @@ window.addEvent('domready', function() {
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<?php
+					if ( $enable_language_groups ) :
+						if ($this->lists['order']=='ie.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
+					endif;
+					?>
 					<a href="<?php echo $link; ?>">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
@@ -528,7 +587,7 @@ window.addEvent('domready', function() {
 				<?php elseif (@$this->langs->{$row->lang}->image) : /* custom image from language db table*/ ?>
 				<img src="../images/<?php echo $this->langs->{$row->lang}->image; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php else : /* default image for language  */ ?>
-				<img src="../components/com_joomfish/images/flags/<?php echo $this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
+				<img src="<?php echo $image_flag_path.$this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
 				<?php endif; ?>
 			</td>
 		<?php elseif(FLEXI_J16GE && $row->lang=='*') : ?>
@@ -545,7 +604,7 @@ window.addEvent('domready', function() {
 			</td>
 			<td align="center" class="col_state">
 			<?php if (($canPublish || $canPublishOwn) && ($limit <= 30)) : ?>
-			<ul class="statetoggler">
+			<ul style='float:left' class="statetoggler">
 				<li class="topLevel">
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<div id="row<?php echo $row->id; ?>">
@@ -603,17 +662,28 @@ window.addEvent('domready', function() {
 				</li>
 			</ul>
 			<?php else : ?>
-			<div id="row<?php echo $row->id; ?>">
+			<div style="float:left" id="row<?php echo $row->id; ?>">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
 					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
 				</span>
 			</div>
 			<?php endif ; ?>
+			<?php if ($extra_img) : ?><img style='float:right;' src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="hasTip" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" /><?php endif; ?>
 			</td>
 			
 			<td align="center">
 				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
 			</td>
+			<?php if ( $enable_language_groups ) : ?>
+			<td align="center">
+				<?php
+					if ($this->lists['order']=='ie.lang_parent_id') {
+						if ($row->id==$row->lang_parent_id) echo "Group";
+						else echo "+";
+					} else echo "unsorted<sup>[3]</sup>";
+				?>
+			</td>
+			<?php endif ; ?>
 			
 			<?php if ($this->CanOrder) : ?>
 			<td class="order">
@@ -649,7 +719,7 @@ window.addEvent('domready', function() {
 				$ix = 0;
 				foreach ($row->categories as $key => $category) :
 					$typeofcats = ((int)$category->id == (int)$row->maincat) ? ' maincat' : ' secondarycat';
-					$catlink	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $category->id;
+					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :
 				?>
@@ -723,6 +793,9 @@ window.addEvent('domready', function() {
 	
 	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br />
 	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items<br />
+	<?php if ( $enable_language_groups )	: ?>
+		<sup>[3]</sup> Click to sort this column and group associated translations together<br />
+	<?php endif; ?>
 		
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

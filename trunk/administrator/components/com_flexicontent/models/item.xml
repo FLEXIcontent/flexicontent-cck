@@ -13,7 +13,7 @@
 		<param name="publish_up" type="calendar" default="" label="Start Publishing" description="FLEXI_DETAILSTART" />
 		<param name="publish_down" type="calendar" default="" label="Finish Publishing" description="FLEXI_DETAILFINISH" />
 	</params>
-	<params group="advanced">
+	<params group="standard">
 		<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" />
 		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">Use Global</option>
