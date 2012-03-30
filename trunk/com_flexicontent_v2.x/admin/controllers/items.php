@@ -896,8 +896,8 @@ class FlexicontentControllerItems extends JController
 			$used = array();
 		}
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanNewTags = (!$permission->CanConfig) ? $permission->CanNewTags : 1;
-		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 1;
+		$CanNewTags = $permission->CanNewTags;
+		$CanUseTags = $permission->CanUseTags;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);

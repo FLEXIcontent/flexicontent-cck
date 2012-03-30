@@ -370,7 +370,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 
 		$model = $this->getModel('categories');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache 		=& JFactory::getCache('com_flexicontent');

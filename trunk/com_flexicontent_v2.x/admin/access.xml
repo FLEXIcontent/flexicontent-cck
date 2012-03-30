@@ -70,6 +70,7 @@
 		<action name="core.delete" title="Delete this item" description="This item can be deleted by members of this user group" />
 		<action name="core.delete.own" title="Delete this item if owned" description="This item can be deleted by the user that owns it" />
 		<action name="core.edit" title="Edit this item" description="This item can be edited by members of this user group" />
+		<action name="core.edit.own" title="Edit this item if owned" description="This item can be edited by the user that owns it" />
 		<action name="core.edit.state" title="Publish this item" description="This item can have its publication state altered by members of this user group" />
 		<action name="core.edit.state.own" title="Publish this item if owned" description="This item can have its publication state altered by the user that owns it" />
 	</section>

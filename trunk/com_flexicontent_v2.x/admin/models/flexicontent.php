@@ -1171,8 +1171,17 @@ class FlexicontentModelFlexicontent extends JModel
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
 			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
-		$result = $db->loadObjectList();
+		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		$category_section = count($result) == 0 ? 1 : 0;
+
+		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
+		$query = $db->getQuery(true)
+			->select('c.id')
+			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
+			->where('se.id is NULL');
+		$db->setQuery($query);
+		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		$article_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
@@ -1180,12 +1189,12 @@ class FlexicontentModelFlexicontent extends JModel
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$result = $db->loadObjectList();
+		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		$field_section = count($result) == 0 ? 1 : 0;
 		
-		//echo "$comp_section && $category_section && $field_section<br>";
-		
-		return ($comp_section && $category_section && $field_section);
+		//echo "$comp_section && $category_section && $article_section && $field_section<br>";
+
+		return ($comp_section && $category_section && $article_section && $field_section);
 	}
 	
 	function initialPermission() {
@@ -1273,11 +1282,12 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title, c.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
+			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'))
+			->order('c.level ASC');   // IMPORTANT create categories asset using increasing depth level, so that get parent assetid will not fail
 		$db->setQuery($query);
-		$results = $db->loadObjectList();
+		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
-		// Add an asset to category that doesnot have one
+		// Add an asset to every category that doesnot have one
 		if(count($results)>0) {
 			foreach($results as $category) {
 				$parentId = $this->_getAssetParentId(null, $category);
@@ -1338,6 +1348,79 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		
 		
+		
+		/*** ITEM assets ***/
+		
+		// Get a list com_content items that do not have assets (or have wrong asset names)
+		$query = $db->getQuery(true)
+			->select('c.id, c.catid as parent_id, c.title, c.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
+			->where('se.id is NULL');//->where('c.extension = ' . $db->quote('com_content'));
+		$db->setQuery($query);
+		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		// Add an asset to every item that doesnot have one
+		if(count($results)>0) {
+			foreach($results as $item) {
+				$parentId = $this->_getAssetParentId(null, $item);
+				$name = "com_content.article.{$item->id}";
+				
+				// Test if an asset for the current CATEGORY ID already exists and load it instead of creating a new asset
+				if ( ! $asset->loadByName($name) ) {
+					if ($item->asset_id) {
+						// asset name not found but item has an asset id set ?, we could delete it here
+						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
+					}
+					
+					// Initialize item asset
+					$asset->id 		= null;
+					$asset->name	= $name;
+					$asset->title	= $item->title;
+					$asset->setLocation($parentId, 'last-child');     // Permissions of items are inherited from their main category
+					
+					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
+					$asset->rules = new JRules();
+					/*
+					if ($parentId == $component_asset->id) {				
+						$actions	= JAccess::getActions($component_name, 'article');
+						$rules 		= json_decode($component_asset->rules);		
+						foreach ($actions as $action) {
+							$catrules[$action->name] = $rules->{$action->name};
+						}
+						$rules = new JRules(json_encode($catrules));
+						$asset->rules = $rules->__toString();
+					} else {
+						$parent = JTable::getInstance('asset');
+						$parent->load($parentId);
+						$asset->rules = $parent->rules;
+					}
+					*/
+					
+					// Save the asset
+					if (!$asset->check() || !$asset->store(false)) {
+						echo $asset->getError();
+						$this->setError($asset->getError());
+						return false;
+					}
+				}
+				
+				// Assign the asset to the item
+				$query = $db->getQuery(true)
+					->update('#__content')
+					->set('asset_id = ' . (int)$asset->id)
+					->where('id = ' . (int)$item->id);
+				$db->setQuery($query);
+				
+				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
+				}
+			}
+		}
+		
+		
+		
 		/*** FLEXIcontent FIELDS assets ***/
 		
 		// Get a list flexicontent fields that do not have assets
@@ -1346,7 +1429,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$results = $db->loadObjectList();
+		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// Add an asset to every field that doesnot have one
 		if(count($results)>0) {

@@ -198,26 +198,27 @@ class FlexicontentViewItem extends JView {
 			if (FLEXI_J16GE) {
 				$rights				= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $form->getValue('id'));
 				$canEdit			= in_array('edit', $rights);
-				$canEditOwn		= (in_array('editown', $rights) && ($form->getValue("created_by") == $user->id));
+				$canEditOwn		= in_array('edit.own', $rights) && $form->getValue("created_by") == $user->id;
 				$canPublish		= in_array('edit.state', $rights);
-				$canPublishOwn= (in_array('edit.state.own', $rights) && ($form->getValue("created_by") == $user->id));
+				$canPublishOwn= in_array('edit.state.own', $rights) && $form->getValue("created_by") == $user->id;
 				$canRight			= $permission->CanConfig;
 			} else if ($user->gid >= 25) {
 				$canEdit = $canEditOwn = $canPublish = $canPublishOwn	= $canRight = true;
 			} else if (FLEXI_ACCESS) {
 				$rights				= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
 				$canEdit			= in_array('edit', $rights);
-				$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id));
+				$canEditOwn		= in_array('editown', $rights) && $row->created_by == $user->id;
 				$canPublish		= in_array('publish', $rights);
-				$canPublishOwn= (in_array('publishown', $rights) && ($row->created_by == $user->id));
+				$canPublishOwn= in_array('publishown', $rights) && $row->created_by == $user->id;
 				$canRight			= in_array('right', $rights);
 			} else {
 				$canEdit			= $user->authorize('com_content', 'edit', 'content', 'all');
-				$canEditOwn		= 0;
+				$canEditOwn		= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
 				$canPublish		= $user->authorize('com_content', 'publish', 'content', 'all');
 				$canPublishOwn= 0;
 			}
-			$has_edit = $canEdit || $canEditOwn || ($lastversion < 3);
+			// redundant ?? ... since already checked by the controller
+			$has_edit = $canEdit || $canEditOwn;// || ($lastversion < 3);
 			if (!$has_edit) {
 				$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::sprintf( 'FLEXI_NO_ACCESS_EDIT', JText::_('FLEXI_ITEM') ));
 			}

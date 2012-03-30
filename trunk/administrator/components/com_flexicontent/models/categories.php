@@ -409,7 +409,7 @@ class FlexicontentModelCategories extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function access($id, $access)
+	function saveaccess($id, $access)
 	{
 		$category  =& $this->getTable('flexicontent_categories', '');
 		
