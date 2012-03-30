@@ -458,7 +458,7 @@ class FlexicontentModelFields extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function access($id, $access)
+	function saveaccess($id, $access)
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');

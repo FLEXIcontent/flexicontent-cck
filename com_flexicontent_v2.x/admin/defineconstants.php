@@ -26,15 +26,16 @@ if (!FLEXI_J16GE) {
 	if (!defined('FLEXI_CAT_EXTENSION'))	define('FLEXI_CAT_EXTENSION', '');
 } else {
 	if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
-	if (!defined('FLEXI_CAT_EXTENSION')) {
-		define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
+	if (!defined('FLEXI_CAT_EXTENSION'))	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
+	if (!defined('FLEXI_CATEGORY'))				define('FLEXI_CATEGORY', $params->get('flexi_category', 1));
+	if (!defined('FLEXI_LFT_CATEGORY') || !defined('FLEXI_RGT_CATEGORY')) {
 		$db = &JFactory::getDBO();
 		$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 		$db->setQuery($query);
 		$obj = $db->loadObject();
-		if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
-		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 	}
+	if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
+	if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 }
 
 // Define configuration constants

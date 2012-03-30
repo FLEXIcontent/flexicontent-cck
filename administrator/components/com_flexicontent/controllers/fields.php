@@ -341,7 +341,7 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$model = $this->getModel('fields');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');

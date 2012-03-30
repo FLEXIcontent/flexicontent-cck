@@ -55,7 +55,7 @@ class FlexicontentViewTags extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
-		if ($user->gid >= 24) {
+		if ($user->gid > 24) {
 			$toolbar =&JToolBar::getInstance('toolbar');
 			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 400, 400);
 		}

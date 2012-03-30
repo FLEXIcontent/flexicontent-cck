@@ -61,7 +61,7 @@ class FlexicontentControllerItems extends JController {
 
 		$user	=& JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanUseTags = (!$permission->CanConfig) ? $permission->CanUseTags : 1;
+		$CanUseTags = $permission->CanUseTags;
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
@@ -91,7 +91,7 @@ class FlexicontentControllerItems extends JController {
 		
 		$user	=& JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanPublish = (!$permission->CanConfig) ? $permission->CanPublish : 1;
+		$CanPublish = $permission->CanPublish;
 		if($CanPublish) {
 			//header('Content-type: application/json');
 			@ob_end_clean();

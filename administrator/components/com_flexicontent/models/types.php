@@ -406,7 +406,7 @@ class FlexicontentModelTypes extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access)
+	function saveaccess($id, $access)
 	{
 		global $mainframe;
 		$row =& JTable::getInstance('flexicontent_types', '');

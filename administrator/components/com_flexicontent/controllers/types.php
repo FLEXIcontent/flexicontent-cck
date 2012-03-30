@@ -259,7 +259,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 		$model = $this->getModel('types');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			JError::raiseError(500, $model->getError());
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');

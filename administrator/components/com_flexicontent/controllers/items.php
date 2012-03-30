@@ -371,11 +371,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			$maincat 	= JRequest::getInt( 'maincat', '' );
 			$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
 			if(!$maincat) $maincat = @$seccats[0];
-			$flexiparams =& JComponentHelper::getParams('com_flexicontent');
-			$vstate = $flexiparams->get('vstate');
 			JRequest::setVar('catid', $maincat);
 			JRequest::setVar('cid', $seccats);
-			JRequest::setVar('vstate', $vstate);//we must use default value from global configuration[enjoyman]
+			JRequest::setVar('vstate', $seccats);//we must use default value from global configuration[enjoyman]
 			JRequest::setVar('state', -4);
 
 			//while (($line = fgetcsv($fp, 0, ',', '"')) !== FALSE) {
@@ -694,7 +692,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$model = $this->getModel('items');
 		
-		if(!$model->access( $id, $access )) {
+		if(!$model->saveaccess( $id, $access )) {
 			$msg = JText::_( 'FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL' );
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';

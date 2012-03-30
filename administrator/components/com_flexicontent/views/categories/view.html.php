@@ -49,7 +49,7 @@ class FlexicontentViewCategories extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );
-		if ($user->gid >= 24) {
+		if ($user->gid > 24) {
 			$toolbar =&JToolBar::getInstance('toolbar');
 			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 400);
 		}

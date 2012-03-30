@@ -112,10 +112,8 @@ class FlexicontentModelItems extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			if (!FLEXI_J16GE) {
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
-			}
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $this->_db->loadResult();
 			
 			$k = 0;
 			$count = count($this->_data);
@@ -341,19 +339,29 @@ class FlexicontentModelItems extends JModel
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate = $this->_db->Quote(JFactory::getDate()->toMySQL());
 		
+		$ver_specific_joins = '';
+		if (FLEXI_J16GE) {
+			$ver_specific_joins .= ' LEFT JOIN #__viewlevels as level ON level.id=i.access';
+			$ver_specific_joins .= ' LEFT JOIN #__usergroups AS g ON g.id = i.access';
+			$ver_specific_joins .= ' LEFT JOIN #__categories AS cat ON i.catid=cat.id AND cat.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION);
+		} else {
+			$ver_specific_joins .= ' LEFT JOIN #__groups AS g ON g.id = i.access';
+		}
+		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
+				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
 				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
 				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired,'
-				. 't.name AS type_name, g.name AS groupname, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
+				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				. ' FROM #__content AS i'
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-				. ' LEFT JOIN #__groups AS g ON g.id = i.access'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+				. $ver_specific_joins
 				. $where
 				. ' GROUP BY i.id'
 				. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
@@ -434,17 +442,25 @@ class FlexicontentModelItems extends JModel
 		
 		$where[] = ' i.state != -1';
 		$where[] = ' i.state != -2';
-		$where[] = ' i.sectionid = ' . $this->_db->Quote(FLEXI_SECTION);
+		if (FLEXI_J16GE) {
+			// Limit items to the children of the FLEXI_CATEGORY, currently FLEXI_CATEGORY is root category (id:1) ...
+			$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
+			$where[] = ' cat.extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION);
+		} else {
+			// Limit items to FLEXIcontent Section
+			$where[] = ' i.sectionid = ' . $this->_db->Quote(FLEXI_SECTION);
+		}
 
 		$user 	=& JFactory::getUser();
 		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
 			$allitems	= $permission->DisplayAllItems;
 
 			if (!@$allitems) {				
 				$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'item');
-				$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');
+				//$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');
 				$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'item');
-				$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');
+				//$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');
 			}
 		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
@@ -459,49 +475,48 @@ class FlexicontentModelItems extends JModel
 			$allitems = 1;
 		}
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
+		if (FLEXI_J16GE) {
+			if (!@$allitems) {
+				$where_edit = array();
+				//print_r($canEditOwn['item']);
+				if (count($canEditOwn['item'])) {
+					$where_edit[] = ' ( i.created_by = ' . $user->id . ' AND i.id IN (' . implode(',', $canEditOwn['item']) . ') )';
+				}
+				//print_r($canEdit['item']);
+				if (count($canEdit['item']))  {
+					$where_edit[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+				}
+				// Add limits to where ...
+				if (count($where_edit)) {
+					$where[] = ' ('.implode(' OR', $where_edit).')';
+				}
+			}
+		} else if (FLEXI_ACCESS) {
 			if (!@$allitems) {				
 				if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
 					if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
 						$allown = array();
 						$allown[] = ' i.created_by = ' . $user->id;
 						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']) == 1) {
-								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
-							} else if (count($canEdit['category']) > 1) {
-								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-							}
+							if (count($canEdit['category']))		$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
 						}
 						if (isset($canEdit['item'])) {
-							if (count($canEdit['item']) == 1) {
-								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
-							} else if (count($canEdit['item']) > 1) {
-								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-							}
+							if (count($canEdit['item']))				$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
 						}
-						$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+						if (count($allown) > 0) {
+							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+						}
 					} else { // standard rules for the other users
 						$allown = array();
 						if (isset($canEditOwn['category'])) {
-							if (count($canEditOwn['category']) == 1) {
-								$allown[] = ' (i.catid = ' . $canEditOwn['category'][0]. ' AND i.created_by = ' . $user->id . ')'; 
-							} else if (count($canEditOwn['category']) > 1) {
-								$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
-							}
+							if (count($canEditOwn['category']))	$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
 						}
+						
 						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']) == 1) {
-								$allown[] = ' i.catid = ' . $canEdit['category'][0]; 
-							} else if (count($canEdit['category']) > 1) {
-								$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-							}
+							if (count($canEdit['category']))	$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
 						}
-						if (isset($canEdit['item'])) {
-							if (count($canEdit['item']) == 1) {
-								$allown[] = ' i.id = ' . $canEdit['item'][0]; 
-							} else if (count($canEdit['item']) > 1) {
-								$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-							}
+						if (isset($canEdit['item']))  {
+							if (count($canEdit['item']))			$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
 						}
 						if (count($allown) > 0) {
 							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
@@ -574,7 +589,6 @@ class FlexicontentModelItems extends JModel
 
 		if ($search && $scope == 4) {
 			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $search, true ), false ).' IN BOOLEAN MODE)';
-//			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $search, true ), false ).')';
 		}
 		
 		// date filtering
@@ -741,7 +755,7 @@ class FlexicontentModelItems extends JModel
 				
 				foreach($fields as $field)
 				{
-					if ($field->iscore != 1 && !empty($field->value)) {
+					if (!empty($field->value)) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;
@@ -1065,7 +1079,8 @@ class FlexicontentModelItems extends JModel
 		$lang =& JFactory::getLanguage();
 		$lang->load('com_messages');
 		
-		$item->url = JURI::base() . 'index.php?option=com_flexicontent&controller=items&task=edit&cid[]=' . $item->id;
+		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';
+		$item->url = JURI::base() . 'index.php?option=com_flexicontent'.$ctrl_task .'&cid[]=' . $item->id;
 
 		foreach ($users as $user)
 		{
@@ -1229,7 +1244,10 @@ class FlexicontentModelItems extends JModel
 				}
 			}
 			
-			$where = $this->_db->nameQuote('sectionid').' = '.$this->_db->Quote(FLEXI_SECTION);
+			$where = ''; 
+			if (!FLEXI_J16GE) {
+				$where = $this->_db->nameQuote('sectionid').' = '.$this->_db->Quote(FLEXI_SECTION);
+			}
 			$row->reorder($where);
 			return true;
 
@@ -1317,11 +1335,18 @@ class FlexicontentModelItems extends JModel
 	{
 		$user = JFactory::getUser();
 		
-		// return true if flexi_access component is not used
-		if (!FLEXI_ACCESS) return true;
+		if (FLEXI_J16GE) {
+			// Not needed we will check individual item's permissions
+			//$permission = FlexicontentHelperPerm::getPerm();
+		} else if ($user->gid > 24) {
+			// Return true for super administrators
+			return true;
+		} else if (!FLEXI_ACCESS) {
+			// Return true if flexi_access component is not used,
+			// since all backend user groups can delete content (manager, administrator, super administrator)
+			return true;
+		}
 
-		// return true for super administrators
-		if ($user->gid >= 24) return true;
 
 		$n		= count( $cid );
 		if ($n)
@@ -1332,15 +1357,25 @@ class FlexicontentModelItems extends JModel
 			$this->_db->setQuery( $query );
 			$items = $this->_db->loadObjectList();
 			
-			// This should be used it bypassed individual item rights
-			//$canDeleteAll			= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
-			//$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
+			// This is not needed since functionality is already included in checkAllItemAccess() ???
+			//if (FLEXI_ACCESS) {
+				//$canDeleteAll			= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
+				//$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
+			//}
 			foreach ($items as $item)
 			{
-				$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$canDelete 		= in_array('delete', $rights) /*|| $canDeleteAll	*/;
-				$canDeleteOwn	= (in_array('deleteown', $rights) /*|| $canDeleteOwnAll*/) && $item->created_by == $user->id;
-				
+				if (FLEXI_J16GE) {
+					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+					$canDelete 		= in_array('delete', $rights);
+					$canDeleteOwn = in_array('delete', $rights) && $item->created_by == $user->id;
+				} else if (FLEXI_ACCESS) {
+					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+					$canDelete 		= in_array('delete', $rights) /*|| $canDeleteAll	*/;
+					$canDeleteOwn	= (in_array('deleteown', $rights) /*|| $canDeleteOwnAll*/) && $item->created_by == $user->id;
+				} else {
+					// This should be unreachable
+					return true;
+				}
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}
 			return true;
@@ -1359,6 +1394,21 @@ class FlexicontentModelItems extends JModel
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
+			
+			if (FLEXI_J16GE) {
+				$query = 'SELECT asset_id FROM #__content'
+						. ' WHERE id IN ('. $cids .')'
+						;
+				$this->_db->setQuery( $query );
+				
+				if(!$this->_db->query()) {
+					$this->setError($this->_db->getErrorMsg());
+					return false;
+				}
+				$assetids = $this->_db->loadResultArray();
+				$assetidslist = implode(',', $assetids );
+			}
+			
 			$query = 'DELETE FROM #__content'
 					. ' WHERE id IN ('. $cids .')'
 					;
@@ -1437,15 +1487,19 @@ class FlexicontentModelItems extends JModel
 			}
 
 			// delete also item ACL
-			if (FLEXI_ACCESS) {
+			if (FLEXI_J16GE) {
+				$query 	= 'DELETE FROM #__assets'
+						. ' WHERE id in ('.$assetidslist.')'
+						;
+			} else if (FLEXI_ACCESS) {
 				$query 	= 'DELETE FROM #__flexiaccess_acl'
 						. ' WHERE acosection = ' . $this->_db->Quote('com_content')
 						. ' AND axosection = ' . $this->_db->Quote('item')
 						. ' AND axo IN ('. $cids .')'
 						;
-				$this->_db->setQuery( $query );
 			}
 			
+			$this->_db->setQuery( $query );
 			if(!$this->_db->query()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
@@ -1466,12 +1520,12 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function access($id, $access)
+	function saveaccess($id, $access)
 	{
 		$mainframe = &JFactory::getApplication();
 		$row =& JTable::getInstance('flexicontent_items', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 
@@ -1578,10 +1632,18 @@ class FlexicontentModelItems extends JModel
 	 */
 	function getLanguages()
 	{
-		$query = 'SELECT *'
-				.' FROM #__languages'
-//				.' ORDER BY ordering ASC'
-				;
+		if (FLEXI_J16GE) {
+			$query = 'SELECT DISTINCT *'
+					.' FROM #__extensions'
+					.' WHERE type="language" '
+					.' GROUP BY element'
+					;
+		} else {
+				$query = 'SELECT *'
+						.' FROM #__languages'
+					//.' ORDER BY ordering ASC'
+						;
+		}
 		$this->_db->setQuery($query);
 		$languages = $this->_db->loadObjectList();
 		
@@ -1617,18 +1679,18 @@ class FlexicontentModelItems extends JModel
 		// Get the site default language
 		$languages =& JComponentHelper::getParams('com_languages');
 		$lang = $languages->get('site', 'en-GB');
-
+	
 		// Get all Joomla sections
 		$query = 'SELECT * FROM #__sections';
 		$this->_db->setQuery($query);
 		$sections = $this->_db->loadObjectList();
-		
+	
 		$logs = new stdClass();
 		$logs->sec = 0;
 		$logs->cat = 0;
 		$logs->art = 0;
 		//$logs->err = new stdClass();
-		
+	
 		// Create the new section for flexicontent items
 		$flexisection =& JTable::getInstance('section');
 		$flexisection->title		= 'FLEXIcontent';
@@ -1639,20 +1701,20 @@ class FlexicontentModelItems extends JModel
 		$flexisection->scope		= 'content';
 		$flexisection->check();
 		$flexisection->store();
-
+	
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
 		$catparams = new JParameter('');
-
+	
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {
 				if (!$param->attributes('name')) continue;  // FIX for empty name e.g. seperator fields
 				$catparams->set($param->attributes('name'), $param->attributes('default'));
 			}
 		}
-		$catparams = $catparams->toString();		
-		
+		$catparams = $catparams->toString();
+	
 		// Loop throught the section object and create cat -> subcat -> items -> fields
 		$k = 0;
 		foreach ($sections as $section)
@@ -1661,17 +1723,17 @@ class FlexicontentModelItems extends JModel
 			$cat->parent_id			= 0;
 			$cat->title				= $section->title;
 			$cat->name				= $section->name;
-      		$cat->alias 			= $section->alias;
-      		$cat->image 			= $section->image;
-      		$cat->section 			= $flexisection->id;
+			$cat->alias 			= $section->alias;
+			$cat->image 			= $section->image;
+			$cat->section 			= $flexisection->id;
 			$cat->image_position	= $section->image_position;
 			$cat->description		= $section->description;
 			$cat->published			= $section->published;
 			$cat->ordering			= $section->ordering;
 			$cat->access			= $section->access;
 			$cat->params			= $catparams;
-	   		$k++;
-	   		$cat->check();
+			$k++;
+			$cat->check();
 			if ($cat->store()) {
 				$logs->sec++;
 			} else {
@@ -1679,12 +1741,12 @@ class FlexicontentModelItems extends JModel
 				$logs->err->$k->id 		= $section->id;
 				$logs->err->$k->title 	= $section->title;
 			}
-			
+	
 			// Get the categories of the created section
-		    $query = 'SELECT * FROM #__categories WHERE section = ' . $section->id;
-    		$this->_db->setQuery($query);
+			$query = 'SELECT * FROM #__categories WHERE section = ' . $section->id;
+			$this->_db->setQuery($query);
 			$categories = $this->_db->loadObjectList();
-			
+	
 			// Loop throught the categories of the created section
 			foreach ($categories as $category)
 			{
@@ -1692,9 +1754,9 @@ class FlexicontentModelItems extends JModel
 				$subcat->load($category->id);
 				$subcat->id			= 0;
 				$subcat->parent_id	= $cat->id;
-      			$subcat->section 	= $flexisection->id;
+				$subcat->section 	= $flexisection->id;
 				$subcat->params		= $catparams;
-		   		$k++;
+				$k++;
 				$subcat->check();
 				if ($subcat->store()) {
 					$logs->cat++;
@@ -1703,12 +1765,12 @@ class FlexicontentModelItems extends JModel
 					$logs->err->$k->id 		= $category->id;
 					$logs->err->$k->title 	= $category->title;
 				}
-			
+	
 				// Get the articles of the created category
-		    	$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
-    			$this->_db->setQuery($query);
+				$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
+				$this->_db->setQuery($query);
 				$articles = $this->_db->loadObjectList();
-
+	
 				// Loop throught the articles of the created category
 				foreach ($articles as $article)
 				{
@@ -1717,8 +1779,8 @@ class FlexicontentModelItems extends JModel
 					$item->id				= 0;
 					$item->sectionid		= $flexisection->id;
 					$item->catid			= $subcat->id;
-			   		$k++;
-			   		$item->check();
+					$k++;
+					$item->check();
 					if ($item->store()) {
 						$logs->art++;
 					} else {
@@ -1729,18 +1791,18 @@ class FlexicontentModelItems extends JModel
 				} // end articles loop
 			} // end categories loop
 		} // end sections loop
-		
+	
 		// Save the created section as flexi_section for the component
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
 		$fparams->set('flexi_section', $flexisection->id);
-    	$fparams = $fparams->toString();		
-
+		$fparams = $fparams->toString();
+	
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-	    
-	    $query 	= 'UPDATE #__components'
-	    		. ' SET params = ' . $this->_db->Quote($fparams)
-	    		. ' WHERE id = ' . $flexi->id;
-	    		;
+	
+		$query 	= 'UPDATE #__components'
+		. ' SET params = ' . $this->_db->Quote($fparams)
+		. ' WHERE id = ' . $flexi->id;
+		;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		return $logs;
