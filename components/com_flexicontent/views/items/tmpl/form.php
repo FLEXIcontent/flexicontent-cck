@@ -20,6 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
+$isNew = ! JRequest::getInt('id', 0);
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
@@ -30,7 +31,7 @@ if (!$this->perms['multicat']) {
 }
 
 // OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
-if ($cid && $overridecatperms) :
+if ($cid && $overridecatperms && $isNew) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
 	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
@@ -228,12 +229,11 @@ function deleteTag(obj) {
 			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
 			<div class="flexi_formblock">
 				<?php
-					$field = $this->fields['title'];
-					$field_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+					$field = @$this->fields['title'];
+					$field_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
 				<label id="title-lbl" for="title" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label; ?>
-					<?php /*echo JText::_( 'FLEXI_TITLE' );*/ ?>
+					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TITLE' ); ?>
 				</label>
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			</div>
@@ -249,7 +249,7 @@ function deleteTag(obj) {
 	
 	<?php endif; ?>
 	
-	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
 				<label id="cid-lbl" for="cid" class="flexi_label">

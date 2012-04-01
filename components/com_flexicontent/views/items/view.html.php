@@ -154,6 +154,19 @@ class FlexicontentViewItems extends JView
 			}
 		}
 		
+		// *************************
+		// Create the document title
+		// *************************
+		
+		// First check and prepend category title
+		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
+			$parentcat = end($parents);
+			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ':"") .$params->get( 'page_title' );
+		} else {
+			$doc_title = $params->get( 'page_title' );
+		}
+		
+		// Second check and prepend site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
@@ -163,45 +176,27 @@ class FlexicontentViewItems extends JView
 				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
 			}
 		}
-
-		/*
-		 * Create the document title
-		 * 
-		 * First is to check if we have a category id, if yes add it.
-		 * If we haven't one than we accessed this screen direct via the menu and don't add the parent category
-		 */
-		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
-			$parentcat = end($parents);
-			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ':"") .$params->get( 'page_title' );
-		} else {
-			$doc_title = $params->get( 'page_title' );
-		}
 		
+		// Finally, set document title
 		$document->setTitle($doc_title);
 		
-		if ($item->metadesc) {
-			$document->setDescription( $item->metadesc );
-		}
 		
-		if ($item->metakey) {
-			$document->setMetadata('keywords', $item->metakey);
-		}
+		// ****************************
+		// Set the document's META tags
+		// ****************************
 		
-		if ($mainframe->getCfg('MetaTitle') == '1') {
-			$document->setMetaData('title', $item->title);
-		}
+		// Set item's META data: desc, keyword, title, author
+		if ($item->metadesc)		$document->setDescription( $item->metadesc );
+		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
+		if ($mainframe->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 		
-		if ($mainframe->getCfg('MetaAuthor') == '1') {
-			$document->setMetaData('author', $item->author);
-		}
-
+		// Set remaining META keys
 		$mdata = new JParameter($item->metadata);
 		$mdata = $mdata->toArray();
 		foreach ($mdata as $k => $v)
 		{
-			if ($v) {
-				$document->setMetadata($k, $v);
-			}
+			if ($v)  $document->setMetadata($k, $v);
 		}
 		
 		// @TODO check that as it seems to be dirty :(
@@ -380,6 +375,7 @@ class FlexicontentViewItems extends JView
 		
 		// Get item and model
 		if (FLEXI_J16GE) {
+			$itemdata = & $this->get('Item');
 			$item = & $this->get('Form');
 		} else {
 			$item = & $this->get('Item');
@@ -653,8 +649,14 @@ class FlexicontentViewItems extends JView
 		// Set: Templates (parameters) Group, by loading item's attribs for every template (these are ALSO saved in the table column 'attribs')
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
-		if (!FLEXI_J16GE ) {
-			foreach ($tmpls as $tmpl) {
+		foreach ($tmpls as $tmpl) {
+			if (FLEXI_J16GE) {
+				foreach ($tmpl->params->getGroup('attribs') as $field) {
+					$fieldname =  $field->__get('fieldname');
+					$value = @$itemdata->attribs[$fieldname];
+					if ($value) $tmpl->params->setValue($fieldname, 'attribs', $value);
+				}
+			} else {
 				$tmpl->params->loadINI($item->attribs);
 			}
 		}

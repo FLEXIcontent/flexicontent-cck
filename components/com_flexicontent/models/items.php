@@ -1045,8 +1045,10 @@ class FlexicontentModelItems extends JModel
 				$menuParams = new JRegistry;
 				$menuParams->loadJSON($menu->params);
 				$params->merge($menuParams);
+				//echo "Menu params: ".$menuParams->get('addcat_title', 'not set')."<br>";
 			}
 		}
+		//echo "Component/menu params: ".$params->get('addcat_title', 'not set')."<br>";
 
 		// Merge parameters from current category (Priority 3)
 		if ( $this->_cid ) {
@@ -1064,6 +1066,7 @@ class FlexicontentModelItems extends JModel
 			
 			// Merge ...
 			$params->merge($catparams);
+			//echo "Cat params: ".$catparams->get('addcat_title', 'not set')."<br>";
 		}
 		
 		$query = 'SELECT t.attribs'
@@ -1077,10 +1080,13 @@ class FlexicontentModelItems extends JModel
 		// Merge TYPE parameters into the page configuration (Priority 2)
 		$typeparams = new JParameter($typeparams);
 		$params->merge($typeparams);
+		//echo "Type params: ".$typeparams->get('addcat_title', 'not set')."<br>";
 
 		// Merge ITEM parameters into the page configuration (Priority 1)
 		$itemparams = new JParameter($this->_item->attribs);
 		$params->merge($itemparams);
+		//echo "Item params: ".$itemparams->get('addcat_title', 'not set')."<br>";
+		//echo "Item MERGED params: ".$params->get('addcat_title', 'not set')."<br>";
 
 		// Merge ACCESS permissions into the page configuration (Priority 0)
 		if (FLEXI_J16GE) {
@@ -1291,7 +1297,7 @@ class FlexicontentModelItems extends JModel
 		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
 
 		// BOF: Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
-		if (is_array($data['text'])) {
+		if (@$data['text'] && is_array($data['text'])) {
 			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
 			foreach($data['text'] as $tab_text) {
@@ -1299,7 +1305,7 @@ class FlexicontentModelItems extends JModel
 			}
 			$data['text'] = & $tabs_text;
 		}
-		if (is_array($post['text'])) {
+		if (@$post['text'] && is_array($post['text'])) {
 			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
 			foreach($post['text'] as $tab_text) {

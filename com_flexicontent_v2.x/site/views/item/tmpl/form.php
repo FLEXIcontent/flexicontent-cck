@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1204 2012-03-20 04:48:05Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -20,6 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
+$isNew = ! JRequest::getInt('id', 0);
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
@@ -30,7 +31,7 @@ if (!$this->perms['multicat']) {
 }
 
 // OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
-if ($cid && $overridecatperms) :
+if ($cid && $overridecatperms && $isNew) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
 	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
@@ -228,13 +229,12 @@ function deleteTag(obj) {
 		<tr>
 			<td class="key">
 				<?php
-					$field = $this->fields['title'];
-					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$field = @$this->fields['title'];
+					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
 				<label id="jform_title-lbl" for="jform_title" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label; ?>
+					<?php echo @$field->label ? $field->label : $this->item->getLabel('title'); ?>
 				</label>
-				<?php /*echo $this->item->getLabel('title'); */?>
 			</td>
 			<td>
 				<?php echo $this->item->getInput('title');?>
@@ -252,7 +252,7 @@ function deleteTag(obj) {
 		</tr>
 	<?php endif; ?>
 	
-	<?php if ($cid && $overridecatperms) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 		<tr>
 			<td class="key">
