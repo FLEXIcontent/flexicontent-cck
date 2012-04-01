@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: fields.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -62,8 +62,15 @@ class JFormFieldFields extends JFormField
 		
 		$field_type = $node->getAttribute('field_type');
 		if($field_type) {
-			$and .= " AND field_type='{$field_type}'";
+			$field_type = explode(",", $field_type);
+			$and .= " AND field_type IN ('". implode("','", $field_type)."')";
 		}
+		
+		$exclude_field_type = $node->getAttribute('exclude_field_type');
+		if($exclude_field_type) {
+			$exclude_field_type = explode(",", $exclude_field_type);
+			$and .= " AND field_type NOT IN ('". implode("','", $exclude_field_type)."')";
+		}		
 		
 		$query = 'SELECT '.$ovalue.' AS value, '.$text.' AS text'
 		. ' FROM #__flexicontent_fields'

@@ -75,6 +75,7 @@ class FlexicontentViewItem extends JView {
 
 		//Get data from the model
 		$model	= & $this->getModel();
+		$itemdata = & $model->getItem();
 		$form	= $this->get('Form');
 		$row = & $form;
 		$version 	= JRequest::getVar( 'version', 0, 'request', 'int' );

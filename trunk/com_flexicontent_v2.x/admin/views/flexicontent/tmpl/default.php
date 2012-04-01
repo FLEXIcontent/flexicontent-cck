@@ -172,8 +172,8 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 					$row = $this->pending[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('core.edit', $rights);
-						$canEditOwn	= in_array('core.edit.own', $rights) && $row->created_by == $user->id;
+						$canEdit 		= in_array('edit', $rights);
+						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
@@ -213,8 +213,8 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->revised[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('core.edit', $rights);
-						$canEditOwn	= in_array('core.edit.own', $rights) && $row->created_by == $user->id;
+						$canEdit 		= in_array('edit', $rights);
+						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -254,8 +254,8 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->inprogress[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('core.edit', $rights);
-						$canEditOwn	= in_array('core.edit.own', $rights) && $row->created_by == $user->id;
+						$canEdit 		= in_array('edit', $rights);
+						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
@@ -295,8 +295,8 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->draft[$i];
 						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('core.edit', $rights);
-						$canEditOwn	= in_array('core.edit.own', $rights) && $row->created_by == $user->id;
+						$canEdit 		= in_array('edit', $rights);
+						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
 				?>
 					<tr>

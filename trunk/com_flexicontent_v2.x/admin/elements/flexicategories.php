@@ -50,6 +50,7 @@ class JFormFieldFlexicategories extends JFormField
 		if ( ! is_array( $values ) ) {
 			$values = explode(",", $values);
 		}
+		
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
@@ -77,6 +78,7 @@ class JFormFieldFlexicategories extends JFormField
 		}
 		if ( $node->getAttribute('multiple') && $node->getAttribute('multiple')=='true' ) {
 			$attribs .=' multiple="multiple"';
+			$fieldName .= "[]";
 		}
 
 		$classes = '';

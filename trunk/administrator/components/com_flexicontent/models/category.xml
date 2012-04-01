@@ -147,7 +147,8 @@
 			<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 			<option value="order">FLEXI_ORDER_ORDERING</option>
 		</param>
-		<param name="orderbycustomfieldid" type="fields" field_type="text" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+		<param name="" type="separator" hr="false" default="FLEXI_CUSTOM_ORDER" description="" level="level3" menu="hide" />
+		<param name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 		<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
 			<option value="ASC">FLEXI_ASC</option>
 			<option value="DESC">FLEXI_DESC</option>

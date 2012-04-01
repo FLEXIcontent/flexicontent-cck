@@ -48,6 +48,9 @@ class JElementFlexicategories extends JElement
 		if ( ! is_array( $values ) ) {
 			$values = explode(",", $values);
 		}
+		
+		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
 		/*if (!$function_added) {
@@ -94,7 +97,7 @@ class JElementFlexicategories extends JElement
 			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
 			' class="inputbox '.$classes.'" '.$attribs,
 			false, true, $actions_allowed=array('core.create') );
-		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldName\" value=\"$value\" />";
+		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldName\" value=\"$values\" />";
 		return $html;
 	}
 }
