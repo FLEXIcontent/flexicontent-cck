@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1220 2012-03-24 07:00:38Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1008,8 +1008,10 @@ class FlexicontentModelItem extends ParentClassItem
 				$menuParams = new JRegistry;
 				$menuParams->loadJSON($menu->params);
 				$params->merge($menuParams);
+				//echo "Menu params: ".$menuParams->get('addcat_title', 'not set')."<br>";
 			}
 		}
+		//echo "Component/menu params: ".$params->get('addcat_title', 'not set')."<br>";
 
 		// Merge parameters from current category (Priority 3)
 		if ( $this->_cid ) {
@@ -1027,6 +1029,7 @@ class FlexicontentModelItem extends ParentClassItem
 			
 			// Merge ...
 			$params->merge($catparams);
+			//echo "Cat params: ".$catparams->get('addcat_title', 'not set')."<br>";
 		}
 		
 		$query = 'SELECT t.attribs'
@@ -1040,10 +1043,13 @@ class FlexicontentModelItem extends ParentClassItem
 		// Merge TYPE parameters into the page configuration (Priority 2)
 		$typeparams = new JParameter($typeparams);
 		$params->merge($typeparams);
+		//echo "Type params: ".$typeparams->get('addcat_title', 'not set')."<br>";
 
 		// Merge ITEM parameters into the page configuration (Priority 1)
 		$itemparams = new JParameter($this->_item->attribs);
 		$params->merge($itemparams);
+		//echo "Item params: ".$itemparams->get('addcat_title', 'not set')."<br>";
+		//echo "Item MERGED params: ".$params->get('addcat_title', 'not set')."<br>";
 
 		// Merge ACCESS permissions into the page configuration (Priority 0)
 		if (FLEXI_J16GE) {

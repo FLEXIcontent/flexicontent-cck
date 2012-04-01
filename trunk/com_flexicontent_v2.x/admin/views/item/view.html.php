@@ -212,16 +212,18 @@ class FlexicontentViewItem extends JView {
 				$canPublishOwn= in_array('publishown', $rights) && $row->created_by == $user->id;
 				$canRight			= in_array('right', $rights);
 			} else {
-				$canEdit			= $user->authorize('com_content', 'edit', 'content', 'all');
-				$canEditOwn		= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
-				$canPublish		= $user->authorize('com_content', 'publish', 'content', 'all');
-				$canPublishOwn= 0;
+				$canEdit = $canEditOwn = $canPublish = $canPublishOwn = ($user->id!=0);
+				// Redudant check, alll backend users have these permissions (managers, admininstrators, super administrators)
+				//$canEdit			= $user->authorize('com_content', 'edit', 'content', 'all');
+				//$canEditOwn		= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
+				//$canPublish		= $user->authorize('com_content', 'publish', 'content', 'all');
+				//$canPublishOwn= 1;
 			}
 			// redundant ?? ... since already checked by the controller
-			$has_edit = $canEdit || $canEditOwn;// || ($lastversion < 3);
+			/*$has_edit = $canEdit || $canEditOwn || ($lastversion < 3);
 			if (!$has_edit) {
 				$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::sprintf( 'FLEXI_NO_ACCESS_EDIT', JText::_('FLEXI_ITEM') ));
-			}
+			}*/
 			
 			// Second, check if item is already edited by a user and check it out (this fails if edit by any user other than the current user)
 			if ($model->isCheckedOut( $user->get('id') )) {
@@ -242,6 +244,17 @@ class FlexicontentViewItem extends JView {
 		// Handle item templates parameters
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
+		foreach ($tmpls as $tmpl) {
+			if (FLEXI_J16GE) {
+				foreach ($tmpl->params->getGroup('attribs') as $field) {
+					$fieldname =  $field->__get('fieldname');
+					$value = @$itemdata->attribs[$fieldname];
+					if ($value) $tmpl->params->setValue($fieldname, 'attribs', $value);
+				}
+			} else {
+				$tmpl->params->loadINI($row->attribs);
+			}
+		}
 
 		//build state list
 		/*$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );

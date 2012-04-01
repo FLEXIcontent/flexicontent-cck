@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1220 2012-03-24 07:00:38Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1367,7 +1367,7 @@ class FlexicontentModelItems extends JModel
 				if (FLEXI_J16GE) {
 					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
 					$canDelete 		= in_array('delete', $rights);
-					$canDeleteOwn = in_array('delete', $rights) && $item->created_by == $user->id;
+					$canDeleteOwn = in_array('delete.own', $rights) && $item->created_by == $user->id;
 				} else if (FLEXI_ACCESS) {
 					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 					$canDelete 		= in_array('delete', $rights) /*|| $canDeleteAll	*/;

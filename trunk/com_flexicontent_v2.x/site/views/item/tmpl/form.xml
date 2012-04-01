@@ -9,7 +9,7 @@
 	
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> 
+			<field name="typeid" type="types" default="0" required="true" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> 
 		</fieldset>
 	</fields>
 		

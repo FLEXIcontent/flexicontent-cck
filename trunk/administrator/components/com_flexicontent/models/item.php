@@ -521,7 +521,7 @@ class FlexicontentModelItem extends JModel {
 		$post['vstate'] = (int)$post['vstate'];
 
 		// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
-		if (is_array($data['text'])) {
+		if (@$data['text'] && is_array($data['text'])) {
 			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
 			foreach($data['text'] as $tab_text) {
@@ -529,7 +529,7 @@ class FlexicontentModelItem extends JModel {
 			}
 			$data['text'] = & $tabs_text;
 		}
-		if (is_array($post['text'])) {
+		if (@$post['text'] && is_array($post['text'])) {
 			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
 			foreach($post['text'] as $tab_text) {

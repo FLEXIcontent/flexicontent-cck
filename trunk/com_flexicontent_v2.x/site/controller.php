@@ -264,6 +264,7 @@ class FlexicontentController extends JController
 			$data	= JRequest::getVar('jform', array(), 'post', 'array');
 			$form = $model->getForm($data, false);
 			$post = & $model->validate($form, $data);
+			$post['attribs'] = $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 			if (!$post) echo $model->getError();
 		} else {
 			$post = JRequest::get('post');

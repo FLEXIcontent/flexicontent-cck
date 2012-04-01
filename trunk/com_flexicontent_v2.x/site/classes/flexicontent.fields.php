@@ -715,13 +715,14 @@ class FlexicontentFields
 		static $fdata = array();
 		static $lang=null;
 		
-		if (@$item->id || !FLEXI_J16GE) {
-			$item_id = (int)$item->id;
-			$type_id = @(int)$item->type_id;
-		} else {
+		if ((is_object($item)) && ($item instanceof JForm)) {
 			$item_id = (int)$item->getValue('id');
 			$type_id = (int)$item->getValue('type_id');
+		} else {
+			$item_id = (int)$item->id;
+			$type_id = @(int)$item->type_id;
 		}
+		
 		$typename = @$item->typename ? $item->typename : "__NOT_SET__";
 		$typealias = @$item->typealias ? $item->typealias : "__NOT_SET__";
 		

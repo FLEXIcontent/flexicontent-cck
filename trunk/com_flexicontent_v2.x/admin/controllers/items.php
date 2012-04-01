@@ -70,6 +70,7 @@ class FlexicontentControllerItems extends JController
 		$form 	= $model->getForm($data, false);
 
 		$validData = & $model->validate($form, $data);
+		$validData['attribs'] = $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 
 		//$diff_arr = array_diff_assoc ( $data, $validData);
 		//echo "<pre>"; print_r($diff_arr);  print_r(array_diff_assoc ($validData, $data)); exit();
