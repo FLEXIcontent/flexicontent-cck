@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1224 2012-04-01 03:09:16Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1230 2012-04-02 17:44:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -830,8 +830,10 @@ class FlexicontentFields
 			
 			//--. In future we may automate this?, although this is faster
 			if ($field->field_type == 'voting') {
-				$fdata[$field->name]->parameters->set('extra_votes', $tparams[$typename]->get('voting_extra_votes', '') );
-				$fdata[$field->name]->parameters->set('main_label', $tparams[$typename]->get('voting_main_label', '') );
+				if ($tparams[$typename]->get('voting_extra_votes', ''))
+					$fdata[$field->name]->parameters->set('extra_votes', $tparams[$typename]->get('voting_extra_votes', '') );
+				if ($tparams[$typename]->get('voting_main_label', ''))
+					$fdata[$field->name]->parameters->set('main_label', $tparams[$typename]->get('voting_main_label', '') );
 			}
 			
 			//--. Check if a custom field that customizes core field per Type
