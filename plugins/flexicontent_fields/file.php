@@ -197,12 +197,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
-		$separatorf			= $field->parameters->get( 'separatorf', 3 ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$useicon			= $field->parameters->get( 'useicon', 1 ) ;
-		$usebutton			= $field->parameters->get( 'usebutton', 0 ) ;
-		$display_filename			= $field->parameters->get( 'display_filename', 0 ) ;
+		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;
+		$opentag		= $field->parameters->get( 'opentag', '' ) ;
+		$closetag		= $field->parameters->get( 'closetag', '' ) ;
+		$useicon		= $field->parameters->get( 'useicon', 1 ) ;
+		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
+		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
+		$display_descr		= $field->parameters->get( 'display_descr', 0 ) ;
+		
+		// Description as tooltip
+		if ($display_filename==2) JHTML::_('behavior.tooltip');
 
 		switch($separatorf)
 		{
@@ -238,18 +242,47 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		foreach ($values as $value) {
 			$icon = '';
 			$filename = $this->getFileName( $value );
-			if ($filename) {
+			if ($filename) {	
+				
+				// --. Create icon according to filetype
 				if ($useicon) {
 					$filename	= $this->addIcon( $filename );
 					$icon		= JHTML::image($filename->icon, $filename->ext, 'class="icon-mime"') .'&nbsp;';
 				}
-				if($usebutton) {
-					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ).'">';
-						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="button" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'.($display_filename?'&nbsp;'.$filename->altname:'');
+				
+				// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
+				$name_str   = ($display_filename || !$usebutton) ? $filename->altname : '';
+				$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
+				
+				// --. Description as tooltip or inline text ... prepare related variables
+				$title_str = $class_str = $text_html  = '';
+				if (!empty($filename->description)) {
+					if ($display_descr==2) {   // As tooltip
+						$title_str  = $name_str . '::' . $filename->description;
+						$class_str  = ' hasTip';
+						$text_html  = '';
+					} else if ($display_descr==1) {  // As inline text
+						$title_str  = '';
+						$class_str  = '';
+						$text_html  = ' <span class="fcfile_descr">'. $filename->description . '</span>';
+					}
+				}
+				
+				// --. Create the download link
+				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+				
+				// --. Finally create displayed html ... a download button (*) OR a download link
+				// (*) with file manager 's description of file as tooltip or as inline text
+				if ($usebutton) {
+					$class_str .= ' button';   // Add an extra css class
+					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
+						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html . $text_html;
 					$str .= '</form>';
 					$field->{$prop}[] = $str;
-				}else
-					$field->{$prop}[]	= $icon . '<a href="' . JRoute::_( 'index.php?id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' ) . '">' . $filename->altname . '</a>';
+				} else {
+					$name_str = $filename->altname;   // no download button, force display of filename
+					$field->{$prop}[]	= $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" >' . $name_str . '</a>' . $text_shown;
+				}
 			}
 			$n++;
 		}
@@ -287,7 +320,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$and = '';
 		if(!$sessiontable->client_id) 
 			$and = ' AND published = 1';
-		$query = 'SELECT filename, altname, ext, id'
+		$query = 'SELECT filename, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id = '. (int) $value . $and
 				;

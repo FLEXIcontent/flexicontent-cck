@@ -41,6 +41,11 @@
 			<option value="1">FLEXI_YES</option>
 			<option value="0">FLEXI_NO</option>
 		</param>
+		<param name="display_descr" type="list" default="1" label="Display filename" description="Display filename(if you use download button)">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES_AS_TIP</option>
+			<option value="2">FLEXI_YES_INLINE</option>
+		</param>
 		<param name="required" type="radio" default="0" label="Required" description="Required">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
