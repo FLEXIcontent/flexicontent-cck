@@ -40,6 +40,7 @@ class FlexicontentController extends JController
 		
 		// Register Extra task
 		$this->registerTask( 'save_a_preview', 'save');
+		$this->registerTask( 'apply', 'save');
 	}
 
 	/**
@@ -608,6 +609,7 @@ class FlexicontentController extends JController
 		$app 	=& JFactory::getApplication();
 		$user 	= &JFactory::getUser();
 		$db  	= &JFactory::getDBO();
+		$session 	=& JFactory::getSession();
 		
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
@@ -618,46 +620,48 @@ class FlexicontentController extends JController
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
 			// Check: item id exists in our voting logging SESSION (array) variable 
-			$votestamp = array();
-			$votecheck = false;
-			if ($session->has('votestamp', 'flexicontent')) {
-				$votestamp = $session->get('votestamp', array(),'flexicontent');
-				$votecheck = isset($votecheck[$id]);
-			}
+			$votestamp = $session->get('votestamp', array(),'flexicontent');
+			$votecheck = isset($votestamp[$cid]);
+			
 			// Set: the current item id, in our voting logging SESSION (array) variable  
-			$votestamp[$id] = 1;
+			$votestamp[$cid] = 1;
 			$session->set('votestamp', $votestamp, 'flexicontent');
-		
+			
+			// Setup variables used in the db queries
 			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
 			$currip_quoted = $db->Quote( $currip );
-			$dbtbl = !(int)$xid ? '#__content_rating' : '#__content_extravote';  // Choose db table to store vote (normal or extra)
-			$and_extra_id = (int)$xid ? ' AND extra_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
+			$dbtbl = !(int)$xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
+			$and_extra_id = (int)$xid ? ' AND field_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
 			
+			// Retreive last vote for the given item
 			$query = ' SELECT *'
 				. ' FROM '.$dbtbl.' AS a '
 				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
 			
 			$db->setQuery( $query );
 			$votesdb = $db->loadObject();
-
+			
 			if ( !$votesdb )
 			{
+				// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
 				$query = ' INSERT '.$dbtbl
 					. ' SET content_id = '.(int)$cid.', '
 					. '  lastip = '.$currip_quoted.', '
 					. '  rating_sum = '.(int)$user_rating.', '
 					. '  rating_count = 1 '
-					. ( (int)$xid ? ', extra_id = '.(int)$xid : '' );
+					. ( (int)$xid ? ', field_id = '.(int)$xid : '' );
 					
 				$db->setQuery( $query );
 				$db->query() or die( $db->stderr() );
 				$result->ratingcount = 1;
 				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
-			} 
+			}
 			else
 			{
+				// Voting record exists for this item, check if user has already voted
 				if ( !$votecheck )   // it is not so good way to check using ip, since 2 users may have same IP, now using SESSION ////if ( $currip!=$votesdb->lastip ) 
 				{
+					// vote accepted update DB
 					$query = " UPDATE ".$dbtbl
 					. ' SET rating_count = rating_count + 1, '
 					. '  rating_sum = rating_sum + '.(int)$user_rating.', '
@@ -671,6 +675,7 @@ class FlexicontentController extends JController
 				} 
 				else 
 				{
+					// vote rejected
 					// avoid setting percentage ... since it may confuse the user because someone from same ip may have voted and
 					// despite telling user that she/he has voted already, user will see a change in the percentage of highlighted stars
 					//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * 20;

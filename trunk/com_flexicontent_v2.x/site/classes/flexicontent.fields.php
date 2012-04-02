@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1204 2012-03-20 04:48:05Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1224 2012-04-01 03:09:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -698,6 +698,17 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$votes = $db->loadObjectList('content_id');
 		
+		$query 	= 'SELECT *, field_id as extra_id FROM #__flexicontent_items_extravote'
+				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
+				;
+		$db->setQuery($query);
+		$extra_votes= $db->loadObjectList();
+		
+		// Assign each item 's extra votes to the item's votes as member variable "extra"
+		foreach ($extra_votes as $extra_vote ) {
+			$votes[$extra_vote->content_id]->extra[$extra_vote->extra_id] = $extra_vote;
+		}
+		
 		return $votes;
 	}
 	
@@ -715,6 +726,7 @@ class FlexicontentFields
 		static $fdata = array();
 		static $lang=null;
 		
+		//--. Discover Content Type Id, Name, Alias
 		if ((is_object($item)) && ($item instanceof JForm)) {
 			$item_id = (int)$item->getValue('id');
 			$type_id = (int)$item->getValue('type_id');
@@ -722,11 +734,10 @@ class FlexicontentFields
 			$item_id = (int)$item->id;
 			$type_id = @(int)$item->type_id;
 		}
-		
 		$typename = @$item->typename ? $item->typename : "__NOT_SET__";
 		$typealias = @$item->typealias ? $item->typealias : "__NOT_SET__";
 		
-		// Create basic field data if no field given
+		//--. Create basic field data if no field given
 		if (!empty($name)) {
 			$field->iscore = $iscore;
 			$field->name = $name;
@@ -736,6 +747,7 @@ class FlexicontentFields
 			$field->attribs = '';
 		}
 		
+		//--. Get a 2 character language tag
 		if (empty($lang)) {
 			$lang = JRequest::getWord('lang', '' );
 			if(empty($lang)){
@@ -744,13 +756,12 @@ class FlexicontentFields
 				$lang = substr($tagLang ,0,2);
 			}
 		}
-
+		
+		//--. Get Content Type parameters
 		if (!isset($tparams[$typename]) && $type_id) {
 			$query = 'SELECT t.attribs, t.name, t.alias'
 					. ' FROM #__flexicontent_types AS t'
 					. ' WHERE t.id = ' . $type_id
-					//. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					//. ' WHERE ie.item_id = ' . $item_id
 					;
 			$db =& JFactory::getDBO();
 			$db->setQuery($query);
@@ -766,7 +777,7 @@ class FlexicontentFields
 			$tparams[$typename] = new JParameter("");
 		}
 		
-		// Custom LABELs and DESCRIPTIONs
+		//--. BESIDES parameters we want to retrieve: ... Custom LABELs and DESCRIPTIONs
 		if ($field->iscore && !isset($fdata[$field->name])) {
 			$fdata[$field->name] = new stdClass();
 			
@@ -814,10 +825,16 @@ class FlexicontentFields
 				// Maintain field 's default description
 			}
 			
-			// Create parameters
-		 $fdata[$field->name]->parameters = new JParameter($field->attribs);
+			//--. Create type specific parameters for the CORE field that we will be used by all subsequent calls to retrieve parameters
+			$fdata[$field->name]->parameters = new JParameter($field->attribs);
 			
-			// Check for type specific parameters
+			//--. In future we may automate this?, although this is faster
+			if ($field->field_type == 'voting') {
+				$fdata[$field->name]->parameters->set('extra_votes', $tparams[$typename]->get('voting_extra_votes', '') );
+				$fdata[$field->name]->parameters->set('main_label', $tparams[$typename]->get('voting_main_label', '') );
+			}
+			
+			//--. Check if a custom field that customizes core field per Type
 			$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field->name."_".$typealias."'";
 			//echo $query;
 			$db =& JFactory::getDBO();
@@ -832,7 +849,7 @@ class FlexicontentFields
 				$jAp->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
 			}
 			
-			// merge field parameter with the type specific parameters ones
+			//--. Finally merge custom field parameters with the type specific parameters ones
 			if ($data) {
 				$ts_params = new JParameter($data->attribs);
 				$fdata[$field->name]->parameters->merge($ts_params);
@@ -844,17 +861,18 @@ class FlexicontentFields
 			$fdata[$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
-		// Set custom label or maintain default
+		//--. Set custom label or maintain default
 		if (isset($fdata[$field->name]->label)) {
 			$field->label = $fdata[$field->name]->label;
 		}
-		// Set custom description or maintain default
+		//--. Set custom description or maintain default
 		if (isset($fdata[$field->name]->description)) {
 			$field->description = $fdata[$field->name]->description;
 		} else if (!$field->description) {
 			$field->description = '';
 		}
-		// field's parameters, to clone ... or not to clone, better clone to allow customizations for individual item fields ...
+		
+		//--. Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
 		$field->parameters = clone($fdata[$field->name]->parameters);
 		
 		return $field;
