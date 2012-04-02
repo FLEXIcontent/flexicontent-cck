@@ -66,5 +66,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'images/M_images/');
 
 // Version constants
 define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'RC4 (r1215)');
+define('FLEXI_RELEASE',	'RC4 (r1232)');
 ?>

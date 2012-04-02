@@ -106,6 +106,8 @@
 	<params group="group-voting"><!-- voting -->
 		<param name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 		<param name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+		<param name="extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
+		<param name="main_label" type="text" default="Overall" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FFLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 	</params>
 	<params group="group-favourites"><!-- favourites -->
 		<param name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">
