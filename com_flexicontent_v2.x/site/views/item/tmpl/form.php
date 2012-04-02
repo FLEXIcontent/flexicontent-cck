@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1222 2012-03-27 20:27:49Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1224 2012-04-01 03:09:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,6 +24,13 @@ $isNew = ! JRequest::getInt('id', 0);
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
+$typeid = getValueFCitem($this->item, 'id') ? getValueFCitem($this->item, 'type_id')	 :  JRequest::getInt('typeid') ;
+$return = JRequest::getString('return', '', 'get');
+if ($return) {
+	$referer = base64_decode( $return );
+} else {
+	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
+}
 
 // DO NOT override user's  permission for submitting to multiple categories
 if (!$this->perms['multicat']) {
@@ -203,27 +210,54 @@ function deleteTag(obj) {
     </h1>
     <?php endif; ?>
 
+	<?php
+	$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
+	$canpublish = $this->perms['canpublish'];
+	$autoapprove = 1; //$this->params->get('auto_approve', 0);  // THIS SHOULD ONLY BE USED in BACKEND ?? It may be confusing to the frontend user
+	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
+	//echo "Auto-Publish Parameter: $autopublished<br />";
+	//echo "Auto-Approve Parameter: $autoapprove<br />";
+	?>
+
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons" style="font-size:90%;">
-			<button class="button" type="button" onclick="return Joomla.submitbutton('save')">
-				<span class="fcbutton_save"><?php echo JText::_( $this->item->getValue('id') ? 'FLEXI_SAVE' : 'FLEXI_ADD' ) ?></span>
+			
+			<button class="button" type="button" onclick="return Joomla.submitbutton('apply');">
+				<span class="fcbutton_apply"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
+			</button>
+			
+		<?php if ( $typeid ) : ?>
+		
+			<button class="button" type="button" onclick="return Joomla.submitbutton('save');">
+				<span class="fcbutton_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 			</button>
 			<button class="button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
-				<span class="fcbutton_preview_save"><?php echo JText::_( 'FLEXI_SAVE_A_PREVIEW' ) ?></span>
+				<span class="fcbutton_preview_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
 			<?php
 				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
-				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->getValue('id').':'.$this->item->getValue('alias'), $this->item->getValue('catid')).'&preview=1');
+				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute(getValueFCitem($this->item, 'id').':'.getValueFCitem($this->item, 'alias'), getValueFCitem($this->item, 'catid')).'&preview=1');
 			?>
+			
+			<?php if ( getValueFCitem($this->item, 'id') ) : ?>
 			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
-				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW' ) ?></span>
+				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW_LATEST' ) ?></span>
 			</button>
+			<?php endif; ?>
+			
+		<?php endif; ?>
+			
 			<button class="button" type="button" onclick="return Joomla.submitbutton('cancel')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
+			
 		</div>
          
 		<br class="clear" />
+		<?php
+			$approval_msg = JText::_( getValueFCitem($this->item, 'id')==0 ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
+			if (!$canpublish)  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
+		?>
 		
 	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
@@ -251,6 +285,20 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 	<?php endif; ?>
+	
+	<?php if ($typeid==0) : ?>
+		<tr>
+			<td class="key">
+				<label id="jform_type_id-lbl" for="jform_type_id" >
+					<?php echo JText::_( 'FLEXI_TYPE' ); ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['type']; ?>
+			</td>
+		</tr>
+	<?php endif; ?>
+
 	
 	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
@@ -308,28 +356,18 @@ function deleteTag(obj) {
 		</tr>
 	<?php endif; ?>
 
-	<?php
-	
-	$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
-	$canpublish = $this->perms['canpublish'];
-	$autoapprove = $this->params->get('auto_approve', 0);
-	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
-	//echo "Auto-Publish Parameter: $autopublished<br />";
-	//echo "Auto-Approve Parameter: $autoapprove<br />";
-	?>
 
 	<?php if (!$autopublished && $canpublish) : // autopublished disabled, display state selection field to the user that can publish ?>
 	
 		<tr>
 			<td class="key">
 				<?php
-					$field = $this->fields['state'];
-					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$field = @$this->fields['state'];
+					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
 				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label; ?>
+					<?php echo @$field->label ? $field->label : $this->item->getLabel('state'); ?>
 				</label>
-				<?php /*echo $this->item->getLabel('state'); */?>
 			</td>
 			<td>
 	  		<?php echo $this->item->getInput('state'); ?>
@@ -355,23 +393,23 @@ function deleteTag(obj) {
 		<tr>
 			<td class="key">
 				<?php
-					$field = $this->fields['state'];
-					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$field = @$this->fields['state'];
+					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
 				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label; ?>
+					<?php echo @$field->label ? $field->label : $this->item->getLabel('state'); ?>
 				</label>
-				<?php /*echo $this->item->getLabel('state'); */?>
 			</td>
 			<td>
 	  		<?php //echo JText::_( 'FLEXI_NEEDS_APPROVAL' );?>
 	  		<?php echo 'You cannot set state of this item, it will be reviewed by administrator'; ?>
-				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->getValue('state', -4);?>" />
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo getValueFCitem($this->item, 'state', -4);?>" />
 				<input type="hidden" id="vstate" name="jform[vstate]" value="1" />
 			</td>
 		</tr>
 	
 	<?php endif; ?>
+	
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<tr>
 			<td class="key">
@@ -424,15 +462,17 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<?php endif; ?>
+
+	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtags)) ) : ?>
+	
 		<tr>
 			<td class="key">
 				<?php
-					$field = $this->fields['tags'];
-					$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$field = @$this->fields['tags'];
+					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
 				?>
 				<label id="jform_tags-lbl" for="jform_tags" <?php echo $field_tooltip; ?> >
-					<?php echo $field->label; ?>
-					<?php //echo JText::_( 'FLEXI_TAGS' ); ?>
+					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TAGS' ); ?>
 				</label>
 			</td>
 			<td>
@@ -446,7 +486,7 @@ function deleteTag(obj) {
 								} else {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
-								}
+							}
 						}
 					?>
 					</ul>
@@ -466,9 +506,13 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<?php endif; ?>
+	<?php endif; ?>
+	
 	</table>
+
+<?php if ($this->fields) : ?>
+
 	<?php
-	if ($this->fields) {
 		$this->document->addScriptDeclaration("
 		window.addEvent('domready', function() {
 			$$('#type_id').addEvent('change', function(ev) {
@@ -484,7 +528,7 @@ function deleteTag(obj) {
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
-			$typename = $types[$this->item->getValue('type_id')]['name'];
+			$typename = $types[getValueFCitem($this->item, 'type_id')]['name'];
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
@@ -582,24 +626,21 @@ function deleteTag(obj) {
 			?>
 		</table>
 	</fieldset>
-	<?php
-	} else if ($this->item->getValue('id') == 0) {
-	?>
-		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
-	<?php
-	} else {
-	?>
-		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
-	<?php
-	}
-	?>
 
-	<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+<?php elseif (getValueFCitem($this->item, 'id') == 0) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
+<?php else : // existing item that has no custom fields, warn the user ?>
+		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
+<?php	endif; ?>
+
 	
-	<?php if ( $this->params->get('usemetadata', 1) ) { ?>
-	<?php
-		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+<?php if (getValueFCitem($this->item, 'id') != 0) : // (existing item) show items parameters (standard, extended, template) ?>
+
+	<?php echo JHtml::_('sliders.start','plugin-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1)); ?>
+	
+	<?php 
+		if ( $this->params->get('usemetadata', 1) ) {
+			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
 	?>
 		<fieldset class="panelform">
 			<table>
@@ -638,13 +679,13 @@ function deleteTag(obj) {
 			</table>
 		</fieldset>
 	<?php } ?>
-
-
-	<?php if($this->perms['canparams'] && $this->params->get('usepublicationdetails', 1)) : ?>
-
+	
+	<?php if ($this->perms['canparams'] && $this->params->get('usepublicationdetails', 0)) : ?>
+	
 		<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options'); ?>
 		<fieldset class="panelform">
 		<ul class="adminformlist">
+		<?php if ($this->perms['isSuperAdmin']) : ?>
 			<li><?php echo $this->item->getLabel('access');?>
 			<?php echo $this->item->getInput('access');?></li>
 			<li><?php echo $this->item->getLabel('created_by');?>
@@ -653,6 +694,7 @@ function deleteTag(obj) {
 			<?php echo $this->item->getInput('created_by_alias');?></li>
 			<li><?php echo $this->item->getLabel('created');?>
 			<?php echo $this->item->getInput('created');?></li>
+		<?php endif; ?>
 			<li><?php echo $this->item->getLabel('publish_up');?>
 			<?php echo $this->item->getInput('publish_up');?></li>
 			<li><?php echo $this->item->getLabel('publish_down');?>
@@ -678,38 +720,40 @@ function deleteTag(obj) {
 		
 	<?php endif; ?>
 		
-	<?php if ($this->perms['cantemplates'] && $this->params->get('usetemplateparams', 1)) : ?>
+	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
 		
 		<?php	echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';?>
-		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->item->getValue("id"), array('useCookie'=>1)); ?>
+		<?php echo JHtml::_('sliders.start','template-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1)); ?>
 		
 		<?php
 		foreach ($this->tmpls as $tmpl) {
 			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
 			echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
-			?>
-			<fieldset class="panelform">
-				<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
-					<?php echo $field->label; ?>
-					<?php echo $field->input; ?>
-				<?php endforeach; ?>
-			</fieldset>
-			<?php
+			
+			?> <fieldset class="panelform"> <?php
+				foreach ($tmpl->params->getGroup('attribs') as $field) :
+					echo $field->label;
+					echo $field->input;
+				endforeach;
+			?> </fieldset> <?php
 		}
 		?>
-		<?php echo JHtml::_('sliders.end'); ?>
-		
 	<?php endif; ?>
-
+	
+		<?php echo JHtml::_('sliders.end'); ?>
+	
+<?php	endif; // end of existing item ?>
 
 		<br class="clear" />
 		<?php echo JHTML::_( 'form.token' ); ?>
-		<input type="hidden" name="return" value="<?php echo @$this->return_page;?>" />
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
-		<input type="hidden" name="referer" value="<?php echo str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']); ?>" />
+		<input type="hidden" name="referer" value="<?php echo $referer; ?>" />
+		<?php if ( getValueFCitem($this->item, 'id')==0 && $typeid ) : ?>
+			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
+		<?php endif;?>
+		
 		<?php echo $this->item->getInput('id');?>
-		<input type="hidden" name="jform[type_id]" value="<?php echo $this->item->getValue('type_id'); ?>" />
 		
 		<?php if ($autopublished) : // autopublish enabled ?>
 			<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />

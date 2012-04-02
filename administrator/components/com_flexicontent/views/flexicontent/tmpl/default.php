@@ -42,7 +42,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 							echo '</div>';
 						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_section')) {
 							echo '<div class="fc-error">';
-							if (!$this->params->get('flexi_section') || $this->params->get('flexi_section') == 0)	echo JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ) . '<br />';
+							if (!$this->params->get('flexi_section') || $this->params->get('flexi_section') == 0)	echo str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SECTION_CHOOSEN' )) . '<br />';
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';

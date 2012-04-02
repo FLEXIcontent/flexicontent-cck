@@ -371,7 +371,7 @@ class FlexicontentViewItems extends JView
 		
 		// Initialiaze JRequest variables
 		JRequest::setVar('loadcurrent', false);  // we are in edit() task, so we load the last item version by default
-		JRequest::setVar('typeid', @$menu->query['typeid'][0]);
+		JRequest::setVar('typeid', @$menu->query['typeid'][0]);  // This also forces zero if value not set
 		
 		// Get item and model
 		if (FLEXI_J16GE) {
@@ -471,7 +471,7 @@ class FlexicontentViewItems extends JView
 		
 		// Tags used by the item
 		if (FLEXI_J16GE) {
-			$usedtagsA 	= $fields['tags']->value;
+			$usedtagsA 	= $isnew ? array() : $fields['tags']->value;
 			$usedtags = $model->getUsedtagsData($usedtagsA);    
 			$usedtags = !is_array($usedtags) ? array() : $usedtags;  // Ensure $usedtags is an array
 		} else {
@@ -537,12 +537,15 @@ class FlexicontentViewItems extends JView
 		$lists = $this->_buildEditLists($perms['multicat']);
 
 		// Build languages list
+		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		if (FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item->getValue("language"), 3);
+			$item_lang = $isnew ? $site_default_lang : $item->getValue("language");
+			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item_lang, 3);
 		} else if (FLEXI_FISH) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item->language, 3);
+			$item_lang = $isnew ? $site_default_lang : $item->language;
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item_lang, 3);
 		} else {
-			$item->language = flexicontent_html::getSiteDefaultLang();
+			$item->language = $site_default_lang;
 		}
 		
 		//Load the JEditor object
@@ -680,6 +683,8 @@ class FlexicontentViewItems extends JView
 		$categories = $globalcats;			// get the categories tree
 		$selectedcats = & $this->get( 'Catsselected' );		// get ids of selected categories (edit action)
 		$actions_allowed = array('core.create');					// user actions allowed for categories
+		$types = & $this->get( 'Typeslist' );
+		$typesselected = '';
 		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
@@ -690,6 +695,13 @@ class FlexicontentViewItems extends JView
 			} else {
 				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $class, true, true,	$actions_allowed);
 			}
+		}
+		
+		//buid types selectlist
+		if (FLEXI_J16GE) {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected, 1, 'class="required"', true );
+		} else {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', true );
 		}
 		
 		// Main category form field

@@ -172,11 +172,11 @@ class FlexicontentController extends JController
 		$initialpermission	= $model->checkInitialPermission();
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
-		//echo "     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
+		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
 		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
-		     
+
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
@@ -546,8 +546,7 @@ VALUES
 		$model = $this->getModel('flexicontent');
 		if ($model->getItemsNoLang()) {
 			// Add site default language to the language field if empty
-			$languages 	=& JComponentHelper::getParams('com_languages');
-			$lang 		= $languages->get('site', 'en-GB');
+			$lang = flexicontent_html::getSiteDefaultLang();
 			$result_items_default_lang = $this->setItemsDefaultLang($lang);
 			if (!$result_items_default_lang) echo "Cannot set default language or set default translation group<br>";
 		} else $result_items_default_lang = true;
