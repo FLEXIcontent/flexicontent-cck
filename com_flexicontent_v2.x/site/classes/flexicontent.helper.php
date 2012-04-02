@@ -584,25 +584,72 @@ class flexicontent_html
 	 */
 	function ItemVote( &$field, $xid, $vote )
 	{
-   		$id  = $field->item_id;
-		
-		$rating_count = $rating_sum = 0;
-		$html = '';
-
-/*
-		$db	=& JFactory::getDBO();
-		$query = 'SELECT * FROM #__content_rating WHERE content_id=' . $id;
-		$db->setQuery($query);
-		$vote = $db->loadObject();
-*/
-		
-		if($vote) {
-			$rating_sum = intval($vote->rating_sum);
-			$rating_count = intval($vote->rating_count);
+		// Check for invalid xid
+		if ($xid!='main' && $xid!='extra' && $xid!='all' && !(int)$xid) {
+			$html .= "ItemVote(): invalid xid '".$xid."' was given";
+			return;
 		}
 		
-		$html .= flexicontent_html::ItemVoteDisplay( $field, $id, $rating_sum, $rating_count, $xid );
-
+		$db	=& JFactory::getDBO();
+  	$id  = $field->item_id;
+		$extra_votes = $field->parameters->get('extra_votes', '');
+		$main_label = $field->parameters->get('main_label', '');
+		$html = '';
+		
+		if (!$vote) {
+			// These are mass retrieved for multiple items, to optimize performance
+			//$db->setQuery( 'SELECT * FROM #__content_rating WHERE content_id=' . $id );
+			//$vote = $db->loadObject();
+			$vote = new stdClass();
+			$vote->rating_sum = $vote->rating_count = 0;
+		} else if (!isset($vote->rating_sum) || !isset($vote->rating_sum)) {
+			$vote->rating_sum = $vote->rating_count = 0;
+		}
+		
+		if ($xid=='main' || $xid=='all') {
+			$html .= flexicontent_html::ItemVoteDisplay( $field, $id, $vote->rating_sum, $vote->rating_count, 'main', $main_label );
+		}
+		
+		if ($xid=='all' || $xid=='extra' || (int)$xid) {
+			
+			// Retrieve and split-up extra vote types, (removing last one if empty)
+			$extra_votes = preg_split("/[\s]*%%[\s]*/", $extra_votes);
+			if ( empty($extra_votes[count($extra_votes)-1]) )  unset( $extra_votes[count($extra_votes)-1] );
+			
+			// Split extra voting ids (xid) and their titles
+			$xid_arr = array();
+			foreach ($extra_votes as $extra_vote) {
+				list($extra_id, $extra_title) = explode("##", $extra_vote);
+				$xid_arr[$extra_id] = $extra_title;
+			}
+			
+			// Query the database
+			if ( (int)$xid )
+			{
+				if ( !isset($vote->extra[(int)$xid]) ) {
+					$extra_vote = new stdClass();
+					$extra_vote->rating_sum = $extra_vote->rating_count = 0;
+					$extra_vote->extra_id = (int)$xid;
+				} else {
+					$extra_vote = $vote->extra[(int)$xid];
+				}
+				$html .= flexicontent_html::ItemVoteDisplay( $field, $id, $extra_vote->rating_sum, $extra_vote->rating_count, $extra_vote->extra_id, $xid_arr[(int)$xid] );
+			}
+			else
+			{
+				foreach ( $xid_arr as $extra_id => $extra_title) {
+					if ( !isset($vote->extra[$extra_id]) ) {
+						$extra_vote = new stdClass();
+						$extra_vote->rating_sum = $extra_vote->rating_count = 0;
+						$extra_vote->extra_id = $extra_id;
+					} else {
+						$extra_vote = $vote->extra[$extra_id];
+					}
+					$html .= flexicontent_html::ItemVoteDisplay( $field, $id, $extra_vote->rating_sum, $extra_vote->rating_count, $extra_vote->extra_id, $extra_title );
+				}				
+			}
+		}
+				
 		return $html;
  	}
 	
@@ -616,7 +663,7 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid )
+ 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='' )
 	{
 		$document =& JFactory::getDocument();
 		
@@ -664,19 +711,20 @@ class flexicontent_html
 		} else {
 			if ( $counter == 3 ) $counter = 0;
 		}
-								
+		
 	 	$html='
 		<div class="'.$class.'">
-			<div class="fcvote">
-				<ul>
+			<div class="fcvote">'
+	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
+				.'<ul>
     				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'">1</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'">2</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'">3</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'">4</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'">5</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'_'.$xid.'">1</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'_'.$xid.'">2</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'_'.$xid.'">3</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'_'.$xid.'">4</a></li>
+    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'_'.$xid.'">5</a></li>
 				</ul>
-	  			<div id="fcvote_'.$id.'_'.$xid.'" class="fcvote-count">';
+	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fcvote-count">';
 		  		if ( $counter != -1 ) {
 	  				if ( $counter != 0 ) {
 						$html .= "(";
@@ -2373,6 +2421,11 @@ class FLEXIUtilities
 	}
 	
 	
+	/*
+	 * Method to confirm if a given string is a valid MySQL date
+	 * param  string			$date
+	 * return boolean			true if valid date, false otherwise
+	 */
 	function isSqlValidDate($date)
 	{
 		$db = & JFactory::getDBO();

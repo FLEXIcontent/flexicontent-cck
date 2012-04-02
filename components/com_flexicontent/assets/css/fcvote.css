@@ -100,6 +100,21 @@
 	z-index: 2;
 }
 
+.fcvote-label {
+	float: left;
+	min-width: 80px;
+	padding: 0 4px 0 0;
+	font-weight:normal;
+	font-size:90%;
+	text-align:right;
+	border-bottom:1px dashed gray;
+	font-style:italic;
+}
+.fcvote-label.xid-main {
+	font-size:100%;
+	font-style:normal;
+	font-weight:bold;
+}
 .fcvote-count{
 	float: left;
 	padding: 0 0 0 4px;
