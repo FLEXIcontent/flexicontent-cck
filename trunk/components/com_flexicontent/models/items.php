@@ -1285,16 +1285,23 @@ class FlexicontentModelItems extends JModel
 		$mainframe = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 		$item  	=& $this->getTable('flexicontent_items', '');
+		if (@$data['id']) {  // Load existing values
+			$item->load((int)$data['id']);
+			//print_r($item);exit;
+		}
 		$user	=& JFactory::getUser();
 		$cparams =& $this->_cparams;
 		
-		//$details		= JRequest::getVar( 'details', array(), 'post', 'array');
-		$details 		= array();
+		$details		= JRequest::getVar( 'details', array(), 'post', 'array');
 		$tags 			= JRequest::getVar( 'tag', array(), 'post', 'array');
 		$cats 			= JRequest::getVar( 'cid', array(), 'post', 'array');
 		$post 			= JRequest::get( 'post', JREQUEST_ALLOWRAW );
-		$post['vstate'] = @(int)$post['vstate'];
-		$typeid 		= JRequest::getVar('typeid', 0, '', 'int');
+		$post['vstate'] = (int)$post['vstate'];
+		$post['id']     = (int)$post['id'];
+		$isnew = !$post['id'];
+		if( !$isnew ) {  // SECURITY concern: ONLY allow to set item type for new items !!!
+			unset($data['type_id']);
+		}
 
 		// BOF: Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
 		if (@$data['text'] && is_array($data['text'])) {
@@ -1313,7 +1320,6 @@ class FlexicontentModelItems extends JModel
 			}
 			$post['text'] = & $tabs_text;
 		}
-		//print_r($data['text']); exit();
 		// EOF: Reconstruct (main)text field
 		
 		// bind it to the table
@@ -1323,18 +1329,15 @@ class FlexicontentModelItems extends JModel
 		}
 		$item->bind($details);
 
-		// sanitise id field
-		$item->id = (int) $item->id;
-		
 		$nullDate	= $this->_db->getNullDate();
 
 		$version = FLEXIUtilities::getLastVersions($item->id, true);
 		$version = is_array($version)?0:$version;
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$isnew = !$item->id;
 		$tags = array_unique($tags);
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
+		// new item or vstate = 2 is approve version then save item to #__content table.
 		if ( $isnew || $post['vstate']==2 )
 		{
 			$config =& JFactory::getConfig();
@@ -1348,15 +1351,14 @@ class FlexicontentModelItems extends JModel
 				$item->modified 	= $mdate->toMySQL();
 				$item->modified_by 	= (int)$user->id;
 			}
+			
 			// Are we saving from an item edit?
 			// This code comes directly from the com_content
-
 			$item->created_by 	= $item->created_by ? $item->created_by : $user->get('id');
-
+			
 			if ($item->created && strlen(trim( $item->created )) <= 10) {
 				$item->created 	.= ' 00:00:00';
 			}
-
 			$date =& JFactory::getDate($item->created, $tzoffset);
 			$item->created = $date->toMySQL();
 
@@ -1388,9 +1390,8 @@ class FlexicontentModelItems extends JModel
 			
 			// auto assign the section
 			$item->sectionid 	= FLEXI_SECTION;
-
-			// set type and language
- 			$item->type_id 		= (int)$typeid;
+			
+			// auto assign the default language if not set
  			$item->language		= $item->language ? $item->language : flexicontent_html::getSiteDefaultLang();			
 			
 			// Get a state and parameter variables from the request
@@ -1911,7 +1912,24 @@ class FlexicontentModelItems extends JModel
 		return $tparams;
 	}
 	
-	
+	/**
+	 * Method to get types list when performing an edit action
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getTypeslist ()
+	{
+		$query = 'SELECT id, name'
+				. ' FROM #__flexicontent_types'
+				. ' WHERE published = 1'
+				. ' ORDER BY name ASC'
+				;
+		$this->_db->setQuery($query);
+		$types = $this->_db->loadObjectList();
+		return $types;	
+	}
+		
 	/**
 	 * Method to get the values of an extrafield
 	 * 

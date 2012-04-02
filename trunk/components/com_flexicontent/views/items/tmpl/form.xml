@@ -10,7 +10,7 @@
 		<name>FLEXICONTENT_ITEM_SUBMISSION</name>
 		<description>FLEXICONTENT_ITEM_SUBMISSION_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-		<param name="typeid" type="types" default="1" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> 
+		<param name="typeid" type="types" default="" label="FLEXI_SELECT_TYPE" description="FLEXI_SELECT_TYPE_DESC" /> 
 		</url>
 		
 		<params addpath="/administrator/components/com_flexicontent/elements">

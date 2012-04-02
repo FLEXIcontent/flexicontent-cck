@@ -80,6 +80,7 @@ class ParentClassItem extends JModelAdmin {
 		parent::__construct();
 		
 		$this->_cparams = & JComponentHelper::getParams( 'com_flexicontent' );
+		$this->populateState();
 	}
 
 	/**
@@ -322,7 +323,8 @@ class ParentClassItem extends JModelAdmin {
 				//$item->language = flexicontent_html::getSiteDefaultLang();
 			}
 			
-			$item->type_id = $this->getTypesselected()->id;
+			// Get item type info, or TRY get type info of new item if type is set in the JRequest ...
+			$item->type_id = @$this->getTypesselected()->id;
 		}
 		return $item;
 	}
@@ -583,38 +585,33 @@ class ParentClassItem extends JModelAdmin {
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$mainframe = &JFactory::getApplication();
+		$user	=& JFactory::getUser();
 		
 		// Get an empty item model (with default values), and the current user too
 		$item  	=& $this->getTable('flexicontent_items', '');
-		$user	=& JFactory::getUser();
+		
+		// Set the item id to the now empty item model
+		$item->id = (int)$data['id'];
+		if ($item->id) $item->load($item->id);
 		
 		// tags and cats will need some manipulation so we retieve them 
 		$tags			= isset($data['tag']) ? $data['tag'] : array();
 		$cats			= isset($data['cid']) ? $data['cid'] : array();
 		
-		// Set the item id to the now empty item model
-		$id			= (int)$data['id'];
-		$item->id = $id;
-		
 		// Make tags unique
 		$tags = array_unique($tags);
-		
-		// Get version and current version, and some global params too
-		$version = FLEXIUtilities::getLastVersions($item->id, true);
-		$version = is_array($version)?0:$version;
-		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
 		// Item Rules ?
 		//$item->setRules($data['rules']);
 		
-		// A zero id indicate new item
-		$isnew = !$id;
+		$data['vstate'] = (int)$data['vstate'];
+		$data['id']     = (int)$data['id'];
+		$isnew = !$data['id'];
+		if( !$mainframe->isAdmin() && !$isnew ) {  // SECURITY concern: ONLY allow to set item type for new items !!!
+			unset($data['type_id']);
+		}
 		
-		// vstate = 2 is approve version then save item to #__content table.
-		$data['vstate']		= (int)$data['vstate'];
-		
-		// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
+		// BOF: Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
 		if (@$data['text'] && is_array($data['text'])) {
 			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
@@ -623,16 +620,23 @@ class ParentClassItem extends JModelAdmin {
 			}
 			$data['text'] = & $tabs_text;
 		}
-		/*if (@$post['text'] && is_array($post['text'])) {
+		if (@$post['text'] && is_array($post['text'])) {
 			$post['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $post['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$tabs_text = '';
 			foreach($post['text'] as $tab_text) {
 				$tabs_text .= $tab_text;
 			}
 			$post['text'] = & $tabs_text;
-		}*/
-		//print_r($data['text']); exit();
+		}
+		// EOF: Reconstruct (main)text field
 		
+		// Get version and current version, and some global params too
+		$version = FLEXIUtilities::getLastVersions($item->id, true);
+		$version = is_array($version)?0:$version;
+		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
+		
+		// new item or vstate = 2 is approve version then save item to #__content table.
 		if( $isnew || ($data['vstate']==2) ) {
 			// auto assign the main category if none selected
 			if ( empty($data['catid']) && !empty($cats[0]) ) {
@@ -663,8 +667,7 @@ class ParentClassItem extends JModelAdmin {
 				JError::raiseNotice(12, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
 			}
 			
-			// Not new and not approving version, load item data
-			$item->load($id);
+			// Not new and not approving version
 			$datenow =& JFactory::getDate();
 			$item->modified 		= $datenow->toMySQL();
 			$item->modified_by 		= $user->get('id');
@@ -1322,7 +1325,7 @@ class ParentClassItem extends JModelAdmin {
 				$this->_db->setQuery($query);
 				$used = $this->_db->loadObject();
 			} else {
-				$typeid = (int)JRequest::getInt('typeid', 1);
+				$typeid = (int)JRequest::getInt('typeid', 0);
 				$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
 					. ' WHERE t.id = ' . (int)$typeid;
 				$this->_db->setQuery($query);

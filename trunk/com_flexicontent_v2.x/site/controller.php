@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1220 2012-03-24 07:00:38Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1224 2012-04-01 03:09:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -264,7 +264,7 @@ class FlexicontentController extends JController
 			$data	= JRequest::getVar('jform', array(), 'post', 'array');
 			$form = $model->getForm($data, false);
 			$post = & $model->validate($form, $data);
-			$post['attribs'] = $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+			$post['attribs'] = @$data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 			if (!$post) echo $model->getError();
 		} else {
 			$post = JRequest::get('post');
@@ -421,7 +421,15 @@ class FlexicontentController extends JController
 			$cache->clean();
 		}
 		$task = JRequest::getVar('task');
-		if($task=='save_a_preview') {
+		if ($task=='apply') {
+			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
+			$refer = JRequest::getString('referer', '', 'post');
+			$return = '&return='.base64_encode( $refer );
+			$link .= $return;
+			$this->setRedirect($link, $msg);
+			return;
+		} else if ($task=='save_a_preview') {
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
 			$this->setRedirect($link, $msg);

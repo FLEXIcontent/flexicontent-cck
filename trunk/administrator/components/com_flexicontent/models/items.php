@@ -146,9 +146,7 @@ class FlexicontentModelItems extends JModel
 	 */
 	function setSiteDefaultLang($id)
 	{
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang 		= $languages->get('site', 'en-GB');
-
+		$lang = flexicontent_html::getSiteDefaultLang();
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET language = ' . $this->_db->Quote($lang)
 				. ' WHERE item_id = ' . (int)$id
@@ -266,12 +264,10 @@ class FlexicontentModelItems extends JModel
 		$this->_db->setQuery($query);
 		$this->_db->query();
 
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang = $languages->get('site', 'en-GB');
-
 		// insert items_ext datas
 		$itemext = array();
 		$typeid = JRequest::getVar('typeid',1);
+		$lang = flexicontent_html::getSiteDefaultLang();
 		foreach ($rows as $row) {
 			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $lang;
 			else $ilang = $lang;  // J1.5 has no language setting
@@ -1677,9 +1673,8 @@ class FlexicontentModelItems extends JModel
 	function import()
 	{
 		// Get the site default language
-		$languages =& JComponentHelper::getParams('com_languages');
-		$lang = $languages->get('site', 'en-GB');
-	
+		$lang = flexicontent_html::getSiteDefaultLang();
+		
 		// Get all Joomla sections
 		$query = 'SELECT * FROM #__sections';
 		$this->_db->setQuery($query);
