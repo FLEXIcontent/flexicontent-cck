@@ -90,7 +90,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$field->value[0] = '';
 		}
 
-		$listelements = explode("%% ", $field_elements);
+		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+		if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+		}
+
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
@@ -137,7 +141,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			
 			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
 	
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);
@@ -232,7 +240,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			break;
 		}
 
-		$listelements = explode("%% ", $field_elements);
+		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+		if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+		}
+
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
@@ -268,7 +280,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		
 		// *** Retrieve values
-		$listelements = explode("%% ", $field_elements);
+		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+		if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+		}
+
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			list($val, $label, $image) = explode("::", $listelement);

@@ -88,7 +88,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 		} else { // Elements mode
 		
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);
@@ -161,7 +165,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 		} else { // Elements mode
 
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 		
 			foreach ($listelements as $listelement) {
@@ -297,7 +305,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		} else { // Elements mode
 
 			// initialise property
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 
 			foreach ($listelements as $listelement) {
@@ -368,7 +380,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 		} else { // CASE 2: Elements mode
 
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
 				list($val, $label) = explode("::", $listelement);

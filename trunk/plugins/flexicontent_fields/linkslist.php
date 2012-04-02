@@ -138,7 +138,11 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			$searchindex = '';
 			
 			$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-			$listelements = explode("%% ", $field_elements);
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+			}
+
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);
@@ -218,7 +222,11 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 						
-		$listelements = explode("%% ", $field_elements);
+		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+		if (empty($listelements[count($listelements)-1])) {
+				unset($listelements[count($listelements)-1]);
+		}
+
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
