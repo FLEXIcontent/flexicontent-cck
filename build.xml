@@ -2,7 +2,9 @@
 <project name="FLEXIcontent" basedir="." default="build">
 
 	<target name="build">
-	
+
+		<propertyprompt propertyName="revision" defaultValue="build0000" promptText="Enter revision number" />	
+		
 		<delete dir="flexipack" includeemptydirs="true" />
 		
 		<copy todir="flexipack/admin" >
@@ -74,11 +76,6 @@
 		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" />
 		<copy file="language/en-GB/en-GB.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/en-GB.mod_flexiadvsearch.ini" />
 		<copy file="language/fr-FR/fr-FR.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/fr-FR.mod_flexiadvsearch.ini" />
-		<copy todir="flexipack/modules/mod_flexitagcloud/elements" >
-			<fileset dir="modules/mod_flexitagcloud/elements">
-				<exclude name=".**" />
-			</fileset>
-		</copy>
 		<copy todir="flexipack/modules/mod_flexiadvsearch/tmpl" >
 			<fileset dir="modules/mod_flexiadvsearch/tmpl">
 				<exclude name=".**" />
@@ -270,11 +267,6 @@
 		<copy file="administrator/language/ru-RU/ru-RU.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/ru-RU.plg_search_flexisearch.ini" />
 		<copy file="administrator/language/de-DE/de-DE.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/de-DE.plg_search_flexisearch.ini" />
 
-		<copy file="plugins/search/flexiadvsearch.php" tofile="flexipack/plugins/search/flexiadvsearch.php" />
-		<copy file="plugins/search/flexiadvsearch.xml" tofile="flexipack/plugins/search/flexiadvsearch.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexiadvsearch.ini" />
-		<copy file="administrator/language/de-DE/de-DE.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/search/de-DE.plg_search_flexiadvsearch.ini" />
-		
 		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/system/flexisystem.php" />
 		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
@@ -301,7 +293,7 @@
 		<copy file="language/ru-RU/ru-RU.com_flexicontent.ini" tofile="flexipack/site/language/ru-RU.com_flexicontent.ini" />
 		<copy file="language/de-DE/de-DE.com_flexicontent.ini" tofile="flexipack/site/language/de-DE.com_flexicontent.ini" />
 		
-		<tar destfile="com_flexicontent.tar.gz" basedir="flexipack" compression="gzip"/>
+		<tar destfile="com_flexicontent_${revision}.tar.gz" basedir="flexipack" compression="gzip"/>
 <!--
 		<tar destfile="com_flexicontent.tar" compression="gzip">
 			<fileset dir="flexipack" />
