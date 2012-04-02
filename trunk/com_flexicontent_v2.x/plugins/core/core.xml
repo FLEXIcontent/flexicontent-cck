@@ -108,6 +108,8 @@
 		<fieldset name="group-voting"><!-- voting -->
 			<field name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			<field name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
+			<field name="main_label" type="text" default="Overall" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FFLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 		</fieldset>
 		<fieldset name="group-favourites"><!-- favourites -->
 			<field name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">

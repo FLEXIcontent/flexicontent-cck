@@ -135,7 +135,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'voting': // voting button
 			$field->value[] = 'button'; // dummy value to force display
-			$field->display = flexicontent_html::ItemVote( $field, 'main', $vote );
+			$field->display = flexicontent_html::ItemVote( $field, 'all', $vote );
 			break;
 
 			case 'favourites': // favourites button
