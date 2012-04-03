@@ -1131,19 +1131,21 @@ class FlexicontentModelFlexicontent extends JModel
 
 	
 	function checkInitialPermission() {
+		$debug_initial_perms = $params =& JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
+		
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
 		$component_name = 'com_flexicontent';
 		
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
-		$db->setQuery($query);
+		$db->setQuery($query);					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		if(!$db->query()) return false;
 		
 		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
-		$db->query();
+		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
 		$asset	= JTable::getInstance('asset');
@@ -1160,10 +1162,11 @@ class FlexicontentModelFlexicontent extends JModel
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
 			
 			$comp_section = ! ( count($deleted_actions) || count($added_actions) );  // false if deleted or addeded actions exist
+			if ($debug_initial_perms) { echo "Deleted actions: "; print_r($deleted_actions); echo "<br> Added actions: "; print_r($added_actions); echo "<br>"; }
 		}
 		
-		//echo ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
-		//echo count(JAccess::getActions('com_flexicontent', 'component')) . "<br />";
+		if ($debug_initial_perms) { echo "Component DB Rule Count " . ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />"; }
+		if ($debug_initial_perms) { echo "Component File Rule Count " . count(JAccess::getActions('com_flexicontent', 'component')) . "<br />"; }
 		
 		// CHECK if some categories don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
@@ -1172,7 +1175,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		//if (count($result)) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
+		if (count($result)) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
 		$category_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1182,7 +1185,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		//if (count($result)) { echo "bad assets for items: "; print_r($result); echo "<br>"; }
+		if (count($result)) { echo "bad assets for items: "; print_r($result); echo "<br>"; }
 		$article_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1192,10 +1195,10 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		//if (count($result)) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
+		if (count($result)) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
 		$field_section = count($result) == 0 ? 1 : 0;
 		
-		//echo "$comp_section && $category_section && $article_section && $field_section<br>";
+		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section <br>"; }
 
 		return ($comp_section && $category_section && $article_section && $field_section);
 	}

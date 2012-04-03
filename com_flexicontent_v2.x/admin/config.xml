@@ -26,13 +26,18 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="separator1" type="separator" default="Performance Options" level="level1" menu="hide" />
+			<field name="separator1" type="separator" default="Performance / Debug Options" level="level1" menu="hide" />
 			<field name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
 				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
 				<option value="1">FLEXI_ALWAYS</option>
 				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</field>
+			<field name="debug_initial_perms" type="radio" default="0" label="Debug Initial Permissions Creation" description="... enable to see log messages and warning of the initial permission checking and creation process" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="separator2" type="separator" default="FLEXI_SEF_URL_PATHWAY_OPTIONS" level="level1" menu="hide" />
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
 			<field name="default_menuitem_preference" type="list" default="1" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
