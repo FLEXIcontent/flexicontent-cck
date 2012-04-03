@@ -30,6 +30,36 @@ class flexicontent_html
 	 */
 	
 	/**
+	 * Escape a string so that it can be used directly by JS source code
+	 *
+	 * @param 	string 		$text
+	 * @param 	int 		$nb
+	 * @return 	string
+	 * @since 1.5
+	 */
+	function escapeJsText($string)
+	{
+		return str_replace("\n", '\n', str_replace('"', '\"', addcslashes(str_replace("\r", '', (string)$string), "\0..\37'\\")));
+	}
+	
+	
+	/**
+	 * Trims whitespace from an array of strings
+	 *
+	 * @param 	string array			$arr_str
+	 * @return 	string array
+	 * @since 1.5
+	 */
+	function arrayTrim($arr_str) {
+		if(!is_array($arr_str)) return false;
+		foreach($arr_str as $k=>$a) {
+			$arr_str[$k] = trim($a);
+		}
+		return $arr_str;
+	}
+	
+	
+	/**
 	 * Strip html tags and cut after x characters
 	 *
 	 * @param 	string 		$text
@@ -2435,6 +2465,72 @@ class FLEXIUtilities
 		$valid = $num > 0;
 		return $valid;
 	}
+	
+	/*
+	 * Converts a string (containing a csv file) into a array of records ( [row][col] )and returns it
+	 * @author: Klemen Nagode (in http://stackoverflow.com/)
+	 */
+	function csvstring_to_array($string, $separatorChar = ',', $enclosureChar = '"', $newlineChar = "\n") {
+	
+		$array = array();   // [row][cols]
+		$size = strlen($string);
+		$columnIndex = 0;
+		$rowIndex = 0;
+		$fieldValue="";
+		$isEnclosured = false;
+	
+		for($i=0; $i<$size;$i++)
+		{
+			$char = $string{$i};
+			$addChar = "";
+	
+			if($isEnclosured) {
+				if($char==$enclosureChar) {
+					if($i+1<$size && $string{$i+1}==$enclosureChar) {
+						// escaped char
+						$addChar=$char;
+						$i++; // dont check next char
+					} else {
+						$isEnclosured = false;
+					}
+				} else {
+					$addChar=$char;
+				}
+			}
+			else
+			{
+				if($char==$enclosureChar) {
+					$isEnclosured = true;
+				} else {
+					
+					if($char==$separatorChar) {
+		
+						$array[$rowIndex][$columnIndex] = $fieldValue;
+						$fieldValue="";
+		
+						$columnIndex++;
+					} elseif($char==$newlineChar) {
+						echo $char;
+						$array[$rowIndex][$columnIndex] = $fieldValue;
+						$fieldValue="";
+						$columnIndex=0;
+						$rowIndex++;
+					} else {
+						$addChar=$char;
+					}
+				}
+			}
+			if($addChar!="") {
+				$fieldValue.=$addChar;
+			}
+		}
+		
+		if($fieldValue) { // save last field
+			$array[$rowIndex][$columnIndex] = $fieldValue;
+		}
+		return $array;
+	}
+	
 }
 
 

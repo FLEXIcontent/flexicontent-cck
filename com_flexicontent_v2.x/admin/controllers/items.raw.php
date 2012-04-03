@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: items.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -33,22 +33,59 @@ class FlexicontentControllerItems extends JController {
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 	}
 
-	/**
-	 * Method to fetch the tags form
-	 * 
-	 * @since 1.5
-	 */
-	function getorphans()
-	{
-		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtdataStatus();
 
-		echo count($status['no']);
+	
+	/**
+	 * Method to reset hits
+	 * 
+	 * @since 1.0
+	 */
+	function resethits()
+	{
+		$id		= JRequest::getInt( 'id', 0 );
+		$model = $this->getModel('item');
+
+		$model->resetHits($id);
+		
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+		} else {
+			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache->clean();
+		}
+		echo 0;
 	}
+
+
+	/**
+	 * Method to reset votes
+	 * 
+	 * @since 1.0
+	 */
+	function resetvotes()
+	{
+		$id		= JRequest::getInt( 'id', 0 );
+		$model = $this->getModel('item');
+
+		$model->resetVotes($id);
+		
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+		} else {
+			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache->clean();
+		}
+		
+		echo JText::_( 'FLEXI_NOT_RATED_YET' );
+	}
+
 	
 	/**
 	 * Method to fetch the tags form
@@ -60,8 +97,15 @@ class FlexicontentControllerItems extends JController {
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		$user	=& JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		$CanUseTags = $permission->CanUseTags;
+		
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanUseTags = $permission->CanUseTags;
+		} else if (FLEXI_ACCESS) {
+			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+		} else {
+			$CanUseTags = 1;
+		}
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
@@ -82,16 +126,24 @@ class FlexicontentControllerItems extends JController {
 		}
 	}
 
+
 	/**
 	 * Method to select new state for many items
 	 * 
 	 * @since 1.5
 	 */
 	function selectstate() {
-		
 		$user	=& JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		$CanPublish = $permission->CanPublish;
+		
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanPublish = $permission->CanPublish;
+		} else if (FLEXI_ACCESS) {
+			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
+		} else {
+			$CanPublish = 1;
+		}
+		
 		if($CanPublish) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
@@ -123,7 +175,11 @@ class FlexicontentControllerItems extends JController {
 							if(window.parent.document.adminForm.boxchecked.value==0)
 								alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>');
 							else
+		<?php if (FLEXI_J16GE) { ?>
 								window.parent.Joomla.submitbutton('items.changestate')";
+		<?php } else { ?>
+								window.parent.submitbutton('changestate')";
+		<?php } ?>
 						target="_parent">
 					<img src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo JText::_( $statedata['desc'] ); ?>" />
 					<?php echo JText::_( $statedata['name'] ); ?>
@@ -139,40 +195,17 @@ class FlexicontentControllerItems extends JController {
 	
 	
 	/**
-	 * Method to reset hits
+	 * Method to fetch the tags form
 	 * 
-	 * @since 1.0
+	 * @since 1.5
 	 */
-	function resethits() {
-		$id		= JRequest::getInt( 'id', 0 );
-		$model = $this->getModel('item');
-
-		$model->resetHits($id);
-		
-		//$cache = &JFactory::getCache('com_flexicontent');
-		$cache = FLEXIUtilities::getCache();
-		$cache->clean('com_flexicontent_items');
-
-		echo 0;
-	}
-
-	/**
-	 * Method to reset votes
-	 * 
-	 * @since 1.0
-	 */
-	function resetvotes()
+	function getorphans()
 	{
-		$id		= JRequest::getInt( 'id', 0 );
-		$model = $this->getModel('item');
+		$model 		=  $this->getModel('items');
+		$status 	=  $model->getExtdataStatus();
 
-		$model->resetVotes($id);
-		
-		//$cache = &JFactory::getCache('com_flexicontent');
-		$cache = FLEXIUtilities::getCache();
-		$cache->clean('com_flexicontent_items');
-
-		echo JText::_( 'FLEXI_NOT_RATED_YET' );
+		echo count($status['no']);
 	}
+
 	
 }
