@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1186 2012-03-13 01:43:51Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -206,7 +206,7 @@ window.addEvent('domready', function() {
 <div class="flexicontent">
 
 <?php if ($this->unassociated) : ?>
-<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component&format=raw" method="post" name="bindForm" id="bindForm">
+<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component" method="post" name="bindForm" id="bindForm">
 	<div class="fc-error">
 	<table>
 		<tr>
