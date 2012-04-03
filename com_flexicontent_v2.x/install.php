@@ -226,7 +226,7 @@ $fields_tbl_cols = $db->loadResultArray();
 			$result = false;
 			if(!in_array('asset_id', $fields_tbl_cols)) {
 				$already = false;
-				$query = "ALTER TABLE `#__flexicontent_fields` ADD `asset_id` INT NULL DEFAULT NULL AFTER `id`, ADD UNIQUE ( `asset_id` )";
+				$query = "ALTER TABLE`#__flexicontent_fields` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 				$db->setQuery($query);
 				$result = $db->query();
 			}

@@ -159,12 +159,6 @@ if ($error) {
 	</tbody>
 </table>
 
-<?php
-$db = &JFactory::getDBO();
-$query = "SHOW COLUMNS FROM #__flexicontent_files;";
-$db->setQuery($query);
-$columns = $db->loadResultArray();
-?>
 <h3><?php echo JText::_('Actions'); ?></h3>
 <table class="adminlist">
 	<thead>
@@ -179,12 +173,21 @@ $columns = $db->loadResultArray();
 		</tr>
 	</tfoot>
 	<tbody>
+<?php
+
+// Alter table __flexicontent_files: Add description column
+$db = &JFactory::getDBO();
+$query = "SHOW COLUMNS FROM #__flexicontent_files";
+$db->setQuery($query);
+$files_tbl_cols = $db->loadResultArray();
+
+?>
 		<tr class="row0">
-			<td class="key">Run SQL "ALTER TABLE `jos_flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`"
+			<td class="key">Run SQL "ALTER TABLE `..._flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`"
 			<?php
 			$already = true;
 			$result = false;
-			if(!in_array('description', $columns)) {
+			if(!in_array('description', $files_tbl_cols)) {
 				$already = false;
 				$query = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
 				$db->setQuery($query);
@@ -196,14 +199,21 @@ $columns = $db->loadResultArray();
 				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 				<span style="<?php echo $style; ?>"><?php
 				if($already) {
-					echo JText::_("Column 'description' is already exists.");
+					echo JText::_("Column 'description' already exists.");
 				}elseif($result) {
 					echo JText::_('Success');
 				}else{
-					echo JText::_('Alter table is not success.');
+					echo JText::_('ALTER TABLE command unsuccessful.');
 				}
 				?></span>
 			</td>
 		</tr>
+				}
+				?></span>
+			</td>
+		</tr>
+<?php
+// ... more actions
+?>
 	</tbody>
 </table>
