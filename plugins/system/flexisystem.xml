@@ -36,5 +36,6 @@
 			<option value="24">ADMINISTRATOR</option>
 			<option value="25">SUPER ADMINISTRATOR</option>
 		</param>
+		<param name="excluded_redirect_urls" type="textarea" rows="6" cols="40" label="Exclude urls from redirection (enter a part)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
 	</params>
 </install>

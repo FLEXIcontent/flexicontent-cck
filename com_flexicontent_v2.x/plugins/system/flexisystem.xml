@@ -20,21 +20,10 @@
 	</languages>
 	<config>
 	<fields name="params">
-		<fieldset name="basic">
-			<field name="redirect_cats" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
-				<option value="99999">ALL</option>
-				<!--option value="6">FLEXI_SYSTEM_NO_REDIRECT</option-->
-				<!--option value="6">MANAGER</option-->
-				<!--option value="7">ADMINISTRATOR</option-->
-				<!--option value="8">SUPER ADMINISTRATOR</option-->
-			</field>
-			<field name="redirect_articles" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
-				<option value="99999">ALL</option>
-				<!--option value="6">FLEXI_SYSTEM_NO_REDIRECT</option-->
-				<!--option value="6">MANAGER</option-->
-				<!--option value="7">ADMINISTRATOR</option-->
-				<!--option value="8">SUPER ADMINISTRATOR</option-->
-			</field>
+		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="exclude_redirect_cats" type="flexiusergroup" default="" multiple="true" size="16" label="Exclude from category redirection" description="Exclude from category redirection ..." />
+			<field name="exclude_redirect_articles" type="flexiusergroup" default="" multiple="true" size="16" label="Exclude from article redirection" description="Exclude from article redirection ..." />
+			<field name="excluded_redirect_urls" type="textarea" rows="6" cols="70" label="Exclude urls from redirection (enter a part)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
 		</fieldset>
 	</fields>
 	</config>

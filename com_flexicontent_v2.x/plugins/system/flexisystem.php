@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 659 2011-07-18 09:06:39Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1129 2012-01-31 03:54:58Z enjoyman@gmail.com $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -80,35 +80,56 @@ class plgSystemFlexisystem extends JPlugin
 		$this->redirectSiteComContent();
 	}
 	
-	/*
-	 * TODO NOT WORKING PROPERLY !!!!!!!!!!!!!!
-	 */
 	function redirectAdminComContent()
 	{
 		$app 				=& JFactory::getApplication();
 		$option 			= JRequest::getCMD('option');
 		$applicationName 	= $app->getName();
+		
+		// Get current user and existing user groups
 		$user 				=& JFactory::getUser();
-
-		$mincats			= $this->params->get('redirect_cats', array());
-		if (!is_array($mincats)) $mincats = array($mincats);
-		$minarts			= $this->params->get('redirect_articles', array());
-		if (!is_array($minarts)) $minarts = array($minarts);
 		$usergroups = array_keys($user->get('groups'));
-
+		
+		// Get user groups excluded from redirection
+		$exclude_mincats = $this->params->get('exclude_redirect_cats', array());
+		$exclude_minarts = $this->params->get('exclude_redirect_articles', array());
+		
+		// Get URLs excluded from redirection
+		$excluded_urls = $this->params->get('excluded_redirect_urls');
+		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
+		if (empty($excluded_urls[count($excluded_urls)-1])) {
+			unset($excluded_urls[count($excluded_urls)-1]);
+		}
+		
+		// Get current URL
+		$uri = JFactory::getUri();
+		
+		// First check exlcuded urls
+		foreach ($excluded_urls as $excluded_url) {
+			$quoted = preg_quote($excluded_url, "#");
+			if(preg_match("#$quoted#", $uri)) return false;
+		}
+		
 		if (!empty($option)) {
 			// if try to access com_content you get redirected to Flexicontent items
-			if ($option == 'com_content' && $applicationName == 'administrator' ) {
-				//get task execution
-				$task = JRequest::getCMD('task');
-				// url to redirect
+			if ( $option == 'com_content' && $applicationName == 'administrator' ) {
+				
+				// Check if a user group is listed in the groups, that are excluded from article redirection
+				if( count(array_intersect($usergroups, $exclude_minarts)) ) return false;
+				
+				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent';
-
+				
+				// Get request variables used to determine whether to apply redirection
+				$task = JRequest::getCMD('task');
 				$layout = JRequest::getCMD('layout');
 				$function = JRequest::getCMD('function');
 				
-				// Selecting Joomla article for menu item
-				if ($layout=="modal" && $function="jSelectArticle_jform_request_id") return false;
+				// Exclusions:
+				//--. Selecting Joomla article for menu item
+				if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
+				//--. JA jatypo (editor-xtd plugin button for text style selecting)
+				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
@@ -119,36 +140,28 @@ class plgSystemFlexisystem extends JPlugin
 				} else {
 					$urlItems .= '&view=items';
 				}
-				/*$redirect = false;
-				if(in_array('-1', $minarts)) {
-					$redirect = false;
-				}elseif(in_array('-2', $minarts)) {
-					$redirect = true;
-				}*/ $redirect = true; // TODO FIX
-				if($redirect) {
-					$app->redirect($urlItems,'');
-				}elseif(count(array_intersect($usergroups, $minarts))>0) {
-					$app->redirect($urlItems,'');
-				}
+				
+				// Apply redirection
+				$app->redirect($urlItems,'');
 				return false;
 
-			} elseif ($option == 'com_categories' && $applicationName == 'administrator' ) {
-				// url to redirect
+			} elseif ( $option == 'com_categories' && $applicationName == 'administrator' ) {
+				
+				// Check if a user group is listed in the groups, that are excluded from article redirection
+				if( count(array_intersect($usergroups, $exclude_mincats)) ) return false;
+				
+				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
-
+				
+				// Get request variables used to determine whether to apply redirection
 				$extension = JRequest::getVar('extension');
-				/*$redirect = false;
-				if(in_array('-1', $mincats)) {
-					$redirect = false;
-				}elseif(in_array('-2', $mincats)) {
-					$redirect = true;
-				}*/ $redirect = true; // TODO FIX
-				if($redirect  && ($extension == 'com_content')) {
-					$app->redirect($urlItems,'');
-				}elseif((count(array_intersect($usergroups, $mincats))>0) && ($extension == 'com_content')) {
+				
+				// Apply redirection if in content scope (J1.5) / extension (J2.5)
+				if( $extension == 'com_content' ) {
 					$app->redirect($urlItems,'');
 				}
 				return false;
+			
 			}
 		}
 	}
@@ -197,7 +210,6 @@ class plgSystemFlexisystem extends JPlugin
 	function getCategoriesTree()
 	{
 		global $globalcats;
-
 		$db		=& JFactory::getDBO();
 
 		// get the category tree and append the ancestors to each node		
@@ -215,7 +227,8 @@ class plgSystemFlexisystem extends JPlugin
 		$parents = array();
 		
 		//set depth limit
-   		$levellimit = 10;
+   	$levellimit = 10;
+		
 		foreach ($cats as $child) {
 			$parent = $child->parent_id;
 			if ($parent) $parents[] = $parent;
@@ -223,6 +236,7 @@ class plgSystemFlexisystem extends JPlugin
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
+		
 		$parents = array_unique($parents);
 
 		//get list of the items
@@ -237,15 +251,16 @@ class plgSystemFlexisystem extends JPlugin
 			$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
 			$cat->descendants			= implode(',', $cat->descendantsarray);
 		}
+		
 		return $globalcats;
 	}
 
 	/**
-	    * Get the ancestors of each category node
-	    *
-	    * @access private
-	    * @return array
-	    */
+    * Get the ancestors of each category node
+    *
+    * @access private
+    * @return array
+    */
 	function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		if (!$ancestors) $ancestors = array();
