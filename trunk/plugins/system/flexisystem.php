@@ -83,17 +83,39 @@ class plgSystemFlexisystem extends JPlugin
 		$option 			= JRequest::getCMD('option');
 		$applicationName 	= $app->getName();
 		$user 				=& JFactory::getUser();
+		
 		$minsecs			= $this->params->get('redirect_sections', 24);
 		$mincats			= $this->params->get('redirect_cats', 24);
 		$minarts			= $this->params->get('redirect_articles', 24);
+		// Get URLs excluded from redirection
+		$excluded_urls = $this->params->get('excluded_redirect_urls');
+		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
+		if (empty($excluded_urls[count($excluded_urls)-1])) {
+			unset($excluded_urls[count($excluded_urls)-1]);
+		}
+		
+		// Get current URL
+		$uri = JFactory::getUri();
+		
+		// First check exlcuded urls
+		foreach ($excluded_urls as $excluded_url) {
+			$quoted = preg_quote($excluded_url, "#");
+			if(preg_match("#$quoted#", $uri)) return false;
+		}
 		
 		if (!empty($option)) {
 			// if try to access com_content you get redirected to Flexicontent items
 			if ($option == 'com_content' && $applicationName == 'administrator' && $user->gid <= $minarts) {
-				//get task execution
-				$task = JRequest::getCMD('task');
-				// url to redirect
+				
+				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent';
+				
+				// Get request variables used to determine whether to apply redirection
+				$task = JRequest::getCMD('task');
+				
+				// Exclusions:
+				//--. JA jatypo (editor-xtd plugin button for text style selecting)
+				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
@@ -105,24 +127,33 @@ class plgSystemFlexisystem extends JPlugin
 					$urlItems .= '&view=items';
 				}
 				
+				// Apply redirection
 				$app->redirect($urlItems,'');
 				return false;
 
 			} elseif ($option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
-				// url to redirect
+				
+				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
+				// Get request variables used to determine whether to apply redirection
 				$scope = JRequest::getVar('scope');
+				
+				// Apply redirection if in content scope (J1.5) / extension (J2.5)
 				if ($scope == 'content') {
 					$app->redirect($urlItems,'');
 				}
 				return false;
 			
 			} elseif ($option == 'com_categories' && $applicationName == 'administrator' && $user->gid <= $mincats) {
-				// url to redirect
+			
+				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
+				// Get request variables used to determine whether to apply redirection
 				$section = JRequest::getVar('section');
+				
+				// Apply redirection if in content section (J1.5)
 				if ($section == 'com_content') {
 					$app->redirect($urlItems,'');
 				}
@@ -192,33 +223,33 @@ class plgSystemFlexisystem extends JPlugin
 		$children = array();
 		$parents = array();
 		
-    	//set depth limit
-   		$levellimit = 10;
+		//set depth limit
+   	$levellimit = 10;
 		
-    	foreach ($cats as $child) {
-        	$parent = $child->parent_id;
-        	if ($parent) $parents[] = $parent;
-       		$list 	= @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
-    	
-    	$parents = array_unique($parents);
+		foreach ($cats as $child) {
+			$parent = $child->parent_id;
+			if ($parent) $parents[] = $parent;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
+		
+		$parents = array_unique($parents);
 
-    	//get list of the items
-    	$globalcats = plgSystemFlexisystem::_getCatAncestors(0, '', array(), $children, true, max(0, $levellimit-1));
+		//get list of the items
+    $globalcats = plgSystemFlexisystem::_getCatAncestors(0, '', array(), $children, true, max(0, $levellimit-1));
 
-    	foreach ($globalcats as $cat) {
-    		$cat->ancestorsonlyarray	= $cat->ancestors;
-    		$cat->ancestorsonly			= implode(',', $cat->ancestors);
-    		$cat->ancestors[] 			= $cat->id;
-    		$cat->ancestorsarray		= $cat->ancestors;
-    		$cat->ancestors				= implode(',', $cat->ancestors);
-    		$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
-    		$cat->descendants			= implode(',', $cat->descendantsarray);
-    	}
-
-    	return $globalcats;
+		foreach ($globalcats as $cat) {
+			$cat->ancestorsonlyarray	= $cat->ancestors;
+			$cat->ancestorsonly			= implode(',', $cat->ancestors);
+			$cat->ancestors[] 			= $cat->id;
+			$cat->ancestorsarray		= $cat->ancestors;
+			$cat->ancestors				= implode(',', $cat->ancestors);
+			$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
+			$cat->descendants			= implode(',', $cat->descendantsarray);
+		}
+		
+		return $globalcats;
 	}
 
 	/**
