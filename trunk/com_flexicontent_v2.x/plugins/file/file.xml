@@ -39,16 +39,16 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="display_filename" type="radio" default="0" label="Display filename" description="Display filename(if you use download button)">
+			<field name="display_filename" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="display_descr" type="list" default="1" label="Display filename" description="Display filename(if you use download button)">
+			<field name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
-				<option value="2">FLEXI_YES_INLINE</option>
+				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="required" type="radio" default="0" label="Required" description="Required">
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -58,7 +58,7 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_file.ini</language>
 		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_file.ini</language>
-		<language tag="de-DE">de-DE.plg_flexicontent_fields_file.ini</language>
 		<language tag="ru-RU">ru-RU.plg_flexicontent_fields_file.ini</language>
+		<language tag="de-DE">de-DE.plg_flexicontent_fields_file.ini</language>
 	</languages>
 </install>

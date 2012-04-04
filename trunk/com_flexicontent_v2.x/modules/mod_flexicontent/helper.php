@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1189 2012-03-14 06:43:38Z ggppdk $
+ * @version 1.2 $Id: helper.php 1220 2012-03-24 07:00:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -338,7 +338,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
 					$lists[$ord]['featured'][$i]->catid = $row-> catid; 
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
+					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? JString::substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 					$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
 					$lists[$ord]['featured'][$i]->typename 	= $row->typename;
@@ -450,7 +450,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
 					$lists[$ord]['standard'][$i]->catid = $row-> catid;
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? substr($row->title, 0, $cuttitle) . '...' : $row->title;
+					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? JString::substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 					$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
 					$lists[$ord]['standard'][$i]->typename 	= $row->typename;

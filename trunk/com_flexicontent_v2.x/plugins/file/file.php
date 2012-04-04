@@ -255,14 +255,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
 				
 				// --. Description as tooltip or inline text ... prepare related variables
-				$title_str = $class_str = $text_html  = '';
+				$alt_str = $class_str = $text_html  = '';
 				if (!empty($filename->description)) {
-					if ($display_descr==2) {   // As tooltip
-						$title_str  = $name_str . '::' . $filename->description;
+					if ($display_descr==1) {   // As tooltip
+						$alt_str    = $name_str . '::' . $filename->description;
 						$class_str  = ' hasTip';
 						$text_html  = '';
-					} else if ($display_descr==1) {  // As inline text
-						$title_str  = '';
+					} else if ($display_descr==2) {  // As inline text
+						$alt_str    = '';
 						$class_str  = '';
 						$text_html  = ' <span class="fcfile_descr">'. $filename->description . '</span>';
 					}
@@ -276,12 +276,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				if ($usebutton) {
 					$class_str .= ' button';   // Add an extra css class
 					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
-						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html . $text_html;
+						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
 					$str .= '</form>';
 					$field->{$prop}[] = $str;
 				} else {
 					$name_str = $filename->altname;   // no download button, force display of filename
-					$field->{$prop}[]	= $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" >' . $name_str . '</a>' . $text_shown;
+					$field->{$prop}[]	= $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_str . '</a>' ." ". $text_html;
 				}
 			}
 			$n++;
