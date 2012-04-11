@@ -85,6 +85,8 @@ if (is_a($add, 'JXMLElement') && count($add->children())) {
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
+	$extension['installer']->setOverwrite(true);
+	$extension['installer']->setUpgrade(true);
 	if ($extension['installer']->install($extension['folder'])) {
 		$extension['status'] = true;
 	} else {
