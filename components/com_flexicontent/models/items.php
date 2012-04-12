@@ -1374,7 +1374,7 @@ class FlexicontentModelItems extends JModel
 			{
 				$item->publish_down = $nullDate;
 			}
-			else
+			else if ($item->publish_down != $nullDate)
 			{
 				if (strlen(trim( $item->publish_down )) <= 10) {
 					$item->publish_down .= ' 00:00:00';
@@ -1382,7 +1382,7 @@ class FlexicontentModelItems extends JModel
 				$date =& JFactory::getDate($item->publish_down, $tzoffset);
 				$item->publish_down = $date->toMySQL();
 			}
-
+			
 			// auto assign the main category if none selected
 			if (!$item->catid) {
 				$item->catid 		= @$data['catid'] ? $data['catid'] : $cats[0];
@@ -1400,18 +1400,34 @@ class FlexicontentModelItems extends JModel
 			$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 
 			// Build item attribs INI string (item parameters)
-			if (is_array($params))
+			/*if (is_array($params))
 			{
-				$txt = array ();
+				$params_txt = array ();
 				foreach ($params as $k => $v) {
 					if (is_array($v)) {
 						$v = implode('|', $v);
 					}
-					$txt[] = "$k=$v";
+					$params_txt[] = "$k=$v";
 				}
-				$item->attribs = implode("\n", $txt);
+				$params_txt = implode("\n", $params_txt);
+				
+				// Merge new parameters with existing parameters
+				$item->attribs = new JParameter($item->attribs);
+				$item->attribs->merge( new JParameter($params_txt) );
+				$item->attribs = $item->attribs->toString();
+			}*/
+			
+			// Merge new parameters to existing values of the item. BUT (important) set empty values if the key exists !
+			if (is_array($params))
+			{
+				$item->attribs = new JParameter($item->attribs);
+				foreach ($params as $k => $v) {
+					$item->attribs->set($k, $v);
+				}
+				$item->attribs = $item->attribs->toString();
 			}
-
+			
+			
 			// Retrieve metadesc and metakey item's columns, and build item metadata INI string
 			$metadata = JRequest::getVar( 'meta', null, 'post', 'array');
 			
