@@ -41,6 +41,10 @@ JPluginHelper::importPlugin('flexicontent');
 JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
+// load english language file for 'com_flexicontent' component then override with current language file
+JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($cando) {
 		$permission = FlexicontentHelperPerm::getPerm();

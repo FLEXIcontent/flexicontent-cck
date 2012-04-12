@@ -18,6 +18,10 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// load english language file for 'com_flexicontent' component then override with current language file
+JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+
 // Get component parameters and add tooltips css and js code
 $params =& JComponentHelper::getParams('com_flexicontent');
 if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
