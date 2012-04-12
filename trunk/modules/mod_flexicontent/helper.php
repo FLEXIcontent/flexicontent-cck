@@ -336,7 +336,8 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
-					$lists[$ord]['featured'][$i]->catid = $row-> catid; 
+					$lists[$ord]['featured'][$i]->catid = $row->catid; 
+					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? JString::substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
@@ -448,7 +449,8 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
-					$lists[$ord]['standard'][$i]->catid = $row-> catid;
+					$lists[$ord]['standard'][$i]->catid = $row->catid;
+					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? JString::substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
@@ -1030,7 +1032,8 @@ class modFlexicontentHelper
 				$query 	= 'SELECT i.*, ie.type_id, ie.language, count(com.object_id) AS nr, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1051,7 +1054,8 @@ class modFlexicontentHelper
 				$query 	= 'SELECT i.*, (cr.rating_sum / cr.rating_count) * 20 AS votes, ie.type_id, ie.language, ty.name AS typename,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1097,7 +1101,8 @@ class modFlexicontentHelper
 			$query 	= 'SELECT i.*, ie.type_id, ie.language, ty.name AS typename,'
 					. $select_image
 					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
