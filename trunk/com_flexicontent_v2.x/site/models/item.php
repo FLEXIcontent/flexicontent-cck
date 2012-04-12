@@ -145,9 +145,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$preview = JRequest::getVar('preview');
 		
 		if (FLEXI_J16GE && $isform) { // Get item in parent class (it is used only for item edit form)
-			$item = parent::getItem($pk);
-			$this->_item = &$item;
-			return $this->_item;
+			return parent::getItem($pk);
 		}
 		
 		// Cache items retrieved, we can retrieve multiple items, for this purpose 
@@ -1046,7 +1044,11 @@ class FlexicontentModelItem extends ParentClassItem
 		//echo "Type params: ".$typeparams->get('addcat_title', 'not set')."<br>";
 
 		// Merge ITEM parameters into the page configuration (Priority 1)
-		$itemparams = new JParameter($this->_item->attribs);
+		if ( is_string($this->_item->attribs) ) {
+			$itemparams = new JParameter($this->_item->attribs);
+		} else {
+			$itemparams = & $this->_item->attribs;
+		}
 		$params->merge($itemparams);
 		//echo "Item params: ".$itemparams->get('addcat_title', 'not set')."<br>";
 		//echo "Item MERGED params: ".$params->get('addcat_title', 'not set')."<br>";

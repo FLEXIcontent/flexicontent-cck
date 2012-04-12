@@ -120,7 +120,7 @@ class ParentClassItem extends JModelAdmin {
 	 */
 	function get($property, $default=null)
 	{
-		if ( $this->_item || $this->_item = $this->getItem() ) {
+		if ( $this->_item || $this->_item = $this->getItem(null, false) ) {
 			if(isset($this->_item->$property)) {
 				return $this->_item->$property;
 			}
@@ -240,73 +240,74 @@ class ParentClassItem extends JModelAdmin {
 			{
 				$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 				
+				// Check if in item form and versioning enabled
 				if($isform && $use_versioning) {
+					
+					// Get the latest version number if version has not been specified
 					if(!$version) {
 						$version = FLEXIUtilities::getLastVersions($item->id, true);
 						JRequest::setVar( 'version', $version);
 					}
 					
+					// Also set a warning if not loading latest version
 					if($version != $item->version && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
 						$unapproved_version_notice = 1;  //  While we are in edit form, we catch cases such as modules loading items , or someone querying priviledges of items, etc
 						JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
 					}
 				}
+				$this->_currentversion = $item->version;   // Set into the model item's current version, it will be used later
 				
-				// Convert the params field to an array.
+				// Convert the attribs field to an array.
 				$registry = new JRegistry;
 				$registry->loadJSON($item->attribs);
 				$item->attribs = $registry->toArray();
-				$this->_currentversion = $item->version;
 
-				// Convert the params field to an array.
+				// Convert the metadata field to an array.
 				$registry = new JRegistry;
 				$registry->loadJSON($item->metadata);
 				$item->metadata = $registry->toArray();
-
+				
+				// Reconstruct main text field of the item out of introtext and fulltext
 				$item->text = trim($item->fulltext) != '' ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
-				$item->_currentversion = $item->version;
-				$query = 'SELECT access'
-					. ' FROM #__categories'
-					. ' WHERE id = '. (int) $item->catid
-					;
+				
+				// Get category access for the item's main category, used later to determine viewing of the item
+				$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
 				$this->_db->setQuery($query);
 				$item->category_access = $this->_db->loadResult();
-
-				$query = 'SELECT name'
-					. ' FROM #__users'
-					. ' WHERE id = '. (int) $item->created_by
-					;
+				
+				// Get name of creator ...
+				$query = 'SELECT name FROM #__users WHERE id = '. (int) $item->created_by;
 				$this->_db->setQuery($query);
 				$item->creator = $this->_db->loadResult();
 
-				//reduce unneeded query
+				// Get name of last modifier if different than creator
 				if ($item->created_by == $item->modified_by) {
 					$item->modifier = $item->creator;
 				} else {
-					$query = 'SELECT name'
-						. ' FROM #__users'
-						. ' WHERE id = '. (int) $item->modified_by
-						;
+					$query = 'SELECT name FROM #__users WHERE id = '. (int) $item->modified_by;
 					$this->_db->setQuery($query);
 					$item->modifier = $this->_db->loadResult();
 				}
+				
+				// Get fields and their versioned values (this includes both CUSTOM and versioned CORE fields)
 				$fields = $this->getExtraFields();
 				
+				// Set versioned categories data
 				$item->cid = @$fields['categories']->value;
-				// Calculate item's score so far (percentage), we have 5 votes max , so 5 * 20 = 100%
+				
+				// Rating are not versioned, retrieve some type info, also retrieve and calculate item's score so far (percentage), we have 5 votes max , so 5 * 20 = 100%
 				$query = "SELECT t.name as typename, t.alias as typealias, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 						." FROM #__flexicontent_items_ext as ie "
 						. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
 						." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
 						." WHERE ie.item_id='".$this->_id."';";
 				$this->_db->setQuery($query);
-				$type = $this->_db->loadObject();
-				if($type) {
-					$item->typename = $type->typename;
-					$item->typealias = $type->typealias;
-					$item->rating_count = $type->rating_count;
-					$item->score = $type->score;
-				}else{
+				if ( $type_and_rating = $this->_db->loadObject() ) {
+					$item->typename			= $type_and_rating->typename;
+					$item->typealias		= $type_and_rating->typealias;
+					$item->rating_count	= $type_and_rating->rating_count;
+					$item->score				= $type_and_rating->score;
+				} else {
 					$item->score = 0;
 				}
 				
@@ -317,15 +318,27 @@ class ParentClassItem extends JModelAdmin {
 				return JError::raiseError(404,JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'));
 			}
 			
-			if ( $pk == 0 && $app->isAdmin() )  // Only apply to Backend
+			
+			// Set item type id, or get type id of new item if type is set in the JRequest ...
+			$typedata = $this->getTypesselected();
+			$item->type_id = $typedata ? $this->getTypesselected()->id : 0;
+			
+			// If backend set state default item state for new items
+			if ( $pk == 0 && $app->isAdmin() )
 			{		
 				$item->state = $this->_cparams->get('new_item_state', -4);
-				//$item->language = flexicontent_html::getSiteDefaultLang();
 			}
 			
-			// Get item type info, or TRY get type info of new item if type is set in the JRequest ...
-			$item->type_id = @$this->getTypesselected()->id;
+			// Set Default site language for new item
+			//if ( $pk == 0 ) $item->language = flexicontent_html::getSiteDefaultLang();
+			
+			// If frontend load item parameters with heritage
+			if ( !$app->isAdmin() )  {
+				$this->_item = & $item;
+				$this->_loadItemParams();
+			}
 		}
+
 		return $item;
 	}
 	
@@ -801,9 +814,12 @@ class ParentClassItem extends JModelAdmin {
 		$item->publish_up = $date->toMySQL();
 
 		// Handle never unpublish date
-		if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '') {
+		if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
+		{
 			$item->publish_down = $nullDate;
-		} else {
+		}
+		else if ($item->publish_down != $nullDate)
+		{
 			if (strlen(trim( $item->publish_down )) <= 10) {
 				$item->publish_down .= ' 00:00:00';
 			}
@@ -1272,24 +1288,32 @@ class ParentClassItem extends JModelAdmin {
 		$subscribers = $this->_db->loadResult();
 		return $subscribers;
 	}
-
+	
+	
 	/**
 	 * Method to get the type parameters of an item
 	 * 
 	 * @return string
 	 * @since 1.5
-	 */
+	 */	
 	function getTypeparams ()
 	{
-		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id
-				;
+		$query	= 'SELECT t.attribs'
+				. ' FROM #__flexicontent_types AS t';
+
+		if ($this->_id == null) {
+			$type_id = JRequest::getInt('typeid', 0);
+			$query .= ' WHERE t.id = ' . (int)$type_id;
+		} else {
+			$query .= ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+					. ' WHERE ie.item_id = ' . (int)$this->_id
+					;
+		}
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
 		return $tparams;
 	}
+
 
 	/**
 	 * Method to get types list when performing an edit action
@@ -1488,7 +1512,7 @@ class ParentClassItem extends JModelAdmin {
 					$field->value 		= $this->getExtrafieldvalue($field->id, $version);
 				}
 				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br>";
-				$field->parameters 	= new JParameter($field->attribs);
+				$field->parameters = new JParameter($field->attribs);
 			}
 		}
 		return $fields;
