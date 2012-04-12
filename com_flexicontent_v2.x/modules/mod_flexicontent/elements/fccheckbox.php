@@ -37,15 +37,35 @@ class JFormFieldFccheckbox extends JFormField
 	
 	function getInput()
 	{
+		if (FLEXI_J16GE) {
+			$value = $this->value;
+			$node = & $this->element;
+		}
+		//print_r($value);
+		
+		// Handle J1.6+
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			if ( empty($value) ) {
+				$value = array();
+			} else if ( !is_array($value) ) {
+				$value = explode("|", $this->value);
+				$value = ($value[0]=='') ? array() : $value;
+			}
+		}
 		$split_char = ",";
-		$node = & $this->element;
-		$value = $this->value;//explode($split_char, $this->value);
-		//$value = ($value[0]=='') ? array() : $value;
 		
 		// Get options and values
 		$checkoptions = explode($split_char, $node->getAttribute('checkoptions'));
 		$checkvals = explode($split_char, $node->getAttribute('checkvals'));
 		$defaultvals = explode($split_char, $node->getAttribute('defaultvals'));
+		
+		// Verify defaultvals option
+		if ( empty($defaultvals[0]) ) $defaultvals = array();
+		if ( count($defaultvals) && $node->getAttribute('display_useglobal') ) {
+			$defaultvals = array();
+			echo "Cannot use field option 'defaultvals' together with 'display_useglobal' 'defaultvals' cleared";
+		}
 
 		// Make value an array if value is not already array, also load defaults, if field parameter never saved
 		if (!is_array($value) || count($value)==0)
@@ -56,18 +76,56 @@ class JFormFieldFccheckbox extends JFormField
 			return "Number of check options not equal to number of check values";
 		
 		// Create checkboxes
-		$fieldname = $this->name.'[]';
-		$element_id = $this->id;
-		$html = '<fieldset id="'.$this->id.'" class="radio">';
+		if (FLEXI_J16GE) {
+			$fieldname = $this->name.'[]';
+			$element_id = $this->id;
+		} else {
+			$fieldname = $control_name.'['.$name.'][]';
+			$element_id = $control_name.$name;
+		}
+		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px">';
+		
+		$disable_all = '';
+		if ( $node->getAttribute('display_useglobal') ) {
+			$check_global='';
+			if (count($value) == 0) {
+				$check_global = ' checked="checked" ';
+				$disable_all = ' disabled="disabled" ';
+			}
+			$html .= '<input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
+			$html .= '<label for="'.$element_id.'_useglobal" >-- '.JText::_('FLEXI_USE_GLOBAL').' --</label>';
+		}
+
 		foreach($checkoptions as $i => $o) {
 			$curr_element_id = $element_id.$i;
-			$html .= '<input id="'.$curr_element_id.'" type="checkbox"';
+			$html .= '<input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
 			$html .= in_array($checkvals[$i], $value) ? ' checked="checked"' : '' ;
 			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
 			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>';
 		}
-		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" /> ';
+
+		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
 		$html .= '</fieldset>';
+		
+		$js 	= "
+function toggle_options_fc_".$element_id."(element) {
+	
+	var panel 	= $('".$element_id."');
+	var inputs 	= panel.getElements('input');
+	if ( $(element).checked ) {
+		inputs.each(function(el){
+			el.setProperty('disabled', 'disabled');
+		});
+	} else {
+		inputs.each(function(el){
+			el.setProperty('disabled', '');
+		});
+	}
+	element.setProperty('disabled', '');
+}";
+
+		$doc = & JFactory::getDocument();
+		$doc->addScriptDeclaration($js);
 		
 		return $html;
 	}
