@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: categorylayout.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: categorylayout.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -29,18 +29,23 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldCategorylayout extends JFormFieldList{
+class JFormFieldCategorylayout extends JFormFieldList
+{
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	 protected $type = 'Categorylayout';
+	protected $type = 'Categorylayout';
 
-	function getOptions() {
+	function getOptions()
+	{
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
-			$lays = array();
+		$value = $this->value;
+		$view	= JRequest::getVar('view');
+		
+		$lays = array();
 		foreach ($tmpls as $tmpl) {
 			$lays[] = $tmpl->name;
 		}
@@ -61,6 +66,7 @@ function disablePanel(element) {
 	inputs.each(function(el){
 		el.setProperty('disabled', 'disabled');
 	});
+	panel.getParent().setStyle('display','none');
 }
 
 function enablePanel(element) {
@@ -74,6 +80,7 @@ function enablePanel(element) {
 	inputs.each(function(el){
     	el.setProperty('disabled', '');
 	});
+	panel.getParent().setStyle('display','');
 }
 
 function activatePanel(active) {
@@ -89,20 +96,20 @@ function activatePanel(active) {
 }
 
 window.addEvent('domready', function(){
-	activatePanel('".$this->value."');			
+	activatePanel('".$value."');			
 });
 ";
 		$doc->addScriptDeclaration($js);
-		$tmpls	= $themes->category;
-		$view	= JRequest::getVar('view');
+		
 		if ($tmpls !== false) {
-			if ($view != 'category') {
+			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
 			}
 			foreach ($tmpls as $tmpl) {
 				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
 			}
 		}
+		
 		return $layouts;
 	}
 }

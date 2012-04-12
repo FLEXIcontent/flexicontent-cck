@@ -18,7 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 /**
  * Renders a categorylayout element
  *
@@ -33,22 +33,21 @@ class JElementCategorylayout extends JElement
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'Categorylayout';
+	var $_name = 'Categorylayout';
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
 		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
 		$view	= JRequest::getVar('view');
-
+		
 		$lays = array();
 		foreach ($tmpls as $tmpl) {
 			$lays[] = $tmpl->name;
 		}
 		$lays = implode("','", $lays);
-
+		
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
@@ -64,6 +63,7 @@ function disablePanel(element) {
 	inputs.each(function(el){
 		el.setProperty('disabled', 'disabled');
 	});
+	panel.getParent().setStyle('display','none');
 }
 
 function enablePanel(element) {
@@ -77,6 +77,7 @@ function enablePanel(element) {
 	inputs.each(function(el){
     	el.setProperty('disabled', '');
 	});
+	panel.getParent().setStyle('display','');
 }
 
 function activatePanel(active) {
@@ -96,7 +97,7 @@ window.addEvent('domready', function(){
 });
 ";
 		$doc->addScriptDeclaration($js);
-
+		
 		if ($tmpls !== false) {
 			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
@@ -105,7 +106,7 @@ window.addEvent('domready', function(){
 				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
 			}
 		}
-
+		
 		return JHTMLSelect::genericList($layouts, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
 	}
 }

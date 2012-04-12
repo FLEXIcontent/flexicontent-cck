@@ -651,7 +651,7 @@ div fieldset.panelform {
 	border-bottom:1px solid black;
 }
 
-div fieldset.panelform label.hasTip {
+div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl {
 	clear: both;
 	padding: 3px 3px 3px 3px;
 	margin:3px 0px 0px 0px;
