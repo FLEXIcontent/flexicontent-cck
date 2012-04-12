@@ -61,7 +61,7 @@ class JElementFCcheckbox extends JElement
 		
 		// Verify defaultvals option
 		if ( empty($defaultvals[0]) ) $defaultvals = array();
-		if ( count($defaultvals) && $node->getAttribute('display_useglobal') ) {
+		if ( count($defaultvals) && $node->attributes('display_useglobal') ) {
 			$defaultvals = array();
 			echo "Cannot use field option 'defaultvals' together with 'display_useglobal' 'defaultvals' cleared";
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1224 2012-04-01 03:09:16Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1229 2012-04-02 17:34:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -82,10 +82,11 @@ if ($cid && $overridecatperms && $isNew) :
 endif;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-	JHTML::_('behavior.mootools');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
 	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
 }
+JHTML::_('behavior.mootools');
+
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -97,7 +98,7 @@ $this->document->addScript( JURI::base().'administrator/components/com_flexicont
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
 
-if ($this->perms['cantags']) {
+if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -275,7 +276,7 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		
-	<?php if ($this->params->get('usealias', 1)) : ?>
+	<?php if ($this->params->get('usealias_fe', 1)) : ?>
 		<tr>
 			<td class="key">
 				<?php echo $this->item->getLabel('alias');?>
@@ -301,6 +302,16 @@ function deleteTag(obj) {
 
 	
 	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+		<tr>
+			<td class="key">
+				<label id="jform_catid-lbl" for="jform_catid">
+					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $fixedmaincat; ?>
+			</td>
+		</tr>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 		<tr>
 			<td class="key">
@@ -318,17 +329,17 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<?php endif; ?>
+	<?php else : ?>
 		<tr>
 			<td class="key">
 				<label id="jform_catid-lbl" for="jform_catid">
-					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
 			</td>
 			<td>
-				<?php echo $fixedmaincat; ?>
+				<?php echo $this->lists['catid']; ?>
 			</td>
 		</tr>
-	<?php else : ?>
 		<?php if ($this->perms['multicat']) : ?>
 		<tr>
 			<td class="key">
@@ -344,16 +355,6 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<?php endif; ?>
-		<tr>
-			<td class="key">
-				<label id="jform_catid-lbl" for="jform_catid">
-					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
-				</label>
-			</td>
-			<td>
-				<?php echo $this->lists['catid']; ?>
-			</td>
-		</tr>
 	<?php endif; ?>
 
 
@@ -421,14 +422,6 @@ function deleteTag(obj) {
 			</td>
 		</tr>
 		<?php endif; ?>
-		<tr>
-			<td class="key">
-				<?php echo $this->item->getLabel('featured'); ?>
-			</td>
-			<td>
-				<?php echo $this->item->getInput('featured');?>
-			</td>
-		</tr>
 		<?php
 		if ($this->perms['canright']) :
 		$this->document->addScriptDeclaration("
@@ -464,8 +457,9 @@ function deleteTag(obj) {
 		<?php endif; ?>
 
 	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtags)) ) : ?>
-	
-		<tr>
+		<?php $display_tags = $this->params->get('usetags_fe', 1)==0 ? 'style="display:none;"' : ''; ?>
+		
+		<tr <?php echo $display_tags; ?> >
 			<td class="key">
 				<?php
 					$field = @$this->fields['tags'];
@@ -480,12 +474,12 @@ function deleteTag(obj) {
 					<ul id="ultagbox">
 					<?php
 						foreach($this->usedtags as $tag) {
-								if ($this->perms['cantags']) {
+								if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 								} else {
-									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
+									echo '<li class="tagitem" style="background-image:url()!important;"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />&nbsp;</li>';
 							}
 						}
 					?>
@@ -494,7 +488,7 @@ function deleteTag(obj) {
 				</div>
 			</td>
 		</tr>
-		<?php if ($this->perms['cantags']) : ?>
+		<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 		<tr>
 			<td class="key">
 				<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?></label>
@@ -634,58 +628,49 @@ function deleteTag(obj) {
 <?php	endif; ?>
 
 	
-<?php if (getValueFCitem($this->item, 'id') != 0) : // (existing item) show items parameters (standard, extended, template) ?>
+<?php if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
 	<?php echo JHtml::_('sliders.start','plugin-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1)); ?>
 	
 	<?php 
-		if ( $this->params->get('usemetadata', 1) ) {
+		if ( $this->params->get('usemetadata_fe', 1) ) {
 			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
 	?>
 		<fieldset class="panelform">
-			<table>
-			<tr>
-				<td>
-				<?php echo $this->item->getLabel('metadesc'); ?>
-				</td>
-				<td>
-				<?php echo $this->item->getInput('metadesc'); ?>
-				</td>
-			</tr>
-			<tr>
-				<td>
-				<?php echo $this->item->getLabel('metakey'); ?>
-				</td>
-				<td>
-				<?php echo $this->item->getInput('metakey'); ?>
-				</td>
-			</tr>
+			<ul class="adminformlist">
+				<li>
+					<?php echo $this->item->getLabel('metadesc'); ?>
+					<?php echo $this->item->getInput('metadesc'); ?>
+				</li>
+				<li>
+					<?php echo $this->item->getLabel('metakey'); ?>
+					<?php echo $this->item->getInput('metakey'); ?>
+				</li>
+				
+		<?php if ($this->params->get('usemetadata_fe', 1) == 2 ) : ?>
+		
 			<?php foreach($this->item->getGroup('metadata') as $field): ?>
-				<tr>
 				<?php if ($field->hidden): ?>
-					<td colspan="2">
 					<?php echo $field->input; ?>
-					</td>
 				<?php else: ?>
-					<td>
-					<?php echo $field->label; ?>
-					</td>
-					<td>
-					<?php echo $field->input; ?>
-					</td>
+					<li>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					</li>
 				<?php endif; ?>
-				</tr>
 			<?php endforeach; ?>
-			</table>
+			
+		<?php endif; ?>
+		
 		</fieldset>
 	<?php } ?>
 	
-	<?php if ($this->perms['canparams'] && $this->params->get('usepublicationdetails', 0)) : ?>
+	<?php if ($this->perms['canpublish'] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
-		<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options'); ?>
+		<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLICATION_DETAILS'), 'details-options'); ?>
 		<fieldset class="panelform">
 		<ul class="adminformlist">
-		<?php if ($this->perms['isSuperAdmin']) : ?>
+		<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ?>
 			<li><?php echo $this->item->getLabel('access');?>
 			<?php echo $this->item->getInput('access');?></li>
 			<li><?php echo $this->item->getLabel('created_by');?>
@@ -702,45 +687,78 @@ function deleteTag(obj) {
 		</ul>
 		</fieldset>
 
-		<?php
-		$fieldSets = $this->item->getFieldsets('attribs');
-		foreach ($fieldSets as $name => $fieldSet) :
-			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-			echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
-			?>
-			<fieldset class="panelform">
-				<?php foreach ($this->item->getFieldset($name) as $field) : ?>
-					<?php echo $field->label; ?>
-					<?php echo $field->input; ?>
-				<?php endforeach; ?>
-			</fieldset>
-		<?php endforeach; ?>
-
-		<?php echo JHtml::_('sliders.end'); ?>
-		
-	<?php endif; ?>
-		
-	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
-		
-		<?php	echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';?>
-		<?php echo JHtml::_('sliders.start','template-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1)); ?>
-		
-		<?php
-		foreach ($this->tmpls as $tmpl) {
-			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-			echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
-			
-			?> <fieldset class="panelform"> <?php
-				foreach ($tmpl->params->getGroup('attribs') as $field) :
-					echo $field->label;
-					echo $field->input;
-				endforeach;
-			?> </fieldset> <?php
-		}
-		?>
 	<?php endif; ?>
 	
-		<?php echo JHtml::_('sliders.end'); ?>
+	<?php
+	$useitemparams_fe = $this->params->get('useitemparams_fe');
+	if ( empty($useitemparams_fe) ) {
+		$useitemparams_fe = array();
+	} else if ( !is_array($useitemparams_fe) ) {
+		$useitemparams_fe = explode("|", $useitemparams_fe);
+	}
+	
+	$fieldSets = $this->item->getFieldsets('attribs');
+	foreach ($fieldSets as $name => $fieldSet) :
+		$fieldsetname = str_replace("params-", "", $name);
+		if ( !in_array($fieldsetname, $useitemparams_fe) ) continue;
+		if ( $name=='themes' ) continue;
+		
+		$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+		echo JHtml::_('sliders.panel', JText::_('FLEXI_PARAMETERS') .": ". JText::_($label), $name.'-options');
+	?>
+		<fieldset class="panelform">
+		<?php
+			foreach ($this->item->getFieldset($name) as $field) :
+				echo $field->label;
+				echo $field->input;
+			endforeach;
+		?>
+		</fieldset>
+	<?php endforeach; ?>
+
+	<?php echo JHtml::_('sliders.end'); ?>
+		
+		
+	<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
+		
+	<?php
+		$type_default_layout = $this->tparams->get('ilayout');
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+
+		foreach ($this->item->getFieldset('themes') as $field) :
+			if ($field->hidden) echo $field->input;
+			else echo $field->label . $field->input;
+		endforeach;
+		
+	?>
+	
+	<blockquote id='__content_type_default_layout__'>
+		<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+	</blockquote>
+	
+	<?php
+	
+		if ( $this->params->get('selecttheme_fe') == 2 ) :
+			echo JHtml::_('sliders.start','template-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1));
+		
+			foreach ($this->tmpls as $tmpl) :
+				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
+				
+				?> <fieldset class="panelform"> <?php
+					foreach ($tmpl->params->getGroup('attribs') as $field) :
+						echo $field->label;
+						echo $field->input;
+					endforeach;
+				?> </fieldset> <?php
+				
+			endforeach;
+		endif;
+	?>
+	
+	<?php endif; ?>
+	
+	<?php echo JHtml::_('sliders.end'); ?>
 	
 <?php	endif; // end of existing item ?>
 

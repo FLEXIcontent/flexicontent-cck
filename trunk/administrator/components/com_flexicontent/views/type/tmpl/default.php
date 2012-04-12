@@ -20,7 +20,6 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
@@ -57,11 +56,12 @@ defined('_JEXEC') or die('Restricted access');
 				echo $this->pane->startPanel( $title, "params-page" );
 				echo $this->form->render('params');
 				echo $this->pane->endPanel();
-
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-
+				
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				
+				echo $this->form->render('params', 'themes');
 				foreach ($this->tmpls as $tmpl) {
-					$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 					echo $tmpl->params->render();
 					echo $this->pane->endPanel();

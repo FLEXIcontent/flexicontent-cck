@@ -359,20 +359,20 @@
 		
 						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_AUTHOR_CATEGORY_PARAMS' ) . '</h3>';
 						
-						$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
+						$title = JText::_( 'FLEXI_PARAMETERS_LAYOUT_STANDARD' );
 						echo $this->pane->startPanel( $title, "params-std" );
 						echo $this->form_authorcat->render('authorcatparams');
 						echo $this->pane->endPanel();
 		
-						$title = JText::_( 'FLEXI_PARAMETERS_COMMON' );
+						$title = JText::_( 'FLEXI_PARAMETERS_LAYOUT_COMMON' );
 						echo $this->pane->startPanel( $title, "params-common" );
 						echo $this->form_authorcat->render('authorcatparams', 'common');
 						echo $this->pane->endPanel();
 						
-						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 		
 						foreach ($this->tmpls as $tmpl) {
-							$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+							$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 							echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 							echo $tmpl->params->render('params');
 							echo $this->pane->endPanel();

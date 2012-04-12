@@ -673,16 +673,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<tr>
 				<td style="padding-top: 5px;">
-					<label for="jform_cid" id="jform_cid-lbl">
-					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
-					</label>
-				</td>
-				<td style="padding-top: 5px;">
-					<?php echo $this->form->getInput('cid');?>
-				</td>
-			</tr>
-			<tr>
-				<td style="padding-top: 5px;">
 					<label for="jform_catid" id="jform_catid-lbl">
 					<strong><?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?></strong>
 					</label>
@@ -691,11 +681,21 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<?php echo $this->form->getInput('catid');?>
 				</td>
 			</tr>
+			<tr>
+				<td style="padding-top: 5px;">
+					<label for="jform_cid" id="jform_cid-lbl">
+					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
+					</label>
+				</td>
+				<td style="padding-top: 5px;">
+					<?php echo $this->form->getInput('cid');?>
+				</td>
+			</tr>
 		</table>
 		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
 
 		<?php
-		echo JHtml::_('sliders.panel',JText::_('FLEXI_DETAILS'), 'details-options');
+		echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLICATION_DETAILS'), 'details-options');
 		/*if (isset($fieldSet->description) && trim($fieldSet->description)) :
 			echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 		endif;*/
@@ -719,7 +719,7 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 
 		<?php
 		echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_STANDARD'), "params-page");
+		//echo JHtml::_('sliders.panel',JText::_('FLEXI_PARAMETERS_LAYOUT_STANDARD'), "params-page");
 		?>
 		<fieldset class="panelform">
 			<?php echo $this->form->getLabel('metadesc'); ?>
@@ -737,24 +737,45 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			<?php endforeach; ?>
 		</fieldset>
 		<?php
-		$fieldSets = $this->form->getFieldsets('attribs');
-		foreach ($fieldSets as $name => $fieldSet) :
-			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-			echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
-			?>
-			<fieldset class="panelform">
-				<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-					<?php echo $field->label; ?>
-					<?php echo $field->input; ?>
-				<?php endforeach; ?>
-			</fieldset>
-		<?php endforeach;
-		?>
+			$fieldSets = $this->form->getFieldsets('attribs');
+			foreach ($fieldSets as $name => $fieldSet) :
+				if ( $name=='themes' ) continue;
 
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+				echo JHtml::_('sliders.panel', JText::_('FLEXI_PARAMETERS') .": ". JText::_($label), $name.'-options');
+				?>
+				<fieldset class="panelform">
+					<?php
+						foreach ($this->form->getFieldset($name) as $field) :
+							echo $field->label;
+							echo $field->input;
+						endforeach;
+					?>
+				</fieldset>
+		<?php endforeach; ?>
+		
+		<?php	echo JHtml::_('sliders.end'); ?>
+		
+		<?php	
+			$type_default_layout = $this->tparams->get('ilayout');
+			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+			
+			foreach ($this->form->getFieldset('themes') as $field) :
+				if ($field->hidden) echo $field->input;
+				else echo $field->label . $field->input;
+			endforeach;
+		?>
+		
+		<blockquote id='__content_type_default_layout__'>
+			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+			<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
+		</blockquote>
+			
+		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
 		<?php
-			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
 			foreach ($this->tmpls as $tmpl) {
-				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+				
 				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
 				?>
 				<fieldset class="panelform">

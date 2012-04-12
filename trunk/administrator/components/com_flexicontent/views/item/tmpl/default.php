@@ -667,16 +667,6 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			</tr>
 			<tr>
 				<td style="padding-top: 5px;">
-					<label for="cid">
-					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
-					</label>
-				</td>
-				<td style="padding-top: 5px;">
-					<?php echo $this->lists['cid']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td style="padding-top: 5px;">
 					<label for="catid">
 					<strong><?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?></strong>
 					</label>
@@ -685,12 +675,22 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 					<?php echo $this->lists['catid']; ?>
 				</td>
 			</tr>
+			<tr>
+				<td style="padding-top: 5px;">
+					<label for="cid">
+					<strong><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></strong>
+					</label>
+				</td>
+				<td style="padding-top: 5px;">
+					<?php echo $this->lists['cid']; ?>
+				</td>
+			</tr>
 		</table>
 
 		<?php
 			echo $this->pane->startPane( 'det-pane' );
 			
-			$title = JText::_( 'FLEXI_DETAILS' );
+			$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
 			echo $this->formparams->render('details');
 			echo $this->pane->endPanel();
@@ -700,14 +700,35 @@ $comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/ima
 			echo $this->formparams->render('meta', 'metadata');
 			echo $this->pane->endPanel();
 			
-			$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-			echo $this->pane->startPanel( $title, "params-page" );
-			echo $this->formparams->render('params', 'standard');
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_BASIC' );
+			echo $this->pane->startPanel( $title, "params-basic" );
+			echo $this->formparams->render('params', 'basic');
 			echo $this->pane->endPanel();
 
-			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_ADVANCED' );
+			echo $this->pane->startPanel( $title, "params-advanced" );
+			echo $this->formparams->render('params', 'advanced');
+			echo $this->pane->endPanel();
+
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_SEOCONF' );
+			echo $this->pane->startPanel( $title, "params-seoconf" );
+			echo $this->formparams->render('params', 'seoconf');
+			echo $this->pane->endPanel();
+
+			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+			$type_default_layout = $this->tparams->get('ilayout');	
+			echo $this->formparams->render('params', 'themes');
+		?>
+		
+		<blockquote id='__content_type_default_layout__'>
+			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+			<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
+		</blockquote>
+		
+		<?php
 			foreach ($this->tmpls as $tmpl) {
-				$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+				
 				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 				echo $tmpl->params->render();
 				echo $this->pane->endPanel();

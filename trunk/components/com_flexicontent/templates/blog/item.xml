@@ -49,7 +49,8 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="" type="separator" hr="false" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
+		
+		<param name="Customblocks" type="spacer" hr="false" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
 		
 		<param name="columnmode" type="list" default="2" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC">
 			<option value="0">FLEXI_COLUMN_MODE_FORCE_1_COLS</option>
