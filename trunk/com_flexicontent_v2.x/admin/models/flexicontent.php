@@ -1626,9 +1626,9 @@ class FlexicontentModelFlexicontent extends JModel
 		// Return the asset id.
 		if ($assetId) {
 			return $assetId;
-		} else {
+		}/* else {
 			return parent::_getAssetParentId($table, $id);
-		}
+		}*/
 	}
 }
 ?>

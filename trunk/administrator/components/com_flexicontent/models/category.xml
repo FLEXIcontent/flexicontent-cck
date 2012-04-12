@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 	<name>Category Edit Form</name>
-
+	
 	<params addpath="/administrator/components/com_flexicontent/elements">
-		<param name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
+
 		<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
 		<param name="" type="separator" hr="false" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
 		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
@@ -25,21 +25,6 @@
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
 		</param>
 				
 		<param name="" type="separator" hr="false" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
@@ -77,16 +62,65 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-				
+
+		<param name="" type="separator" hr="false" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" menu="hide" />
+		<param name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+	 	</param>
+<!--
+		<param name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
+	 		<option value="0">List</option>
+	 		<option value="1">Comma separated list</option>
+	 	</param>
+-->
+		<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+		</param>
+		
+		<param name="" type="separator" hr="false" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" menu="hide" />
+		<param name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+		</param>
+		<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+		<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+			<option value="2">Auto</option>
+		</param>
+		<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+		</param>
+
+	</params>
+
+
+	<params group="item_list_creation" addpath="/administrator/components/com_flexicontent/elements">
+
 		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" menu="hide" />
 		<param name="show_editbutton" type="radio" default="0" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
-		<param name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
 		</param>
+		<param name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_Hide</option>
+			<option value="1">FLEXI_Show</option>
+		</param>
+		
 		<param name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE">
 			<option value="0">FLEXI_Hide</option>
 			<option value="1">FLEXI_Show</option>
@@ -105,33 +139,6 @@
 			<option value="1">FLEXI_Show</option>
 		</param>
 -->
-	</params>
-
-	<params group="common" addpath="/administrator/components/com_flexicontent/elements">
-
-		<param name="" type="separator" hr="false" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" menu="hide" />
-		<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-		<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-			<option value="2">Auto</option>
-		</param>
-		<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		
-		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
-		<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
-			<option value="0">FLEXI_NO</option> 
-			<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
-			<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
-		</param> 
-		<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_No</option>
-			<option value="1">FLEXI_Yes</option>
-		</param>
 		
 		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
 		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
@@ -158,6 +165,23 @@
 			<option value="1">FLEXI_INT</option>
 		</param>
 		
+		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
+		<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
+			<option value="0">FLEXI_NO</option> 
+			<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
+			<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
+		</param> 
+		<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_No</option>
+			<option value="1">FLEXI_Yes</option>
+		</param>
+		
+	</params>
+
+
+	<params group="item_filtering" addpath="/administrator/components/com_flexicontent/elements">
+		
 		<param name="" type="separator" hr="false" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" menu="hide" />
 		<param name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
 		<param name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
@@ -167,22 +191,6 @@
 		<param name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="" type="separator" hr="false" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" menu="hide" />
-		<param name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-	 	</param>
-<!--
-		<param name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
-	 		<option value="0">List</option>
-	 		<option value="1">Comma separated list</option>
-	 	</param>
--->
-		<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
 		</param>
 		
 		<param name="" type="separator" hr="false" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" menu="hide" />
@@ -205,5 +213,10 @@
 		</param>
 		<param name="filters" type="filters" size="10" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 		<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
+	</params>
+	
+	<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
+		<param name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 	</params> 
+
 </form>
