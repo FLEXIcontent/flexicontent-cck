@@ -73,44 +73,43 @@
 -->
 	<fields name="attribs">
 		<fieldset name="basic">
-			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" onchange="activatePanel(this.value);" />
-
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
 			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2" menu="hide" />		
 			<field name="show_title" type="list" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
 				<option value="2">FLEXI_JOMCOMMENTS</option>
 			</field>
 			<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2" menu="hide" />
 			<field name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -217,7 +216,7 @@
 			
 			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" menu="hide" />
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -227,7 +226,48 @@
 				<option value="1">Show</option>
 			</field-->
 		</fieldset>
+
+		<fieldset name="FRONTEND_ITEM_FORM">
+
+			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
+			</field>
+			<field name="usemetadata_fe" type="radio" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
+				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
+			</field>
+			<field name="usepublicationdetails_fe" type="radio" default="" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
+				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
+			</field>
+			<field name="useitemparams_fe" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_PARAMETERS_ITEM_BASIC,FLEXI_PARAMETERS_ITEM_ADVANCED,FLEXI_PARAMETERS_ITEM_SEOCONF" checkvals="basic,advanced,seoconf" defaultvals=""
+				label="FLEXI_MENU_USE_ITEM_PARAMETERS" description="FLEXI_MENU_USE_ITEM_PARAMETERS_DESC" />
+			<field name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
+				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
+			</field>
+		</fieldset>
+
+		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" onchange="activatePanel(this.value);" />
+		</fieldset>
 	</fields>
+	
 	<fields name="metadata">
 	</fields>
 </form>

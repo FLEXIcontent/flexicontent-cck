@@ -880,10 +880,13 @@ div#flexicontent #editor-xtd-buttons .button2-left {
 	margin:4px 0px 0px 4px !important;
 }
 
-/***********************/
-/* CSS FIXES FOR J1.6+ */
-/***********************/
-div#flexicontent .pane-slider ul.adminformlist, div#flexicontent ul#rules, div#flexicontent ul#rules ul {
+/**************************************/
+/* BOF: item form css fixes for j1.6+ */
+/**************************************/
+
+/* PANELs */
+div#flexicontent .pane-slider ul.adminformlist,
+div#flexicontent ul#rules, div#flexicontent ul#rules ul {
 	list-style-type: none !important;
 	margin: 0px !important;
 	padding: 2px !important;
@@ -893,8 +896,13 @@ div#flexicontent .pane-sliders .panel {
 	margin-top: 8px;
 }
 
-div#flexicontent .pane-sliders .panel h3 span {
-	padding: 4px;
+div#flexicontent .pane-sliders .pane-toggler span {
+    background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
+    padding-left: 20px;
+}
+div#flexicontent .pane-sliders .pane-toggler-down span {
+    background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;
+    padding-left: 20px;
 }
 
 div#flexicontent .pane-sliders .panel .pane-slider {
@@ -906,7 +914,14 @@ div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
 	border: 1px solid lightgray !important;
 }
 
-fieldset.adminform fieldset.radio, fieldset.panelform fieldset.radio, fieldset.adminform-legacy fieldset.radio {
+div#flexicontent .panel h3 a {
+	padding:0px 0px 4px 0px;
+}
+
+/* FIELDs */
+div#flexicontent fieldset.adminform fieldset.radio,
+div#flexicontent fieldset.panelform fieldset.radio,
+div#flexicontent fieldset.adminform-legacy fieldset.radio {
 	border: 0 none;
 	float: left;
 	margin: 2px 0px 5px 2px;
@@ -918,7 +933,7 @@ div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform select {
 	font-size: 90%;
 }
 
-
+/* Field containing TABLE */
 div#flexicontent table.admintable td {
 	margin: 0px;
 	padding: 0.2em 0.4em;
@@ -933,11 +948,12 @@ div#flexicontent table.admintable td.paramlist_key {
 	padding: 0px 4px 0px 4px;
 }
 
-div#flexicontent .panel h3 a {
-	padding:0px 0px 4px 0px;
-}
+/**************************************/
+/* EOF: item form css fixes for j1.6+ */
+/**************************************/
 
-/** state toggler */
+
+/*** state toggler ***/
 .statetoggler {
 	float: right !important;
 	display: inline-block !important;
@@ -972,4 +988,10 @@ div#flexicontent .panel h3 a {
 
 .statetoggler li ul li img {
 	padding: 2px !important;
+}
+
+/*** container of message for item having default content template layout ***/
+#__content_type_default_layout__ {
+	margin: 12px 4px 4px 32px;
+	padding:0px;
 }

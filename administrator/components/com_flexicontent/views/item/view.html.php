@@ -294,8 +294,25 @@ class FlexicontentViewItem extends JView {
 		$formparams->loadINI($row->metadata);
 
 		// Handle item templates parameters
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->items;
+		$themes			= flexicontent_tmpl::getTemplates();
+		$tmpls_all	= $themes->items;
+		
+		$allowed_tmpls = $tparams->get('allowed_ilayouts');
+		$type_default_layout = $tparams->get('ilayout', 'default');
+		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+		else																			$allowed_tmpls = $allowed_tmpls;
+		if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+		
+		if ( count($allowed_tmpls) ) {
+			foreach ($tmpls_all as $tmpl) {
+				if (in_array($tmpl->name, $allowed_tmpls) )
+				$tmpls[]= $tmpl;
+			}
+		} else {
+			$tmpls= $tmpls_all;
+		}
+		
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
 				foreach ($tmpl->params->getGroup('attribs') as $field) {

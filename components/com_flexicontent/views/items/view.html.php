@@ -374,13 +374,14 @@ class FlexicontentViewItems extends JView
 		JRequest::setVar('typeid', @$menu->query['typeid'][0]);  // This also forces zero if value not set
 		
 		// Get item and model
+		$model = & $this->getModel();
 		if (FLEXI_J16GE) {
-			$itemdata = & $this->get('Item');
+			//$model->setId(0); // Clear $model->_item, to force recalculation of the item data
+			$itemdata = & $model->getItem($model->getId(), false);
 			$item = & $this->get('Form');
 		} else {
 			$item = & $this->get('Item');
 		}
-		$model = & $this->getModel();
 		
 		// *******************************
 		// CHECK EDIT / CREATE PERMISSIONS
@@ -573,7 +574,10 @@ class FlexicontentViewItems extends JView
 		
 		// Merge item parameters
 		if (!$isnew) {
-			$params->merge($item->parameters);
+			if (FLEXI_J16GE)
+				$params->merge($itemdata->parameters);
+			else
+				$params->merge($item->parameters);
 		}
 		
 		// Ensure the row data is safe html
@@ -631,7 +635,7 @@ class FlexicontentViewItems extends JView
 				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
 			}
 			
-			// Set:  Standard (parameters) Group, (these are retrieved from the item table column 'attribs')
+			// Set:  Attributes (parameters) Group, (these are retrieved from the item table column 'attribs')
 			// (also contains templates parameters, but we will use these individual for every template ... see below)
 			$formparams->loadINI($item->attribs);
 	
@@ -647,20 +651,46 @@ class FlexicontentViewItems extends JView
 			$pane = & JPane::getInstance('sliders');
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
+		} else {
+			if ( JHTML::_('date', $item->getValue('publish_down') , '%Y') <= 1969 || $item->getValue('publish_down') == $db->getNullDate() ) {
+				$item->setValue('publish_down', null, JText::_( 'FLEXI_NEVER' ) );
+			} else {
+				$item->setValue('publish_down', null, JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S') );
+			}
 		}
 		
 		// Set: Templates (parameters) Group, by loading item's attribs for every template (these are ALSO saved in the table column 'attribs')
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->items;
-		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				foreach ($tmpl->params->getGroup('attribs') as $field) {
-					$fieldname =  $field->__get('fieldname');
-					$value = @$itemdata->attribs[$fieldname];
-					if ($value) $tmpl->params->setValue($fieldname, 'attribs', $value);
+		$themes			= flexicontent_tmpl::getTemplates();
+		$tmpls_all	= $themes->items;
+		
+		$allowed_tmpls = $tparams->get('allowed_ilayouts');
+		$type_default_layout = $tparams->get('ilayout', 'default');
+		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+		else																			$allowed_tmpls = $allowed_tmpls;
+		if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+		
+		if ( count($allowed_tmpls) ) {
+			foreach ($tmpls_all as $tmpl) {
+				if (in_array($tmpl->name, $allowed_tmpls) )
+				$tmpls[]= $tmpl;
+			}
+		} else {
+			$tmpls= $tmpls_all;
+		}
+		
+		if (!$isnew) {
+			foreach ($tmpls as $tmpl) {
+				if (FLEXI_J16GE) {
+					//echo "<pre>"; print_r($itemdata->attribs); echo "</pre>"; //exit;
+					foreach ($tmpl->params->getGroup('attribs') as $field) {
+						$fieldname =  $field->__get('fieldname');
+						$value = $itemdata->parameters->get($fieldname);
+						if ( strlen($value) ) $tmpl->params->setValue($fieldname, 'attribs', $value);
+					}
+				} else {
+					$tmpl->params->loadINI($item->attribs);
 				}
-			} else {
-				$tmpl->params->loadINI($item->attribs);
 			}
 		}
 		$this->assignRef('tmpls',		$tmpls);

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 1079 2012-01-02 00:18:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,16 +19,14 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
+
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
 				<table  class="admintable">
 					<tr>
 						<td class="key">
-							<label for="name">
-								<?php //echo JText::_( 'FLEXI_TYPE_NAME' ).':'; ?>
 								<?php echo $this->form->getLabel('name'); ?>
-							</label>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('name'); ?>
@@ -57,6 +55,8 @@ defined('_JEXEC') or die('Restricted access');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$fieldSets = $this->form->getFieldsets('attribs');
 				foreach ($fieldSets as $name => $fieldSet) :
+					if ( $name=='themes' ) continue;
+					
 					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($name).'_FIELDSET_LABEL';
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
@@ -76,12 +76,18 @@ defined('_JEXEC') or die('Restricted access');
 				<?php endforeach;
 				echo JHtml::_('sliders.end');
 				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				
+				foreach ($this->form->getFieldset('themes') as $field) :
+					if ($field->hidden) echo $field->input;
+					else echo $field->label . $field->input;
+				endforeach;
+				
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				foreach ($this->tmpls as $tmplname=>$tmpl) :
 					$fieldSets = $tmpl->params->getFieldsets('attribs');
 					foreach ($fieldSets as $name => $fieldSet) :
-						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';

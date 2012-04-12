@@ -269,23 +269,34 @@
 			</field>
 			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
 
-			<field name="separator11" label="" type="separator" default="FLEXI_SIMPLIFY_FRONTEND_FORM" level="level1" menu="hide" />
+			<field name="separator11" label="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" level="level1" menu="hide" />
 
-			<field name="usealias" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+			<field name="usealias_fe" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usemetadata" type="radio" default="1" label="FLEXI_MENU_USE_META" description="FLEXI_MENU_USE_META_DESC">
+			<field name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
-			<field name="usepublicationdetails" type="radio" default="0" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
+			<field name="usemetadata_fe" type="radio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
+				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
-			<field name="usetemplateparams" type="radio" default="0" label="FLEXI_MENU_USE_TEMPLATE_PARAMS" description="FLEXI_MENU_USE_TEMPLATE_PARAMS_DESC">
+			<field name="usepublicationdetails_fe" type="radio" default="1" label="FLEXI_MENU_USE_PUBLICATION_DETAILS" description="FLEXI_MENU_USE_PUBLICATION_DETAILS_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_USEFIELD_YES_NEED_PARAMS</option>
+				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
+				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
+			</field>
+			<field name="useitemparams_fe" type="fccheckbox" default=""
+				checkoptions="FLEXI_PARAMETERS_ITEM_BASIC,FLEXI_PARAMETERS_ITEM_ADVANCED,FLEXI_PARAMETERS_ITEM_SEOCONF" checkvals="basic,advanced,seoconf" defaultvals=""
+				label="FLEXI_MENU_USE_ITEM_PARAMETERS" description="FLEXI_MENU_USE_ITEM_PARAMETERS_DESC" />
+			<field name="selecttheme_fe" type="radio" default="0" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
+				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 			</field>
 			
 			<field name="separator12" label="" type="separator" default="FLEXI_CACHE_CONF" level="level1" menu="hide" />

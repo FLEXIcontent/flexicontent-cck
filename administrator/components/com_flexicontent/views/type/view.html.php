@@ -31,7 +31,7 @@ class FlexicontentViewType extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -62,7 +62,6 @@ class FlexicontentViewType extends JView {
 		JToolBarHelper::save();
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
-
 
 		//Get data from the model
 		$model		= & $this->getModel();

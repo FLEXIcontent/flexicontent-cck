@@ -82,10 +82,11 @@ if ($cid && $overridecatperms && $isNew) :
 endif;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-	JHTML::_('behavior.mootools');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.4.4.min.js');
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
 	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
 }
+JHTML::_('behavior.mootools');
+
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
 	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -97,7 +98,7 @@ $this->document->addScript( JURI::base().'administrator/components/com_flexicont
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
 
-if ($this->perms['cantags']) {
+if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
@@ -235,7 +236,7 @@ function deleteTag(obj) {
 				<span class="fcbutton_preview_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
 			<?php
-				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=1000,height=600,directories=no,location=no';
+				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
 				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute(getValueFCitem($this->item, 'id').':'.getValueFCitem($this->item, 'alias'), getValueFCitem($this->item, 'catid')).'&preview=1');
 			?>
 			
@@ -272,7 +273,7 @@ function deleteTag(obj) {
 				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape(getValueFCitem($this->item, 'title')); ?>" size="65" maxlength="254" />
 			</div>
 		
-	<?php if ($this->params->get('usealias', 1)) : ?>
+	<?php if ($this->params->get('usealias_fe', 1)) : ?>
 					
 			<div class="flexi_formblock">
 				<label id="alias-lbl" for="alias" class="flexi_label" >
@@ -296,6 +297,12 @@ function deleteTag(obj) {
 
 	
 	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+			<div class="flexi_formblock">
+				<label id="catid-lbl" for="catid" class="flexi_label">
+					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+				</label>
+				<?php echo $fixedmaincat; ?>
+			</div>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
 			<div class="flexi_formblock">
 				<label id="cid-lbl" for="cid" class="flexi_label">
@@ -309,13 +316,13 @@ function deleteTag(obj) {
 				<?php echo $fixedcats; ?>
 			</div>
 		<?php endif; ?>
+	<?php else : ?>
 			<div class="flexi_formblock">
 				<label id="catid-lbl" for="catid" class="flexi_label">
-					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
-				<?php echo $fixedmaincat; ?>
+				<?php echo $this->lists['catid']; ?>
 			</div>
-	<?php else : ?>
 		<?php if ($this->perms['multicat']) : ?>
 			<div class="flexi_formblock">
 				<label id="cid-lbl" for="cid" class="flexi_label">
@@ -327,13 +334,6 @@ function deleteTag(obj) {
 				<?php echo $this->lists['cid']; ?>
 			</div>
 		<?php endif; ?>
-		
-			<div class="flexi_formblock">
-				<label id="catid-lbl" for="catid" class="flexi_label">
-					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
-				</label>
-				<?php echo $this->lists['catid']; ?>
-			</div>
 	<?php endif; ?>
 
 
@@ -422,20 +422,21 @@ function deleteTag(obj) {
 		<?php endif; ?>
 
 	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtags)) ) : ?>
-	
-		<fieldset class="flexi_tags">
+		<?php $display_tags = $this->params->get('usetags_fe', 1)==0 ? 'style="display:none;"' : ''; ?>
+		
+		<fieldset class="flexi_tags" <?php echo $display_tags ?> >
 			<legend><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
 				<div class="qf_tagbox" id="qf_tagbox">
 					<ul id="ultagbox">
 					<?php
 						foreach( $this->tags as $tag ) {
 							if(in_array($tag->id, $this->usedtags)) {
-								if ($this->perms['cantags']) {
+								if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
 									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
 								} else {
-									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" class="deletetag" align="right"></a></li>';
+									echo '<li class="tagitem" style="background-image:url()!important;"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" />&nbsp;</li>';
 								}
 							}
 						}
@@ -443,7 +444,7 @@ function deleteTag(obj) {
 					</ul>
 					<br class="clear" />
 				</div>
-		<?php if ($this->perms['cantags']) : ?>
+		<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 				<div id="tags">
 					<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
@@ -578,12 +579,24 @@ function deleteTag(obj) {
 <?php	endif; ?>
 
 	
-<?php if (getValueFCitem($this->item, 'id') != 0) : // (existing item) show items parameters (standard, extended, template) ?>
+<?php if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
 	<?php echo "<br/ >"; ?>
 	<?php  echo $this->pane->startPane( 'det-pane' ); ?>
 	<?php 
-		if ( $this->params->get('usemetadata', 1) ) {
+		if ( $this->params->get('usemetadata_fe', 1) ) {
+			
+			// Remove xml nodes if advanced meta parameters
+			if ($this->params->get('usemetadata_fe', 1) != 2 ) :
+				$advanced_metadata_params = array('robots', 'author');
+				$metadata_nodes = array();
+				foreach($this->formparams->_xml['metadata']->_children as $index => $element) :
+					if ( ! in_array($element->_attributes['name'], $advanced_metadata_params))
+						$metadata_nodes[] = & $this->formparams->_xml['metadata']->_children[$index];
+				endforeach;
+				$this->formparams->_xml['metadata']->_children = $metadata_nodes;
+			endif;
+			
 			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
 			echo $this->pane->startPanel( $title, "metadata-page" );
 			echo $this->formparams->render('meta', 'metadata');
@@ -591,31 +604,80 @@ function deleteTag(obj) {
 		}
 	?>
 	
-	<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails', 0)) : ?>
+	<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
 		<?php
-		$title = JText::_( 'FLEXI_DETAILS' );
+			// Remove xml nodes if advanced meta parameters
+			//echo "<pre>"; print_r($this->formparams->_xml); exit;
+			
+			if ($this->params->get('usepublicationdetails_fe', 1) != 2 ) :
+				$advanced_metadata_params = array('created_by', 'created_by_alias', 'created');
+				$metadata_nodes = array();
+				foreach($this->formparams->_xml['_default']->_children as $index => $element) :
+					if ( ! in_array($element->_attributes['name'], $advanced_metadata_params))
+						$metadata_nodes[] = & $this->formparams->_xml['_default']->_children[$index];
+				endforeach;
+				$this->formparams->_xml['_default']->_children = $metadata_nodes;
+			endif;
+
+
+		$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
 		echo $this->pane->startPanel( $title, 'details' );
 		echo $this->formparams->render('details');
 		echo $this->pane->endPanel();
 		?>
 	<?php endif; ?>
 		
-	<?php if ($this->perms['canparams'] && $this->params->get('usetemplateparams', 1)) : ?>
+	<?php
+		$useitemparams_fe = $this->params->get('useitemparams_fe');
+		if ( empty($useitemparams_fe) ) {
+			$useitemparams_fe = array();
+		} else if ( !is_array($useitemparams_fe) ) {
+			$useitemparams_fe = explode("|", $useitemparams_fe);
+		}
 		
-		<?php
-		$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
-		echo $this->pane->startPanel( $title, "params-page" );
-		echo $this->formparams->render('params', 'standard');
-		echo $this->pane->endPanel();
-
-		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
-		foreach ($this->tmpls as $tmpl) {
-			$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
-			echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-			echo $tmpl->params->render();
+		if ( in_array('basic', $useitemparams_fe) ) {
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_BASIC' );
+			echo $this->pane->startPanel( $title, "params-basic" );
+			echo $this->formparams->render('params', 'basic');
 			echo $this->pane->endPanel();
 		}
+		
+		if ( in_array('advanced', $useitemparams_fe) ) {
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_ADVANCED' );
+			echo $this->pane->startPanel( $title, "params-advanced" );
+			echo $this->formparams->render('params', 'advanced');
+			echo $this->pane->endPanel();
+		}
+
+		if ( in_array('seoconf', $useitemparams_fe) ) {
+			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_SEOCONF' );
+			echo $this->pane->startPanel( $title, "params-seoconf" );
+			echo $this->formparams->render('params', 'seoconf');
+			echo $this->pane->endPanel();
+		}
+
+	if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) :
+	
+		$type_default_layout = $this->tparams->get('ilayout');
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+		echo $this->formparams->render('params', 'themes');
+	?>
+	
+	<blockquote id='__content_type_default_layout__'>
+		<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+	</blockquote>
+	
+	<?php
+		if ( $this->params->get('selecttheme_fe') == 2 ) :
+			foreach ($this->tmpls as $tmpl) :
+				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+				
+				echo $this->pane->startPanel( $title, "params-".$tmpl->name );
+				echo $tmpl->params->render();
+				echo $this->pane->endPanel();
+			endforeach;
+		endif;
 		?>
 	<?php endif; ?>
 	
