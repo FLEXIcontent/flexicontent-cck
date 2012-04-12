@@ -90,7 +90,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// CHECK permissions, in case form was tampered with ...
 		$itemid = @$post['id'];
 		$isnew  = !$itemid;
-		JRequest::setVar( 'cid', array($itemid), 'post', 'array' );
+		if (FLEXI_J16GE) {
+			JRequest::setVar( 'cid', array($itemid), 'post', 'array' );
+		}
 		
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
