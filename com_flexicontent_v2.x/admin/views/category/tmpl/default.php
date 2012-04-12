@@ -186,7 +186,7 @@ dump($this->row);
 				<?php
 				$fieldSets = $this->iform->getFieldsets('params');
 				foreach ($fieldSets as $name => $fieldSet) :
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
@@ -201,12 +201,24 @@ dump($this->row);
 				<?php endforeach;
 				echo JHtml::_('sliders.end');
 				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				?>
+				
+				<?php foreach($this->iform->getGroup('templates') as $field): ?>
+					<?php if ($field->hidden): ?>
+						<?php echo $field->input; ?>
+					<?php else: ?>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					<?php endif; ?>
+				<?php endforeach; ?>
+				
+				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->iform->getValue("id"), array('useCookie'=>1));
 				foreach ($this->tmpls as $tmpl) {
 					$fieldSets = $tmpl->params->getFieldsets('attribs');
 					foreach ($fieldSets as $name => $fieldSet) :
-						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';

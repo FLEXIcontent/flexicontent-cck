@@ -194,20 +194,26 @@ dump($this->row);
 				<?php
 				echo $this->pane->endPanel();
 
-				$title = JText::_( 'FLEXI_PARAMETERS_STANDARD' );
+				$title = JText::_( 'FLEXI_PARAMETERS_CAT_INFO_OPTIONS' );
 				echo $this->pane->startPanel( $title, "params-std" );
 				echo $this->form->render('params');
 				echo $this->pane->endPanel();
 
-				$title = JText::_( 'FLEXI_PARAMETERS_COMMON' );
-				echo $this->pane->startPanel( $title, "params-common" );
-				echo $this->form->render('params', 'common');
+				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
+				echo $this->pane->startPanel( $title, "params-item_list_creation" );
+				echo $this->form->render('params', 'item_list_creation');
 				echo $this->pane->endPanel();
 				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_THEMES' ) . '</h3>';
+				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );
+				echo $this->pane->startPanel( $title, "params-item_filtering" );
+				echo $this->form->render('params', 'item_filtering');
+				echo $this->pane->endPanel();
+				
+				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				echo $this->form->render('params', 'templates')."<br/>";
 
 				foreach ($this->tmpls as $tmpl) {
-					$title = JText::_( 'FLEXI_PARAMETERS_SPECIFIC' ) . ' : ' . $tmpl->name;
+					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 					echo $tmpl->params->render();
 					echo $this->pane->endPanel();
