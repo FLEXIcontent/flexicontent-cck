@@ -78,7 +78,7 @@ class JFormFieldFlexicategories extends JFormField
 		}
 		if ( $node->getAttribute('multiple') && $node->getAttribute('multiple')=='true' ) {
 			$attribs .=' multiple="multiple"';
-			$fieldName .= "[]";
+			//$fieldName .= "[]"; // html form element has this already
 		}
 
 		$classes = '';
