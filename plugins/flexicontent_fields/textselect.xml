@@ -29,8 +29,8 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 		<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 			<option value="0">FLEXI_NO</option>
@@ -43,10 +43,10 @@
 			<option value="1">FLEXI_LINE_BREAK</option>
 			<option value="2">FLEXI_PIPE</option>
 			<option value="3">FLEXI_COMMA</option>
-			<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
+			<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
 		</param>
-		<param name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
-		<param name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
+		<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+		<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -60,8 +60,8 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="select_pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-		<param name="select_posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="select_pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+		<param name="select_posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 		<param name="select_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 		<param name="select_firstoptiontext" type="text" default="Please Select" label="First option text" description="First option text." />
 		<param name="select_usefirstoption" type="radio" default="1" label="Use first option" description="Use 'Please Select' option, if you don't need to use this option you can click No.">

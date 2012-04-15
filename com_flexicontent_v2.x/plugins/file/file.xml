@@ -22,15 +22,23 @@
 		</fieldset>
 		<fieldset name="group-file">
 			<field name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			
 			<field name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
-				<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
 			</field>
-			<field name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
-			<field name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
