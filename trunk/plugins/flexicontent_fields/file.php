@@ -197,6 +197,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$mainframe =& JFactory::getApplication();
 
 		// some parameter shortcuts
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
 		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;
 		$opentag		= $field->parameters->get( 'opentag', '' ) ;
 		$closetag		= $field->parameters->get( 'closetag', '' ) ;
@@ -204,6 +207,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
 		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 0 ) ;
+		
+		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		// Description as tooltip
 		if ($display_filename==2) JHTML::_('behavior.tooltip');
@@ -242,7 +248,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		foreach ($values as $value) {
 			$icon = '';
 			$filename = $this->getFileName( $value );
-			if ($filename) {	
+			if ($filename) {
 				
 				// --. Create icon according to filetype
 				if ($useicon) {
@@ -275,18 +281,26 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				// (*) with file manager 's description of file as tooltip or as inline text
 				if ($usebutton) {
 					$class_str .= ' button';   // Add an extra css class
-					$str = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
-						$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
+					$str  = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
+					$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
 					$str .= '</form>';
-					$field->{$prop}[] = $str;
 				} else {
 					$name_str = $filename->altname;   // no download button, force display of filename
-					$field->{$prop}[]	= $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_str . '</a>' ." ". $text_html;
+					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_str . '</a>' ." ". $text_html;
 				}
+				
+				// Values Prefix and Suffox Texts
+				$field->{$prop}[]	=  $pretext . $str . $posttext;
+				$n++;
 			}
-			$n++;
+			
 		}
+		
+		// Values Separator
 		$field->{$prop} = implode($separatorf, $field->{$prop});
+		
+		// Field opening / closing texts
+		$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 	}
 	
 
