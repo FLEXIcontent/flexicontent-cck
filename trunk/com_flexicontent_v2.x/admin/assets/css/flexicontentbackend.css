@@ -643,6 +643,7 @@ div fieldset.panelform fieldset.radio label {
 	float:left;
 	min-width:0px;
 	margin-top:4px;
+	width:auto!important;
 }
 
 div fieldset.panelform {
@@ -671,7 +672,7 @@ div fieldset label {
 }
 div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
 div.panel fieldset img, div.panel fieldset button {
-	margin:4px 1px 0px 4px!important;
+	margin:6px 1px 0px 16px!important;
 	display:inline;
 	float:left;
 }

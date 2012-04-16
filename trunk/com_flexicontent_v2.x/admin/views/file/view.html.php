@@ -39,6 +39,8 @@ class FlexicontentViewFile extends JView {
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
+		$permission = FlexicontentHelperPerm::getPerm();
+		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		
@@ -48,6 +50,7 @@ class FlexicontentViewFile extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
+		$form			= & $this->get('Form');
 		$row     	= & $this->get( 'File' );
 		
 		// fail if checked out not by 'me'
@@ -66,9 +69,11 @@ class FlexicontentViewFile extends JView {
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		$this->assignRef('row'    	, $row);
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('document'      , $document);
+		$this->assignRef('permission'	, $permission);
+		$this->assignRef('row'				, $row);
+		$this->assignRef('form'				, $form);
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);
 	}

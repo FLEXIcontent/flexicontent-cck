@@ -92,7 +92,7 @@ class JElementFCcheckbox extends JElement
 				$disable_all = ' disabled="disabled" ';
 			}
 			$html .= '<input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" >-- '.JText::_('FLEXI_USE_GLOBAL').' --</label>';
+			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label>';
 		}
 
 		foreach($checkoptions as $i => $o) {
