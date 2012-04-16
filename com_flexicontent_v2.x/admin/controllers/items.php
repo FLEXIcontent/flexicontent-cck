@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1240 2012-04-12 04:32:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -269,8 +269,16 @@ class FlexicontentControllerItems extends JController
 		$user = & JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		
+		if (FLEXI_J16GE) {
+			$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
+		} else if (FLEXI_ACCESS) {
+			$canCopy = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
+		} else {
+			$canCopy = 1;
+		}
+		
 		// check access of copy task
-		if ( !$user->authorise('flexicontent.copyitems', 'com_flexicontent') ) {
+		if ( !$canCopy ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=items');
 			return false;

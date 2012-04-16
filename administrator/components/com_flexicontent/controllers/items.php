@@ -269,8 +269,16 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user = & JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		
+		if (FLEXI_J16GE) {
+			$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
+		} else if (FLEXI_ACCESS) {
+			$canCopy = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
+		} else {
+			$canCopy = 1;
+		}
+		
 		// check access of copy task
-		if ( !$user->authorise('flexicontent.copyitems', 'com_flexicontent') ) {
+		if ( !$canCopy ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=items');
 			return false;
