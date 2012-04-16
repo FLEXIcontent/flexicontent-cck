@@ -1596,7 +1596,7 @@ class FlexicontentModelItems extends JModel
 				// process field mambots onBeforeSaveField
 				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name] ) );
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$post[$field->name], &$files[$field->name], &$item ) );
 
 				// -- Add the new values to the database 
 				$postvalues = $post[$field->name];

@@ -109,7 +109,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField( $field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'select') return;

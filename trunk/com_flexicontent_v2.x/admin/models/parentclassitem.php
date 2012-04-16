@@ -979,7 +979,7 @@ class ParentClassItem extends JModelAdmin {
 				// process field mambots onBeforeSaveField
 				//$results = $dispatcher->trigger('onBeforeSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField',array( $field, &$postdata[$field->name], &$files[$field->name] ));
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField',array( $field, &$postdata[$field->name], &$files[$field->name], &$item ));
 
 				// add the new values to the database 
 				if (is_array(@$data[$field->name])) {
