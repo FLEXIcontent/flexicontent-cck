@@ -40,14 +40,14 @@ class JElementFlexicategories extends JElement
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		static $function_added = false;
-		
 		$doc 		=& JFactory::getDocument();
-		$fieldName	= $control_name.'['.$name.']';
-		$values = $value;
-		//var_dump($values);
-		if ( ! is_array( $values ) ) {
-			$values = explode(",", $values);
-		}
+		
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
 		
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -68,19 +68,18 @@ class JElementFlexicategories extends JElement
 			$doc->addScriptDeclaration($js);
 		}*/
 		
-		$attribs = '';
-		if ($node->attributes('size')) {
-			$attribs .= ' size="'.$node->attributes('size').'" ';
-		} else {
-			$attribs .= ' size="8" ';
-		}
-		if ( $node->attributes('multiple') && $node->attributes('multiple')=='true' ) {
+		$attribs = 'style="float:left;"';
+		if ( $node->attributes('multiple') && $node->attributes('multiple')!='false' ) {
 			$attribs .=' multiple="multiple"';
-			$fieldName .= "[]";
+			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="8" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<40) { ${element_id}_oldsize=$element_id.size; $element_id.size=40;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
+		} else {
+			$maximize_link = '';
 		}
-
+		
 		$classes = '';
-		if ( $node->attributes('required') && $node->attributes('required')=='true' ) {
+		if ( $node->attributes('required') && $node->attributes('required')!='false' ) {
 			$classes .= ' required';
 		}
 		if ( $node->attributes('validation_class') ) {
@@ -93,12 +92,13 @@ class JElementFlexicategories extends JElement
 		}
 		
 		$ffname = $node->attributes('name');
-		$html = flexicontent_cats::buildcatselect($tree, $fieldName, $values, $top,
+		$html = flexicontent_cats::buildcatselect($tree, $fieldname, $values, $top,
 			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
 			' class="inputbox '.$classes.'" '.$attribs,
 			false, true, $actions_allowed=array('core.create') );
-		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldName\" value=\"$values\" />";
-		return $html;
+		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldname\" value=\"$values\" />";
+		
+		return $html.$maximize_link;
 	}
 }
 ?>
