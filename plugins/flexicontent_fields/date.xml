@@ -32,7 +32,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+		<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
 			<option value="1">FLEXI_LINE_BREAK</option>
 			<option value="2">FLEXI_PIPE</option>
