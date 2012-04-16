@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modeladmin');
 
 /**
  * FLEXIcontent Component File Model
@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFile extends JModel
+class FlexicontentModelFile extends JModelAdmin
 {
 	/**
 	 * File data
@@ -223,5 +223,46 @@ class FlexicontentModelFile extends JModel
 
 		return true;
 	}
+	
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true) {
+		// Initialise variables.
+		$app = JFactory::getApplication();
+
+		// Get the form.
+		$form = $this->loadForm('com_flexicontent.field', 'field', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) {
+			return false;
+		}
+
+		return $form;
+	}
+	
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData() {
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+
+		if (empty($data)) {
+			$data = $this->getFile();
+		}
+
+		return $data;
+	}
+	
+	
+	
 }
 ?>

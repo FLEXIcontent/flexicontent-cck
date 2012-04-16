@@ -64,14 +64,12 @@ defined('_JEXEC') or die('Restricted access');
 					endif;
 					?>
 					<fieldset class="panelform">
-						<table>
-						<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<tr>
-							<td><?php echo $field->label; ?></td>
-							<td><?php echo $field->input; ?></td>
-						</tr>
-						<?php endforeach; ?>
-						</table>
+						<?php
+						foreach ($this->form->getFieldset($name) as $field) :
+							echo $field->label;
+							echo $field->input;
+						endforeach;
+						?>
 					</fieldset>
 				<?php endforeach;
 				echo JHtml::_('sliders.end');
@@ -94,18 +92,14 @@ defined('_JEXEC') or die('Restricted access');
 						endif;
 				?>
 						<fieldset class="panelform">
-							<table>
-							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
+							<?php 
+							foreach ($tmpl->params->getFieldset($name) as $field) :
 								$fieldname =  $field->__get('fieldname');
-								//$value = isset($this->attribs[$fieldname])?$this->attribs[$fieldname]:$tmpl->params->getValue($fieldname, $name);
 								$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
+								echo $tmpl->params->getLabel($fieldname, $name);
+								echo $tmpl->params->getInput($fieldname, $name, $value);
+							endforeach;
 							?>
-							<tr>
-								<td><?php echo $tmpl->params->getLabel($fieldname, $name); ?></td>
-								<td><?php echo $tmpl->params->getInput($fieldname, $name, $value); ?></td>
-							</tr>
-							<?php endforeach; ?>
-							</table>
 						</fieldset>
 				<?php
 					endforeach;//fieldSets

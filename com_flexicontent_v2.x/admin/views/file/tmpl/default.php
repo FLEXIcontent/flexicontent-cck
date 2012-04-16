@@ -95,6 +95,12 @@ function submitbutton(pressbutton) {
 
 
 <?php
+
+// We do not use assets for files it seems like an overkill,
+// INSTEAD we use 8 Component permissions:  uploadfiles, viewallfiles,
+// editfile, publishfile, deletefile, editownfile, publishownfile, deleteownfile
+
+/*
 if ($this->permission->CanConfig) :
 $this->document->addScriptDeclaration("
 	window.addEvent('domready', function() {
@@ -113,7 +119,7 @@ $this->document->addScriptDeclaration("
 	<table id="tabacces" class="admintable" width="100%">
 	<tr>
 		<td>
-		<div id="access"><?php echo $this->lists['access']; ?></div>
+		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 	</td>
 	</tr>
 </table>
@@ -121,7 +127,10 @@ $this->document->addScriptDeclaration("
 	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 </div>
 </fieldset>
-<?php endif; ?>
+<?php
+endif;
+*/
+?>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>
