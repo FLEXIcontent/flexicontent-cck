@@ -285,13 +285,12 @@ class FlexicontentModelItem extends ParentClassItem
 					$itemcats = FLEXI_J16GE ? $this->getCatsselected() : $this->_item->categories;
 					$cats_are_published = true;
 					foreach ($itemcats as $catid) {
-						$cats_are_published &= $globalcats[$catid]->published;
+						$cats_are_published |= $globalcats[$catid]->published;
 						if (FLEXI_J16GE) {  // For J1.6+ check all ancestor categories from current one to the root
-							foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published &= $globalcats[$pcid]->published;
+							foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published |= $globalcats[$pcid]->published;
 						}
 					}
 					$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
-					
 				}
 				
 				
