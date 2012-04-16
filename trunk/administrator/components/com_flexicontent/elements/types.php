@@ -20,7 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 /**
- * Renders a fields element
+ * Renders a types element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
@@ -37,7 +37,8 @@ class JElementTypes extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$db =& JFactory::getDBO();
+		$doc	= & JFactory::getDocument();
+		$db		= & JFactory::getDBO();
 		
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
@@ -47,20 +48,27 @@ class JElementTypes extends JElement
 		
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
-
-		$attribs = "";
-		if ($node->attributes('multiple')) {
+		
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
+		$attribs = 'style="float:left;"';
+		if ($node->attributes('multiple') && $node->attributes('multiple')!='false' ) {
 			$attribs .= ' multiple="true" ';
 			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
-			$fieldname = $control_name.'['.$name.'][]';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			$fieldname = $control_name.'['.$name.']';
+			$maximize_link = '';
 		}
-		$values = $value;
-		$element_id = $control_name.$name;
 
-		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		$html = JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return $html.$maximize_link;
 	}
 }
