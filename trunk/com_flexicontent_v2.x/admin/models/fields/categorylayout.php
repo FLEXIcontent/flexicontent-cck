@@ -38,6 +38,10 @@ class JFormFieldCategorylayout extends JFormFieldList
 	 */
 	protected $type = 'Categorylayout';
 
+	function set($property, $value) {
+		$this->$property = $value;
+	}
+	
 	function getOptions()
 	{
 		$themes	= flexicontent_tmpl::getTemplates();
