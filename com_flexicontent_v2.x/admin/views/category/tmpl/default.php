@@ -208,8 +208,12 @@ dump($this->row);
 					<?php if ($field->hidden): ?>
 						<?php echo $field->input; ?>
 					<?php else: ?>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
+						<?php 
+							echo $field->label;
+							$field->set('input', null);
+							$field->set('value', $this->attribs[$field->fieldname]);
+							echo $field->input;
+						?>
 					<?php endif; ?>
 				<?php endforeach; ?>
 				
