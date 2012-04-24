@@ -24,6 +24,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option> 
 			</field>
+			<field name="featured" type="list" default="" label="FLEXI_FEATURED_ITEMS" description="FLEXI_FEATURED_ITEMS_DESC"> 
+				<option value="">FLEXI_SHOW_BOTH</option>
+				<option value="show">FLEXI_FEATURED_ONLY</option> 
+				<option value="hide">FLEXI_NORMAL_ONLY</option> 
+			</field>
 		</fieldset>
 	</fields>
 </metadata>

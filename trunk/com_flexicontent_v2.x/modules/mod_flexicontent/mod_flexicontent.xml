@@ -106,6 +106,13 @@
 				<option value="2">FLEXI_INCLUDE</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_FEATURED_ITEMS_SCOPE" level="level1" menu="hide" />
+			<field name="method_featured" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_FEATURED_ITEMS_DESC">
+				<option value="0">FLEXI_ALL</option>
+				<option value="1">FLEXI_EXCLUDE</option>
+				<option value="2">FLEXI_INCLUDE</option>
+			</field>
+			
 			<field name="FLEXI_CAT_SCOPE" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 			<field name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
