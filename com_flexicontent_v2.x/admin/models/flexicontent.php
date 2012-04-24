@@ -1610,8 +1610,9 @@ class FlexicontentModelFlexicontent extends JModel
 				$assetId = (int) $result;
 			}
 		}
+		
 		// This is a category that needs to parent with the extension.
-		elseif ($assetId === null) {
+		if ($assetId === null || $assetId === false) {
 			// Build the query to get the asset id for the parent category.
 			$query	= $db->getQuery(true)
 				->select('id')
@@ -1624,9 +1625,10 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 
 		// Return the asset id.
-		if ($assetId) {
+		return $assetId;
+		/*if ($assetId) {
 			return $assetId;
-		}/* else {
+		} else {
 			return parent::_getAssetParentId($table, $id);
 		}*/
 	}
