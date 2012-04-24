@@ -245,7 +245,7 @@
 			<field name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		
 			<field name="FLEXI_IMAGE_PARAMS" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
-			<field name="mod_image" type="fcimage" valcolumn="name" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+			<field name="mod_image" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="mod_image_custom_display" type="text" size="48" default="" label="Field HTML as Image" description=
 				"You can use the HTML produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- &lt;b&gt;Note: image size and other parameters are not used&lt;/b&gt;,&lt;br&gt; -- Write: like fieldname##varname e.g. for image fields use: imgfieldname##display_small, imgfieldname##display_medium, imgfieldname##display_large" />
 			<field name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
