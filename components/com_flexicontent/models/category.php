@@ -647,6 +647,16 @@ class FlexicontentModelCategory extends JModel {
 			}
 		}
 		
+		// Featured items, this item property exists in J1.6+ only
+		if (FLEXI_J16GE) {
+			$featured = $cparams->get('featured');
+			switch ($featured) {
+				case 'show': $where .= ' AND i.featured=1'; break;
+				case 'hide': $where .= ' AND i.featured=0'; break;
+				default: break;
+			}
+		}
+		
 		global $currcat_data;
 		return $currcat_data['where'] = $where;
 	}

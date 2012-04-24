@@ -522,6 +522,9 @@ class modFlexicontentHelper
 		// current item scope parameters
 		$method_curuserfavs = (int)$params->get('method_curuserfavs', 1);
 		
+		// featured items scope parameters
+		$method_featured = (int)$params->get('method_featured', 1);
+		
 		// categories scope parameters
 		$method_cat 		= (int)$params->get('method_cat', 1);
 		$catids 			= $params->get('catids', array());
@@ -668,6 +671,15 @@ class modFlexicontentHelper
 		} else {
 		  // All Items regardless of being favoured by current user
 		  $join_favs = '';
+		}
+		
+		// featured items scope
+  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
+			$where .= ' AND i.featured=0';
+		} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
+			$where .= ' AND i.featured=1';
+		} else {
+		  // All Items regardless of being featured or not
 		}
 		
 		// categories scope
