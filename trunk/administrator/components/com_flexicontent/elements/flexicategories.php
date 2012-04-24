@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: qfcategory.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: flexicategories.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,23 +19,25 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+// Load the category class
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+
 /**
- * Renders an Item element
+ * Renders a category list
  *
  * @package Joomla
  * @subpackage FLEXIcontent
- * @since 1.0
+ * @since 1.5
  */
-
 class JElementFlexicategories extends JElement
 {
-   /**
-	* Element name
-	*
-	* @access	protected
-	* @var		string
-	*/
-	var	$_name = 'Title';
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	
+	var	$_name = 'Flexicategories';
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{

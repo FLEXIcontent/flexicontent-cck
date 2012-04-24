@@ -21,7 +21,15 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.html.html');
 jimport('joomla.form.formfield');
 /**
- * Renders a types element
+ * Renders an alphaindex element
+ *
+ * @package 	Joomla
+ * @subpackage	FLEXIcontent
+ * @since		1.5
+ */
+
+/**
+ * Renders an alphaindex element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
@@ -37,7 +45,8 @@ class JFormFieldAlphaindex extends JFormField
 	*/
 	var	$type = 'Alphaindex';
 
-	function getInput() {
+	function getInput()
+	{
 		$doc 		=& JFactory::getDocument();
 		$db =& JFactory::getDBO();
 		$node = &$this->element;

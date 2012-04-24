@@ -37,18 +37,18 @@ class JElementFields extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-
-		$db =& JFactory::getDBO();
+		$doc	= & JFactory::getDocument();
+		$db		= & JFactory::getDBO();
 		
 		$and = ((boolean)$node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
 		if ((boolean)$node->attributes('fieldnameastext')) {
 			$text = 'CONCAT(label, \'(\', `name`, \')\')';
-		}else{
+		} else {
 			$text = 'label';
 		}
 		if ((boolean)$node->attributes('fieldnameasvalue')) {
 			$ovalue = '`name`';
-		}else{
+		} else {
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
 		
@@ -78,25 +78,30 @@ class JElementFields extends JElement
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
-		if ( $db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
-			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-		}
 		
-		$attribs = "";
-		if ((boolean)$node->attributes('multiple')) {
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
+		$attribs = ' style="float:left;" ';
+		if ($node->attributes('multiple') && $node->attributes('multiple')!='false' ) {
 			$attribs .= ' multiple="true" ';
 			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
-			$fieldname = $control_name.'['.$name.'][]';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			$fieldname = $control_name.'['.$name.']';
+			$maximize_link = '';
 		}
 		if ($onchange = $node->attributes('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
-		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
+		$html = JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return $html.$maximize_link;
 	}
 }

@@ -67,6 +67,9 @@ class JElementTypes extends JElement
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
+		if ($onchange = $node->attributes('onchange')) {
+			$attribs .= ' onchange="'.$onchange.'"';
+		}
 
 		$html = JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 		return $html.$maximize_link;

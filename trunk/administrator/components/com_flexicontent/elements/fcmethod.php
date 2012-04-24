@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 4 $Id: fcmethod.php 567 2011-04-13 11:06:52Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: fcmethod.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
