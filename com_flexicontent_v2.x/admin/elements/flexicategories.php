@@ -21,21 +21,21 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.html.html');
 jimport('joomla.form.formfield');
 /**
- * Renders an Item element
+ * Renders a category list
  *
  * @package Joomla
  * @subpackage FLEXIcontent
- * @since 1.0
+ * @since 1.5
  */
 
 class JFormFieldFlexicategories extends JFormField
 {
-   /**
-	* Element name
-	*
-	* @access	protected
-	* @var		string
-	*/
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	
 	var	$type = 'Flexicategories';
 
 	function getInput()

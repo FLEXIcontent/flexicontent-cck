@@ -20,7 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 /**
- * Renders a fields element
+ * Renders an alphaindex element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
@@ -79,9 +79,9 @@ class JElementAlphaindex extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
+		$doc 		=& JFactory::getDocument();
 		$db =& JFactory::getDBO();
 		
-		$doc 		=& JFactory::getDocument();
 		$options = array();
 		$options[0] = new stdClass();  $options[1] = new stdClass();  $options[2] = new stdClass();
 		$options[0]->text=JTEXT::_("FLEXI_HIDE"); $options[0]->value=0;

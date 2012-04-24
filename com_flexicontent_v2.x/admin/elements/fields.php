@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: fields.php 1225 2012-04-01 03:22:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,21 +37,21 @@ class JFormFieldFields extends JFormField
 	 */
 	var	$type = 'Fields';
 
-	function getInput() {
-		$values = $this->value;
-
-		$db =& JFactory::getDBO();
-		$node = &$this->element;
+	function getInput()
+	{
+		$doc	= & JFactory::getDocument();
+		$db		= & JFactory::getDBO();
+		$node	= & $this->element;
 		
 		$and = ((boolean)$node->getAttribute('isnotcore')) ? ' AND iscore = 0' : '';
 		if ((boolean)$node->getAttribute('fieldnameastext')) {
 			$text = 'CONCAT(label, \'(\', `name`, \')\')';
-		}else{
+		} else {
 			$text = 'label';
 		}
 		if ((boolean)$node->getAttribute('fieldnameasvalue')) {
 			$ovalue = '`name`';
-		}else{
+		} else {
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
 		
@@ -81,25 +81,30 @@ class JFormFieldFields extends JFormField
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
-		if ( $db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
-			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-		}
 		
-		$attribs = "";
-		if ((boolean)$node->getAttribute('multiple')) {
-			$attribs .= ' multiple="true" ';
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
+		$attribs = ' style="float:left;" ';
+		if ($node->getAttribute('multiple') && $node->getAttribute('multiple')!='false' ) {
+			$attribs .= 'multiple="true" ';
 			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
-			$fieldname = $this->name.'[]';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			$fieldname = $this->name;
+			$maximize_link = '';
 		}
 		if ($onchange = $node->getAttribute('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
-		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values);
+		$html = JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return $html.$maximize_link;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1237 2012-04-04 00:46:19Z ggppdk $
+ * @version 1.2 $Id: helper.php 1242 2012-04-12 04:52:32Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,6 +18,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+jimport('joomla.html.parameter');
 
 require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');

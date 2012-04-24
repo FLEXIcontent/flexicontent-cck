@@ -1,9 +1,10 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1081 2012-01-02 20:32:09Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @author ggppdk
  * @license GNU/GPL v2
  * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
@@ -18,38 +19,36 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+
 /**
- * Renders a types element
+ * Renders a tags element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldTypes extends JFormField
+class JElementTags extends JElement
 {
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$type = 'Types';
+	var	$_name = 'Tags';
 
-	function getInput()
+	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
-		$node	= & $this->element;
 		
 		$query = 'SELECT id AS value, name AS text'
-		. ' FROM #__flexicontent_types'
+		. ' FROM #__flexicontent_tags'
 		. ' WHERE published = 1'
 		. ' ORDER BY name ASC, id ASC'
 		;
 		
 		$db->setQuery($query);
-		$types = $db->loadObjectList();
+		$tags = $db->loadObjectList();
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
@@ -59,21 +58,21 @@ class JFormFieldTypes extends JFormField
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
 		
 		$attribs = ' style="float:left;" ';
-		if ($node->getAttribute('multiple') && $node->getAttribute('multiple')!='false' ) {
-			$attribs .= 'multiple="true" ';
-			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
+		if ($node->attributes('multiple')) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
-			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($tags, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
-		if ($onchange = $node->getAttribute('onchange')) {
+		if ($onchange = $node->attributes('onchange')) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
-		$html = JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		$html = JHTML::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 		return $html.$maximize_link;
 	}
 }

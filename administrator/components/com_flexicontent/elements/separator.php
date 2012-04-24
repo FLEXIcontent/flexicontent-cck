@@ -52,7 +52,6 @@ class JElementSeparator extends JElement
 			$class = "hasTip";
 			$title = JText::_($value)."::".JText::_($node->attributes('description'));
 		}
-		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</div>';
+		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>';
 	}
-
 }

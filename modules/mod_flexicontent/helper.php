@@ -18,6 +18,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+jimport('joomla.html.parameter');
 
 require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');

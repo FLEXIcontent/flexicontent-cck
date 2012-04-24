@@ -36,22 +36,11 @@ class JElementFCcheckbox extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		if (FLEXI_J16GE) {
-			$value = $this->value;
-			$node = & $this->element;
-		}
-		//print_r($value);
+		if (FLEXI_J16GE)  $node = & $this->element;
 		
-		// Handle J1.6+
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			if ( empty($value) ) {
-				$value = array();
-			} else if ( !is_array($value) ) {
-				$value = explode("|", $this->value);
-				$value = ($value[0]=='') ? array() : $value;
-			}
-		}
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		$split_char = ",";
 		
 		// Get options and values
@@ -67,27 +56,22 @@ class JElementFCcheckbox extends JElement
 		}
 
 		// Make value an array if value is not already array, also load defaults, if field parameter never saved
-		if (!is_array($value) || count($value)==0)
-			$value = (!is_array($value) && strlen($value)) ? array($value) : $defaultvals;
+		if ( count($values)==0 )  $values = $defaultvals;
 
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
 		
 		// Create checkboxes
-		if (FLEXI_J16GE) {
-			$fieldname = $this->name.'[]';
-			$element_id = $this->id;
-		} else {
-			$fieldname = $control_name.'['.$name.'][]';
-			$element_id = $control_name.$name;
-		}
+		$fieldname	= FLEXI_J16GE ? $this->name.'[]' : $control_name.'['.$name.'][]';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
 		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px">';
 		
 		$disable_all = '';
 		if ( $node->attributes('display_useglobal') ) {
 			$check_global='';
-			if (count($value) == 0) {
+			if (count($values) == 0) {
 				$check_global = ' checked="checked" ';
 				$disable_all = ' disabled="disabled" ';
 			}

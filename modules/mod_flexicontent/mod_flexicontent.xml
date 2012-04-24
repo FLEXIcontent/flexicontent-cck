@@ -104,7 +104,7 @@
 		
 		<param name="" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 		<param name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
-		<param name="catids" type="flexicategories" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
+		<param name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 		<param name="behaviour_cat" type="list" default="0" label="FLEXI_BEHAVIOUR" description="FLEXI_BEHAVIOUR_DESC">
 			<option value="0">FLEXI_STATIC_REGARDLESS_CURRENT_ITEM</option>
 			<option value="1">FLEXI_SAME_CAT</option>
@@ -240,7 +240,7 @@
 		<param name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" menu="hide" />
-		<param name="mod_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+		<param name="mod_image" type="fcimage" valcolumn="name" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 		<param name="mod_image_custom_display" type="text" size="48" default="" label="Field HTML as Image" description=
 			"You can use the HTML produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- &lt;b&gt;Note: image size and other parameters are not used&lt;/b&gt;,&lt;br&gt; -- Write: like fieldname##varname e.g. for image fields use: imgfieldname##display_small, imgfieldname##display_medium, imgfieldname##display_large" />
 		<param name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
@@ -290,7 +290,7 @@
 				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 		/>
-		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
+		<param name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -313,7 +313,7 @@
 				checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 				label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 		/>
-		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
+		<param name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." >
 			<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
