@@ -39,13 +39,15 @@ class FlexicontentControllerFields extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		 	'edit' );
+		$this->registerTask( 'add'  ,		 		'edit' );
 		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
-		$this->registerTask( 'copy', 			'copy' );
+		$this->registerTask( 'saveandnew',	'save' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic', 	'access' );
+			$this->registerTask( 'accessregistered','access' );
+			$this->registerTask( 'accessspecial', 	'access' );
+		}
+		$this->registerTask( 'copy', 				'copy' );
 	}
 
 	/**
@@ -61,12 +63,31 @@ class FlexicontentControllerFields extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$task		= JRequest::getVar('task');
-
-		//Sanitize
 		$post = JRequest::get( 'post' );
-
 		$model = $this->getModel('field');
+		$user	=& JFactory::getUser();
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			if (!$field_id) {
+				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+			} else {
+				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			}
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
+		
 		if ( $model->store($post) ) {
 
 			switch ($task)
@@ -93,8 +114,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		} else {
 
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_FIELD' );
-			//JError::raiseWarning( 500, $model->getError() );
-			$link 	= 'index.php?option=com_flexicontent&view=field';
+			$link = 'index.php?option=com_flexicontent&view=field';
+			JError::raiseWarning( 500, $model->getError() );
 		}
 
 		$model->checkin();
@@ -111,7 +132,24 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function publish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$user	=& JFactory::getUser();
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -120,15 +158,16 @@ class FlexicontentControllerFields extends FlexicontentController
 			$model = $this->getModel('fields');
 
 			if(!$model->publish($cid, 1)) {
-				JError::raiseError( 500, $model->getError() );
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+				JError::raiseWarning( 500, $model->getError() );
+			} else {
+				$total = count( $cid );
+				$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_PUBLISHED' );
+				$cache = &JFactory::getCache('com_flexicontent');
+				$cache->clean();
+				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
 			}
-
-			$total = count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_PUBLISHED' );
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -143,27 +182,40 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$user	=& JFactory::getUser();
 		$model 		= $this->getModel('fields');
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-
 		} else if (!$model->canunpublish($cid)) {
+			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_FIELDS' ));
 		} else {
-
-			if(!$model->publish($cid, 0)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			
+			if (FLEXI_J16GE) {
+				$asset = 'com_flexicontent.field.' . $field_id;
+				$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			} else {
+				$is_authorised = true;
 			}
 			
-			$total = count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_UNPUBLISHED' );
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
+			if ( !$is_authorised ) {
+				$msg = '';
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			} else if(!$model->publish($cid, 0)) {
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+				JError::raiseWarning( 500, $model->getError() );
+			} else {
+				$total = count( $cid );
+				$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_UNPUBLISHED' );
+				$cache = &JFactory::getCache('com_flexicontent');
+				$cache->clean();
+				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
+			}
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -179,26 +231,39 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$user	=& JFactory::getUser();
 		$model 		= $this->getModel('fields');
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-
+			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
 		} else if (!$model->candelete($cid)) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
+			$msg = '';
+			JError::raiseNotice(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
 		} else {
-
-			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			
+			if (FLEXI_J16GE) {
+				$asset = 'com_flexicontent.field.' . $field_id;
+				$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
+			} else {
+				$is_authorised = true;
 			}
 			
-			$msg = count($cid).' '.JText::_( 'FLEXI_FIELDS_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
+			if ( !$is_authorised ) {
+				$msg = '';
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			} else if (!$model->delete($cid)) {
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+				JError::raiseWarning( 500, $model->getError() );
+			} else {
+				$msg = count($cid).' '.JText::_( 'FLEXI_FIELDS_DELETED' );
+				$cache = &JFactory::getCache('com_flexicontent');
+				$cache->clean();
+				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
+			}
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
@@ -215,6 +280,33 @@ class FlexicontentControllerFields extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$model 	= $this->getModel('field');
+		$user	=& JFactory::getUser();
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
+		
+		// Error if checkedout by another administrator
+		if ($model->isCheckedOut( $user->get('id') )) {
+			$msg = JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg);
+			return;
+		}
 
 		$field = & JTable::getInstance('flexicontent_fields', '');
 		$field->bind(JRequest::get('post'));
@@ -237,10 +329,32 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			if (!$field_id) {
+				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+			} else {
+				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			}
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
+		
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
 			return;
 		}
 
@@ -248,6 +362,45 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		parent::display();
 	}
+
+
+	/**
+	 * Logic to order up/down a field
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function reorder($dir=null)
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		// Get variables: model, user, field id, new ordering
+		$model = $this->getModel('fields');
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+		} else if ( $model->move($dir) ){
+			// success
+		} else {
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
+			JError::raiseWarning( 500, $model->getError() );
+		}
+
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields');
+	}
+
 
 	/**
 	 * Logic to orderup a field
@@ -258,13 +411,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function orderup()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$model = $this->getModel('fields');
-		$model->move(-1);
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields');
+		$this->reorder($dir=-1);
 	}
 
 	/**
@@ -276,13 +423,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function orderdown()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$model = $this->getModel('fields');
-		$model->move(1);
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields');
+		$this->reorder($dir=1);
 	}
 
 	/**
@@ -297,13 +438,25 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$order 	= JRequest::getVar( 'order', array(0), 'post', 'array' );
-		
+		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
-		if(!$model->saveorder($cid, $order)) {
-			$msg = '';
-			JError::raiseError(500, $model->getError());
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
+
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+		} else if(!$model->saveorder($cid, $order)) {
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+			JError::raiseWarning( 500, $model->getError() );
 		} else {
 			$msg = JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
 		}
@@ -322,33 +475,55 @@ class FlexicontentControllerFields extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
 
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
+		$user	=& JFactory::getUser();
+		$model = $this->getModel('fields');
+		$task  = JRequest::getVar( 'task' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
 		} else {
-			if (FLEXI_ACCESS) {
-				$access = 3;
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
+			return;
+		}
+		
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$field_id];
+		} else {
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
 			} else {
-				$access = 2;
+				if (FLEXI_ACCESS) {
+					$access = 3;
+				} else {
+					$access = 2;
+				}
 			}
 		}
-
-		$model = $this->getModel('fields');
 		
-		if(!$model->saveaccess( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+		if(!$model->saveaccess( $field_id, $access )) {
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+			JError::raiseWarning( 500, $model->getError() );
 		} else {
+			$msg = '';
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
-		$this->setRedirect('index.php?option=com_flexicontent&view=fields' );
+		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg);
 	}
 
 	/**
@@ -363,29 +538,70 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		// Get model, user, ids of copied fields
+		$model = $this->getModel('fields');
+		$user  =& JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
-		$cf = 0;
-		$ncf = 0;
+		// calculate access
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.copyfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect('index.php?option=com_flexicontent&view=fields');
+			return;
+		}
+		
+		// Remove core fields
+		$core_cid = array();
+		$non_core_cid = array();
+		
+		// Copying of core fields is not allowed
 		foreach ($cid as $id) {
 			if ($id < 15) {
-				$cf++;
+				$core_cid[] = $id;
 			} else {
-				$ncf++;
+				$non_core_cid[] = $id;
 			}
 		}
-
-		$model = $this->getModel('fields');
 		
-		if(!$model->copy( $cid )) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_FIELDS_COPY_FAILED' ));
+		// Remove uneditable fields
+		$auth_cid = array();
+		$non_auth_cid = array();
+		
+		// Cannot copy fields you cannot edit
+		foreach ($non_core_cid as $id) {
+			$asset = 'com_flexicontent.field.' . $id;
+			if (FLEXI_J16GE) {
+				if ( $user->authorise('flexicontent.editfield', $asset) ) {
+					$auth_cid[] = $id;
+				} else {
+					$non_auth_cid[] = $id;
+				}
+			} else {
+				$auth_cid[] = $id;
+			}
+		}
+		
+		// Try to copy fields
+		if(!$model->copy( $auth_cid )) {
+			$msg = JText::_( 'FLEXI_FIELDS_COPY_FAILED' );
+			JError::raiseWarning( 500, $model->getError() );
 		} else {
 			$msg = '';
-			if ($ncf) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', $ncf) . ' ';
+			if (count($auth_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($auth_cid)) . ' ';
 			}
-			if ($cf) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', $cf);
+			if (count($core_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($core_cid)) . ' ';
+			}
+			if (count($non_auth_cid)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -395,26 +611,30 @@ class FlexicontentControllerFields extends FlexicontentController
 	}
 
 
+	//*************************
+	// RAW output functions ...
+	//*************************
+	
+	/**
+	 * Logic to get (e.g. via AJAX call) the field specific parameters
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
 	function getfieldspecificproperties() {
 		//$id		= JRequest::getVar( 'id', 0 );
-		JRequest::setVar( 'view', 'field' );
+		JRequest::setVar( 'view', 'field' );    // set view to be field, if not already done in http request
+		if (FLEXI_J16GE) {
+			JRequest::setVar( 'format', 'raw' );    // force raw format, if not already done in http request
+			JRequest::setVar( 'cid', '' );          // needed when changing type of an existing field
+		}
 		//JRequest::setVar( 'hidemainmenu', 1 );
 		
 		// Import field to execute its constructor, e.g. needed for loading language file etc
 		JPluginHelper::importPlugin('flexicontent_fields', JRequest::getVar('field_type'));
-		// Just in case it is need in future ...
-		JPluginHelper::importPlugin('flexicontent_fields', $plugin_name='core');
 		
-		$model 	= $this->getModel('field');
-		$user	=& JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
-			return;
-		}
-
-		$model->checkout( $user->get('id') );
+		// Display the field parameters
 		parent::display();
 	}
 }

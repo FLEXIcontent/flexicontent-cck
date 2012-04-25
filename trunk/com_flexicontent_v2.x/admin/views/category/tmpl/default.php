@@ -163,7 +163,7 @@ dump($this->row);
 					<?php echo $this->iform->getInput('access'); ?>
 				</fieldset>
 
-				<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_FIELDSET_LABEL'), 'meta-options'); ?>
+				<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION_FIELDSET_LABEL'), 'meta-options'); ?>
 				<fieldset class="panelform">
 				<ul class="adminformlist">
 					<li><?php echo $this->iform->getLabel('metadesc'); ?>
@@ -211,7 +211,7 @@ dump($this->row);
 						<?php 
 							echo $field->label;
 							$field->set('input', null);
-							$field->set('value', $this->attribs[$field->fieldname]);
+							$field->set('value', @$this->attribs[$field->fieldname]);
 							echo $field->input;
 						?>
 					<?php endif; ?>

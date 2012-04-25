@@ -36,9 +36,11 @@ class FlexicontentViewCategories extends JView {
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 			'filter_order', 	'c.lft', 'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir','filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
+		$filter_language	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
+		
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim($search) );
 
@@ -85,6 +87,9 @@ class FlexicontentViewCategories extends JView {
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );
 
+		//publish unpublished filter
+		$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'class="inputbox" onchange="submitform();"', $filter_language, 2);
+		
 		// search filter
 		$lists['search']= $search;
 

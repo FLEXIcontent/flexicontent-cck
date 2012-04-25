@@ -17,9 +17,9 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$listOrder	= $this->state->get('list.ordering');
-$listDirn	= $this->state->get('list.direction');
-$saveOrder 	= ($listOrder == 'a.lft' && $listDirn == 'asc');
+$listOrder	= $this->lists['order'];
+$listDirn	= $this->lists['order_Dir'];
+$saveOrder 	= ($listOrder == 'c.lft' && $listDirn == 'asc');
 $user		= &JFactory::getUser();
 $userId		= $user->get('id');
 ?>
@@ -33,7 +33,10 @@ $userId		= $user->get('id');
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-			  <?php echo $this->lists['state']; ?>
+				<div class="filter-select fltrt">
+				  <?php echo $this->lists['language']; ?>
+				  <?php echo $this->lists['state']; ?>
+				</div>
 			</td>
 		</tr>
 	</table>
@@ -50,9 +53,14 @@ $userId		= $user->get('id');
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="90">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'saveorder' ) : ''; ?>
+				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' ) : ''; ?>
 			</th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+				<th width="5%" class="nowrap">
+					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+			<th width="1%" nowrap="nowrap">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
 		</tr>
 	</thead>
 
@@ -70,6 +78,7 @@ $userId		= $user->get('id');
 		$i = 0;
 		$n = count($this->rows);
 		$canCats	= $this->permission->CanCats;
+		$originalOrders = array();
 		foreach ($this->rows as $row) {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link 		= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
@@ -129,6 +138,7 @@ $userId		= $user->get('id');
 				<?php echo $access; ?>
 			</td>
 			<td class="order">
+			 <?php if ($canChange) : ?>
 				<?php if ($saveOrder) : ?>
 					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
 					<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
@@ -136,8 +146,21 @@ $userId		= $user->get('id');
 				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
 				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" />
 				<?php $originalOrders[] = $orderkey + 1; ?>
+			<?php else : ?>
+				<?php echo $orderkey + 1;?>
+			<?php endif; ?>
 			</td>
-			<td align="center"><?php echo $row->id; ?></td>
+					<td class="center nowrap">
+					<?php if ($row->language=='*'):?>
+						<?php echo JText::alt('JALL','language'); ?>
+					<?php else:?>
+						<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
+					<?php endif;?>
+					</td>
+					<td class="center">
+						<span title="<?php echo sprintf('%d-%d', $item->lft, $item->rgt);?>">
+							<?php echo (int) $row->id; ?></span>
+					</td>
 		</tr>
 		<?php 
 			$k = 1 - $k;
@@ -154,5 +177,6 @@ $userId		= $user->get('id');
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="original_order_values" value="<?php echo implode($originalOrders, ','); ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>

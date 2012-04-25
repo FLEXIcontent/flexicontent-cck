@@ -34,13 +34,19 @@ class FlexicontentControllerFields extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		// Register Extra task
 		$this->registerTask( 'add'  ,		 		'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew',	'save' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic', 	'access' );
+			$this->registerTask( 'accessregistered','access' );
+			$this->registerTask( 'accessspecial', 	'access' );
+		}
 		$this->registerTask( 'copy', 				'copy' );
 	}
 
@@ -51,7 +57,8 @@ class FlexicontentControllerFields extends FlexicontentController
 	 * @return void
 	 * @since 1.0
 	 */
-	function save() {
+	function save()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
@@ -59,15 +66,19 @@ class FlexicontentControllerFields extends FlexicontentController
 		$post = JRequest::get( 'post' );
 		$model = $this->getModel('field');
 		$user	=& JFactory::getUser();
-
-		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
-		$asset = 'com_flexicontent.field.' . $field_id;
-		if (!$field_id) {
-			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			if (!$field_id) {
+				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+			} else {
+				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			}
 		} else {
-			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			$is_authorised = true;
 		}
 		
 		// check access
@@ -78,6 +89,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		if ( $model->store($post) ) {
+
 			switch ($task)
 			{
 				case 'apply' :
@@ -121,12 +133,16 @@ class FlexicontentControllerFields extends FlexicontentController
 	function publish()
 	{
 		$user	=& JFactory::getUser();
-		
-		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
-		$asset = 'com_flexicontent.field.' . $field_id;
-		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		} else {
+			$is_authorised = true;
+		}
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -167,9 +183,9 @@ class FlexicontentControllerFields extends FlexicontentController
 	function unpublish()
 	{
 		$user	=& JFactory::getUser();
-		
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$model 		= $this->getModel('fields');
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -178,9 +194,13 @@ class FlexicontentControllerFields extends FlexicontentController
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_UNPUBLISH_THESE_FIELDS' ));
 		} else {
-			$field_id		= (int)$cid[0];
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			
+			if (FLEXI_J16GE) {
+				$asset = 'com_flexicontent.field.' . $field_id;
+				$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			} else {
+				$is_authorised = true;
+			}
 			
 			if ( !$is_authorised ) {
 				$msg = '';
@@ -211,9 +231,10 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$model 		= $this->getModel('fields');
 		$user	=& JFactory::getUser();
+		$model 		= $this->getModel('fields');
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id		= (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -222,10 +243,13 @@ class FlexicontentControllerFields extends FlexicontentController
 			$msg = '';
 			JError::raiseNotice(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
 		} else {
-
-			$field_id		= (int)$cid[0];
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
+			
+			if (FLEXI_J16GE) {
+				$asset = 'com_flexicontent.field.' . $field_id;
+				$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
+			} else {
+				$is_authorised = true;
+			}
 			
 			if ( !$is_authorised ) {
 				$msg = '';
@@ -259,12 +283,16 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
-		
-		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
-		$asset = 'com_flexicontent.field.' . $field_id;
-		$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+		
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+		} else {
+			$is_authorised = true;
+		}
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -301,15 +329,19 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$model 	= $this->getModel('field');
 		$user	=& JFactory::getUser();
-
-		// calculate access
 		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
-		$asset = 'com_flexicontent.field.' . $field_id;
-		if (!$field_id) {
-			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+
+		// calculate access
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			if (!$field_id) {
+				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
+			} else {
+				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			}
 		} else {
-			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
+			$is_authorised = true;
 		}
 		
 		// check access
@@ -350,7 +382,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
 		// calculate access
-		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -364,7 +400,6 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields');
 	}
-
 
 
 	/**
@@ -410,7 +445,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
 		
 		// calculate access
-		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
 
 		// check access
 		if ( !$is_authorised ) {
@@ -438,12 +477,18 @@ class FlexicontentControllerFields extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$user	=& JFactory::getUser();
+		$model = $this->getModel('fields');
+		$task  = JRequest::getVar( 'task' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
 		
 		// calculate access
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
-		$asset = 'com_flexicontent.field.' . $field_id;
-		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		if (FLEXI_J16GE) {
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+		} else {
+			$is_authorised = true;
+		}
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -451,11 +496,23 @@ class FlexicontentControllerFields extends FlexicontentController
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
 			return;
 		}
-
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-		$access = $accesses[$field_id];
-
-		$model = $this->getModel('fields');
+		
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$field_id];
+		} else {
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
+			} else {
+				if (FLEXI_ACCESS) {
+					$access = 3;
+				} else {
+					$access = 2;
+				}
+			}
+		}
 		
 		if(!$model->saveaccess( $field_id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
@@ -486,8 +543,15 @@ class FlexicontentControllerFields extends FlexicontentController
 		$user  =& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
-		// check access of copy task
-		if ( ! $user->authorise('flexicontent.copyfields', 'com_flexicontent') ) {
+		// calculate access
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('flexicontent.copyfields', 'com_flexicontent');
+		} else {
+			$is_authorised = true;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=fields');
 			return;
@@ -513,10 +577,14 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Cannot copy fields you cannot edit
 		foreach ($non_core_cid as $id) {
 			$asset = 'com_flexicontent.field.' . $id;
-			if ( $user->authorise('flexicontent.editfield', $asset) ) {
-				$auth_cid[] = $id;
+			if (FLEXI_J16GE) {
+				if ( $user->authorise('flexicontent.editfield', $asset) ) {
+					$auth_cid[] = $id;
+				} else {
+					$non_auth_cid[] = $id;
+				}
 			} else {
-				$non_auth_cid[] = $id;
+				$auth_cid[] = $id;
 			}
 		}
 		
