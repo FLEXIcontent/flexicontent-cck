@@ -37,12 +37,6 @@ class FlexicontentControllerTags extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
-
-		// Register Extra task
-		$this->registerTask( 'add'  ,			'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'import', 			'import' );
 	}
 
 	/**

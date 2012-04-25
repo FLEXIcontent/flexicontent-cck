@@ -48,9 +48,9 @@
 	<param name="" type="jparamstab" description="FLEXI_TYPE_DESC_CUSTOMIZE" />
 	
 		<param name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" menu="hide" />
-		<param name="maintext_label" type="text" default="" size="100" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
-		<param name="maintext_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="maintext_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="maintext_label" type="text" default="" size="90" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
+		<param name="maintext_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="maintext_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
 		<param name="hide_maintext" type="radio" default="0" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
 			<option value="0">FLEXI_NO</option>
@@ -66,68 +66,68 @@
 	<param name="" type="jparamstab" description="FLEXI_TYPE_FIELDS1_CUSTOMIZE" />
 	
 		<param name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2" menu="hide" />
-		<param name="title_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="title_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="title_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="title_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="title_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="title_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
 		<param name="" type="separator" default="FLEXI_FIELD_CREATED" level="level2" menu="hide" />
-		<param name="created_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="created_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="created_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="created_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="created_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="created_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level2" menu="hide" />
-		<param name="created_by_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="created_by_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="created_by_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="created_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="created_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="created_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level2" menu="hide" />
-		<param name="modified_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="modified_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="modified_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="modified_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="modified_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="modified_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level2" menu="hide" />
-		<param name="modified_by_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="modified_by_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="modified_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="modified_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level2" menu="hide" />
-		<param name="document_type_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="document_type_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="document_type_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="document_type_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="document_type_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="document_type_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 	<param name="" type="jparamstab" description="FLEXI_TYPE_FIELDS2_CUSTOMIZE" />
 	
 		<param name="" type="separator" default="FLEXI_FIELD_HITS" level="level2" menu="hide" />
-		<param name="hits_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="hits_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="hits_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="hits_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="hits_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="hits_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_VERSION" level="level2" menu="hide" />
-		<param name="version_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="version_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="version_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="version_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="version_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="version_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_STATE" level="level2" menu="hide" />
-		<param name="state_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="state_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="state_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="state_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="state_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="state_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_VOTING" level="level2" menu="hide" />
-		<param name="voting_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="voting_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="voting_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="voting_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="voting_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="voting_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		<param name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
 		<param name="voting_main_label" type="text" default="Overall" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FFLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 		
 		<param name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level2" menu="hide" />
-		<param name="favourites_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="favourites_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="favourites_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="favourites_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="favourites_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="favourites_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_FIELD_TAGS" level="level2" menu="hide" />
-		<param name="tags_label" type="text" default="" size="100" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-		<param name="tags_desc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-		<param name="tags_viewdesc" type="textarea" default="" rows="2" cols="60" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+		<param name="tags_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+		<param name="tags_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+		<param name="tags_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 
 	<param name="" type="jparamstab" description="FLEXI_SEO_CONF" />
 		

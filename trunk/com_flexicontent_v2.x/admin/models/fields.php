@@ -126,14 +126,14 @@ class FlexicontentModelFields extends JModelList
 		static $query;
 		
 		if(!isset($query)) {
-			$db = &JFactory::getDBO();
-			$query = $db->getQuery(true);
 			
 			// Get the WHERE, HAVING and ORDER BY clauses for the query
 			$where		= trim($this->_buildContentWhere());
 			$orderby	= trim($this->_buildContentOrderBy());
 			$having		= trim($this->_buildContentHaving());
 	
+			$db = &JFactory::getDBO();
+			$query = $db->getQuery(true);
 			$query->select(
 				$this->getState( 'list.select',
 					't.*, level.title as access_level, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'

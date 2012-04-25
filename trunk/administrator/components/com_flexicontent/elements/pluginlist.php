@@ -37,7 +37,15 @@ class JElementPluginlist extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-
+		if (FLEXI_J16GE)  $node = & $this->element;
+		
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.'][]';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
 		$plugins 	= array();
 //		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
@@ -58,6 +66,6 @@ class JElementPluginlist extends JElement
 
 		$class = 'class="inputbox" multiple="true" size="5"';
 		
-		return JHTMLSelect::genericList($plugins, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
+		return JHTMLSelect::genericList($plugins, $fieldname, $class, 'value', 'text', $values, $element_id);
 	}
 }

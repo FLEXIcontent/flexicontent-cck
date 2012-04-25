@@ -169,6 +169,7 @@ class FlexicontentModelFields extends JModel
 		static $query;
 		
 		if(!isset($query)) {
+			
 			// Get the WHERE, HAVING and ORDER BY clauses for the query
 			$where		= $this->_buildContentWhere();
 			$orderby	= $this->_buildContentOrderBy();
@@ -464,7 +465,7 @@ class FlexicontentModelFields extends JModel
 		$option = JRequest::getVar('option');
 		$row =& JTable::getInstance('flexicontent_fields', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 

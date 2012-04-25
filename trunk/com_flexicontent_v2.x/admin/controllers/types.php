@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: types.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,6 +42,11 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 		'save' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic', 	'access' );
+			$this->registerTask( 'accessregistered','access' );
+			$this->registerTask( 'accessspecial', 	'access' );
+		}
 		$this->registerTask( 'copy', 			'copy' );
 	}
 
@@ -242,10 +247,21 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id		= (int)$cid[0];
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-		$access = $accesses[$id];
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id       = (int)$cid[0];
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$id];
+		} else {
+			$task		= JRequest::getVar( 'task' );
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
+			} else {
+				$access = 2;
+			}
+		}
 
 		$model = $this->getModel('types');
 		
