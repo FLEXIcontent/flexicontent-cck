@@ -82,7 +82,7 @@ class JElementFCcheckbox extends JElement
 		foreach($checkoptions as $i => $o) {
 			$curr_element_id = $element_id.$i;
 			$html .= '<input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
-			$html .= in_array($checkvals[$i], $value) ? ' checked="checked"' : '' ;
+			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
 			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
 			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label> &nbsp; ';
 		}

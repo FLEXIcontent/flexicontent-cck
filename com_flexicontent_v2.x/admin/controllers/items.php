@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1240 2012-04-12 04:32:40Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1249 2012-04-16 01:21:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,7 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends JController
+class FlexicontentControllerItems extends FlexicontentController
 {
 	/**
 	 * Constructor
@@ -55,7 +55,8 @@ class FlexicontentControllerItems extends JController
 			$this->registerTask( 'accessspecial',		'access' );
 		}
 	}
-
+	
+	
 	/**
 	 * Logic to save an item
 	 *

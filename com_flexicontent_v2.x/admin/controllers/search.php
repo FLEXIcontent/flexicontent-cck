@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id$
+ * @version 1.5 stable $Id: search.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -133,7 +133,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	function purge() {
 		$model = $this->getModel('search');
 		$model->purge();
-		$msg = 'The item(s) were purged.';
+		$msg = 'FLEXI_ITEMS_PURGED';
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 }

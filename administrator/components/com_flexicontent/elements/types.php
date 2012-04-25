@@ -39,6 +39,7 @@ class JElementTypes extends JElement
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
+		if (FLEXI_J16GE)  $node = & $this->element;
 		
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'

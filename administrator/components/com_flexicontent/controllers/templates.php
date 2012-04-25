@@ -39,10 +39,10 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		'edit' );
-		$this->registerTask( 'apply', 		'save' );
-		$this->registerTask( 'duplicate', 	'duplicate' );
-		$this->registerTask( 'remove', 		'remove' );
+		$this->registerTask( 'add'  ,     'edit' );
+		$this->registerTask( 'apply',     'save' );
+		$this->registerTask( 'duplicate', 'duplicate' );
+		$this->registerTask( 'remove',    'remove' );
 	}
 		
 	/**

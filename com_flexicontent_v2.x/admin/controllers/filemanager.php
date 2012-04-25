@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: filemanager.php 368 2010-07-16 10:14:17Z enjoyman $
+ * @version 1.5 stable $Id: filemanager.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,13 +27,15 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerFilemanager extends FlexicontentController{
+class FlexicontentControllerFilemanager extends FlexicontentController
+{
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 	}
 	
@@ -42,11 +44,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 	 *
 	 * @since 1.0
 	 */
-	function upload() {
+	function upload()
+	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 		
 		$user		= & JFactory::getUser();
+		$mainframe = &JFactory::getApplication();
 		
 		// calculate access
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
@@ -59,7 +63,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			return;
 		}
 		
-		$mainframe = &JFactory::getApplication();
 		$file 		= JRequest::getVar( 'Filedata', '', 'files', 'array' );
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
@@ -224,11 +227,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 	 *
 	 * @since 1.0
 	 */
-	function addurl() {
+	function addurl()
+	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-		$mainframe = &JFactory::getApplication();
 
+		$mainframe = &JFactory::getApplication();
+		
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
 		$altname	= JRequest::getVar( 'file-url-display', null, 'post', 'string' );
@@ -296,12 +301,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 	 *
 	 * @since 1.0
 	 */
-	function addlocal() {
-		$mainframe = &JFactory::getApplication();
-
+	function addlocal()
+	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$mainframe = &JFactory::getApplication();
+		
 		$return		=  JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
 		$regexp		=  JRequest::getVar( 'file-filter-re', '.', 'post' );
@@ -444,7 +450,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
-
+		
 		JRequest::setVar( 'view', 'file' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 		
@@ -485,7 +491,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
-
+		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 		= $this->getModel('filemanager');
 
@@ -657,7 +663,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController{
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
-
+		
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {

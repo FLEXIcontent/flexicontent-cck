@@ -46,11 +46,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function upload()
 	{
-		global $mainframe;
-
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-
+		
+		$user		= & JFactory::getUser();
+		$mainframe = &JFactory::getApplication();
+		
 		$file 		= JRequest::getVar( 'Filedata', '', 'files', 'array' );
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
@@ -215,11 +216,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function addurl()
 	{
-		global $mainframe;
-
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$mainframe = &JFactory::getApplication();
+		
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
 		$altname	= JRequest::getVar( 'file-url-display', null, 'post', 'string' );
@@ -289,11 +290,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function addlocal()
 	{
-		global $mainframe;
-
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$mainframe = &JFactory::getApplication();
+		
 		$return		=  JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
 		$regexp		=  JRequest::getVar( 'file-filter-re', '.', 'post' );
@@ -413,7 +414,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	}
 
 	/**
-	 * Logic to create the view for the edit categoryscreen
+	 * Logic for editing a file
 	 *
 	 * @access public
 	 * @return void
@@ -421,12 +422,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function edit( )
 	{	
+		$user		= & JFactory::getUser();
+		$model	= & $this->getModel('file');
+		
 		JRequest::setVar( 'view', 'file' );
 		JRequest::setVar( 'hidemainmenu', 1 );
-
-		$model 	= $this->getModel('file');
-		$user	=& JFactory::getUser();
-
+		
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
 			$this->setRedirect( 'index.php?option=com_flexicontent&controller=filemanager&task=edit', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
@@ -448,6 +449,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$user		= & JFactory::getUser();
+		$model	= & $this->getModel('file');
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 		= $this->getModel('filemanager');
@@ -472,7 +476,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	}
 	
 	/**
-	 * Logic to save the altname
+	 * Logic for saving altered file data
 	 *
 	 * @access public
 	 * @return void
@@ -483,13 +487,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
+		$user		= & JFactory::getUser();
+		$model	= & $this->getModel('file');
 		$task		= JRequest::getVar('task');
-
-		//Sanitize
 		$post = JRequest::get( 'post' );
-
-		$model = $this->getModel('file');
-
+		
 		if ($model->store($post)) {
 
 			switch ($task)
@@ -531,6 +533,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
+		// Check In the file and redirect ...
 		$file = & JTable::getInstance('flexicontent_files', '');
 		$file->bind(JRequest::get('post'));
 		$file->checkin();
@@ -539,7 +542,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	}
 	
 	/**
-	 * Logic to publish filemanager
+	 * Logic to publish a file
 	 *
 	 * @access public
 	 * @return void
@@ -547,33 +550,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function publish()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
-		} else {
-
-			$model = $this->getModel('filemanager');
-
-			if(!$model->publish($cid, 1)) {
-				JError::raiseError(500, $model->getError());
-			}
-
-			$msg 	= JText::_( 'Published file' );
-		
-			$cache 		=& JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		}
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', $msg );
+		$this->changeState(1);
 	}
 	
 	/**
-	 * Logic to unpublish filemanager
+	 * Logic to unpublish a file
 	 *
 	 * @access public
 	 * @return void
@@ -581,23 +562,39 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function unpublish()
 	{
+		$this->changeState(0);
+	}
+	
+	
+	/**
+	 * Logic to change publication state of files
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function changeState($state)
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$user		= & JFactory::getUser();
+		$model	= & $this->getModel('file');
 		
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 		} else {
 
 			$model = $this->getModel('filemanager');
 
-			if(!$model->publish($cid, 0)) {
+			if(!$model->publish($cid, $state)) {
 				JError::raiseError(500, $model->getError());
 			}
 
-			$msg 	= JText::_( 'Unpublished file' );
+			$msg 	= JText::_( $state ? 'Published file' : 'Unpublished file' );
 		
 			$cache 		=& JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -605,4 +602,5 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', $msg );
 	}
+
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: types.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,8 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelTypes extends JModelList{
+class FlexicontentModelTypes extends JModelList
+{
 	/**
 	 * Type data
 	 *
@@ -62,7 +63,8 @@ class FlexicontentModelTypes extends JModelList{
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		$mainframe = &JFactory::getApplication();
@@ -88,8 +90,20 @@ class FlexicontentModelTypes extends JModelList{
 	function setId($id)
 	{
 		// Set id and wipe data
-		$this->_id	 = $id;
+		$this->_id   = (int)$id;
 		$this->_data = null;
+	}
+
+	/**
+	 * Method to get the Type identifier
+	 *
+	 * @access	public
+	 * @param	int Type identifier
+	 */
+	function getId()
+	{
+		// Get id
+		return $this->_id;
 	}
 
 	/**
@@ -99,7 +113,8 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getListQuery() {
+	function getListQuery()
+	{
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -158,7 +173,8 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentHaving() {
+	function _buildContentHaving()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
@@ -214,9 +230,11 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function candelete($cid = array()) {
+	function candelete($cid = array())
+	{
 		$n		= count( $cid );
-		if (count( $cid )) {
+		if (count( $cid ))
+		{
 			for ($i = 0; $i < $n; $i++)
 			{
 			$query = 'SELECT COUNT( type_id )'
@@ -318,7 +336,8 @@ class FlexicontentModelTypes extends JModelList{
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function saveaccess($id, $access) {
+	function saveaccess($id, $access)
+	{
 		$mainframe = &JFactory::getApplication();
 
 		$row =& JTable::getInstance('flexicontent_types', '');

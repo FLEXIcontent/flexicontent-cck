@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: pluginlist.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: pluginlist.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -29,7 +29,8 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldPluginlist extends JFormFieldList{
+class JFormFieldPluginlist extends JFormFieldList
+{
 	/**
 	 * Element name
 	 * @access	protected
@@ -37,11 +38,17 @@ class JFormFieldPluginlist extends JFormFieldList{
 	 */
 	var	$type = 'Pluginlist';
 
-	function getInput() {
-		//$name, $value, &$node, $control_name
-		$name = $this->name;
-		$value = $this->value;
-		$values = explode("|", $value);
+	function getInput()
+	{
+		if (FLEXI_J16GE)  $node = & $this->element;
+		
+		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( empty($values) )							$values = array();
+		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.'][]';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		
 		$plugins 	= array();
 //		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
@@ -62,6 +69,7 @@ class JFormFieldPluginlist extends JFormFieldList{
 		}
 
 		$class = 'class="inputbox" multiple="true" size="5"';
-		return JHTML::_('select.genericlist', $plugins, $name.'[]', $class, 'value', 'text', $values, $name);
+		
+		return JHTMLSelect::genericList($plugins, $fieldname, $class, 'value', 'text', $values, $element_id);
 	}
 }

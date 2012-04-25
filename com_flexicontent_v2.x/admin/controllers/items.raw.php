@@ -27,7 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends JController {
+class FlexicontentControllerItems extends FlexicontentController {
 	/**
 	 * Constructor
 	 *

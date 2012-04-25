@@ -42,9 +42,11 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$this->registerTask( 'add'  ,		 	'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic', 	'access' );
+			$this->registerTask( 'accessregistered','access' );
+			$this->registerTask( 'accessspecial', 	'access' );
+		}
 		$this->registerTask( 'copy', 			'copy' );
 	}
 
@@ -72,7 +74,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			switch ($task)
 			{
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->get('id');
+					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->getId();
 					break;
 
 				case 'saveandnew' :
@@ -245,16 +247,20 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
-
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id       = (int)$cid[0];
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$id];
 		} else {
-			$access = 2;
+			$task		= JRequest::getVar( 'task' );
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
+			} else {
+				$access = 2;
+			}
 		}
 
 		$model = $this->getModel('types');

@@ -674,12 +674,14 @@ class modFlexicontentHelper
 		}
 		
 		// featured items scope
-  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
-			$where .= ' AND i.featured=0';
-		} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
-			$where .= ' AND i.featured=1';
-		} else {
-		  // All Items regardless of being featured or not
+		if (FLEXI_J16GE) {
+	  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
+				$where .= ' AND i.featured=0';
+			} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
+				$where .= ' AND i.featured=1';
+			} else {
+			  // All Items regardless of being featured or not
+			}
 		}
 		
 		// categories scope

@@ -67,7 +67,8 @@ class FlexicontentModelTypes extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
@@ -89,8 +90,20 @@ class FlexicontentModelTypes extends JModel
 	function setId($id)
 	{
 		// Set id and wipe data
-		$this->_id	 = $id;
+		$this->_id   = (int)$id;
 		$this->_data = null;
+	}
+
+	/**
+	 * Method to get the Type identifier
+	 *
+	 * @access	public
+	 * @param	int Type identifier
+	 */
+	function getId()
+	{
+		// Get id
+		return $this->_id;
 	}
 
 	/**
@@ -246,7 +259,8 @@ class FlexicontentModelTypes extends JModel
 	 */
 	function _buildContentHaving()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -318,7 +332,7 @@ class FlexicontentModelTypes extends JModel
 				return false;
 				}
 			}
-		return true;
+			return true;
 		}
 	}
 
@@ -408,10 +422,11 @@ class FlexicontentModelTypes extends JModel
 	 */
 	function saveaccess($id, $access)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
+
 		$row =& JTable::getInstance('flexicontent_types', '');
 
-		$row->load( $this->_id );
+		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
 

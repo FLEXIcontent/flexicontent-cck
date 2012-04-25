@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1242 2012-04-12 04:52:32Z ggppdk $
+ * @version 1.2 $Id: helper.php 1258 2012-04-24 03:18:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -674,12 +674,14 @@ class modFlexicontentHelper
 		}
 		
 		// featured items scope
-  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
-			$where .= ' AND i.featured=0';
-		} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
-			$where .= ' AND i.featured=1';
-		} else {
-		  // All Items regardless of being featured or not
+		if (FLEXI_J16GE) {
+	  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
+				$where .= ' AND i.featured=0';
+			} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
+				$where .= ' AND i.featured=1';
+			} else {
+			  // All Items regardless of being featured or not
+			}
 		}
 		
 		// categories scope
