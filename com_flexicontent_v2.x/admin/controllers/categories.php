@@ -36,14 +36,24 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function __construct()
 	{
-		$this->text_prefix = 'com_content';
+		if (FLEXI_J16GE) {
+			$this->text_prefix = 'com_content';
+		}
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		 		'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew',	'save' );
+		$this->registerTask( 'add'  ,        'edit' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'saveandnew',   'save' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic',     'access' );
+			$this->registerTask( 'accessregistered', 'access' );
+			$this->registerTask( 'accessspecial',    'access' );
+		}
 		$this->registerTask( 'params', 			'params' );
+		$this->registerTask( 'orderdown', 	'orderdown' );
+		$this->registerTask( 'orderup', 		'orderup' );
+		$this->registerTask( 'saveorder', 	'saveorder' );
 	}
 
 	/**
@@ -53,15 +63,22 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 * @return void
 	 * @since 1.0
 	 */
-	/*function save() {
+	/*function save()
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$task		= JRequest::getVar('task');
-		$permission = FlexicontentHelperPerm::getPerm();
 
 		// define the rights for correct redirecting the save task
-		$CanCats 	= $permission->CanCats;
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+		} else {
+			$CanCats = 1;
+		}
 
 		//Sanitize
 		$post = JRequest::get( 'post' );
@@ -70,6 +87,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$model = $this->getModel('category');
 
 		if ( $model->store($post) ) {
+			
 			switch ($task)
 			{
 				case 'apply' :
@@ -92,6 +110,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			
 			//Take care of access levels and state
 			$categoriesmodel = & $this->getModel('categories');
+			if (!FLEXI_ACCESS && !FLEXI_J16GE) {
+				$categoriesmodel->access($model->get('id'), $model->get('access'));
+			}
 			
 			$pubid = array();
 			$pubid[] = $model->get('id');
@@ -107,13 +128,18 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			$catscache->clean();
 
 		} else {
-			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY '. $model->getError() );
+			
+			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY' );
+			JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=category'.(@$_REQUEST['id']?'&cid[]='.(int)$_REQUEST['id']:'');
 		}
+		
 		$model->checkin();
+		
 		$this->setRedirect($link, $msg);
 	}*/
-
+	
+	
 	/**
 	 * Logic to publish categories
 	 *
@@ -123,8 +149,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function publish()
 	{
-		//self::changestate(1);
-		parent::publish();
+		if (FLEXI_J16GE)   parent::publish();
+		else               self::changestate(1);
 	}
 
 	/**
@@ -136,8 +162,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function unpublish()
 	{
-		parent::unpublish();
-		//self::changestate(0);
+		if (FLEXI_J16GE)   parent::unpublish();
+		else               self::changestate(0);
 	}
 
 	/**
@@ -152,7 +178,15 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		$user = JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+		} else {
+			$CanCats = 1;
+		}
+		
 		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$msg = '';
 
@@ -161,7 +195,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			// no category selected
 			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 		}
-		else if (!$permission->CanCats)
+		else if (!$CanCats)
 		{
 			// no access rights
 			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
@@ -238,34 +272,27 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	}
 
 	/**
-	 * Logic to mass ordering categories
+	 * Save the manual order inputs from the categories list page.
 	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
+	 * @return	void
+	 * @since	1.6
 	 */
-	function saveorder()
+	public function saveorder()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$order 	= JRequest::getVar( 'order', array(0), 'post', 'array' );
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$model = $this->getModel('categories');
-		if(!$model->saveorder($cid, $order)) {
-			$msg = '';
-			JError::raiseWarning(500, $model->getError());
+		// Get the arrays from the Request
+		$order	= JRequest::getVar('order',	null, 'post', 'array');
+		$originalOrder = explode(',', JRequest::getString('original_order_values'));
+
+		// Make sure something has changed
+		if (!($order === $originalOrder)) {
+			parent::saveorder();
+		} else {
+			// Nothing to reorder
+			$this->setRedirect(JRoute::_('index.php?option='.$this->option.'&view='.$this->view_list, false), 'Nothing to reorder');
+			return true;
 		}
-		
-		// clean cache
-		$cache 		=& JFactory::getCache('com_flexicontent');
-		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-		$catscache->clean();
-
-		$msg = 'NEW ORDERING SAVED';
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
 
 	/**
@@ -279,7 +306,17 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		$permission = FlexicontentHelperPerm::getPerm();
+		
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+		} else {
+			$CanCats = 1;
+		}
+		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$msg = '';
 
@@ -288,7 +325,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			// no category selected
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
 		}
-		else if (!$permission->CanCats)
+		else if (!$CanCats)
 		{
 			// no access rights
 			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
@@ -316,29 +353,86 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	}
 
 	/**
+	 * logic for cancel an action
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function cancel()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		// define the rights for correct redirecting the save task
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+		} else {
+			$CanCats 	= 1;
+		}
+
+		$category = & JTable::getInstance('flexicontent_categories','');
+		$category->bind(JRequest::get('post'));
+		$category->checkin();
+
+		if ($CanCats) {
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories' );
+		} else {
+			$this->setRedirect( 'index.php?option=com_flexicontent' );
+		}
+	}
+
+	/**
 	 * Logic to set the category access level
 	 *
 	 * @access public
 	 * @return void
 	 * @since 1.0
 	 */
-	function access( ) {
+	function access( )
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id		= (int)$cid[0];
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-		$access = $accesses[$id];
-
 		$user = JFactory::getUser();
 		$model = $this->getModel('categories');
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id       = (int)$cid[0];
 		
-		if (!$user->authorise('core.edit', 'com_content.category.'.$id)) {
+		// Get new category access
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$id];
+		}
+		else
+		{
+			$task		= JRequest::getVar( 'task' );
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
+			} else {
+				if (FLEXI_ACCESS) {
+					$access = 3;
+				} else {
+					$access = 2;
+				}
+			}
+		}
+
+		// Check authorization for access setting task
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('core.edit', 'com_content.category.'.$id);
+		}else {
+			$is_authorised = 1;
+		}
+		if (!$is_authorised) {
 			// no access rights
 			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			// redirect to categories management tab
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 		} else if(!$model->saveaccess( $id, $access )) {
 			JError::raiseWarning(500, $model->getError());
 		} else {
@@ -351,7 +445,16 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$this->setRedirect('index.php?option=com_flexicontent&view=categories' );
 	}
 	
-	function getModel() {
+	
+	/**
+	 * Override getModel function to return the customized categories
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function getModel()
+	{
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'categories.php');
 		$model = new FlexicontentModelCategories();
 		return $model;

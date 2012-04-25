@@ -77,6 +77,7 @@ class FlexicontentModelCategories extends JModelList
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
+		$filter_language 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
 		//$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -89,6 +90,8 @@ class FlexicontentModelCategories extends JModelList
 			)
 		);
 		$query->from('#__categories AS c');
+		$query->select('l.title AS language_title');
+		$query->join('LEFT', '`#__languages` AS l ON l.lang_code = c.language');
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
 		$query->join('LEFT', '#__usergroups AS g ON g.id = c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
@@ -99,6 +102,10 @@ class FlexicontentModelCategories extends JModelList
 			} else if ($filter_state == 'U' ) {
 				$query->where("c.published = 0");
 			}
+		}
+		if ( $filter_language && $filter_language != '*' ) {
+			echo $filter_language;
+			$query->where("l.lang_code = '".$filter_language."'");
 		}
 		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
 		// Filter by search in title
@@ -204,46 +211,52 @@ class FlexicontentModelCategories extends JModelList
 		return true;
 	}
 
+
+	
 	/**
-	 * Method to order categories
+	 * Method to save the reordered nested set tree.
+	 * First we save the new order values in the lft values of the changed ids.
+	 * Then we invoke the table rebuild to implement the new ordering.
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function saveorder($cid = array(), $order)
+	 * @param   array    $idArray    An array of primary key ids.
+	 * @param   integer  $lft_array  The lft value
+	 *
+	 * @return  boolean  False on failure or error, True otherwise
+	 *
+	 * @since   1.6
+	*/
+	public function saveorder($idArray = null, $lft_array = null)
 	{
-		$row 	=& JTable::getInstance('flexicontent_categories','');
-		
-		$groupings = array();
+		// Get an instance of the table object.
+		$table = $this->getTable();
 
-		// update ordering values
-		for( $i=0; $i < count($cid); $i++ )
+		if (!$table->saveorder($idArray, $lft_array))
 		{
-			$row->load( (int) $cid[$i] );
-			
-			// track categories
-			$groupings[] = $row->parent_id;
+			$this->setError($table->getError());
+			return false;
+		}
 
-			if ($row->ordering != $order[$i])
-			{
-				$row->ordering = $order[$i];
-				if (!$row->store()) {
-					$this->setError($this->_db->getErrorMsg());
-					return false;
-				}
-			}
-		}
-		
-		// execute updateOrder for each parent group
-		$groupings = array_unique( $groupings );
-		foreach ($groupings as $group){
-			$row->reorder('parent_id = '.$group.(!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ') );
-		}
+		// Clear the cache
+		$this->cleanCache();
 
 		return true;
 	}
-
+	
+	
+	/**
+	 * Returns a Table object, always creating it
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	*/
+	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
+		return JTable::getInstance($type, $prefix, $config);
+	}
+	
+	
 	/**
 	 * Method to remove a category
 	 *

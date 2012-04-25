@@ -511,6 +511,8 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		return $result;
 	}
+	
+	
 	/**
 	 * Returns a Table object, always creating it
 	 *

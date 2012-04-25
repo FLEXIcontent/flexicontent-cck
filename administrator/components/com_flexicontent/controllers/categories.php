@@ -36,15 +36,20 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function __construct()
 	{
+		if (FLEXI_J16GE) {
+			$this->text_prefix = 'com_content';
+		}
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,		 	'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'accesspublic', 	'access' );
-		$this->registerTask( 'accessregistered','access' );
-		$this->registerTask( 'accessspecial', 	'access' );
+		$this->registerTask( 'add'  ,        'edit' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'saveandnew',   'save' );
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic',     'access' );
+			$this->registerTask( 'accessregistered', 'access' );
+			$this->registerTask( 'accessspecial',    'access' );
+		}
 		$this->registerTask( 'params', 			'params' );
 	}
 
@@ -63,11 +68,13 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$task		= JRequest::getVar('task');
 
 		// define the rights for correct redirecting the save task
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
 		} else {
-			$CanCats 	= 1;
+			$CanCats = 1;
 		}
 
 		//Sanitize
@@ -77,7 +84,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model = $this->getModel('category');
 
 		if ( $model->store($post) ) {
-
+			
 			switch ($task)
 			{
 				case 'apply' :
@@ -100,7 +107,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			
 			//Take care of access levels and state
 			$categoriesmodel = & $this->getModel('categories');
-			if (!FLEXI_ACCESS) {
+			if (!FLEXI_ACCESS && !FLEXI_J16GE) {
 				$categoriesmodel->access($model->get('id'), $model->get('access'));
 			}
 			
@@ -118,17 +125,18 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$catscache->clean();
 
 		} else {
-
+			
 			$msg 	= JText::_( 'FLEXI_ERROR_SAVING_CATEGORY' );
-			JError::raiseError( 500, $model->getError() );
-			$link 	= 'index.php?option=com_flexicontent&view=category';
+			JError::raiseWarning( 500, $model->getError() );
+			$link 	= 'index.php?option=com_flexicontent&view=category'.(@$_REQUEST['id']?'&cid[]='.(int)$_REQUEST['id']:'');
 		}
-
+		
 		$model->checkin();
-
+		
 		$this->setRedirect($link, $msg);
 	}
-
+	
+	
 	/**
 	 * Logic to publish categories
 	 *
@@ -138,31 +146,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function publish()
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
-		} else {
-
-			$model = $this->getModel('categories');
-
-			if(!$model->publish($cid, 1)) {
-				JError::raiseError(500, $model->getError());
-			}
-
-			$msg 	= JText::_( 'FLEXI_CATEGORY_PUBLISHED' );
-		
-			$cache 		=& JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
-			$catscache->clean();
-		}
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+		if (FLEXI_J16GE)   parent::publish();
+		else               self::changestate(1);
 	}
 
 	/**
@@ -174,32 +159,68 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function unpublish()
 	{
+		if (FLEXI_J16GE)   parent::unpublish();
+		else               self::changestate(0);
+	}
+
+	/**
+	 * Logic to unpublish categories
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function changestate($state=1)
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
 		} else {
-
-			$model = $this->getModel('categories');
-
-			if(!$model->publish($cid, 0)) {
-				JError::raiseError(500, $model->getError());
-			}
-
-			$msg 	= JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
+			$CanCats = 1;
+		}
 		
+		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$msg = '';
+
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			// no category selected
+			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+		}
+		else if (!$CanCats)
+		{
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+		}
+		else
+		{
+			// try to change state
+			$model = $this->getModel('categories');
+			if( !$model->publish($cid, $state) ) {
+				JError::raiseWarning(500, $model->getError());
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+				return;
+			}
+			
+			// set message
+			$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
+			
+			// clean cache
 			$cache 		=& JFactory::getCache('com_flexicontent');
 			$cache->clean();
 			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
-		
+
+		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
+
 
 	/**
 	 * Logic to orderup a category
@@ -268,6 +289,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			JError::raiseWarning(500, $model->getError());
 		}
 		
+		// clean cache
 		$cache 		=& JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
@@ -288,24 +310,49 @@ class FlexicontentControllerCategories extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
+		
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
+			$CanCats = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
 		} else {
+			$CanCats = 1;
+		}
+		
+		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$msg = '';
 
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			// no category selected
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
+		}
+		else if (!$CanCats)
+		{
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+		}
+		else
+		{
+			// try to delete the category and clean cache
 			$model = $this->getModel('categories');
-
 			$msg = $model->delete($cid);
-
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			if (!$msg) {
+				JError::raiseWarning(500, $model->getError());
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
+				return;
+			}
+			
+			// clean cache
+			$cache =& JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache =& JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		
+		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
 
@@ -322,8 +369,11 @@ class FlexicontentControllerCategories extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// define the rights for correct redirecting the save task
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$CanCats = $perms->CanCats;
+		} else if (FLEXI_ACCESS) {
 			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
 		} else {
 			$CanCats 	= 1;
@@ -352,26 +402,43 @@ class FlexicontentControllerCategories extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id			= (int)$cid[0];
-		$task		= JRequest::getVar( 'task' );
-
-		if ($task == 'accesspublic') {
-			$access = 0;
-		} elseif ($task == 'accessregistered') {
-			$access = 1;
-		} else {
-			if (FLEXI_ACCESS) {
-				$access = 3;
+		$user = JFactory::getUser();
+		$model = $this->getModel('categories');
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id       = (int)$cid[0];
+		
+		// Get new category access
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$id];
+		}
+		else
+		{
+			$task		= JRequest::getVar( 'task' );
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
 			} else {
-				$access = 2;
+				if (FLEXI_ACCESS) {
+					$access = 3;
+				} else {
+					$access = 2;
+				}
 			}
 		}
 
-		$model = $this->getModel('categories');
-		
-		if(!$model->saveaccess( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+		// Check authorization for access setting task
+		if (FLEXI_J16GE) {
+			$is_authorised = $user->authorise('core.edit', 'com_content.category.'.$id);
+		}else {
+			$is_authorised = 1;
+		}
+		if (!$is_authorised) {
+			// no access rights
+			JError::raiseWarning(500, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+		} else if(!$model->saveaccess( $id, $access )) {
+			JError::raiseWarning(500, $model->getError());
 		} else {
 			$cache 		=& JFactory::getCache('com_flexicontent');
 			$cache->clean();
@@ -381,7 +448,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=categories' );
 	}
-
+	
+	
 	/**
 	 * Logic to create the view for the edit categoryscreen
 	 *
@@ -426,6 +494,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$destid		= JRequest::getVar( 'destcid', null, 'post', 'array' );
 		$task		= JRequest::getVar( 'task' );
 
+		$user = JFactory::getUser();
 		$model 	= $this->getModel('category');		
 		$params = $model->getParams($copyid);
 		

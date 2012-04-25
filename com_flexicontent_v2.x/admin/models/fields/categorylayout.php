@@ -116,5 +116,17 @@ window.addEvent('domready', function(){
 		
 		return $layouts;
 	}
+	
+	function getLabel()
+	{
+		$label = $this->element['label'];
+		$class = ""; $title = "";
+		if ($this->element['description']) {
+			$class = "hasTip";
+			$title = JText::_($label)."::".JText::_($this->element['description']);
+		}
+		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
+	}
+	
 }
 ?>

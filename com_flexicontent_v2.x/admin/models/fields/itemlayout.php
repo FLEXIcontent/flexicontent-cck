@@ -87,7 +87,6 @@ class JFormFieldItemlayout extends JFormFieldList
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
 				if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
-				else																			$allowed_tmpls = $allowed_tmpls;
 				if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 				//echo "Allowed Templates: "; print_r($allowed_tmpls); echo "<br>\n";
 			}
