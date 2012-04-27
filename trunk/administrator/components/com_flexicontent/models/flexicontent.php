@@ -453,29 +453,26 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @return	boolean	True on success
 	 */
 	function getOldBetaFiles() {
-		static $return;
-		if($return===NULL) {
-			$files 	= array (
-				'author.xml',
-				'author.php',
-				'myitems.xml',
-				'myitems.php',
-				'default.xml',
-				'default.php',
-				'index.html',
-				'form.php',
-				'form.xml'
-				);
-			$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-			$cattmpl 	= JFolder::files($catdir);		
-			$ctmpl 		= array_diff($cattmpl,$files);
-			
-			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-			$itemtmpl 	= JFolder::files($itemdir);		
-			$itmpl 		= array_diff($itemtmpl,$files);
-			
-			$return = ($ctmpl || $itmpl) ? false : true;
-		}
+		$files 	= array (
+			'author.xml',
+			'author.php',
+			'myitems.xml',
+			'myitems.php',
+			'default.xml',
+			'default.php',
+			'index.html',
+			'form.php',
+			'form.xml'
+			);
+		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
+		$cattmpl 	= JFolder::files($catdir);		
+		$ctmpl 		= array_diff($cattmpl,$files);
+		
+		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
+		$itemtmpl 	= JFolder::files($itemdir);		
+		$itmpl 		= array_diff($itemtmpl,$files);
+		
+		$return = ($ctmpl || $itmpl) ? false : true;
 		return $return;
 	}
 
@@ -809,6 +806,8 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		return diff_version($current_versions, $last_versions);
 	}
+	
+	
 	function checkCurrentVersionData() {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
@@ -960,6 +959,7 @@ class FlexicontentModelFlexicontent extends JModel
 		return true;
 	}
 	
+	
 	function formatFlexiPlugins()
 	{
 		$db 	= & $this->_db;
@@ -973,7 +973,7 @@ class FlexicontentModelFlexicontent extends JModel
 			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
 				$query = 'UPDATE #__plugins SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE id = ' . (int)$fp->id;
 				$db->setQuery($query);
-				$db->Query();
+				$db->query();
 			}
 		}
 	}

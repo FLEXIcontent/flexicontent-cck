@@ -183,7 +183,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 </script>
 -->
 <?php // endif; ?>
-<?php if (0/*!$this->oldbetafiles*/) : ?>
+<?php if (!$this->oldbetafiles) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('oldbetafiles').addEvent('click', function(e) {
@@ -238,104 +238,103 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 </script>
 <?php endif; ?>
 
-		<table class="adminlist" cellspacing="0" cellpadding="0" border="0" width="100%">
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
-				</td>
-				<td id="publishplugins-log">
-					<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key" style="width:280px;">
-					<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
-				</td>
-				<td id="existtype-log">
-					<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key" style="width:280px;">
-					<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
-				</td>
-				<td id="existmenuitems-log">
-					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
-				</td>
-				<td id="existfields-log">
-					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
-				</td>
-				<td id="existlang-log">
-					<?php echo $this->existlang ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existlang" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
-				</td>
-				<td id="existversions-log">
-					<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversions" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
-				</td>
-				<td id="existversionsdata-log">
-					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
-				</td>
-				<td id="existauthors-log">
-					<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
-				</td>
-			</tr>
+<table class="adminlist" cellspacing="0" cellpadding="0" border="0" width="100%">
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
+		</td>
+		<td id="publishplugins-log">
+			<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key" style="width:280px;">
+			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
+		</td>
+		<td id="existtype-log">
+			<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key" style="width:280px;">
+			<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
+		</td>
+		<td id="existmenuitems-log">
+			<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
+		</td>
+		<td id="existfields-log">
+			<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
+		</td>
+		<td id="existlang-log">
+			<?php echo $this->existlang ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existlang" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
+		</td>
+		<td id="existversions-log">
+			<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversions" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
+		</td>
+		<td id="existversionsdata-log">
+			<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existversionsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
+		</td>
+		<td id="existauthors-log">
+			<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
 <!--
-			<tr>
-				<td class="key">
-					<?php // echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
-				</td>
-				<td id="cachethumb-log">
-					<?php // echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-				</td>
-			</tr>
+	<tr>
+		<td class="key">
+			<?php // echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
+		</td>
+		<td id="cachethumb-log">
+			<?php // echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+		</td>
+	</tr>
 -->
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_CLEANUP_TEMPLATE_FILES' ); ?>
-				</td>
-				<td id="oldbetafiles-log">
-					<?php echo $this->oldbetafiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
-				</td>
-				<td id="oldfieldsdata-log">
-					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
-				</td>
-				<td id="missingversion-log">
-					<?php echo !$this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
-				</td>
-			</tr>
-	</table>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_CLEANUP_TEMPLATE_FILES' ); ?>
+		</td>
+		<td id="oldbetafiles-log">
+			<?php echo $this->oldbetafiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
+		</td>
+		<td id="oldfieldsdata-log">
+			<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
+		</td>
+		<td id="missingversion-log">
+			<?php echo !$this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+		</td>
+	</tr>
+</table>

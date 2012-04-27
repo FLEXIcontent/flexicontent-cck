@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: filters.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: filters.php 1026 2011-12-07 09:15:07Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -30,7 +30,8 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFilters extends JFormFieldList{
+class JFormFieldFilters extends JFormFieldList
+{
 	/**
 	 * JFormField type
 	 * @access	protected
@@ -38,17 +39,16 @@ class JFormFieldFilters extends JFormFieldList{
 	 */
 	protected $type = 'Filters';
 
-	function getOptions() {
-		//$name, $value, &$node, $control_name
+	function getOptions()
+	{
 		$db =& JFactory::getDBO();
 		
 		$query = 'SELECT id AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
-		. ' AND isfilter = 1'
+		. ' AND isfilter=1'
 		. ' ORDER BY label ASC, id ASC'
 		;
-		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 		return $fields;

@@ -457,29 +457,26 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @return	boolean	True on success
 	 */
 	function getOldBetaFiles() {
-		static $return;
-		if($return===NULL) {
-			$files 	= array (
-				'author.xml',
-				'author.php',
-				'myitems.xml',
-				'myitems.php',
-				'default.xml',
-				'default.php',
-				'index.html',
-				'form.php',
-				'form.xml'
-				);
-			$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-			$cattmpl 	= JFolder::files($catdir);		
-			$ctmpl 		= array_diff($cattmpl,$files);
-			
-			$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-			$itemtmpl 	= JFolder::files($itemdir);		
-			$itmpl 		= array_diff($itemtmpl,$files);
-			
-			$return = ($ctmpl || $itmpl) ? false : true;
-		}
+		$files 	= array (
+			'author.xml',
+			'author.php',
+			'myitems.xml',
+			'myitems.php',
+			'default.xml',
+			'default.php',
+			'index.html',
+			'form.php',
+			'form.xml'
+			);
+		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
+		$cattmpl 	= JFolder::files($catdir);		
+		$ctmpl 		= array_diff($cattmpl,$files);
+		
+		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
+		$itemtmpl 	= JFolder::files($itemdir);		
+		$itmpl 		= array_diff($itemtmpl,$files);
+		
+		$return = ($ctmpl || $itmpl) ? false : true;
 		return $return;
 	}
 
@@ -800,6 +797,8 @@ class FlexicontentModelFlexicontent extends JModel
 		}
 		return diff_version($current_versions, $last_versions);
 	}
+	
+	
 	function checkCurrentVersionData() {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
@@ -953,6 +952,7 @@ class FlexicontentModelFlexicontent extends JModel
 		return true;
 	}
 	
+	
 	function formatFlexiPlugins()
 	{
 		$db 	= & $this->_db;
@@ -967,7 +967,7 @@ class FlexicontentModelFlexicontent extends JModel
 			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
 				$query = 'UPDATE #__extensions SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE `type`='.$db->Quote('plugin').' AND extension_id = ' . (int)$fp->id;
 				$db->setQuery($query);
-				$db->Query();
+				$db->query();
 			}
 		}
 	}
@@ -1175,7 +1175,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result)) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
+		if (count($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
 		$category_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1185,7 +1185,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result)) { echo "bad assets for items: "; print_r($result); echo "<br>"; }
+		if (count($result) && $debug_initial_perms) { echo "bad assets for items: "; print_r($result); echo "<br>"; }
 		$article_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1195,7 +1195,7 @@ class FlexicontentModelFlexicontent extends JModel
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result)) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
+		if (count($result) && $debug_initial_perms) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
 		$field_section = count($result) == 0 ? 1 : 0;
 		
 		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section <br>"; }

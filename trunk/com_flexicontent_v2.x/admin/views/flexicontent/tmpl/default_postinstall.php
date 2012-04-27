@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default_postinstall.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default_postinstall.php 1163 2012-03-07 10:11:22Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,277 +22,277 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	window.addEvent('domready', function() {
 		var ajaxloader = '<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">';
 <?php if(!$this->existfields) : //@TODO must write a class for that!!! I'm a dirty lazy pig :-) ?>
-		$('existfields').addEvent('click', function(e) {
-			var url = "index.php?option=com_flexicontent&task=createdefaultfields&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			e = new Event(e).stop();
-			if(MooTools.version>="1.2.4") {
-				$('existfields-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existfields-log')
-				}).send();
-			}else{
-				$('existfields-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existfields-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existfields').addEvent('click', function(e) {
+		var url = "index.php?option=com_flexicontent&task=createdefaultfields&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		e = new Event(e).stop();
+		if(MooTools.version>="1.2.4") {
+			$('existfields-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existfields-log')
+			}).send();
+		}else{
+			$('existfields-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existfields-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->existmenuitems) : ?>
-		$('existmenuitems').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createMenuItems&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existmenuitems-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existmenuitems-log')
-				}).send();
-			}else{
-				$('existmenuitems-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existmenuitems-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existmenuitems').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createMenuItems&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existmenuitems-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existmenuitems-log')
+			}).send();
+		}else{
+			$('existmenuitems-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existmenuitems-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->existtype) : ?>
-		$('existtype').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createdefaultype&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existtype-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existtype-log')
-				}).send();
-			}else{
-				$('existtype-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existtype-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existtype').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createdefaultype&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existtype-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existtype-log')
+			}).send();
+		}else{
+			$('existtype-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existtype-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->allplgpublish) : ?>
-		$('publishplugins').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=publishplugins&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('publishplugins-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('publishplugins-log')
-				}).send();
-			}else{
-				$('publishplugins-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('publishplugins-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('publishplugins').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=publishplugins&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('publishplugins-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('publishplugins-log')
+			}).send();
+		}else{
+			$('publishplugins-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('publishplugins-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->existlang) : ?>
-		$('existlang').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createlangcolumn&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existlang-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existlang-log')
-				}).send();
-			}else{
-				$('existlang-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existlang-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existlang').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createlangcolumn&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existlang-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existlang-log')
+			}).send();
+		}else{
+			$('existlang-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existlang-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->existversions) : ?>
-		$('existversions').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existversions-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existversions-log')
-				}).send();
-			}else{
-				$('existversions-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existversions-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existversions').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existversions-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existversions-log')
+			}).send();
+		}else{
+			$('existversions-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existversions-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->existversionsdata) : ?>
-		$('existversionsdata').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=populateversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existversionsdata-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existversionsdata-log')
-				}).send();
-			}else{
-				$('existversionsdata-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existversionsdata-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existversionsdata').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=populateversionstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existversionsdata-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existversionsdata-log')
+			}).send();
+		}else{
+			$('existversionsdata-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existversionsdata-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if (!$this->existauthors) : ?>
-		$('existauthors').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=createauthorstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('existauthors-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('existauthors-log')
-				}).send();
-			}else{
-				$('existauthors-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('existauthors-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('existauthors').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createauthorstbl&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existauthors-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existauthors-log')
+			}).send();
+		}else{
+			$('existauthors-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existauthors-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->cachethumb) : ?>
-		$('cachethumb').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('cachethumb-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('cachethumb-log')
-				}).send();
-			}else{
-				$('cachethumb-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('cachethumb-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('cachethumb').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=cachethumbchmod&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('cachethumb-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('cachethumb-log')
+			}).send();
+		}else{
+			$('cachethumb-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('cachethumb-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
-<?php if(0 /*!$this->oldbetafiles*/) : ?>
-	$('oldbetafiles').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('oldbetafiles-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('oldbetafiles-log')
-				}).send();
-			}else{
-				$('oldbetafiles-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('oldbetafiles-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+<?php if (!$this->oldbetafiles) : ?>
+$('oldbetafiles').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=deleteoldfiles&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('oldbetafiles-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('oldbetafiles-log')
+			}).send();
+		}else{
+			$('oldbetafiles-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('oldbetafiles-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
-<?php if(!$this->nooldfieldsdata) : ?>
+<?php if (!$this->nooldfieldsdata) : ?>
 $('oldfieldsdata').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('oldfieldsdata-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('oldfieldsdata-log')
-				}).send();
-			}else{
-				$('oldfieldsdata-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('oldfieldsdata-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=cleanupoldtables&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('oldfieldsdata-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('oldfieldsdata-log')
+			}).send();
+		}else{
+			$('oldfieldsdata-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('oldfieldsdata-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
-<?php if($this->missingversion) : ?>
+<?php if ($this->missingversion) : ?>
 $('missingversion').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('missingversion-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('missingversion-log')
-				}).send();
-			}else{
-				$('missingversion-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('missingversion-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('missingversion-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('missingversion-log')
+			}).send();
+		}else{
+			$('missingversion-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('missingversion-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 <?php if(!$this->initialpermission) : ?>
-		$('initialpermission').addEvent('click', function(e) {
-			e = new Event(e).stop();
-			var url = "index.php?option=com_flexicontent&task=initialpermission&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
-			if(MooTools.version>="1.2.4") {
-				$('initialpermission-log').set('html', ajaxloader);
-				new Request.HTML({
-					url: url,
-					method: 'get',
-					update: $('initialpermission-log')
-				}).send();
-			}else{
-				$('initialpermission-log').set('html',ajaxloader);
-				var ajax = new Ajax(url, {
-					method: 'get',
-					update: $('initialpermission-log')
-				});
-				ajax.request.delay(500, ajax);
-			}
-		});
+	$('initialpermission').addEvent('click', function(e) {
+		e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=initialpermission&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('initialpermission-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('initialpermission-log')
+			}).send();
+		}else{
+			$('initialpermission-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('initialpermission-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
 <?php endif; ?>
 	});
 </script>
