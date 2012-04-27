@@ -37,28 +37,18 @@ class JElementFilters extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
 		$db =& JFactory::getDBO();
 		
-		$filters = $fparams->get('filter_types', 'createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple');
-		$filters = explode(',', $filters);
-
-		foreach($filters as $f) {
-			$f = $db->Quote($f);
-		}
-		$filterstring = implode('","', $filters);
-
 		$query = 'SELECT id AS value, label AS text'
 		. ' FROM #__flexicontent_fields'
 		. ' WHERE published = 1'
-		. ' AND (field_type IN ("'.$filterstring.'") OR isfilter=1)'
+		. ' AND isfilter=1'
 		. ' ORDER BY label ASC, id ASC'
 		;
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
-
-		$class = 'multiple="true" size="5"';
 		
+		$class = 'multiple="true" size="5"';
 		return JHTML::_('select.genericlist', $fields, $control_name.'['.$name.'][]', $class, 'value', 'text', $value, $control_name.$name);
 	}
 }

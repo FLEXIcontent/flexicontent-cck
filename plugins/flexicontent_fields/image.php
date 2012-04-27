@@ -39,13 +39,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$js = "
 			function fx_img_toggle_required (obj_changed, obj_req_toggle) {
-			  if (obj_changed.value!='') {
+				if (obj_changed.value!='') {
 					obj_changed.className='';
-			  	obj_req_toggle.className='';
-			  } else {
+					obj_req_toggle.className='';
+				} else {
 					obj_changed.className='required';
-			  	obj_req_toggle.className='required';
-			  }
+					obj_req_toggle.className='required';
+				}
 			}
 			";
 		$document	= & JFactory::getDocument();
@@ -192,10 +192,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$legendinview = explode("|", $legendinview);
 			$legendinview = ($legendinview[0]=='') ? array() : $legendinview;
 		} else {
-  		$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
-  	}
-  	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
-  	if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
+			$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
+		}
+		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
+		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
 		
 		// Check and disable 'usepopup'
 		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category'));
@@ -203,10 +203,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$popupinview = explode("|", $popupinview);
 			$popupinview = ($popupinview[0]=='') ? array() : $popupinview;
 		} else {
-	  	$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
-	  }
-  	if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
-  	if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
+			$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
+		}
+		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
+		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
 		
 		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
@@ -346,15 +346,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$thumb_size = 0;
 				if ($view == 'category')
-				  $thumb_size =  $field->parameters->get('thumbincatview',2);
+					$thumb_size =  $field->parameters->get('thumbincatview',2);
 				if($view == FLEXI_ITEMVIEW)
-				  $thumb_size =  $field->parameters->get('thumbinitemview',1);
+					$thumb_size =  $field->parameters->get('thumbinitemview',1);
 				switch ($thumb_size)
 				{
-				  case 1: $src = $srcs; break;
-				  case 2: $src = $srcm; break;
-				  case 3: $src = $srcb; $popuptype = 0; break;
-				  default: $src = $srcs; break;
+					case 1: $src = $srcs; break;
+					case 2: $src = $srcm; break;
+					case 3: $src = $srcb; $popuptype = 0; break;
+					default: $src = $srcs; break;
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
@@ -699,8 +699,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 								
 			if (!JFile::delete($image)) 
 			{ 
-		    	// handle failed delete
-		    	$errors[] = JText::_('Unable to delete file');
+				// handle failed delete
+				$errors[] = JText::_('Unable to delete file');
 			}
 		}
 		

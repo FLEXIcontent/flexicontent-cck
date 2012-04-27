@@ -21,11 +21,11 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 
 	function plgFlexicontent_fieldsTextSelect( &$subject, $params ) {
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
-        	JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
-        	JPlugin::loadLanguage('plg_flexicontent_fields_textselect', JPATH_ADMINISTRATOR);
-        	JPluginHelper::importPlugin('flexicontent_fields', 'text' );
-        	JPluginHelper::importPlugin('flexicontent_fields', 'select' );
+		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_textselect', JPATH_ADMINISTRATOR);
+		JPluginHelper::importPlugin('flexicontent_fields', 'text' );
+		JPluginHelper::importPlugin('flexicontent_fields', 'select' );
 	}
 	
 	
@@ -44,15 +44,16 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 		$field->parameters->set('field_elements', $query);
 		$field->field_type = 'select';
 		plgFlexicontent_fieldsSelect::onDisplayField($field, $item);
+		$field->field_type = 'textselect';
 	}
 	
 	
 	function onDisplayField(&$field, &$item) {
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		$field->field_type = 'text';
 		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type = 'textselect';
 	}
 
 
@@ -60,9 +61,9 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
-		if(!$post) return;
 		$field->field_type = 'text';
 		plgFlexicontent_fieldsText::onBeforeSaveField($field, $item, $file);
+		$field->field_type = 'textselect';
 	}
 
 
@@ -70,10 +71,19 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
-		
-		$field->label = JText::_($field->label);
-		
 		$field->field_type = 'text';
 		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);
+		$field->field_type = 'textselect';
 	}
+	
+	
+	function onDisplayFilter(&$filter, $value='')
+	{
+		// execute the code only if the field type match the plugin type
+		if($filter->field_type != 'textselect' ) return;
+		$filter->field_type = 'text';
+		plgFlexicontent_fieldsText::onDisplayFilter($filter, $value);
+		$filter->field_type = 'textselect';
+	}	
+	
 }

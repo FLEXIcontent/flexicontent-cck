@@ -30,8 +30,10 @@ jimport('joomla.form.form');
  */
 class FlexicontentViewField extends JView {
 
-	function display($tpl = null) {
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		//initialise variables
 		$document	= & JFactory::getDocument();
@@ -71,8 +73,13 @@ class FlexicontentViewField extends JView {
 		$this->supportsearch = true;
 		$this->supportadvsearch = false;
 		$this->supportfilter = false;
-		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date');
-		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories');
+		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'textselect');
+		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories', 'textselect');
+		
+		// Get fields forced as filters
+		$config_filters = $cparams->get('filter_types', 'createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple,textselect');
+		$config_filters = explode(',', $config_filters);
+		$all_filters = array_unique(array_merge($core_filters, $config_filters));
 		
 		if($form->getValue('field_type'))
 		{
@@ -85,7 +92,7 @@ class FlexicontentViewField extends JView {
 			$classmethods	= get_class_methods($classname);
 			if ($form->getValue("iscore")) {
 				$this->supportadvsearch = in_array($form->getValue('field_type'), $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
-				$this->supportfilter = in_array($form->getValue('field_type'), $core_filters);
+				$this->supportfilter = in_array($form->getValue('field_type'), $all_filters);
 			} else {
 				$this->supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
 				$this->supportfilter = in_array('onDisplayFilter', $classmethods);

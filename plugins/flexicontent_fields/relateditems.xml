@@ -23,7 +23,7 @@
 		<param name="" type="separator" default="FLEXI_RIFLD_SCOPE" hr="false" level="level1" menu="hide" />
 		<param name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level2" menu="hide" />
 		<param name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
-		<param name="catids" type="flexicategories" multiple="true" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
+		<param name="catids" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
 		
 		<param name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC">
 			<option value="0">FLEXI_NO</option>
