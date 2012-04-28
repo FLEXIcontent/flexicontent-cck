@@ -175,7 +175,7 @@ ul.import-failed li {
 }
 
 .statetoggler li ul li img {
-	padding: 2px;
+	/*padding: 2px;*//* this effects with some admin template.*/
 }
 
 /** rating bar **/
