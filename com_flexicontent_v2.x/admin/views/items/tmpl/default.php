@@ -33,6 +33,11 @@ if ( FLEXI_J16GE || FLEXI_FISH ) {
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 
 ?>
+<style>
+img{
+	height:16px;
+}
+</style>
 <script language="javascript" type="text/javascript">
 if(MooTools.version>="1.2.4") {
 	window.addEvent('domready', function() {stateselector.init()});
@@ -580,19 +585,25 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-		<?php if ((FLEXI_FISH || FLEXI_J16GE) && isset($row->lang) && $row->lang ) : ?>
+		<?php if ((FLEXI_FISH || FLEXI_J16GE) && isset($row->lang) && ($row->lang!='*') ) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
 				<?php if (@$this->langs->{$row->lang}->imageurl) : /* image calculated by joomfish vJ2.2+ getLanguageImageSource() helper function  */ ?>
 				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif (@$this->langs->{$row->lang}->image) : /* custom image from language db table*/ ?>
 				<img src="../images/<?php echo $this->langs->{$row->lang}->image; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php else : /* default image for language  */ ?>
+				<?php else : /* default image for language  */
+				if(file_exists(JPATH_ADMINISTRATOR.DS.$image_flag_path.$this->langs->{$row->lang}->shortcode)) {
+				?>
 				<img src="<?php echo $image_flag_path.$this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
-				<?php endif; ?>
+				<?php
+				}else{
+					echo strtoupper($row->lang);
+				}
+				endif; ?>
 			</td>
 		<?php elseif(FLEXI_J16GE && $row->lang=='*') : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_("All"); ?>">
-				<?php echo JText::_("All");?>
+				<?php echo strtoupper(JText::_("FLEXI_ALL"));?>
 			</td>
 		<?php elseif(isset($row->lang) && $row->lang) : ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
@@ -616,46 +627,34 @@ window.addEvent('domready', function() {
 					<div class="options">
 						<ul>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_PUBLISH_THIS_ITEM' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
+									<img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" style="width:16px;height:16px;" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
 								</a>
-								</div>
 							</li>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('0', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_UNPUBLISH_THIS_ITEM' ); ?>">
 									<img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
-								</a>	
-								</div>
+								</a>
 							</li>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('-1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_ARCHIVE_THIS_ITEM' ); ?>">
 									<img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
 								</a>
-								</div>
 							</li>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('-3', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_PENDING' ); ?>">
 									<img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
 								</a>
-								</div>
 							</li>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('-4', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_TO_WRITE' ); ?>">
 									<img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
-								</a>	
-								</div>
+								</a>
 							</li>
 							<li>
-								<div>
 								<a href="javascript:void(0);" onclick="dostate('-5', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_IN_PROGRESS' ); ?>">
 									<img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
-								</a>	
-								</div>
+								</a>
 							</li>
 						</ul>
 					</div>
