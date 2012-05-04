@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1229 2012-04-02 17:34:51Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1246 2012-04-12 06:34:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -21,6 +21,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
 $isNew = ! JRequest::getInt('id', 0);
+$itemlang = substr(getValueFCitem($this->item, 'language') ,0,2);
+if (isset($this->row->item_translations)) foreach ($this->row->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
@@ -97,6 +99,7 @@ $this->document->addScript( JURI::base().'administrator/components/com_flexicont
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
@@ -197,8 +200,9 @@ function addtag(id, tagname) {
 }
 
 function deleteTag(obj) {
-	parent = jQuery(jQuery(obj).getParent());
-	jQuery(parent).remove();
+	var parent = obj.parentNode;
+	parent.innerHTML = "";
+	parent.parentNode.removeChild(parent);
 }
 
 </script>
@@ -218,33 +222,45 @@ function deleteTag(obj) {
 	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
 	//echo "Auto-Publish Parameter: $autopublished<br />";
 	//echo "Auto-Approve Parameter: $autoapprove<br />";
+
+	$allowbuttons_fe = $this->params->get('allowbuttons_fe');
+	if ( empty($allowbuttons_fe) )						$allowbuttons_fe = array();
+	else if ( ! is_array($allowbuttons_fe) )	$allowbuttons_fe = !FLEXI_J16GE ? array($allowbuttons_fe) : explode("|", $allowbuttons_fe);
 	?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons" style="font-size:90%;">
 			
+		<?php if (in_array( 'apply', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return Joomla.submitbutton('apply');">
-				<span class="fcbutton_apply"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
+				<span class="fcbutton_apply"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 			</button>
+		<?php endif; ?>
 			
 		<?php if ( $typeid ) : ?>
 		
 			<button class="button" type="button" onclick="return Joomla.submitbutton('save');">
 				<span class="fcbutton_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 			</button>
+			
+		<?php if (in_array( 'save_preview', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
 				<span class="fcbutton_preview_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
+		<?php endif; ?>
+
 			<?php
 				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
 				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute(getValueFCitem($this->item, 'id').':'.getValueFCitem($this->item, 'alias'), getValueFCitem($this->item, 'catid')).'&preview=1');
 			?>
 			
+		<?php if (in_array( 'preview_latest', $allowbuttons_fe) ) : ?>
 			<?php if ( getValueFCitem($this->item, 'id') ) : ?>
 			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
-				<span class="fcbutton_preview"><?php echo JText::_( 'FLEXI_PREVIEW_LATEST' ) ?></span>
+				<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 			</button>
 			<?php endif; ?>
+		<?php endif; ?>
 			
 		<?php endif; ?>
 			
@@ -257,65 +273,109 @@ function deleteTag(obj) {
 		<br class="clear" />
 		<?php
 			$approval_msg = JText::_( getValueFCitem($this->item, 'id')==0 ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
-			if (!$canpublish)  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
+			if ( !$canpublish && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
 		?>
 		
-	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-		<tr>
-			<td class="key">
+		<fieldset class="flexi_general">
+			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
+			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['title'];
-					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label id="jform_title-lbl" for="jform_title" <?php echo $field_tooltip; ?> >
+				<label id="jform_title-lbl" for="jform_title" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : $this->item->getLabel('title'); ?>
 				</label>
-			</td>
-			<td>
+				
+			<?php	if ( isset($this->row->item_translations) ) :?>
+			
+				<!-- tabber start -->
+				<div class="fctabber" style=''>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<?php echo $this->item->getInput('title');?>
+					</div>
+					<?php foreach ($this->row->item_translations as $t): ?>
+						<?php if ($itemlang!=$t->shortcode) : ?>
+							<div class="tabbertab" style="padding: 0px;" >
+								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
+								<?php
+								$ff_id = 'jfdata_'.$t->shortcode.'_title';
+								$ff_name = 'jfdata['.$t->shortcode.'][title]';
+								?>
+								<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="50" maxlength="254" />
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+				
+			<?php else : ?>
 				<?php echo $this->item->getInput('title');?>
-			</td>
-		</tr>
+			<?php endif; ?>
+
+			</div>
 		
 	<?php if ($this->params->get('usealias_fe', 1)) : ?>
-		<tr>
-			<td class="key">
-				<?php echo $this->item->getLabel('alias');?>
-			</td>
-			<td>
+					
+			<div class="flexi_formblock">
+				<span class="flexi_label">
+					<?php echo $this->item->getLabel('alias');?>
+				</span>
+				
+			<?php	if ( isset($this->row->item_translations) ) :?>
+			
+				<!-- tabber start -->
+				<div class="fctabber" style=''>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<?php echo $this->item->getInput('alias');?>
+					</div>
+					<?php foreach ($this->row->item_translations as $t): ?>
+						<?php if ($itemlang!=$t->shortcode) : ?>
+							<div class="tabbertab" style="padding: 0px;" >
+								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
+								<?php
+								$ff_id = 'jfdata_'.$t->shortcode.'_alias';
+								$ff_name = 'jfdata['.$t->shortcode.'][alias]';
+								?>
+								<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="50" maxlength="254" />
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+				
+			<?php else : ?>
 				<?php echo $this->item->getInput('alias');?>
-			</td>
-		</tr>
+			<?php endif; ?>
+			
+			</div>
+	
 	<?php endif; ?>
 	
 	<?php if ($typeid==0) : ?>
-		<tr>
-			<td class="key">
-				<label id="jform_type_id-lbl" for="jform_type_id" >
+	
+			<div class="flexi_formblock">
+				<label id="type_id-lbl" for="type_id" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_TYPE' ); ?>
 				</label>
-			</td>
-			<td>
 				<?php echo $this->lists['type']; ?>
-			</td>
-		</tr>
+			</div>
+			
 	<?php endif; ?>
 
 	
 	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
-		<tr>
-			<td class="key">
-				<label id="jform_catid-lbl" for="jform_catid">
+			<div class="flexi_formblock">
+				<label id="jform_catid-lbl" for="jform_catid" class="flexi_label">
 					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
-			</td>
-			<td>
 				<?php echo $fixedmaincat; ?>
-			</td>
-		</tr>
+			</div>
 		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
-		<tr>
-			<td class="key">
-				<label id="jform_cid-lbl" for="jform_cid">
+			<div class="flexi_formblock">
+				<label id="jform_cid-lbl" for="jform_cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
 						<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
@@ -323,105 +383,103 @@ function deleteTag(obj) {
 						</span>
 					<?php endif; ?>
 				</label>
-			</td>
-			<td>
 				<?php echo $fixedcats; ?>
-			</td>
-		</tr>
+			</div>
 		<?php endif; ?>
 	<?php else : ?>
-		<tr>
-			<td class="key">
-				<label id="jform_catid-lbl" for="jform_catid">
+			<div class="flexi_formblock">
+				<label id="jform_catid-lbl" for="jform_catid" class="flexi_label">
 					<?php echo JText::_( (!$this->perms['multicat']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
-			</td>
-			<td>
 				<?php echo $this->lists['catid']; ?>
-			</td>
-		</tr>
+			</div>
 		<?php if ($this->perms['multicat']) : ?>
-		<tr>
-			<td class="key">
-				<label id="jform_cid-lbl" for="jform_cid">
+			<div class="flexi_formblock">
+				<label id="jform_cid-lbl" for="jform_cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
 					</span>
 				</label>
-			</td>
-			<td>
 				<?php echo $this->lists['cid']; ?>
-			</td>
-		</tr>
+			</div>
 		<?php endif; ?>
 	<?php endif; ?>
 
 
 	<?php if (!$autopublished && $canpublish) : // autopublished disabled, display state selection field to the user that can publish ?>
 	
-		<tr>
-			<td class="key">
+			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['state'];
-					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
+				<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : $this->item->getLabel('state'); ?>
 				</label>
-			</td>
-			<td>
-	  		<?php echo $this->item->getInput('state'); ?>
+				<?php echo $this->item->getInput('state'); ?>
 	  		<?php	if ($autoapprove) : ?>
 	  			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 	  		<?php	endif;?>
-			</td>
-		</tr>
+			</div>
 		
 		<?php	if (!$autoapprove) :	?>
-		<tr>
-			<td class="key">
+			<div class="flexi_formblock">
+				<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' );?>
-			</td>
-			<td>
+				</label>
 				<?php echo $this->lists['vstate']; ?>
-			</td>
-		</tr>
+			</div>
 		<?php	endif; ?>
 		
 	<?php elseif (!$autopublished && !$canpublish) : ?>
-	
-		<tr>
-			<td class="key">
+			<?php
+				// Enable approval if versioning disabled, this make sense,
+				// since if use can edit item THEN item should be updated !!!
+				$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
+			?>
+			
+			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['state'];
-					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 				?>
-				<label id="jform_state-lbl" for="jform_state" <?php echo $field_tooltip; ?> >
+				<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : $this->item->getLabel('state'); ?>
 				</label>
-			</td>
-			<td>
-	  		<?php //echo JText::_( 'FLEXI_NEEDS_APPROVAL' );?>
-	  		<?php echo 'You cannot set state of this item, it will be reviewed by administrator'; ?>
-				<input type="hidden" id="state" name="jform[state]" value="<?php echo getValueFCitem($this->item, 'state', -4);?>" />
-				<input type="hidden" id="vstate" name="jform[vstate]" value="1" />
-			</td>
-		</tr>
+	  		<?php 
+	  			//echo JText::_( 'FLEXI_NEEDS_APPROVAL' );
+	  			if ( !$this->item )
+	  				echo 'You cannot publish/unpublish this item, it will be reviewed by administrator';
+	  			else
+	  				echo 'You cannot publish/unpublish of this item';
+					// Enable approval if versioning disabled, this make sense,
+					// since if use can edit item THEN item should be updated !!!
+					$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
+	  		?>
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->id ? $this->item->state : -4; ?>" />
+				<input type="hidden" id="vstate" name="jform[vstate]" value="<?php echo $item_vstate; ?>" />
+			</div>
 	
 	<?php endif; ?>
 	
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-		<tr>
-			<td class="key">
-				<?php echo $this->item->getLabel('language'); ?>
-			</td>
-			<td>
+			<div class="flexi_formblock">
+				<span class="flexi_label">
+					<?php echo $this->item->getLabel('language'); ?>
+				</span>
 				<?php echo $this->lists['languages']; ?>
+			</div>
+			
+			<!--div class="flexi_formblock">
+				<span class="flexi_label">
+					<?php echo $this->item->getLabel('lang_parent_id'); ?>
+				</span>
 				<?php echo $this->item->getInput('lang_parent_id'); ?>
-			</td>
-		</tr>
+			</div-->
 		<?php endif; ?>
+		</fieldset>
+		
 		<?php
 		if ($this->perms['canright']) :
 		$this->document->addScriptDeclaration("
@@ -437,8 +495,6 @@ function deleteTag(obj) {
 			");
 
 		?>
-		<tr>
-			<td colspan="2">
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
@@ -452,57 +508,43 @@ function deleteTag(obj) {
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 					</div>
 				</fieldset>
-			</td>
-		</tr>
 		<?php endif; ?>
 
-	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtags)) ) : ?>
+	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtagsdata)) ) : ?>
 		<?php $display_tags = $this->params->get('usetags_fe', 1)==0 ? 'style="display:none;"' : ''; ?>
 		
-		<tr <?php echo $display_tags; ?> >
-			<td class="key">
-				<?php
-					$field = @$this->fields['tags'];
-					$field_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
-				?>
-				<label id="jform_tags-lbl" for="jform_tags" <?php echo $field_tooltip; ?> >
-					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TAGS' ); ?>
-				</label>
-			</td>
-			<td>
+		<fieldset class="flexi_tags" <?php echo $display_tags ?> >
+			<?php
+				$field = @$this->fields['tags'];
+				$label_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+			?>
+			<legend <?php echo $label_tooltip; ?> ><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
 				<div class="qf_tagbox" id="qf_tagbox">
 					<ul id="ultagbox">
 					<?php
-						foreach($this->usedtags as $tag) {
-								if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-								} else {
-									echo '<li class="tagitem" style="background-image:url()!important;"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />&nbsp;</li>';
+						foreach($this->usedtagsdata as $tag) {
+							if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
+								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+							} else {
+								echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
+								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /></li>';
 							}
 						}
 					?>
 					</ul>
 					<br class="clear" />
 				</div>
-			</td>
-		</tr>
 		<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
-		<tr>
-			<td class="key">
-				<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?></label>
-			</td>
-			<td>
 				<div id="tags">
-					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+					<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
+					</label>
 				</div>
-			</td>
-		</tr>
 		<?php endif; ?>
+		</fieldset>
+		
 	<?php endif; ?>
-	
-	</table>
 
 <?php if ($this->fields) : ?>
 
@@ -526,7 +568,7 @@ function deleteTag(obj) {
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
-		<table class="admintable" width="100%">
+		<table class="admintable" width="100%" style="border-width:0px!important;" >
 			<?php
 			$hidden = array(
 				'fcloadmodule',
@@ -534,6 +576,7 @@ function deleteTag(obj) {
 				'toolbar'
 			);
 			
+			$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 			foreach ($this->fields as $field) {
 				
 				// SKIP frontend hidden fields from this listing
@@ -542,79 +585,88 @@ function deleteTag(obj) {
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
-				// Create main text field, via calling the display function of the textarea field (will also check for tabs)
-				if ($field->field_type == 'maintext')
-				{
-					// Create main text field, via calling the display function of the textarea field (will also check for tabs)
-					$maintext = @$field->value[0];
-					$maintext = html_entity_decode($maintext, ENT_QUOTES, 'UTF-8');
-					$field->maintext = & $maintext;
-					FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$this->item) );
-				}
-				
-				// -- Tooltip for the current field
-				$field_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+				// -- Tooltip for the current field label
+				$label_tooltip = $field->description ? 'class="flexi_label hasTip" title="'.$field->label.'::'.$field->description.'"' : ' class="flexi_label" ';
+				$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
+				$not_in_tabs = "";
 				?>
 				
-				<?php	if ( !is_array($field->html) ) : ?>
-					<tr>
-						<td class="key">
-							<label for="<?php echo $field->name; ?>" <?php echo $field_tooltip; ?> >
-								<?php echo $field->label; ?>
-							</label>
-						</td>
-						<td>
-							<?php
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-								if(isset($field->html)){
-									echo $field->html;
-								} else {
-									echo $noplugin;
-								}
-							?>
-						</td>
-					</tr>
+			<tr>
+				<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
 					
+					<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
+						<?php echo $field->label; ?>
+					</label>
+					
+					<div style='float:left!important; padding:0px!important; margin:0px!important; '>
+					
+				<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
+					
+					<!-- tabber start -->
+					<div class="fctabber" style=''>
+						<div class="tabbertab" style="padding: 0px;" >
+							<h3> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
+							<?php
+								$field_tab_labels = & $field->tab_labels;
+								$field_html       = & $field->html;
+								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+							?>
+						</div>
+						<?php foreach ($this->row->item_translations as $t): ?>
+							<?php if ($itemlang!=$t->shortcode) : ?>
+								<div class="tabbertab" style="padding: 0px;" >
+									<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<?php
+									$field_tab_labels = & $t->fields->text->tab_labels;
+									$field_html       = & $t->fields->text->html;
+									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+									?>
+								</div>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</div>
+					<!-- tabber end -->
+				
 				<?php else : ?>
 			
-					<tr>
-						<td colspan="2">
+					<?php	if ( !is_array($field->html) ) : ?>
+					
+						<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+					
+					<?php else : ?>
+					
+						<!-- tabber start -->
+						<div class="fctabber">
+						<?php foreach ($field->html as $i => $fldhtml): ?>
+							<?php
+								// Hide field when it has no label, and skip creating tab
+								$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+								if (!isset($field->tab_labels[$i]))	continue;
+							?>
 							
-							<?php $not_in_tabs = ""; ?>
-							
-							<div class="fctabber">
-							<?php foreach ($field->html as $i => $field_html): ?>
+							<div class="tabbertab">
+								<h3> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
 								<?php
-								if (!isset($field->tab_labels[$i])) {
-									if (isset($field->html[$i])) $not_in_tabs .= "<div style='display:none!important'>".$field->html[$i]."</div>";
-									continue;
-								}
+									echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+									$not_in_tabs = "";      // Clear the hidden fields variable
+									echo $field->html[$i];  // Current TAB CONTENTS
 								?>
-								<div class="tabbertab">
-									<h3>
-										<?php echo $field->tab_labels[$i]; ?>
-									</h3>
-								<?php
-									$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-									echo $not_in_tabs;
-									$not_in_tabs = ""; // reset
-									if(isset($field->html[$i])){
-										echo $field->html[$i];
-									} else {
-										echo $noplugin;
-									}
-								?>
-								</div>
-							<?php endforeach; ?>
 							</div>
 							
-							<?php echo $not_in_tabs; ?>
-							
-						</td>
-					</tr>
+						<?php endforeach; ?>
+						</div>
+						<!-- tabber end -->
+						<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+						
+					<?php endif; ?>
 					
 				<?php endif; ?>
+				
+					</div>
 			
+				</td>
+			</tr>
+				
 			<?php
 			}
 			?>
@@ -631,39 +683,6 @@ function deleteTag(obj) {
 <?php if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
 	<?php echo JHtml::_('sliders.start','plugin-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1)); ?>
-	
-	<?php 
-		if ( $this->params->get('usemetadata_fe', 1) ) {
-			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-	?>
-		<fieldset class="panelform">
-			<ul class="adminformlist">
-				<li>
-					<?php echo $this->item->getLabel('metadesc'); ?>
-					<?php echo $this->item->getInput('metadesc'); ?>
-				</li>
-				<li>
-					<?php echo $this->item->getLabel('metakey'); ?>
-					<?php echo $this->item->getInput('metakey'); ?>
-				</li>
-				
-		<?php if ($this->params->get('usemetadata_fe', 1) == 2 ) : ?>
-		
-			<?php foreach($this->item->getGroup('metadata') as $field): ?>
-				<?php if ($field->hidden): ?>
-					<?php echo $field->input; ?>
-				<?php else: ?>
-					<li>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
-					</li>
-				<?php endif; ?>
-			<?php endforeach; ?>
-			
-		<?php endif; ?>
-		
-		</fieldset>
-	<?php } ?>
 	
 	<?php if ($this->perms['canpublish'] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
@@ -689,14 +708,107 @@ function deleteTag(obj) {
 
 	<?php endif; ?>
 	
-	<?php
-	$useitemparams_fe = $this->params->get('useitemparams_fe');
-	if ( empty($useitemparams_fe) ) {
-		$useitemparams_fe = array();
-	} else if ( !is_array($useitemparams_fe) ) {
-		$useitemparams_fe = explode("|", $useitemparams_fe);
-	}
 	
+	<?php 
+		if ( $this->params->get('usemetadata_fe', 1) ) {
+			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
+			
+			//echo $this->form->getLabel('metadesc');
+			//echo $this->form->getInput('metadesc');
+			//echo $this->form->getLabel('metakey');
+			//echo $this->form->getInput('metakey');
+	?>
+		<fieldset class="panelform">
+			<ul class="adminformlist">
+				<li>
+					<?php echo $this->item->getLabel('metadesc'); ?>
+
+			<?php	if ( isset($this->row->item_translations) ) :?>
+				
+				<!-- tabber start -->
+				<div class="fctabber" style='display:inline-block;'>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<?php echo $this->item->getInput('metadesc'); ?>
+					</div>
+					<?php foreach ($this->row->item_translations as $t): ?>
+						<?php if ($itemlang!=$t->shortcode) : ?>
+							<div class="tabbertab" style="padding: 0px;" >
+								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
+								<?php
+								$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
+								$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
+								?>
+								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="50" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+			
+			<?php else : ?>
+				<?php echo $this->item->getInput('metadesc'); ?>
+			<?php endif; ?>
+			
+				</li>
+				<li>
+					<?php echo $this->item->getLabel('metakey'); ?>
+			<?php	if ( isset($this->row->item_translations) ) :?>
+			
+				<!-- tabber start -->
+				<div class="fctabber" style='display:inline-block;'>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<?php echo $this->item->getInput('metakey'); ?>
+					</div>
+					<?php foreach ($this->row->item_translations as $t): ?>
+						<?php if ($itemlang!=$t->shortcode) : ?>
+							<div class="tabbertab" style="padding: 0px;" >
+								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
+								<?php
+								$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
+								$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
+								?>
+								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="50" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+			
+			<?php else : ?>
+				<?php echo $this->item->getInput('metakey'); ?>
+			<?php endif; ?>
+
+				</li>
+				
+		<?php if ($this->params->get('usemetadata_fe', 1) == 2 ) : ?>
+		
+			<?php foreach($this->item->getGroup('metadata') as $field): ?>
+				<?php if ($field->hidden): ?>
+					<?php echo $field->input; ?>
+				<?php else: ?>
+					<li>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					</li>
+				<?php endif; ?>
+			<?php endforeach; ?>
+			
+		<?php endif; ?>
+		
+		</fieldset>
+	<?php } ?>
+	
+	
+	<?php
+		$useitemparams_fe = $this->params->get('useitemparams_fe');
+		if ( empty($useitemparams_fe) ) {
+			$useitemparams_fe = array();
+		} else if ( !is_array($useitemparams_fe) ) {
+			$useitemparams_fe = explode("|", $useitemparams_fe);
+		}
+		
 	$fieldSets = $this->item->getFieldsets('attribs');
 	foreach ($fieldSets as $name => $fieldSet) :
 		$fieldsetname = str_replace("params-", "", $name);
@@ -737,10 +849,9 @@ function deleteTag(obj) {
 	</blockquote>
 	
 	<?php
-	
 		if ( $this->params->get('selecttheme_fe') == 2 ) :
 			echo JHtml::_('sliders.start','template-sliders-'.getValueFCitem($this->item, "id"), array('useCookie'=>1));
-		
+			
 			foreach ($this->tmpls as $tmpl) :
 				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
@@ -751,7 +862,6 @@ function deleteTag(obj) {
 						echo $field->input;
 					endforeach;
 				?> </fieldset> <?php
-				
 			endforeach;
 		endif;
 	?>

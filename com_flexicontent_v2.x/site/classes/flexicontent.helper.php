@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1220 2012-03-24 07:00:38Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1233 2012-04-03 00:02:56Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,9 +39,14 @@ class flexicontent_html
 	 */
 	function escapeJsText($string)
 	{
-		return str_replace("\n", '\n', str_replace('"', '\"', addcslashes(str_replace("\r", '', (string)$string), "\0..\37'\\")));
+		$string = (string)$string;
+		$string = str_replace("\r", '', $string);
+		$string = addcslashes($string, "\0..\37'\\");
+		$string = str_replace('"', '\"', $string);
+		$string = str_replace("'", "\'", $string);
+		$string = str_replace("\n", ' ', $string);
+		return $string;
 	}
-	
 	
 	/**
 	 * Trims whitespace from an array of strings
@@ -57,7 +62,6 @@ class flexicontent_html
 		}
 		return $arr_str;
 	}
-	
 	
 	/**
 	 * Strip html tags and cut after x characters
@@ -1022,6 +1026,7 @@ class flexicontent_html
 		return $list;
 	}
 
+	
 	/**
 	 * Method to build the Joomfish languages list
 	 * 
@@ -1033,77 +1038,7 @@ class flexicontent_html
 		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 		
-		// Retrieve languages
-		if (FLEXI_J16GE) {   // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
-			$query = 'SELECT DISTINCT *'
-					.' FROM #__extensions'
-					.' WHERE type="language" '
-					.' GROUP BY element';
-		} else if (FLEXI_FISH) {   // Use joomfish languages table
-			$query = 'SELECT *'
-					.' FROM #__languages'
-				//.' WHERE active = 1'        // removed by JoomFish v2.2+ ??
-				//.' ORDER BY ordering ASC'   // removed by JoomFish v2.2+ ??
-					;
-		} else {
-			return 'buildlanguageslist(): ERROR no joomfish installed';
-		}
-		$db->setQuery($query);
-		$languages = $db->loadObjectList();
-
-
-		// Calculate image paths
-		if (FLEXI_J16GE) {  // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
-			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-			$mediapath	= $mainframe->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
-		} else {
-			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
-		}
-		
-		// Prepare language objects
-		if (FLEXI_J16GE) {  // FOR FUTURE JoomFish SUPPORT if-else must be swapped and tested
-			
-			foreach ($languages as $lang) {
-				// Calculate/Fix languages data
-				$lang->code = $lang->element;
-				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
-				$lang->id = $lang->extension_id;
-				// Get image path
-				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
-			}
-			
-			// Also prepend '*' (ALL) language to language array
-			$lang_all = new stdClass();
-			$lang_all->code = '*';
-			$lang_all->name = 'All';
-			$lang_all->shortcode = '*';
-			$lang_all->id = 0;
-			array_unshift($languages, $lang_all);
-			
-			// Select language -ALL- if none selected
-			//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
-			
-		} else if (isset($languages[0]->sef)) { // JoomFish v2.2+
-			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
-		
-			foreach ($languages as $lang) {
-				// Calculate/Fix languages data
-				$lang->code = $lang->lang_code;
-				$lang->name = $lang->title;
-				$lang->shortcode = $lang->sef;
-				$lang->id = $lang->lang_id;
-				// Get image path via helper function
-				$lang->imgsrc = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
-			}
-			
-		} else { // JoomFish until v2.1
-		
-			foreach ($languages as $lang) {
-				// Get image path till 
-				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';			
-			}
-		}
+		$languages = FLEXIUtilities::getlanguageslist();
 		
 		switch ($type)
 		{
@@ -1200,9 +1135,35 @@ class flexicontent_html
 	
 		return $list;
 	}
-
+	
+	
 	/**
-	 * Method to get the default site language
+	 * Method to get the user's Current Language
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	function getUserCurrentLang()
+	{
+		static $lang = null;
+		if ($lang) return $lang;
+		
+		// First try language from http request
+		$lang = JRequest::getWord('lang', '' );
+		if ( empty($lang) ) {
+			// Second get DEFAULT --USER-- language, note this is different from the default Frontend/Backend "Content" language
+			$langFactory= JFactory::getLanguage();
+			$lang = $langFactory->getTag();
+			$lang = substr($lang,0,2);
+		}
+		return $lang;
+	}
+	
+	
+	/**
+	 * Method to get Site (Frontend) default language
+	 * NOTE: ... this is the default language of created content for J1.5, but in J1.6+ is '*' (=all) 
+	 * NOTE: ... joomfish creates translations in all other languages
 	 * 
 	 * @return string
 	 * @since 1.5
@@ -1228,9 +1189,8 @@ class flexicontent_html
 		}
 		return $str;
 	 }
-
-
-
+	 
+	 
 	/**
 		Diff implemented in pure php, written from scratch.
 		Copyright (C) 2003  Daniel Unterberger <diff.phpnet@holomind.de>
@@ -1366,42 +1326,54 @@ class flexicontent_html
 		$html2 = implode(" ", $html2);
 		return array($html1, $html2);
 	}
-
-	function getJCoreFields($ffield=NULL, $mapcorefield=false, $swap=false) {
-		if(!$swap) {//core field=>flexicontent field
+	
+	
+	/**
+	 * Method to retrieve mappings of CORE fields (Names to Types and reverse)
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getJCoreFields($ffield=NULL, $map_maintext_to_introtext=false, $reverse=false) {
+		if(!$reverse)  // MAPPING core fields NAMEs => core field TYPEs
+		{
 			$flexifield = array(
-				//'categories'=>'categories',
-				//'tags'=>'tags',
+				'title'=>'title',
+				'categories'=>'categories',
+				'tags'=>'tags',
 				'text'=>'maintext',
 				'created'=>'created',
 				'created_by'=>'createdby',
-				//'modified'=>'modified',
-				//'modified_by'=>'modifiedby',
-				'title'=>'title',
+				'modified'=>'modified',
+				'modified_by'=>'modifiedby',
 				'hits'=>'hits',
-				//'document_type'=>'type',
+				'document_type'=>'type',
 				'version'=>'version',
 				'state'=>'state'
 			);
-			if($mapcorefield) {
+			if ($map_maintext_to_introtext)
+			{
 				$flexifield['introtext'] = 'maintext';
 			}
-		}else{//flexicontent field=>core field
+		}
+		else    // MAPPING core field TYPEs => core fields NAMEs
+		{
 			$flexifield = array(
-				//'categories'=>'categories',
-				//'tags'=>'tags',
+				'title'=>'title',
+				'categories'=>'categories',
+				'tags'=>'tags',
 				'maintext'=>'text',
 				'created'=>'created',
 				'createdby'=>'created_by',
-				//'modified'=>'modified',
-				//'modifiedby'=>'modified_by',
-				'title'=>'title',
+				'modified'=>'modified',
+				'modifiedby'=>'modified_by',
 				'hits'=>'hits',
-				//'type'=>'document_type',
+				'type'=>'document_type',
 				'version'=>'version',
 				'state'=>'state'
 			);
-			if($mapcorefield) {
+			if ($map_maintext_to_introtext)
+			{
 				$flexifield['maintext'] = 'introtext';
 			}
 		}
@@ -1517,6 +1489,37 @@ class flexicontent_html
 			)
 		);
 	}
+
+	/*
+	 * Method to confirm if a given string is a valid MySQL date
+	 * param  string			$date
+	 * return boolean			true if valid date, false otherwise
+	 */
+	function createFieldTabber( &$field_html, &$field_tab_labels, $class )
+	{
+		$not_in_tabs = "";
+		
+		$output = "<!-- tabber start --><div class='fctabber' class='".$class."'>"."\n";
+		
+		foreach ($field_html as $i => $html) {
+			// Hide field when it has no label, and skip creating tab
+			$no_label = ! isset( $field_tab_labels[$i] );
+			$not_in_tabs .= $no_label ? "<div style='display:none!important'>".$field_html[$i]."</div>" : "";
+			if ( $no_label ) continue;
+			
+			$output .= "	<div class='tabbertab'>"."\n";
+			$output .= "		<h3>".$field_tab_labels[$i]."</h3>"."\n";   // Current TAB LABEL
+			$output .= "		".$not_in_tabs."\n";                        // Output hidden fields (no tab created), by placing them inside the next appearing tab
+			$output .= "		".$field_html[$i]."\n";                     // Current TAB CONTENTS
+			$output .= "	</div>"."\n";
+			
+			$not_in_tabs = "";     // Clear the hidden fields variable
+		}
+		$output .= "</div><!-- tabber end -->";
+		$output .= $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area
+		return $output;
+	}
+	
 }
 
 class flexicontent_upload
@@ -1978,7 +1981,126 @@ class flexicontent_images
 
 class FLEXIUtilities
 {
+	/**
+	 * Method to get information of site languages
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getlanguageslist()
+	{
+		$mainframe =& JFactory::getApplication();
+		$db =& JFactory::getDBO();
+		static $languages = null;
+		if ($languages) return $languages;
+		
+		// ******************
+		// Retrieve languages
+		// ******************
+		if (FLEXI_FISH) {   // Use joomfish languages table
+			$query = 'SELECT l.* '
+				. ( FLEXI_FISH_22GE ? ", lext.* " : "" )
+				. ( FLEXI_FISH_22GE ? ", l.lang_id as id " : ", l.id " )
+				. ( FLEXI_FISH_22GE ? ", l.lang_code as code, l.sef as shortcode" : ", l.code, l.shortcode" )
+				. ( FLEXI_FISH_22GE ? ", CASE WHEN CHAR_LENGTH(l.title) THEN l.title ELSE l.title_native END as name" : ", l.name " )
+				. ' FROM #__languages as l'
+				. ( FLEXI_FISH_22GE ? ' JOIN #__jf_languages_ext as lext ON l.lang_id=lext.lang_id ' : '')
+				. ' WHERE '.    (FLEXI_FISH_22GE ? ' l.published=1 ' : ' l.active=1 ')
+				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
+					;
+		} else if (FLEXI_J16GE) {   // Use J1.6+ language info
+			$query = 'SELECT DISTINCT *, extension_id as id '
+					.' FROM #__extensions'
+					.' WHERE type="language" '
+					.' GROUP BY element';
+		} else {
+			JError::raiseWarning(500, 'getlanguageslist(): ERROR no joomfish installed');
+			return array();
+		}
+		$db->setQuery($query);
+		$languages = $db->loadObjectList('id');
+		//echo "<pre>"; print_r($languages); echo "</pre>";
+		if ($db->getErrorNum()) {
+			JError::raiseWarning(500, $db->getErrorMsg()."<br>Query:<br>".$query);
+			return array();
+		}
+		
+		
+		// *********************
+		// Calculate image paths
+		// *********************
+		if (FLEXI_FISH) {   // Use joomfish images
+			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
+		} else {  // FLEXI_J16GE, use J1.6+ images
+			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+			$mediapath	= $mainframe->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
+		}
+		
+		
+		// ************************
+		// Prepare language objects
+		// ************************
+		if ( FLEXI_FISH && FLEXI_FISH_22GE )  // JoomFish v2.2+
+		{
+			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
+			foreach ($languages as $lang) {
+				// Get image path via helper function
+				$lang->imgsrc = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+			}
+		}
+		else if ( FLEXI_FISH )                // JoomFish until v2.1
+		{
+			foreach ($languages as $lang) {
+				// $lang->image, holds a custom image path
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';			
+			}
+		}
+		else
+		{                                     // FLEXI_J16GE, based on J1.6+ language data and images
+			foreach ($languages as $lang) {
+				// Calculate/Fix languages data
+				$lang->code = $lang->element;
+				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				$lang->id = $lang->extension_id;
+				// $lang->image, holds a custom image path
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
+			}
+			
+			// Also prepend '*' (ALL) language to language array
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = 'All';
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			array_unshift($languages, $lang_all);
+			
+			// Select language -ALL- if none selected
+			//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
+		}
+		
+		return $languages;
+	}
 	
+	
+	/**
+	 * Method to build an array of languages hashed by id or by language code
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getLanguages($hash='code')
+	{
+		$langs = new stdClass();
+		
+		$languages = FLEXIUtilities::getlanguageslist();
+		foreach ($languages as $language)
+			$langs->{$language->$hash} = $language;
+		
+		return $langs;
+	}
+	
+		
 	/**
 	 * Method to get the last version kept
 	 * 

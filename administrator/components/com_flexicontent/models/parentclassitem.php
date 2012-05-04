@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.modeladmin' );
+jimport('joomla.application.component.model');
 jimport( 'joomla.html.parameter' );
 /**
  * FLEXIcontent Component Item Model
@@ -28,7 +28,7 @@ jimport( 'joomla.html.parameter' );
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class ParentClassItem extends JModelAdmin
+class ParentClassItem extends JModel
 {
 	/**
 	 * Component parameters

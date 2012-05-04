@@ -43,13 +43,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$editor 	= & JFactory::getEditor();
 		
 		// some parameter shortcuts
-		$cols				= $field->parameters->get( 'cols', 75 ) ;
-		$rows				= $field->parameters->get( 'rows', 20 ) ;
-		$height				= $field->parameters->get( 'height', 400 ) ;
-		$default_value			= $field->parameters->get( 'default_value' ) ;
-		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
-		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$cols      = $field->parameters->get( 'cols', 75 ) ;
+		$rows      = $field->parameters->get( 'rows', 20 ) ;
+		$height    = $field->parameters->get( 'height', 400 ) ;
+		$use_html  = $field->parameters->get( 'use_html', 0 ) ;
+		$required  = $field->parameters->get( 'required', 0 ) ;
+		$required  = $required ? ' required' : '';
+		
+		$default_value = $field->parameters->get( 'default_value' ) ;
 		
 		// tabbing parameters
 		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
@@ -77,15 +78,27 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->value = array();
 				$field->value[0] = '';
 			}
-			$field_value = & $field->value[0];
 			$field_name = $field->name;
+			$field_idtag = $field->name;
 			$skip_buttons_arr = array('pagebreak', 'readmore');
 		} else if ($field->field_type == 'maintext') {
-			$field_value = & $field->maintext;
-			$field_name = 'text';
+			if ( !is_array($field->name) ) {
+				$field_name = $field->name;
+				$field_idtag = $field->name;
+			} else {
+				foreach ( $field->name as $i => $ffname) {
+					if ($i==0) {
+						$field_name = $field_idtag = $ffname;
+					} else {
+						$field_name .= '['.$ffname.']';
+						$field_idtag .= '_'.$ffname;
+					}
+				}
+			}
 			$required = '';
 			$skip_buttons_arr = array();
 		}
+		$field_value = & $field->value[0];
 		
 		
 		// MAKE MAIN TEXT FIELD OR TEXTAREAS TABBED

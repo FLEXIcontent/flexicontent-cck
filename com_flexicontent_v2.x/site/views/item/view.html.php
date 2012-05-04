@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1229 2012-04-02 17:34:51Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1246 2012-04-12 06:34:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,6 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
-require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 
 /**
  * HTML View class for the Items View
@@ -53,11 +52,14 @@ class FlexicontentViewItem extends JView
 		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
 		
 		// Initialize variables
-		$mainframe = &JFactory::getApplication();
-		$document	= & JFactory::getDocument();
-		$user			= & JFactory::getUser();
+		$mainframe  = &JFactory::getApplication();
+		$dispatcher = & JDispatcher::getInstance();
+		$document   = & JFactory::getDocument();
+		$user       = & JFactory::getUser();
+		$db         = & JFactory::getDBO();
+		$nullDate   = $db->getNullDate();
+		
 		$menu			= JSite::getMenu()->getActive();
-		$dispatcher	= & JDispatcher::getInstance();
 		$aid			= !FLEXI_J16GE ? (int) $user->get('aid') : $user->getAuthorisedViewLevels();
 		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
@@ -96,11 +98,7 @@ class FlexicontentViewItem extends JView
 		// 'preview' request variable will force last, and finally 'version' request variable will force specific
 		// NOTE: preview and version variables cannot be used by users that cannot edit the item
 		JRequest::setVar('loadcurrent', true);
-		if (FLEXI_J16GE) {
-			$item = & $model->getItem($model->getId(), false);
-		} else {
-			$item = & $model->getItem();
-		}
+		$item = & $model->getItem();
 		
 		// Check that item was loaded successfully, NOTE, this maybe unreachable if getItem() already has raised an ERROR ...
 		if ($item->id == 0)
@@ -377,7 +375,7 @@ class FlexicontentViewItem extends JView
 		$model = & $this->getModel();
 		if (FLEXI_J16GE) {
 			//$model->setId(0); // Clear $model->_item, to force recalculation of the item data
-			$itemdata = & $model->getItem($model->getId(), false);
+			$row = & $model->getItem($model->getId(), false);
 			$item = & $this->get('Form');
 		} else {
 			$item = & $this->get('Item');
@@ -460,24 +458,56 @@ class FlexicontentViewItem extends JView
 		$tparams = & $this->get( 'Typeparams' );
 		$tparams = new JParameter($tparams);
 		
-		// Get fields and create their edit html, also customize core fields
+		// *****************************************************************************
+		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
+		// (a) Apply Content Type Customization to CORE fields (label, description, etc) 
+		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField' 
+		// *****************************************************************************
 		$fields = & $this->get( 'Extrafields' );
-		foreach ($fields as $field) {
-			$fieldname = $field->iscore ? 'core' : $field->field_type;
+		foreach ($fields as $field)
+		{
 			// -- SET a type specific label & description for the core field and also retrieve any other ITEM TYPE customizations (must call this manually when editing)
-			if ($field->iscore) FlexicontentFields::loadFieldConfig($field, $item);
-			// Create field 's editing HTML
-			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayField', array( &$field, &$item ) );
+			if ($field->iscore) {
+				FlexicontentFields::loadFieldConfig($field, $item);
+			} else {
+				// Create field 's editing HTML
+				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
+			}
+			if ($field->field_type == 'maintext')
+			{
+				// Create main text field, via calling the display function of the textarea field (will also check for tabs)
+				// We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish data
+				
+				if ( isset($row->item_translations) ) {
+					$itemlang = substr($row->language ,0,2);
+					foreach ($row->item_translations as $lang_id => $t)	{
+						if ($itemlang == $t->shortcode) continue;
+						$field->name = array('jfdata',$t->shortcode,'text');
+						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
+						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+						$t->fields->text->tab_labels = $field->tab_labels;
+						$t->fields->text->html = $field->html;
+						unset( $field->tab_labels );
+						unset( $field->html );
+					}
+				}
+				$field->name = 'text';
+				$field->value[0] = html_entity_decode(FLEXI_J16GE ? $row->text: $item->text, ENT_QUOTES, 'UTF-8');
+				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+			}
 		}
 		
 		// Tags used by the item
-		if (FLEXI_J16GE) {
-			$usedtagsA 	= $isnew ? array() : $fields['tags']->value;
-			$usedtags = $model->getUsedtagsData($usedtagsA);    
-			$usedtags = !is_array($usedtags) ? array() : $usedtags;  // Ensure $usedtags is an array
-		} else {
+		$usedtagsids  = & $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
+		//$usedtagsIds 	= $isnew ? array() : $fields['tags']->value;
+		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
+		//echo "<br>usedtagsIds: "; print_r($usedtagsids);
+		//echo "<br>usedtags (data): "; print_r($usedtagsdata);
+		
+		// Compatibility for old overriden templates ...
+		if (!FLEXI_J16GE) {
 			$tags			= & $this->get('Alltags');
-			$usedtags	= & $this->get('Usedtags');
+			$usedtags	= & $this->get('UsedtagsIds');
 		}
 		
 		// Load permissions (used by form template)
@@ -535,7 +565,7 @@ class FlexicontentViewItem extends JView
 		}
 
 		// Get the edit lists
-		$lists = $this->_buildEditLists($perms['multicat']);
+		$lists = $this->_buildEditLists($perms);
 
 		// Build languages list
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
@@ -575,7 +605,7 @@ class FlexicontentViewItem extends JView
 		// Merge item parameters
 		if (!$isnew) {
 			if (FLEXI_J16GE)
-				$params->merge($itemdata->parameters);
+				$params->merge($row->parameters);
 			else
 				$params->merge($item->parameters);
 		}
@@ -586,14 +616,17 @@ class FlexicontentViewItem extends JView
 
 		$this->assign('action', 	$uri->toString());
 
+		$this->assignRef('row',			$row);
 		$this->assignRef('item',			$item);
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',			$lists);
 		$this->assignRef('editor',		$editor);
 		$this->assignRef('user',			$user);
-		if (!FLEXI_J16GE)
+		if (!FLEXI_J16GE) {  // compatibility old templates
 			$this->assignRef('tags',		$tags);
-		$this->assignRef('usedtags',	$usedtags);
+			$this->assignRef('usedtags',	$usedtags);
+		}
+		$this->assignRef('usedtagsdata', $usedtagsdata);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('tparams',		$tparams);
 		$this->assignRef('perms', 		$perms);
@@ -629,7 +662,7 @@ class FlexicontentViewItem extends JView
 			$formparams->set('created_by_alias', $item->created_by_alias);
 			$formparams->set('created', JHTML::_('date', $item->created, '%Y-%m-%d %H:%M:%S'));
 			$formparams->set('publish_up', JHTML::_('date', $item->publish_up, '%Y-%m-%d %H:%M:%S'));
-			if (JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $db->getNullDate()) {
+			if (JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $nullDate) {
 				$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
 			} else {
 				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
@@ -652,10 +685,8 @@ class FlexicontentViewItem extends JView
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
 		} else {
-			if ( JHTML::_('date', $item->getValue('publish_down') , '%Y') <= 1969 || $item->getValue('publish_down') == $db->getNullDate() ) {
+			if ( JHTML::_('date', $item->getValue('publish_down') , 'Y') <= 1969 || $item->getValue('publish_down') == $nullDate ) {
 				$item->setValue('publish_down', null, JText::_( 'FLEXI_NEVER' ) );
-			} else {
-				$item->setValue('publish_down', null, JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S') );
 			}
 		}
 		
@@ -667,7 +698,6 @@ class FlexicontentViewItem extends JView
 		$type_default_layout = $tparams->get('ilayout', 'default');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
-		else																			$allowed_tmpls = $allowed_tmpls;
 		if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 		
 		if ( count($allowed_tmpls) ) {
@@ -682,10 +712,9 @@ class FlexicontentViewItem extends JView
 		if (!$isnew) {
 			foreach ($tmpls as $tmpl) {
 				if (FLEXI_J16GE) {
-					//echo "<pre>"; print_r($itemdata->attribs); echo "</pre>"; //exit;
 					foreach ($tmpl->params->getGroup('attribs') as $field) {
 						$fieldname =  $field->__get('fieldname');
-						$value = $itemdata->parameters->get($fieldname);
+						$value = $row->itemparams->get($fieldname);
 						if ( strlen($value) ) $tmpl->params->setValue($fieldname, 'attribs', $value);
 					}
 				} else {
@@ -703,7 +732,7 @@ class FlexicontentViewItem extends JView
 	 *
 	 * @since 1.0
 	 */
-	function _buildEditLists($multicat = 1)
+	function _buildEditLists($perms)
 	{
 		global $globalcats;
 		$lists = array();
@@ -711,14 +740,16 @@ class FlexicontentViewItem extends JView
 		$user = & JFactory::getUser();	// get current user
 		$item = & $this->get('Item');		// get the item from the model
 		$categories = $globalcats;			// get the categories tree
-		$selectedcats = & $this->get( 'Catsselected' );		// get ids of selected categories (edit action)
+		$selectedcats = & $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
 		$actions_allowed = array('core.create');					// user actions allowed for categories
 		$types = & $this->get( 'Typeslist' );
 		$typesselected = '';
 		
+		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;
+		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
-		if ($multicat) {
+		if ($perms['multicat']) {
 			$class = 'class="inputbox validate" multiple="multiple" size="8"';
 			if (FLEXI_J16GE) {
 				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $class, true, true,	$actions_allowed);

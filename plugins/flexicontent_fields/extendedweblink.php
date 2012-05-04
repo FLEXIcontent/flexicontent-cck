@@ -60,7 +60,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
-					'handle': '.drag".$field->id."'
+					'handle': '.fcfield-drag'
 					});			
 				});
 			";
@@ -95,7 +95,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
-						'handle': '.drag".$field->id."'
+						'handle': '.fcfield-drag'
 					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
@@ -132,34 +132,22 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$document->addScriptDeclaration($js);
 			
 			$css = '
-			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
 				clear:both;
 				list-style: none;
 				display: block;
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
-			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			span.drag'.$field->id.' img {
-				margin: -4px 8px;
-				cursor: move;
-				float: none;
-				display: inline;
-			}
-			#sortables_'.$field->id.' li .admintable {
-				
-				text-align: right;
-			}
-			#sortables_'.$field->id.' li:only-child span.drag, #sortables_'.$field->id.' li:only-child input.fcbutton {
-				display:none;
-			}
+			#sortables_'.$field->id.' li .admintable { text-align: right; }
+			#sortables_'.$field->id.' li:only-child span.drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			$document->addStyleDeclaration($css);
 
 			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 			$n = 0;
-			$field->html = '<ul id="sortables_'.$field->id.'">';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
 				$value  = unserialize($value);
@@ -188,7 +176,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 						'.$class.'
 						'.$id.'
 					</tbody></table>
-					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
+					<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>
 					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.($value['hits'] ? $value['hits'] : 0).'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					
@@ -196,7 +184,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$n++;
 				}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
+			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
 
 		} else {
 			$value = unserialize($field->value[0]);

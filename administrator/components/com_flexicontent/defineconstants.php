@@ -60,11 +60,16 @@ if (!defined('FLEXI_CACHE')) 			define('FLEXI_CACHE'			, $params->get('advcache'
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
 if (!defined('FLEXI_GC'))					define('FLEXI_GC'					, $params->get('purge_gc', 1));
 if (!defined('FLEXI_FISH'))				define('FLEXI_FISH'				, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
+if ( FLEXI_FISH ) {
+	$db = & JFactory::getDBO();
+	$db->setQuery("SELECT COUNT(*) FROM #__jf_languages_ext");
+	define('FLEXI_FISH_22GE', (boolean) $db->loadResult() );
+}
 if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'		, 1 );
 if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'items' );
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'images/M_images/');
 
 // Version constants
 define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'RC4 (r1235)');
+define('FLEXI_RELEASE',	'RC4 (r1264)');
 ?>

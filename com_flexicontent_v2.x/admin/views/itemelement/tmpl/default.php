@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1124 2012-01-25 17:50:18Z maxime.danjou@netassopro.com $
+ * @version 1.5 stable $Id: default.php 1126 2012-01-26 21:48:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -111,12 +111,22 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<td align="center"><?php echo $row->lang; ?></td>
-			<?php endif; ?>
+			
+		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+				
+				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
+					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
+				<?php elseif( !empty($row->lang) ) : ?>
+					<?php echo $row->lang=='*' ? JText::_("All") : $row->lang;?>
+				<?php endif; ?>
+				
+			</td>
+		<?php endif; ?>
+					
 			<td align="center">
 				<?php if ($img) : ?>
-					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>"  title="<?php echo $alt; ?>" />
+					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" title="<?php echo $alt; ?>" />
 				<?php endif; ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>

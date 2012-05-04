@@ -3,8 +3,8 @@
 	<fieldset>
 		<field name="id"  type="hidden" class="readonly" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" readonly="true" />
 		<field name="asset_id" type="hidden" filter="unset" />
-		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" maxlength="254" size="45" required="true" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" maxlength="254" size="55" />
+		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" maxlength="254" size="50" required="true" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" maxlength="254" size="50" />
 		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="" class="inputbox" />
 		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="raw" buttons="true" />
 		<field name="state" type="list" label="FLEXI_STATE" description="JFIELD_PUBLISHED_DESC" class="inputbox" filter="intval" size="1" default="-4">
@@ -20,7 +20,7 @@
 			<option value="2">JYES</option>
 		</field>
 		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JFIELD_TAGS_DESC" class="" required="false" multiple="true" />
-		<field name="cid" type="categorytree" label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC" class="mcat" multiple="true" />
+		<field name="cid" type="categorytree" size="40" label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC" class="mcat" multiple="true" />
 		<field name="catid" type="categorytree" label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC" class="scat" required="true" top="2" />
 		<field name="buttonspacer" description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION" type="spacer" />
 		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="inputbox" size="20" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
@@ -35,12 +35,12 @@
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
-		<field name="metakey" type="textarea" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" class="inputbox" rows="3" cols="30" />
-		<field name="metadesc" type="textarea" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" class="inputbox" rows="3" cols="30" />
+		<field name="metakey" type="textarea" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" class="inputbox" rows="3" cols="50" />
+		<field name="metadesc" type="textarea" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" class="inputbox" rows="3" cols="50" />
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" class="inputbox" size="1" />
 		<field name="hits" type="hidden" label="JGLOBAL_HITS" description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6" readonly="true" filter="unset" />
 		<field name="score" type="hidden" label="FLEXI_SCORE" description="FLEXI_SCORE_DESC" class="readonly" size="6" readonly="true" filter="unset" />
-		<field name="lang_parent_id" type="hidden" label="Master Language Item" description="The master language item, which is being translated by current item. Master language item also contains untrlaslated field values" class="readonly" size="6"/>
+		<field name="lang_parent_id" type="text" label="FLEXI_MASTER_LANGUAGE_ITEM" description="FLEXI_MASTER_LANGUAGE_ITEM_DESC" class="inputbox" size="6"/>
 		<field name="language" type="contentlanguage" label="JFIELD_LANGUAGE_LABEL" description="COM_CONTENT_FIELD_LANGUAGE_DESC" class="inputbox">
 			<option value="*">JALL</option>
 		</field>

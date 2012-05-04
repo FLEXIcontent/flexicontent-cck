@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.modeladmin');
 require_once('parentclassitem.php');
+
 /**
  * FLEXIcontent Component Category Model
  *
@@ -29,30 +30,15 @@ require_once('parentclassitem.php');
  * @since		1.0
  */
 class FlexicontentModelItem extends ParentClassItem {
-	/**
-	 * Item data
-	 *
-	 * @var object
-	 */
-	var $_id = 0;
-
+	
 	/**
 	 * Constructor
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
-		$data = JRequest::get( 'post' );
-		$pk = @$data['jform']['id'];
-		if(!$pk) {
-			$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
-		// Initialise variables.
-		$this->setState($this->getName().'.id', $pk);
-		$this->setId($pk);
 	}
 }
 ?>

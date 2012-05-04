@@ -171,6 +171,9 @@
 
 		<fieldset name="FRONTEND_ITEM_FORM">
 
+			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST" checkvals="apply,save_preview,preview_latest" defaultvals=""
+				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
 			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

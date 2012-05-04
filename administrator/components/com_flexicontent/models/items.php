@@ -1620,49 +1620,7 @@ class FlexicontentModelItems extends JModel
 		return $authors;	
 	}
 	
-	/**
-	 * Method to build the Joomfish languages list
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	function getLanguages()
-	{
-		if (FLEXI_J16GE) {
-			$query = 'SELECT DISTINCT *'
-					.' FROM #__extensions'
-					.' WHERE type="language" '
-					.' GROUP BY element'
-					;
-		} else {
-				$query = 'SELECT *'
-						.' FROM #__languages'
-					//.' ORDER BY ordering ASC'
-						;
-		}
-		$this->_db->setQuery($query);
-		$languages = $this->_db->loadObjectList();
-		
-		$langs = new stdClass();
-		if (isset($languages[0]->sef)) {
-			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
-			foreach ($languages as $lang) {
-				$lang->code = $lang->lang_code;
-				$lang->name = $lang->title;
-				$lang->shortcode = $lang->sef;
-				$lang->id = $lang->lang_id;
-				$lang->imageurl = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
-				$langs->{$lang->code} = $lang;
-			}
-		}
-		foreach ($languages as $language) {
-			$name		 	= $language->code;
-			$langs->$name 	= $language;			
-		}
-		
-		return $langs;
-	}
-
+	
 	/**
 	 * Method to import Joomla! com_content datas and structure
 	 * 
@@ -1685,7 +1643,7 @@ class FlexicontentModelItems extends JModel
 		$logs->cat = 0;
 		$logs->art = 0;
 		//$logs->err = new stdClass();
-	
+		
 		// Create the new section for flexicontent items
 		$flexisection =& JTable::getInstance('section');
 		$flexisection->title		= 'FLEXIcontent';
@@ -1696,24 +1654,25 @@ class FlexicontentModelItems extends JModel
 		$flexisection->scope		= 'content';
 		$flexisection->check();
 		$flexisection->store();
-	
+		
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
 		$catparams = new JParameter('');
-	
+		
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {
 				if (!$param->attributes('name')) continue;  // FIX for empty name e.g. seperator fields
 				$catparams->set($param->attributes('name'), $param->attributes('default'));
 			}
 		}
-		$catparams = $catparams->toString();
-	
-		// Loop throught the section object and create cat -> subcat -> items -> fields
+		$catparams_str = $catparams->toString();
+		
+		// Loop through the section object and create cat -> subcat -> items -> fields
 		$k = 0;
 		foreach ($sections as $section)
 		{
+			// Create a category for every imported section, to contain all categories of the section
 			$cat = &JTable::getInstance('flexicontent_categories','');
 			$cat->parent_id			= 0;
 			$cat->title				= $section->title;
@@ -1726,7 +1685,7 @@ class FlexicontentModelItems extends JModel
 			$cat->published			= $section->published;
 			$cat->ordering			= $section->ordering;
 			$cat->access			= $section->access;
-			$cat->params			= $catparams;
+			$cat->params			= $catparams_str;
 			$k++;
 			$cat->check();
 			if ($cat->store()) {
@@ -1736,8 +1695,8 @@ class FlexicontentModelItems extends JModel
 				$logs->err->$k->id 		= $section->id;
 				$logs->err->$k->title 	= $section->title;
 			}
-	
-			// Get the categories of the created section
+			
+			// Get the categories of each imported section
 			$query = 'SELECT * FROM #__categories WHERE section = ' . $section->id;
 			$this->_db->setQuery($query);
 			$categories = $this->_db->loadObjectList();
@@ -1750,7 +1709,7 @@ class FlexicontentModelItems extends JModel
 				$subcat->id			= 0;
 				$subcat->parent_id	= $cat->id;
 				$subcat->section 	= $flexisection->id;
-				$subcat->params		= $catparams;
+				$subcat->params		= $catparams_str;
 				$k++;
 				$subcat->check();
 				if ($subcat->store()) {
@@ -1760,19 +1719,19 @@ class FlexicontentModelItems extends JModel
 					$logs->err->$k->id 		= $category->id;
 					$logs->err->$k->title 	= $category->title;
 				}
-	
+				
 				// Get the articles of the created category
 				$query = 'SELECT * FROM #__content WHERE catid = ' . $category->id;
 				$this->_db->setQuery($query);
 				$articles = $this->_db->loadObjectList();
-	
+				
 				// Loop throught the articles of the created category
 				foreach ($articles as $article)
 				{
 					$item = &JTable::getInstance('content');
 					$item->load($article->id);
-					$item->id				= 0;
-					$item->sectionid		= $flexisection->id;
+					$item->id					= 0;
+					$item->sectionid	= $flexisection->id;
 					$item->catid			= $subcat->id;
 					$k++;
 					$item->check();
@@ -1786,18 +1745,17 @@ class FlexicontentModelItems extends JModel
 				} // end articles loop
 			} // end categories loop
 		} // end sections loop
-	
+		
 		// Save the created section as flexi_section for the component
 		$fparams =& JComponentHelper::getParams('com_flexicontent');
 		$fparams->set('flexi_section', $flexisection->id);
 		$fparams = $fparams->toString();
-	
+		
 		$flexi =& JComponentHelper::getComponent('com_flexicontent');
-	
 		$query 	= 'UPDATE #__components'
-		. ' SET params = ' . $this->_db->Quote($fparams)
-		. ' WHERE id = ' . $flexi->id;
-		;
+			. ' SET params = ' . $this->_db->Quote($fparams)
+			. ' WHERE id = ' . $flexi->id;
+			;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		return $logs;

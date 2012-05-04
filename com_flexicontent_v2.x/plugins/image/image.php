@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1220 2012-03-24 07:00:38Z ggppdk $
+ * @version 1.0 $Id: image.php 1262 2012-04-27 12:52:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -174,7 +174,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
 
-		global $multiboxadded;
+		static $multiboxadded = false;
 		$mainframe = &JFactory::getApplication();
 		$view = JRequest::getVar('view');
 		jimport('joomla.filesystem');
