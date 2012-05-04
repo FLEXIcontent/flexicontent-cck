@@ -25,12 +25,11 @@ class modFlexiTagCloudHelper
 {
 	function getTags(&$params)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		// Initialize
 		$db				=& JFactory::getDBO();
 		$user			=& JFactory::getUser();
-		$gid			= (int) $user->get('aid');
 		$nullDate		= $db->getNullDate();
 		$date 			= & JFactory::getDate();
 		$now  			= $date->toMySQL();
@@ -46,7 +45,7 @@ class modFlexiTagCloudHelper
 		$scope		= is_array($scope) ? implode(',', $scope) : $scope;
 		$tagitemid	= (int)$params->get('force_itemid', 0);
 
-		$where 	= ' WHERE i.sectionid = ' . FLEXI_SECTION;
+		$where 	= !FLEXI_J16GE ? ' WHERE i.sectionid = ' . FLEXI_SECTION : ' WHERE 1 ';
 		$where .= ' AND i.state IN ( 1, -5 )';
 		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
@@ -55,15 +54,20 @@ class modFlexiTagCloudHelper
 
 		// filter by permissions
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['item'])) {
-					$where .= ' AND ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
-				} else {
-					$where .= ' AND i.access <= '.$gid;
-				}
+			if (FLEXI_J16GE) {
+				$aid_arr  = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where  .= ' AND i.access IN ('.$aid_list.')';
 			} else {
-				$where .= ' AND i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+				}
+				if ( !empty($readperms['item']) ) {
+					$where .= ' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
+				} else {
+					$where .= ' AND i.access <= '.$aid;
+				}
 			}
 		}
 

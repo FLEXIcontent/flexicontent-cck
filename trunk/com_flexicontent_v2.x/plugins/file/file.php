@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1237 2012-04-04 00:46:19Z ggppdk $
+ * @version 1.0 $Id: file.php 1247 2012-04-15 20:11:13Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -65,13 +65,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			var filelist = document.getElementById('sortables_".$field->id."');
 			
 			$(li).addClass('sortabledisabled');
-			$(span).addClass('drag".$field->id."');
+			$(span).addClass('fcfield-drag');
 			
 			var button = document.createElement('input');
 			button.type = 'button';
 			button.name = 'removebutton_'+id;
 			button.id = 'removebutton_'+id;
-			$(button).addClass('fcbutton');
+			$(button).addClass('fcfield-button');
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
 			
@@ -99,7 +99,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			new Sortables($('sortables_".$field->id."'), {
 				'constrain': true,
 				'clone': true,
-				'handle': '.drag".$field->id."'
+				'handle': '.fcfield-drag'
 			});			
 		
 		}
@@ -129,7 +129,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
-					'handle': '.drag".$field->id."'
+					'handle': '.fcfield-drag'
 					});			
 				});
 			";
@@ -137,20 +137,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$document->addScriptDeclaration($js);
 
 			$css = '
-			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
 				clear:both;
 				list-style: none;
 				height: 20px;
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
-			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag'.$field->id.' img {
-				margin: -4px 8px;
-				cursor: move;
-				float: none;
-				display: inline;
-			}
 			';
 			$document->addStyleDeclaration($css);
 
@@ -160,15 +153,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		$field->html = "<span id='req_container_{$field->id}'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
-		$field->html .= '<ul id="sortables_'.$field->id.'">';
+		$field->html .= '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filename = $this->getFileName( $file );
 				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
 				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"custom[".$field->name."][]\" value=\"".$file."\" />";
-				$field->html .= "<input class=\"inputbox fcbutton\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
-				$field->html .= "<span class=\"drag".$field->id."\">".$move."</span>";
+				$field->html .= "<input class=\"inputbox fcfield-button\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
+				$field->html .= "<span class=\"fcfield-drag\">".$move."</span>";
 				$field->html .= '</li>';
 				$i++;
 			}
@@ -178,7 +171,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->getValue('id').'&amp;items=0&amp;filter_uploader='.$user->get('id').'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
-		<div class=\"button-add\">
+		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
 				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>

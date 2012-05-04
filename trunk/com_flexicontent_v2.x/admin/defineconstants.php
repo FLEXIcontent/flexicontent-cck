@@ -1,4 +1,21 @@
 <?php
+/**
+ * @version 1.5 stable $Id: defineconstants.php 1235 2012-04-03 03:46:18Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
@@ -26,16 +43,15 @@ if (!FLEXI_J16GE) {
 	if (!defined('FLEXI_CAT_EXTENSION'))	define('FLEXI_CAT_EXTENSION', '');
 } else {
 	if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
-	if (!defined('FLEXI_CAT_EXTENSION'))	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-	if (!defined('FLEXI_CATEGORY'))				define('FLEXI_CATEGORY', $params->get('flexi_category', 1));
-	if (!defined('FLEXI_LFT_CATEGORY') || !defined('FLEXI_RGT_CATEGORY')) {
+	if (!defined('FLEXI_CAT_EXTENSION')) {
+		define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
 		$db = &JFactory::getDBO();
 		$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 		$db->setQuery($query);
 		$obj = $db->loadObject();
+		if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
+		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 	}
-	if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
-	if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 }
 
 // Define configuration constants
@@ -44,7 +60,12 @@ if (!defined('FLEXI_CACHE')) 			define('FLEXI_CACHE'			, $params->get('advcache'
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
 if (!defined('FLEXI_GC'))					define('FLEXI_GC'					, $params->get('purge_gc', 1));
 if (!defined('FLEXI_FISH'))				define('FLEXI_FISH'				, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
-if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'		, 0 );
+if ( FLEXI_FISH ) {
+	$db = & JFactory::getDBO();
+	$db->setQuery("SELECT COUNT(*) FROM #__jf_languages_ext");
+	define('FLEXI_FISH_22GE', (boolean) $db->loadResult() );
+}
+if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'		, 1 );
 if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'item' );
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/');
 

@@ -244,7 +244,7 @@ class FlexicontentViewItems extends JView {
 		$status      	= & $this->get( 'ExtdataStatus');
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$langs	= & $this->get( 'Languages' );
+			$langs	= & FLEXIUtilities::getLanguages('code');
 		}
 		$categories = $globalcats?$globalcats:array();
 		

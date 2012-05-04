@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: helper.php 572 2011-04-17 11:57:59Z emmanuel.danan@gmail.com $
+ * @version 1.1 $Id: helper.php 1051 2011-12-12 20:14:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -26,12 +26,10 @@ class modFlexiTagCloudHelper
 	function getTags(&$params)
 	{
 		$mainframe = &JFactory::getApplication();
-		JPluginHelper::importPlugin('system', 'flexisystem');
 
 		// Initialize
 		$db				=& JFactory::getDBO();
 		$user			=& JFactory::getUser();
-		$gid		    = max ($user->getAuthorisedViewLevels());
 		$nullDate		= $db->getNullDate();
 		$date 			= & JFactory::getDate();
 		$now  			= $date->toMySQL();
@@ -47,7 +45,7 @@ class modFlexiTagCloudHelper
 		$scope		= is_array($scope) ? implode(',', $scope) : $scope;
 		$tagitemid	= (int)$params->get('force_itemid', 0);
 
-		$where 	= ' WHERE 1';
+		$where 	= !FLEXI_J16GE ? ' WHERE i.sectionid = ' . FLEXI_SECTION : ' WHERE 1 ';
 		$where .= ' AND i.state IN ( 1, -5 )';
 		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
@@ -56,16 +54,21 @@ class modFlexiTagCloudHelper
 
 		// filter by permissions
 		if (!$show_noauth) {
-			/*if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['item'])) {
-					$where .= ' AND ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
-				} else {
-					$where .= ' AND i.access <= '.$gid;
+			if (FLEXI_J16GE) {
+				$aid_arr  = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where  .= ' AND i.access IN ('.$aid_list.')';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
 				}
-			} else {*/
-				$where .= ' AND i.access <= '.$gid;
-			//}
+				if ( !empty($readperms['item']) ) {
+					$where .= ' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
+				} else {
+					$where .= ' AND i.access <= '.$aid;
+				}
+			}
 		}
 
 		// category scope

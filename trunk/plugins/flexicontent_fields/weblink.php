@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
-					'handle': '.drag".$field->id."'
+					'handle': '.fcfield-drag'
 					});			
 				});
 			";
@@ -101,7 +101,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
-						'handle': '.drag".$field->id."'
+						'handle': '.fcfield-drag'
 					});			
 
 					fx.start({ 'opacity': 1 }).chain(function(){
@@ -138,21 +138,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$document->addScriptDeclaration($js);
 			
 			$css = '
-			#sortables_'.$field->id.' { margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
 				clear:both;
 				list-style: none;
 				height: 20px;
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
-			#sortables_'.$field->id.' li input.fcbutton, .fcbutton { cursor: pointer; margin-left: 3px; }
-			span.drag'.$field->id.' img {
-				margin: -4px 8px;
-				cursor: move;
-				float: none;
-				display: inline;
-			}
-			li input.urllink, li input.urltitle, li input.fcbutton {
+			li input.urllink, li input.urltitle, li input.fcfield-button {
 				float:none;
 			} 
 			';
@@ -160,7 +153,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 			$n = 0;
-			$field->html = '<ul id="sortables_'.$field->id.'">';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 
 			foreach ($field->value as $value) {
 				$value = unserialize($value);
@@ -172,12 +165,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					<input class="urltitle'.$required.'" name="'.$field->name.'['.$n.'][title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
 					<input class="urlhits" name="'.$field->name.'['.$n.'][hits]" type="hidden" value="'.$value['hits'].'" />
 					<span class="hits"><span class="hitcount">'.($value['hits'] ? $value['hits'] : 0).'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
-					<input class="fcbutton" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="drag'.$field->id.'">'.$move2.'</span>
+					<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>
 				</li>';
 				$n++;
 			}
 			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" id="add'.$field->name.'" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else {
 			$field->value[0] = unserialize($field->value[0]);

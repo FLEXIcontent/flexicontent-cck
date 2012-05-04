@@ -554,6 +554,7 @@ window.addEvent('domready', function() {
 				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED' );
 			}
 			
+			// Set a row language, even if empty to avoid errors
 			$lang_default = !FLEXI_J16GE ? '' : '*';
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
@@ -580,25 +581,19 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
-		<?php if ((FLEXI_FISH || FLEXI_J16GE) && isset($row->lang) && $row->lang ) : ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
-				<?php if (@$this->langs->{$row->lang}->imageurl) : /* image calculated by joomfish vJ2.2+ getLanguageImageSource() helper function  */ ?>
-				<img src="<?php echo $this->langs->{$row->lang}->imageurl; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php elseif (@$this->langs->{$row->lang}->image) : /* custom image from language db table*/ ?>
-				<img src="../images/<?php echo $this->langs->{$row->lang}->image; ?>" alt="<?php echo $row->lang; ?>" />
-				<?php else : /* default image for language  */ ?>
-				<img src="<?php echo $image_flag_path.$this->langs->{$row->lang}->shortcode; ?>.gif" alt="<?php echo $row->lang; ?>" />
+			
+		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+				
+				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
+					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
+				<?php elseif( !empty($row->lang) ) : ?>
+					<?php echo $row->lang=='*' ? JText::_("All") : $row->lang;?>
 				<?php endif; ?>
-			</td>
-		<?php elseif(FLEXI_J16GE && $row->lang=='*') : ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.JText::_("All"); ?>">
-				<?php echo JText::_("All");?>
-			</td>
-		<?php elseif(isset($row->lang) && $row->lang) : ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.$this->langs->{$row->lang}->name; ?>">
-				<?php echo $row->lang; ?>
+				
 			</td>
 		<?php endif; ?>
+		
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>

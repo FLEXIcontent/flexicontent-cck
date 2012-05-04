@@ -66,6 +66,9 @@ class FlexicontentViewItemelement extends JView {
 		$types		= & $this->get( 'Typeslist' );
 		$pageNav 	= & $this->get( 'Pagination' );
 
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$langs	= & FLEXIUtilities::getLanguages('code');
+		}
 		$categories = $globalcats;
 		
 		// build the categories select list for filter
@@ -98,6 +101,9 @@ class FlexicontentViewItemelement extends JView {
 		}
 
 		//assign data to template
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$this->assignRef('langs'    , $langs);
+		}
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('pageNav' 		, $pageNav);

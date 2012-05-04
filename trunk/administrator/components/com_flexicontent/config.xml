@@ -67,6 +67,15 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
+		<param name="enable_language_groups" type="radio" default="0" label="Enable language groups" description="Enable associations of items into translation groups"  menu="hide">
+			<option value="0">FLEXI_No</option>
+			<option value="1">FLEXI_Yes</option>
+		</param>
+		<param name="editjf_translations" type="radio" default="0" label="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS" description="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_NO_DISABLE_WARNING</option>
+			<option value="2">FLEXI_YES</option>
+		</param>
 
 		<param name="" type="separator" default="FLEXI_VERSIONING_CONF" level="level1" menu="hide" />
 
@@ -262,6 +271,9 @@
 
 		<param name="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" level="level1" menu="hide" />
 		
+		<param name="allowbuttons_fe" type="fccheckbox" default=""
+			checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST" checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
+			label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
 		<param name="usealias_fe" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

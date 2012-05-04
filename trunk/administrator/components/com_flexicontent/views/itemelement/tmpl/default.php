@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm" id="adminForm">
 
 <table class="adminform">
 	<tr>
@@ -95,6 +95,8 @@ defined('_JEXEC') or die('Restricted access');
 					$img = 'publish_g.png';
 					$alt = JText::_( 'FLEXI_IN_PROGRESS' );
 					$state = -5;
+				} else {
+					$img = '';
 				}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
@@ -109,11 +111,23 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
 			</td>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<td align="center"><?php echo $row->lang; ?></td>
-			<?php endif; ?>
+			
+		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+				
+				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
+					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
+				<?php elseif( !empty($row->lang) ) : ?>
+					<?php echo $row->lang=='*' ? JText::_("All") : $row->lang;?>
+				<?php endif; ?>
+				
+			</td>
+		<?php endif; ?>
+					
 			<td align="center">
-				<img src="images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
+				<?php if ($img) : ?>
+					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" title="<?php echo $alt; ?>" />
+				<?php endif; ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>

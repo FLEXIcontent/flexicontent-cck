@@ -537,6 +537,11 @@ ul#ultagbox li{
 	margin: 2px !important;
 	line-height: 100% !important;
 }
+
+.tagitem.plain {
+	background: url(../images/tag_blue.png) #f9f9f9 no-repeat  100% 50% !important;
+	padding-right: 18px!important;
+}
 .tagitem {
 	border: 1px solid silver !important;
 	padding: 4px 1px 3px 6px !important;
@@ -559,6 +564,14 @@ div#tags {
 }
 div#tags #input-tags {
 	margin: 4px !important;
+}
+div#tags #input_new_tag {
+	display:inline-block !important;
+	padding: 0px !important;
+	margin: 0px 4px -4px 0px;
+	width: 16px !important;
+	height: 16px !important;
+	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50% !important;
 }
 .qf_tagbox {
 	display: block !important;
@@ -624,6 +637,127 @@ div label.lang_box {
 	float: left;
 }
 
+#flexicontent .tabberlive {
+	width:auto; float:left; margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
+}
+
+#flexicontent .fctabber {
+	overflow:visible; width:5000px;
+}
+
+#flexicontent .fieldvaltabber {
+	width:auto;
+	float:left;
+	margin: -12px 0px 6px 1px;
+	padding: 0px;
+	border-width:0px;
+}
+
+#flexicontent ul.tabbernav li.tabberactive a, #flexicontent ul.tabbernav li.tabberactive a:hover {
+	background-color: darkred;
+	color: white;
+	border-bottom: 1px solid darkred;
+}
+
+#flexicontent ul.tabbernav {
+	border-bottom: 1px solid #777788 !important;
+	font: bold 12px Verdana,sans-serif !important;
+	margin: 0 !important;
+	padding: 3px 0px 0px 0px !important;
+}
+
+#flexicontent ul.tabbernav li {	padding: 3px !important;	margin: 0px !important; line-height: 14px !important; }
+	
+#flexicontent .fcfield-row .flexi_label { margin:0px 8px 0px 2px; border:1px dashed lightgray!important; text-align:right; }
+#flexicontent .fcfield-clear { width:100%!important; padding:0px!important; margin:8px 0px 8px 0px!important; float:left; clear:both!important; border-top:1px dashed gray!important; }
+#flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
+#flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px !important; padding:0px !important;  }
+
+#flexicontent .fcfield-button-add {	float:left; margin:2px 0px 0px 12px; padding:0px; }
+#flexicontent .fcfield-addvalue, .fcfield-button,
+#flexicontent .fcfield-button-add a {
+	display: inline-block; float:left; padding:1px 8px; margin:2px 2px 0px 6px;
+	background-color: white!important; color:gray!important; font-size:11px; font-weight:bold;
+	border-radius:4px; border:1px solid lightgray; text-decoration:none!important;
+}
+#flexicontent .fcfield-addvalue:hover, .fcfield-button:hover,
+#flexicontent .fcfield-button-add a:hover {
+	background-color:darkred!important; color:white!important;
+	text-decoration:none!important; border:1px solid darkred;
+}
+#flexicontent .fcfield-button { margin-left:6px!important; }
+#flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; }
+#flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
+
+div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
+	/*margin: 2px 2px 2px 0px !important;*/
+}
+
+div.flexi_edit .flexi_label {
+	display: block;
+	float: left;
+  background-color: #F6F6F6;
+  border-bottom: 1px solid #E9E9E9;
+  border-right: 1px solid #E9E9E9;
+  font-weight: bold;
+  text-align: right;
+  width: 140px;
+  margin:0px;
+  padding:3px;
+}
+
+div.flexi_edit .flexi_label {
+	display: block;
+	float: left;
+  background-color: #F6F6F6;
+  border-bottom: 1px solid #E9E9E9;
+  border-right: 1px solid #E9E9E9;
+  font-weight: bold;
+  text-align: right;
+  width: 140px;
+  margin:2px;
+  padding:3px;
+}
+
+div.flexi_edit .flexi_label.invalid {
+	font-weight: bold;
+}
+div.flexi_edit .flexi_formblock {
+	clear: both;
+}
+
+div.flexi_edit fieldset {
+	border: 1px solid #dddddd;
+	margin-bottom: 1em;
+	padding: 4px;
+}
+
+div.flexi_edit form input,
+div.flexi_edit form button,
+div.flexi_edit form select,
+div.flexi_edit form textarea {
+	background-color: #ffffff;
+	border: 1px solid #dddddd;
+	cursor: pointer;
+	margin: 0;
+	padding: 0.1em 0.4em 0.1em 0.2em;
+}
+
+div.flexi_edit form input.invalid,
+div.flexi_edit form select.invalid {
+	border: 1px dotted #ff0000;
+}
+
+div.flexi_box_left,
+div.flexi_box_right {
+	float: left;
+	width: 48%;
+}
+
+div.flexi_box_right {
+	float: right;
+}
+
 /******* END OF COMMON J1.5 / J1.7+ CSS ***********/
 
 /*******************************/
@@ -672,7 +806,8 @@ div fieldset label {
 }
 div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
 div.panel fieldset img, div.panel fieldset button {
-	margin:6px 1px 0px 16px!important;
+	margin:4px 1px 0px 12px!important;
+	padding:2px !important;
 	display:inline;
 	float:left;
 }
@@ -733,8 +868,8 @@ div table.adminform {
 	font-size:11px;
 }
 
-div input#jform_title, div input#jform_leveltitle, div input#jform_grouptitle {
-	font-size:14px;
+#titleblock input, #aliasblock input {
+	font-size:inherit !important; 
 }
 
 div table.adminform td {
@@ -765,8 +900,4 @@ div table.admintable td.key, div table.admintable td.paramlist_key {
 
 div div#element-box div.m {
 	background-color: #FFFFFF;
-}
-
-div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
-	margin: 2px 2px 2px 0px;
 }

@@ -91,12 +91,12 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
 							</label><br />
 							<label for="method-autotranslation">
-								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copyonly();" />
-								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
+								<!--input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copyonly();" /-->
+								<?php echo " &nbsp;--&nbsp; <span style='color:gray;'>".JText::_( 'FLEXI_AUTO_TRANSLATION' )."</span>"; ?>
 							</label><br />
 							<label for="method-firstjf-thenauto">
-								<input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" />
-								<?php echo JText::_( 'FLEXI_FIRST_JF_THEN_AUTO' ); ?>
+								<!--input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" /-->
+								<?php echo " &nbsp;--&nbsp; <span style='color:gray;'>".JText::_( 'FLEXI_FIRST_JF_THEN_AUTO' )."</span>"; ?>
 							</label>
 						</td>
 					<?php else : ?>

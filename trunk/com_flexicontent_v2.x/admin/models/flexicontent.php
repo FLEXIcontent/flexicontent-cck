@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1216 2012-03-22 04:06:29Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -809,143 +809,144 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	
-	function addCurrentVersionData()
+	function addCurrentVersionData($item_id = null)
 	{
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_CAT_EXTENSION) return true;
+		
+		$db 		= &$this->_db;
+		$nullDate	= $db->getNullDate();
 
 		// @TODO: move somewhere else
 		$this->formatFlexiPlugins();
 		
-		//clean old categories cache.
+		// Clean categories cache
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
-		// add the current version data
-		$db 		= &$this->_db;
-		$nullDate	= $db->getNullDate();
-		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext` FROM #__content as c"
-				. " JOIN #__categories as cat ON c.catid=cat.id "
-				." WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";// ."AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
+		
+		// Get some basic info of all items, or of the given item
+		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext`"
+			." FROM #__content as c"
+			. " JOIN #__categories as cat ON c.catid=cat.id "
+			." WHERE cat.extension='".FLEXI_CAT_EXTENSION."'" // ."AND cat.lft >= ".$this->_db->Quote(FLEXI_LFT_CATEGORY)." AND cat.rgt <= ".$this->_db->Quote(FLEXI_RGT_CATEGORY).";";
+			.($item_id ? " AND c.id=".$item_id : "")
+			;
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
 		
-		$diff_arrays = $this->getDiffVersions();
-
-/*
-		// Remove this part at it seems to cause triple versions
-		// Additionnal check from Suriya is required
-		
-		$query 	= "SELECT c.id,c.version,iv.version as iversion FROM #__content as c " .
-			" LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version" .
-			" WHERE sectionid='".FLEXI_SECTION."' AND c.version > '1' AND iv.version IS NULL;";
-		$db->setQuery($query);
-		$newrows = $db->loadAssocList();
-		foreach($newrows as $r) {
-			$newrows[$r["id"]] = $r;
+		if (!$item_id) {
+			// Get current version ids of ALL ITEMS not having current versions
+			$diff_arrays = $this->getDiffVersions();
+		} else {
+			// Get current version id of a SPECIFIC ITEM
+			$diff_arrays = FLEXIUtilities::getCurrentVersions($item_id);
 		}
-		$diff_arrays = array_merge_recursive($diff_arrays, $newrows);
-*/
-
-		foreach($diff_arrays as $row) {
-			if(isset($row["id"]) && $row["id"] && isset($rows[$row["id"]])) {
-				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder "
+		
+		$jcorefields = flexicontent_html::getJCoreFields();
+		$add_cats = true;
+		$add_tags = true;
+		$clean_database = false;
+		
+		// For all items not having the current version, add it
+		foreach($diff_arrays as $item)
+		{
+			$item_id = @ (int)$item["id"];
+			if( isset( $rows[$item_id] ) )
+			{
+				$row = & $rows[$item_id];
+				
+				// Get field values of the current item version
+				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,f.iscore "
 						." FROM #__flexicontent_fields_item_relations as fir"
-						//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
+					//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
 						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
-						." WHERE fir.item_id='".$row["id"]."';";
-
+						." WHERE fir.item_id=".$row->id." AND f.iscore=0";  // old versions stored categories & tags into __flexicontent_fields_item_relations
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
-				$jcorefields = flexicontent_html::getJCoreFields();
-				$catflag = false;
-				$tagflag = false;
+				
+				// Delete old data
+				if ($clean_database && $fields) {
+					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
+					$db->setQuery($query);
+					$db->query();
+				}
+				
+				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
 				$f->id=1;
 				$f->valueorder=1;
 				$f->field_type="maintext";
 				$f->name="text";
-				 // append the text property to the object
-				if (JString::strlen($rows[$row['id']]->fulltext) > 1) {
-					$f->value = $rows[$row['id']]->introtext . '<hr id="system-readmore" />' . $rows[$row['id']]->fulltext;
-				} else {
-					$f->value = $rows[$row['id']]->introtext;
+				$f->value = $row->introtext;
+				if ( JString::strlen($row->fulltext) > 1 ) {
+					$f->value .= '<hr id="system-readmore" />' . $row->fulltext;
 				}
 				if(substr($f->value, 0, 3)!="<p>") {
 					$f->value = "<p>".$f->value."</p>";
 				}
 				$fields[] = $f;
+
+				// Add the 'categories' field to the fields array for adding to versioning table
+				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
+				$db->setQuery($query);
+				$categories = $db->loadResultArray();
+				if(!$categories || !count($categories)) {
+					$categories = array($catid = $row->catid);
+					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
+					$db->setQuery($query);
+					$db->query();
+				}
+				$f = new stdClass();
+				$f->field_id 		= 13;
+				$f->item_id 		= $row->id;
+				$f->valueorder	= 1;
+				$f->version		= (int)$row->version;
+				$f->value		= serialize($categories);
+				if ($add_cats) $fields[] = $f;
+				
+				// Add the 'tags' field to the fields array for adding to versioning table
+				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
+				$db->setQuery($query);
+				$tags = $db->loadResultArray();
+				$f = new stdClass();
+				$f->field_id 		= 14;
+				$f->item_id 		= $row->id;
+				$f->valueorder	= 1;
+				$f->version		= (int)$row->version;
+				$f->value		= serialize($tags);
+				if ($add_tags) $fields[] = $f;
+
+				// Add field values to field value versioning table
 				foreach($fields as $field) {
 					// add the new values to the database 
 					$obj = new stdClass();
-					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $row["id"];
-					$obj->valueorder	= $field->valueorder;
-					$obj->version		= (int)$rows[$row['id']]->version;
-					// @TODO : move in the plugin code
-					if( ($field->field_type=='categories') && ($field->name=='categories') ) {
-						continue;
-						//$obj->value = serialize($item->categories);
-						//$catflag = true;
-					}elseif( ($field->field_type=='tags') && ($field->name=='tags') ) {
-						continue;
-						//$obj->value = serialize($item->tags);
-						//$tagflag = true;
-					}else{
-						$obj->value			= $field->value;
-					}
+					$obj->field_id   = $field->id;
+					$obj->item_id    = $row->id;
+					$obj->valueorder = $field->valueorder;
+					$obj->version    = (int)$row->version;
+					$obj->value      = $field->value;
 					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
+					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
-					//echo "insert into __flexicontent_items_versions<br />";
-					if( !isset($jcorefields[$field->name]) && !in_array($field->field_type, $jcorefields)) {
+					if( !$field->iscore ) {
 						unset($obj->version);
+						//echo "inserting into __flexicontent_fields_item_relations<br />";
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
-						//echo "insert into __flexicontent_fields_item_relations<br />";
 					}
 					//$searchindex 	.= @$field->search;
 				}
-				if(!$catflag) {
-					$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row["id"]."';";
-					$db->setQuery($query);
-					$categories = $db->loadResultArray();
-
-					if(!$categories || !count($categories)) {
-						$categories = array($catid = $rows[$row["id"]]->catid);
-						$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row["id"]."', '0');";
-						$db->setQuery($query);
-						$db->query();
-					}
-					$obj = new stdClass();
-					$obj->field_id 		= 13;
-					$obj->item_id 		= $row["id"];
-					$obj->valueorder	= 1;
-					$obj->version		= (int)$rows[$row["id"]]->version;
-					$obj->value		= serialize($categories);
-					$db->insertObject('#__flexicontent_items_versions', $obj);
-					//unset($obj->version);
-					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-				}
-				if(!$tagflag) {
-					$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row["id"]."';";
-					$db->setQuery($query);
-					$tags = $db->loadResultArray();
-					$obj = new stdClass();
-					$obj->field_id 		= 14;
-					$obj->item_id 		= $row["id"];
-					$obj->valueorder	= 1;
-					$obj->version		= (int)$rows[$row["id"]]->version;
-					$obj->value		= serialize($tags);
-					$db->insertObject('#__flexicontent_items_versions', $obj);
-					//unset($obj->version);
-					//$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-				}
+				
+				// **********************************************************************************
+				// Add basic METADATA of current item version (kept in table #__flexicontent_versions)
+				// **********************************************************************************
 				$v = new stdClass();
-				$v->item_id 		= (int)$row["id"];
-				$v->version_id		= (int)$rows[$row["id"]]->version;
-				$v->created 		= ($rows[$row['id']]->modified && ($rows[$row['id']]->modified != $nullDate)) ? $rows[$row['id']]->modified : $rows[$row['id']]->created;
-				$v->created_by 		= $rows[$row['id']]->created_by;
-				//$v->comment		= 'kept current version to version table.';
-				//echo "insert into __flexicontent_versions<br />";
+				$v->item_id    = (int)$row->id;
+				$v->version_id = (int)$row->version;
+				$v->created    = ($row->modified && ($row->modified != $nullDate)) ? $row->modified : $row->created;
+				$v->created_by = $row->created_by;
+				$v->comment    = '';
+				//echo "inserting into __flexicontent_versions<br />";
 				$db->insertObject('#__flexicontent_versions', $v);
 			}
 		}

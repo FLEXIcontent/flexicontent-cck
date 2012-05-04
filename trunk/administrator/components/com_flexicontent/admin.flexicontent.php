@@ -103,6 +103,19 @@ if(!function_exists('FLEXISubmenu')) {
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
+// SECURITY CONCERN !!!: Force permission checking by requiring to go through the custom controller when view is specified
+$controller = JRequest::getWord( 'controller' );
+$view = JRequest::getWord( 'view' );
+$view2ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users');
+
+if( !$controller && isset($view2ctrl[$view]) ) {
+	JRequest::setVar('controller', $view2ctrl[$view]);
+	$task = JRequest::getWord( 'task' );
+	if ( !$task ) {
+		JRequest::setVar('task', 'edit');
+	}
+}
+
 if (FLEXI_J16GE) {
 	//Create the controller
 	$controller	= JController::getInstance('Flexicontent');

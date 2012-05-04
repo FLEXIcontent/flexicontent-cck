@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1230 2012-04-02 17:44:21Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1231 2012-04-02 18:05:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -52,6 +52,7 @@ class FlexicontentFields
 		if (FLEXI_GC) $itemcache->gc(); 			//auto-clean expired item cache
 
 		// @TODO : move to the constructor
+		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
 		$taglist			= FlexicontentFields::_getTags($items);
 		$catlist			= FlexicontentFields::_getCategories($items);
 		$vars['favourites']	= FlexicontentFields::_getFavourites($items);
@@ -60,7 +61,8 @@ class FlexicontentFields
 		$vars['authors']	= FlexicontentFields::_getAuthors($items);
 		$vars['typenames']	= FlexicontentFields::_getTypenames($items);
 		$vars['votes']		= FlexicontentFields::_getVotes($items);
-
+		
+		// TODO create single query, to optimize category view
 		for ($i=0; $i < sizeof($items); $i++)
 		{
 			$var				= array();
@@ -75,6 +77,7 @@ class FlexicontentFields
 			$item_id = $items[$i]->id;
 			$items[$i]->cats = isset($catlist[$item_id]) ? $catlist[$item_id] : array();
 			$items[$i]->tags = isset($taglist[$item_id]) ? $taglist[$item_id] : array();
+			$items[$i]->categories = & $items[$i]->cats;
 			
 			// Apply the fields cache to public or just registered users
 			$apply_cache = true;
@@ -186,7 +189,9 @@ class FlexicontentFields
 		$item->vote			= @$vote 				? $vote 			: '';
 		
 		if ($item->fields) {
-			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, isset($item->version_id) ? $item->version_id : $item->version);
+			// IMPORTANT the items model and possibly other will set item PROPERTY version_id to indicate loading an item version,
+			// It is not the responisibility of this CODE to try to detect previewing of an item version, it is better left to the model
+			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, !empty($item->version_id) ? $item->version_id : 0);
 		}
 		
 		return $item;
@@ -474,15 +479,11 @@ class FlexicontentFields
 	 */
 	function _getFieldsvalues($item, $fields, $version=0)
 	{
-		$preview = JRequest::getVar('preview');
-		if($preview) {
-			$version = $version ? $version : JRequest::setVar('version');
-		}
 		$db =& JFactory::getDBO();
 		$query = 'SELECT field_id, value'
-				.($preview?' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
+				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id = ' . (int)$item
-				.($preview?' AND version=' . (int)$version:'')
+				.( $version ? ' AND version=' . (int)$version:'')
 				.' ORDER BY field_id, valueorder'
 				;
 		$db->setQuery($query);
@@ -619,12 +620,15 @@ class FlexicontentFields
 	 */
 	function _getModifiers($items)
 	{
+		// This is fix for versioned field of modifier in items view when previewing
+		$versioned_item = count($items)==1 && $items[0]->modified_by && !empty($items[0]->version_id);
+		
 		$db =& JFactory::getDBO();
 		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }		
-
+		foreach ($items as $item) { array_push($cids, $item->id); }
+		
 		$query 	= 'SELECT i.id, u.name, u.username, u.email FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON u.id = i.modified_by'
+				. ' LEFT JOIN #__users AS u ON '  .  ( $versioned_item ? 'u.id = '.$items[0]->modified_by : 'u.id = i.modified_by' )
 				. " WHERE i.id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
@@ -642,12 +646,15 @@ class FlexicontentFields
 	 */
 	function _getAuthors($items)
 	{
+		// This is fix for versioned field of creator in items view when previewing
+		$versioned_item = count($items)==1 && $items[0]->created_by && !empty($items[0]->version_id);
+		
 		$db =& JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
 		$query 	= 'SELECT i.id, u.name, i.created_by_alias as alias, u.username, u.email FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. ' LEFT JOIN #__users AS u ON '  .  ( $versioned_item ? 'u.id = '.$items[0]->created_by : 'u.id = i.created_by' )
 				. " WHERE i.id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);

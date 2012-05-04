@@ -70,25 +70,39 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$task	= JRequest::getVar('task');
+		$user = & JFactory::getUser();
 		$model = $this->getModel('item');
-		$user	=& JFactory::getUser();
 		
+		// Get data from request and validate them
 		if (FLEXI_J16GE) {
-			$data	= JRequest::getVar('jform', array(), 'post', 'array');
+			// Retrieve form data these are subject to basic filtering
+			$data   = JRequest::getVar('jform', array(), 'post', 'array');    // Core Fields and and item Parameters
+			$custom = JRequest::getVar('custom', array(), 'post', 'array');   // Custom Fields
+			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');   // Joomfish Data
+			
+			// Validate Form data for core fields and for parameters
 			$form = $model->getForm($data, false);
 			$post = & $model->validate($form, $data);
-			$post['attribs'] = $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-			if (!$post) echo $model->getError();
+			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
+			
+			// Some values need to be assigned after validation
+			$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+			$post['custom']  = & $custom;            // Assign array of custom field values, they are in the custom form array instead of jform
+			$post['jfdata']  = & $jfdata;            // Assign array of Joomfish field values, they are in the jfdata form array instead of jform
 		} else {
-			//Sanitize
-			$post = JRequest::get( 'post' );
-			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW );
+			// Retrieve form data these are subject to basic filtering
+			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
+			
+			// Some values need to be assigned after validation
+			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field
 		}
 		
+		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
 		//$diff_arr = array_diff_assoc ( $data, $post);
-		//echo "<pre>"; print_r($diff_arr);  print_r(array_diff_assoc ($post, $data)); exit();
+		//echo "<pre>"; print_r($diff_arr); exit();
 		
-		// CHECK permissions, in case form was tampered with ...
+		// PERFORM ACCESS CHECKS, NOTE: we need to check access again,
+		// despite having checked them on edit form load, because user may have tampered with the form ... 
 		$itemid = @$post['id'];
 		$isnew  = !$itemid;
 		if (FLEXI_J16GE) {
@@ -1166,10 +1180,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$model 	= $this->getModel('item');
 		$user	=& JFactory::getUser();
-		$cid = JRequest::getVar( 'cid', array(0), 'request', 'array' );
-		$itemid = (int)$cid[0];
+		$model = $this->getModel('item');
+		$itemid = $model->getId();
 		$isnew = !$itemid;
 		
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
@@ -1217,7 +1230,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$used = null;
 
 		if ($id) {
-			$used = !FLEXI_J16GE ? $model->getUsedtagsArray($id) : $model->getUsedtagsIds($id);
+			$used = $model->getUsedtagsIds($id);
 		}
 		if(!is_array($used)){
 			$used = array();
@@ -1321,7 +1334,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$model 	= $this->getModel('item');
 		$model->setId($id);
-		$item = $model->getItem( FLEXI_J16GE ? $id : true );
+		$item = $model->getItem( $id );
 		
 		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
@@ -1339,6 +1352,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M" ;
 		$date_format = JText::_( $jt_date_format );
 		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
+		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		foreach($versions as $v) {
 			$class = ($v->nr == $active) ? ' class="active-version"' : '';
 			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>
@@ -1346,9 +1360,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
 				<td class='versions' align='center'><a href='#' class='hasTip' title='Comment::".$v->comment."'>".$comment."</a>";
 				if((int)$v->nr==(int)$currentversion) {//is current version?
-					echo "<a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&view=item&cid=".$item->id."&version=".$v->nr."\");' href='#'>".JText::_( 'FLEXI_CURRENT' )."</a>";
+					echo "<a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&".$ctrl_task."&cid=".$item->id."&version=".$v->nr."\");' href='#'>".JText::_( 'FLEXI_CURRENT' )."</a>";
 				}else{
-					$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 					echo "<a class='modal-versions' href='index.php?option=com_flexicontent&view=itemcompare&cid[]=".$item->id."&version=".$v->nr."&tmpl=component' title='".JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' )."' rel='{handler: \"iframe\", size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}'>".$view."</a><a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&".$ctrl_task."&cid=".$item->id."&version=".$v->nr."&".JUtility::getToken()."=1\");' href='#' title='".JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr )."'>".$revert;
 				}
 				echo "</td></tr>";

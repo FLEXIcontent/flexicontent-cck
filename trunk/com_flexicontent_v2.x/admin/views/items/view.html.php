@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1189 2012-03-14 06:43:38Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -244,7 +244,7 @@ class FlexicontentViewItems extends JView {
 		$status      	= & $this->get( 'ExtdataStatus');
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$langs	= & $this->get( 'Languages' );
+			$langs	= & FLEXIUtilities::getLanguages('code');
 		}
 		$categories = $globalcats?$globalcats:array();
 		
