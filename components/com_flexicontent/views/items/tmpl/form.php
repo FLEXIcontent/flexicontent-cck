@@ -464,6 +464,7 @@ function deleteTag(obj) {
 	<?php endif; ?>
 	
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+		
 			<div class="flexi_formblock">
 				<label for="languages" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
@@ -471,12 +472,15 @@ function deleteTag(obj) {
 				<?php echo $this->lists['languages']; ?>
 			</div>
 			
-			<!--div class="flexi_formblock">
+			<?php if ( 0 && $this->params->get('enable_language_groups', 0)) : ?>
+			<div class="flexi_formblock">
 				<label for="languages" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
 				</label>
 				<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo getValueFCitem($this->item, 'lang_parent_id'); ?>" size="6" maxlength="20" />
-			</div-->
+			</div>
+			<?php endif; ?>
+			
 		<?php endif; ?>
 		</fieldset>
 		

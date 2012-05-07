@@ -64,7 +64,6 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field-->
-			<field name="flexi_fish" type="hidden" default="0" label="FLEXI_JOOMFISH_SUPPORT" description="FLEXI_JOOMFISH_SUPPORT_DESC"  menu="hide"/>
 			<field name="filtercat" type="radio" default="0" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
@@ -77,9 +76,8 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field-->
-			<field name="disable_lang_select" type="hidden" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide"/>
 			
-			<field name="enable_language_groups" type="radio" default="0" label="Enable language groups" description="Enable associations of items into translation groups"  menu="hide">
+			<field name="enable_language_groups" type="radio" default="1" label="Enable language groups" description="Enable associations of items into translation groups"  menu="hide">
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
@@ -88,7 +86,6 @@
 				<option value="1">FLEXI_NO_DISABLE_WARNING</option>
 				<option value="2">FLEXI_YES</option>
 			</field-->
-			<field name="editjf_translations" type="hidden" default="0" label="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS" description="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS_DESC"  menu="hide"/>
 
 			<field name="separator4" label="" type="separator" default="FLEXI_VERSIONING_CONF" level="level1" menu="hide" />
 
