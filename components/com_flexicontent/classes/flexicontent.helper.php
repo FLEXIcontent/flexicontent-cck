@@ -2670,20 +2670,4 @@ if(!function_exists('diff_version')) {
 	}
 }
 
-if(!function_exists('getValueFCitem')) {
-	function getValueFCitem ( &$item, $key, $default_val='' ) {
-		// Get Value
-		if (FLEXI_J16GE)
-			$val = $item->getValue($key);
-		else
-			$val = $item->{$key};
-		
-		// Return value (or default value)
-		if ($val)
-			return $val;
-		else
-			return $default_val;
-	}
-}
-
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1246 2012-04-12 06:34:20Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1267 2012-05-07 10:55:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -459,85 +459,82 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							$not_in_tabs = "";
 							?>
 							
-							<?php	if ( !is_array($field->html) ) : ?>
-								<tr>
-									<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
+							<tr>
+								<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
 									
-										<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
-											<?php echo $field->label; ?>
-										</label>
+									<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
+										<?php echo $field->label; ?>
+									</label>
 										
-										<div style='float:left!important; padding:0px!important; margin:0px!important; '>
+									<div style='float:left!important; padding:0px!important; margin:0px!important; '>
 										
-									<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
+								<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
 										
-										<!-- tabber start -->
-										<div class="fctabber" style=''>
-											<div class="tabbertab" style="padding: 0px;" >
-												<h3> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
-												<?php
-													$field_tab_labels = & $field->tab_labels;
-													$field_html       = & $field->html;
-													echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-												?>
-											</div>
-											<?php foreach ($this->row->item_translations as $t): ?>
-												<?php if ($itemlang!=$t->shortcode) : ?>
-													<div class="tabbertab" style="padding: 0px;" >
-														<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
-														<?php
-														$field_tab_labels = & $t->fields->text->tab_labels;
-														$field_html       = & $t->fields->text->html;
-														echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-														?>
-													</div>
-												<?php endif; ?>
-											<?php endforeach; ?>
+									<!-- tabber start -->
+									<div class="fctabber" style=''>
+										<div class="tabbertab" style="padding: 0px;" >
+											<h3> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
+											<?php
+												$field_tab_labels = & $field->tab_labels;
+												$field_html       = & $field->html;
+												echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+											?>
 										</div>
-										<!-- tabber end -->
-									
-									<?php else : ?>
-								
-										<?php	if ( !is_array($field->html) ) : ?>
-										
-											<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-										
-										<?php else : ?>
-										
-											<!-- tabber start -->
-											<div class="fctabber">
-											<?php foreach ($field->html as $i => $fldhtml): ?>
-												<?php
-													// Hide field when it has no label, and skip creating tab
-													$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-													if (!isset($field->tab_labels[$i]))	continue;
-												?>
-												
-												<div class="tabbertab">
-													<h3> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
+										<?php foreach ($this->row->item_translations as $t): ?>
+											<?php if ($itemlang!=$t->shortcode) : ?>
+												<div class="tabbertab" style="padding: 0px;" >
+													<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 													<?php
-														echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-														$not_in_tabs = "";      // Clear the hidden fields variable
-														echo $field->html[$i];  // Current TAB CONTENTS
+													$field_tab_labels = & $t->fields->text->tab_labels;
+													$field_html       = & $t->fields->text->html;
+													echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
 													?>
 												</div>
-												
-											<?php endforeach; ?>
-											</div>
-											<!-- tabber end -->
-											<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-											
-										<?php endif; ?>
-										
-									<?php endif; ?>
+											<?php endif; ?>
+										<?php endforeach; ?>
+									</div>
+									<!-- tabber end -->
 									
-										</div>
-										
-									</td>
-								</tr>
+								<?php else : ?>
 								
-							<?php endif; ?>
-							
+									<?php	if ( !is_array($field->html) ) : ?>
+										
+										<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+										
+									<?php else : ?>
+										
+										<!-- tabber start -->
+										<div class="fctabber">
+										<?php foreach ($field->html as $i => $fldhtml): ?>
+											<?php
+												// Hide field when it has no label, and skip creating tab
+												$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+												if (!isset($field->tab_labels[$i]))	continue;
+											?>
+												
+											<div class="tabbertab">
+												<h3> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
+												<?php
+													echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+													$not_in_tabs = "";      // Clear the hidden fields variable
+													echo $field->html[$i];  // Current TAB CONTENTS
+												?>
+											</div>
+												
+										<?php endforeach; ?>
+										</div>
+										<!-- tabber end -->
+										<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+											
+									<?php endif; ?>
+										
+								<?php endif; ?>
+									
+									</div>
+										
+								</td>
+							</tr>
+								
 						<?php
 						}
 						?>
@@ -832,7 +829,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 								$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 								?>
-								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="27" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="26" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -862,7 +859,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 								$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 								?>
-								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="27" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+								<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="26" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>

@@ -73,7 +73,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// initialise property
 		$default_values		= '';
-		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();
@@ -153,9 +153,9 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// OTHER SCOPE LIMITS
 		if ($samelangonly) {
-			if ($item->getValue('language')!='*') {
+			if ($item->language!='*') {  // for J2.5, but harmless for J1.5
 				$where .= ($where=="") ? "" : " AND ";
-				$where .= " (ie.language='{$item->getValue('language')}' OR ie.language='*') ";
+				$where .= " (ie.language='{$item->language}' OR ie.language='*') ";
 			}
 		}
 		if ($onlypublished) {

@@ -153,8 +153,10 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// OTHER SCOPE LIMITS
 		if ($samelangonly) {
-			$where .= ($where=="") ? "" : " AND ";
-			$where .= " ie.language='{$item->language}' ";
+			if ($item->language!='*') {  // for J2.5, but harmless for J1.5
+				$where .= ($where=="") ? "" : " AND ";
+				$where .= " (ie.language='{$item->language}' OR ie.language='*') ";
+			}
 		}
 		if ($onlypublished) {
 			$where .= ($where=="") ? "" : " AND ";

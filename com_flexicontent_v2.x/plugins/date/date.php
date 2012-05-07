@@ -159,7 +159,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$n++;
 			}
 			$field->html .=	'</ul>';
-			$field->html 	.= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
 			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], 'custom['.$field->name.'][]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';

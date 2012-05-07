@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: radio.php 1059 2011-12-20 07:18:32Z ggppdk $
+ * @version 1.0 $Id: radio.php 1227 2012-04-02 15:14:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.radio
@@ -71,7 +71,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		}
 
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} elseif ( !isset($field->value[0]) ) {

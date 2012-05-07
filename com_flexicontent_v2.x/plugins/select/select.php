@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: select.php 1059 2011-12-20 07:18:32Z ggppdk $
+ * @version 1.0 $Id: select.php 1251 2012-04-16 02:36:00Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.select
@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$required 	= $required ? ' required' : '';
 
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} else if (!$field->value) {
@@ -93,7 +93,6 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			if (empty($listelements[count($listelements)-1])) {
 				unset($listelements[count($listelements)-1]);
 			}
-
 			$listarrays = array();
 			foreach ($listelements as $listelement) {
 				$listarrays[] = explode("::", $listelement);

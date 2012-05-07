@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: extendedweblink.php 1222 2012-03-27 20:27:49Z ggppdk $
+ * @version 1.0 $Id: extendedweblink.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.extendedweblink
@@ -43,7 +43,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$required 	= $required ? ' required' : '';
 		
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {

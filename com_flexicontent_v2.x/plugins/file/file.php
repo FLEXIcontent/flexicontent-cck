@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		$files = implode(":", $field->value);
 		$user = & JFactory::getUser();
-		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->getValue('id').'&amp;items=0&amp;filter_uploader='.$user->get('id').'&amp;'.JUtility::getToken().'=1';
+		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;items=0&amp;filter_uploader='.$user->get('id').'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"fcfield-button-add\">

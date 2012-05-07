@@ -21,12 +21,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Added to allow the user to choose some of the pre-selected categories
 $cid = $this->params->get("cid");
 $isNew = ! JRequest::getInt('id', 0);
-$itemlang = substr(getValueFCitem($this->item, 'language') ,0,2);
+$itemlang = substr($this->item->language ,0,2);
 if (isset($this->item->item_translations)) foreach ($this->item->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
 $overridecatperms = $this->params->get("overridecatperms", 1);
-$typeid = getValueFCitem($this->item, 'id') ? getValueFCitem($this->item, 'type_id')	 :  JRequest::getInt('typeid') ;
+$typeid = $this->item->id ? $this->item->type_id	 :  JRequest::getInt('typeid') ;
 $return = JRequest::getString('return', '', 'get');
 if ($return) {
 	$referer = base64_decode( $return );
@@ -233,29 +233,29 @@ function deleteTag(obj) {
 			
 		<?php if (in_array( 'apply', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return submitbutton('apply');">
-				<span class="fcbutton_apply"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
+				<span class="fcbutton_apply"><?php echo JText::_( $this->item->id ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 			</button>
 		<?php endif; ?>
 			
 		<?php if ( $typeid ) : ?>
 		
 			<button class="button" type="button" onclick="return submitbutton('save');">
-				<span class="fcbutton_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
+				<span class="fcbutton_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 			</button>
 			
 		<?php if (in_array( 'save_preview', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return submitbutton('save_a_preview');">
-				<span class="fcbutton_preview_save"><?php echo JText::_( getValueFCitem($this->item, 'id') ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
+				<span class="fcbutton_preview_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
 		<?php endif; ?>
 
 			<?php
 				$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
-				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute(getValueFCitem($this->item, 'id').':'.getValueFCitem($this->item, 'alias'), getValueFCitem($this->item, 'catid')).'&preview=1');
+				$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid).'&preview=1');
 			?>
 			
 		<?php if (in_array( 'preview_latest', $allowbuttons_fe) ) : ?>
-			<?php if ( getValueFCitem($this->item, 'id') ) : ?>
+			<?php if ( $this->item->id ) : ?>
 			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 				<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 			</button>
@@ -272,7 +272,7 @@ function deleteTag(obj) {
          
 		<br class="clear" />
 		<?php
-			$approval_msg = JText::_( getValueFCitem($this->item, 'id')==0 ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
+			$approval_msg = JText::_( $this->item->id==0 ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
 			if ( !$canpublish && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
 		?>
 		
@@ -293,7 +293,7 @@ function deleteTag(obj) {
 				<div class="fctabber" style=''>
 					<div class="tabbertab" style="padding: 0px;" >
 						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
-						<input class="inputbox required" style='margin:0px;' type="text" id="title" name="title" value="<?php echo $this->escape(getValueFCitem($this->item, 'title')); ?>" size="65" maxlength="254" />
+						<input class="inputbox required" style='margin:0px;' type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($itemlang!=$t->shortcode) : ?>
@@ -311,7 +311,7 @@ function deleteTag(obj) {
 				<!-- tabber end -->
 				
 			<?php else : ?>
-				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape(getValueFCitem($this->item, 'title')); ?>" size="65" maxlength="254" />
+				<input class="inputbox required" type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 			<?php endif; ?>
 
 			</div>
@@ -329,7 +329,7 @@ function deleteTag(obj) {
 				<div class="fctabber" style=''>
 					<div class="tabbertab" style="padding: 0px;" >
 						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
-						<input class="inputbox required" style='margin:0px;' type="text" id="alias" name="alias" value="<?php echo $this->escape(getValueFCitem($this->item, 'alias')); ?>" size="65" maxlength="254" />
+						<input class="inputbox required" style='margin:0px;' type="text" id="alias" name="alias" value="<?php echo $this->escape($this->item->alias); ?>" size="65" maxlength="254" />
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($itemlang!=$t->shortcode) : ?>
@@ -347,7 +347,7 @@ function deleteTag(obj) {
 				<!-- tabber end -->
 				
 			<?php else : ?>
-				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->escape(getValueFCitem($this->item, 'alias')); ?>" size="65" maxlength="254" />
+				<input class="inputbox" type="text" id="alias" name="alias" value="<?php echo $this->escape($this->item->alias); ?>" size="65" maxlength="254" />
 			<?php endif; ?>
 			
 			</div>
@@ -477,7 +477,7 @@ function deleteTag(obj) {
 				<label for="languages" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
 				</label>
-				<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo getValueFCitem($this->item, 'lang_parent_id'); ?>" size="6" maxlength="20" />
+				<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->item->lang_parent_id; ?>" size="6" maxlength="20" />
 			</div>
 			<?php endif; ?>
 			
@@ -568,7 +568,7 @@ function deleteTag(obj) {
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
-			$typename = $types[getValueFCitem($this->item, 'type_id')]['name'];
+			$typename = $types[$this->item->type_id]['name'];
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
@@ -677,7 +677,7 @@ function deleteTag(obj) {
 		</table>
 	</fieldset>
 
-<?php elseif (getValueFCitem($this->item, 'id') == 0) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+<?php elseif ($this->item->id == 0) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 <?php else : // existing item that has no custom fields, warn the user ?>
 		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
@@ -694,7 +694,6 @@ function deleteTag(obj) {
 		<?php
 			// Remove xml nodes if advanced meta parameters
 			//echo "<pre>"; print_r($this->formparams->_xml); exit;
-			
 			if ($this->params->get('usepublicationdetails_fe', 1) != 2 ) :
 				$advanced_metadata_params = array('created_by', 'created_by_alias', 'created');
 				$metadata_nodes = array();
@@ -704,69 +703,39 @@ function deleteTag(obj) {
 				endforeach;
 				$this->formparams->_xml['_default']->_children = $metadata_nodes;
 			endif;
-
-
-		$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
-		echo $this->pane->startPanel( $title, 'details' );
-		echo $this->formparams->render('details');
-		echo $this->pane->endPanel();
+		
+			$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
+			echo $this->pane->startPanel( $title, 'details' );
+			echo $this->formparams->render('details');
+			echo $this->pane->endPanel();
 		?>
 	<?php endif; ?>
 	
 	
-	<?php 
-		if ( $this->params->get('usemetadata_fe', 1) ) {
+	<?php if ( $this->params->get('usemetadata_fe', 1) ) { ?>
+	<?php
+		$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
+		echo $this->pane->startPanel( $title, 'metadata' );	
+	?>
+	<table class="paramlist admintable" width="100%" cellspacing="1" style="height:">
+		<tbody>
+		<tr>
+			<td class="paramlist_key" width="40%">
+				<span class="editlinktip">
+					<label id="metadescription-lbl" class="hasTip" for="metadescription" title="::<?php echo JText::_('FLEXI_METADESC'); ?>" >
+						<?php echo JText::_('FLEXI_Description'); ?>
+					</label>
+				</span>
+			</td>
+			<td class="paramlist_value">
 			
-			//$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
-			//echo $this->pane->startPanel( $title, 'metadata' );
-			//echo $this->formparams->render('metadata');
-			//echo $this->pane->endPanel();
-		
-			// Remove xml nodes if advanced meta parameters
-			if ($this->params->get('usemetadata_fe', 1) != 2 ) :
-				$advanced_metadata_params = array('robots', 'author');
-				$metadata_nodes = array();
-				foreach($this->formparams->_xml['metadata']->_children as $index => $element) :
-					//echo "<pre>"; print_r($element); echo "</pre>"; //$formparams->get('keywords');
-					if ( ! in_array($element->_attributes['name'], $advanced_metadata_params))
-						$metadata_nodes[] = & $this->formparams->_xml['metadata']->_children[$index];
-				endforeach;
-				$this->formparams->_xml['metadata']->_children = $metadata_nodes;
-			endif;
-			
-			$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
-			echo $this->pane->startPanel( $title, "metadata-page" );
-			foreach($this->formparams->_xml['metadata']->_children as $index => $element) :
-				$meta_arr[$element->_attributes['name']] = $element;
-				$name=$element->_attributes['name']; $attrs[$name]="";
-				$attrs[$name] .= @$meta_arr[$name]->_attributes['rows'] ? ' rows="'.$meta_arr[$name]->_attributes['rows'].'"' : "";
-				$attrs[$name] .= @$meta_arr[$name]->_attributes['cols'] ? ' cols="'.$meta_arr[$name]->_attributes['cols'].'"' : "";
-				$attrs[$name] .= @$meta_arr[$name]->_attributes['size'] ? ' size="'.$meta_arr[$name]->_attributes['size'].'"' : "";
-				$m_tips[$name] = @$meta_arr[$name]->_attributes['description'] ? ' title="::'.JText::_($meta_arr[$name]->_attributes['description']).'"' : "";
-				$label=$element->_attributes['label']; $descr=$element->_attributes['description'];
-			endforeach;
-			?>
-		<table class="paramlist admintable" width="100%" cellspacing="1" style="height:">
-			<tbody>
-				
-			<?php if ( isset($meta_arr['description']) ) : ?>
-			<tr>
-				<td class="paramlist_key" width="40%">
-					<span class="editlinktip">
-						<label id="metadescription-lbl" class="hasTip" for="metadescription" <?php echo $m_tips['description']; ?> >
-							<?php echo JText::_($meta_arr['description']->_attributes['label']); ?>
-						</label>
-					</span>
-				</td>
-				<td class="paramlist_value">
-					
 			<?php	if ( isset($this->item->item_translations) ) :?>
 				
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
 						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
-						<textarea id="metadescription" class="text_area" rows="3" cols="50" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+						<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($itemlang!=$t->shortcode) : ?>
@@ -776,7 +745,7 @@ function deleteTag(obj) {
 								$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 								$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 								?>
-								<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="50" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+								<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -784,31 +753,29 @@ function deleteTag(obj) {
 				<!-- tabber end -->
 			
 			<?php else : ?>
-				<textarea id="metadescription" class="text_area" <?php echo $attrs['description']; ?> name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+				<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
 			<?php endif; ?>
 			
-				</td>
-			</tr>
-			<?php endif; ?>
+			</td>
+		</tr>
 			
-			<?php if ( isset($meta_arr['keywords']) ) : ?>
-			<tr>
-				<td class="paramlist_key" width="40%">
-					<span class="editlinktip">
-						<label id="metakeywords-lbl" class="hasTip" for="metakeywords" <?php echo $m_tips['keywords']; ?> >
-							<?php echo JText::_($meta_arr['keywords']->_attributes['label']); ?>
-						</label>
-					</span>
-				</td>
-				<td class="paramlist_value">
-
+		<tr>
+			<td class="paramlist_key" width="40%">
+				<span class="editlinktip">
+					<label id="metakeywords-lbl" class="hasTip" for="metakeywords" title="::<?php echo JText::_('FLEXI_METAKEYS'); ?>" >
+						<?php echo JText::_('FLEXI_Keywords'); ?>
+					</label>
+				</span>
+			</td>
+			<td class="paramlist_value">
+			
 			<?php	if ( isset($this->item->item_translations) ) :?>
 			
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
 						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
-						<textarea id="metakeywords" class="text_area" rows="3" cols="50" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+						<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($itemlang!=$t->shortcode) : ?>
@@ -818,7 +785,7 @@ function deleteTag(obj) {
 								$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 								$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 								?>
-								<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="50" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+								<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -826,49 +793,21 @@ function deleteTag(obj) {
 				<!-- tabber end -->
 			
 			<?php else : ?>
-				<textarea id="metakeywords" class="text_area" <?php echo $attrs['keywords']; ?> name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+				<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
 			<?php endif; ?>
 			
 				</td>
 			</tr>
-			<?php endif; ?>
-			
-			<?php if ( isset($meta_arr['robots']) ) : ?>
-			<tr>
-				<td class="paramlist_key" width="40%">
-					<span class="editlinktip">
-						<label id="metarobots-lbl" class="hasTip" for="metarobots" <?php echo $m_tips['robots']; ?> >
-							<?php echo JText::_($meta_arr['robots']->_attributes['label']); ?>
-						</label>
-					</span>
-				</td>
-				<td class="paramlist_value">
-					<input id="metarobots" class="text_area" type="text" <?php echo $attrs['robots']; ?> value="<?php echo $this->formparams->get('robots'); ?>" name="meta[robots]">
-				</td>
-			</tr>
-			<?php endif; ?>
-			
-			<?php if ( isset($meta_arr['author']) ) : ?>
-			<tr>
-				<td class="paramlist_key" width="40%">
-					<span class="editlinktip">
-						<label id="metaauthor-lbl" class="hasTip" for="metaauthor" <?php echo $m_tips['author']; ?> >
-							<?php echo JText::_($meta_arr['author']->_attributes['label']); ?>
-						</label>
-					</span>
-				</td>
-				<td class="paramlist_value">
-					<input id="metaauthor" class="text_area" type="text" <?php echo $attrs['author']; ?> value="<?php echo $this->formparams->get('author'); ?>" name="meta[author]">
-				</td>
-			</tr>
-			<?php endif; ?>
-			
-		</table>			
+		</table>
+		
+		<?php if ($this->params->get('usemetadata_fe', 1) == 2 ) : ?>
 			<?php
-			//echo $this->formparams->render('meta', 'metadata');
+			echo $this->formparams->render('meta', 'metadata');
 			echo $this->pane->endPanel();
-		}
-	?>
+			?>
+		<?php endif; ?>
+		
+	<?php } ?>
 	
 	
 	<?php
@@ -899,9 +838,11 @@ function deleteTag(obj) {
 			echo $this->formparams->render('params', 'seoconf');
 			echo $this->pane->endPanel();
 		}
-
-	if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) :
+	?>
 	
+	<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
+		
+	<?php
 		$type_default_layout = $this->tparams->get('ilayout');
 		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 		echo $this->formparams->render('params', 'themes');
@@ -934,10 +875,10 @@ function deleteTag(obj) {
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="referer" value="<?php echo $referer; ?>" />
-		<?php if ( getValueFCitem($this->item, 'id')==0 && $typeid ) : ?>
+		<?php if ( $this->item->id==0 && $typeid ) : ?>
 			<input type="hidden" name="type_id" value="<?php echo $typeid; ?>" />
 		<?php endif;?>
-		<input type="hidden" name="id" value="<?php echo getValueFCitem($this->item, 'id'); ?>" />
+		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 		<input type="hidden" name="views" value="items" />
 		
 		<?php if ($autopublished) : // autopublish enabled ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: weblink.php 623 2011-06-30 14:29:28Z enjoyman@gmail.com $
+ * @version 1.0 $Id: weblink.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.weblink
@@ -46,7 +46,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$required 	= $required ? ' required' : '';
 		
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_link) {
+		if($item->version < 2 && $default_link) {
 			$field->value = array();
 			$field->value[0]['link'] = $default_link;
 			$field->value[0]['title'] = $default_title;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 1050 2011-12-12 02:02:58Z ggppdk $
+ * @version 1.0 $Id: text.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		$required 	= $required ? ' required' : '';
 
 		// initialise property
-		if( ( $item->getValue('version', NULL, 0) < 2 || $default_value_use > 0) && strlen($default_value)) {
+		if( ( $item->version < 2 || $default_value_use > 0) && strlen($default_value)) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {
