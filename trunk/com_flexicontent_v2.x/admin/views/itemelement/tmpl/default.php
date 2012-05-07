@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1126 2012-01-26 21:48:09Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+$app = &JFactory::getApplication();
 ?>
 
 <form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm" id="adminForm">
@@ -126,7 +127,7 @@ defined('_JEXEC') or die('Restricted access');
 					
 			<td align="center">
 				<?php if ($img) : ?>
-					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" title="<?php echo $alt; ?>" />
+					<img src="<?php  echo $app->isAdmin() ? "../" : ""; ?>components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" title="<?php echo $alt; ?>" />
 				<?php endif; ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>

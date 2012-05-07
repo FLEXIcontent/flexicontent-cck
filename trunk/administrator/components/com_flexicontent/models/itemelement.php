@@ -176,7 +176,8 @@ class FlexicontentModelItemelement extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-
+		$currauthor = JRequest::getVar('currauthor');
+		
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
@@ -221,6 +222,11 @@ class FlexicontentModelItemelement extends JModel
 
 		if ( $search ) {
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+		}
+		
+		if ($currauthor) {
+			$user = JFactory::getUser();
+			$where[] = ' i.created_by='.$user->id;
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

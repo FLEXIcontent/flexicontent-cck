@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1121 2012-01-25 11:14:15Z maxime.danjou@netassopro.com $
+ * @version 1.5 stable $Id: view.html.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

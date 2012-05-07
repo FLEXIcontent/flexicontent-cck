@@ -298,7 +298,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											if (!$this->cparams->get('auto_approve', 1)) :
 												// Enable approval if versioning disabled, this make sense,
 												// since if use can edit item THEN item should be updated !!!
-												$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
+												$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
 												echo '<input type="hidden" name="vstate" value="'.$item_vstate.'" />';
 											else :
 												echo '<input type="hidden" name="vstate" value="2" />';
@@ -363,12 +363,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							</div>
 							<?php endif; ?>
 							
+							<?php if ($this->cparams->get('enable_language_groups', 0)) : ?>
 							<div><br/><br/>
 								<label for="lang_parent_id" class="hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
 									<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
 								</label>
 								<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->row->lang_parent_id; ?>" size="6" maxlength="20" />
 							</div>
+							<?php endif; ?>
 						</td>
 					</tr>
 				</table>

@@ -102,10 +102,10 @@ class plgSystemFlexiadvroute extends JPlugin
 	  	$view = JRequest::getVar('view');
 		  $option = JRequest::getVar('option');
 		  $item_slug = JRequest::getVar('id');
+		  $item_id = (int) $item_slug;
 		  
 		  // Execute only if current page is a FLEXIcontent items view (viewing an individual item)
-		  if ( $view != FLEXI_ITEMVIEW || $option!='com_flexicontent' || !$item_id ) return;
-		  $item_id = (int) $item_slug;
+		  if ( $view != FLEXI_ITEMVIEW || $option!='com_flexicontent' ) return;
 		}
 		else if (FLEXI_J16GE)
 		{
@@ -139,19 +139,20 @@ class plgSystemFlexiadvroute extends JPlugin
 			$prev_page_isflexi    = $prev_page_isitemview || $prev_page_iscatview;
 			
 			$switching_language   = $prev_page_isflexi && $curr_page_ishome && $language_changed;
-			$check_currpage       = ($curr_page_iscatview && $language_changed) || $curr_page_isitemview;
 			
 			/*echo "<br>prev_page_isflexi: $prev_page_isflexi, curr_page_ishome: $curr_page_ishome,"
 					."<br>language_changed: $language_changed,"
 					."<br>prev_page_isitemview: $prev_page_isitemview, prev_page_iscatview: $prev_page_iscatview";
 					."<br>curr_page_isitemview: $curr_page_isitemview, curr_page_iscatview: $curr_page_iscatview";*/
 		 
-		  // Execute only if previous page was FLEXIcontent item or category view
-			if ( !$switching_language && !$check_currpage ) return;
+		  // Execute only if previous page was FLEXIcontent item or category view and we switched language
+			// or if current page is FLEXIcontent item in order to check if language specified is not the item's language
+			if ( !$switching_language && !$curr_page_isitemview ) return;
 			
 			$cat_id  = (int) ($switching_language ? $cat_slug  : JRequest::getVar('cid'));
 		  $item_id = (int) ($switching_language ? $item_slug : JRequest::getVar('id'));
-		  $view    = $switching_language ? $view      : JRequest::getVar('view');
+		  $view    = $switching_language ? $view    : JRequest::getVar('view');
+		  $option  = $switching_language ? $option  : JRequest::getVar('option');
 		}
 		
 		if ( FLEXI_J16GE && $view=='category' ) {  

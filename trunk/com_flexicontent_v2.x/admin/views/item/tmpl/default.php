@@ -299,7 +299,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											if (!$this->cparams->get('auto_approve', 1)) :
 												// Enable approval if versioning disabled, this make sense,
 												// since if use can edit item THEN item should be updated !!!
-												$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
+												$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
 												echo '<input type="hidden" name="jform[vstate]" value="'.$item_vstate.'" />';
 											else :
 												echo '<input type="hidden" name="jform[vstate]" value="2" />';
@@ -374,6 +374,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<?php echo $this->form->getInput('featured');?>
 								</td>
 							</tr>
+							<?php if ($this->cparams->get('enable_language_groups', 1)) : ?>
 							<tr>
 								<td>
 									<?php echo $this->form->getLabel('lang_parent_id'); ?>
@@ -382,6 +383,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<?php echo $this->form->getInput('lang_parent_id'); ?>
 								</td>
 							</tr>
+							<?php endif; ?>
 							</table>
 						</td>
 					</tr>
