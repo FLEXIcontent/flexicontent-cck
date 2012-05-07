@@ -21,11 +21,10 @@ defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $globalcats, $globaltypes, $globalitems, $globalnoroute;
+global $sh_LANG, $globalcats, $globalnopath, $globalnoroute;
 
 // Insure that the global vars are array
-if (!is_array($globaltypes))	$globaltypes	= array();
-if (!is_array($globalitems))	$globalitems	= array();
+if (!is_array($globalnopath))	$globalnopath	= array();
 if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 $sefConfig 		= & shRouter::shGetConfig();
@@ -105,7 +104,7 @@ if($format == 'raw') {
 
 switch ($view) {
 	
-	case 'items' :
+	case 'items' : 	case 'item' :
 
 		if (!empty($id)) {
 		
@@ -146,11 +145,11 @@ switch ($view) {
 								}
 							}		
 						}
-						if (!in_array($row->id, $globaltypes)) {
+						if (!in_array($row->id, $globalnopath)) {
 							$title [] = $row->title;
 						}
 						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
-						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->id, $globaltypes)) {
+						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->type_id, $globalnopath)) {
 							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
 							$database->setQuery($q);
 							if (shTranslateUrl($option, $shLangName)) // V 1.2.4.m
@@ -167,7 +166,7 @@ switch ($view) {
 						}
 						shMustCreatePageId( 'set', true);
 					}
-				}	
+				}
 			
 				// Remove the vars from the url
 				if (!empty($id))
@@ -199,19 +198,21 @@ switch ($view) {
 			if (@$globalcats[$cid]->ancestorsarray) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				foreach ($ancestors as $ancestor) {
-					if (shTranslateURL ( $option, $shLangName )) {
-						$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
-						$database->setQuery ( $query );
-						$row = $database->loadObject ();
-						$title[] = $row->title . '/';
-					} else {
-						$title[] = $globalcats[$ancestor]->title . '/';
+					if (!in_array($ancestor, $globalnoroute)) {
+						if (shTranslateURL ( $option, $shLangName )) {
+							$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
+							$database->setQuery ( $query );
+							$row = $database->loadObject ();
+							$title[] = $row->title . '/';
+						} else {
+							$title[] = $globalcats[$ancestor]->title . '/';
+						}
 					}
 				}		
 			} else {
 				$title [] = '/';
 			}
-          	shMustCreatePageId( 'set', true);
+			shMustCreatePageId( 'set', true);
 		}
 
 		// Remove the vars from the url

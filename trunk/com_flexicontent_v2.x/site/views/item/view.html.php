@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1246 2012-04-12 06:34:20Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -48,8 +48,8 @@ class FlexicontentViewItem extends JView
 		}
 		
 		// Get globaltypes and make sure it is an array
-		global $globaltypes;
-		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
+		global $globalnopath;
+		$globalnopath = !is_array($globalnopath) ? array() : $globalnopath;
 		
 		// Initialize variables
 		$mainframe  = &JFactory::getApplication();
@@ -284,8 +284,8 @@ class FlexicontentViewItem extends JView
 			if ($params->get('add_item_pathway', 1)) $item_depth++;
 		}
 
-		if (count($globaltypes) > 0) {   // ggppdk: I DO NOT understand the purpose of this IF
-			if (!in_array($item->id, $globaltypes)) {
+		if (count($globalnopath) > 0) {   // ggppdk: I DO NOT understand the purpose of this IF
+			if (!in_array($item->id, $globalnopath)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
 		} else {

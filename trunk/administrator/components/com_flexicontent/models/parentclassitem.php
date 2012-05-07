@@ -532,7 +532,7 @@ class ParentClassItem extends JModel
 				// **********************************
 				// Retrieve and prepare JoomFish data
 				// **********************************
-				if ( (FLEXI_FISH || FLEXI_J16GE) && $task=='edit' && $option=='com_flexicontent' && $editjf_translations > 0 )
+				if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $task=='edit' && $option=='com_flexicontent' && $editjf_translations > 0 )
 				{
 					// -- Try to retrieve all joomfish data for the current item
 					$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
@@ -676,7 +676,7 @@ class ParentClassItem extends JModel
 				// then calculate item's score so far (percentage), e.g. we have 5 votes max
 				$query = "SELECT t.name as typename, t.alias as typealias, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
 						." FROM #__flexicontent_items_ext as ie "
-						. " LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
+						." LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
 						." LEFT JOIN #__flexicontent_types AS t ON ie.type_id = t.id"
 						." WHERE ie.item_id='".$this->_id."';";
 				$db->setQuery($query);
@@ -1724,7 +1724,7 @@ class ParentClassItem extends JModel
 		// ****************************
 		// Save joomfish data in the db
 		// ****************************
-		if ( (FLEXI_FISH || FLEXI_J16GE) && $editjf_translations )
+		if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $editjf_translations )
 			$this->_saveJFdata( $data['jfdata'], $item );
 		
 		if (FLEXI_ACCESS) {
