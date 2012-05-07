@@ -75,7 +75,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		}
 
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} elseif (!$field->value) {
 			$field->value = array();

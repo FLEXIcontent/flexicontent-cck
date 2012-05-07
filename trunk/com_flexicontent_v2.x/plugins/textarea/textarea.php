@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 1167 2012-03-09 03:25:01Z ggppdk $
+ * @version 1.0 $Id: textarea.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -71,7 +71,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// initialise property
 		if($field->field_type == 'textarea') {
-			if($item->getValue('version', NULL, 0) < 2 && $default_value) {
+			if($item->version < 2 && $default_value) {
 				$field->value = array();
 				$field->value[0] = JText::_($default_value);
 			} elseif (!$field->value) {

@@ -46,7 +46,7 @@ class plgFlexicontent_fieldsHidden extends JPlugin{
 		$required 	= $required ? ' required' : '';
 		
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} elseif (!$field->value) {

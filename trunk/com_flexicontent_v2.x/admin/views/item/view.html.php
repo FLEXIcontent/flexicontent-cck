@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1246 2012-04-12 06:34:20Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -162,7 +162,7 @@ class FlexicontentViewItem extends JView
 				FlexicontentFields::loadFieldConfig($field, $row);
 			} else {
 				// Create field 's editing HTML
-				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$form ));
+				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$row ));
 			}
 			if ($field->field_type == 'maintext')
 			{
@@ -175,7 +175,7 @@ class FlexicontentViewItem extends JView
 						if ($itemlang == $t->shortcode) continue;
 						$field->name = array('jfdata',$t->shortcode,'text');
 						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
-						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$form) );
+						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
 						$t->fields->text->tab_labels = $field->tab_labels;
 						$t->fields->text->html = $field->html;
 						unset( $field->tab_labels );
@@ -184,7 +184,7 @@ class FlexicontentViewItem extends JView
 				}
 				$field->name = 'text';
 				$field->value[0] = html_entity_decode(FLEXI_J16GE ? $row->text: $row->text, ENT_QUOTES, 'UTF-8');
-				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$form) );
+				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
 			}
 		}
 		

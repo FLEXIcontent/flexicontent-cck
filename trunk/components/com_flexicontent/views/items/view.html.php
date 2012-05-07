@@ -373,12 +373,11 @@ class FlexicontentViewItems extends JView
 		
 		// Get item and model
 		$model = & $this->getModel();
+		$item = & $this->get('Item');
 		if (FLEXI_J16GE) {
 			//$model->setId(0); // Clear $model->_item, to force recalculation of the item data
-			$row = & $model->getItem($model->getId(), false);
-			$item = & $this->get('Form');
-		} else {
-			$item = & $this->get('Item');
+			//$row = & $model->getItem($model->getId(), false);
+			$form = & $this->get('Form');
 		}
 		
 		// *******************************
@@ -386,24 +385,19 @@ class FlexicontentViewItems extends JView
 		// *******************************
 		
 		// new item and ownership variables
-		if (FLEXI_J16GE) {
-			$isnew = !$item->getValue('id');
-			$isOwner = ( $item->getValue('created_by') == $user->get('id') );
-		} else {
-			$isnew = !$item->id;
-			$isOwner = ( $item->created_by == $user->get('id') );
-		}
+		$isnew = !$item->id;
+		$isOwner = ( $item->created_by == $user->get('id') );
 		
 		if (!$isnew) {
 			// EDIT action
 			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $item->getValue('id');
+				$asset = 'com_content.article.' . $item->id;
 				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				// ALTERNATIVE 1
 				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->getValue('id'));
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->getValue('created_by') == $user->get('id')) ;
+				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
 				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
@@ -492,7 +486,7 @@ class FlexicontentViewItems extends JView
 					}
 				}
 				$field->name = 'text';
-				$field->value[0] = html_entity_decode(FLEXI_J16GE ? $row->text: $item->text, ENT_QUOTES, 'UTF-8');
+				$field->value[0] = html_entity_decode(FLEXI_J16GE ? $item->text: $item->text, ENT_QUOTES, 'UTF-8');
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 			}
 		}
@@ -521,8 +515,8 @@ class FlexicontentViewItems extends JView
 			$perms['cantemplates']= $permission->CanTemplates;
 			
 			//item specific permissions
-			if ( $item->getValue('id') ) {
-				$asset = 'com_content.article.' . $item->getValue('id');
+			if ( $item->id ) {
+				$asset = 'com_content.article.' . $item->id;
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
@@ -570,7 +564,7 @@ class FlexicontentViewItems extends JView
 		// Build languages list
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		if (FLEXI_J16GE) {
-			$item_lang = $isnew ? $site_default_lang : $item->getValue("language");
+			$item_lang = $isnew ? $site_default_lang : $item->language;
 			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item_lang, 3);
 		} else if (FLEXI_FISH) {
 			$item_lang = $isnew ? $site_default_lang : $item->language;
@@ -604,10 +598,7 @@ class FlexicontentViewItems extends JView
 		
 		// Merge item parameters
 		if (!$isnew) {
-			if (FLEXI_J16GE)
-				$params->merge($row->parameters);
-			else
-				$params->merge($item->parameters);
+			$params->merge($item->parameters);
 		}
 		
 		// Ensure the row data is safe html
@@ -617,6 +608,9 @@ class FlexicontentViewItems extends JView
 		$this->assign('action', 	$uri->toString());
 
 		$this->assignRef('item',			$item);
+		if (FLEXI_J16GE) {  // most core field are created via calling methods of the form (J2.5)
+			$this->assignRef('form',		$form);
+		}
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',			$lists);
 		$this->assignRef('editor',		$editor);
@@ -684,8 +678,8 @@ class FlexicontentViewItems extends JView
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
 		} else {
-			if ( JHTML::_('date', $item->getValue('publish_down') , 'Y') <= 1969 || $item->getValue('publish_down') == $nullDate ) {
-				$item->setValue('publish_down', null, JText::_( 'FLEXI_NEVER' ) );
+			if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate ) {
+				$item->publish_down= JText::_( 'FLEXI_NEVER' );
 			}
 		}
 		
@@ -713,7 +707,7 @@ class FlexicontentViewItems extends JView
 				if (FLEXI_J16GE) {
 					foreach ($tmpl->params->getGroup('attribs') as $field) {
 						$fieldname =  $field->__get('fieldname');
-						$value = $row->itemparams->get($fieldname);
+						$value = $item->itemparams->get($fieldname);
 						if ( strlen($value) ) $tmpl->params->setValue($fieldname, 'attribs', $value);
 					}
 				} else {

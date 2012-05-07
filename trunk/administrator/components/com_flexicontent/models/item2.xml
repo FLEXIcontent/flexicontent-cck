@@ -73,10 +73,10 @@
 	</params>
 	
 	<params group="metadata">
-		<param name="description" type="textarea" rows="5" cols="30" default="" label="FLEXI_Description" description="FLEXI_METADESC" />
-		<param name="keywords" type="textarea" rows="5" cols="30" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" />
-		<param name="robots" type="text" size="20" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />
-		<param name="author" type="text" size="20" default="" label="FLEXI_Author" description="FLEXI_METAAUTHOR" />
+		<!--param name="description" type="textarea" rows="5" cols="19" default="" label="FLEXI_Description" description="FLEXI_METADESC" /-->
+		<!--param name="keywords" type="textarea" rows="5" cols="19" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" /-->
+		<param name="robots" type="text" size="34" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />
+		<param name="author" type="text" size="34" default="" label="FLEXI_Author" description="FLEXI_METAAUTHOR" />
 	</params>
 	
 	<params group="themes">

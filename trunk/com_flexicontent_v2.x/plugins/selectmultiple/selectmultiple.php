@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: selectmultiple.php 1059 2011-12-20 07:18:32Z ggppdk $
+ * @version 1.0 $Id: selectmultiple.php 1251 2012-04-16 02:36:00Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.selectmultiple
@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 
 		// initialise property
-		if($item->getValue('version', NULL, 0) < 2 && $default_values) {
+		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();

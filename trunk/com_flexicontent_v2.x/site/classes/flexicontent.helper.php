@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1266 2012-05-07 07:52:45Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -2667,22 +2667,6 @@ if(!function_exists('diff_version')) {
 			}
 		}
 		return $difference;
-	}
-}
-
-if(!function_exists('getValueFCitem')) {
-	function getValueFCitem ( &$item, $key, $default_val='' ) {
-		// Get Value
-		if (FLEXI_J16GE)
-			$val = $item->getValue($key);
-		else
-			$val = $item->{$key};
-		
-		// Return value (or default value)
-		if ($val)
-			return $val;
-		else
-			return $default_val;
 	}
 }
 

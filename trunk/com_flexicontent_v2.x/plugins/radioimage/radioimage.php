@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: radioimage.php 1127 2012-01-29 23:51:31Z ggppdk $
+ * @version 1.0 $Id: radioimage.php 1227 2012-04-02 15:14:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.radioimage
@@ -80,7 +80,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 
 		// initialise property
-		if ($item->getValue('version', NULL, 0) < 2 && $default_value) {
+		if($item->version < 2 && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} elseif ( !isset($field->value[0]) ) {
