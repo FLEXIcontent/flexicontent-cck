@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1169 2012-03-09 04:17:19Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1219 2012-03-23 03:44:13Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -277,18 +277,6 @@ class FlexicontentViewCategory extends JView
 		} else {
 			$tmpl = '.category.default';
 		}
-
-		// Callback function for the array filter
-		function filterCats($var)
-		{
-			global $globalnoroute;
-			if (!is_array($globalnoroute)) $globalnoroute = array();
-			
-			if (!in_array($var, $globalnoroute)) {
-				return ($var);
-			}
-			return;
-		}
 		
 		// @TODO trigger the plugin selectively
 		// and delete the plugins tags if not active
@@ -348,15 +336,9 @@ class FlexicontentViewCategory extends JView
 				$allcats = array();
 				$item->cats = $item->cats?$item->cats:array();
 				foreach ($item->cats as $cat) {
-					array_push($allcats, $cat->id);
-				}
-				$allowed = array_filter($allcats, "filterCats");
-				
-				if (count($allowed) > 0)
-				{
-					foreach ($allowed as $rcat) {
-						$item->categoryslug = $globalcats[$rcat]->slug;
-						break; // Trick we don't need all $allowed only one of them
+					if (!in_array($cat->id, $globalnoroute)) {
+						$item->categoryslug = $globalcats[$cat->id]->slug;
+						break;
 					}
 				}
 			}

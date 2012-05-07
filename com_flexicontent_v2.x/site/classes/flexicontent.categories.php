@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.categories.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.categories.php 1169 2012-03-09 04:17:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -65,8 +65,7 @@ class flexicontent_cats
 	function getParentCats()
 	{
 		$db			=& JFactory::getDBO();
-		global $globaltypes, $globalnoroute;
-		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
+		global $globalnoroute;
 		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 		
 		$this->parentcats_ids = array_reverse($this->parentcats_ids);

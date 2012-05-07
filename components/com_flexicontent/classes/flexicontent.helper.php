@@ -2004,7 +2004,7 @@ class FLEXIUtilities
 				. ( FLEXI_FISH_22GE ? ", l.lang_code as code, l.sef as shortcode" : ", l.code, l.shortcode" )
 				. ( FLEXI_FISH_22GE ? ", CASE WHEN CHAR_LENGTH(l.title) THEN l.title ELSE l.title_native END as name" : ", l.name " )
 				. ' FROM #__languages as l'
-				. ( FLEXI_FISH_22GE ? ' JOIN #__jf_languages_ext as lext ON l.lang_id=lext.lang_id ' : '')
+				. ( FLEXI_FISH_22GE ? ' LEFT JOIN #__jf_languages_ext as lext ON l.lang_id=lext.lang_id ' : '')
 				. ' WHERE '.    (FLEXI_FISH_22GE ? ' l.published=1 ' : ' l.active=1 ')
 				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
 					;
@@ -2019,7 +2019,7 @@ class FLEXIUtilities
 		}
 		$db->setQuery($query);
 		$languages = $db->loadObjectList('id');
-		//echo "<pre>"; print_r($languages); echo "</pre>";
+		//echo "<pre>"; echo $query; print_r($languages); echo "</pre>"; exit;
 		if ($db->getErrorNum()) {
 			JError::raiseWarning(500, $db->getErrorMsg()."<br>Query:<br>".$query);
 			return array();
