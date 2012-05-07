@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_TAGS">
 		<message>
 			<![CDATA[FLEXICONTENT_TAGS_TIP]]>
@@ -56,7 +57,7 @@
 				<option value="rhits">Least Hits</option>
 				<option value="order">Ordering</option>
 			</param>
-			<param name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<param name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
@@ -68,4 +69,5 @@
 			
 		</params>
 	</state>
+	
 </metadata>

@@ -39,7 +39,7 @@
 			<field name="limit" type="text" default="25" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="method" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
-			<field name="categories" type="flexicategories" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
+			<field name="categories" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 			<field name="@spacer" type="spacer" default="" label="" description="" />
 			<field name="seo_mode" type="radio" default="1" label="FLEXI_SEO_MODE" description="FLEXI_SEO_MODE_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -61,7 +61,7 @@
 				<option value="rhits">Least Hits</option>
 				<option value="order">Ordering</option>
 			</field>
-			<field name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>

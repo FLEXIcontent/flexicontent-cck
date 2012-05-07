@@ -15,7 +15,7 @@
 	
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
-
+			
 			<field name="sep_appearance" type="separator" hr="false" default="Appearance" description="" level="level2" menu="hide" />
 			<field name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -44,12 +44,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-
+			
 			<field name="sep_items_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 				<option value="">Default</option>
 				<option value="date">Oldest first</option>
 				<option value="rdate">Most recent first</option>
+				<option value="modified">Last modified first</option>
 				<option value="alpha">Title Alphabetical</option>
 				<option value="ralpha">Title Reverse-Alphabetical</option>
 				<option value="author">Author Alphabetical</option>
@@ -58,7 +59,7 @@
 				<option value="rhits">Least Hits</option>
 				<option value="order">Ordering</option>
 			</field>
-			<field name="orderbycustomfieldid" type="fields" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>

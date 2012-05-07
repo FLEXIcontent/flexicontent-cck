@@ -7,7 +7,7 @@
 	<license>GNU/GPL v2</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
-	<version>1.0</version>
+	<version>2.0</version>
 	<description>System plugin for advanced FLEXIcontent routing</description>
 	<files>
 		<filename plugin="flexiadvroute">flexiadvroute.php</filename>
@@ -17,11 +17,25 @@
 		<language tag="fr-FR">fr-FR.plg_system_flexiadvroute.ini</language>
 	</languages>
 	<params addpath="/administrator/components/com_flexicontent/elements">
-		<param name="route_to_type" type="radio" default="0" label="FLEXI_ADVROUTE_TO_TYPE" description="FLEXI_ADVROUTE_TO_TYPE_DESC">
+		<param name="" type="separator" default="Hide Categories from Pathway/URLs for Types" hr="false" level="level2" menu="hide" />
+		<param name="route_to_type" type="radio" default="0" label="Enable" description="">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="type_to_route" type="types" default="" label="FLEXI_ADVROUTE_TYPES_TO_ROUTE" description="FLEXI_ADVROUTE_TYPES_TO_ROUTE_DESC" />
-		<param name="cats_to_exclude" type="flexicategories" default="" label="FLEXI_ADVROUTE_CATS_TO_EXCLUDE" description="FLEXI_ADVROUTE_CATS_TO_EXCLUDE_DESC" />
+		<param name="type_to_route" type="types" multiple="true" default="" label="Content Types" description="" />
+		
+		<param name="" type="separator" default="Hide Category Links&lt;br&gt;(Do not route to these categories)" hr="false" level="level2" menu="hide" />
+		<param name="cats_to_exclude" type="flexicategories" multiple="true" size="24" default="" label="FLEXI_CATEGORIES" description="FLEXI_ADVROUTE_CATS_TO_EXCLUDE_DESC" />
+		
+		<param name="" type="separator" default="Language switch associated items and (for J2.5) categories too" hr="false" level="level2" menu="hide" />
+		<param name="lang_switch_items" type="radio" default="1" label="Switch items" description="Associated items that translate the same content will be on the fly switched when language changes">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="debug_lang_switch" type="radio" default="1" label="Debug language switching" description="A message will be displayed when item or category (J2.5) view is redirected">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+
 	</params>
 </install>
