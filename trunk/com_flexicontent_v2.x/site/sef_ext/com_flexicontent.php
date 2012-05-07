@@ -147,10 +147,10 @@ switch ($view) {
 							}		
 						}
 						if (!in_array($row->id, $globaltypes)) {
-						$title [] = $row->title;
-					}
+							$title [] = $row->title;
+						}
 						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
-						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->id, $globaltypes)) {					
+						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->id, $globaltypes)) {
 							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
 							$database->setQuery($q);
 							if (shTranslateUrl($option, $shLangName)) // V 1.2.4.m
@@ -165,7 +165,7 @@ switch ($view) {
 								}
 							}
 						}
-          				shMustCreatePageId( 'set', true);
+						shMustCreatePageId( 'set', true);
 					}
 				}	
 			

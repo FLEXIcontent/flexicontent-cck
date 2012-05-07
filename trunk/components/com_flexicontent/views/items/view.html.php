@@ -48,8 +48,8 @@ class FlexicontentViewItems extends JView
 		}
 		
 		// Get globaltypes and make sure it is an array
-		global $globaltypes;
-		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
+		global $globalnopath;
+		$globalnopath = !is_array($globalnopath) ? array() : $globalnopath;
 		
 		// Initialize variables
 		$mainframe  = &JFactory::getApplication();
@@ -284,8 +284,8 @@ class FlexicontentViewItems extends JView
 			if ($params->get('add_item_pathway', 1)) $item_depth++;
 		}
 
-		if (count($globaltypes) > 0) {   // ggppdk: I DO NOT understand the purpose of this IF
-			if (!in_array($item->id, $globaltypes)) {
+		if (count($globalnopath) > 0) {   // ggppdk: I DO NOT understand the purpose of this IF
+			if (!in_array($item->id, $globalnopath)) {
 				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
 			}
 		} else {

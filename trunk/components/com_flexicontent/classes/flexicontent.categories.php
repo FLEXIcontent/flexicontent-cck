@@ -65,8 +65,7 @@ class flexicontent_cats
 	function getParentCats()
 	{
 		$db			=& JFactory::getDBO();
-		global $globaltypes, $globalnoroute;
-		$globaltypes = !is_array($globaltypes) ? array() : $globaltypes;
+		global $globalnoroute;
 		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 		
 		$this->parentcats_ids = array_reverse($this->parentcats_ids);
