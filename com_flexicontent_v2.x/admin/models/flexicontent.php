@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1222 2012-03-27 20:27:49Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -874,11 +874,12 @@ class FlexicontentModelFlexicontent extends JModel
 				
 				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
-				$f->id=1;
-				$f->valueorder=1;
-				$f->field_type="maintext";
-				$f->name="text";
-				$f->value = $row->introtext;
+				$f->id					= 1;
+				$f->iscore			= 1;
+				$f->valueorder	= 1;
+				$f->field_type	= "maintext";
+				$f->name				= "text";
+				$f->value				= $row->introtext;
 				if ( JString::strlen($row->fulltext) > 1 ) {
 					$f->value .= '<hr id="system-readmore" />' . $row->fulltext;
 				}
@@ -898,8 +899,8 @@ class FlexicontentModelFlexicontent extends JModel
 					$db->query();
 				}
 				$f = new stdClass();
-				$f->field_id 		= 13;
-				$f->item_id 		= $row->id;
+				$f->id 					= 13;
+				$f->iscore			= 1;
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
@@ -910,8 +911,8 @@ class FlexicontentModelFlexicontent extends JModel
 				$db->setQuery($query);
 				$tags = $db->loadResultArray();
 				$f = new stdClass();
-				$f->field_id 		= 14;
-				$f->item_id 		= $row->id;
+				$f->id 					= 14;
+				$f->iscore			= 1;
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($tags);

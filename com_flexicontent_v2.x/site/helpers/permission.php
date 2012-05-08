@@ -95,6 +95,7 @@ class FlexicontentHelperPerm {
 			// OTHER components permissions
 			$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
 			$permission->CanComments 	= $Comments_Enabled && $user->authorise('core.manage', 'com_jcomments');
+			$permission->CanImport 		= 0;//$permission->CanAdd;
 		}
 		
 		return $permission;

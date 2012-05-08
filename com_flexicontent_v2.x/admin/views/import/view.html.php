@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id$
+ * @version 1.5 stable $Id: view.html.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
