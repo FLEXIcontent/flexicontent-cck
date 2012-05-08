@@ -176,10 +176,11 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td valign="top">
 				<table  class="adminform">
 					<tr>
-						<td valign="top" width="550">
+						<td valign="top" width="340">
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
+									
 										<?php
 											$field = $this->fields['title'];
 											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
@@ -195,7 +196,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
 												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="50" maxlength="254" />
+												<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="42" maxlength="254" />
 											</div>
 											<?php foreach ($this->row->item_translations as $t): ?>
 												<?php if ($itemlang!=$t->shortcode) : ?>
@@ -205,7 +206,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 														$ff_id = 'jfdata_'.$t->shortcode.'_title';
 														$ff_name = 'jfdata['.$t->shortcode.'][title]';
 														?>
-														<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="50" maxlength="254" />
+														<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="42" maxlength="254" />
 													</div>
 												<?php endif; ?>
 											<?php endforeach; ?>
@@ -213,13 +214,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<!-- tabber end -->
 										
 									<?php else : ?>
-										<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="50" maxlength="254" />
+										<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="42" maxlength="254" />
 									<?php endif; ?>
 									
 									</td>
 								</tr>
 								<tr>
 									<td>
+										
 										<label for="alias" class="flexi_label">
 										<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 										</label>
@@ -230,7 +232,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
 												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<input id="alias" name="alias" class="inputbox required" value="<?php echo $this->row->alias; ?>" size="50" maxlength="254" />
+												<input id="alias" name="alias" class="inputbox required" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
 											</div>
 											<?php foreach ($this->row->item_translations as $t): ?>
 												<?php if ($itemlang!=$t->shortcode) : ?>
@@ -240,7 +242,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 														$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 														$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 														?>
-														<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="50" maxlength="254" />
+														<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="42" maxlength="254" />
 													</div>
 												<?php endif; ?>
 											<?php endforeach; ?>
@@ -248,13 +250,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<!-- tabber end -->
 										
 									<?php else : ?>
-										<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="50" maxlength="254" />
+										<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
 									<?php endif; ?>
 									
 									</td>
 								</tr>
 								<tr>
 									<td>
+									
 										<?php
 											$field = $this->fields['document_type'];
 											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
@@ -263,11 +266,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_TYPE' ).':';*/ ?>
 										</label>
+										
 										<?php echo $this->lists['type']; ?>
+									
 									</td>
 								</tr>
 								<tr>
 									<td>
+										
 										<?php
 											$field = $this->fields['state'];
 											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
@@ -276,11 +282,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 										</label>
+										
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
 										echo $this->lists['state'] . '&nbsp;';
 										if (!$this->cparams->get('auto_approve', 1)) :
-											echo JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
+											echo "<br/>".JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
 										else :
 											echo '<input type="hidden" name="vstate" value="2" />';
 										endif;
@@ -297,19 +304,24 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											endif;
 									endif;
 									?>
+										
 									</td>
 								</tr>
+
+															
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
 										<label for="notify" class="flexi_label">
-										<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
+											<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
 										</label>
+										
 										<input type="checkbox" name="notify" id="notify" />
 										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
 										<?php echo $infoimage; ?>
 										</span>
 										(<?php echo $this->subscribers . ' ' . (($this->subscribers > 1) ? JText::_( 'FLEXI_SUBSCRIBERS' ) : JText::_( 'FLEXI_SUBSCRIBER' )); ?>)
+										
 									</td>
 								</tr>
 								<?php endif; ?>
@@ -333,15 +345,18 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									?>
 								</ul>
 							</div>
+							
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
+							
 								<label for="input-tags" class="flexi_label">
 									<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 								</label>
-									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
+								<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
+							
 							</div>
 							<?php endif; ?>
-							
+								
 							<div style='clear:both; margin-bottom:12px;'></div>
 							
 							<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
@@ -349,24 +364,26 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<label for="language" class="flexi_label">
 								<?php echo JText::_( 'FLEXI_LANGUAGE' ).':'; ?>
 								</label>
+								
 								<?php echo $this->lists['languages']; ?>
 							</div>
 							<?php endif; ?>
-							
+
 							<?php if ($this->cparams->get('enable_language_groups', 0)) : ?>
-							<div style='clear:both;'>
-								<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
-									<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
-								</label>
-								<?php
-									require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
-									$attrs = array('type'=>"item", 'label'=>"FLEXI_MASTER_LANGUAGE_ITEM", 'description'=>"FLEXI_MASTER_LANGUAGE_ITEM_DESC", 'currauthor'=>"1", 'class'=>"inputbox", 'size'=>"6");
-									$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
-									$ff_lang_parent_id = new JElementItem();
-									echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
-								?>
-							</div>
+								<div style='clear:both;'>
+									<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
+										<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
+									</label>
+									<?php
+										require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
+										$attrs = array('type'=>"item", 'label'=>"FLEXI_MASTER_LANGUAGE_ITEM", 'description'=>"FLEXI_MASTER_LANGUAGE_ITEM_DESC", 'currauthor'=>"1", 'class'=>"inputbox", 'size'=>"6");
+										$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
+										$ff_lang_parent_id = new JElementItem();
+										echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
+									?>
+								</div>
 							<?php endif; ?>
+							
 						</td>
 					</tr>
 				</table>

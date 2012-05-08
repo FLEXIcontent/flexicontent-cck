@@ -208,10 +208,6 @@ $files_tbl_cols = $db->loadResultArray();
 				?></span>
 			</td>
 		</tr>
-				}
-				?></span>
-			</td>
-		</tr>
 <?php
 // ... more actions
 ?>

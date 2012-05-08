@@ -1080,7 +1080,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 		}
-
+		
+		$model = $this->getModel('item');
+		
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
 		
 		// Check if user can edit the item
