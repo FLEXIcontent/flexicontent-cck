@@ -176,20 +176,18 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td valign="top">
 				<table  class="adminform">
 					<tr>
-						<td valign="top">
+						<td valign="top" width="550">
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
 										<?php
 											$field = $this->fields['title'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 										?>
 										<label for="title" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
 										</label>
-									</td>
-									<td>
 									
 									<?php	if ( isset($this->row->item_translations) ) :?>
 									
@@ -222,11 +220,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								</tr>
 								<tr>
 									<td>
-										<label for="alias">
+										<label for="alias" class="flexi_label">
 										<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 										</label>
-									</td>
-									<td>
 
 									<?php	if ( isset($this->row->item_translations) ) :?>
 									
@@ -261,14 +257,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<td>
 										<?php
 											$field = $this->fields['document_type'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 										?>
 										<label for="type_id" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_TYPE' ).':';*/ ?>
 										</label>
-									</td>
-									<td>
 										<?php echo $this->lists['type']; ?>
 									</td>
 								</tr>
@@ -276,14 +270,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<td>
 										<?php
 											$field = $this->fields['state'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 										?>
 										<label for="published" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 										</label>
-									</td>
-									<td>
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
 										echo $this->lists['state'] . '&nbsp;';
@@ -307,26 +299,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									?>
 									</td>
 								</tr>
-								<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-								<tr>
-									<td>
-										<label for="language">
-										<?php echo JText::_( 'FLEXI_LANGUAGE' ).':'; ?>
-										</label>
-									</td>
-									<td>
-									<?php echo $this->lists['languages']; ?>
-									</td>
-								</tr>
-								<?php endif; ?>
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
-										<label for="notify">
+										<label for="notify" class="flexi_label">
 										<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
 										</label>
-									</td>
-									<td>
 										<input type="checkbox" name="notify" id="notify" />
 										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
 										<?php echo $infoimage; ?>
@@ -337,7 +315,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<?php endif; ?>
 							</table>
 						</td>
-						<td valign="top" width="50%">
+						<td valign="top" align="left"">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
 								<?php
@@ -357,18 +335,36 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							</div>
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
-								<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
+								<label for="input-tags" class="flexi_label">
+									<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 								</label>
+									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
+							</div>
+							<?php endif; ?>
+							
+							<div style='clear:both; margin-bottom:12px;'></div>
+							
+							<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+							<div style='clear:both;'>
+								<label for="language" class="flexi_label">
+								<?php echo JText::_( 'FLEXI_LANGUAGE' ).':'; ?>
+								</label>
+								<?php echo $this->lists['languages']; ?>
 							</div>
 							<?php endif; ?>
 							
 							<?php if ($this->cparams->get('enable_language_groups', 0)) : ?>
-							<div><br/><br/>
-								<label for="lang_parent_id" class="hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
+							<div style='clear:both;'>
+								<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
 									<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
 								</label>
-								<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->row->lang_parent_id; ?>" size="6" maxlength="20" />
+								<?php
+									require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
+									$attrs = array('type'=>"item", 'label'=>"FLEXI_MASTER_LANGUAGE_ITEM", 'description'=>"FLEXI_MASTER_LANGUAGE_ITEM_DESC", 'currauthor'=>"1", 'class'=>"inputbox", 'size'=>"6");
+									$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
+									$ff_lang_parent_id = new JElementItem();
+									echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
+								?>
 							</div>
 							<?php endif; ?>
 						</td>

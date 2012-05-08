@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1126 2012-01-26 21:48:09Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1267 2012-05-07 10:55:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -40,10 +40,13 @@ class JFormFieldItem extends JFormField
 
 	function getInput()
 	{
-		$doc 		=& JFactory::getDocument();
-		$fieldName	= "jform[request][".$this->element["name"]."]";
-		$value		= $this->value;
 		$node = & $this->element;
+		$doc 		=& JFactory::getDocument();
+		
+		$element_id = $this->id;
+		
+		$fieldname	= $this->name;
+		$value			= $this->value;
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
@@ -58,19 +61,19 @@ class JFormFieldItem extends JFormField
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
-				$('".$fieldName."_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ITEM' )."');
-				$('".$fieldName."_id').setProperty('value', '0');
+				$('".$element_id."_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ITEM' )."');
+				$('".$element_id."_id').setProperty('value', '0');
 			});
 		});
 		
 		function qfSelectItem(id, cid, title) {
-			document.getElementById('".$fieldName."_id').value = id;
+			document.getElementById('".$element_id."_id').value = id;
 			
 			var cid_field =	document.getElementById('jform_request_cid');
 			if (cid_field) cid_field.value = cid;
-			/*else document.getElementById('".$fieldName."_id').value += ':'+cid; */
+			/*else document.getElementById('".$element_id."_id').value += ':'+cid; */
 			
-			document.getElementById('".$fieldName."_name').value = title;
+			document.getElementById('".$element_id."_name').value = title;
 			$('sbox-btn-close').fireEvent('click');
 		}";
 
@@ -80,9 +83,9 @@ class JFormFieldItem extends JFormField
 
 		JHTML::_('behavior.modal', 'a.modal');
 
-		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"".$fieldName."_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
+		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"".$element_id."_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"".$fieldName."_id\" name=\"$fieldName\" value=\"$value\" />";
+		$html .= "\n<input type=\"hidden\" id=\"".$element_id."_id\" name=\"$fieldname\" value=\"$value\" />";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
 
 		return $html;

@@ -472,12 +472,18 @@ function deleteTag(obj) {
 				<?php echo $this->lists['languages']; ?>
 			</div>
 			
-			<?php if ( 0 && $this->params->get('enable_language_groups', 0)) : ?>
+			<?php if ( $this->params->get('enable_language_groups', 0) ) : ?>
 			<div class="flexi_formblock">
-				<label for="languages" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
+				<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
+					<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
 				</label>
-				<input type="text" id="lang_parent_id" name="lang_parent_id" value="<?php echo $this->item->lang_parent_id; ?>" size="6" maxlength="20" />
+				<?php
+					require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
+					$attrs = array('type'=>"item", 'label'=>"FLEXI_MASTER_LANGUAGE_ITEM", 'description'=>"FLEXI_MASTER_LANGUAGE_ITEM_DESC", 'currauthor'=>"1", 'class'=>"inputbox", 'size'=>"6");
+					$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
+					$ff_lang_parent_id = new JElementItem();
+					echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->item->lang_parent_id, $jelement, '');
+				?>
 			</div>
 			<?php endif; ?>
 			

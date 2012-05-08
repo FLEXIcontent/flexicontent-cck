@@ -18,7 +18,15 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+$document	= & JFactory::getDocument();
+$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/general.css');
+$document->addStyleSheet(JURI::root().'administrator/templates/system/css/system.css');
+$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/component.css');
+
+
 require_once(JPATH_BASE.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."itemelement".DS."view.html.php");
 ?>

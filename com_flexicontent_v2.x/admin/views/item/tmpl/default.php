@@ -176,56 +176,58 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td valign="top">
 				<table  class="adminform">
 					<tr>
-						<td valign="top">
+						<td valign="top" width="550">
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
-										<?php
-											$field = $this->fields['title'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
-										?>
-										<label for="title" <?php echo $label_tooltip; ?> >
-											<?php echo $field->label.':'; ?>
-											<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
-										</label>
-										<?php /*echo $this->form->getLabel('title');*/ ?>
-									</td>
-									<td id="titleblock">
-									
-									<?php	if ( isset($this->row->item_translations) ) :?>
-									
-										<!-- tabber start -->
-										<div class="fctabber" style=''>
-											<div class="tabbertab" style="padding: 0px;" >
-												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<?php echo $this->form->getInput('title');?>
-											</div>
-											<?php foreach ($this->row->item_translations as $t): ?>
-												<?php if ($itemlang!=$t->shortcode) : ?>
-													<div class="tabbertab" style="padding: 0px;" >
-														<h3> <?php echo $t->shortcode; // $t->name; ?> </h3>
-														<?php
-														$ff_id = 'jfdata_'.$t->shortcode.'_title';
-														$ff_name = 'jfdata['.$t->shortcode.'][title]';
-														?>
-														<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="50" maxlength="254" />
-													</div>
-												<?php endif; ?>
-											<?php endforeach; ?>
-										</div>
-										<!-- tabber end -->
 										
-									<?php else : ?>
-										<?php echo $this->form->getInput('title');?>
-									<?php endif; ?>
+										<span class="flexi_label">
+											<?php
+												$field = $this->fields['title'];
+												$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											?>
+											<label for="title" <?php echo $label_tooltip; ?> >
+												<?php echo $field->label.':'; ?>
+												<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
+											</label>
+											<?php /*echo $this->form->getLabel('title');*/ ?>
+										</span>
+										
+										<?php	if ( isset($this->row->item_translations) ) :?>
+										
+											<!-- tabber start -->
+											<div class="fctabber" style=''>
+												<div class="tabbertab" style="padding: 0px;" >
+													<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
+													<?php echo $this->form->getInput('title');?>
+												</div>
+												<?php foreach ($this->row->item_translations as $t): ?>
+													<?php if ($itemlang!=$t->shortcode) : ?>
+														<div class="tabbertab" style="padding: 0px;" >
+															<h3> <?php echo $t->shortcode; // $t->name; ?> </h3>
+															<?php
+															$ff_id = 'jfdata_'.$t->shortcode.'_title';
+															$ff_name = 'jfdata['.$t->shortcode.'][title]';
+															?>
+															<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="50" maxlength="254" />
+														</div>
+													<?php endif; ?>
+												<?php endforeach; ?>
+											</div>
+											<!-- tabber end -->
+											
+										<?php else : ?>
+											<?php echo $this->form->getInput('title');?>
+										<?php endif; ?>
 									
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<?php echo $this->form->getLabel('alias');?>
-									</td>
-									<td id="aliasblock">
+										
+										<span class="flexi_label">
+											<?php echo $this->form->getLabel('alias');?>
+										</span>
 
 									<?php	if ( isset($this->row->item_translations) ) :?>
 									
@@ -258,88 +260,93 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								</tr>
 								<tr>
 									<td>
-										<?php
-											$field = $this->fields['document_type'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
-										?>
-										<label for="type_id" <?php echo $label_tooltip; ?> >
-											<?php echo $field->label.':'; ?>
-											<?php /*echo JText::_( 'FLEXI_TYPE' ).':';*/ ?>
-										</label>
-										<?php /*echo $this->form->getLabel('type_id');*/ ?>
-									</td>
-									<td>
+										
+										<span class="flexi_label">
+											<?php
+												$field = $this->fields['document_type'];
+												$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											?>
+											<label for="type_id" <?php echo $label_tooltip; ?> >
+												<?php echo $field->label.':'; ?>
+												<?php /*echo JText::_( 'FLEXI_TYPE' ).':';*/ ?>
+											</label>
+											<?php /*echo $this->form->getLabel('type_id');*/ ?>
+										</span>
+										
 										<?php echo $this->form->getInput('type_id'); ?>
+										
 									</td>
 								</tr>
 								<tr>
 									<td>
+										
+										<span class="flexi_label">
+											<?php
+												$field = $this->fields['state'];
+												$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											?>
+											<label for="published" <?php echo $label_tooltip; ?> >
+												<?php echo $field->label.':'; ?>
+												<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
+											</label>
+											<?php /*echo $this->form->getLabel('state');*/ ?>
+										</span>
+										
 										<?php
-											$field = $this->fields['state'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
-										?>
-										<label for="published" <?php echo $label_tooltip; ?> >
-											<?php echo $field->label.':'; ?>
-											<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
-										</label>
-										<?php /*echo $this->form->getLabel('state');*/ ?>
-									</td>
-									<td>
-									<?php
-									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
-										echo $this->form->getInput('state') . '&nbsp;';
-										if (!$this->cparams->get('auto_approve', 1)) :
-											echo $this->form->getLabel('vstate') . $this->form->getInput('vstate');
-										else :
-											echo '<input type="hidden" name="jform[vstate]" value="2" />';
-										endif;
-									else :
-										echo $this->published;
-										echo '<input type="hidden" name="jform[state]" value="'.$this->form->getValue("state").'" />';
+										if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
+											echo $this->form->getInput('state') . '&nbsp;';
 											if (!$this->cparams->get('auto_approve', 1)) :
-												// Enable approval if versioning disabled, this make sense,
-												// since if use can edit item THEN item should be updated !!!
-												$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
-												echo '<input type="hidden" name="jform[vstate]" value="'.$item_vstate.'" />';
+												echo $this->form->getLabel('vstate') . $this->form->getInput('vstate');
 											else :
 												echo '<input type="hidden" name="jform[vstate]" value="2" />';
 											endif;
-									endif;
-									?>
+										else :
+											echo $this->published;
+											echo '<input type="hidden" name="jform[state]" value="'.$this->form->getValue("state").'" />';
+												if (!$this->cparams->get('auto_approve', 1)) :
+													// Enable approval if versioning disabled, this make sense,
+													// since if use can edit item THEN item should be updated !!!
+													$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
+													echo '<input type="hidden" name="jform[vstate]" value="'.$item_vstate.'" />';
+												else :
+													echo '<input type="hidden" name="jform[vstate]" value="2" />';
+												endif;
+										endif;
+										?>
+										
 									</td>
 								</tr>
-								<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+
 								<tr>
 									<td>
-										<?php echo $this->form->getLabel('language').':'; ?>
-									</td>
-									<td>
-									<?php echo $this->lists['languages']; ?>
+										<span class="flexi_label">
+											<?php echo $this->form->getLabel('featured'); ?>
+										</span>
+										<?php echo $this->form->getInput('featured');?>
 									</td>
 								</tr>
-								<?php endif; ?>
+															
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
-										<label for="notify">
-										<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
-										</label>
-									</td>
-									<td>
+										<span class="flexi_label">
+											<label for="notify">
+												<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
+											</label>
+										</span>
+										
 										<input type="checkbox" name="notify" id="notify" />
 										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
 										<?php echo $infoimage; ?>
 										</span>
 										(<?php echo $this->subscribers . ' ' . (($this->subscribers > 1) ? JText::_( 'FLEXI_SUBSCRIBERS' ) : JText::_( 'FLEXI_SUBSCRIBER' )); ?>)
+										
 									</td>
 								</tr>
 								<?php endif; ?>
 							</table>
 						</td>
-						<td valign="top" width="50%">
-							<table cellspacing="0" cellpadding="0" border="0" width="100%">
-							<tr>
-							<td colspan="2">
+						<td valign="top" align="left" style="text-align:left;">
 							<div class="qf_tagbox" id="qf_tagbox">
 								<ul id="ultagbox">
 								<?php
@@ -357,34 +364,39 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									?>
 								</ul>
 							</div>
+							
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
-								<label for="input-tags"><?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-									<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
-								</label>
+								<span class="flexi_label">
+									<label for="input-tags">
+										<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+									</label>
+								</span>
+								<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
 							</div>
 							<?php endif; ?>
-							</td>
-							</tr>
-							<tr>
-								<td width="40%">
-									<?php echo $this->form->getLabel('featured'); ?>
-								</td>
-								<td>
-									<?php echo $this->form->getInput('featured');?>
-								</td>
-							</tr>
-							<?php if ($this->cparams->get('enable_language_groups', 1)) : ?>
-							<tr>
-								<td>
-									<?php echo $this->form->getLabel('lang_parent_id'); ?>
-								</td>
-								<td>
-									<?php echo $this->form->getInput('lang_parent_id'); ?>
-								</td>
-							</tr>
+								
+							<div style='clear:both; margin-bottom:12px;'></div>
+							
+							<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+								<div style='clear:both;'>
+									<span class="flexi_label">
+										<?php echo $this->form->getLabel('language').':'; ?>
+									</span>
+									
+									<?php echo $this->lists['languages']; ?>
+								</div>
 							<?php endif; ?>
-							</table>
+
+							<?php if ($this->cparams->get('enable_language_groups', 1)) : ?>
+								<div style='clear:both;'>
+									<span class="flexi_label">
+										<?php echo $this->form->getLabel('lang_parent_id'); ?>
+									</span>
+									<?php echo $this->form->getInput('lang_parent_id'); ?>
+								</div>
+							<?php endif; ?>
+							
 						</td>
 					</tr>
 				</table>
