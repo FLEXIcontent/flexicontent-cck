@@ -878,7 +878,7 @@ div table.adminform td {
 	text-align:left;
 }
 
-div table.adminform input { font-size:11px; padding:2px; }
+div table.adminform input { font-size:11px !important; padding:2px; }
 div table.adminform select { font-size:10px; }
 
 div table.admintable td {
