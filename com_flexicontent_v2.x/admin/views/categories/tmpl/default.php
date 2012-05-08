@@ -158,7 +158,7 @@ $userId		= $user->get('id');
 					<?php endif;?>
 					</td>
 					<td class="center">
-						<span title="<?php echo sprintf('%d-%d', $item->lft, $item->rgt);?>">
+						<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 							<?php echo (int) $row->id; ?></span>
 					</td>
 		</tr>
