@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1247 2012-04-15 20:11:13Z ggppdk $
+ * @version 1.0 $Id: file.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -157,8 +157,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
-				$filename = $this->getFileName( $file );
-				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filename->filename."\" disabled=\"disabled\" />";
+				$filedata = $this->getFileData( $file );
+				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filedata->filename."\" disabled=\"disabled\" />";
 				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"custom[".$field->name."][]\" value=\"".$file."\" />";
 				$field->html .= "<input class=\"inputbox fcfield-button\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
 				$field->html .= "<span class=\"fcfield-drag\">".$move."</span>";
@@ -237,33 +237,46 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// initialise property
 		$field->{$prop} = array();
 
+		// Get user access level (these are multiple for J2.5)
+		$user = & JFactory::getUser();
+		if (FLEXI_J16GE) $aid_arr = $user->getAuthorisedViewLevels();
+		else             $aid = (int) $user->get('aid');
+		
 		$n = 0;
 		foreach ($values as $value) {
 			$icon = '';
-			$filename = $this->getFileName( $value );
-			if ($filename) {
-				
+			$filedata = $this->getFileData( $value );
+			//print_r($filedata); exit;
+			if ( $filedata )
+			{
+				// Check user access on the file
+				if (FLEXI_J16GE) {
+					if ( !in_array($filedata->access,$aid_arr) ) continue;
+				} else {
+					if ( $aid < @$filedata->access ) continue;
+				}
+				 
 				// --. Create icon according to filetype
 				if ($useicon) {
-					$filename	= $this->addIcon( $filename );
-					$icon		= JHTML::image($filename->icon, $filename->ext, 'class="icon-mime"') .'&nbsp;';
+					$filedata	= $this->addIcon( $filedata );
+					$icon		= JHTML::image($filedata->icon, $filedata->ext, 'class="icon-mime"') .'&nbsp;';
 				}
 				
 				// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
-				$name_str   = ($display_filename || !$usebutton) ? $filename->altname : '';
+				$name_str   = ($display_filename || !$usebutton) ? $filedata->altname : '';
 				$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
 				
 				// --. Description as tooltip or inline text ... prepare related variables
 				$alt_str = $class_str = $text_html  = '';
-				if (!empty($filename->description)) {
+				if (!empty($filedata->description)) {
 					if ($display_descr==1) {   // As tooltip
-						$alt_str    = $name_str . '::' . $filename->description;
+						$alt_str    = $name_str . '::' . $filedata->description;
 						$class_str  = ' hasTip';
 						$text_html  = '';
 					} else if ($display_descr==2) {  // As inline text
 						$alt_str    = '';
 						$class_str  = '';
-						$text_html  = ' <span class="fcfile_descr">'. $filename->description . '</span>';
+						$text_html  = ' <span class="fcfile_descr">'. $filedata->description . '</span>';
 					}
 				}
 				
@@ -278,7 +291,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
 					$str .= '</form>';
 				} else {
-					$name_str = $filename->altname;   // no download button, force display of filename
+					$name_str = $filedata->altname;   // no download button, force display of filename
 					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_str . '</a>' ." ". $text_html;
 				}
 				
@@ -316,7 +329,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	}
 
 
-	function getFileName( $value )
+	function getFileData( $value )
 	{
 		$db =& JFactory::getDBO();
 		$session = & JFactory::getSession();
@@ -327,14 +340,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$and = '';
 		if(!$sessiontable->client_id) 
 			$and = ' AND published = 1';
-		$query = 'SELECT filename, altname, description, ext, id'
+		$query = 'SELECT * ' //filename, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id = '. (int) $value . $and
 				;
 		$db->setQuery($query);
-		$filename = $db->loadObject();
+		$filedata = $db->loadObject();
 
-		return $filename;
+		return $filedata;
 	}
 	
 
