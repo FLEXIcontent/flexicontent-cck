@@ -553,7 +553,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 			
 			// Read and parse the file
-			$contents = flexicontent_html::csvstring_to_array(file_get_contents($csvfile));
+			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile));
 			
 			// alternative way of reading / parsing SCV data ...
 			/*require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'DataSource.php');
@@ -665,10 +665,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user	=& JFactory::getUser();
 		$model 	= $this->getModel('items');
 		
-		if (!FLEXI_J16GE) {
+		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
 			$canImport = $permission->CanConfig;
-		} else if ($user->gid < 25) {
+		} else if ($user->gid >= 25) {
 			$canImport = 1;
 		} else {
 			$canImport = 0;

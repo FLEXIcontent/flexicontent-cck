@@ -771,14 +771,14 @@ VALUES
 		foreach($rows as $row)
 		{
 			$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
-			$item_id = @ (int)$row["id"];
+			$item_id = $row->id;
+			
 			if($row->version > $lastversion)
 			{
 				// Get field values of the current item version
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,f.iscore "
 						." FROM #__flexicontent_fields_item_relations as fir"
-					//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
-						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
+						." JOIN #__flexicontent_fields as f on f.id=fir.field_id "
 						." WHERE fir.item_id=".$row->id." AND f.iscore=0";  // old versions stored categories & tags into __flexicontent_fields_item_relations
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
@@ -792,11 +792,12 @@ VALUES
 				
 				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
-				$f->id=1;
-				$f->valueorder=1;
-				$f->field_type="maintext";
-				$f->name="text";
-				$f->value = $row->introtext;
+				$f->id					= 1;
+				$f->iscore			= 1;
+				$f->valueorder	= 1;
+				$f->field_type	= "maintext";
+				$f->name				= "text";
+				$f->value				= $row->introtext;
 				if ( JString::strlen($row->fulltext) > 1 ) {
 					$f->value .= '<hr id="system-readmore" />' . $row->fulltext;
 				}
@@ -816,8 +817,8 @@ VALUES
 					$db->query();
 				}
 				$f = new stdClass();
-				$f->field_id 		= 13;
-				$f->item_id 		= $row->id;
+				$f->id					= 13;
+				$f->iscore			= 1;
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
@@ -828,8 +829,8 @@ VALUES
 				$db->setQuery($query);
 				$tags = $db->loadResultArray();
 				$f = new stdClass();
-				$f->field_id 		= 14;
-				$f->item_id 		= $row->id;
+				$f->id					= 14;
+				$f->iscore			= 1;
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($tags);
@@ -868,6 +869,7 @@ VALUES
 				$db->insertObject('#__flexicontent_versions', $v);
 			}
 		}
+		
 		$queries 	= array();
 		// delete unused records
 		// 1,'maintext',  2,'created',  3,'createdby',  4,'modified',  5,'modifiedby',  6,'title',  7,'hits'

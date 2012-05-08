@@ -1452,8 +1452,8 @@ class ParentClassItem extends JModel
 		// auto assign the default language if not set
 		$default_language = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang() ;
 		$item->language   = $item->language ? $item->language : $default_language ;
-			
-
+		
+		
 		// *****************************************************************************
 		// Get version information, and force version approval ON is versioning disabled
 		// *****************************************************************************
@@ -1468,34 +1468,35 @@ class ParentClassItem extends JModel
 		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
 		if((count($result)>0) && in_array(false, $result)) return false;
 		
+		
+		// **********************************************************************
+		// new item Or item version is approved ... save item to #__content table
+		// **********************************************************************
+		if( $isnew || $data['vstate']==2 )
+		{
+			if(!$this->applyCurrentVersion($item, $data)) return false;
+			//echo "<pre>"; var_dump($data); exit();
+		}
+
 		// ****************************************************************************
 		// Save fields values to appropriate tables (versioning table or normal tables)
 		// ****************************************************************************
 		if(!$this->saveFields($isnew, $item, $data)) return false;
 		
-		if( $isnew || $data['vstate']==2 )
+		
+		// *********************************************************************************************
+		// not new and not approving version, set modifier and modification time as if it has been saved
+		// *********************************************************************************************
+		if( !$isnew && !$data['vstate']==2 )
 		{
-			// **********************************************************************
-			// new item Or item version is approved ... save item to #__content table
-			// **********************************************************************
-			
-			if(!$this->applyCurrentVersion($item, $data)) return false;
-			//echo "<pre>"; var_dump($data); exit();
-		}
-		else
-		{
-			// *********************************
-			// not new and not approving version
-			// *********************************
-			
 			if ( $mainframe->isAdmin() )
 				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
 			else
 				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
 			
 			$datenow =& JFactory::getDate();
-			$item->modified 		= $datenow->toMySQL();
-			$item->modified_by 		= $user->get('id');
+			$item->modified			= $datenow->toMySQL();
+			$item->modified_by	= $user->get('id');
 			
 		}
 		
