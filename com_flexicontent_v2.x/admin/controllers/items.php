@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1249 2012-04-16 01:21:37Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1270 2012-05-08 04:28:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1080,7 +1080,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 		}
-
+		
+		$model = $this->getModel('item');
+		
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
 		
 		// Check if user can edit the item
