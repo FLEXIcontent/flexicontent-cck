@@ -66,6 +66,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$task		= JRequest::getVar('task');
+		$user = JFactory::getUser();
 
 		// define the rights for correct redirecting the save task
 		if (FLEXI_J16GE) {
@@ -107,9 +108,8 @@ class FlexicontentControllerCategories extends FlexicontentController
 			
 			//Take care of access levels and state
 			$categoriesmodel = & $this->getModel('categories');
-			if (!FLEXI_ACCESS && !FLEXI_J16GE) {
-				$categoriesmodel->access($model->get('id'), $model->get('access'));
-			}
+			if (!FLEXI_ACCESS)
+				$categoriesmodel->saveaccess($model->get('id'), $model->get('access'));
 			
 			$pubid = array();
 			$pubid[] = $model->get('id');

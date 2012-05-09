@@ -825,7 +825,7 @@ class FlexicontentModelCategory extends JModel {
 		$user			= &JFactory::getUser();
 
 		// Access
-		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
+		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON sc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
 		
 		// Where
 		$where = ' WHERE sc.published = 1';
@@ -838,7 +838,7 @@ class FlexicontentModelCategory extends JModel {
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR sc.access <= '. (int) $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR sc.access <= '. (int) $aid . ')';
 				} else {
 					$where .= ' AND sc.access <= '.$aid;
 				}
