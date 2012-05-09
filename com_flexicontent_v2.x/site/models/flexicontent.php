@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1108 2012-01-15 04:06:31Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -113,6 +113,78 @@ class FlexicontentModelFlexicontent extends JModel
 		return $this->_data;
 	}
 	
+	
+	/**
+	 * Build the order clause
+	 *
+	 * @access private
+	 * @return string
+	 */
+	function _buildItemOrderBy($prefix)
+	{
+		$params = $this->_params;
+		
+		$filter_order     = $this->getState('filter_order');
+		$filter_order_dir = $this->getState('filter_order_dir');
+		
+		$filter_order     = $filter_order     ? $filter_order      :  'c.title';
+		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
+
+		if ($params->get($prefix.'orderby')) {
+			$order = $params->get($prefix.'orderby');
+			
+			switch ($order) {
+				case 'date' :                  // *** J2.5 only ***
+				$filter_order		= 'c.created_time';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rdate' :                 // *** J2.5 only ***
+				$filter_order		= 'c.created_time';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'modified' :              // *** J2.5 only ***
+				$filter_order		= 'c.modified_time';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'alpha' :
+				$filter_order		= 'c.title';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'ralpha' :
+				$filter_order		= 'c.title';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'author' :                // *** J2.5 only ***
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rauthor' :               // *** J2.5 only ***
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'hits' :                  // *** J2.5 only ***
+				$filter_order		= 'c.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rhits' :                 // *** J2.5 only ***
+				$filter_order		= 'c.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'order' :
+				$filter_order		= !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+				$filter_order_dir	= 'ASC';
+				break;
+			}
+			
+		}
+		
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
+		$orderby .= $filter_order!='c.title' ? ', c.title' : '';   // Order by title after default ordering
+
+		return $orderby;
+	}
+	
+	
 	/**
 	 * Method to build the Categories query
 	 * This method creates the first level categories and their assigned item count
@@ -125,7 +197,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
+		$orderby = $this->_buildItemOrderBy('cat_');
 
 		// Get the root category from this directory
 		$rootcat = JRequest::getVar('rootcat',false);
@@ -179,8 +251,10 @@ class FlexicontentModelFlexicontent extends JModel
 				}
 			}
 		}
+		$join .= (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '');
 
 		$query = 'SELECT c.*,'
+				. (FLEXI_J16GE ? ' u.name as author,' : '')
 				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
 					. ' ('
 					. ' SELECT COUNT( DISTINCT i.id )'
@@ -199,7 +273,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				. ' AND c.parent_id = '.$rootcat
 				. $and
-				. ' ORDER BY '.$ordering
+				. $orderby
 				;
 		return $query;
 	}
@@ -282,7 +356,7 @@ class FlexicontentModelFlexicontent extends JModel
 		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$ordering	= !FLEXI_J16GE ? 'c.ordering ASC' : 'c.lft ASC' ;
+		$orderby = $this->_buildItemOrderBy('subcat_');
 		
 		// Shortcode of the site active language (joomfish)
 		$lang 		= JRequest::getWord('lang', '' );
@@ -359,7 +433,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				. ' AND c.parent_id = '.(int)$id
 				. $and
-				. ' ORDER BY '.$ordering
+				. $orderby
 				;
 
 		$this->_db->setQuery($query);
