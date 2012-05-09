@@ -228,6 +228,11 @@
 			</field>
 			
 			<field name="sep_search_and_filter" type="separator" hr="false" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" menu="hide" />
+			<field name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
+	       <option value="">FLEXI_USE_GLOBAL</option>
+	       <option value="0">FLEXI_No</option>
+	       <option value="1">FLEXI_Yes</option>
+	    </field>
 			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

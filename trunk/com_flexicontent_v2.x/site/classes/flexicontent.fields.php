@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1231 2012-04-02 18:05:15Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -837,10 +837,19 @@ class FlexicontentFields
 			
 			//--. In future we may automate this?, although this is faster
 			if ($field->field_type == 'voting') {
-				if ($tparams[$typename]->get('voting_extra_votes', ''))
-					$fdata[$field->name]->parameters->set('extra_votes', $tparams[$typename]->get('voting_extra_votes', '') );
-				if ($tparams[$typename]->get('voting_main_label', ''))
-					$fdata[$field->name]->parameters->set('main_label', $tparams[$typename]->get('voting_main_label', '') );
+				$voting_override_extra_votes = $tparams[$typename]->get('voting_override_extra_votes', '');
+				$voting_extra_votes          = $tparams[$typename]->get('voting_extra_votes', '');
+				$voting_main_label           = $tparams[$typename]->get('voting_main_label', '');
+				
+				// Override --voting field-- configuration regarding extra votes
+				if ( $voting_override_extra_votes ) {
+					$fdata[$field->name]->parameters->set('extra_votes', $voting_extra_votes );
+					// Set a Default main label if one was not given but extra votes exist
+					$main_label = $voting_main_label ? $voting_main_label : JText::_('FLEXI_OVERALL');
+				}
+				if ( $voting_override_extra_votes ) {
+					$fdata[$field->name]->parameters->set('main_label', $voting_main_label );
+				}
 			}
 			
 			//--. Check if a custom field that customizes core field per Type

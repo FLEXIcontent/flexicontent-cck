@@ -130,8 +130,14 @@
 			<field name="voting_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
 			<field name="voting_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+
+			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level3" menu="hide" />
+			<field name="voting_override_extra_votes" type="radio" default="0" label="FLEXI_OVERRIDE_VOTE_EXTRA" description="FLEXI_OVERRIDE_VOTE_EXTRA_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
-			<field name="voting_main_label" type="text" default="Overall" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FFLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
+			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level2" menu="hide" />
 			<field name="favourites_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
