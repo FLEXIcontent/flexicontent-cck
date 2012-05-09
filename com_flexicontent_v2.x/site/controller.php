@@ -1246,7 +1246,7 @@ class FlexicontentController extends JController
 		
 		$itemmodel = &$this->getModel(FLEXI_ITEMVIEW);
 		$view  = &$this->getView('search', 'html');
-		$view->_models['items'] = &$itemmodel;
+		$view->setModel($itemmodel);
 		
 		JRequest::setVar('view', 'search');
 		parent::display(true);

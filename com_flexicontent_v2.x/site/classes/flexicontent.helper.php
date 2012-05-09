@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1266 2012-05-07 07:52:45Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1268 2012-05-07 23:14:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -626,8 +626,13 @@ class flexicontent_html
 		
 		$db	=& JFactory::getDBO();
   	$id  = $field->item_id;
-		$extra_votes = $field->parameters->get('extra_votes', '');
-		$main_label = $field->parameters->get('main_label', '');
+  	
+  	$enable_extra_votes = $field->parameters->get('extra_votes', '');
+		$extra_votes = !$enable_extra_votes ? '' : $field->parameters->get('extra_votes', '');
+		$main_label  = !$enable_extra_votes ? '' : $field->parameters->get('main_label', '');
+		// Set a Default main label if one was not given but extra votes exist
+		$main_label  = (!$main_label && $extra_votes) ? JText::_('FLEXI_OVERALL') : $main_label;
+		
 		$html = '';
 		
 		if (!$vote) {
