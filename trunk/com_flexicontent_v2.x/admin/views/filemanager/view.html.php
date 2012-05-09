@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 270 2010-06-11 09:08:38Z enjoyman $
+ * @version 1.5 stable $Id: view.html.php 1108 2012-01-15 04:06:31Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,8 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFilemanager extends JView{
+class FlexicontentViewFilemanager extends JView
+{
 	/**
 	 * Creates the Filemanagerview
 	 *
@@ -54,22 +55,26 @@ class FlexicontentViewFilemanager extends JView{
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order', 	'filter_order', 	'f.filename', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 			'filter', 			'', 			'int' );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 	'filter_uploader', '', 				'int' );
-		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',				'word' );
-		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 			'word' );
-		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 			'alnum' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 			'search', 			'', 'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 			'item_id', 			'', 'int' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter 				= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 				'filter', 				1, 			'int' );
+		$filter_uploader= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader','filter_uploader',0,			'int' );
+		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',			'word' );
+		$filter_secure	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 		'word' );
+		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 		'alnum' );
+		$search 				= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 				'search', 				'', 		'string' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 				'item_id', 				0,	 		'int' );
+		$search 				= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-
-		$permission = FlexicontentHelperPerm::getPerm();
-
-		if (!$permission->CanFiles) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+		} else if (FLEXI_ACCESS) {
+			$CanUpload        = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanViewAllFiles  = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanUpload        = 1;
+			$CanViewAllFiles  = 1;
 		}
 		
 		//Create Submenu
@@ -77,8 +82,12 @@ class FlexicontentViewFilemanager extends JView{
 		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_FILEMANAGER' ), 'files' );
-		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		if (FLEXI_J16GE) {
+			JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
+			if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		} else {
+			JToolBarHelper::deleteList();
+		}
 		
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');
@@ -141,14 +150,20 @@ class FlexicontentViewFilemanager extends JView{
 		//assign data to template
 		$this->assign('require_ftp'		, $ftp);
 		
-		$this->assignRef('session'			, JFactory::getSession());
-		$this->assignRef('pane'				, $pane);
-		$this->assignRef('params'			, $params);
-		$this->assignRef('lists'      		, $lists);
-		$this->assignRef('rows'      		, $rows);
-		$this->assignRef('pageNav' 			, $pageNav);
-		$this->assignRef('permission' 		, $permission);
-
+		$this->assignRef('session'    , JFactory::getSession());
+		$this->assignRef('pane'       , $pane);
+		$this->assignRef('params'     , $params);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('rows'       , $rows);
+		$this->assignRef('pageNav'    , $pageNav);
+		if (FLEXI_J16GE) {
+			$this->assignRef('CanUpload'       , $permission->CanUpload);
+			$this->assignRef('CanViewAllFiles' , $permission->CanViewAllFiles);
+		} else {
+			$this->assignRef('CanUpload'       , $CanUpload);
+			$this->assignRef('CanViewAllFiles' , $CanViewAllFiles);
+		}
+		
 		parent::display($tpl);
 
 	}

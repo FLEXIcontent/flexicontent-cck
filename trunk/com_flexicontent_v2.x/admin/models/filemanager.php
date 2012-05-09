@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: filemanager.php 350 2010-06-29 08:47:01Z emmanuel.danan $
+ * @version 1.5 stable $Id: filemanager.php 798 2011-08-11 04:03:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -107,6 +107,9 @@ class FlexicontentModelFilemanager extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 			$this->_data = $this->countImageRelations($this->_data);
@@ -165,7 +168,7 @@ class FlexicontentModelFilemanager extends JModel
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.items', 			'items', 			'', 'int' );
+		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 			'item_id', 			0, 'int' );
 		
 		// File field relation sub query
 		$subf	= 'SELECT COUNT(value)'
@@ -176,7 +179,7 @@ class FlexicontentModelFilemanager extends JModel
 			;
 			
 		if ($filter_item) {
-			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
@@ -189,7 +192,7 @@ class FlexicontentModelFilemanager extends JModel
 				. $orderby
 				;
 		} else {
-			$query = 'SELECT f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader, ('.$subf.') AS nrassigned'
 				. ' FROM #__flexicontent_files AS f'
 				. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where
@@ -228,15 +231,15 @@ class FlexicontentModelFilemanager extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere() {
+	function _buildContentWhere()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$permission = FlexicontentHelperPerm::getPerm();
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', '', 'int' );
+		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', '', 'int' );
+		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
 		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
 		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
 		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 'filter_ext', '', 'alnum' );
@@ -244,7 +247,14 @@ class FlexicontentModelFilemanager extends JModel
 
 		$where = array();
 		
-		$CanViewAllFiles = $permission->CanViewAllFiles;
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+		} else if (FLEXI_ACCESS) {
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanViewAllFiles	= 1;
+		}
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;

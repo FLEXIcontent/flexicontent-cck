@@ -131,7 +131,7 @@ echo $this->pane->endPane();
 		</td>
 	</tr>
 </table>
-<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm">
+<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 	<table class="adminform">
 		<tr>
 			<td width="100%">

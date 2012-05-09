@@ -74,7 +74,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</td>
 	</tr>
 </table>
-<form action="index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component&amp;layout=image&amp;filter_secure=M" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component&amp;layout=image&amp;filter_secure=M" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
 		<tr>

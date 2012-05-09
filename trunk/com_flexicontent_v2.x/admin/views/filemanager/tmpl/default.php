@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 331 2010-06-23 06:43:09Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,7 +28,7 @@ table#filemanager-zone label{
 		<td>
 			<?php
 			echo $this->pane->startPane( 'stat-pane' );
-			if ($this->permission->CanUpload) :
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
 			?>
 		    <?php if ($this->require_ftp): ?>
@@ -137,7 +137,7 @@ table#filemanager-zone label{
 									</label>
 								</td>
 								<td>
-		                        	<input type="text" id="file-url-data" size="40" class="required" name="file-url-data" />                        
+									<input type="text" id="file-url-data" size="40" class="required" name="file-url-data" />
 								</td>
 							</tr>
 							<tr>
@@ -147,7 +147,7 @@ table#filemanager-zone label{
 									</label>
 								</td>
 								<td>
-                		        	<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />                        
+									<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
 								</td>
 							</tr>
 							<tr>
@@ -168,7 +168,7 @@ table#filemanager-zone label{
 			</form>
 			<?php
 			echo $this->pane->endPanel();
-			if ($this->permission->CanUpload) :
+			if ($this->CanUpload) :
 			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' );
 			?>
 			<!-- File from server Form -->
@@ -273,7 +273,7 @@ table#filemanager-zone label{
 			 	<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->permission->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
 			</td>
 		</tr>
 	</table>
