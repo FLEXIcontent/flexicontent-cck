@@ -62,8 +62,10 @@ if (!defined('FLEXI_GC'))					define('FLEXI_GC'					, $params->get('purge_gc', 1
 if (!defined('FLEXI_FISH'))				define('FLEXI_FISH'				, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 if ( FLEXI_FISH ) {
 	$db = & JFactory::getDBO();
-	$db->setQuery("SELECT COUNT(*) FROM #__jf_languages_ext");
-	define('FLEXI_FISH_22GE', (boolean) $db->loadResult() );
+	$config =& JFactory::getConfig();
+	$dbprefix = $config->getValue('config.dbprefix');
+	$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
+	define('FLEXI_FISH_22GE', (boolean) count($db->loadObjectList()) );
 }
 if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'		, 1 );
 if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'items' );

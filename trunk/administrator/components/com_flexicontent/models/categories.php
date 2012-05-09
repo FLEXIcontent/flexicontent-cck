@@ -72,15 +72,15 @@ class FlexicontentModelCategories extends JModel
 	}
 
 	/**
-	 * Method to get categories item data
+	 * Method to get categories data
 	 *
 	 * @access public
 	 * @return array
+	 * @since	1.0
 	 */
 	function getData()
 	{
-		global $mainframe;
-		
+		$mainframe = &JFactory::getApplication();
 		static $items;
 
 		if (isset($items)) {
@@ -230,7 +230,7 @@ class FlexicontentModelCategories extends JModel
 					$this->_addCategories($id, $cid, 'parents');
 				}
 			}
-						
+			
 			$cids = implode( ',', $cid );
 
 			$query = 'UPDATE #__categories'
@@ -270,7 +270,8 @@ class FlexicontentModelCategories extends JModel
 		
 		return true;
 	}
-
+	
+	
 	/**
 	 * Method to order categories
 	 *
@@ -310,7 +311,8 @@ class FlexicontentModelCategories extends JModel
 
 		return true;
 	}
-
+	
+	
 	/**
 	 * Method to remove a category
 	 *
@@ -321,14 +323,15 @@ class FlexicontentModelCategories extends JModel
 	function delete($cids)
 	{
 		$params = & JComponentHelper::getParams('com_flexicontent');
-		$table  =& $this->getTable('flexicontent_categories', '');
+		$table  = & $this->getTable('flexicontent_categories', '');
+		$user 	= & JFactory::getUser();
 		
 		// Add all children to the list
 		foreach ($cids as $id)
 		{
 			$this->_addCategories($id, $cids);
 		}
-				
+		
 		$cids = implode( ',', $cids );
 
 		$query = 'SELECT c.id, c.parent_id, c.title, COUNT( e.catid ) AS numcat'
@@ -416,18 +419,12 @@ class FlexicontentModelCategories extends JModel
 		//handle childs
 		$cids = array();
 		$cids[] = $id;
-		$this->_addCategories($id, $cids);
+		$this->_addCategories($id, $cids);   // Propagate access level to children
 		
 		foreach ($cids as $cid) {
 			
 			$category->load( (int)$cid );
-			
-			if ($category->access < $access) {				
-				$category->access = $access;
-			} else {
-				$category->load( $id );
-				$category->access = $access;
-			}
+			$category->access = $access;
 			
 			if ( !$category->check() ) {
 				$this->setError($this->_db->getErrorMsg());

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: categories.php 184 2010-04-04 06:08:30Z emmanuel.danan $
+ * @version 1.5 stable $Id: categories.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -65,11 +65,14 @@ class FlexicontentModelCategories extends JModelList
 	}
 
 	/**
+	 * Method to get the query used to retrieve categories data
+	 *
+	 * @access public
 	 * @return	string
 	 * @since	1.6
 	 */
-	function getListQuery() {
-		// Create a new query object.
+	function getListQuery()
+	{
 		$mainframe = &JFactory::getApplication();
 		$db = $this->getDbo();
 		$option = JRequest::getVar('option');
@@ -81,6 +84,7 @@ class FlexicontentModelCategories extends JModelList
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
 		//$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
+		// Create a new query object.
 		$query = $db->getQuery(true);
 		// Select the required fields from the table.
 		$query->select(
@@ -210,8 +214,7 @@ class FlexicontentModelCategories extends JModelList
 		
 		return true;
 	}
-
-
+	
 	
 	/**
 	 * Method to save the reordered nested set tree.
@@ -356,7 +359,7 @@ class FlexicontentModelCategories extends JModelList
 		//handle childs
 		$cids = array();
 		$cids[] = $id;
-		//$this->_addCategories($id, $cids);   // Propagate access level to children ??? !!! ???
+		$this->_addCategories($id, $cids);   // Propagate access level to children
 		
 		foreach ($cids as $cid) {
 			
