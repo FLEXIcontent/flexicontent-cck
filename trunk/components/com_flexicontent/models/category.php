@@ -363,8 +363,11 @@ class FlexicontentModelCategory extends JModel {
 	{
 		$params = $this->_params;
 		
-		$filter_order		= $this->getState('filter_order', 'i.title');
-		$filter_order_dir	= $this->getState('filter_order_dir', 'ASC');
+		$filter_order     = $this->getState('filter_order');
+		$filter_order_dir = $this->getState('filter_order_dir');
+		
+		$filter_order     = $filter_order     ? $filter_order      :  'i.title';
+		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
 
 		if ($params->get('orderby')) {
 			$order = $params->get('orderby');
@@ -415,14 +418,15 @@ class FlexicontentModelCategory extends JModel {
 		}
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		if ($params->get('orderbycustomfieldid', 0) != 0)
-			{
+		{
 			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 			$filter_order		= 'f.value'.$int;
 			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
-			}
+		}
 		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
-
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
+		$orderby .= $filter_order!='i.title' ? ', c.title' : '';   // Order by title after default ordering
+		
 		return $orderby;
 	}
 

@@ -31,6 +31,12 @@
 			<param name="catlimit" type="text" default="200" size="4" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" />
 
 			<param name="" type="separator" default="FLEXI_VIEW_CATS_CONF" level="level1" menu="hide" />
+			<param name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</param>
 			<param name="hide_empty_cats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_CATS" description="FLEXI_HIDE_EMPTY_CATS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -61,6 +67,12 @@
 			<param name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 					
 			<param name="" type="separator" default="FLEXI_VIEW_SUBCATS_CONF" level="level1" menu="hide" />
+			<param name="subcat_orderby" type="list" default="order" label="FLEXI_SUBCATEGORY_ORDER" description="FLEXI_SUBCATEGORY_ORDER_DESC">
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</param>
 			<param name="hide_empty_subcats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_SUBCATS" description="FLEXI_HIDE_EMPTY_SUBCATS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
