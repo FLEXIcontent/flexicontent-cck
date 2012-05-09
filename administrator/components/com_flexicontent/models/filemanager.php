@@ -67,7 +67,8 @@ class FlexicontentModelFilemanager extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.files.limitstart', 'limitstart', 0, 'int' );
@@ -162,7 +163,8 @@ class FlexicontentModelFilemanager extends JModel
 	function _buildQuery()
 	{
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
@@ -211,7 +213,8 @@ class FlexicontentModelFilemanager extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
@@ -230,7 +233,8 @@ class FlexicontentModelFilemanager extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
 		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
@@ -243,7 +247,10 @@ class FlexicontentModelFilemanager extends JModel
 
 		$where = array();
 		
-		if (FLEXI_ACCESS) {
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+		} else if (FLEXI_ACCESS) {
 			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
 		} else {
 			$CanViewAllFiles	= 1;
@@ -299,7 +306,8 @@ class FlexicontentModelFilemanager extends JModel
 	 */
 	function _buildContentHaving()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -317,7 +325,8 @@ class FlexicontentModelFilemanager extends JModel
 	}
 	
 	function _buildQueryUsers() {
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();

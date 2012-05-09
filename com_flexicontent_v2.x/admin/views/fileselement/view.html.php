@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 587 2011-04-22 10:17:16Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: view.html.php 1108 2012-01-15 04:06:31Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -92,12 +92,18 @@ class FlexicontentViewFileselement extends JView
 		}
 		';
 		$document->addStyleDeclaration($css);
-
-
-		$permission = FlexicontentHelperPerm::getPerm();
-		$CanUpload = $permission->CanUpload;
-		$CanViewAllFiles = $permission->CanViewAllFiles;
-
+		
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanUpload = $permission->CanUpload;
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+		} else if (FLEXI_ACCESS) {
+			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanUpload			= 1;
+			$CanViewAllFiles	= 1;
+		}
 
 		//Get data from the model
 		$model = $this->getModel();
@@ -107,6 +113,7 @@ class FlexicontentViewFileselement extends JView
 		$users = &$this->get('Users');
 		
 		$fname = $model->getFieldName($fieldid);
+		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		//add js to document
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		$js = "
@@ -116,7 +123,7 @@ class FlexicontentViewFileselement extends JView
 			window.parent.qfSelectFile".$fieldid."(id, file);
 		}
 		window.addEvent('domready', function() {
-			fileobjs = window.parent.document.getElementsByName('custom[{$fname}][]');
+			fileobjs = window.parent.document.getElementsByName('{$formfieldname}');
 			for(i=0,n=fileobjs.length;i<n;i++) {
 				row = document.getElementById('file'+fileobjs[i].value);
 				if((typeof row) !='undefined') {

@@ -36,7 +36,8 @@ class FlexicontentViewFileselement extends JView
 	 * @since 1.0
 	 */
 	function display( $tpl = null ) {
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
@@ -91,8 +92,12 @@ class FlexicontentViewFileselement extends JView
 		}
 		';
 		$document->addStyleDeclaration($css);
-
-		if (FLEXI_ACCESS) {
+		
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanUpload = $permission->CanUpload;
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+		} else if (FLEXI_ACCESS) {
 			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
 			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
 		} else {
@@ -108,6 +113,7 @@ class FlexicontentViewFileselement extends JView
 		$users = &$this->get('Users');
 		
 		$fname = $model->getFieldName($fieldid);
+		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		//add js to document
 		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		$js = "
@@ -117,7 +123,7 @@ class FlexicontentViewFileselement extends JView
 			window.parent.qfSelectFile".$fieldid."(id, file);
 		}
 		window.addEvent('domready', function() {
-			fileobjs = window.parent.document.getElementsByName('{$fname}[]');
+			fileobjs = window.parent.document.getElementsByName('{$formfieldname}');
 			for(i=0,n=fileobjs.length;i<n;i++) {
 				row = document.getElementById('file'+fileobjs[i].value);
 				if((typeof row) !='undefined') {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 633 2011-07-08 03:23:13Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: view.html.php 1219 2012-03-23 03:44:13Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -63,22 +63,12 @@ class FlexicontentViewFields extends JView {
 			$permission = FlexicontentHelperPerm::getPerm();
 		} else {
 			$permission = new stdClass();
-		
-			if (FLEXI_ACCESS) {
-				$permission->CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			} else {
-				$permission->CanFields = 1;
-			}
 			$permission->CanCopyFields = 1;
 			$permission->CanAddField = 1;
 			$permission->CanEditField = 1;
 			$permission->CanDeleteField = 1;
 			$permission->CanOrderFields = 1;
 			$permission->CanCopyFields = 1;
-		}
-		
-		if (!$permission->CanFields) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		$contrl = FLEXI_J16GE ? "fields." : "";
