@@ -88,6 +88,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get current user and existing user groups
 		$user 				=& JFactory::getUser();
+		$usergroups = $user->get('groups');
+		$usergroups = is_array($usergroups) ? $usergroups : array();
 		$usergroups = array_keys($user->get('groups'));
 		
 		// Get user groups excluded from redirection
