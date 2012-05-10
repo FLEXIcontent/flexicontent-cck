@@ -713,7 +713,7 @@ VALUES
 			JFile::delete($catdir.DS.$c);
 		}
 		
-		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'items'.DS.'tmpl');
+		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
 		$itemtmpl 	= JFolder::files($itemdir);		
 		$itmpl 		= array_diff($itemtmpl,$files);
 		foreach ($itmpl as $i) {
