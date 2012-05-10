@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1262 2012-04-27 12:52:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -67,12 +67,19 @@ class FlexicontentViewField extends JView {
 
 		//Get data from the model
 		$model				= & $this->getModel();
-		$form				= $this->get('Form');
+		$row     			= & $this->get( 'Field' );
+		if (FLEXI_J16GE) {
+			$form				= $this->get('Form');
+		} else {
+			$types				= & $this->get( 'Typeslist' );
+			$typesselected		= & $this->get( 'Typesselected' );
+		}
+		JHTML::_('behavior.tooltip');
 		
 		//support checking.
-		$this->supportsearch = true;
-		$this->supportadvsearch = false;
-		$this->supportfilter = false;
+		$supportsearch    = true;
+		$supportadvsearch = false;
+		$supportfilter    = false;
 		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'textselect');
 		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories', 'textselect');
 		
@@ -81,28 +88,29 @@ class FlexicontentViewField extends JView {
 		$config_filters = explode(',', $config_filters);
 		$all_filters = array_unique(array_merge($core_filters, $config_filters));
 		
-		if($form->getValue('field_type'))
+		if($row->field_type)
 		{
+			// Import field file
+			JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
+			
 			// load plugin's english language file then override with current language file
-			$extension_name = 'plg_flexicontent_fields_'. ($form->getValue("iscore") ? 'core' : $form->getValue('field_type'));
+			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
 			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
 			
-			$classname	= 'plgFlexicontent_fields'.($form->getValue("iscore") ? 'core' : $form->getValue('field_type'));
+			$classname	= 'plgFlexicontent_fields'.($row->iscore ? 'core' : $row->field_type);
 			$classmethods	= get_class_methods($classname);
-			if ($form->getValue("iscore")) {
-				$this->supportadvsearch = in_array($form->getValue('field_type'), $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
-				$this->supportfilter = in_array($form->getValue('field_type'), $all_filters);
+			if ($row->iscore) {
+				$supportadvsearch = in_array($row->field_type, $core_advsearch);//I'm not sure for this line, we may be change it if we have other ways are better.[Enjoyman]
+				$supportfilter = in_array($row->field_type, $all_filters);
 			} else {
-				$this->supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
-				$this->supportfilter = in_array('onDisplayFilter', $classmethods);
+				$supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
+				$supportfilter = in_array('onDisplayFilter', $classmethods);
 			}
 		}
-		
-		JHTML::_('behavior.tooltip');
 
 		//build field_type list
-		if ($form->getValue("iscore") == 1) { $class = 'disabled="disabled"'; } else {
+		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
 			$class = '';
 			$document->addScriptDeclaration("
 					window.addEvent('domready', function() {
@@ -125,24 +133,29 @@ class FlexicontentViewField extends JView {
 		}
 
 		// fail if checked out not by 'me'
-		if ($form->getValue("id")) {
+		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
-		$permission = &FlexicontentHelperPerm::getPerm();
+		
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-
+		
+		// assign permissions for J2.5
+		if (FLEXI_J16GE) {
+			$permission = &FlexicontentHelperPerm::getPerm();
+			$this->assignRef('permission'   , $permission);
+		}
 		//assign data to template
-		$this->assignRef('document'     , $document);
-		$this->assignRef('row'      	, $row);
-		$this->assignRef('permission'   , $permission);
+		$this->assignRef('document'   , $document);
+		$this->assignRef('row'        , $row);
 		$this->assignRef('lists'      	, $lists);
-//		$this->assignRef('tmpls'      	, $tmpls);
-		//$this->assignRef('aform'	, $aform);
-		$this->assignRef('form'		, $form);
+		$this->assignRef('form'      , $form);
+		$this->assignRef('supportsearch'    , $supportsearch);
+		$this->assignRef('supportadvsearch' , $supportadvsearch);
+		$this->assignRef('supportfilter'    , $supportfilter);
 
 		parent::display($tpl);
 	}

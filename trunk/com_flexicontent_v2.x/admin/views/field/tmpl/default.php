@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 1125 2012-01-26 12:38:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -25,6 +25,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr>
 		<td valign="top">
+		
 			<fieldset>
 			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
 				<table class="admintable" width="100%">
@@ -128,8 +129,9 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 				</table>
 			</fieldset>
+			
 			<?php
-				if ($this->permission->CanConfig) :
+			if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');
@@ -142,20 +144,21 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					});
 				");
 			?>
-				<fieldset class="flexiaccess">
-					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-					<table id="tabacces" class="admintable" width="100%">
-				    	<tr>
-				    		<td>
-				        		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-				        	</td>
-				    	</tr>
-					</table>
-					<div id="notabacces">
+			<fieldset class="flexiaccess">
+				<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+				<table id="tabacces" class="admintable" width="100%">
+					<tr>
+						<td>
+							<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+						</td>
+					</tr>
+				</table>
+				<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-					</div>
-				</fieldset>
-			<?php endif; ?>
+				</div>
+			</fieldset>
+		<?php endif; ?>
+		
 		</td>
 
 		<td valign="top" width="40%" style="padding: 7px 0 0 5px">
