@@ -2014,10 +2014,12 @@ class FLEXIUtilities
 				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
 					;
 		} else if (FLEXI_J16GE) {   // Use J1.6+ language info
-			$query = 'SELECT DISTINCT *, extension_id as id '
-					.' FROM #__extensions'
-					.' WHERE type="language" '
-					.' GROUP BY element';
+			$query = 'SELECT DISTINCT le.*, le.extension_id as id, lc.image as image_prefix'
+					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
+					.' FROM #__extensions as le'
+					.' LEFT JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'
+					.' WHERE le.type="language" '
+					.' GROUP BY le.element';
 		} else {
 			JError::raiseWarning(500, 'getlanguageslist(): ERROR no joomfish installed');
 			return array();
@@ -2068,8 +2070,9 @@ class FLEXIUtilities
 				$lang->code = $lang->element;
 				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
 				$lang->id = $lang->extension_id;
+				$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
 				// $lang->image, holds a custom image path
-				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $image_prefix . '.gif';
 			}
 			
 			// Also prepend '*' (ALL) language to language array
