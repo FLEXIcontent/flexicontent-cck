@@ -54,7 +54,8 @@ class JFormFieldItemlayout extends JFormFieldList
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
 		$type_default_layout = '';
-		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && 'items'==$controller) ){
+		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && 'items'==$controller) )
+		{
 			// Get item id
 			if (!$app->isAdmin()) {
 				// FRONTEND, use "id" from request
@@ -87,6 +88,7 @@ class JFormFieldItemlayout extends JFormFieldList
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
 				if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+				$all_tmpl_allowed = count($allowed_tmpls) == 0;
 				if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 				//echo "Allowed Templates: "; print_r($allowed_tmpls); echo "<br>\n";
 			}
@@ -95,7 +97,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		$tmpls = array();
 		$lays = array();
 		foreach ($tmpls_all as $tmpl) {
-			if ( !count($allowed_tmpls) || in_array($tmpl->name, $allowed_tmpls) ) {
+			if ( $all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls) ) {
 				$tmpls[] = $tmpl;
 				$lays[] = $tmpl->name;
 			}
