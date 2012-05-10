@@ -252,6 +252,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function onBeforeSaveField( $field, &$post, &$file ) {
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
+		if ( !FLEXI_J16GE && $field->parameters->get( 'use_html', 0 ) ) {
+			$rawdata = JRequest::getVar($field->name, '', 'post', 'string', JREQUEST_ALLOWRAW);
+			if ($rawdata) $post = $rawdata;
+		}
 		if(!$post) return;
 
 		// Reconstruct value if it has splitted up e.g. to tabs
