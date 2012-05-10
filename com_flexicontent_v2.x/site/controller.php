@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1262 2012-04-27 12:52:36Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1274 2012-05-09 05:19:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -328,7 +328,7 @@ class FlexicontentController extends JController
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
 
 		// first verify it's an edit action
-		if ($model->get('id') > 1)
+		if ( $model->get('id') )
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');

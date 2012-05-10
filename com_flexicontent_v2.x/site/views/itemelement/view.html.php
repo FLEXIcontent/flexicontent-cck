@@ -23,9 +23,13 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', 
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 $document	= & JFactory::getDocument();
-$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/general.css');
 $document->addStyleSheet(JURI::root().'administrator/templates/system/css/system.css');
-$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/template.css');
-		
+if (FLEXI_J16GE) {
+	$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/general.css');
+	$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/template.css');
+} else {
+	$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/general.css');
+	$document->addStyleSheet(JURI::root().'administrator/templates/khepri/css/component.css');
+}
 require_once(JPATH_BASE.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."itemelement".DS."view.html.php");
 ?>

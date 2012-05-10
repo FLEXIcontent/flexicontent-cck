@@ -328,7 +328,7 @@ class FlexicontentController extends JController
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
 
 		// first verify it's an edit action
-		if ($model->get('id') > 1)
+		if ( $model->get('id') )
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
