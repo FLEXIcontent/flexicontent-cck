@@ -295,7 +295,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 		// ** some parameter shortcuts
 		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
 		$field->html = '';
 		
 		
