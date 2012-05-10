@@ -67,18 +67,18 @@ class FlexicontentViewField extends JView {
 		//Get data from the model
 		$model				= & $this->getModel();
 		$row     			= & $this->get( 'Field' );
-		$types				= & $this->get( 'Typeslist' );
-		$typesselected		= & $this->get( 'Typesselected' );
+		if (FLEXI_J16GE) {
+			$form				= $this->get('Form');
+		} else {
+			$types				= & $this->get( 'Typeslist' );
+			$typesselected		= & $this->get( 'Typesselected' );
+		}
 		JHTML::_('behavior.tooltip');
 		
-		// Import field to execute its constructor, e.g. needed for loading language file etc
-		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
-		// If constructor does not load language file then this will load it
-
 		//support checking.
-		$supportsearch = true;
+		$supportsearch    = true;
 		$supportadvsearch = false;
-		$supportfilter = false;
+		$supportfilter    = false;
 		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'textselect');
 		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories', 'textselect');
 		
@@ -89,6 +89,9 @@ class FlexicontentViewField extends JView {
 		
 		if($row->field_type)
 		{
+			// Import field file
+			JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
+			
 			// load plugin's english language file then override with current language file
 			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
 			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -130,7 +133,7 @@ class FlexicontentViewField extends JView {
 						$$('#field_type').addEvent('change', function(ev) {
 							$('fieldspecificproperties').setHTML('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							var ajaxoptions ={
-								method:'get',
+								method: 'get',
 								onComplete:function(response) {
 									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
 									$('field_typename').innerHTML = $('field_type').value;
@@ -171,19 +174,23 @@ class FlexicontentViewField extends JView {
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
-
+		
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-
+		
+		// assign permissions for J2.5
+		if (FLEXI_J16GE) {
+			$permission = &FlexicontentHelperPerm::getPerm();
+			$this->assignRef('permission'   , $permission);
+		}
 		//assign data to template
-		$this->assignRef('document'      , $document);
-		$this->assignRef('row'      	, $row);
+		$this->assignRef('document'   , $document);
+		$this->assignRef('row'        , $row);
 		$this->assignRef('lists'      	, $lists);
-//		$this->assignRef('tmpls'      	, $tmpls);
-		$this->assignRef('form'			, $form);
-		$this->assignRef('supportsearch', $supportsearch);
-		$this->assignRef('supportadvsearch', $supportadvsearch);
-		$this->assignRef('supportfilter', $supportfilter);
+		$this->assignRef('form'      , $form);
+		$this->assignRef('supportsearch'    , $supportsearch);
+		$this->assignRef('supportadvsearch' , $supportadvsearch);
+		$this->assignRef('supportfilter'    , $supportfilter);
 
 		parent::display($tpl);
 	}

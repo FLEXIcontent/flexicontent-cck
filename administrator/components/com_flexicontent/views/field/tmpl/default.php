@@ -25,12 +25,13 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr>
 		<td valign="top">
+		
 			<fieldset>
 			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
 				<table class="admintable">
 					<tr>
 						<td class="key">
-							<label for="label">
+							<label for="label" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_LABEL').'::'.JText::_('FLEXI_FIELD_FIELDLABEL_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_LABEL' ).': *'; ?>
 							</label>
 						</td>
@@ -41,7 +42,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->row->iscore == 0) : ?>
 					<tr>
 						<td class="key">
-							<label for="name">
+							<label for="name" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_NAME').'::'.JText::_('FLEXI_FIELD_FIELDNAME_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).': *'; ?>
 							</label>
 						</td>
@@ -51,7 +52,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php else : ?>
 						<td class="key">
-							<label for="name">
+							<label for="name" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_NAME').'::'.JText::_('FLEXI_FIELD_FIELDNAME_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).': *'; ?>
 							</label>
 						</td>
@@ -65,7 +66,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					?>
 					<tr>
 						<td class="key">
-							<label for="published">
+							<label for="published" class="hasTip" title="<?php echo JText::_('FLEXI_PUBLISHED').'::'.JText::_('FLEXI_FIELD_PUBLISHED_DESC');?>">
 								<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
 							</label>
 						</td>
@@ -78,7 +79,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="published">
+							<label for="issearch">
 								<?php echo JText::_( 'FLEXI_FIELD_IS_SEARCHABLE' ).':'; ?>
 							</label>
 						</td>
@@ -91,7 +92,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="published">
+							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_IS_ADVANCED_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_IS_ADVSEARCH_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE' ).':'; ?>
 							</label>
 						</td>
@@ -104,7 +105,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="published">
+							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ISFILTER').'::'.JText::_('FLEXI_FIELD_ISFILTER_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_ISFILTER' ).':'; ?>
 							</label>
 						</td>
@@ -118,7 +119,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if (!FLEXI_ACCESS) : ?>
 					<tr>
 						<td class="key">
-							<label for="access">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_ACCESS_LEVEL').'::'.JText::_('FLEXI_FIELD_ACCESSLEVEL_DESC');?>">
 								<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
 							</label>
 						</td>
@@ -130,7 +131,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->row->iscore == 0) : ?>
 					<tr>
 						<td class="key">
-							<label for="field_type">
+							<label for="field_type" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_TYPE').'::'.JText::_('FLEXI_FIELD_FIELDTYPE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_TYPE' ).': *'; ?>
 							</label>
 						</td>
@@ -144,7 +145,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php endif; ?>
 					<tr>
 						<td class="key">
-							<label for="field_type">
+							<label for="ordering" class="hasTip" title="<?php echo JText::_('Ordering').'::'.JText::_('FLEXI_FIELD_ORDER_DESC');?>">
 								<?php echo JText::_( 'Ordering' ).': '; ?>
 							</label>
 						</td>
@@ -154,7 +155,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<tr>
 						<td class="key">
-							<label for="description">
+							<label for="description" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_DESCRIPTION').'::'.JText::_('FLEXI_FIELD_DESCRIPTION_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_DESCRIPTION' ).': '; ?>
 							</label>
 						</td>
@@ -164,17 +165,17 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 				</table>
 			</fieldset>
-	
+			
 			<?php
 			if (FLEXI_ACCESS) :
-			$this->document->addScriptDeclaration("
-				window.addEvent('domready', function() {
-				var slideaccess = new Fx.Slide('tabacces');
-				var slidenoaccess = new Fx.Slide('notabacces');
-				slideaccess.hide();
-					$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-						slideaccess.toggle();
-						slidenoaccess.toggle();
+				$this->document->addScriptDeclaration("
+					window.addEvent('domready', function() {
+						var slideaccess = new Fx.Slide('tabacces');
+						var slidenoaccess = new Fx.Slide('notabacces');
+						slideaccess.hide();
+						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
+							slideaccess.toggle();
+							slidenoaccess.toggle();
 						});
 					});
 				");
@@ -182,18 +183,18 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<fieldset class="flexiaccess">
 				<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 				<table id="tabacces" class="admintable" width="100%">
-		        	<tr>
-		        		<td>
-		            		<div id="access"><?php echo $this->lists['access']; ?></div>
-		            	</td>
-		        	</tr>
-		    	</table>
+					<tr>
+						<td>
+							<div id="access"><?php echo $this->lists['access']; ?></div>
+						</td>
+					</tr>
+				</table>
 				<div id="notabacces">
-				<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-		    	</div>
-		    </fieldset>
-		    <?php endif; ?>
-	
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+				</div>
+			</fieldset>
+		<?php endif; ?>
+		
 		</td>
 
 		<td valign="top" width="40%" style="padding: 7px 0 0 5px">
