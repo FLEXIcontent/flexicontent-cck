@@ -176,7 +176,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td valign="top">
 				<table  class="adminform">
 					<tr>
-						<td valign="top" width="370">
+						<td valign="top" width="340">
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
