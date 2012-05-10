@@ -233,7 +233,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			}
 
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+		$options[] = JHTML::_('select.option', '', '-'.JText::_('FLEXI_ALL').'-');
 		foreach ($listarrays as $listarray) {
 			$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}			

@@ -293,7 +293,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
 		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('All');
+		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
 		$field->html = '';
 		
 		

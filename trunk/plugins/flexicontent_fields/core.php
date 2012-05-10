@@ -329,7 +329,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 				
 				$query 	= ' SELECT DISTINCT i.created_by AS value, u.name AS text'
 						. ' FROM #__content AS i'
@@ -357,7 +357,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 				
 				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
 					. ' FROM #__content AS i'
@@ -385,7 +385,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 				
 				$query 	= ' SELECT id AS value, name AS text'
 						. ' FROM #__flexicontent_types'
@@ -410,7 +410,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 				
 				$options = array(); 
 				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
@@ -431,7 +431,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 
 				global $globalcats;
 
@@ -458,7 +458,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 2) 
 					$text_select = $filter->label; 
 				else 
-					$text_select = JText::_('All');
+					$text_select = JText::_('FLEXI_ALL');
 				
 				$query 	= ' SELECT id AS value, name AS text'
 						. ' FROM #__flexicontent_tags'
