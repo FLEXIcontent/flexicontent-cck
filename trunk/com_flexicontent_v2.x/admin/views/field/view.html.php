@@ -76,6 +76,9 @@ class FlexicontentViewField extends JView {
 		}
 		JHTML::_('behavior.tooltip');
 		
+		// Import field file
+		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
+			
 		//support checking.
 		$supportsearch    = true;
 		$supportadvsearch = false;
@@ -90,9 +93,6 @@ class FlexicontentViewField extends JView {
 		
 		if($row->field_type)
 		{
-			// Import field file
-			JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
-			
 			// load plugin's english language file then override with current language file
 			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
 			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
