@@ -823,7 +823,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$class = ' class="'.$required.' "';
 		$onchange= ' onchange="';
 		$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'_newfile\')); ' : '';
-		$onchange .= ($autoupload && $app->isAdmin()) ? ' submitbutton(\'apply\')"' : '';
+		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
+		$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 		$onchange .= ' "';
 		foreach ($values as $value) {
 			$options[] = JHTML::_('select.option', $value, $value); 
