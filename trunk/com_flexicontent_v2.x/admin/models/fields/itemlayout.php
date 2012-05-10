@@ -53,6 +53,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
+		$all_tmpl_allowed = true;
 		$type_default_layout = '';
 		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && 'items'==$controller) )
 		{
