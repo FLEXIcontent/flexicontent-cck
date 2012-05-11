@@ -107,6 +107,8 @@ class FlexicontentModelCategory extends JModel {
 		
 		// Populate state data, if category id is changed this function must be called again
 		$this->populateCategoryState();
+		// Get sub categories according to configuration
+		$this->_getGroupCats();
 	}
 	
 	/**
@@ -351,8 +353,51 @@ class FlexicontentModelCategory extends JModel {
 		
 		return $authorItem;
 	}
+	
+	
+	/**
+	 * Retrieve author item
+	 *
+	 * @access public
+	 * @return string
+	 */
+	function _getGroupCats()
+	{
+		global $globalcats;
+		
+		if ( $this->_id && count($this->_group_cats) )
+			return $this->_group_cats;
+		
+		// Get the category parameters
+		$cparams = $this->_params;
 
-
+		if ($this->_id) {
+			// display sub-categories
+			$display_subcats = $cparams->get('display_subcategories_items', 0);
+			
+			// Display items from current category
+			$_group_cats = array($this->_id);
+			
+			// Display items from (current and) immediate sub-categories (1-level)
+			if ($display_subcats==1) {
+				if(is_array($this->_childs))
+					foreach($this->_childs as $ch)
+						$_group_cats[] = $ch->id;
+			}
+			
+			// Display items from (current and) all sub-categories (any-level)
+			if ($display_subcats==2) {
+				// descendants also includes current category
+				$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
+			}
+			
+			$this->_group_cats = array_unique($_group_cats);
+		}
+		
+		return $this->_group_cats;
+	}
+	
+	
 	/**
 	 * Build the order clause
 	 *
@@ -438,7 +483,9 @@ class FlexicontentModelCategory extends JModel {
 	 */
 	function _buildItemWhere( )
 	{
-		global $globalcats;
+		global $globalcats, $currcat_data;
+		if ( !empty($currcat_data['where']) ) return $currcat_data['where'];
+		
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -448,29 +495,6 @@ class FlexicontentModelCategory extends JModel {
 		
 		// Get the category parameters
 		$cparams = $this->_params;
-
-		if ($this->_id) {
-			// display sub-categories
-			$display_subcats = $cparams->get('display_subcategories_items', 0);
-			
-			// Display items from current category
-			$_group_cats = array($this->_id);
-			
-			// Display items from (current and) immediate sub-categories (1-level)
-			if ($display_subcats==1) {
-				if(is_array($this->_childs))
-					foreach($this->_childs as $ch)
-						$_group_cats[] = $ch->id;
-			}
-			
-			// Display items from (current and) all sub-categories (any-level)
-			if ($display_subcats==2) {
-				// descendants also includes current category
-				$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
-			}
-			
-			$this->_group_cats = array_unique($_group_cats);
-		}
 		
 		// Get the site default language in case no language is set in the url
 		$lang 		= JRequest::getWord('lang', '' );
@@ -661,9 +685,9 @@ class FlexicontentModelCategory extends JModel {
 			}
 		}
 		
-		global $currcat_data;
 		return $currcat_data['where'] = $where;
 	}
+
 
 	/**
 	 * Method to build the Categories query
@@ -807,7 +831,11 @@ class FlexicontentModelCategory extends JModel {
 		
 		$this->_db->setQuery($query);
 		$assigneditems = count($this->_db->loadResultArray());
-
+		if ( $this->_db->getErrorNum() ) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		}
+		
 		return $assigneditems;
 	}
 
@@ -990,6 +1018,9 @@ class FlexicontentModelCategory extends JModel {
 	 */
 	function _loadCategoryParams($cid)
 	{
+		global $currcat_data;
+		if ( !empty($currcat_data['params']) ) return $currcat_data['params'];
+		
 		if ($this->_params === NULL) {
 			jimport("joomla.html.parameter");
 			$mainframe = &JFactory::getApplication();
@@ -1064,7 +1095,6 @@ class FlexicontentModelCategory extends JModel {
 			}
 		}
 		
-		global $currcat_data;
 		return $currcat_data['params'] = $params;
 	}
 
