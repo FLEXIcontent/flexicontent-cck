@@ -621,7 +621,7 @@ class FlexicontentFields
 	function _getModifiers($items)
 	{
 		// This is fix for versioned field of modifier in items view when previewing
-		$versioned_item = count($items)==1 && $items[0]->modified_by && !empty($items[0]->version_id);
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->modified_by) && $items[0]->id==JRequest::getInt('id');
 		
 		$db =& JFactory::getDBO();
 		$cids = array();
@@ -647,7 +647,7 @@ class FlexicontentFields
 	function _getAuthors($items)
 	{
 		// This is fix for versioned field of creator in items view when previewing
-		$versioned_item = count($items)==1 && $items[0]->created_by && !empty($items[0]->version_id);
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by) && $items[0]->id==JRequest::getInt('id');
 		
 		$db =& JFactory::getDBO();
 		$cids = array();
