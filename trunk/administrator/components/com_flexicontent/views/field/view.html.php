@@ -44,9 +44,10 @@ class FlexicontentViewField extends JView {
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//add js function to overload the joomla submitform
+		JHTML::_('behavior.mootools');
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-
+		
 		//create the toolbar
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
@@ -54,11 +55,19 @@ class FlexicontentViewField extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
-
+		
+		if (FLEXI_J16GE) {
+			JToolBarHelper::apply('fields.apply');
+			JToolBarHelper::save('fields.save');
+			JToolBarHelper::custom( 'fields.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			JToolBarHelper::cancel('fields.cancel');
+		} else {
+			JToolBarHelper::apply();
+			JToolBarHelper::save();
+			JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			JToolBarHelper::cancel();
+		}
+		
 		//Load pane behavior
 		jimport('joomla.html.pane');
 		//Import File system
