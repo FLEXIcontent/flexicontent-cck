@@ -250,10 +250,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			if ( $filedata )
 			{
 				// Check user access on the file
-				if (FLEXI_J16GE) {
-					if ( !in_array($filedata->access,$aid_arr) ) continue;
-				} else {
-					if ( $aid < @$filedata->access ) continue;
+				if ( !empty($filedata->access) ) {
+					if (FLEXI_J16GE) {
+						if ( !in_array($filedata->access,$aid_arr) ) continue;
+					} else {
+						if ( $aid < $filedata->access ) continue;
+					}
 				}
 				 
 				// --. Create icon according to filetype
