@@ -673,7 +673,7 @@ window.addEvent('domready', function() {
 			<td align="center">
 				<?php
 					if ($this->lists['order']=='ie.lang_parent_id') {
-						if ($row->id==$row->lang_parent_id) echo "Group";
+						if ($row->id==$row->lang_parent_id) echo "Main";
 						else echo "+";
 					} else echo "unsorted<sup>[3]</sup>";
 				?>

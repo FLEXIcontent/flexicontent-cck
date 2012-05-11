@@ -176,8 +176,8 @@ class FlexicontentModelItemelement extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$currauthor = JRequest::getVar('currauthor');
 		
+		$currauthor 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.currauthor', 'currauthor', '', 'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );

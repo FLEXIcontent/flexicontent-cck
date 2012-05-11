@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1222 2012-03-27 20:27:49Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -673,7 +673,7 @@ window.addEvent('domready', function() {
 			<td align="center">
 				<?php
 					if ($this->lists['order']=='ie.lang_parent_id') {
-						if ($row->id==$row->lang_parent_id) echo "Group";
+						if ($row->id==$row->lang_parent_id) echo "Main";
 						else echo "+";
 					} else echo "unsorted<sup>[3]</sup>";
 				?>
