@@ -90,7 +90,7 @@ class plgSystemFlexisystem extends JPlugin
 		$user 				=& JFactory::getUser();
 		$usergroups = $user->get('groups');
 		$usergroups = is_array($usergroups) ? $usergroups : array();
-		$usergroups = array_keys($user->get('groups'));
+		$usergroups = array_keys($usergroups);
 		
 		// Get user groups excluded from redirection
 		$exclude_mincats = $this->params->get('exclude_redirect_cats', array());
