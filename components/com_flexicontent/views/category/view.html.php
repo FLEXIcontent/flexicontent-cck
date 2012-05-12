@@ -74,21 +74,20 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		// Get data from the model		
-		$category 	= & $this->get('Category');
-		$categories	= & $this->get('Childs');
-		$items 		= & $this->get('Data');
-		$filters 	= & $this->get('Filters');
-		$alpha	 	= & $this->get('Alphaindex');
-		$model		= & $this->getModel();
+		$category   = & $this->get('Category');
+		$categories = & $this->get('Childs');
+		$items    = & $this->get('Data');
+		$total    = & $this->get('Total');
+		$filters  = & $this->get('Filters');
+		$alpha    = & $this->get('Alphaindex');
+		$model    = & $this->getModel();
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart		= JRequest::getInt('limitstart');
-		$format			= JRequest::getVar('format', null);
+		$limitstart = JRequest::getInt('limitstart');
+		$format     = JRequest::getVar('format', null);
 		
 		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$params	= & $category->parameters;
-		
-		$total 		= & $this->get('Total');
 		
 		$authorid = JRequest::getInt('authorid', 0);
 		$layout = JRequest::getInt('layout', 0);

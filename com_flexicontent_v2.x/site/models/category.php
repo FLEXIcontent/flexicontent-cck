@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1276 2012-05-09 11:29:25Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1290 2012-05-11 06:42:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,46 +37,46 @@ class FlexicontentModelCategory extends JModel {
 	var $_id = null;
 	
 	/**
-	 * Categories items Data
-	 *
-	 * @var mixed
-	 */
-	var $_data = null;
-
-	/**
-	 * Childs
-	 *
-	 * @var mixed
-	 */
-	var $_childs = null;
-	
-	/**
-	 * Category data
+	 * Category properties
 	 *
 	 * @var object
 	 */
 	var $_category = null;
 
 	/**
-	 * Categories total
+	 * Array of Subcategories properties
+	 *
+	 * @var mixed
+	 */
+	var $_childs = null;
+	
+	/**
+	 * Category/Subcategory (current page) ITEMS  (belonging to $_data_cats Categories)
+	 *
+	 * @var mixed
+	 */
+	var $_data = null;
+	
+	/**
+	 * Array of subcategory ids (includes category id too) used to create the ITEMS list
+	 *
+	 * @var array
+	 */
+	var $_data_cats = array();
+	
+	/**
+	 * Count of the total (not just current page) Category/Subcategory ITEMS
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
 
 	/**
-	 * parameters
+	 * Category parameters, merged with (a) Component and (b) Current Joomla menu item
 	 *
 	 * @var object
 	 */
 	var $_params = null;
-	
-	/**
-	 * Group Categories
-	 *
-	 * @var array
-	 */
-	var $_group_cats = array();
 
 	/**
 	 * Category author (used by AUTHOR layout)
@@ -107,8 +107,6 @@ class FlexicontentModelCategory extends JModel {
 		
 		// Populate state data, if category id is changed this function must be called again
 		$this->populateCategoryState();
-		// Get sub categories according to configuration
-		$this->_getGroupCats();
 	}
 	
 	/**
@@ -160,8 +158,12 @@ class FlexicontentModelCategory extends JModel {
 	{
 		// Set new category ID and wipe data
 		if ($this->_id != $cid) {
-			$this->_data = $this->_childs = $this->_category = $this->_total = $this->_params = null;
-			$this->_group_cats = array();
+			$this->_category  = null;
+			$this->_childs    = null;
+			$this->_data      = null;
+			$this->_data_cats = null;
+			$this->_total     = null;
+			$this->_params    = null;
 		}
 		$this->_id = $cid;
 	}		
@@ -356,45 +358,75 @@ class FlexicontentModelCategory extends JModel {
 	
 	
 	/**
-	 * Retrieve author item
+	 * Retrieve subcategory ids of a given category
 	 *
 	 * @access public
 	 * @return string
 	 */
-	function _getGroupCats()
+	function & _getDataCats($cid)
 	{
-		global $globalcats;
-		
-		if ( $this->_id && count($this->_group_cats) )
-			return $this->_group_cats;
-		
-		// Get the category parameters
-		$cparams = $this->_params;
+		if ( $this->_data_cats ) return $this->_data_cats;
 
-		if ($this->_id) {
-			// display sub-categories
-			$display_subcats = $cparams->get('display_subcategories_items', 0);
-			
-			// Display items from current category
-			$_group_cats = array($this->_id);
-			
-			// Display items from (current and) immediate sub-categories (1-level)
-			if ($display_subcats==1) {
-				if(is_array($this->_childs))
-					foreach($this->_childs as $ch)
-						$_group_cats[] = $ch->id;
+		global $globalcats;
+		$cparams = & $this->_params;
+		$user 		= &JFactory::getUser();
+		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
+
+		// Get the category parameters
+		$cparams = & $this->_params;
+		// show unauthorized items
+		$show_noauth = $cparams->get('show_noauth', 0);
+		
+		// filter by permissions
+		if (!$show_noauth) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess = ' AND c.access IN ('.$aid_list.')';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if (isset($readperms['category']) && count($readperms['category']) ) {
+						$andaccess = ' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
+					} else {
+						$andaccess = ' AND c.access <= '.$aid;
+					}
+				} else {
+					$andaccess = ' AND c.access <= '.$aid;
+				}
 			}
-			
-			// Display items from (current and) all sub-categories (any-level)
-			if ($display_subcats==2) {
-				// descendants also includes current category
-				$_group_cats = array_map('trim',explode(",",$globalcats[$this->_id]->descendants));
-			}
-			
-			$this->_group_cats = array_unique($_group_cats);
 		}
 		
-		return $this->_group_cats;
+		// filter by depth level
+		$display_subcats = $cparams->get('display_subcategories_items', 0);
+		if ($display_subcats==0) {
+			//$anddepth = ' AND c.id = '. $this->_id;
+			$this->_data_cats = array($this->_id);
+			return $this->_data_cats;
+		} else if ($display_subcats==1) {
+			$anddepth = ' AND c.parent_id = '. $this->_id;
+		} else {
+			$anddepth = ' AND c.id IN ('.$globalcats[$this->_id]->descendants.')';
+		}
+		
+		// finally create the query string
+		$query = 'SELECT c.id'
+			. ' FROM #__categories AS c'
+			. ' WHERE c.published = 1'
+			. $andaccess
+			. $anddepth
+			. ' ORDER BY '.$ordering
+			;
+		
+		$this->_db->setQuery($query);
+		$this->_data_cats = $this->_db->loadResultArray();
+		if ( $this->_db->getErrorNum() ) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		}
+		
+		return $this->_data_cats;
 	}
 	
 	
@@ -494,17 +526,11 @@ class FlexicontentModelCategory extends JModel {
 		$nullDate	= $this->_db->getNullDate();
 		
 		// Get the category parameters
-		$cparams = $this->_params;
+		$cparams = & $this->_params;
 		
 		// Get the site default language in case no language is set in the url
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
-
+		$lang = flexicontent_html::getUserCurrentLang();
+		
 		// category language parameter, currently UNUSED
 		$catlang = $cparams->get('language', '');
 		// filter items using currently selected language
@@ -517,8 +543,10 @@ class FlexicontentModelCategory extends JModel {
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
 		if ($this->_id) {
-			$_group_cats = "'".implode("','", $this->_group_cats)."'";
-			$where .= ' AND rel.catid IN ('.$_group_cats.')';
+			// Get sub categories used to create items list, according to configuration and user access
+			$_data_cats = $this->_getDataCats($this->_id);
+			$_data_cats = "'".implode("','", $this->_data_cats)."'";
+			$where .= ' AND rel.catid IN ('.$_data_cats.')';
 		} 
 		
 		// Limit to published items. Exception when user can edit item
@@ -690,18 +718,18 @@ class FlexicontentModelCategory extends JModel {
 
 
 	/**
-	 * Method to build the Categories query
+	 * Method to build the childs categories query
 	 *
 	 * @access private
 	 * @return string
 	 */
-	function _buildChildsquery()
+	function _buildChildsQuery()
 	{
 		$user 		= &JFactory::getUser();
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
 		// Get the category parameters
-		$cparams = $this->_params;
+		$cparams = & $this->_params;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
 		
@@ -736,7 +764,8 @@ class FlexicontentModelCategory extends JModel {
 			;
 		return $query;
 	}
-
+	
+	
 	/**
 	 * Method to get the assigned items for a category
 	 *
@@ -747,36 +776,26 @@ class FlexicontentModelCategory extends JModel {
 	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
-
 		$user 		= &JFactory::getUser();
 
 		// Get the category parameters
-		$cparams = $this->_params;
-		// Get the site default language in case no language is set in the url
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		$cparams = & $this->_params;
 		
-		// category language parameter, currently UNUSED
-		$catlang = $cparams->get('language', '');
-		// filter items using currently selected language
-		$filtercat  = $cparams->get('filtercat', 0);
-		// show unauthorized items
-		$show_noauth = $cparams->get('show_noauth', 0);
+		// Show assigned items, this should not cause problems, category parameters says not to display itemcount for subcategories
+		if ( !$cparams->get('show_itemcount', 0) ) return null;
 		
-		$show_itemcount  = $cparams->get('show_itemcount', 0);
-		// This should not cause problems, category parameters says not to display itemcount for subcategories
-		if ($show_itemcount==0) return null;
+		// Get some parameters and other info
+		$catlang = $cparams->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
+		$lang = flexicontent_html::getUserCurrentLang();   // Get user language
+		$filtercat  = $cparams->get('filtercat', 0);       // Filter items using currently selected language
+		$show_noauth = $cparams->get('show_noauth', 0);    // Show unauthorized items
 		
-		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
-		$joinaccess2	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-		$where 			= ' WHERE cc.published = 1';
+		// Limit by access
+		$joinaccess   = FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
+		$joinaccess2  = FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
+		$where        = ' WHERE cc.published = 1';
 
-		// Filter the category view with the active active language
+		// Filter the category view with the current user language
 		if (FLEXI_FISH && $filtercat) {
 			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
 		}
@@ -797,9 +816,8 @@ class FlexicontentModelCategory extends JModel {
 		$states = $ignoreState ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
-		// Count items according to subcategories included (none,1st level,all level)
-		$_group_cats = "'".implode("','", $this->_group_cats)."'";
-		$where .= ' AND rel.catid IN ('.$_group_cats. ')';
+		// Count items according to full depth level !!!
+		$where .= ' AND rel.catid IN ('.$globalcats[$id]->descendants.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
@@ -818,7 +836,7 @@ class FlexicontentModelCategory extends JModel {
 				}
 			}
 		}
-
+		
 		$query 	= 'SELECT DISTINCT itemid'
 				. ' FROM #__flexicontent_cats_item_relations AS rel'
 				. ' LEFT JOIN #__content AS i ON rel.itemid = i.id'
@@ -848,7 +866,7 @@ class FlexicontentModelCategory extends JModel {
 	 */
 	function _getsubs($id)
 	{
-		$cparams = $this->_params;
+		$cparams = & $this->_params;
 		$show_noauth	= $cparams->get('show_noauth', 0);
 		$user			= &JFactory::getUser();
 
@@ -886,9 +904,9 @@ class FlexicontentModelCategory extends JModel {
 			;
 
 		$this->_db->setQuery($query);
-		$this->_subs = $this->_db->loadObjectList();
-
-		return $this->_subs;
+		$subcats = $this->_db->loadObjectList();
+		
+		return $subcats;
 	}
 
 	/**
@@ -900,25 +918,26 @@ class FlexicontentModelCategory extends JModel {
 
 	function getChilds()
 	{
-		$query = $this->_buildChildsquery();
+		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
-		$id = $this->_id;
+		$id = $this->_id;  // save id in case we need to change it
 		$k = 0;
 		$count = count($this->_childs);
 		for($i = 0; $i < $count; $i++) {
 			$category =& $this->_childs[$i];
 			
-			$category->assigneditems	= $this->_getassigned( $category->id );
-			$category->subcats			= $this->_getsubs( $category->id );
-			$this->_id					= $category->id;
-			//$category->items			= $this->getData();
+			$category->assigneditems = $this->_getassigned( $category->id );
+			$category->subcats       = $this->_getsubs( $category->id );
+			//$this->_id          = $category->id;
+			//$category->items    = $this->getData();
 			$this->_data				= null;
 			$k = 1 - $k;
 		}
-		$this->_id = $id;
+		$this->_id = $id;  // restore id in case it has been changed
 		return $this->_childs;
 	}
-
+	
+	
 	/**
 	 * Method to load the Category
 	 *
@@ -970,7 +989,7 @@ class FlexicontentModelCategory extends JModel {
 		
 		// Set category parameters, these have already been loaded
 		$this->_category->parameters = & $this->_params;
-		$cparams = $this->_params;
+		$cparams = & $this->_params;
 
 		//check whether category access level allows access
 		$canread = true;
@@ -1190,9 +1209,9 @@ class FlexicontentModelCategory extends JModel {
 			break;
 			
 			case 'categories':
-				$_group_cats = array_intersect(array($value), $this->_group_cats);
-				$_group_cats = "'".implode("','", $_group_cats)."'";
-				$where = ' catid IN ('.$_group_cats.')';
+				$_data_cats = array_intersect(array($value), $this->_data_cats);
+				$_data_cats = "'".implode("','", $_data_cats)."'";
+				$where = ' catid IN ('.$_data_cats.')';
 				$query  = 'SELECT id'
 					. ' FROM #__content'
 					. ' WHERE ' . $where
@@ -1253,7 +1272,7 @@ class FlexicontentModelCategory extends JModel {
 	 */
  	function getAlphaindex()
 	{
-		$where			= $this->_buildItemWhere();
+		$where  = $this->_buildItemWhere();
 		
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 				. ' FROM #__content AS i'
