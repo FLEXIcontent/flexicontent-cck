@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1219 2012-03-23 03:44:13Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1265 2012-05-07 06:07:01Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -74,21 +74,20 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		// Get data from the model		
-		$category 	= & $this->get('Category');
-		$categories	= & $this->get('Childs');
-		$items 		= & $this->get('Data');
-		$filters 	= & $this->get('Filters');
-		$alpha	 	= & $this->get('Alphaindex');
-		$model		= & $this->getModel();
+		$category   = & $this->get('Category');
+		$categories = & $this->get('Childs');
+		$items    = & $this->get('Data');
+		$total    = & $this->get('Total');
+		$filters  = & $this->get('Filters');
+		$alpha    = & $this->get('Alphaindex');
+		$model    = & $this->getModel();
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart		= JRequest::getInt('limitstart');
-		$format			= JRequest::getVar('format', null);
+		$limitstart = JRequest::getInt('limitstart');
+		$format     = JRequest::getVar('format', null);
 		
 		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$params	= & $category->parameters;
-		
-		$total 		= & $this->get('Total');
 		
 		$authorid = JRequest::getInt('authorid', 0);
 		$layout = JRequest::getInt('layout', 0);
