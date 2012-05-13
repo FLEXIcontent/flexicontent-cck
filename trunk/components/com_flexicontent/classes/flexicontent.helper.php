@@ -2003,8 +2003,10 @@ class FLEXIUtilities
 		// e.g. en/en.category.ini, but this is an overkill and make result into duplication of strings ... better all in one file 
 		$extension = '';  // JRequest::get('view');
 		
-		// Current language, we decided to use 2-letter language SEF shortcode, e.g. 'en' instead of 'en-GB'
-		$language_tag = flexicontent_html::getUserCurrentLang();
+		// Current language, we decided to use LL-CC (language-country) format mapping SEF shortcode, e.g. 'en' to 'en-GB'
+		$user_lang = flexicontent_html::getUserCurrentLang();
+		$languages = FLEXIUtilities::getLanguages($hash='shortcode');
+		$language_tag = $languages->$user_lang->code;
 		
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
