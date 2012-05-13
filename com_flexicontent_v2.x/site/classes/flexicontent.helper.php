@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1274 2012-05-09 05:19:03Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1284 2012-05-10 10:37:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1986,6 +1986,35 @@ class flexicontent_images
 
 class FLEXIUtilities
 {
+	
+	/**
+	 * Load Template-Specific language file to override or add new language strings
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	
+	function loadTemplateLanguageFile( $tmplname='default', $view='' )
+	{
+		// Check that template name was given
+		$tmplname = empty($tmplname) ? 'default' : $tmplname;
+		
+		// This is normally component/module/plugin name, we could use 'category', 'items', etc to have a view specific language file
+		// e.g. en/en.category.ini, but this is an overkill and make result into duplication of strings ... better all in one file 
+		$extension = '';  // JRequest::get('view');
+		
+		// Current language, we decided to use 2-letter language SEF shortcode, e.g. 'en' instead of 'en-GB'
+		$language_tag = flexicontent_html::getUserCurrentLang();
+		
+		// We will use template folder as BASE of language files instead of joomla's language folder
+		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
+		$base_dir = JPATH_COMPONENT.DS.'templates'.DS.$tmplname;
+		
+		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
+		JFactory::getLanguage()->load($extension, $base_dir, 'en', $reload=true);           // Fallback to english language template file
+		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+	}
+	
 	/**
 	 * Method to get information of site languages
 	 * 

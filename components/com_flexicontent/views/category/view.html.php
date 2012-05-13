@@ -89,6 +89,9 @@ class FlexicontentViewCategory extends JView
 		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$params	= & $category->parameters;
 		
+		// Load Template-Specific language file to override or add new language strings
+		FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
+		
 		$authorid = JRequest::getInt('authorid', 0);
 		$layout = JRequest::getInt('layout', 0);
 		$authordescr_item = false;
