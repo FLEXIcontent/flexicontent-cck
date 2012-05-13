@@ -525,18 +525,11 @@ class FlexicontentModelCategory extends JModel {
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
-		// Get the category parameters
-		$cparams = & $this->_params;
-		
-		// Get the site default language in case no language is set in the url
-		$lang = flexicontent_html::getUserCurrentLang();
-		
-		// category language parameter, currently UNUSED
-		$catlang = $cparams->get('language', '');
-		// filter items using currently selected language
-		$filtercat  = $cparams->get('filtercat', 0);
-		// show unauthorized items
-		$show_noauth = $cparams->get('show_noauth', 0);
+		$cparams = & $this->_params;                      // Get the category parameters
+		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
+		$catlang = $cparams->get('language', '');         // Category language parameter, currently UNUSED
+		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
+		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
 		
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1=1';
@@ -786,7 +779,7 @@ class FlexicontentModelCategory extends JModel {
 		
 		// Get some parameters and other info
 		$catlang = $cparams->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
-		$lang = flexicontent_html::getUserCurrentLang();   // Get user language
+		$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
 		$filtercat  = $cparams->get('filtercat', 0);       // Filter items using currently selected language
 		$show_noauth = $cparams->get('show_noauth', 0);    // Show unauthorized items
 		

@@ -109,7 +109,10 @@ class FlexicontentViewItems extends JView
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
 		$params = & $item->parameters;
-
+		
+		// Load Template-Specific language file to override or add new language strings
+		FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
+		
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
 		$item	= $item[0];
@@ -379,6 +382,9 @@ class FlexicontentViewItems extends JView
 			//$row = & $model->getItem($model->getId(), false);
 			$form = & $this->get('Form');
 		}
+		
+		// Load Template-Specific language file to override or add new language strings
+		FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout') );
 		
 		// *******************************
 		// CHECK EDIT / CREATE PERMISSIONS

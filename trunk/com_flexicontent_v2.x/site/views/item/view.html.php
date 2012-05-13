@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1265 2012-05-07 06:07:01Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1268 2012-05-07 23:14:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -109,7 +109,10 @@ class FlexicontentViewItem extends JView
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
 		$params = & $item->parameters;
-
+		
+		// Load Template-Specific language file to override or add new language strings
+		FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
+		
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
 		$item	= $item[0];
@@ -379,6 +382,9 @@ class FlexicontentViewItem extends JView
 			//$row = & $model->getItem($model->getId(), false);
 			$form = & $this->get('Form');
 		}
+		
+		// Load Template-Specific language file to override or add new language strings
+		FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout') );
 		
 		// *******************************
 		// CHECK EDIT / CREATE PERMISSIONS
