@@ -199,11 +199,11 @@ $files_tbl_cols = $db->loadResultArray();
 				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 				<span style="<?php echo $style; ?>"><?php
 				if($already) {
-					echo JText::_("Column 'description' already exists.");
-				}elseif($result) {
-					echo JText::_('Success');
-				}else{
-					echo JText::_('ALTER TABLE command unsuccessful.');
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'description' already exists.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'description' added.");
+				} else {
+					echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 				}
 				?></span>
 			</td>
