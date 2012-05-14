@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1171 2012-03-09 04:53:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -57,7 +57,7 @@ class FlexicontentModelTags extends JModel
 	 * @var object
 	 */
 	var $_params = null;
-
+	
 	/**
 	 * Constructor
 	 *
@@ -68,14 +68,14 @@ class FlexicontentModelTags extends JModel
 		parent::__construct();
 		
 		// Load parameters
-		$this->_params = $this->_loadTagParams();
+		$this->_params = $this->_loadParams();
 		$params = $this->_params;
 
 		//get the number of events from database
-		$limit			= JRequest::getInt('limit', $params->get('limit'));
-		$limitstart		= JRequest::getInt('limitstart');
-		$id				= JRequest::getInt('id', 0);
+		$limit      = JRequest::getInt('limit', $params->get('limit'));
+		$limitstart = JRequest::getInt('limitstart');
 		
+		$id = JRequest::getInt('id', 0);		
 		$this->setId((int)$id);
 
 		$this->setState('limit', $limit);
@@ -188,15 +188,29 @@ class FlexicontentModelTags extends JModel
 		$user		= & JFactory::getUser();
 		$params = $this->_params;
 		
+		// image for an image field
+		$use_image    = (int)$params->get('use_image', 1);
+		$image_source = $params->get('image_source');
+
+		// EXTRA select and join for special fields: --image--
+		if ($use_image && $image_source) {
+			$select_image = ' img.value AS image,';
+			$join_image   = '	LEFT JOIN #__flexicontent_fields_item_relations AS img'
+				. '	ON ( i.id = img.item_id AND img.valueorder = 1 AND img.field_id = '.$image_source.' )';
+		} else {
+			$select_image	= '';
+			$join_image		= '';
+		}
+		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
-
+		
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess	= ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
+				$andaccess = ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
 				$joinaccess	= '';
 			} else {
 				$aid = (int) $user->get('aid');
@@ -216,31 +230,33 @@ class FlexicontentModelTags extends JModel
 			$andaccess   = '';
 		}
 
+		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
 		
 		// Add sort items by custom field.
 		$field_item = '';
 		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND field_id='.(int)$params->get('orderbycustomfieldid', 0);
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
 
-		$query = 'SELECT i.id, i.title, i.*, ie.*,'
-		 . ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		 . ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		 . ' FROM #__content AS i'
-		 . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		 . ' INNER JOIN #__flexicontent_tags_item_relations AS t ON t.itemid = i.id'
-		 . ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		 . ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-		 . ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
-		 . $field_item
-		 . $joinaccess
-		 . $where
-		 . $andaccess
-		 . ' GROUP BY i.id'
-		 . $orderby
-		 ;
+		$query = 'SELECT i.id, i.*, ie.*, '.$select_image
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' INNER JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+			. $join_image
+			. $field_item
+			. $joinaccess
+			. $where
+			. $andaccess
+			. ' GROUP BY i.id'
+			. $orderby
+			;
 		return $query;
 	}
 
@@ -307,32 +323,16 @@ class FlexicontentModelTags extends JModel
 		}
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 		if ($params->get('orderbycustomfieldid', 0) != 0)
-			{
+		{
 			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 			$filter_order		= 'f.value'.$int;
 			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
-			}
+		}
 		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 
 		return $orderby;
 	}
-
-	/**
-	 * Build the order clause
-	 *
-	 * @access private
-	 * @return string
-	 */
-	/*function _buildItemOrderBy()
-	{	
-		$filter_order		= $this->getState('filter_order');
-		$filter_order_dir	= $this->getState('filter_order_dir');
-
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
-
-		return $orderby;
-	}*/
 	
 	/**
 	 * Method to build the WHERE clause
@@ -349,18 +349,12 @@ class FlexicontentModelTags extends JModel
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
 		
-		// Get the site default language in case no language is set in the url
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		// User current language
+		$lang = flexicontent_html::getUserCurrentLang();
 		$filtertag  = $params->get('filtertag', 0);
 
-		// First thing we need to do is to select only the requested items
-		$where = ' WHERE t.tid = '.$this->_id;
+		// First thing we need to do is to select only the requested TAGGED items
+		$where = ' WHERE tag.tid = '.$this->_id;
 		
 		// Filter the tag view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
@@ -395,12 +389,7 @@ class FlexicontentModelTags extends JModel
 		 */
 		if ($params->get('use_search'))
 		{
-			$filter		= JRequest::getVar('filter', NULL, 'request');
-			/*if($filter===NULL) {
-				$filter =  $session->get($option.'.category.filter');
-			} else {
-				$session->set($option.'.category.filter', $filter);
-			}*/
+			$filter 		= JRequest::getString('filter', '', 'request');
 
 			if ($filter)
 			{
@@ -440,7 +429,7 @@ class FlexicontentModelTags extends JModel
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadTagParams()
+	function _loadParams()
 	{
 		$mainframe =& JFactory::getApplication();
 
