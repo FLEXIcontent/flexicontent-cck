@@ -17,6 +17,38 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$params = & $this->params;
+$db     =& JFactory::getDBO();
+$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+
+// Date configuration
+$use_date   = $params->get( 'show_modify_date', 0 ) ;
+$dateformat = $params->get( 'date_format', 'DATE_FORMAT_LC2' ) ;
+$customdate = $params->get( 'custom_date', '' ) ;
+$dateformat = ($dateformat != "DATE_FORMAT_CUSTOM") ? $dateformat : $customdate;
+
+// Image configuration
+$use_image    = (int)$params->get('use_image', 1);
+$image_source = $params->get('image_source');
+$img_height   = (int)$params->get('img_height', 40);
+$img_width    = (int)$params->get('img_width', 40);
+$img_method   = (int)$params->get('img_method', 1);
+
+// Retrieve default image for the image field
+if ($image_source) {
+	$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $image_source;
+	$db->setQuery($query);
+	$midata = new stdClass();
+	$midata->params = $db->loadResult();
+	$midata->params = new JParameter($midata->params);
+	
+	$midata->default_image = $midata->params->get( 'default_image', '');
+	if ( $midata->default_image !== '' ) {
+		$midata->default_image_filepath = JPATH_BASE.DS.$midata->default_image;
+		$midata->default_image_filename = basename($midata->default_image);
+	}
+}
+
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -36,6 +68,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <h2 class="flexicontent tagitems<?php echo $this->tag->id; ?>">
 	<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->escape($this->tag->name); ?>
 </h2>
+
+<?php if (!count($this->items)) : ?>
+
+	<div class="note">
+		<?php echo JText::_( 'FLEXI_NO_ITEMS_TAGGED' ); ?>
+	</div>
+
+<?php else : ?>
 
 <?php if ($this->params->get('use_search')) : ?>
 <form action="<?php echo $this->action; ?>" method="post" id="adminForm">
@@ -58,45 +98,86 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->escape($this->tag->name); ?>">
 	<thead>
 		<tr>
-			<?php if ($this->params->get('use_image', 1)) : ?>
+			<?php if ($use_image) : ?>
 			<th id="fc_image"><?php echo JText::_( 'FLEXI_IMAGE' ); ?></th>
 			<?php endif; ?>
 			<th id="fc_title"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
 			<th id="fc_desc"><?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?></th>
+			<?php if ($use_date) : ?>
+			<th id="fc_modified"><?php echo JText::_( 'FLEXI_LAST_UPDATED' ); ?></th>
+			<?php endif; ?>
 		</tr>
-	</thead>	
+	</thead>
 	<tbody>	
 	<?php
 	foreach ($this->items as $item) :
-    	$src 	= flexicontent_html::extractimagesrc($item);
-    	$w		= '&amp;w=40';
-    	$h		= '&amp;h=40';
-    	$aoe	= '';
-    	$q		= '&amp;q=95';
-    	$conf	= $w . $h . $aoe . $q;
-			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-	?>
-  			<tr class="sectiontableentry" >
-				<?php if ($this->params->get('use_image', 1)) : ?>
-    			<td headers="fc_image" align="center">
-    				<?php if ($src) : ?>
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
-						<img src="<?php echo JURI::base(); ?>components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=<?php echo $base_url . $src . $conf; ?>" />
-					</a>
-					<?php endif; ?>
-				</td>
-				<?php endif; ?>
-    			<td headers="fc_title">
-    				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $this->escape($item->title); ?></a>
-				</td>
-    			<td headers="fc_intro">
-    				<?php echo flexicontent_html::striptagsandcut( $item->introtext, 150 ); ?>
-				</td>
-			</tr>
-	<?php endforeach; ?>
+		if ($image_source) {
+			$src = '';
+			if (!empty($item->image)) {
+				$image	= unserialize($item->image);
+				$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+			} else if (!empty($midata->default_image_filepath)) {
+				$src	= $midata->default_image_filepath;
+			}
+				
+			if ($src) {
+				$h		= '&amp;h=' . $img_height;
+				$w		= '&amp;w=' . $img_height;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
+				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
+				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			}
+		} else {
+			$articleimage = flexicontent_html::extractimagesrc($item);
+			if ($articleimage) {
+			  $src	= $articleimage;
+			
+				$h		= '&amp;h=' . $img_height;
+				$w		= '&amp;w=' . $img_width;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
+				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $zc . $f;
+			
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+				$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			}
+		}
+		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+	?>
+		<tr class="sectiontableentry" >
+		<?php if ($this->params->get('use_image', 1)) : ?>
+			<td headers="fc_image" align="center">
+				<?php if (!empty($src)) : ?>
+				<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
+				<img src="<?php echo $thumb; ?>" />
+				</a>
+				<?php endif; ?>
+			</td>
+		<?php endif; ?>
+			<td headers="fc_title">
+				<a href="<?php echo $item_link; ?>"><?php echo $this->escape($item->title); ?></a>
+			</td>
+			<td headers="fc_intro">
+				<?php echo flexicontent_html::striptagsandcut( $item->introtext, 150 ); ?>
+			</td>
+		<?php if ($use_date) : ?>
+			<td headers="fc_modified">
+				<?php echo JHTML::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
+			</td>
+		<?php endif; ?>
+		</tr>
+	<?php endforeach; ?>
 	</tbody>
 </table>
+<?php endif; ?>
 
 <!-- BOF pagination -->
 <?php if ($this->params->get('show_pagination', 2) != 0) : ?>

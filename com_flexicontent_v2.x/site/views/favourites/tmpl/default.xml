@@ -8,15 +8,23 @@
 	
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+			
+			<field name="sep_appearance" type="separator" hr="false" default="Appearance" description="" level="level1" menu="hide" />
+			
+			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+		 	</field>
+			
+			<field name="sep_image" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" menu="hide" />
+			<field name="use_image" type="radio" default="1" label="FLEXI_SHOW" description="...">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-	 			<option value="0">FLEXI_NO</option>
-	 			<option value="1">FLEXI_YES</option>
-		 	</field>
-			<field name="show_modify_date" type="radio" default="1" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC">
+			<field name="image_source" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+			
+			<field name="sep_moddate" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
+			<field name="show_modify_date" type="radio" default="1" label="FLEXI_SHOW" description="...">
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
 			</field>
@@ -28,7 +36,8 @@
 				<option value="DATE_FORMAT_CUSTOM">FLEXI_FIELD_CUSTOM_FORMAT</option>
 			</field>
 			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
-			<field name="@spacer" type="spacer" default="" label="" description="" />
+			
+			<field name="sep_pagination" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
 				<option value="0">Hide</option>
@@ -39,6 +48,32 @@
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
 			</field>
+			
+			<field name="sep_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />
+			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+				<option value="">Default</option>
+				<option value="date">Oldest first</option>
+				<option value="rdate">Most recent first</option>
+				<option value="modified">Last modified first</option>
+				<option value="alpha">Title Alphabetical</option>
+				<option value="ralpha">Title Reverse-Alphabetical</option>
+				<option value="author">Author Alphabetical</option>
+				<option value="rauthor">Author Reverse-Alphabetical</option>
+				<option value="hits">Most Hits</option>
+				<option value="rhits">Least Hits</option>
+				<option value="order">Ordering</option>
+			</field>
+			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</field>
+			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE">
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INT</option>
+			</field>
+			
 		</fieldset>
 	</fields>
+	
 </metadata>

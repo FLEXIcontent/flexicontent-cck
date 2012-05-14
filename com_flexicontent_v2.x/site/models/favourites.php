@@ -60,25 +60,13 @@ class FlexicontentModelFavourites extends JModel
 	{
 		parent::__construct();
 		
-		$mainframe =& JFactory::getApplication();
+		// Load parameters
+		$this->_params = $this->_loadParams();
+		$params = $this->_params;
 
-		// Get the PAGE/COMPONENT parameters
-		$params = clone( $mainframe->getParams('com_flexicontent') );
-		
-		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
-		
-		$this->_params = $params;
-		
 		//get the number of events from database
-		$limit			= JRequest::getInt('limit', $params->get('limit'));
-		$limitstart		= JRequest::getInt('limitstart');
+		$limit      = JRequest::getInt('limit', $params->get('limit'));
+		$limitstart = JRequest::getInt('limitstart');
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -101,12 +89,17 @@ class FlexicontentModelFavourites extends JModel
 		{		
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+			if ( $this->_db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
 		}
+		
 		return $this->_data;
 	}
 	
 	/**
-	 * Total nr of items
+	 * Total nr of Items
 	 *
 	 * @access public
 	 * @return integer
@@ -124,7 +117,7 @@ class FlexicontentModelFavourites extends JModel
 	}
 	
 	/**
-	 * Builds the query
+	 * Method to build the query
 	 *
 	 * @access public
 	 * @return string
@@ -134,16 +127,30 @@ class FlexicontentModelFavourites extends JModel
 		$user		= & JFactory::getUser();
 		$params = $this->_params;
 		
+		// image for an image field
+		$use_image    = (int)$params->get('use_image', 1);
+		$image_source = $params->get('image_source');
+
+		// EXTRA select and join for special fields: --image--
+		if ($use_image && $image_source) {
+			$select_image = ' img.value AS image,';
+			$join_image   = '	LEFT JOIN #__flexicontent_fields_item_relations AS img'
+				. '	ON ( i.id = img.item_id AND img.valueorder = 1 AND img.field_id = '.$image_source.' )';
+		} else {
+			$select_image	= '';
+			$join_image		= '';
+		}
+		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
-
+		
 		// Select only items user has access to if he is not allowed to show unauthorized items
-		$joinaccess = $andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
 				$andaccess = ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
+				$joinaccess	= '';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -152,34 +159,46 @@ class FlexicontentModelFavourites extends JModel
 					$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
 					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
 				} else {
+					$joinaccess	 = '';
 					$andaccess   = ' AND mc.access <= '.$aid;
 					$andaccess  .= ' AND i.access <= '.$aid;
 				}
 			}
+		} else {
+			$joinaccess	 = '';
+			$andaccess   = '';
 		}
 
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildItemWhere();
 		$orderby	= $this->_buildItemOrderBy();
+		
+		// Add sort items by custom field.
+		$field_item = '';
+		if ($params->get('orderbycustomfieldid', 0) != 0) {
+			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+		}
 
-		$query 	= 'SELECT DISTINCT f.itemid, i.*, ie.*,'
-				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-				. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
-				. ' LEFT JOIN #__flexicontent_favourites AS f ON f.itemid = i.id'
-		        . $joinaccess
-		        . $where
-		        . $andaccess
-				. ' GROUP BY i.id'
-				. $orderby
-				;
-
+		$query = 'SELECT i.id, i.*, ie.*, '.$select_image
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' INNER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+			. $join_image
+			. $field_item
+			. $joinaccess
+			. $where
+			. $andaccess
+			. ' GROUP BY i.id'
+			. $orderby
+			;
 		return $query;
 	}
+
 
 	/**
 	 * Build the order clause
@@ -188,10 +207,67 @@ class FlexicontentModelFavourites extends JModel
 	 * @return string
 	 */
 	function _buildItemOrderBy()
-	{	
+	{
+		$params = $this->_params;
+				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
 
+		if ($params->get('orderby')) {
+			$order = $params->get('orderby');
+			
+			switch ($order) {
+				case 'date' :
+				$filter_order		= 'i.created';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rdate' :
+				$filter_order		= 'i.created';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'modified' :
+				$filter_order		= 'i.modified';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'alpha' :
+				$filter_order		= 'i.title';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'ralpha' :
+				$filter_order		= 'i.title';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'author' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rauthor' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'hits' :
+				$filter_order		= 'i.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rhits' :
+				$filter_order		= 'i.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'order' :
+				$filter_order		= 'rel.ordering';
+				$filter_order_dir	= 'ASC';
+				break;
+			}
+			
+		}
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		if ($params->get('orderbycustomfieldid', 0) != 0)
+		{
+			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+			$filter_order		= 'f.value'.$int;
+			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+		}
+		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.created';
 
 		return $orderby;
@@ -205,15 +281,35 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildItemWhere( )
 	{
-		$user		= & JFactory::getUser();
-		$gid		= (int) $user->get('aid');
-		$params	=  $this->_params;
+		$mainframe =& JFactory::getApplication();
+		$params = $this->_params;
 
-		// First thing we need to do is to select only the requested items
-		$where = ' WHERE f.userid = '.(int)$user->get('id');
+		$user		= & JFactory::getUser();
+		$now		= $mainframe->get('requestTime');
+		$nullDate	= $this->_db->getNullDate();
+
+		// First thing we need to do is to select only the requested FAVOURED items
+		$where = ' WHERE fav.userid = '.(int)$user->get('id');
 		
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
+		// Limit to published items. Exception when user can edit item
+		// but NO CLEAN WAY OF CHECKING individual item EDIT ACTION while creating this query !!!
+		// *** so we will rely only on item created or modified by the user ***
+		// when view is created the edit button will check individual item EDIT ACTION
+		// NOTE: *** THE ABOVE MENTIONED EXCEPTION WILL NOT OVERRIDE ACCESS
+		if (FLEXI_J16GE) {
+			$ignoreState = $user->authorise('core.admin', 'com_flexicontent');  // Super user privelege, can edit all for sure
+		} else if (FLEXI_ACCESS) {
+			$ignoreState = (int)$user->gid >= 25;  // Super admin, can edit all for sure
+		} else {
+			$ignoreState = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
+		}
+		
+		$states = $ignoreState ? '1, -5, 0, -3, -4' : '1, -5';
+		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		
+		// Limit by publication date. Exception: when displaying personal user items or items modified by the user
+		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
@@ -232,5 +328,46 @@ class FlexicontentModelFavourites extends JModel
 		}
 		return $where;
 	}
+	
+	
+	/**
+	 * Method to load parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadParams()
+	{
+		$mainframe =& JFactory::getApplication();
+
+		// Get the PAGE/COMPONENT parameters
+		$params = clone( $mainframe->getParams('com_flexicontent') );
+		
+		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			$menuParams = new JRegistry;
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams->loadJSON($menu->params);
+			}
+			$params->merge($menuParams);
+		}
+		
+		// Higher Priority: prefer from http request than menu item
+		if (JRequest::getVar('orderby', '' )) {
+			$params->set('orderby', JRequest::getVar('orderby') );
+		}
+		if (JRequest::getVar('orderbycustomfieldid', '' )) {
+			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
+		}
+		if (JRequest::getVar('orderbycustomfieldint', '' )) {
+			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
+		}
+		if (JRequest::getVar('orderbycustomfielddir', '' )) {
+			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
+		}
+		
+		return $params;
+	}	
 }
 ?>
