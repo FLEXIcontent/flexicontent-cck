@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1268 2012-05-07 23:14:11Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1296 2012-05-13 07:47:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -111,7 +111,8 @@ class FlexicontentViewItem extends JView
 		$params = & $item->parameters;
 		
 		// Load Template-Specific language file to override or add new language strings
-		FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
+		if (FLEXI_FISH)
+			FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
 		
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);

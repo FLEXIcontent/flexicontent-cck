@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1295 2012-05-12 08:50:13Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1296 2012-05-13 07:47:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -90,7 +90,8 @@ class FlexicontentViewCategory extends JView
 		$params	= & $category->parameters;
 		
 		// Load Template-Specific language file to override or add new language strings
-		FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
+		if (FLEXI_FISH)
+			FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
 		
 		$authorid = JRequest::getInt('authorid', 0);
 		$layout = JRequest::getInt('layout', 0);
