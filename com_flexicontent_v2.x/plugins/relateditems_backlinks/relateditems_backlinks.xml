@@ -67,7 +67,6 @@
 	</fields>
 	</config>
 	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems.ini</language>
-		<language tag="de-DE">de-DE.plg_flexicontent_fields_relateditems.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems_backlinks.ini</language>
 	</languages>
 </install>

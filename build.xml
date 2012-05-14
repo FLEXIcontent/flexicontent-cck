@@ -254,6 +254,10 @@
 		<copy file="plugins/flexicontent_fields/relateditems.xml" tofile="flexipack/plugins/relateditems/relateditems.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relateditems.ini" tofile="flexipack/plugins/relateditems/en-GB.plg_flexicontent_fields_relateditems.ini" />
 		
+		<copy file="plugins/flexicontent_fields/relateditems_backlinks.php" tofile="flexipack/plugins/relateditems_backlinks/relateditems_backlinks.php" />
+		<copy file="plugins/flexicontent_fields/relateditems_backlinks.xml" tofile="flexipack/plugins/relateditems_backlinks/relateditems_backlinks.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relateditems_backlinks.ini" tofile="flexipack/plugins/relateditems_backlinks/en-GB.plg_flexicontent_fields_relateditems_backlinks.ini" />
+		
 		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
 		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexinotify/en-GB.plg_flexicontent_flexinotify.ini" />
