@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1129 2012-01-31 03:54:58Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: flexisystem.php 1265 2012-05-07 06:07:01Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -21,6 +21,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.plugin.plugin' );
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
  * Example system plugin
@@ -59,8 +60,15 @@ class plgSystemFlexisystem extends JPlugin
 		$view   = JRequest::getVar('view', '');
 		$layout = JRequest::getVar('layout', '');
 		$tmpl   = JRequest::getVar('tmpl', '');
-		if(($option=='com_content')&&($layout=='pagebreak')) return;
-		//if(($option=='com_content')&&($view=='articles')&&($layout=='modal')&&($tmpl=='component')) return;
+		$task   = JRequest::getVar('task', '');
+		
+		// Exclude pagebreak outputing dialog from redirection
+		if( !FLEXI_J16GE ) {
+			if ( $option=='com_content' && $task=='ins_pagebreak' ) return;
+		} else {
+			if ( $option=='com_content' && $layout=='pagebreak' ) return;
+		}
+		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
 
 		$this->trackSaveConf();
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
@@ -379,7 +387,7 @@ class plgSystemFlexisystem extends JPlugin
 		return;
 	}
 
-	// Function by decide type of user
+	// Function by decide type of user, currently unused since we used user access level instead of this function
 	function getUserType() {
     
     // Joomla default user groups
