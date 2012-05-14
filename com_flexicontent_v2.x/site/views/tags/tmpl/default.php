@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1088 2012-01-08 16:40:44Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1299 2012-05-14 00:06:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -49,6 +49,12 @@ if ($image_source) {
 	}
 }
 
+// Extra fields configuration
+$use_fields = (int)$params->get('use_fields', 1);
+$fields = $params->get('fields');
+$fields = array_map( 'trim', explode(',', $params->get('fields')) );
+if ($fields[0]=='') $fields = array();
+
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -76,6 +82,16 @@ if ($image_source) {
 	</div>
 
 <?php else : ?>
+
+<?php
+if ($use_fields && count($fields)) {
+	foreach ($this->items as $item) {
+		foreach ($fields as $fieldname) {
+			FlexicontentFields::getFieldDisplay($item, $fieldname, $values=null, $method='display');
+		}
+	}
+}
+?>
 
 <?php if ($this->params->get('use_search')) : ?>
 <form action="<?php echo $this->action; ?>" method="post" id="adminForm">
@@ -105,6 +121,11 @@ if ($image_source) {
 			<th id="fc_desc"><?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?></th>
 			<?php if ($use_date) : ?>
 			<th id="fc_modified"><?php echo JText::_( 'FLEXI_LAST_UPDATED' ); ?></th>
+			<?php endif; ?>
+			<?php if ($use_fields && count($fields)) : ?>
+				<?php foreach ($fields as $fieldname) : ?>
+				<th id="fc_<?php echo $fieldname; ?>" ><?php echo $this->items[0]->fields[$fieldname]->label; ?></th>
+				<?php endforeach; ?>
 			<?php endif; ?>
 		</tr>
 	</thead>
@@ -173,6 +194,13 @@ if ($image_source) {
 				<?php echo JHTML::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
 			</td>
 		<?php endif; ?>
+		
+		<?php if ($use_fields && count($fields)) : ?>
+			<?php foreach ($fields as $fieldname) : ?>
+				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></th>
+			<?php endforeach; ?>
+		<?php endif; ?>
+		
 		</tr>
 	<?php endforeach; ?>
 	</tbody>

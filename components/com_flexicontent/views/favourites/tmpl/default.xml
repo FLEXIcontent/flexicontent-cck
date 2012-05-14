@@ -39,6 +39,13 @@
 			</param>
 			<param name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
 			
+			<param name="" type="separator" hr="false" default="FLEXI_EXTRA_FIELDS" description="FLEXI_EXTRA_FIELDS_DESC" level="level2" menu="hide" />
+			<param name="use_fields" type="radio" default="0" label="FLEXI_SHOW" description="...">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
+
 			<param name="" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
 			<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<param name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
