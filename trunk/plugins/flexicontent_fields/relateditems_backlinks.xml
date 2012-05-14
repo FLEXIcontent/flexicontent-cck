@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Related Items - BackLinks</name>
+	<author>Clément Peyrel</author>
+	<creationDate>2010-07-14</creationDate>
+	<copyright></copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>c.peyrel@sitefaitbienfait.fr</authorEmail>
+	<authorUrl>http://www.sitefaitbienfait.fr</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_RELATEDITEMS_BACKLINKS</description>
+	<files>
+		<filename plugin="relateditems_backlinks">relateditems_backlinks.php</filename>
+	</files>
+	<params group="standard">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+	</params>
+	<params group="group-relateditems_backlinks" addpath="/administrator/components/com_flexicontent/elements">
+		<param name="reverse_field" type="fields" field_type="relateditems" label="FLEXI_FIELD_CHOOSE_FCFIELD" description="FLEXI_FIELD_CHOOSE_FCFIELD_DESC" />
+		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+			<option value="">Default</option>
+			<option value="date">Oldest first</option>
+			<option value="rdate">Most recent first</option>
+			<option value="alpha">Title Alphabetical</option>
+			<option value="ralpha">Title Reverse-Alphabetical</option>
+			<option value="hits">Most Hits</option>
+			<option value="rhits">Least Hits</option>
+			<option value="order">Ordering</option>
+		</param>
+		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+		<param name="displayway" type="list" default="1" label="FLEXI_DISPLAY_WAY" description="FLEXI_DISPLAY_WAY_DESC">
+			<option value="0">FLEXI_DISPLAY_WAY_VALUE</option>
+			<option value="1">FLEXI_DISPLAY_WAY_TEXT</option>
+		</param>
+		<param name="addlink" type="radio" default="1" label="FLEXI_ADD_LINK" description="FLEXI_ADD_LINK_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="remove_space" type="radio" default="1" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC"  />
+		<param name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+		<param name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
+		<param name="separatorf" type="list" default="1" label="FLEXI_FIELD_SEPARATOR_FRONTEND" description="FLEXI_FIELD_SEPARATOR_FRONTEND_DESC">
+			<option value="0">FLEXI_SPACE</option>
+			<option value="1">FLEXI_LINE_BREAK</option>
+			<option value="2">FLEXI_PIPE</option>
+			<option value="3">FLEXI_COMMA</option>
+			<option value="4">FLEXI_FIELD_TAG_CUSTOM</option>
+		</param>
+		<param name="opentag" type="text" default="" label="FLEXI_FIELD_TAG_OPEN" description="FLEXI_FIELD_TAG_OPEN_DESC" />
+		<param name="closetag" type="text" default="" label="FLEXI_FIELD_TAG_CLOSE" description="FLEXI_FIELD_TAG_CLOSE_DESC" />		
+	</params>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems_backlinks.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_relateditems_backlinks.ini</language>
+	</languages>
+</install>

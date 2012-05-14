@@ -57,8 +57,18 @@ class plgSystemFlexisystem extends JPlugin
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 		
 		$option = JRequest::getCMD('option');
-		$task = JRequest::getVar('task', '');
-		if(($option=='com_content')&&($task=='ins_pagebreak')) return;
+		$view   = JRequest::getVar('view', '');
+		$layout = JRequest::getVar('layout', '');
+		$tmpl   = JRequest::getVar('tmpl', '');
+		$task   = JRequest::getVar('task', '');
+		
+		// Exclude pagebreak outputing dialog from redirection
+		if( !FLEXI_J16GE ) {
+			if ( $option=='com_content' && $task=='ins_pagebreak' ) return;
+		} else {
+			if ( $option=='com_content' && $layout=='pagebreak' ) return;
+		}
+		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
 
 		$this->trackSaveConf();
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
@@ -207,7 +217,6 @@ class plgSystemFlexisystem extends JPlugin
 	function getCategoriesTree()
 	{
 		global $globalcats;
-
 		$db		=& JFactory::getDBO();
 
 		// get the category tree and append the ancestors to each node		
