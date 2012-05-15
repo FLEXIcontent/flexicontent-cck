@@ -478,10 +478,11 @@ class FlexicontentViewCategory extends JView
 		$pageNav = $model->getPagination();
 		$resultsCounter = $model->getResultsCounter();
 
-		$this->assign('action', 			$uri->toString());
-
-		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
+		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		
+		$this->assignRef('action',			$category_link);  // $uri->toString()
+		$this->assignRef('print_link' ,	$print_link);
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , $categories);
 		$this->assignRef('items' , 			$items);
@@ -494,7 +495,6 @@ class FlexicontentViewCategory extends JView
 		$this->assignRef('lists' ,	 		$lists);
 		$this->assignRef('alpha' ,	 		$alpha);
 		$this->assignRef('tmpl' ,				$tmpl);
-		$this->assignRef('print_link' ,	$print_link);
 
 		/*
 		 * Set template paths : this procedure is issued from K2 component

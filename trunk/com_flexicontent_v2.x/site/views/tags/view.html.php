@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1088 2012-01-08 16:40:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -121,13 +121,16 @@ class FlexicontentViewTags extends JView
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
-		$this->assign('action', 					$uri->toString());
-
-		$this->assignRef('items' , 					$items);
-		$this->assignRef('tag' , 					$tag);
-		$this->assignRef('params' , 				$params);
-		$this->assignRef('pageNav' , 				$pageNav);
-		$this->assignRef('lists' ,	 				$lists);
+		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id));
+		$print_link = JRoute::_('index.php?view=tags&id='.$tag->id.'&pop=1&tmpl=component');
+		
+		$this->assignRef('tag' , 				$tag);
+		$this->assignRef('action', 			$tag_link);  // $uri->toString()
+		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('items' , 			$items);
+		$this->assignRef('params' , 		$params);
+		$this->assignRef('pageNav' , 		$pageNav);
+		$this->assignRef('lists' ,	 		$lists);
 
 		parent::display($tpl);
 

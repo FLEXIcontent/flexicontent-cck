@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1296 2012-05-13 07:47:53Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1306 2012-05-15 00:04:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -478,10 +478,11 @@ class FlexicontentViewCategory extends JView
 		$pageNav = $model->getPagination();
 		$resultsCounter = $model->getResultsCounter();
 
-		$this->assign('action', 			$uri->toString());
-
-		$print_link = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
+		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		
+		$this->assignRef('action',			$category_link);  // $uri->toString()
+		$this->assignRef('print_link' ,	$print_link);
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , $categories);
 		$this->assignRef('items' , 			$items);
@@ -494,7 +495,6 @@ class FlexicontentViewCategory extends JView
 		$this->assignRef('lists' ,	 		$lists);
 		$this->assignRef('alpha' ,	 		$alpha);
 		$this->assignRef('tmpl' ,				$tmpl);
-		$this->assignRef('print_link' ,	$print_link);
 
 		/*
 		 * Set template paths : this procedure is issued from K2 component
