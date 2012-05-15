@@ -611,9 +611,7 @@ class FlexicontentViewItems extends JView
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
 		//JFilterOutput::objectHTMLSafe( $item );
-
-		$this->assign('action', 	$uri->toString());
-
+		
 		$this->assignRef('item',			$item);
 		if (FLEXI_J16GE) {  // most core field are created via calling methods of the form (J2.5)
 			$this->assignRef('form',		$form);

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1088 2012-01-08 16:40:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -104,12 +104,15 @@ class FlexicontentViewFavourites extends JView
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
-		$this->assign('action', 					$uri->toString());
-
-		$this->assignRef('items' , 					$items);
-		$this->assignRef('params' , 				$params);
-		$this->assignRef('pageNav' , 				$pageNav);
-		$this->assignRef('lists' ,	 				$lists);
+		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites' );
+		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		
+		$this->assignRef('action', 			$fav_link);  // $uri->toString()
+		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('items' , 			$items);
+		$this->assignRef('params' , 		$params);
+		$this->assignRef('pageNav' , 		$pageNav);
+		$this->assignRef('lists' ,	 		$lists);
 
 		parent::display($tpl);
 

@@ -38,21 +38,33 @@ function FLEXIcontentBuildRoute(&$query)
 	}
 	
 	// 2. Try to match the variables against the variables of the menuItem
-	$menuItem_matches = true;
-	foreach($query as $index => $value) {
-		if (!isset($menuItem->query[$index])) {
-			$menuItem_matches = false;
-			break;
+	if ( !empty($menuItem) ) {
+		$menuItem_matches = true;
+		foreach($query as $index => $value) {
+			// Do not try to match menu itemid, we retrieved the given Itemid
+			if ($index=='Itemid') continue;
+		
+			// Check that the variable exists in the menu item id
+			if (!isset($menuItem->query[$index])) {
+				$menuItem_matches = false;
+				break;
+			}
+		
+			$value = in_array($index, array('id','cid')) ? (int)$query[$index] : $query[$index];
+			if ( $value != $menuItem->query[$index] ) {
+				$menuItem_matches = false;
+				break;
+			}
 		}
-		if ($query[$index] != $menuItem->query[$index]) {
-			$menuItem_matches = false;
-			break;
+		
+		// If exact menu match then unset ALL $query array, only the menu item segments will appear
+		if ($menuItem_matches) {
+			foreach($query as $index => $value) {
+				if ( $index!="option" && $index!="Itemid")
+					unset($query[$index]);
+			}
+			return $segments;  // $segments is empty we will get variables from menuItem (it has them)
 		}
-		$query_backup[$index] = $value;
-	}
-	if ($menuItem_matches) {
-		foreach($query as $index => $value) unset($query[$index]);
-		return $segments;  // $segments is empty we will get variables from menuItem (it has them)
 	}
 	
 	// 3. Handle known 'task'(s) formulating segments of SEF URL appropriately

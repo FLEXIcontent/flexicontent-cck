@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1299 2012-05-14 00:06:22Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1300 2012-05-14 01:53:56Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -59,6 +59,56 @@ if ($fields[0]=='') $fields = array();
 
 <div id="flexicontent" class="flexicontent">
 
+<script type="text/javascript">
+	function tableOrdering( order, dir, task )
+	{
+		var form = document.getElementById("adminForm");
+
+		form.filter_order.value 	= order;
+		form.filter_order_Dir.value	= dir;
+		
+		var form = document.getElementById("adminForm");
+		
+		adminFormPrepare(form);
+		form.submit( task );
+	}
+	
+	function adminFormPrepare(form) {
+		var extra_action = '';
+		var var_sep = form.action.match(/\?/) ? '&' : '?';
+		
+		for(i=0; i<form.elements.length; i++) {
+			
+			var element = form.elements[i];
+			
+			// No need to add the default values for ordering, to the URL
+			if (element.name=='filter_order' && element.value=='i.title') continue;
+			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
+			
+			var matches = element.name.match(/(filter[.]*|letter)/);
+			if (matches && element.value != '') {
+			  extra_action += var_sep + element.name + '=' + element.value;
+			  var_sep = '&';
+			}
+		}
+		form.action += extra_action;   //alert(extra_action);
+	}
+	
+	function adminFormClearFilters (form) {
+		for(i=0; i<form.elements.length; i++) {
+			var element = form.elements[i];
+			
+			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
+			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
+			
+			var matches = element.name.match(/(filter[.]*|letter)/);
+			if (matches) {
+				element.value = '';
+			}
+		}
+	}
+</script>
+
 <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
 
     <h1 class="componentheading">
@@ -90,12 +140,12 @@ if ($use_fields && count($fields)) {
 ?>
 
 <?php if ($this->params->get('use_search')) : ?>
-<form action="<?php echo $this->action; ?>" method="post" id="adminForm">
+<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
 <div id="fc_filter" class="floattext">
 	<div class="fc_fleft">
-		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" onchange="document.getElementById('adminForm').submit();" />
-		<button onclick="document.getElementById('adminForm').submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-		<button onclick="document.getElementById('filter').value='';document.getElementById('adminForm').submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area"/>
+		<button class='fc_button' onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+		<button class='fc_button' onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 	</div>
 </div>
 <input type="hidden" name="option" value="com_flexicontent" />

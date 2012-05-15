@@ -38,7 +38,7 @@ function FLEXIcontentBuildRoute(&$query)
 	}
 	
 	// 2. Try to match the variables against the variables of the menuItem
-	if ( $menuItem ) {
+	if ( !empty($menuItem) ) {
 		$menuItem_matches = true;
 		foreach($query as $index => $value) {
 			// Do not try to match menu itemid, we retrieved the given Itemid

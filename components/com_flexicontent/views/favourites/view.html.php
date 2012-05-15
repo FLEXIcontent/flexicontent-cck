@@ -104,12 +104,15 @@ class FlexicontentViewFavourites extends JView
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
-		$this->assign('action', 					$uri->toString());
-
-		$this->assignRef('items' , 					$items);
-		$this->assignRef('params' , 				$params);
-		$this->assignRef('pageNav' , 				$pageNav);
-		$this->assignRef('lists' ,	 				$lists);
+		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites' );
+		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		
+		$this->assignRef('action', 			$fav_link);  // $uri->toString()
+		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('items' , 			$items);
+		$this->assignRef('params' , 		$params);
+		$this->assignRef('pageNav' , 		$pageNav);
+		$this->assignRef('lists' ,	 		$lists);
 
 		parent::display($tpl);
 

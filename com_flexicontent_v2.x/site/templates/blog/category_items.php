@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1222 2012-03-27 20:27:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -59,12 +59,12 @@ $tmpl = $this->tmpl;
 </script>
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
-<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="adminFormPrepare(this);">
+<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
 <div id="fc_filter" class="floattext">
 	<?php if ($this->params->get('use_search')) : ?>
 	<div class="fc_fleft">
-		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" onchange="document.getElementById('adminForm').submit();" />
+		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" />
 		<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
 		  <br>
 		<?php endif; ?>

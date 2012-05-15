@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1296 2012-05-13 07:47:53Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1306 2012-05-15 00:04:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -611,9 +611,7 @@ class FlexicontentViewItem extends JView
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
 		//JFilterOutput::objectHTMLSafe( $item );
-
-		$this->assign('action', 	$uri->toString());
-
+		
 		$this->assignRef('item',			$item);
 		if (FLEXI_J16GE) {  // most core field are created via calling methods of the form (J2.5)
 			$this->assignRef('form',		$form);
