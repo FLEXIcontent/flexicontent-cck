@@ -90,7 +90,7 @@ class FlexicontentViewCategory extends JView
 		$params	= & $category->parameters;
 		
 		// Load Template-Specific language file to override or add new language strings
-		if (FLEXI_FISH)
+		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
 		
 		$authorid = JRequest::getInt('authorid', 0);
