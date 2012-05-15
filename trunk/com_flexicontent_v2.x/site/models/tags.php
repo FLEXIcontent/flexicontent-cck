@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1171 2012-03-09 04:53:46Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1299 2012-05-14 00:06:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -249,6 +249,7 @@ class FlexicontentModelTags extends JModel
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. $join_image
 			. $field_item
 			. $joinaccess

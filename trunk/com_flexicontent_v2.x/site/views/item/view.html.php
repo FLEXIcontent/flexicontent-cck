@@ -111,7 +111,7 @@ class FlexicontentViewItem extends JView
 		$params = & $item->parameters;
 		
 		// Load Template-Specific language file to override or add new language strings
-		if (FLEXI_FISH)
+		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
 		
 		// Bind Fields

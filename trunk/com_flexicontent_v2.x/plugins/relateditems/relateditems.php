@@ -165,45 +165,12 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
     if ($where!="") $where = " WHERE " . $where;
     
-		switch ($order) {
-		case 'date':
-			$filter_order		= 'c.created';
-			$filter_order_dir	= 'ASC';
-			break;
-		case 'rdate':
-			$filter_order		= 'c.created';
-			$filter_order_dir	= 'DESC';
-			break;
-		case 'alpha':
-			$filter_order		= 'c.title';
-			$filter_order_dir	= 'ASC';
-			break;
-		case 'ralpha':
-			$filter_order		= 'c.title';
-			$filter_order_dir	= 'DESC';
-			break;
-		case 'hits':
-			$filter_order		= 'c.hits';
-			$filter_order_dir	= 'ASC';
-			break;
-		case 'rhits':
-			$filter_order		= 'c.hits';
-			$filter_order_dir	= 'DESC';
-			break;
-		case 'order':
-			$filter_order		= 'rel.ordering';
-			$filter_order_dir	= 'ASC';
-			break;
-		default:
-			$filter_order		= 'c.id';
-			$filter_order_dir	= 'ASC';
-			break;
-		}
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', c.title';
+		$orderby 	= $this->_buildItemOrderBy($order);
     
 		$query = "SELECT c.title, c.id, c.catid, c.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, c.alias FROM #__content AS c "
 			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on c.id=ie.item_id " : "")
-			. " LEFT JOIN #__flexicontent_cats_item_relations AS rel on c.id=rel.itemid "
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel on c.id=rel.itemid '
+			. ' LEFT JOIN #__users AS u ON u.id = c.created_by'
 			. $where
 			. " GROUP BY rel.itemid "
 			. $orderby
@@ -212,6 +179,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		//echo $query; //exit();
 		$items_arr = $db->loadObjectList();
 		if (!$items_arr) $items_arr = array();
+		if($db->getErrorNum()) {
+			echo $db->getErrorMsg();
+			$field->html = '';
+			return false;
+		}
 		
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
@@ -443,23 +415,23 @@ window.addEvent( 'domready', function() {
 			$publish_where  = ' AND ( c.publish_up = '.$db->Quote($nullDate).' OR c.publish_up <= '.$db->Quote($now).' )'; 
 			$publish_where .= ' AND ( c.publish_down = '.$db->Quote($nullDate).' OR c.publish_down >= '.$db->Quote($now).' )';
 		}
-		$query = "SELECT c.title, c.id, c.alias, c.state, c.catid as maincatid, ".
-			" GROUP_CONCAT(cat.id SEPARATOR  ',') AS catidlist, ".
-			" GROUP_CONCAT(cat.alias SEPARATOR  ',') AS  cataliaslist ".
-			" FROM #__content AS c ".
-			" LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.itemid ".
-			" LEFT JOIN #__categories AS cat ON rel.catid=cat.id ";
-		$where = " WHERE c.id IN (";
-		$sep = '';
-		foreach($fieldval as $itemid => $itemdata) {
-			$where .= $sep.$itemid;
-			$sep = ',';
-		}
-		$where .= ")";
-		$query .= $where;
-		$query .= $publish_where;
-		$query .= " GROUP BY c.id ";
 		
+		$order = $field->parameters->get('orderby_frontend');
+		$orderby 	= $this->_buildItemOrderBy($order);
+		
+		$where = " WHERE c.id IN (". implode(",", array_keys($fieldval)) .")";
+		
+		$query = "SELECT c.title, c.id, c.alias, c.state, c.catid as maincatid, "
+			." GROUP_CONCAT(cat.id SEPARATOR  ',') AS catidlist, "
+			." GROUP_CONCAT(cat.alias SEPARATOR  ',') AS  cataliaslist "
+			." FROM #__content AS c "
+			." LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.itemid "
+			." LEFT JOIN #__categories AS cat ON rel.catid=cat.id "
+			. $where
+			. $publish_where
+			. " GROUP BY c.id "
+			. $orderby
+			;
 		$db->setQuery($query);
 		if (count($values))
 			$results = $db->loadObjectList();
@@ -516,5 +488,69 @@ window.addEvent( 'domready', function() {
 			}
 		}
 	}
+	
+	/**
+	 * Build the order clause
+	 *
+	 * @access private
+	 * @return string
+	 */
+	function _buildItemOrderBy($order)
+	{
+		$params = & $field->parameters;
+		$filter_order		= '';
+		$filter_order_dir	= '';
+		
+		if ($order) {
+			switch ($order) {
+				case 'date' :
+				$filter_order		= 'c.created';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rdate' :
+				$filter_order		= 'c.created';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'modified' :
+				$filter_order		= 'c.modified';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'alpha' :
+				$filter_order		= 'c.title';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'ralpha' :
+				$filter_order		= 'c.title';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'author' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rauthor' :
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'hits' :
+				$filter_order		= 'c.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+				case 'rhits' :
+				$filter_order		= 'c.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+				case 'order' :
+				$filter_order		= 'rel.ordering';
+				$filter_order_dir	= 'ASC';
+				break;
+			}
+			
+		}
 
+		if ($filter_order)
+			$orderby = ' ORDER BY '.$filter_order.' '.$filter_order_dir.', c.title';
+
+		return $orderby;
+	}
+	
 }

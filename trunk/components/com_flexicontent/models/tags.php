@@ -249,6 +249,7 @@ class FlexicontentModelTags extends JModel
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. $join_image
 			. $field_item
 			. $joinaccess
