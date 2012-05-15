@@ -60,6 +60,9 @@ class FlexicontentViewTemplate extends JView {
 		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
+		
+		if (FLEXI_FISH || FLEXI_J16GE)
+			FLEXIUtilities::loadTemplateLanguageFile( $folder );
 
 		//Get data from the model
 		$layout    	= & $this->get( 'Data');
