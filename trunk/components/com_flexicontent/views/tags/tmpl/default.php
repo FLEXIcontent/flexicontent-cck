@@ -135,9 +135,10 @@ if ($fields[0]=='') $fields = array();
 
 <?php
 if ($use_fields && count($fields)) {
-	foreach ($this->items as $item) {
+	foreach ($this->items as $i => $item) {
 		foreach ($fields as $fieldname) {
-			FlexicontentFields::getFieldDisplay($item, $fieldname, $values=null, $method='display');
+			// IMPORTANT: below we must use $this->items[$i], and not $item, otherwise joomla will not cache value !!!
+			FlexicontentFields::getFieldDisplay($this->items[$i], $fieldname, $values=null, $method='display');
 		}
 	}
 }
