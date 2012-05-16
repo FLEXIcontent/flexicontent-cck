@@ -2013,7 +2013,7 @@ class FLEXIUtilities
 		$base_dir = JPATH_COMPONENT.DS.'templates'.DS.$tmplname;
 		
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		JFactory::getLanguage()->load($extension, $base_dir, 'en', $reload=true);           // Fallback to english language template file
+		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);           // Fallback to english language template file
 		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 	}
 	
