@@ -11,12 +11,12 @@
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 		<field name="top_cols" type="list" default="two" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC"> 
-			<option value="">Use Global</option>
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="one">FLEXI_1_COL</option>
 			<option value="two">FLEXI_2_COLS</option>
 		</field> 
 		<field name="bottom_cols" type="list" default="two" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC"> 
-			<option value="">Use Global</option>
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="one">FLEXI_1_COL</option>
 			<option value="two">FLEXI_2_COLS</option>
 		</field> 
