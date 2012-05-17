@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1296 2012-05-13 07:47:53Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1312 2012-05-17 01:08:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -808,7 +808,8 @@ class FlexicontentModelCategory extends JModel {
 		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 		// Count items according to full depth level !!!
-		$where .= ' AND rel.catid IN ('.$globalcats[$id]->descendants.')';
+		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+		$where .= ' AND rel.catid IN ('.$catlist.')';
 		
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		if (!$show_noauth) {

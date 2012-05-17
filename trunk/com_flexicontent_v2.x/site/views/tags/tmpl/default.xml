@@ -65,7 +65,7 @@
 			
 			<field name="sep_seo" type="separator" hr="false" default="SEO" description="" level="level1" menu="hide" />
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
-				<option value="">Use Global</option>
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
