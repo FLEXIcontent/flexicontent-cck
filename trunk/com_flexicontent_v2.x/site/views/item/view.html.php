@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1306 2012-05-15 00:04:30Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1309 2012-05-16 06:20:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,6 +39,8 @@ class FlexicontentViewItem extends JView
 	 */
 	function display( $tpl = null )
 	{
+		jimport( 'joomla.html.parameter' );
+		
 		// check for form layout
 		if($this->getLayout() == 'form') {
 			$this->_displayForm($tpl);

@@ -30,11 +30,11 @@
 			</field>
 			<field name="image_source" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			
-			<field name="" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
+			<field name="sep_moddate" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
 			<field name="show_modify_date" type="radio" default="0" label="FLEXI_SHOW" description="...">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-		 	</field>
+			</field>
 			<field name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -49,18 +49,18 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
+			<field name="fields" type="textarea" cols="30" rows="3" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
 
 			<field name="sep_pagination" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-			<field name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+			<field name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 				<option value="2">Auto</option>
 			</field>
-			<field name="show_pagination_results" type="radio" default="1" label="Pagination Results" description="PARAMPAGINATIONRESULTS">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+			<field name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
 			<field name="sep_seo" type="separator" hr="false" default="SEO" description="" level="level1" menu="hide" />

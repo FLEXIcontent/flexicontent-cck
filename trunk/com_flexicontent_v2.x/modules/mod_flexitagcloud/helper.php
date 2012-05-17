@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: helper.php 1051 2011-12-12 20:14:06Z ggppdk $
+ * @version 1.1 $Id: helper.php 1264 2012-05-04 15:55:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -23,7 +23,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'
 
 class modFlexiTagCloudHelper
 {
-	function getTags(&$params)
+	function getTags(&$params, &$module)
 	{
 		$mainframe = &JFactory::getApplication();
 
@@ -120,7 +120,7 @@ class modFlexiTagCloudHelper
 		$i		= 0;
 		$lists	= array();
 		foreach ( $rows as $row )
-		{	
+		{
 			$lists[$i]->size 			= modFlexiTagCloudHelper::sizer($min, $max, $row->no, $minsize, $maxsize);
 			$lists[$i]->name 			= $row->name;
 			$lists[$i]->screenreader	= JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
@@ -130,15 +130,7 @@ class modFlexiTagCloudHelper
 				$lists[$i]->link 		= FlexicontentHelperRoute::getTagRoute($row->slug);
 			}
 			
-			// Set them here so that there passed to the model via the http request
-			$lists[$i]->link .= $params->get('orderby', '') ? ( '&orderby=' . $params->get('orderby', '') ) : '';
-			if ( $params->get('orderbycustomfieldid', '') ) {
-				$lists[$i]->link .= $params->get('orderbycustomfieldid', '') ? ( '&orderbycustomfieldid=' . $params->get('orderbycustomfieldid', '') ) : '';
-				$lists[$i]->link .= $params->get('orderbycustomfieldint', '') ? ( '&orderbycustomfieldint=' . $params->get('orderbycustomfieldint', '') ) : '';
-				$lists[$i]->link .= $params->get('orderbycustomfielddir', '') ? ( '&orderbycustomfielddir=' . $params->get('orderbycustomfielddir', '') ) : '';
-			}
-			
-			$lists[$i]->link 		= JRoute::_($lists[$i]->link);
+			$lists[$i]->link 		= JRoute::_($lists[$i]->link.'&module='.$module->id);
 
 			$i++;
 		}

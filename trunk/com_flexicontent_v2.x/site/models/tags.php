@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1299 2012-05-14 00:06:22Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1306 2012-05-15 00:04:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -31,28 +31,28 @@ jimport('joomla.application.component.model');
 class FlexicontentModelTags extends JModel
 {
 	/**
-	 * Data
-	 *
-	 * @var mixed
-	 */
-	var $_data = null;
-	
-	/**
-	 * Tag
+	 * Current Tag properties
 	 *
 	 * @var mixed
 	 */
 	var $_tag = null;
 	
 	/**
-	 * Items total
+	 * Item list data
+	 *
+	 * @var mixed
+	 */
+	var $_data = null;
+	
+	/**
+	 * Items list total
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
-
+	
 	/**
-	 * parameters
+	 * Tags view parameters via menu or via tag cloud module or ...
 	 *
 	 * @var object
 	 */
@@ -67,16 +67,15 @@ class FlexicontentModelTags extends JModel
 	{
 		parent::__construct();
 		
-		// Load parameters
-		$this->_params = $this->_loadParams();
-		$params = $this->_params;
-
+		// Set id and load parameters
+		$id = JRequest::getInt('id', 0);		
+		$this->setId((int)$id);
+		
+		$params = & $this->_params;
+		
 		//get the number of events from database
 		$limit      = JRequest::getInt('limit', $params->get('limit'));
 		$limitstart = JRequest::getInt('limitstart');
-		
-		$id = JRequest::getInt('id', 0);		
-		$this->setId((int)$id);
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -94,9 +93,13 @@ class FlexicontentModelTags extends JModel
 	 */
 	function setId($id)
 	{
-		// Set new category ID and wipe data
-		$this->_id			= $id;
-		$this->_data		= null;
+		// Set new category ID, wipe member variables and load parameters
+		$this->_id      = $id;
+		$this->_tag     = null;
+		$this->_data    = null;
+		$this->_total   = null;
+		$this->_params  = null;
+		$this->_loadParams();
 	}
 
 	/**
@@ -186,7 +189,7 @@ class FlexicontentModelTags extends JModel
 	function _buildQuery()
 	{   	
 		$user		= & JFactory::getUser();
-		$params = $this->_params;
+		$params = & $this->_params;
 		
 		// image for an image field
 		$use_image    = (int)$params->get('use_image', 1);
@@ -270,7 +273,7 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
-		$params = $this->_params;
+		$params = & $this->_params;
 				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
@@ -344,18 +347,18 @@ class FlexicontentModelTags extends JModel
 	function _buildItemWhere( )
 	{
 		$mainframe =& JFactory::getApplication();
-		$params = $this->_params;
+		$params = & $this->_params;
 
 		$user		= & JFactory::getUser();
 		$now		= $mainframe->get('requestTime');
 		$nullDate	= $this->_db->getNullDate();
+
+		// First thing we need to do is to select only the requested TAGGED items
+		$where = ' WHERE tag.tid = '.$this->_id;
 		
 		// User current language
 		$lang = flexicontent_html::getUserCurrentLang();
 		$filtertag  = $params->get('filtertag', 0);
-
-		// First thing we need to do is to select only the requested TAGGED items
-		$where = ' WHERE tag.tid = '.$this->_id;
 		
 		// Filter the tag view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
@@ -400,6 +403,64 @@ class FlexicontentModelTags extends JModel
 		return $where;
 	}
 	
+	
+	/**
+	 * Method to load parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadParams()
+	{
+		if (!empty($this->_params)) return;
+		
+		$mainframe =& JFactory::getApplication();
+
+		if ( !JRequest::getInt('module', 0 ) )
+		{
+			// Get the PAGE/COMPONENT parameters
+			$params = clone( $mainframe->getParams('com_flexicontent') );
+			
+			// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) {
+				$menuParams = new JRegistry;
+				if ($menu = JSite::getMenu()->getActive()) {
+					$menuParams->loadJSON($menu->params);
+				}
+				$params->merge($menuParams);
+			}
+		}
+		else
+		{
+			// Higher Priority: prefer module configuration requested in URL
+			jimport( 'joomla.application.module.helper' );
+			jimport( 'joomla.html.parameter' );
+			$params = new JParameter('');
+			
+			// load by module name, not used
+			//$module_name = JRequest::getInt('module', 0 );
+			//$module = & JModuleHelper::getModule('mymodulename');
+			
+			// load by module id
+			$module_id = JRequest::getInt('module', 0 );
+			$module = & JTable::getInstance ( 'Module', 'JTable' );
+			
+			if ( !$module->load($module_id) ) {
+				JError::raiseNotice ( 500, $module->getError() );
+			} else if (!FLEXI_J16GE) {
+				$moduleParams = new JParameter($module->params);
+			} else {
+				$moduleParams = new JRegistry();
+				$moduleParams->loadString($module->params);
+			}
+			$params->merge($moduleParams);
+		}
+		
+		$this->_params = & $params;
+	}
+	
+	
 	/**
 	 * Method to load the Tag data
 	 *
@@ -417,52 +478,13 @@ class FlexicontentModelTags extends JModel
 				;
 
 		$this->_db->setQuery($query);
-		$this->_tag = $this->_db->loadObject();
+		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
+		$this->_tag->parameters = & $this->_params;   // Assign tag parameters ( already load by setId() )
         
 		return $this->_tag;
 	}
 	
-	
-	/**
-	 * Method to load parameters
-	 *
-	 * @access	private
-	 * @return	void
-	 * @since	1.5
-	 */
-	function _loadParams()
-	{
-		$mainframe =& JFactory::getApplication();
-
-		// Get the PAGE/COMPONENT parameters
-		$params = clone( $mainframe->getParams('com_flexicontent') );
 		
-		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
-		}
-		
-		// Higher Priority: prefer from http request than menu item
-		if (JRequest::getVar('orderby', '' )) {
-			$params->set('orderby', JRequest::getVar('orderby') );
-		}
-		if (JRequest::getVar('orderbycustomfieldid', '' )) {
-			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
-		}
-		if (JRequest::getVar('orderbycustomfieldint', '' )) {
-			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
-		}
-		if (JRequest::getVar('orderbycustomfielddir', '' )) {
-			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
-		}
-		
-		return $params;
-	}	
-	
 	/**
 	 * Method to store the tag
 	 *

@@ -44,20 +44,77 @@
 			<option value="0">FLEXI_NO</option>
 		</param>
 		<param name="force_itemid" type="text" default="" label="FLEXI_FORCE_ITEMID" description="FLEXI_FORCE_ITEMID_DESC" />
+		
+		
+		<param name="" type="jparamstab" description="FLEXI_ITEM_LIST_CONFIGURATION" />
+		
+		<param name="" type="separator" hr="false" default="Appearance" description="" level="level1" menu="hide" />
+		
+		<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+	 	</param>
+		
+		<param name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" menu="hide" />
+		<param name="use_image" type="radio" default="1" label="FLEXI_SHOW" description="...">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="image_source" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+		
+		<param name="" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
+		<param name="show_modify_date" type="radio" default="0" label="FLEXI_SHOW" description="...">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_DATE_FORMAT_DESC">
+			<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
+			<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
+			<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
+			<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
+			<option value="DATE_FORMAT_CUSTOM">FLEXI_FIELD_CUSTOM_FORMAT</option>
+		</param>
+		<param name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+		
+		<param name="" type="separator" hr="false" default="FLEXI_EXTRA_FIELDS" description="FLEXI_EXTRA_FIELDS_DESC" level="level2" menu="hide" />
+		<param name="use_fields" type="radio" default="0" label="FLEXI_SHOW" description="...">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="fields" type="textarea" cols="30" rows="3" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
 
-		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
+		<param name="" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
+		<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+		<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+			<option value="2">Auto</option>
+		</param>
+		<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</param>
+		
+		<param name="" type="separator" hr="false" default="SEO" description="" level="level1" menu="hide" />
+		<param name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+			<option value="">Use Global</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		
+		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />
 		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
-			<option value="">Default</option>
-			<option value="date">Oldest first</option>
-			<option value="rdate">Most recent first</option>
-			<option value="modified">Last modified first</option>
-			<option value="alpha">Title Alphabetical</option>
-			<option value="ralpha">Title Reverse-Alphabetical</option>
-			<option value="author">Author Alphabetical</option>
-			<option value="rauthor">Author Reverse-Alphabetical</option>
-			<option value="hits">Most Hits</option>
-			<option value="rhits">Least Hits</option>
-			<option value="order">Ordering</option>
+			<option value="">FLEXI_ORDER_DEFAUKT</option>
+			<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+			<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+			<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+			<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+			<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+			<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+			<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+			<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+			<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+			<option value="order">FLEXI_ORDER_ORDERING</option>
 		</param>
 		<param name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 		<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
@@ -68,7 +125,7 @@
 			<option value="0">FLEXI_TEXT</option>
 			<option value="1">FLEXI_INT</option>
 		</param>
-
+			
 	</params>
 	
 	<params group="advanced">

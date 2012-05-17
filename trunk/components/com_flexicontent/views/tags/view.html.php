@@ -95,6 +95,9 @@ class FlexicontentViewTags extends JView
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
 		
+		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
+		$params = & $tag->parameters;
+		
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
 		$uri  			=& JFactory::getURI();

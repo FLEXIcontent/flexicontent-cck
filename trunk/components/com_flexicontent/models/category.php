@@ -372,8 +372,6 @@ class FlexicontentModelCategory extends JModel {
 		$user 		= &JFactory::getUser();
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
-		// Get the category parameters
-		$cparams = & $this->_params;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
 		
