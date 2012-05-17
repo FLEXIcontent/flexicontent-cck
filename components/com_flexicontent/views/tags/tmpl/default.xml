@@ -47,18 +47,18 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
+			<param name="fields" type="textarea" cols="30" rows="3" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
 
 			<param name="" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
 			<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-			<param name="show_pagination" type="list" default="2" label="Pagination" description="Show/Hide Pagination support">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+			<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 				<option value="2">Auto</option>
 			</param>
-			<param name="show_pagination_results" type="radio" default="1" label="Pagination Results" description="PARAMPAGINATIONRESULTS">
-				<option value="0">Hide</option>
-				<option value="1">Show</option>
+			<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</param>
 			
 			<param name="" type="separator" hr="false" default="SEO" description="" level="level1" menu="hide" />

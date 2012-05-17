@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1308 2012-05-15 10:37:44Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1310 2012-05-16 06:40:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,8 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport( 'joomla.html.parameter' );
+
 $params = & $this->params;
 $db     =& JFactory::getDBO();
 $flexiparams =& JComponentHelper::getParams('com_flexicontent');
@@ -139,6 +141,7 @@ if ($use_fields && count($fields)) {
 		foreach ($fields as $fieldname) {
 			// IMPORTANT: below we must use $this->items[$i], and not $item, otherwise joomla will not cache value !!!
 			FlexicontentFields::getFieldDisplay($this->items[$i], $fieldname, $values=null, $method='display');
+			if ( !empty($this->items[$i]->fields[$fieldname]->display) )  $found_fields[$fieldname] = 1;
 		}
 	}
 }
@@ -175,7 +178,8 @@ if ($use_fields && count($fields)) {
 			<?php endif; ?>
 			<?php if ($use_fields && count($fields)) : ?>
 				<?php foreach ($fields as $fieldname) : ?>
-				<th id="fc_<?php echo $fieldname; ?>" ><?php echo $this->items[0]->fields[$fieldname]->label; ?></th>
+					<?php	if ( empty($found_fields[$fieldname]) ) continue; ?>
+					<th id="fc_<?php echo $fieldname; ?>" ><?php echo $this->items[0]->fields[$fieldname]->label; ?></th>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</tr>
@@ -248,6 +252,7 @@ if ($use_fields && count($fields)) {
 		
 		<?php if ($use_fields && count($fields)) : ?>
 			<?php foreach ($fields as $fieldname) : ?>
+				<?php	if ( empty($found_fields[$fieldname]) ) continue; ?>
 				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></th>
 			<?php endforeach; ?>
 		<?php endif; ?>

@@ -38,5 +38,5 @@ if ($add_ccs && $caching) {
 	echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css">';
 }
 
-$list = modFlexiTagCloudHelper::getTags($params);
+$list = modFlexiTagCloudHelper::getTags($params, $module);
 require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));

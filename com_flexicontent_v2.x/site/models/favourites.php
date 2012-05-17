@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: favourites.php 1299 2012-05-14 00:06:22Z ggppdk $
+ * @version 1.5 stable $Id: favourites.php 1306 2012-05-15 00:04:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -30,22 +30,23 @@ jimport('joomla.application.component.model');
  */
 class FlexicontentModelFavourites extends JModel
 {
+	
 	/**
-	 * Data
+	 * Item list data
 	 *
 	 * @var mixed
 	 */
 	var $_data = null;
 	
 	/**
-	 * Items total
+	 * Items list total
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
-
+	
 	/**
-	 * parameters
+	 * Favourites view parameters via menu or ...
 	 *
 	 * @var object
 	 */
@@ -60,10 +61,12 @@ class FlexicontentModelFavourites extends JModel
 	{
 		parent::__construct();
 		
-		// Load parameters
-		$this->_params = $this->_loadParams();
-		$params = $this->_params;
-
+		// Set id and load parameters
+		$id = JRequest::getInt('id', 0);		
+		$this->setId((int)$id);
+		
+		$params = & $this->_params;
+		
 		//get the number of events from database
 		$limit      = JRequest::getInt('limit', $params->get('limit'));
 		$limitstart = JRequest::getInt('limitstart');
@@ -74,6 +77,60 @@ class FlexicontentModelFavourites extends JModel
 		// Get the filter request variables
 		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.modified'));
 		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'DESC'));
+	}
+	
+	/**
+	 * Method to set the tag id
+	 *
+	 * @access	public
+	 * @param	int	tag ID number
+	 */
+	function setId($id)
+	{
+		// Set new category ID, wipe member variables and load parameters
+		$this->_id      = $id;
+		$this->_data    = null;
+		$this->_total   = null;
+		$this->_params  = null;
+		$this->_loadParams();
+	}
+
+	/**
+	 * Overridden get method to get properties from the tag
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return 	mixed 				The value of the property
+	 * @since	1.5
+	 */
+	function get($property, $default=null)
+	{
+		if ( $this->_tag || $this->_tag = $this->getTag() ) {
+			if(isset($this->_tag->$property)) {
+				return $this->_tag->$property;
+			}
+		}
+		return $default;
+	}
+	
+	/**
+	 * Overridden set method to pass properties on to the tag
+	 *
+	 * @access	public
+	 * @param	string	$property	The name of the property
+	 * @param	mixed	$value		The value of the property to set
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function set( $property, $value=null )
+	{
+		if ( $this->_tag || $this->_tag = $this->getTag() ) {
+			$this->_tag->$property = $value;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -125,7 +182,7 @@ class FlexicontentModelFavourites extends JModel
 	function _buildQuery()
 	{   	
 		$user		= & JFactory::getUser();
-		$params = $this->_params;
+		$params = & $this->_params;
 		
 		// image for an image field
 		$use_image    = (int)$params->get('use_image', 1);
@@ -209,7 +266,7 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
-		$params = $this->_params;
+		$params = & $this->_params;
 				
 		$filter_order		= $this->getState('filter_order');
 		$filter_order_dir	= $this->getState('filter_order_dir');
@@ -283,7 +340,7 @@ class FlexicontentModelFavourites extends JModel
 	function _buildItemWhere( )
 	{
 		$mainframe =& JFactory::getApplication();
-		$params = $this->_params;
+		$params = & $this->_params;
 
 		$user		= & JFactory::getUser();
 		$now		= $mainframe->get('requestTime');
@@ -340,6 +397,8 @@ class FlexicontentModelFavourites extends JModel
 	 */
 	function _loadParams()
 	{
+		if (!empty($this->_params)) return;
+		
 		$mainframe =& JFactory::getApplication();
 
 		// Get the PAGE/COMPONENT parameters
@@ -354,21 +413,7 @@ class FlexicontentModelFavourites extends JModel
 			$params->merge($menuParams);
 		}
 		
-		// Higher Priority: prefer from http request than menu item
-		if (JRequest::getVar('orderby', '' )) {
-			$params->set('orderby', JRequest::getVar('orderby') );
-		}
-		if (JRequest::getVar('orderbycustomfieldid', '' )) {
-			$params->set('orderbycustomfieldid', JRequest::getVar('orderbycustomfieldid') );
-		}
-		if (JRequest::getVar('orderbycustomfieldint', '' )) {
-			$params->set('orderbycustomfieldint', JRequest::getVar('orderbycustomfieldint') );
-		}
-		if (JRequest::getVar('orderbycustomfielddir', '' )) {
-			$params->set('orderbycustomfielddir', JRequest::getVar('orderbycustomfielddir') );
-		}
-		
-		return $params;
-	}	
+		$this->_params = & $params;
+	}
 }
 ?>

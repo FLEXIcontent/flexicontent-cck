@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1290 2012-05-11 06:42:50Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1296 2012-05-13 07:47:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -372,8 +372,6 @@ class FlexicontentModelCategory extends JModel {
 		$user 		= &JFactory::getUser();
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
-		// Get the category parameters
-		$cparams = & $this->_params;
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
 		

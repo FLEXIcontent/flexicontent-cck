@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1308 2012-05-15 10:37:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -94,6 +94,9 @@ class FlexicontentViewTags extends JView
 		
 		$document->setTitle($params->get('page_title'));
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
+		
+		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
+		$params = & $tag->parameters;
 		
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
