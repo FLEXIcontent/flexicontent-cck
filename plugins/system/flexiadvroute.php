@@ -88,7 +88,7 @@ class plgSystemFlexiadvroute extends JPlugin
 		if( $app->isAdmin() )  return;
 		
 		// Execute only if groups enabled and if plugin parameter for switching is enabled
-		if ( !$flexiparams->get('enable_language_groups') || !$this->params->get('switch_langassociated_items', 1) )  return;
+		if ( !$flexiparams->get('enable_translation_groups') || !$this->params->get('switch_langassociated_items', 1) )  return;
 		
 		// Execute only if some languange switcher is available
 		if ( !FLEXI_J16GE && !FLEXI_FISH )  return;

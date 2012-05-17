@@ -358,12 +358,12 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		static $return;
 		if($return === NULL) {
-			$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+			$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 			$db =& JFactory::getDBO();
 			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
 				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
 				. " WHERE ie.language='' "
-				. ($enable_language_groups ? " OR ie.lang_parent_id='0' " : "")
+				. ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
 				. (FLEXI_J16GE ? " OR i.language<>ie.language " : "")
 				;
 			$db->setQuery($query);

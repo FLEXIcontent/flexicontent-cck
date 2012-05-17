@@ -19,6 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// Set a default timezone if web server provider has not done so
+if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
+	date_default_timezone_set('UTC');
+
 // Joomla version variables
 if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 1 );
 //jimport( 'joomla.version' );  $jversion = new JVersion;

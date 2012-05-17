@@ -22,12 +22,12 @@ $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
 
-$enable_language_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_language_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 
 $items_list_cols = 14;
 if ( FLEXI_J16GE || FLEXI_FISH ) {
 	$items_list_cols++;
-	if ( $enable_language_groups ) $items_list_cols++;
+	if ( $enable_translation_groups ) $items_list_cols++;
 }
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
@@ -283,7 +283,7 @@ window.addEvent('domready', function() {
 			<th width="" class="center">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
-			<?php if ( $enable_language_groups ) : ?>
+			<?php if ( $enable_translation_groups ) : ?>
 			<th width="" class="center">
 				<?php echo JHTML::_('grid.sort', 'Translation Group', 'ie.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -381,7 +381,7 @@ window.addEvent('domready', function() {
 				<?php echo $this->lists['filter_state']; ?>
 			</td>
 			<td class="left"></td>
-		<?php if ( $enable_language_groups ) : ?>
+		<?php if ( $enable_translation_groups ) : ?>
 			<td class="left"></td>
 		<?php endif; ?>
 			<td class="left"></td>
@@ -569,7 +569,7 @@ window.addEvent('domready', function() {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
 					<?php
-					if ( $enable_language_groups ) :
+					if ( $enable_translation_groups ) :
 						if ($this->lists['order']=='ie.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
 					endif;
 					?>
@@ -669,7 +669,7 @@ window.addEvent('domready', function() {
 			<td align="center">
 				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
 			</td>
-			<?php if ( $enable_language_groups ) : ?>
+			<?php if ( $enable_translation_groups ) : ?>
 			<td align="center">
 				<?php
 					if ($this->lists['order']=='ie.lang_parent_id') {
@@ -788,7 +788,7 @@ window.addEvent('domready', function() {
 	
 	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br />
 	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items<br />
-	<?php if ( $enable_language_groups )	: ?>
+	<?php if ( $enable_translation_groups )	: ?>
 		<sup>[3]</sup> Click to sort this column and group associated translations together<br />
 	<?php endif; ?>
 		

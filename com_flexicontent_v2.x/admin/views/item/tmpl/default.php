@@ -390,7 +390,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							</div>
 							<?php endif; ?>
 
-							<?php if ($this->cparams->get('enable_language_groups', 1)) : ?>
+							<?php if ($this->cparams->get('enable_translation_groups', 1)) : ?>
 								<div style='clear:both;'>
 									<span class="flexi_label">
 										<?php echo $this->form->getLabel('lang_parent_id'); ?>

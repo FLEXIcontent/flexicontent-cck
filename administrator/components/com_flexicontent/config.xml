@@ -67,7 +67,8 @@
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
-		<param name="enable_language_groups" type="radio" default="0" label="Enable language groups" description="Enable associations of items into translation groups"  menu="hide">
+		
+		<param name="enable_translation_groups" type="radio" default="0" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>
