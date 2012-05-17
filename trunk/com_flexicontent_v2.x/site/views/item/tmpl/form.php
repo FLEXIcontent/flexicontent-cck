@@ -472,7 +472,7 @@ function deleteTag(obj) {
 				<?php echo $this->lists['languages']; ?>
 			</div>
 			
-			<?php if ($this->params->get('enable_language_groups', 1)) : ?>
+			<?php if ($this->params->get('enable_translation_groups')) : ?>
 			<div class="flexi_formblock">
 				<span class="flexi_label">
 					<?php echo $this->form->getLabel('lang_parent_id'); ?>

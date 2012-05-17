@@ -369,7 +369,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							</div>
 							<?php endif; ?>
 
-							<?php if ($this->cparams->get('enable_language_groups', 0)) : ?>
+							<?php if ($this->cparams->get('enable_translation_groups', 0)) : ?>
 								<div style='clear:both;'>
 									<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
 										<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
