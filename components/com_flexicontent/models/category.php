@@ -363,7 +363,7 @@ class FlexicontentModelCategory extends JModel {
 	 * @access public
 	 * @return string
 	 */
-	function & _getDataCats($cid)
+	function & _getDataCats($id)
 	{
 		if ( $this->_data_cats ) return $this->_data_cats;
 
@@ -400,12 +400,13 @@ class FlexicontentModelCategory extends JModel {
 		$display_subcats = $cparams->get('display_subcategories_items', 0);
 		if ($display_subcats==0) {
 			//$anddepth = ' AND c.id = '. $this->_id;
-			$this->_data_cats = array($this->_id);
+			$this->_data_cats = array($id);
 			return $this->_data_cats;
 		} else if ($display_subcats==1) {
-			$anddepth = ' AND c.parent_id = '. $this->_id;
+			$anddepth = ' AND ( c.parent_id = ' .$id. ' OR c.id='.$id.')';
 		} else {
-			$anddepth = ' AND c.id IN ('.$globalcats[$this->_id]->descendants.')';
+			$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+			$anddepth = ' AND c.id IN ('.$catlist.')';
 		}
 		
 		// finally create the query string
@@ -1027,7 +1028,7 @@ class FlexicontentModelCategory extends JModel {
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadCategoryParams($cid)
+	function _loadCategoryParams($id)
 	{
 		global $currcat_data;
 		if ( !empty($currcat_data['params']) ) return $currcat_data['params'];
@@ -1055,9 +1056,9 @@ class FlexicontentModelCategory extends JModel {
 			}
 			
 			$catparams = "";
-			if ($cid) {
+			if ($id) {
 				// Retrieve category parameters
-				$query = 'SELECT params FROM #__categories WHERE id = ' . $cid;
+				$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 				$this->_db->setQuery($query);
 				$catparams = $this->_db->loadResult();
 			}
