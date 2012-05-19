@@ -75,8 +75,9 @@ class JElementItem extends JElement
 			document.getElementById('sbox-window').close();
 		}";
 
-		$currauthor = (boolean) $node->attributes('currauthor');
-		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $currauthor ? '&currauthor=1' : '' );
+		$langparent_item = (boolean) $node->attributes('langparent_item');
+		$type_id = $node->attributes('type_id');
+		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $langparent_item ? '&langparent_item=1' : '' ).( $type_id ? '&type_id='.$type_id : '' );
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');

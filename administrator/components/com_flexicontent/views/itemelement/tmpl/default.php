@@ -18,6 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 $app = &JFactory::getApplication();
+$option = JRequest::getVar('option');
+$langparent_item  = $app->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
+$type_id  = $app->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
 ?>
 
 <form action="index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component&object=<?= JRequest::getVar('object',''); ?>" method="post" name="adminForm" id="adminForm">
@@ -31,9 +34,11 @@ $app = &JFactory::getApplication();
 			<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 		</td>
 		<td nowrap="nowrap">
-			<?php echo $this->lists['filter_type'];	?>
+			<?php if ( !$type_id) : ?>
+				<?php echo $this->lists['filter_type'];	?>
+			<?php endif; ?>
 			<?php echo $this->lists['filter_cats'];	?>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			<?php if ((FLEXI_FISH || FLEXI_J16GE) && !$langparent_item) : ?>
 				<?php echo $this->lists['filter_lang']; ?>
 			<?php endif; ?>
 			<?php echo $this->lists['state'];	?>
@@ -47,7 +52,12 @@ $app = &JFactory::getApplication();
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+			<th width="1%" nowrap="nowrap">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th width="50px" nowrap="nowrap">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -111,6 +121,10 @@ $app = &JFactory::getApplication();
 					<?php endif; ?>
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
+			</td>
+			
+			<td align="center" class="col_type">
+				<?php echo $row->type_name; ?>
 			</td>
 			
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>

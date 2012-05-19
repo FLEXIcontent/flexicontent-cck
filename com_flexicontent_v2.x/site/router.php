@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: router.php 1308 2012-05-15 10:37:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -179,6 +179,12 @@ function FLEXIcontentParseRoute($segments)
 		$vars['fid'] 	= @$segments[1];
 		$vars['cid']	= @$segments[2];
 		$vars['ord'] 	= @$segments[3];
+		return $vars;
+	}
+	
+	// 3.c 'weblink' task
+	if($segments[0] == 'itemelement') {
+		$vars['view'] = 'itemelement';
 		return $vars;
 	}
 	

@@ -472,12 +472,26 @@ function deleteTag(obj) {
 				<?php echo $this->lists['languages']; ?>
 			</div>
 			
-			<?php if ($this->params->get('enable_translation_groups')) : ?>
+			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
 			<div class="flexi_formblock">
-				<span class="flexi_label">
-					<?php echo $this->form->getLabel('lang_parent_id'); ?>
-				</span>
-				<?php echo $this->form->getInput('lang_parent_id'); ?>
+				<label for="lang_parent_id" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
+					<span class="editlinktip hasTip" title="::<?php echo JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' );?>">
+						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
+					</span>
+				</label>
+				<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) ) : ?>
+					<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
+					<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->item->id; ?>" />
+				<?php else : ?>
+					<?php
+						$jAp=& JFactory::getApplication();
+						$option = JRequest::getVar('option');
+						$jAp->setUserState( $option.'.itemelement.type_id', $this->item->type_id);
+						$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
+						echo $this->form->getInput('lang_parent_id');
+					?>
+				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			
