@@ -182,6 +182,12 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 	
+	// 3.c 'weblink' task
+	if($segments[0] == 'itemelement') {
+		$vars['view'] = 'itemelement';
+		return $vars;
+	}
+	
 	// 4. *** Cases that VIEW is provided (expicitly given) ***
 	
 	// 4.a 'item(s)' view

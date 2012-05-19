@@ -549,6 +549,8 @@ window.addEvent( 'domready', function() {
 
 		if ($filter_order)
 			$orderby = ' ORDER BY '.$filter_order.' '.$filter_order_dir.', c.title';
+		else
+			$orderby = ' ORDER BY c.title';
 
 		return $orderby;
 	}

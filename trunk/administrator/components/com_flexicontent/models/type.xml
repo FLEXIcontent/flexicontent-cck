@@ -6,17 +6,17 @@
 		<param name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2" menu="hide" />		
-		<param name="show_title" type="list" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
+		<param name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
+		<param name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+		<param name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_JCOMMENTS</option>
@@ -29,17 +29,17 @@
 		</param>
 		
 		<param name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2" menu="hide" />
-		<param name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+		<param name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+		<param name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+		<param name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
@@ -52,12 +52,14 @@
 		<param name="maintext_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 		<param name="maintext_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 		<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
-		<param name="hide_maintext" type="radio" default="0" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+		<param name="hide_maintext" type="radio" default="" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" menu="hide" />
-		<param name="hide_html" type="radio" default="0" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+		<param name="hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>

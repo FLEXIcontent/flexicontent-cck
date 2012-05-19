@@ -40,7 +40,7 @@
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" class="inputbox" size="1" />
 		<field name="hits" type="hidden" label="JGLOBAL_HITS" description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6" readonly="true" filter="unset" />
 		<field name="score" type="hidden" label="FLEXI_SCORE" description="FLEXI_SCORE_DESC" class="readonly" size="6" readonly="true" filter="unset" />
-		<field name="lang_parent_id" type="item" label="FLEXI_MASTER_LANGUAGE_ITEM" description="FLEXI_MASTER_LANGUAGE_ITEM_DESC" currauthor="1" class="inputbox" size="6"/>
+		<field name="lang_parent_id" type="item" label="FLEXI_ORIGINAL_CONTENT_ITEM" description="FLEXI_ORIGINAL_CONTENT_ITEM_DESC" langparent_item="1" class="inputbox" size="6"/>
 		<field name="language" type="contentlanguage" label="JFIELD_LANGUAGE_LABEL" description="COM_CONTENT_FIELD_LANGUAGE_DESC" class="inputbox">
 			<option value="*">JALL</option>
 		</field>

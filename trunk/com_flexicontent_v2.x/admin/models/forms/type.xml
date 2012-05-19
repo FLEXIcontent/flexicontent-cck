@@ -3,7 +3,7 @@
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" />
 	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" />
-	<field name="published" type="list" class="inputbox" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">
+	<field name="published" type="radio" class="inputbox" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
@@ -17,17 +17,17 @@
 		<fieldset name="basic">
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
 			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2" menu="hide" />		
-			<field name="show_title" type="list" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
+			<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
+			<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
@@ -40,17 +40,17 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2" menu="hide" />
-			<field name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+			<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+			<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+			<field name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -64,12 +64,14 @@
 			<field name="maintext_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
-			<field name="hide_maintext" type="radio" default="0" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+			<field name="hide_maintext" type="radio" default="" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" menu="hide" />
-			<field name="hide_html" type="radio" default="0" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+			<field name="hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

@@ -369,18 +369,26 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							</div>
 							<?php endif; ?>
 
-							<?php if ($this->cparams->get('enable_translation_groups', 0)) : ?>
+							<?php if ($this->cparams->get('enable_translation_groups')) : ?>
 								<div style='clear:both;'>
-									<label for="lang_parent_id" class="flexi_label hasTip" title="<?php echo '::'.JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM_DESC' );?>" >
-										<?php echo JText::_( 'FLEXI_MASTER_LANGUAGE_ITEM' );?>
+									<label for="lang_parent_id" class="flexi_label" >
+										<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
+										<span class="editlinktip hasTip" title="::<?php echo JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' );?>">
+											<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
+										</span>
 									</label>
-									<?php
-										require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
-										$attrs = array('type'=>"item", 'label'=>"FLEXI_MASTER_LANGUAGE_ITEM", 'description'=>"FLEXI_MASTER_LANGUAGE_ITEM_DESC", 'currauthor'=>"1", 'class'=>"inputbox", 'size'=>"6");
-										$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
-										$ff_lang_parent_id = new JElementItem();
-										echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
-									?>
+									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) ) : ?>
+										<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
+										<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->row->id; ?>" />
+									<?php else : ?>
+										<?php
+											require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
+											$attrs = array('type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",  'type_id'=>$this->row->type_id, 'langparent_item'=>"1", 'class'=>"inputbox", 'size'=>"6");
+											$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
+											$ff_lang_parent_id = new JElementItem();
+											echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
+										?>
+									<?php endif; ?>
 								</div>
 							<?php endif; ?>
 							

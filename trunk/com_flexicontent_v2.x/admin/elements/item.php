@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1267 2012-05-07 10:55:21Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1269 2012-05-08 01:51:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -77,8 +77,9 @@ class JFormFieldItem extends JFormField
 			$('sbox-btn-close').fireEvent('click');
 		}";
 
-		$currauthor = (boolean) $node->getAttribute('currauthor');
-		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $currauthor ? '&currauthor=1' : '' );
+		$langparent_item = (boolean) $node->getAttribute('langparent_item');
+		$type_id = $node->getAttribute('type_id');
+		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $langparent_item ? '&langparent_item=1' : '' ).( $type_id ? '&type_id='.$type_id : '' );
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');

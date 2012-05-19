@@ -135,11 +135,12 @@ class FlexicontentModelItemelement extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$lang		= (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ' : '';
 
-		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, ' . $lang . 'u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, ' . $lang . 'u.name AS editor, t.name AS type_name'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+					. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
 					. $where
 					. $orderby
 					;
@@ -177,13 +178,19 @@ class FlexicontentModelItemelement extends JModel
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$currauthor 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.currauthor', 'currauthor', '', 'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
-		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
+		$type_id         = $mainframe->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
+		$langparent_item = $mainframe->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
+		$filter_state    = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
+		$filter_cats     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
+		$filter_type     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
+		
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
+			if ($langparent_item)
+				$filter_lang = flexicontent_html::getSiteDefaultLang();
+			else
+				$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
 		}
+		
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
@@ -209,8 +216,10 @@ class FlexicontentModelItemelement extends JModel
 		if ( $filter_cats ) {
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
-
-		if ( $filter_type ) {
+		
+		if ( $type_id ) {
+			$where[] = 'ie.type_id = ' . $type_id;
+		} else if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
 		}
 
@@ -224,7 +233,7 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 		}
 		
-		if ($currauthor) {
+		if ($langparent_item) {
 			$user = JFactory::getUser();
 			$where[] = ' i.created_by='.$user->id;
 		}
