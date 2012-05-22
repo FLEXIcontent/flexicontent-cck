@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1309 2012-05-16 06:20:37Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1312 2012-05-17 01:08:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -92,7 +92,6 @@ class FlexicontentViewItem extends JView
 		if ($params->get('disable_lang_select', 1)) {
 			$document->addStyleDeclaration($css);
 		}
-		$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
 
 		//get item data
 		

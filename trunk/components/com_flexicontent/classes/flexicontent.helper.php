@@ -295,10 +295,10 @@ class flexicontent_html
 	 */
 	function statebutton( $item, &$params)
 	{
-		$user	= & JFactory::getUser();
-		$db 	=& JFactory::getDBO();
-		$config		=& JFactory::getConfig();
-		$document		= & JFactory::getDocument();
+		$user = & JFactory::getUser();
+		$db   = & JFactory::getDBO();
+		$config   = & JFactory::getConfig();
+		$document = & JFactory::getDocument();
 		$nullDate = $db->getNullDate();
 		
 		// Determine if current user can edit state of the given item
@@ -322,6 +322,7 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
 				if(MooTools.version>="1.2.4") {
 					window.addEvent("domready", function() {stateselector.init()});

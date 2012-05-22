@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1297 2012-05-13 14:51:30Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1311 2012-05-16 07:25:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -295,10 +295,10 @@ class flexicontent_html
 	 */
 	function statebutton( $item, &$params)
 	{
-		$user	= & JFactory::getUser();
-		$db 	=& JFactory::getDBO();
-		$config		=& JFactory::getConfig();
-		$document		= & JFactory::getDocument();
+		$user = & JFactory::getUser();
+		$db   = & JFactory::getDBO();
+		$config   = & JFactory::getConfig();
+		$document = & JFactory::getDocument();
 		$nullDate = $db->getNullDate();
 		
 		// Determine if current user can edit state of the given item
@@ -322,6 +322,7 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
 				if(MooTools.version>="1.2.4") {
 					window.addEvent("domready", function() {stateselector.init()});

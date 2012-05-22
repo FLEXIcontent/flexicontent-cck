@@ -92,7 +92,6 @@ class FlexicontentViewItems extends JView
 		if ($params->get('disable_lang_select', 1)) {
 			$document->addStyleDeclaration($css);
 		}
-		$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
 
 		//get item data
 		
