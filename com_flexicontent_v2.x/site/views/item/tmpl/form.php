@@ -487,8 +487,9 @@ function deleteTag(obj) {
 					<?php
 						$jAp=& JFactory::getApplication();
 						$option = JRequest::getVar('option');
-						$jAp->setUserState( $option.'.itemelement.type_id', $this->item->type_id);
 						$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
+						$jAp->setUserState( $option.'.itemelement.type_id', $this->row->type_id);
+						$jAp->setUserState( $option.'.itemelement.created_by', $this->row->created_by);
 						echo $this->form->getInput('lang_parent_id');
 					?>
 				<?php endif; ?>

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `iscore` tinyint(1) NOT NULL default '0',
   `issearch` tinyint(1) NOT NULL default '1',
   `isadvsearch` tinyint(1) NOT NULL default '0',
+  `untranslatable` tinyint(1) NOT NULL default '0',
   `positions` text NOT NULL,
   `published` tinyint(1) NOT NULL default '0',
   `attribs` text NOT NULL,
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `id` int(11) NOT NULL auto_increment,
   `filename` varchar(255) NOT NULL,
   `altname` varchar(255) NOT NULL,
+  `description` text NOT NULL default '',
   `url` tinyint(3) unsigned NOT NULL default '0',
   `secure` tinyint(3) unsigned NOT NULL default '1',
   `ext` varchar(10) NOT NULL,
@@ -160,6 +162,15 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `position` varchar(100) NOT NULL default '',
   `fields` text NOT NULL,
   PRIMARY KEY  (`template`,`layout`,`position`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
+  `field_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `extratable` varchar(255) NOT NULL,
+  `extraid` int(11) NOT NULL,
+  `search_index` longtext NOT NULL,
+  PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (

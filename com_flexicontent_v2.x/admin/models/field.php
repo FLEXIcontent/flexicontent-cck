@@ -28,7 +28,8 @@ jimport('joomla.application.component.modeladmin');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelField extends JModelAdmin{
+class FlexicontentModelField extends JModelAdmin
+{
 	/**
 	 * Field data
 	 *
@@ -41,7 +42,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -54,7 +56,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @access	public
 	 * @param	int field identifier
 	 */
-	function setId($id) {
+	function setId($id)
+	{
 		// Set field id and wipe data
 		$this->_id	    = $id;
 		$this->_field	= null;
@@ -69,7 +72,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return 	mixed 				The value of the property
 	 * @since	1.0
 	 */
-	function get($property, $default=null) {
+	function get($property, $default=null)
+	{
 		if ($this->_loadField()) {
 			if(isset($this->_field->$property)) {
 				return $this->_field->$property;
@@ -336,6 +340,7 @@ class FlexicontentModelField extends JModelAdmin{
 			$field->iscore					= 0;
 			$field->issearch				= 1;
 			$field->isadvsearch				= 0;
+			$field->untranslatable		= 0;
 			$field->positions				= array();
 			$field->published				= 1;
 			$field->attribs					= null;
@@ -353,8 +358,10 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin() {
-		if ($this->_id) {
+	function checkin()
+	{
+		if ($this->_id)
+		{
 			$field = & JTable::getInstance('flexicontent_fields', '');
 			return $field->checkout($uid, $this->_id);
 		}
@@ -369,8 +376,10 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null) {
-		if ($this->_id) {
+	function checkout($uid = null)
+	{
+		if ($this->_id)
+		{
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
 				$user	=& JFactory::getUser();
@@ -391,8 +400,10 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True if checked out
 	 * @since	1.0
 	 */
-	function isCheckedOut( $uid=0 ) {
-		if ($this->_loadField()) {
+	function isCheckedOut( $uid=0 )
+	{
+		if ($this->_loadField())
+		{
 			if ($uid) {
 				return ($this->_field->checked_out && $this->_field->checked_out != $uid);
 			} else {
@@ -413,7 +424,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function store($data) {
+	function store($data)
+	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
@@ -427,7 +439,8 @@ class FlexicontentModelField extends JModelAdmin{
 		$attribs		= $data['jform']['attribs'];
 
 		// Build parameter INI string
-		if (is_array($attribs)) {
+		if (is_array($attribs))
+		{
 			$txt = array ();
 			foreach ($attribs as $k => $v) {
 				if (is_array($v)) {
@@ -486,7 +499,8 @@ class FlexicontentModelField extends JModelAdmin{
 		$this->_field	=& $field;
 		
 		// append all types to the type array if the field belongs to core
-		if ($field->iscore == 1) {
+		if ($field->iscore == 1)
+		{
 			$query 	= 'SELECT id'
 				. ' FROM #__flexicontent_types'
 				;
@@ -511,7 +525,8 @@ class FlexicontentModelField extends JModelAdmin{
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		
-		foreach($types as $type) {
+		foreach($types as $type)
+		{
 			// insert only the new records
 			if (!in_array($type, $used)) {
 				//get last position of each field in each type;
@@ -542,7 +557,8 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist () {
+	function getTypeslist ()
+	{
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'
 			. ' WHERE published = 1'
@@ -559,12 +575,14 @@ class FlexicontentModelField extends JModelAdmin{
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypesselected() {
+	function getTypesselected()
+	{
 		$query = 'SELECT DISTINCT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int)$this->_id;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		return $used;
 	}
+	
 }
 
 ?>

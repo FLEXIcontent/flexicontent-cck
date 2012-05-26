@@ -82,6 +82,13 @@
 		description ="FLEXI_FIELD_IS_ADVSEARCH_DESC"
 		class="inputbox" />
 	<field
+		name="untranslatable"
+		type="booleanlist"
+		default="0"
+		label="FLEXI_FIELD_UNTRANSLATABLE"
+		description ="FLEXI_FIELD_UNTRANSLATABLE_DESC"
+		class="inputbox" />
+	<field
 		name="published"
 		type="booleanlist"
 		default="1"

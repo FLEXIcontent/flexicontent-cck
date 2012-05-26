@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1313 2012-05-17 17:36:46Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1315 2012-05-18 01:06:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -394,7 +394,9 @@ class FlexicontentModelCategory extends JModel {
 					$andaccess = ' AND c.access <= '.$aid;
 				}
 			}
-		}
+		} else {
+			$andaccess = '';
+		}		
 		
 		// filter by depth level
 		$display_subcats = $cparams->get('display_subcategories_items', 0);
@@ -744,6 +746,8 @@ class FlexicontentModelCategory extends JModel {
 					$andaccess = ' AND c.access <= '.$aid;
 				}
 			}
+		} else {
+			$andaccess = '';
 		}
 
 		$query = 'SELECT c.*,'

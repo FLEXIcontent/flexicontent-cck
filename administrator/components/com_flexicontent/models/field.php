@@ -167,6 +167,7 @@ class FlexicontentModelField extends JModel
 			$field->iscore					= 0;
 			$field->issearch				= 1;
 			$field->isadvsearch				= 0;
+			$field->untranslatable		= 0;
 			$field->positions				= array();
 			$field->published				= 1;
 			$field->attribs					= null;
@@ -290,7 +291,7 @@ class FlexicontentModelField extends JModel
 			$this->setError($field->getError() );
 			return false;
 		}
-
+		
 		// Store it in the db
 		if (!$field->store()) {
 			$this->setError( $this->_db->getErrorMsg() );
@@ -324,8 +325,8 @@ class FlexicontentModelField extends JModel
 		if ($field->iscore == 1)
 		{
 			$query 	= 'SELECT id'
-					. ' FROM #__flexicontent_types'
-					;
+				. ' FROM #__flexicontent_types'
+				;
 			$this->_db->setQuery($query);
 			$types = $this->_db->loadResultArray();
 		}
@@ -333,17 +334,17 @@ class FlexicontentModelField extends JModel
 		// Store field to types relations
 		// delete relations which type is not part of the types array anymore
 		$query 	= 'DELETE FROM #__flexicontent_fields_type_relations'
-				. ' WHERE field_id = '.$field->id
-				. ($types ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
-				;
+			. ' WHERE field_id = '.$field->id
+			. ($types ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
+			;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
 		// draw an array of the used types
 		$query 	= 'SELECT type_id'
-				. ' FROM #__flexicontent_fields_type_relations'
-				. ' WHERE field_id = '.$field->id
-				;
+			. ' FROM #__flexicontent_fields_type_relations'
+			. ' WHERE field_id = '.$field->id
+			;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadResultArray();
 		
@@ -353,15 +354,15 @@ class FlexicontentModelField extends JModel
 			if (!in_array($type, $used)) {
 				//get last position of each field in each type;
 				$query 	= 'SELECT max(ordering) as ordering'
-						. ' FROM #__flexicontent_fields_type_relations'
-						. ' WHERE type_id = ' . $type
-						;
+					. ' FROM #__flexicontent_fields_type_relations'
+					. ' WHERE type_id = ' . $type
+					;
 				$this->_db->setQuery($query);
 				$ordering = $this->_db->loadResult()+1;
 
 				$query 	= 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`)'
-						.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
-						;
+					.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
+					;
 				$this->_db->setQuery($query);
 				$this->_db->query();
 			}
@@ -379,10 +380,10 @@ class FlexicontentModelField extends JModel
 	function getTypeslist ()
 	{
 		$query = 'SELECT id, name'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
+			. ' FROM #__flexicontent_types'
+			. ' WHERE published = 1'
+			. ' ORDER BY name ASC'
+			;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();
 		return $types;	

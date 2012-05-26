@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1292 2012-05-11 15:21:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -635,7 +635,7 @@ class FlexicontentModelItems extends JModel
 		}
 		// If translation method includes autotranslate ...
 		if ($translate_method==3 || $translate_method==4) {
-			require_once(JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'translator.php');
+			require_once(JPATH_COMPONENT.DS.'helpers'.DS.'translator.php');
 		}
 		
 		foreach ($cid as $itemid)
@@ -706,12 +706,11 @@ class FlexicontentModelItems extends JModel
 
 				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
 				if ($translate_method == 3 || $translate_method == 4) {
-					$translatables = array('title', 'introtext', 'fulltext');
+					$translatables = array('title', 'introtext', 'fulltext', 'keywords', 'keydesc');
 					
 					$fieldvalues_arr = array();
 					foreach($translatables as $translatable) {
 						if ($doauto[$translatable]) {
-							echo $translatable;
 							$fieldnames_arr[] = $translatable;
 							$translatable_obj = new stdClass(); 
 							$translatable_obj->originalValue = $row->{$translatable};

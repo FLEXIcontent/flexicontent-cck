@@ -44,9 +44,10 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
-						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_cat_extension')) {
+						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_cat_extension') /*|| !$this->params->get('search_mode')*/) {
 							echo '<div class="fc-error">';
-							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '') echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', "<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='index.php?option=com_config&view=component&component=com_flexicontent&path=&tmpl=component' style='color: red;'>".JText::_("GLOBAL_CONFIGURATION")."</a>" ) . '<br />';
+							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '')	echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', "<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='index.php?option=com_config&view=component&component=com_flexicontent&path=&tmpl=component' style='color: red;'>".JText::_("GLOBAL_CONFIGURATION")."</a>" ) . '<br />';
+							//else if (!$this->params->get('search_mode'))	echo str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SEARCH_MODE_CONFIGURED' )) . '<br />';
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';

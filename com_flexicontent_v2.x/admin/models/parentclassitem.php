@@ -128,7 +128,7 @@ class ParentClassItem extends JModelAdmin
 		$this->_id = (int) $id;
 		
 		// Set current category, but verify item is assigned to this category, (SECURITY concern)
-		$this->_cid = $currcatid;
+		$this->_cid = (int) $currcatid;
 		if ($this->_cid) {
 			$q = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid =". (int)$this->_id ." AND catid = ". (int)$this->_cid;
 			$this->_db->setQuery($q);
@@ -1572,13 +1572,32 @@ class ParentClassItem extends JModelAdmin
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
 
-		///////////////////////////////
-		// store extra fields values //
-		///////////////////////////////
+		//*********************************
+		// Checks for untranslatable fields
+		//*********************************
 		
-		// get the field object
-		//$this->_id 	= $item->id;
-		$fields		= $this->getExtrafields();
+		// CASE 1. Check if saving an item that translates an original content in site's default language
+		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
+		$enable_translation_groups = $cparams->get('enable_translation_groups');
+		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
+		$get_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
+		
+		// CASE 2. Check if saving an original content item (item's language is site default language)
+		// ... Get item ids of translating items
+		if ($is_content_default_lang && $this->_id) {
+			$query = 'SELECT ie.item_id'
+				.' FROM #__flexicontent_items_ext as ie'
+				.' WHERE ie.lang_parent_id = ' . (int)$this->_id;
+			$this->_db->setQuery($query);
+			$translation_ids = $this->_db->loadResultArray();
+		}
+		if (empty($translation_ids)) $translation_ids = array();
+		
+		
+		// ***************************************************************************************************************************
+		// Get item's fields ... and their values (for untranslatable fields the field values from original content item are retrieved
+		// ***************************************************************************************************************************		
+		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0);
 		
 		if($data['vstate']==2) { // the new version is approved, remove old version values from the field table
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
@@ -1591,11 +1610,14 @@ class ParentClassItem extends JModelAdmin
 			
 			foreach($fields as $field) {
 				// In J1.6 field's posted values have different location if not CORE (aka custom field)
-				if ($field->iscore || !FLEXI_J16GE) {
+				if ( $get_untraslatable_values && $field->untranslatable ) {
+					$postvalue = $field->value;
+				} else if ($field->iscore || !FLEXI_J16GE) {
 					$postvalue = @$data[$field->name];  // Value may not be used in form or may have been been skipped to maintain current value
 				} else {
 					$postvalue = @$data['custom'][$field->name];
 				}
+				
 				// Skip fields not having value
 				if (!$postvalue) continue;
 				
@@ -1608,6 +1630,18 @@ class ParentClassItem extends JModelAdmin
 				$postvalues = $postvalue;
 				$postvalues = is_array($postvalues) ? $postvalues : array($postvalues);
 				$i = 1;
+				
+				// Delete field values in all translating items, if current field is untranslatable and current item version is approved
+				if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
+					if (count($translation_ids) && $field->untranslatable) {
+						foreach($translation_ids as $t_item_id) {
+							$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id='.$t_item_id.' AND field_id='.$obj->field_id;
+							$this->_db->setQuery($query);
+							$this->_db->query();
+						}
+					}
+				}
+				
 				foreach ($postvalues as $postvalue) {
 					
 					// -- a. Add versioning values, but do not version the 'hits' field
@@ -1633,6 +1667,15 @@ class ParentClassItem extends JModelAdmin
 						unset($obj->version);
 						if ( isset($obj->value) && strlen(trim($obj->value)) ) {
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+							
+							// Save field value in all translating items, if current field is untranslatable
+							if (count($translation_ids) && $field->untranslatable) {
+								foreach($translation_ids as $t_item_id) {
+									$obj->item_id = $t_item_id;
+									$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+								}
+							}
+							
 						}
 					}
 					$i++;
@@ -1839,7 +1882,7 @@ class ParentClassItem extends JModelAdmin
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
 				if ( !strlen(trim(str_replace("&nbsp;", "", strip_tags($jfdata[$fieldname])))) ) continue;   // skip empty content
-				echo "<br><b>#__jf_content($fieldname) :</b><br>";
+				//echo "<br><b>#__jf_content($fieldname) :</b><br>";
 				$query = "INSERT INTO #__jf_content (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote($jfdata[$fieldname]).", '".md5($item->{$fieldname})."', '', '$modified', '$modified_by', 1)";
 				//echo $query."<br>\n";
@@ -1853,7 +1896,7 @@ class ParentClassItem extends JModelAdmin
 			$query = "UPDATE #__content SET title=".$db->Quote($item->title).",  alias=".$db->Quote($item->alias).",  introtext=".$db->Quote($item->introtext)
 				.",  `fulltext`=".$db->Quote($item->fulltext).",  images=".$db->Quote($item->images).",  metadesc=".$db->Quote($item->metadesc).",  metakey=".$db->Quote($item->metakey)
 				.", publish_up=".$db->Quote($item->publish_up).",  publish_down=".$db->Quote($item->publish_down).",  attribs=".$db->Quote($item->attribs)." WHERE id=".$db->Quote($item->id);
-			echo $query."<br>\n";
+			//echo $query."<br>\n";
 			if (FLEXI_J16GE) {
 				//$query = $db->replacePrefix($query);
 				$query = str_replace("#__", $dbprefix, $query);
@@ -2304,17 +2347,17 @@ class ParentClassItem extends JModelAdmin
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
 	 */
-	function getExtrafieldvalue($fieldid, $version = 0)
+	function getExtrafieldvalue($field_id, $version, $item_id)
 	{
-		$id = (int)$this->_id;
-		if(!$id) return array();
+		$item_id = (int)$item_id;
+		if(!$item_id) return array();
 		
 		$cparams =& $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$query = 'SELECT value'
 			.( ($version<=0 || !$use_versioning) ? ' FROM #__flexicontent_fields_item_relations AS fv' : ' FROM #__flexicontent_items_versions AS fv' )
-			.' WHERE fv.item_id = ' . (int)$this->_id
-			.' AND fv.field_id = ' . (int)$fieldid
+			.' WHERE fv.item_id = ' . (int)$item_id
+			.' AND fv.field_id = ' . (int)$field_id
 			.( ($version>0 && $use_versioning) ? ' AND fv.version='.((int)$version) : '')
 			.' ORDER BY valueorder'
 			;
@@ -2345,7 +2388,7 @@ class ParentClassItem extends JModelAdmin
 	 * @return object
 	 * @since 1.5
 	 */
-	function getExtrafields($force = false)
+	function getExtrafields($force = false, $lang_parent_id = 0)
 	{
 		static $fields;
 		if(!$fields || $force) {
@@ -2374,7 +2417,10 @@ class ParentClassItem extends JModelAdmin
 					$this->getCoreFieldValue($field, $version);
 				} else {
 					// Load non core field (versioned or non-versioned) OR core field (versioned only)
-					$field->value = $this->getExtrafieldvalue($field->id, $version);
+					
+					// whether to use untranslatable value from original content item
+					$item_id = ($lang_parent_id && @$field->untranslatable) ? $lang_parent_id : $this->_id;
+					$field->value = $this->getExtrafieldvalue($field->id, $version, $item_id );
 					if( ( $field->name=='categories') || $field->name=='tags' ) {
 						// categories and tags must have been serialized but some early versions did not do it, we will check before unserializing them
 						$field->value = ($array = @unserialize($field->value[0]) ) ? $array : $field->value;
