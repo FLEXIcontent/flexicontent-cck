@@ -7,6 +7,12 @@
 			<field name="flexi_cat_extension" type="list" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide">
 				<option value="com_content">com_content Categories</option>
 			</field>
+			<!--field name="search_mode" type="list" default="" label="FLEXI_SELECT_SEARCH_MODE" description="FLEXI_SELECT_SEARCH_MODE_DESC"  menu="hide">
+				<option value="0">FLEXI_PLEASE_SELECT</option>
+				<option value="1">FLEXI_JOOMLA_CONTENT_SEARCH</option>
+				<option value="2">FLEXI_STANDARD_FLEXI_SEARCH</option>
+				<option value="3">FLEXI_ADVANCED_FLEXI_SEARCH</option>
+			</field-->
 
 			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
 				<option value="0">FLEXI_NO</option>

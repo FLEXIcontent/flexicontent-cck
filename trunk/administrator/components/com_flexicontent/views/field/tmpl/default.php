@@ -116,6 +116,19 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
+					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
+						<td class="key">
+							<label for="untranslatable" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_UNTRANSLATABLE').'::'.JText::_('FLEXI_FIELD_UNTRANSLATABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_UNTRANSLATABLE' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<?php
+							$html = JHTML::_('select.booleanlist', 'untranslatable', 'class="inputbox"', $this->row->untranslatable );
+							echo $html;
+							?>
+						</td>
+					</tr>
 					<?php if (!FLEXI_ACCESS) : ?>
 					<tr>
 						<td class="key">

@@ -4,6 +4,12 @@
 		<param name="" type="separator" default="FLEXI_GENERAL_CONF" level="level1" menu="hide" />
 
 		<param name="flexi_section" type="section" size="30" default="" label="FLEXI_SELECT_A_SECTION" description="FLEXI_SELECT_A_SECTION_DESC"  menu="hide" />
+		<!--param name="search_mode" type="list" default="" label="FLEXI_SELECT_SEARCH_MODE" description="FLEXI_SELECT_SEARCH_MODE_DESC"  menu="hide">
+			<option value="0">FLEXI_PLEASE_SELECT</option>
+			<option value="1">FLEXI_JOOMLA_CONTENT_SEARCH</option>
+			<option value="2">FLEXI_STANDARD_FLEXI_SEARCH</option>
+			<option value="3">FLEXI_ADVANCED_FLEXI_SEARCH</option>
+		</param-->
 		<param name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_JCOMMENTS</option>

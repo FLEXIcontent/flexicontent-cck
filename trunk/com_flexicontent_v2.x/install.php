@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: install.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: install.php 1304 2012-05-14 20:54:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -214,7 +214,7 @@ $files_tbl_cols = $db->loadResultArray();
 		</tr>
 <?php
 
-// Alter table __flexicontent_fields: Add asset_id column
+// Alter table __flexicontent_fields: Add untranslatable column
 $db = &JFactory::getDBO();
 $query = "SHOW COLUMNS FROM #__flexicontent_fields";
 $db->setQuery($query);
@@ -222,6 +222,41 @@ $fields_tbl_cols = $db->loadResultArray();
 
 ?>
 		<tr class="row1">
+			<td class="key">Run SQL "ALTER TABLE `...__flexicontent_fields` ADD `untranslatable` TEXT NOT NULL AFTER `isadvsearch`"
+			<?php
+			$already = true;
+			$result = false;
+			if(!in_array('isadvsearch', $fields_tbl_cols)) {
+				$already = false;
+				$query = "ALTER TABLE`#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'untranslatable' already exists.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'untranslatable' added.");
+				} else {
+					echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+				}
+				?></span>
+			</td>
+		</tr>
+<?php
+
+// Alter table __flexicontent_fields: Add asset_id column
+$db = &JFactory::getDBO();
+$query = "SHOW COLUMNS FROM #__flexicontent_fields";
+$db->setQuery($query);
+$fields_tbl_cols = $db->loadResultArray();
+
+?>
+		<tr class="row0">
 			<td class="key">Run SQL "ALTER TABLE `..._flexicontent_fields` ADD `asset_id` INT NULL DEFAULT NULL AFTER `id`,<br> ADD UNIQUE ( `asset_id` )"
 			<?php
 			$already = true;
@@ -247,8 +282,5 @@ $fields_tbl_cols = $db->loadResultArray();
 				?></span>
 			</td>
 		</tr>
-<?php
-// ... more actions
-?>
 	</tbody>
 </table>

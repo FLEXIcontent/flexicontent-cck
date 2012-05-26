@@ -148,6 +148,11 @@ class FlexicontentViewItem extends JView
 			JToolBarHelper::cancel();
 		}
 		
+		// Check if saving an item that translates an original content in site's default language
+		$enable_translation_groups = $cparams->get('enable_translation_groups');
+		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($row->language, 0,2);
+		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $row->lang_parent_id && $row->lang_parent_id!=$row->id;
+		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc) 
@@ -161,7 +166,11 @@ class FlexicontentViewItem extends JView
 				FlexicontentFields::loadFieldConfig($field, $row);
 			} else {
 				// Create field 's editing HTML
-				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$row ));
+				if ($modify_untraslatable_values && $field->untranslatable) {
+					$field->html = JText::_( 'FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE' );
+				} else {
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$row ));
+				}
 			}
 			if ($field->field_type == 'maintext')
 			{

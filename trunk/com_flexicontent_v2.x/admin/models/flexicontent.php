@@ -322,9 +322,9 @@ class FlexicontentModelFlexicontent extends JModel
 				. ' FROM #__extensions'
 				. ' WHERE `type`='.$this->_db->Quote('plugin').' AND '
 				. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
-				. ' OR element = ' . $this->_db->Quote('flexisearch')
+				//. ' OR element = ' . $this->_db->Quote('flexisearch')
 				. ' OR element = ' . $this->_db->Quote('flexisystem')
-				. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
+				//. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
 				. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
 				. ' AND enabled <> 1'
 				;

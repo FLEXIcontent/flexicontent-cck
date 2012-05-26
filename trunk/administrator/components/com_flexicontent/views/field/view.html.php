@@ -88,9 +88,10 @@ class FlexicontentViewField extends JView {
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
 			
 		//support checking.
-		$supportsearch    = true;
-		$supportadvsearch = false;
-		$supportfilter    = false;
+		$supportsearch          = true;
+		$supportadvsearch       = false;
+		$supportfilter          = false;
+		$supportuntranslatable  = false;
 		$core_advsearch = array('title', 'maintext', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'textselect');
 		$core_filters = array('createdby', 'modifiedby', 'type', 'state', 'tags', 'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple', 'text', 'date', 'categories', 'textselect');
 		
@@ -115,6 +116,8 @@ class FlexicontentViewField extends JView {
 				$supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
 				$supportfilter = in_array('onDisplayFilter', $classmethods);
 			}
+			
+			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
 		}
 				
 		//build selectlists
@@ -195,11 +198,12 @@ class FlexicontentViewField extends JView {
 		//assign data to template
 		$this->assignRef('document'   , $document);
 		$this->assignRef('row'        , $row);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('form'      , $form);
-		$this->assignRef('supportsearch'    , $supportsearch);
-		$this->assignRef('supportadvsearch' , $supportadvsearch);
-		$this->assignRef('supportfilter'    , $supportfilter);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('form'       , $form);
+		$this->assignRef('supportsearch'           , $supportsearch);
+		$this->assignRef('supportadvsearch'        , $supportadvsearch);
+		$this->assignRef('supportfilter'           , $supportfilter);
+		$this->assignRef('supportuntranslatable'  , $supportuntranslatable);
 
 		parent::display($tpl);
 	}

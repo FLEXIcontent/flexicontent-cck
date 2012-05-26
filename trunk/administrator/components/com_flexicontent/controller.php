@@ -33,6 +33,7 @@ class FlexicontentController extends JController
 		parent::__construct();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
+		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
 		// If configuration not saved REDIRECT TO DASHBOARD VIEW (will ask to save or import)
 		$view = JRequest::getVar('view');

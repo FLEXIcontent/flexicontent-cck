@@ -90,6 +90,14 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('isfilter'); ?>
 						</td>
 					</tr>
+					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
+						<td class="key">
+							<?php echo $this->form->getLabel('untranslatable').':'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('untranslatable'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('access').':'; ?>

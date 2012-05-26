@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_fields.php 1035 2011-12-09 00:16:50Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent_fields.php 1138 2012-02-07 03:01:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -50,6 +50,8 @@ class flexicontent_fields extends JTable
 	var $issearch			= 1;
 	/** @var int */
 	var $isadvsearch		= 0;
+	/** @var int */
+	var $untranslatable	= 0;
 	/** @var string */
 	var $positions			= '';
 	/** @var string */

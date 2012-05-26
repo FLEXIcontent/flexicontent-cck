@@ -178,8 +178,18 @@ class FlexicontentModelItemelement extends JModel
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$type_id         = $mainframe->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
 		$langparent_item = $mainframe->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
+		$type_id         = $mainframe->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
+		$created_by      = $mainframe->getUserStateFromRequest( $option.'.itemelement.created_by', 'created_by', 0, 'int' );
+		if ($langparent_item) {
+			$user_fullname = JFactory::getUser($created_by)->name;
+			$this->_db->setQuery('SELECT name FROM #__flexicontent_types WHERE id = '.$type_id);
+			$type_name = $this->_db->loadResult();
+			$msg = sprintf("Selecting ORIGINAL Content item for a translating item of &nbsp; Content Type: \"%s\" &nbsp; and &nbsp; User: \"%s\"", $type_name, $user_fullname);
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage($msg,'message');
+		}
+		
 		$filter_state    = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
 		$filter_cats     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
 		$filter_type     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
@@ -217,7 +227,7 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = 'rel.catid = ' . $filter_cats;
 		}
 		
-		if ( $type_id ) {
+		if ($langparent_item && $type_id ) {
 			$where[] = 'ie.type_id = ' . $type_id;
 		} else if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
@@ -233,9 +243,15 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 		}
 		
-		if ($langparent_item) {
-			$user = JFactory::getUser();
-			$where[] = ' i.created_by='.$user->id;
+		/*$user = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$isAdmin = JAccess::check($user->id, 'core.admin', 'root.1');
+		} else {
+			$isAdmin = $user->gid >= 24;
+		}*/
+		
+		if ($langparent_item && $created_by) {
+			$where[] = ' i.created_by='.$created_by;
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

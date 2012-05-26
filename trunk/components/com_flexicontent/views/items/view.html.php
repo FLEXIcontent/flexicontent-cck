@@ -460,6 +460,11 @@ class FlexicontentViewItems extends JView
 		$tparams = & $this->get( 'Typeparams' );
 		$tparams = new JParameter($tparams);
 		
+		// Check if saving an item that translates an original content in site's default language
+		$enable_translation_groups = $params->get('enable_translation_groups');
+		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
+		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
+		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc) 
@@ -473,7 +478,11 @@ class FlexicontentViewItems extends JView
 				FlexicontentFields::loadFieldConfig($field, $item);
 			} else {
 				// Create field 's editing HTML
-				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
+				if ($modify_untraslatable_values && $field->untranslatable) {
+					$field->html = JText::_( 'FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE' );
+				} else {
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
+				}
 			}
 			if ($field->field_type == 'maintext')
 			{

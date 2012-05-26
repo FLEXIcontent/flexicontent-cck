@@ -77,7 +77,11 @@ class JElementItem extends JElement
 
 		$langparent_item = (boolean) $node->attributes('langparent_item');
 		$type_id = $node->attributes('type_id');
-		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $langparent_item ? '&langparent_item=1' : '' ).( $type_id ? '&type_id='.$type_id : '' );
+		$created_by = $node->attributes('created_by');
+		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
+		$link .= $langparent_item ? '&langparent_item=1' : '&langparent_item=0';
+		$link .= $type_id ? '&type_id='.$type_id : '';
+		$link .= $created_by ? '&created_by='.$created_by : '';
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');

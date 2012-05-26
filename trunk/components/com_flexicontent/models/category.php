@@ -394,7 +394,9 @@ class FlexicontentModelCategory extends JModel {
 					$andaccess = ' AND c.access <= '.$aid;
 				}
 			}
-		}
+		} else {
+			$andaccess = '';
+		}		
 		
 		// filter by depth level
 		$display_subcats = $cparams->get('display_subcategories_items', 0);
@@ -744,6 +746,8 @@ class FlexicontentModelCategory extends JModel {
 					$andaccess = ' AND c.access <= '.$aid;
 				}
 			}
+		} else {
+			$andaccess = '';
 		}
 
 		$query = 'SELECT c.*,'

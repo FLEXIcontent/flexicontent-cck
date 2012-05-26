@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1269 2012-05-08 01:51:53Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1317 2012-05-19 22:17:59Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -79,7 +79,11 @@ class JFormFieldItem extends JFormField
 
 		$langparent_item = (boolean) $node->getAttribute('langparent_item');
 		$type_id = $node->getAttribute('type_id');
-		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component'.( $langparent_item ? '&langparent_item=1' : '' ).( $type_id ? '&type_id='.$type_id : '' );
+		$created_by = $node->getAttribute('created_by');
+		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
+		$link .= $langparent_item ? '&langparent_item=1' : '&langparent_item=0';
+		$link .= $type_id ? '&type_id='.$type_id : '';
+		$link .= $created_by ? '&created_by='.$created_by : '';
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');

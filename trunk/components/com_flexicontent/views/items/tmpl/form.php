@@ -486,7 +486,11 @@ function deleteTag(obj) {
 				<?php else : ?>
 					<?php
 						require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
-						$attrs = array('type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC", 'type_id'=>$this->item->type_id, 'langparent_item'=>"1", 'class'=>"inputbox", 'size'=>"6");
+						$attrs = array(
+							'type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",
+							'langparent_item'=>"1", 'type_id'=>$this->item->type_id, 'created_by'=>$this->item->created_by,
+							'class'=>"inputbox", 'size'=>"6"
+						);
 						$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
 						$ff_lang_parent_id = new JElementItem();
 						echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->item->lang_parent_id, $jelement, '');
