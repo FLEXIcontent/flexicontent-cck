@@ -138,31 +138,20 @@ class FlexicontentModelCategories extends JModel
 		//establish the hierarchy of the categories
 		$children = array();
 		
-		// Parse configuration for every row
-   	foreach ($rows as $cat) {
-   		$config_arr = preg_split('/(?:\r\n|\r|\n)/',$cat->config);
-   		$cat->config = new stdClass();
-   		foreach($config_arr as $config_var) {
-				if(!$config_var) continue;
-   			list($varname,$varval) = explode('=',$config_var);
-   			if(!empty($varname)) $cat->config->{$varname} = $varval;
-   		}
-   	}
+		//set depth limit
+		$levellimit = 10;
 		
-    	//set depth limit
-   		$levellimit = 10;
-		
-    	foreach ($rows as $child) {
-        	$parent = $child->parent_id;
-       		$list 	= @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
     	
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
+		//get list of the items
+		$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
 
-    	    	//eventually only pick out the searched items.
+		//eventually only pick out the searched items.
 		if ($search) {
 			$list1 = array();
 

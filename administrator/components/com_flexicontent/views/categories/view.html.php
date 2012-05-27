@@ -26,7 +26,9 @@ class FlexicontentViewCategories extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option, $globalcats;
+		global $globalcats;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -36,15 +38,17 @@ class FlexicontentViewCategories extends JView {
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
+		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 'filter_order', $order_property, 'cmd' );
+		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir',	'', 'word' );
+		$filter_state     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-
+		
+		//Create Submenu
 		FLEXISubmenu('CanCats');
 
 		//create the toolbar
@@ -61,7 +65,11 @@ class FlexicontentViewCategories extends JView {
 		JToolBarHelper::deleteList();
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
+		$rows = & $this->get( 'Data');
+		
+		// Parse configuration for every category
+   	foreach ($rows as $cat) $cat->config = new JParameter($cat->config);
+
 		$pageNav 	= & $this->get( 'Pagination' );
 		$categories = $globalcats;
 
@@ -87,15 +95,15 @@ class FlexicontentViewCategories extends JView {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.ordering') ? 'c.ordering' : '';
+		$ordering = ($lists['order'] == $order_property) ? $order_property : '';
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('rows'       , $rows);
 		$this->assignRef('CanRights'	, $CanRights);
 		$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('user'			, $user);
+		$this->assignRef('ordering'   , $ordering);
+		$this->assignRef('user'       , $user);
 
 		parent::display($tpl);
 	}

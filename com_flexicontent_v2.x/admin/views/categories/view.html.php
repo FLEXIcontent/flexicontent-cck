@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1223 2012-03-30 08:34:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -23,7 +23,9 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewCategories extends JView {
-	function display($tpl = null) {
+
+	function display($tpl = null)
+	{
 		global $globalcats;
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -36,18 +38,19 @@ class FlexicontentViewCategories extends JView {
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 			'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir','filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
-		$filter_language	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
+		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 'filter_order', $order_property, 'cmd' );
+		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir',	'', 'word' );
+		$filter_state     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
+		$filter_language	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', '*', 'cmd' );
 		
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim($search) );
+		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
 		$permission = FlexicontentHelperPerm::getPerm();
-
 		if (!$permission->CanCats) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
@@ -69,9 +72,12 @@ class FlexicontentViewCategories extends JView {
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Items');
-		$this->state		= $this->get('State');
-		$rows			= $this->get('Items');
+		$rows = & $this->get( 'Items');
+		
+		// Parse configuration for every category
+   	foreach ($rows as $cat) $cat->config = new JParameter($cat->config);
+
+		$this->state = $this->get('State');
 		$this->pagination	= $this->get('Pagination');
 		$children = array();
 		
@@ -97,15 +103,14 @@ class FlexicontentViewCategories extends JView {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.lft') ? 'c.lft' : '';
+		$ordering = ($lists['order'] == $order_property) ? $order_property : '';
 
 		//assign data to template
-		$this->assignRef('lists'      		, $lists);
-		$this->assignRef('rows'      		, $rows);
-		$this->assignRef('permission'      	, $permission);
-		//$this->assignRef('pageNav' 		, $pageNav);
-		$this->assignRef('orderingx'		, $ordering);
-		$this->assignRef('user'			, $user);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('rows'       , $rows);
+		$this->assignRef('permission' , $permission);
+		$this->assignRef('orderingx'  , $ordering);
+		$this->assignRef('user'       , $user);
 
 		parent::display($tpl);
 	}

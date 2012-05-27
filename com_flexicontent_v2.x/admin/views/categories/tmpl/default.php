@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 184 2010-04-04 06:08:30Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 720 2011-07-30 02:59:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,13 +17,15 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$listOrder	= $this->lists['order'];
-$listDirn	= $this->lists['order_Dir'];
-$saveOrder 	= ($listOrder == 'c.lft' && $listDirn == 'asc');
-$user		= &JFactory::getUser();
-$userId		= $user->get('id');
+$listOrder  = $this->lists['order'];
+$listDirn   = $this->lists['order_Dir'];
+$saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
+$user       = &JFactory::getUser();
+$userId     = $user->get('id');
+$infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
+
 	<table class="adminform">
 		<tr>
 			<td width="100%">
@@ -48,6 +50,7 @@ $userId		= $user->get('id');
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -99,7 +102,8 @@ $userId		= $user->get('id');
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
-				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $row->level-1) ?>
+				<?php //echo str_repeat('<span class="gi">|&mdash;</span>', $row->level-1) ?>
+				<?php echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
 						<?php if ($row->checked_out) : ?>
 							<?php echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin); ?>
 						<?php endif; ?>
@@ -109,13 +113,12 @@ $userId		= $user->get('id');
 						<?php else : ?>
 							<?php echo $this->escape($row->title); ?>
 						<?php endif; ?>
-						<p class="smallsub" title="<?php echo $this->escape($row->path);?>">
-							<?php echo str_repeat('<span class="gtr">|&mdash;</span>', $row->level-1) ?>
-							<?php if (empty($row->note)) : ?>
-								<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($row->alias));?>
-							<?php else : ?>
-								<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS_NOTE', $this->escape($row->alias), $this->escape($row->note));?>
-							<?php endif; ?></p>
+						
+						<?php if (!empty($row->note)) : ?>
+							<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo $this->escape($row->note);?>">
+								<?php echo $infoimage; ?>
+							</span
+						<?php endif; ?>
 			</td>
 			<td>
 				<?php
@@ -125,6 +128,9 @@ $userId		= $user->get('id');
 					echo htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				}
 				?>
+			</td>
+			<td align="center">
+				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "default <sup>[1]</sup>") ?>
 			</td>
 			<td align="center">
 				<?php echo $row->nrassigned?>
