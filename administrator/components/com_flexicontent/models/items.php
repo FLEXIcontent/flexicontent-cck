@@ -635,7 +635,14 @@ class FlexicontentModelItems extends JModel
 		}
 		// If translation method includes autotranslate ...
 		if ($translate_method==3 || $translate_method==4) {
-			require_once(JPATH_COMPONENT.DS.'helpers'.DS.'translator.php');
+			require_once(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php');
+		}
+		// If translation method load description field to allow some parsing according to parameters
+		if ($translate_method==3 || $translate_method==4) {
+			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
+			$desc_field_id = $this->_db->loadResult();
+			$desc_field =& JTable::getInstance('flexicontent_fields', '');
+			$desc_field->load($desc_field_id);
 		}
 		
 		foreach ($cid as $itemid)
@@ -665,7 +672,7 @@ class FlexicontentModelItems extends JModel
 				$row->language	= $lang ? $lang : $row->language;
 				$lang_to				= substr($row->language,0,2);
 				
-				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = true;    // In case JF data is missing
+				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
 				if ($translate_method == 2 || $translate_method == 4) {
 					// a. Try to get joomfish translation from the item
 					$query = "SELECT c.* FROM `#__jf_content` AS c "
@@ -681,7 +688,7 @@ class FlexicontentModelItems extends JModel
 							$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
 						}
 						
-						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>4){
+						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>2){
 							$row->title = $jfitemdata->title;
 							$row->title = ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
 							$doauto['title'] = false;
@@ -691,22 +698,38 @@ class FlexicontentModelItems extends JModel
 							$row->alias = $jfitemdata->alias;
 						}
 						
-						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>10) {
+						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>2) {
 							$row->introtext = $jfitemdata->introtext;
 							$doauto['introtext'] = false;
 						}
 						
-						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>10) {
+						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>2) {
 							$row->fulltext = $jfitemdata->fulltext;
 							$doauto['fulltext'] = false;
+						}
+						
+						if (isset($jfitemdata->metakey) && mb_strlen($jfitemdata->metakey)>2) {
+							$row->metakey = $jfitemdata->metakey;
+							$doauto['metakey'] = false;
+						}
+						
+						if (isset($jfitemdata->metadesc) && mb_strlen($jfitemdata->metadesc)>2) {
+							$row->metadesc = $jfitemdata->metadesc;
+							$doauto['metadesc'] = false;
 						}
 					}
 				}
 				
+				// Parse fulltext field into tabs to avoid destroying them during translation
+				FlexicontentFields::loadFieldConfig($desc_field, $row);
+				$desc_field->parameters->set( 'use_html', 0 );
+				$desc_field->value[0] = $row->fulltext;
+				FLEXIUtilities::call_FC_Field_Func('textarea', 'parseTabs', array(&$desc_field, &$row) );
 
 				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
 				if ($translate_method == 3 || $translate_method == 4) {
-					$translatables = array('title', 'introtext', 'fulltext', 'keywords', 'keydesc');
+					$translatables = array('title', 'introtext', 'metakey', 'metadesc');
+					if (!$desc_field->tabs_detected)  $translatables[] = 'fulltext';
 					
 					$fieldvalues_arr = array();
 					foreach($translatables as $translatable) {
@@ -730,6 +753,70 @@ class FlexicontentModelItems extends JModel
 							}
 						}
 					}
+					
+					$dti = & $desc_field->tab_info;
+					
+					$fieldnames_arr = array();
+					$fieldvalues_arr = array();
+					if ($desc_field->tabs_detected) {
+						
+						$fieldnames_arr[] = 'beforetabs';
+						$translatable_obj = new stdClass(); 
+						$translatable_obj->originalValue = $dti->beforetabs;
+						$translatable_obj->noTranslate = false;
+						$fieldvalues_arr[] = $translatable_obj;
+						
+						$fieldnames_arr[] = 'aftertabs';
+						$translatable_obj = new stdClass(); 
+						$translatable_obj->originalValue = $dti->aftertabs;
+						$translatable_obj->noTranslate = false;
+						$fieldvalues_arr[] = $translatable_obj;
+						
+						foreach($dti->tab_titles as $i => $tab_title) {
+							$fieldnames_arr[] = 'tab_titles_'.$i;
+							$translatable_obj = new stdClass(); 
+							$translatable_obj->originalValue = $tab_title;
+							$translatable_obj->noTranslate = false;
+							$fieldvalues_arr[] = $translatable_obj;
+						}
+						
+						foreach($dti->tab_contents as $i => $tab_content) {
+							$fieldnames_arr[] = 'tab_contents_'.$i;
+							$translatable_obj = new stdClass(); 
+							$translatable_obj->originalValue = $tab_content;
+							$translatable_obj->noTranslate = false;
+							$fieldvalues_arr[] = $translatable_obj;
+						}
+						
+						unset($translated_desc);
+						if (count($fieldvalues_arr)) {
+							$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+							
+							if (intval($result)) {
+								$i = 0;
+								$translated_desc = new stdClass();
+								foreach($fieldnames_arr as $fieldname) {
+									$translated_desc->{$fieldname} = $fieldvalues_arr[$i]->translationValue;
+									$i++;
+								}
+							}
+						}
+						//echo "<pre>"; print_r($translated_desc);
+						
+						// Reconstruct fulltext out of the translated tabs code
+						if (isset($translated_desc)) {
+							$row->fulltext  = $translated_desc->beforetabs;
+							$row->fulltext .= $dti->tabs_start;
+							foreach ( $dti->tab_titles as $i => $tab_title ) {
+								$row->fulltext .= str_replace( $tab_title, $translated_desc->{'tab_titles_'.$i}, $dti->tab_startings[$i]);
+								$row->fulltext .= $translated_desc->{'tab_contents_'.$i};
+								$row->fulltext .= $dti->tab_endings[$i];
+							}
+							$row->fulltext .= $dti->tabs_end;
+							$row->fulltext .= $translated_desc->aftertabs;
+						}
+					}
+					
 				}
 				
 				$row->store();

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: flexisearch.php 677 2011-07-24 15:19:52Z ggppdk $
+ * @version 1.0 $Id: flexisearch.php 1147 2012-02-22 08:24:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -180,9 +180,9 @@ class plgSearchFlexisearch extends JPlugin
 				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$text;}
 				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$text;	$wheres2[]	= 'a.fulltext LIKE '.$text;}
 				if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$text;		$wheres2[]	= 'a.metadesc LIKE '.$text;}
-				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
+				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$text;}
 				if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$text;}
-				$where		= '(' . implode(') OR (', $wheres2) . ')';
+				if (count($wheres2)) $where		= '(' . implode(') OR (', $wheres2) . ')';
 				break;
 			case 'all':
 			case 'any':
@@ -197,12 +197,15 @@ class plgSearchFlexisearch extends JPlugin
 					if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$word;		$wheres2[]	= 'a.metadesc LIKE '.$word;}
 					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
 					if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$word;}
-					$wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
+					if (count($wheres2)) $wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
 				}
-				$where = '(' . implode(($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
+				if (count($wheres)) {
+					$where = '(' . implode(($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
+				}
 				break;
 		}
 		if (!$where) {return array();}
+		//if ( empty($where) ) $where = '1';
 		
 		switch ($ordering) {
 			case 'oldest':
@@ -265,38 +268,38 @@ class plgSearchFlexisearch extends JPlugin
 			$query->clear();
 			$query->select(
 				' a.id as id, '
-				.'a.title AS title, '
-				.'a.metakey AS metakey, '
-				.'a.metadesc AS metadesc, '
-				.'a.modified AS created, '     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
-				.'t.name AS tagname, '
-				.'fir.value as field, '
-				.'CONCAT(a.introtext, a.fulltext) AS text, '
-				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, a.title ) AS section, '
-				.'CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END AS slug, '
-				.'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug, '
-				.'"2" AS browsernav '
+				.' a.title AS title,'
+				.' a.metakey AS metakey,'
+				.' a.metadesc AS metadesc,'
+				.' a.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
+				.' t.name AS tagname,'
+				.' fir.value as field,'
+				.' CONCAT(a.introtext, a.fulltext) AS text,'
+				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, a.title ) AS section,'
+				.' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END AS slug,'
+				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
+				.' "2" AS browsernav'
 				);
 			$query->from('#__content AS a '
-				.'LEFT JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id '
-				.'LEFT JOIN #__flexicontent_fields_item_relations AS fir ON a.id = fir.item_id '
-				.'LEFT JOIN #__categories AS c ON a.catid = c.id '
-				.'LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid '
-				.'LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id '
-				.'LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	'
+				.' LEFT JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id'
+				.' LEFT JOIN #__flexicontent_fields_item_relations AS fir ON a.id = fir.item_id'
+				.' LEFT JOIN #__categories AS c ON a.catid = c.id'
+				.' LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid'
+				.' LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id'
+				.' LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	'
 				. $joinaccess
 				);
 			$query->where(' ('. $where .') ' 
-				.'AND ie.type_id IN('.$types.') '
-				.'AND a.state IN (1, -5) AND c.published = 1 '
-				.'AND (a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).') '
-				.'AND (a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).') '
-				. $andaccess
-				// Filter by language
-				. $andlang
+				.' AND ie.type_id IN('.$types.') '
+				.' AND a.state IN (1, -5) AND c.published = 1 '
+				.' AND (a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).') '
+				.' AND (a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).') '
+				. $andaccess // Filter by user access
+				. $andlang   // Filter by current language
 				); 
 			$query->group('a.id');
 			$query->order($order);
+			//echo "<pre>".$query."</pre>";
 			
 			$db->setQuery($query, 0, $limit);
 			$list = $db->loadObjectList();

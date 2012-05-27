@@ -95,9 +95,23 @@ class plgSystemFlexisystem extends JPlugin
 		$applicationName 	= $app->getName();
 		$user 				=& JFactory::getUser();
 		
-		$minsecs			= $this->params->get('redirect_sections', 24);
-		$mincats			= $this->params->get('redirect_cats', 24);
-		$minarts			= $this->params->get('redirect_articles', 24);
+		if (FLEXI_J16GE) {
+			// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
+			$usergroups = $user->get('groups');
+			$usergroups = is_array($usergroups) ? $usergroups : array();
+			$usergroups = array_keys($usergroups);
+		}
+		
+		// Get user groups excluded from redirection
+		if (FLEXI_J16GE) {
+			$exclude_mincats = $this->params->get('exclude_redirect_cats', array());
+			$exclude_minarts = $this->params->get('exclude_redirect_articles', array());
+		} else {
+			$minsecs			= $this->params->get('redirect_sections', 24);
+			$mincats			= $this->params->get('redirect_cats', 24);
+			$minarts			= $this->params->get('redirect_articles', 24);
+		}
+		
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
@@ -116,15 +130,28 @@ class plgSystemFlexisystem extends JPlugin
 		
 		if (!empty($option)) {
 			// if try to access com_content you get redirected to Flexicontent items
-			if ($option == 'com_content' && $applicationName == 'administrator' && $user->gid <= $minarts) {
+			if ( $option == 'com_content' && $applicationName == 'administrator' ) {
+				
+				// Check if a user group is groups, that are excluded from article redirection
+				if (FLEXI_J16GE) {
+					if( count(array_intersect($usergroups, $exclude_minarts)) ) return false;
+				} else {
+					if( $user->gid > $minarts ) return false;
+				}
 				
 				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent';
 				
 				// Get request variables used to determine whether to apply redirection
 				$task = JRequest::getCMD('task');
+				$layout = JRequest::getCMD('layout');      // Currently used for J2.5 only
+				$function = JRequest::getCMD('function');  // Currently used for J2.5 only
 				
-				// Exclusions:
+				// *** Specific Redirect Exclusions ***
+				
+				//--. (J2.5 only) Selecting Joomla article for menu item
+				if ( FLEXI_J16GE && $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
+				
 				//--. JA jatypo (editor-xtd plugin button for text style selecting)
 				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
@@ -142,7 +169,28 @@ class plgSystemFlexisystem extends JPlugin
 				$app->redirect($urlItems,'');
 				return false;
 
-			} elseif ($option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
+			} elseif ( $option == 'com_categories' && $applicationName == 'administrator' ) {
+				
+				// Check if a user group is groups, that are excluded from category redirection
+				if (FLEXI_J16GE) {
+					if( count(array_intersect($usergroups, $exclude_mincats)) ) return false;
+				} else {
+					if( $user->gid > $mincats ) return false;
+				}
+ 				
+				// Default (target) redirection url
+				$urlItems = 'index.php?option=com_flexicontent&view=categories';
+				
+				// Get request variables used to determine whether to apply redirection
+				$category_scope = JRequest::getVar( FLEXI_J16GE ? 'extension' : 'section' );
+				
+				// Apply redirection if in com_categories is in content scope
+				if ( $category_scope == 'com_content' ) {
+					$app->redirect($urlItems,'');
+				}
+				return false;
+				
+			} elseif ( !FLEXI_J16GE && $option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
 				
 				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
@@ -155,20 +203,7 @@ class plgSystemFlexisystem extends JPlugin
 					$app->redirect($urlItems,'');
 				}
 				return false;
-			
-			} elseif ($option == 'com_categories' && $applicationName == 'administrator' && $user->gid <= $mincats) {
-			
-				// Default (target) redirection url
-				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
-				// Get request variables used to determine whether to apply redirection
-				$section = JRequest::getVar('section');
-				
-				// Apply redirection if in content section (J1.5)
-				if ($section == 'com_content') {
-					$app->redirect($urlItems,'');
-				}
-				return false;
 			}
 		}
 	}
@@ -199,16 +234,21 @@ class plgSystemFlexisystem extends JPlugin
 					// Warning current menu item id must not be passed to the routing functions since it points to com_content , and thus it will break FC SEF URLs
 					$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
 					
-					$query 	= 'SELECT sectionid FROM #__content'
-							. ' WHERE id = ' . $id
-							;
-					$db->setQuery($query);
-					$section = $db->loadResult();
-
-					if ($section == $flexisection) {
+					if (!FLEXI_J16GE) {
+						$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
+						$section = $db->loadResult();
+						$in_limits = ($section == $flexisection);
+					} else {
+						$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
+						$maincat = $db->loadResult();
+						$in_limits = ($maincat>=FLEXI_LFT_CATEGORY && $maincat<=FLEXI_RGT_CATEGORY);
+					}
+					
+					if ($in_limits) {
 						$app->redirect($urlItem);
 						return false;
 					}
+					
 				}
 			}
 		}
@@ -383,5 +423,45 @@ class plgSystemFlexisystem extends JPlugin
 
 		return;
 	}
+	
+	
+	// ***********************
+	// J2.5 SPECIFIC FUNCTIONS
+	// ***********************
+	
+	// Function by decide type of user, currently unused since we used user access level instead of this function
+	function getUserType() {
+    
+    // Joomla default user groups
+    $author_grp = 3;
+    $editor_grp = 4;
+    $publisher_grp = 5;
+    $manager_grp = 6;
+    $admin_grp = 7;
+    $super_admin_grp = 8;
+    
+    $user = &JFactory::getUser();
+    $coreUserGroups = $user->getAuthorisedGroups();
+    // $coreViewLevels = $user->getAuthorisedViewLevels();
+    $aid = max ($user->getAuthorisedViewLevels());
+    
+    $access = '';
+    if ($aid == 1)
+    	$access = 'public'; // public
+    if ($aid == 2 || $aid > 3)
+    	$access = 'registered'; // registered user or member of custom joomla group
+    if ($aid == 3
+    	|| in_array($author_grp,$coreUserGroups)  	|| in_array($editor_grp,$coreUserGroups)
+    	|| in_array($publisher_grp,$coreUserGroups)	|| in_array($manager_grp,$coreUserGroups)
+    	|| max($coreUserGroups)>8
+    )
+    	$access = 'special'; // special user
+    if (in_array($admin_grp,$coreUserGroups))
+    	$access = 'admin'; // is admin user
+    if (in_array($super_admin_grp,$coreUserGroups))
+    	$access = 'superadmin'; // is super admin user
+    
+    return $access;
+  }
 	
 }

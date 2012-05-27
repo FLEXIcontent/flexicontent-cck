@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1274 2012-05-09 05:19:03Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1294 2012-05-11 16:49:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -780,30 +780,32 @@ class FlexicontentFields
 			$typename = $typedata->name;  // workaround for J1.6+  form not having typename property
 			$typealias = $typedata->alias;  // workaround for J1.6+  form not having typealias property
 			$tparams[$typename] = new JParameter($typedata->attribs);
-		} if (!isset($tparams[$typename])) {
+		}
+		
+		if (!isset($tparams[$typename])) {
 			$tparams[$typename] = new JParameter("");
 		}
 		
 		//--. BESIDES parameters we want to retrieve: ... Custom LABELs and DESCRIPTIONs
-		if ($field->iscore && !isset($fdata[$field->name])) {
-			$fdata[$field->name] = new stdClass();
+		if ($field->iscore && !isset($fdata[$typealias][$field->name])) {
+			$fdata[$typealias][$field->name] = new stdClass();
 			
 			// -- SET a type specific label for the current field
 			// a. Try field label to get for current language
 			$field_label_type = $tparams[$typename]->get($field->field_type.'_label', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
 			if ($result) {
-				$fdata[$field->name]->label = $matches[2];
+				$fdata[$typealias][$field->name]->label = $matches[2];
 			} else if ($field_label_type) {
 				// b. Try to get default for all languages
 				$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
 				if ($result) {
-					$fdata[$field->name]->label = $matches[2];
+					$fdata[$typealias][$field->name]->label = $matches[2];
 				} else {
 					// c. Check that no languages specific string are defined
 					$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
 					if (!$result) {
-						$fdata[$field->name]->label = $field_label_type;
+						$fdata[$typealias][$field->name]->label = $field_label_type;
 					}
 				}
 			} else {
@@ -815,17 +817,17 @@ class FlexicontentFields
 			$field_desc_type = $tparams[$typename]->get($field->field_type.'_desc', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
 			if ($result) {
-				$fdata[$field->name]->description = $matches[2];
+				$fdata[$typealias][$field->name]->description = $matches[2];
 			} else if ($field_label_type) {
 				// b. Try to get default for all languages
 				$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
 				if ($result) {
-					$fdata[$field->name]->description = $matches[2];
+					$fdata[$typealias][$field->name]->description = $matches[2];
 				} else {
 					// c. Check that no languages specific string are defined
 					$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
 					if (!$result) {
-						$fdata[$field->name]->description = $field_desc_type;
+						$fdata[$typealias][$field->name]->description = $field_desc_type;
 					}
 				}
 			} else {
@@ -833,7 +835,7 @@ class FlexicontentFields
 			}
 			
 			//--. Create type specific parameters for the CORE field that we will be used by all subsequent calls to retrieve parameters
-			$fdata[$field->name]->parameters = new JParameter($field->attribs);
+			$fdata[$typealias][$field->name]->parameters = new JParameter($field->attribs);
 			
 			//--. In future we may automate this?, although this is faster
 			if ($field->field_type == 'voting') {
@@ -843,12 +845,12 @@ class FlexicontentFields
 				
 				// Override --voting field-- configuration regarding extra votes
 				if ( $voting_override_extra_votes ) {
-					$fdata[$field->name]->parameters->set('extra_votes', $voting_extra_votes );
+					$fdata[$typealias][$field->name]->parameters->set('extra_votes', $voting_extra_votes );
 					// Set a Default main label if one was not given but extra votes exist
 					$main_label = $voting_main_label ? $voting_main_label : JText::_('FLEXI_OVERALL');
 				}
 				if ( $voting_override_extra_votes ) {
-					$fdata[$field->name]->parameters->set('main_label', $voting_main_label );
+					$fdata[$typealias][$field->name]->parameters->set('main_label', $voting_main_label );
 				}
 			}
 			
@@ -870,28 +872,28 @@ class FlexicontentFields
 			//--. Finally merge custom field parameters with the type specific parameters ones
 			if ($data) {
 				$ts_params = new JParameter($data->attribs);
-				$fdata[$field->name]->parameters->merge($ts_params);
+				$fdata[$typealias][$field->name]->parameters->merge($ts_params);
 			} else if ($field->field_type=='maintext') {
-				$fdata[$field->name]->parameters->set( 'use_html',  !$tparams[$typename]->get('hide_html', 0) ) ;
+				$fdata[$typealias][$field->name]->parameters->set( 'use_html',  !$tparams[$typename]->get('hide_html', 0) ) ;
 			}
 			
-		} else if ( !isset($fdata[$field->name]) ) {
-			$fdata[$field->name]->parameters = new JParameter($field->attribs);
+		} else if ( !isset($fdata[$typealias][$field->name]) ) {
+			$fdata[$typealias][$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
 		//--. Set custom label or maintain default
-		if (isset($fdata[$field->name]->label)) {
-			$field->label = $fdata[$field->name]->label;
+		if (isset($fdata[$typealias][$field->name]->label)) {
+			$field->label = $fdata[$typealias][$field->name]->label;
 		}
 		//--. Set custom description or maintain default
-		if (isset($fdata[$field->name]->description)) {
-			$field->description = $fdata[$field->name]->description;
+		if (isset($fdata[$typealias][$field->name]->description)) {
+			$field->description = $fdata[$typealias][$field->name]->description;
 		} else if (!$field->description) {
 			$field->description = '';
 		}
 		
 		//--. Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
-		$field->parameters = clone($fdata[$field->name]->parameters);
+		$field->parameters = clone($fdata[$typealias][$field->name]->parameters);
 		
 		return $field;
 	}
