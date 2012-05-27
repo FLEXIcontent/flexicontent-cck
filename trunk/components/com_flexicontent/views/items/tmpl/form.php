@@ -47,8 +47,10 @@ if ($cid && $overridecatperms && $isNew) :
 	if (!in_array($maincatid, $cids)) $cids[] = $maincatid;
 	$cids_kv 	= array();
 	$options 	= array();
+	$categories = array();
 	foreach ($cids as $cat) {
 		$cids_kv[$cat] = $globalcats[$cat]->title;
+		$categories[] = $globalcats[$cat];
 	}
 	
 	switch($postcats) {
@@ -73,10 +75,15 @@ if ($cid && $overridecatperms && $isNew) :
 			break;
 		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 			$in_single_cat = false;
-			foreach ($cids_kv as $k => $v) {
+			/*foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', 'multiple="multiple" size="6"', 'value', 'text', '' );
+			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', 'multiple="multiple" size="6"', 'value', 'text', '' );*/
+			
+			$actions_allowed = array('core.create');
+			$class = 'class="inputbox validate" multiple="multiple" size="8"';
+			$fixedcats = flexicontent_cats::buildcatselect($categories, 'cid[]', array(), false, $class, true, true,	$actions_allowed);
+			
 			array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
 			$fixedmaincat = JHTML::_('select.genericlist', $options, 'catid', ' class="required" ', 'value', 'text', $maincatid );
 			break;

@@ -47,8 +47,10 @@ if ($cid && $overridecatperms && $isNew) :
 	if (!in_array($maincatid, $cids)) $cids[] = $maincatid;
 	$cids_kv 	= array();
 	$options 	= array();
+	$categories = array();
 	foreach ($cids as $cat) {
 		$cids_kv[$cat] = $globalcats[$cat]->title;
+		$categories[] = $globalcats[$cat];
 	}
 	
 	switch($postcats) {
@@ -73,10 +75,15 @@ if ($cid && $overridecatperms && $isNew) :
 			break;
 		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 			$in_single_cat = false;
-			foreach ($cids_kv as $k => $v) {
+			/*foreach ($cids_kv as $k => $v) {
 				$options[] = JHTML::_('select.option', $k, $v );
 			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', 'multiple="multiple" size="6"', 'value', 'text', '', 'jform_cid' );
+			$fixedcats = JHTML::_('select.genericlist', $options, 'jform[cid][]', 'multiple="multiple" size="6"', 'value', 'text', '', 'jform_cid' );*/
+			
+			$actions_allowed = array('core.create');
+			$class = 'class="inputbox validate" multiple="multiple" size="8"';
+			$fixedcats = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', array(), false, $class, true, true,	$actions_allowed);
+			
 			array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
 			$fixedmaincat = JHTML::_('select.genericlist', $options, 'jform[catid]', ' class="required" ', 'value', 'text', $maincatid, 'jform_catid' );
 			break;
@@ -488,8 +495,8 @@ function deleteTag(obj) {
 						$jAp=& JFactory::getApplication();
 						$option = JRequest::getVar('option');
 						$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
-						$jAp->setUserState( $option.'.itemelement.type_id', $this->row->type_id);
-						$jAp->setUserState( $option.'.itemelement.created_by', $this->row->created_by);
+						$jAp->setUserState( $option.'.itemelement.type_id', $this->item->type_id);
+						$jAp->setUserState( $option.'.itemelement.created_by', $this->item->created_by);
 						echo $this->form->getInput('lang_parent_id');
 					?>
 				<?php endif; ?>
