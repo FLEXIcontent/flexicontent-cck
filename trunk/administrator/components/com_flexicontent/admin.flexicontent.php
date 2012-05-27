@@ -24,6 +24,7 @@ require_once (JPATH_COMPONENT.DS.'defineconstants.php');
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
 if (FLEXI_J16GE)
 	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
 else

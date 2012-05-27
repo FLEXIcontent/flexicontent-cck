@@ -34,6 +34,75 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$field->field_type =  'textarea';
 	}
 	
+	
+	function parseTabs(&$field, &$item) {
+		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
+
+		$start_of_tabs_pattern = $field->parameters->get('start_of_tabs_pattern');
+		$end_of_tabs_pattern = $field->parameters->get('end_of_tabs_pattern');
+		
+		$start_of_tabs_default_text = $field->parameters->get('start_of_tabs_default_text');  // Currently unused
+		$default_tab_list = $field->parameters->get('default_tab_list');                      // Currently unused
+		
+		$title_tab_pattern = $field->parameters->get('title_tab_pattern');
+		$start_of_tab_pattern = $field->parameters->get('start_of_tab_pattern');
+		$end_of_tab_pattern = $field->parameters->get('end_of_tab_pattern');
+		
+		$field_value = & $field->value[0];
+		$field->tabs_detected = false;
+		
+		// MAKE MAIN TEXT FIELD OR TEXTAREAS TABBED
+		if ( $editorarea_per_tab ) {
+			
+			//echo 'tabs start: ' . preg_match_all('/'.$start_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
+			//print_r ($matches); echo "<br />";
+			
+			//echo 'tabs end: ' . preg_match_all('/'.$end_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
+			//print_r ($matches); echo "<br />";
+			
+			$field->tabs_detected = preg_match('/' .'(.*)('.$start_of_tabs_pattern .')(.*)(' .$end_of_tabs_pattern .')(.*)'. '/su', $field_value ,$matches);
+			
+			if ($field->tabs_detected) {
+				$field->tab_info = new stdClass();
+				$field->tab_info->beforetabs = $matches[1];
+				$field->tab_info->tabs_start = $matches[2];
+				$insidetabs = $matches[3];
+				$field->tab_info->tabs_end   = $matches[4];
+				$field->tab_info->aftertabs  = $matches[5];
+				
+				//echo 'tab start: ' . preg_match_all('/'.$start_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
+				//echo "<pre>"; print_r ($matches); echo "</pre><br />";									
+				
+				//echo 'tab end: ' . preg_match_all('/'.$end_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
+				//print_r ($matches); echo "<br />";
+				
+				$tabs_count = preg_match_all('/('.$start_of_tab_pattern .')(.*?)(' .$end_of_tab_pattern .')/su', $insidetabs ,$matches) . "<br />";
+				
+				if ($tabs_count) {
+					$tab_startings = $matches[1];
+					
+					foreach ($tab_startings as $i => $v) {
+						$title_matched = preg_match('/'.$title_tab_pattern.'/su', $tab_startings[$i] ,$title_matches) . "<br />";
+						//echo "<pre>"; print_r($title_matches); echo "</pre>";
+						$tab_titles[$i] = $title_matches[1];
+					}
+					
+					$tab_contents = $matches[2];
+					$tab_endings = $matches[3];
+					//foreach ($tab_titles as $tab_title) echo "$tab_title &nbsp; &nbsp; &nbsp;";
+				} else {
+					echo "FALIED while parsing tabs<br />";
+					$field->tabs_detected = 0;
+				}
+				
+				$field->tab_info->tab_startings = & $tab_startings;
+				$field->tab_info->tab_titles    = & $tab_titles;
+				$field->tab_info->tab_contents  = & $tab_contents;
+				$field->tab_info->tab_endings   = & $tab_endings;
+			}
+		}
+	}
+	
 	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
@@ -59,15 +128,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$force_beforetabs = $field->parameters->get('force_beforetabs');
 		$force_aftertabs = $field->parameters->get('force_aftertabs');
 		
-		$start_of_tabs_pattern = $field->parameters->get('start_of_tabs_pattern');
-		$end_of_tabs_pattern = $field->parameters->get('end_of_tabs_pattern');
-		
-		$start_of_tabs_default_text = $field->parameters->get('start_of_tabs_default_text');
-		$title_tab_pattern = $field->parameters->get('title_tab_pattern');
-		$default_tab_list = $field->parameters->get('default_tab_list');
-		
-		$start_of_tab_pattern = $field->parameters->get('start_of_tab_pattern');
-		$end_of_tab_pattern = $field->parameters->get('end_of_tab_pattern');
 		
 		// initialise property
 		if($field->field_type == 'textarea') {
@@ -100,53 +160,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 		$field_value = & $field->value[0];
 		
-		
-		// MAKE MAIN TEXT FIELD OR TEXTAREAS TABBED
-		if ( $editorarea_per_tab ) {
-			
-			//echo 'tabs start: ' . preg_match_all('/'.$start_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
-			//print_r ($matches); echo "<br />";
-			
-			//echo 'tabs end: ' . preg_match_all('/'.$end_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
-			//print_r ($matches); echo "<br />";
-			
-			$field->tabs_detected = preg_match('/' .'(.*)('.$start_of_tabs_pattern .')(.*)(' .$end_of_tabs_pattern .')(.*)'. '/su', $field_value ,$matches);
-			
-			if ($field->tabs_detected) {
-				
-				$beforetabs = $matches[1];
-				$tabs_start = $matches[2];
-				$insidetabs = $matches[3];
-				$tabs_end = $matches[4];
-				$aftertabs = $matches[5];
-				
-				//echo 'tab start: ' . preg_match_all('/'.$start_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
-				//echo "<pre>"; print_r ($matches); echo "</pre><br />";									
-				
-				//echo 'tab end: ' . preg_match_all('/'.$end_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
-				//print_r ($matches); echo "<br />";
-				
-				$tabs_count = preg_match_all('/('.$start_of_tab_pattern .')(.*?)(' .$end_of_tab_pattern .')/su', $insidetabs ,$matches) . "<br />";
-				
-				if ($tabs_count) {
-					$tab_start = $matches[1];
-					
-					foreach ($tab_start as $i => $v) {
-						$title_matched = preg_match('/'.$title_tab_pattern.'/su', $tab_start[$i] ,$title_matches) . "<br />";
-						//echo "<pre>"; print_r($title_matches); echo "</pre>";
-						$tab_titles[$i] = $title_matches[1];
-					}
-					
-					$tab_contents = $matches[2];
-					$tab_end = $matches[3];
-					//foreach ($tab_titles as $tab_title) echo "$tab_title &nbsp; &nbsp; &nbsp;";
-				} else {
-					echo "FALIED while parsing tabs<br />";
-					$field->tabs_detected = 0;
-				}
-			}
-		}
-		
+		// Try to parse tabs
+		$this->parseTabs($field, $item);
 		
 		// Create textarea(s) or editor area(s) ... multiple will be created if tabs are detected and 'editorarea per tab' is enabled
 		if ( !$editorarea_per_tab || !$field->tabs_detected )
@@ -164,17 +179,18 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		else
 		{
 			$ta_count = 0;
+			$ti = & $field->tab_info;
 			
 			// 1. BEFORE TABS
-			if ( $force_beforetabs == 1  ||  ($beforetabs && trim(strip_tags($beforetabs))) ) {
+			if ( $force_beforetabs == 1  ||  ($ti->beforetabs && trim(strip_tags($ti->beforetabs))) ) {
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Intro Text';
 				
 				if (!$use_html) {
-					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$beforetabs.'</textarea>'."\n";
+					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->beforetabs.'</textarea>'."\n";
 				} else {
-					$beforetabs = htmlspecialchars( $beforetabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $beforetabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
+					$ti->beforetabs = htmlspecialchars( $ti->beforetabs, ENT_NOQUOTES, 'UTF-8' );
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->beforetabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}
@@ -183,21 +199,21 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = !$merge_tabs_code_editor ? 'TabBegin' : 'T';
 			if (!$merge_tabs_code_editor) {
-				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $tabs_start .'</textarea>'."\n";
+				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tabs_start .'</textarea>'."\n";
 				$ta_count++;
 			} else {
-				$field->html[$ta_count] = $tabs_start;
+				$field->html[$ta_count] = $ti->tabs_start;
 			}
 			
-			foreach ($tab_contents as $i => $tab_content) {
+			foreach ($ti->tab_contents as $i => $tab_content) {
 				// START OF TAB
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
-				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'Start of tab: '. $tab_titles[$i]; 
-				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$tab_start[$i] .'</textarea>'."\n";
+				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'Start of tab: '. $ti->tab_titles[$i]; 
+				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tab_startings[$i] .'</textarea>'."\n";
 				$ta_count++;
 
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
-				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ $tab_titles[$i]; 
+				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ $ti->tab_titles[$i]; 
 				
 				if (!$use_html) {
 					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$tab_content.'</textarea>'."\n";
@@ -209,30 +225,30 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				
 				// END OF TAB
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
-				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'End of tab: '. $tab_titles[$i]; 
+				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'End of tab: '. $ti->tab_titles[$i]; 
 				if (!$merge_tabs_code_editor) {
-					$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $tab_end[$i] .'</textarea>'."\n";
+					$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tab_endings[$i] .'</textarea>'."\n";
 					$ta_count++;
 				} else {
-					$field->html[$ta_count] = $tab_end[$i];
+					$field->html[$ta_count] = $ti->tab_endings[$i];
 				}
 			}
 			
 			// 2. END OF TABS
 			$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] =  !$merge_tabs_code_editor ? 'TabEnd' : 'T';
-			$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$tabs_end .'</textarea>'."\n";
+			$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tabs_end .'</textarea>'."\n";
 			$ta_count++;
 			
-			if ( $force_aftertabs == 1  ||  ($aftertabs && trim(strip_tags($aftertabs))) ) {
+			if ( $force_aftertabs == 1  ||  ($ti->aftertabs && trim(strip_tags($ti->aftertabs))) ) {
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Foot Text' ;
 				
 				if (!$use_html) {
-					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$aftertabs.'</textarea>'."\n";
+					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->aftertabs.'</textarea>'."\n";
 				} else {
-					$aftertabs = htmlspecialchars( $aftertabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $aftertabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
+					$ti->aftertabs = htmlspecialchars( $ti->aftertabs, ENT_NOQUOTES, 'UTF-8' );
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->aftertabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}

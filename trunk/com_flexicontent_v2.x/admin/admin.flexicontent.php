@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: admin.flexicontent.php 1239 2012-04-12 04:29:12Z ggppdk $ 
+ * @version 1.5 stable $Id: admin.flexicontent.php 1264 2012-05-04 15:55:52Z ggppdk $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,6 +24,7 @@ require_once (JPATH_COMPONENT.DS.'defineconstants.php');
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
 if (FLEXI_J16GE)
 	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
 else

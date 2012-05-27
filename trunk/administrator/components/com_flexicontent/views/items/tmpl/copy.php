@@ -90,7 +90,7 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 								<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copyonly();" />
 								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
 							</label><br />
-						<?php if ( JFile::exists(JPATH_COMPONENT.DS.'helpers'.DS.'translator.php') ) : ?>
+						<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : ?>
 							<label for="method-autotranslation">
 								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copyonly();" />
 								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
