@@ -90,7 +90,7 @@ class FlexicontentModelCategories extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
+				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config '
 			)
 		);
 		$query->from('#__categories AS c');

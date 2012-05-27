@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access'); ?>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
 		<tr>
@@ -111,7 +111,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				?>
 			</td>
 			<td align="center">
-				<?php echo ($row->config->clayout ? $row->config->clayout : "default <sup>[1]</sup>") ?>
+				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "default <sup>[1]</sup>") ?>
 			</td>
 			<td align="center">
 				<?php echo $row->nrassigned?>
