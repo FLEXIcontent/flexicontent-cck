@@ -2352,9 +2352,14 @@ class FLEXIUtilities
 			// 2. Create plugin instance
 			$class = "plgFlexicontent_fields{$fieldname}";
 			if( class_exists($class) ) {
+				// Create class name of the plugin
 				$className = 'plg'.'flexicontent_fields'.$fieldname;
-				$dispatcher = &JDispatcher::getInstance();
+				// Create a plugin instance
+				$dispatcher = & JDispatcher::getInstance();
 				$fc_plgs[$fieldname] =  new $className($dispatcher, array());
+				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
+				$plugin_db_data = & JPluginHelper::getPlugin('flexicontent_fields',$fieldname);
+				$fc_plgs[$fieldname]->params = new JParameter($plugin_db_data->params);
 			} else {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
@@ -2389,9 +2394,14 @@ class FLEXIUtilities
 			// 2. Create plugin instance
 			$class = "plgContent{$fieldname}";
 			if( class_exists($class) ) {
+				// Create class name of the plugin
 				$className = 'plg'.'content'.$fieldname;
-				$dispatcher = &JDispatcher::getInstance();
+				// Create a plugin instance
+				$dispatcher = & JDispatcher::getInstance();
 				$content_plgs[$fieldname] =  new $className($dispatcher, array());
+				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
+				$plugin_db_data = & JPluginHelper::getPlugin('content',$fieldname);
+				$content_plgs[$fieldname]->params = new JParameter($plugin_db_data->params);
 			} else {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
