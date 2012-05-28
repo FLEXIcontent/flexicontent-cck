@@ -113,7 +113,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
-		<param name="main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FFLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
+		<param name="main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 	</params>
 	<params group="group-favourites"><!-- favourites -->
 		<param name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">

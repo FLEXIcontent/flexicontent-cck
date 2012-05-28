@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 	function plgFlexicontent_fieldsText( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 	
 	

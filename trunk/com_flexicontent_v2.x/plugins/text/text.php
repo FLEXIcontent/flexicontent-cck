@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.0 $Id: text.php 1281 2012-05-10 08:09:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -21,7 +21,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 	function plgFlexicontent_fieldsText( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 	
 	
