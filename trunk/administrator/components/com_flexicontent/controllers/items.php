@@ -404,7 +404,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Access check
 		$copytask_allow_uneditable = JComponentHelper::getParams( 'com_flexicontent' )->get('copytask_allow_uneditable', 1);
-		if (!$copytask_allow_uneditable) {
+		if (!$copytask_allow_uneditable || $method==2) { // if method is 2 (move) we will deny moving uneditable items
 			// Remove uneditable items
 			$auth_cid = array();
 			$non_auth_cid = array();
