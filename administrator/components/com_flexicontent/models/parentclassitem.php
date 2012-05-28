@@ -30,6 +30,8 @@ jimport( 'joomla.html.parameter' );
  */
 class ParentClassItem extends JModel
 {
+	var $_name = 'ParentClassItem';
+	
 	/**
 	 * Component parameters
 	 *

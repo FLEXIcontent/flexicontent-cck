@@ -161,22 +161,27 @@ class FlexicontentViewItem extends JView
 		$fields = & $this->get( 'Extrafields' );
 		foreach ($fields as $field)
 		{
-			// -- SET a type specific label & description for the core field and also retrieve any other ITEM TYPE customizations (must call this manually when editing)
+			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
+			// NOTE: the field parameters are already created so there is not need to call this for CUSTOM fields, which do not have CONTENT TYPE customizations
 			if ($field->iscore) {
 				FlexicontentFields::loadFieldConfig($field, $row);
-			} else {
-				// Create field 's editing HTML
+			}
+			
+			// b. Create field 's editing HTML
+			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
+			if (!$field->iscore)
+			{
 				if ($modify_untraslatable_values && $field->untranslatable) {
 					$field->html = JText::_( 'FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE' );
 				} else {
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$row ));
 				}
 			}
+			
+			// c. Create main text field, via calling the display function of the textarea field (will also check for tabs)
+			// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish data
 			if ($field->field_type == 'maintext')
 			{
-				// Create main text field, via calling the display function of the textarea field (will also check for tabs)
-				// We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish data
-				
 				if ( isset($row->item_translations) ) {
 					$itemlang = substr($row->language ,0,2);
 					foreach ($row->item_translations as $lang_id => $t)	{

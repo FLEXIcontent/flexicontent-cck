@@ -720,26 +720,31 @@ class FlexicontentModelItems extends JModel
 					}
 				}
 				
-				// Parse fulltext field into tabs to avoid destroying them during translation
-				FlexicontentFields::loadFieldConfig($desc_field, $row);
-				$desc_field->parameters->set( 'use_html', 0 );
-				$desc_field->value[0] = $row->fulltext;
-				FLEXIUtilities::call_FC_Field_Func('textarea', 'parseTabs', array(&$desc_field, &$row) );
 
 				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
 				if ($translate_method == 3 || $translate_method == 4) {
-					$translatables = array('title', 'introtext', 'metakey', 'metadesc');
-					if (!$desc_field->tabs_detected)  $translatables[] = 'fulltext';
 					
+					// Translate fulltext item property, using the function for which handles custom fields TYPES: text, textarea, ETC
+					if ($doauto['fulltext']) {
+						$desc_field->value = $row->fulltext;
+						$fields = array( &$desc_field );
+						$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
+						$row->fulltext = $desc_field->value;
+					}
+					
+					// TRANSLATE basic item properties (if not already imported via Joomfish)
+					$translatables = array('title', 'introtext', 'metakey', 'metadesc');
+					
+					$fieldnames_arr = array();
 					$fieldvalues_arr = array();
 					foreach($translatables as $translatable) {
-						if ($doauto[$translatable]) {
-							$fieldnames_arr[] = $translatable;
-							$translatable_obj = new stdClass(); 
-							$translatable_obj->originalValue = $row->{$translatable};
-							$translatable_obj->noTranslate = false;
-							$fieldvalues_arr[] = $translatable_obj;
-						}
+						if ( !$doauto[$translatable] ) continue;
+						
+						$fieldnames_arr[] = $translatable;
+						$translatable_obj = new stdClass(); 
+						$translatable_obj->originalValue = $row->{$translatable};
+						$translatable_obj->noTranslate = false;
+						$fieldvalues_arr[] = $translatable_obj;
 					}
 					
 					if (count($fieldvalues_arr)) {
@@ -753,71 +758,8 @@ class FlexicontentModelItems extends JModel
 							}
 						}
 					}
-					
-					$dti = & $desc_field->tab_info;
-					
-					$fieldnames_arr = array();
-					$fieldvalues_arr = array();
-					if ($desc_field->tabs_detected) {
-						
-						$fieldnames_arr[] = 'beforetabs';
-						$translatable_obj = new stdClass(); 
-						$translatable_obj->originalValue = $dti->beforetabs;
-						$translatable_obj->noTranslate = false;
-						$fieldvalues_arr[] = $translatable_obj;
-						
-						$fieldnames_arr[] = 'aftertabs';
-						$translatable_obj = new stdClass(); 
-						$translatable_obj->originalValue = $dti->aftertabs;
-						$translatable_obj->noTranslate = false;
-						$fieldvalues_arr[] = $translatable_obj;
-						
-						foreach($dti->tab_titles as $i => $tab_title) {
-							$fieldnames_arr[] = 'tab_titles_'.$i;
-							$translatable_obj = new stdClass(); 
-							$translatable_obj->originalValue = $tab_title;
-							$translatable_obj->noTranslate = false;
-							$fieldvalues_arr[] = $translatable_obj;
-						}
-						
-						foreach($dti->tab_contents as $i => $tab_content) {
-							$fieldnames_arr[] = 'tab_contents_'.$i;
-							$translatable_obj = new stdClass(); 
-							$translatable_obj->originalValue = $tab_content;
-							$translatable_obj->noTranslate = false;
-							$fieldvalues_arr[] = $translatable_obj;
-						}
-						
-						unset($translated_desc);
-						if (count($fieldvalues_arr)) {
-							$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
-							
-							if (intval($result)) {
-								$i = 0;
-								$translated_desc = new stdClass();
-								foreach($fieldnames_arr as $fieldname) {
-									$translated_desc->{$fieldname} = $fieldvalues_arr[$i]->translationValue;
-									$i++;
-								}
-							}
-						}
-						//echo "<pre>"; print_r($translated_desc);
-						
-						// Reconstruct fulltext out of the translated tabs code
-						if (isset($translated_desc)) {
-							$row->fulltext  = $translated_desc->beforetabs;
-							$row->fulltext .= $dti->tabs_start;
-							foreach ( $dti->tab_titles as $i => $tab_title ) {
-								$row->fulltext .= str_replace( $tab_title, $translated_desc->{'tab_titles_'.$i}, $dti->tab_startings[$i]);
-								$row->fulltext .= $translated_desc->{'tab_contents_'.$i};
-								$row->fulltext .= $dti->tab_endings[$i];
-							}
-							$row->fulltext .= $dti->tabs_end;
-							$row->fulltext .= $translated_desc->aftertabs;
-						}
-					}
-					
 				}
+				//print_r($row->fulltext); exit;
 				
 				$row->store();
 				$copyid = (int)$row->id;
@@ -829,12 +771,24 @@ class FlexicontentModelItems extends JModel
 				}
 
 				// get the item fields
-				$query 	= 'SELECT *'
-						. ' FROM #__flexicontent_fields_item_relations'
+				$doTranslation = $translate_method == 3 || $translate_method == 4;
+				$query 	= 'SELECT fir.*'
+						. ($doTranslation ? ',  f.name, f.field_type ' : '')
+						. ' FROM #__flexicontent_fields_item_relations as fir'
+						. ($doTranslation ? ' LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id' : '')
 						. ' WHERE item_id = '. $sourceid
 						;
 				$this->_db->setQuery($query);
 				$fields = $this->_db->loadObjectList();
+				//echo "<pre>"; print_r($fields); exit;
+				
+				if ($doTranslation) {
+					$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
+				}
+				foreach ($fields as $field) {
+					if ($field->field_type!='text' && $field->field_type!='textarea') continue;
+					//print_r($field->value); echo "<br><br>";
+				}
 				
 				foreach($fields as $field)
 				{
@@ -922,6 +876,130 @@ class FlexicontentModelItems extends JModel
 		}
 		return true;
 	}
+	
+	
+	function translateFieldValues( &$fields, &$row, $lang_from, $lang_to )
+	{
+		// Translate 'text' TYPE fields
+		$fieldnames_arr = array();
+		$fieldvalues_arr = array();
+		foreach($fields as $field_index => $field)
+		{
+			if ( $field->field_type!='text' ) continue;
+			$fieldnames_arr[] = 'field_value'.$field_index;
+			$translatable_obj = new stdClass(); 
+			$translatable_obj->originalValue = $field->value;
+			$translatable_obj->noTranslate = false;
+			$fieldvalues_arr[] = $translatable_obj;
+		}
+		
+		if (count($fieldvalues_arr)) {
+			$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+			
+			if (intval($result)) {
+				foreach($fieldnames_arr as $index => $fieldname) {
+					$field_index = str_replace('field_value', '', $fieldname);
+					$fields[$field_index]->value = $fieldvalues_arr[$index]->translationValue;
+				}
+			}
+		}
+		
+		// Translate 'textarea' TYPE fields
+		$fieldnames_arr = array();
+		$fieldvalues_arr = array();
+		foreach($fields as $field_index => $field)
+		{
+			if ( $field->field_type!='textarea' && $field->field_type!='maintext' ) continue;
+			if ( !is_array($field->value) ) $field->value = array($field->value);
+			
+			// Load field parameters
+			FlexicontentFields::loadFieldConfig($field, $row);
+			
+			// Parse fulltext field into tabs to avoid destroying them during translation
+			FLEXIUtilities::call_FC_Field_Func('textarea', 'parseTabs', array(&$field, &$row) );
+			$dti = & $field->tab_info;
+			
+			if ( !$field->tabs_detected ) {
+				$fieldnames_arr[] = $field->name;
+				$translatable_obj = new stdClass(); 
+				$translatable_obj->originalValue = $field->value[0];
+				$translatable_obj->noTranslate = false;
+				$fieldvalues_arr[] = $translatable_obj;
+			} else {
+				// BEFORE tabs
+				$fieldnames_arr[] = 'beforetabs';
+				$translatable_obj = new stdClass(); 
+				$translatable_obj->originalValue = $dti->beforetabs;
+				$translatable_obj->noTranslate = false;
+				$fieldvalues_arr[] = $translatable_obj;
+				
+				// AFTER tabs
+				$fieldnames_arr[] = 'aftertabs';
+				$translatable_obj = new stdClass(); 
+				$translatable_obj->originalValue = $dti->aftertabs;
+				$translatable_obj->noTranslate = false;
+				$fieldvalues_arr[] = $translatable_obj;
+				
+				// TAB titles
+				foreach($dti->tab_titles as $i => $tab_title) {
+					$fieldnames_arr[] = 'tab_titles_'.$i;
+					$translatable_obj = new stdClass(); 
+					$translatable_obj->originalValue = $tab_title;
+					$translatable_obj->noTranslate = false;
+					$fieldvalues_arr[] = $translatable_obj;
+				}
+				
+				// TAB contents
+				foreach($dti->tab_contents as $i => $tab_content) {
+					$fieldnames_arr[] = 'tab_contents_'.$i;
+					$translatable_obj = new stdClass(); 
+					$translatable_obj->originalValue = $tab_content;
+					$translatable_obj->noTranslate = false;
+					$fieldvalues_arr[] = $translatable_obj;
+				}
+			}
+			
+			// Do Google Translation
+			unset($translated_parts);
+			if (count($fieldvalues_arr)) {
+				$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
+				
+				if (intval($result)) {
+					$translated_parts = new stdClass();
+					foreach($fieldnames_arr as $index => $fieldname) {
+						$translated_parts->{$fieldname} = $fieldvalues_arr[$index]->translationValue;
+					}
+				}
+			}
+			//echo "<pre>"; print_r($translated_parts);
+			
+			// Reconstruct field value out of the translated tabs code and assign it back to the field
+			if (isset($translated_parts)) {
+				if (!$field->tabs_detected ) {
+					$fields[$field_index]->value = $translated_parts->{$field->name};
+				} else {
+					$translated_value  = $translated_parts->beforetabs;
+					$translated_value .= $dti->tabs_start;
+					foreach ( $dti->tab_titles as $i => $tab_title ) {
+						$translated_value .= str_replace( $tab_title, $translated_parts->{'tab_titles_'.$i}, $dti->tab_startings[$i]);
+						$translated_value .= $translated_parts->{'tab_contents_'.$i};
+						$translated_value .= $dti->tab_endings[$i];
+					}
+					$translated_value .= $dti->tabs_end;
+					$translated_value .= $translated_parts->aftertabs;
+					
+					// Assign translated value back to the field
+					$fields[$field_index]->value = $translated_value;
+				}
+			} else {
+				// no translation performed, or translation unsuccessful
+				$field->value = $field->value[0];
+			}
+		}
+		
+	}
+				
+	
 
 	/**
 	 * Method to copy items
