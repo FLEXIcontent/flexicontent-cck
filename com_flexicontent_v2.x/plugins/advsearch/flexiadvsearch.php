@@ -50,9 +50,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	$db		= & JFactory::getDBO();
 	$user	= & JFactory::getUser();
-	//$gid	= (int) $user->get('aid');
-	$gid = $user->getAuthorisedGroups();
-	$gids = "'".implode("','", $gid)."'";
+	
 	// Get the WHERE and ORDER BY clauses for the query
 	$params 	= & $mainframe->getParams('com_flexicontent');
 	
@@ -90,6 +88,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	//$limit 			= $pluginParams->def( 'search_limit', 50 );
 	$limit 			= $pluginParams->get( 'search_limit', 50 );
+	$limitstart = JRequest::getVar('limitstart', 0);
 	//$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
 	$filter_lang 	= $pluginParams->get( 'filter_lang', 1 );
 	//$browsernav 	= (int)$pluginParams->def( 'browsernav', 2 );
@@ -154,16 +153,30 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	
 	// Select only items user has access to if he is not allowed to show unauthorized items
+	$joinaccess	= '';
 	$andaccess	= '';
 	if (!$show_noauth) {
-		$andaccess  .= ' AND c.access IN ('.$gids.')';
-		$andaccess  .= ' AND a.access IN ('.$gids.')';
+		if (FLEXI_J16GE) {
+			$aid_arr = $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			$andaccess  .= ' AND c.access IN ('.$aid_list.')';
+			$andaccess  .= ' AND a.access IN ('.$aid_list.')';
+		} else if (FLEXI_ACCESS) {
+			$aid = (int) $user->get('aid');
+			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+			$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
+			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $aid . ')';
+		} else {
+			$andaccess  .= ' AND c.access <= '.$gid;
+			$andaccess  .= ' AND a.access <= '.$gid;
+		}
 	}
 
 	// filter by active language
 	$andlang = '';
-	if (FLEXI_FISH && $filter_lang) {
-		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
+	if ((FLEXI_FISH || FLEXI_J16GE) && $filter_lang) {
+		$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 	}
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$search_fields = $params->get('search_fields', '');
@@ -186,7 +199,9 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$FOPERATOR = JRequest::getVar('foperator', 'OR');
 	$items = array();
 	$resultfields = array();
-	$custom = JRequest::getVar('custom', array());
+	if (FLEXI_J16GE) {
+		$custom = JRequest::getVar('custom', array());
+	}
 	JPluginHelper::importPlugin( 'flexicontent_fields');
 	$foundfields = array();
 	foreach($fields as $field) {
@@ -196,6 +211,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
 		if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
 			$foundfields[$field->id] = array();
+			//var_dump($field->id, $fieldsearch[0]);echo "<br />";
 			$fieldsearch = $fieldsearch[0];
 			//echo $fieldsearch ."<br>";
 			$fieldsearch = explode(" ", $fieldsearch);
@@ -240,13 +256,14 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
 		. ' a.created AS created,'
 		. ' ie.search_index AS text,'
-		. ' "'.$browsernav.'" AS browsernav,c.lft,c.rgt,'
+		. ' "'.$browsernav.'" AS browsernav, c.lft, c.rgt,'
 		. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
 		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 		. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
 		. ' FROM #__content AS a'
 		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
 		. ' LEFT JOIN #__categories AS c ON c.id = a.catid'
+		. $joinaccess
 		. ' WHERE '
 		. '('
 		. '( '.$where.' )'
@@ -261,7 +278,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
 		. ' ORDER BY '. $order
 	;
-	$db->setQuery( $query, 0, $limit );
+	$db->setQuery( $query, $limitstart, $limit );
+	//$db->setQuery( $query );
 	$list = $db->loadObjectList();
 	if(isset($list)) {
 		foreach($list as $key => $row) {
@@ -276,7 +294,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	return $list;
 }
-$mainframe = &JFactory::getApplication();
-$mainframe->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
-$mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexiContentAreas' );
+
+$jAp=& JFactory::getApplication();
+$jAp->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
+$jAp->registerEvent( 'onSearchAreas', 'plgSearchFlexiContentAreas' );
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 1140 2012-02-07 03:42:30Z ggppdk $
+ * @version 1.0 $Id: fcpagenav.php 1167 2012-03-09 03:25:01Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -141,6 +141,9 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($now).' )' . 
 						($types_to_exclude ? ' AND ie.type_id NOT IN (' . $types . ')' : '')
 						;
+			if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+				$xwhere .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			}
 			
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$field_item = '';
@@ -167,7 +170,6 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					. $field_item
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
 					. ' WHERE rel.catid = ' . ($cid ? $cid : (int) $item->catid)
-					. ( (FLEXI_FISH && $filtercat) ? ' AND ie.language LIKE ' . $db->Quote( $lang .'%' ) : "" )  // FILTER FOR CURRENT LAGNUAGE
 					. $xwhere
 					. $andaccess
 					//. ' GROUP BY a.id'  // NOT NEEDED and may mask errors, commented out

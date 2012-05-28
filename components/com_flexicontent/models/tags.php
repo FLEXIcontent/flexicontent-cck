@@ -362,7 +362,7 @@ class FlexicontentModelTags extends JModel
 		
 		// Filter the tag view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		// Limit to published items. Exception when user can edit item

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1315 2012-05-18 01:06:18Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1319 2012-05-26 19:27:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -792,8 +792,8 @@ class FlexicontentModelCategory extends JModel {
 		$where        = ' WHERE cc.published = 1';
 
 		// Filter the category view with the current user language
-		if (FLEXI_FISH && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		// Limit to published items. Exception when user can edit item

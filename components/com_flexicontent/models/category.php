@@ -792,8 +792,8 @@ class FlexicontentModelCategory extends JModel {
 		$where        = ' WHERE cc.published = 1';
 
 		// Filter the category view with the current user language
-		if (FLEXI_FISH && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		// Limit to published items. Exception when user can edit item

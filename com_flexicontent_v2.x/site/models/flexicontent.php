@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1147 2012-02-22 08:24:48Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1275 2012-05-09 06:51:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -221,8 +221,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$where  = ' WHERE cc.published = 1';
 		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
@@ -375,8 +375,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$where  = ' WHERE cc.published = 1';
 		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtercat) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
@@ -467,8 +467,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$filtercat  = $params->get('filtercat', 0);
 
 		// Filter the category view with the active active language
-		if (FLEXI_FISH && $filtercat) {
-			$and = ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		// WE DO NOT show_noauth parameter in FEEDs ... we only list authorised ...

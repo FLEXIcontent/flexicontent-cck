@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1306 2012-05-15 00:04:30Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1312 2012-05-17 01:08:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -362,7 +362,7 @@ class FlexicontentModelTags extends JModel
 		
 		// Filter the tag view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
-			$where .= ' AND ie.language LIKE ' . $this->_db->Quote( $lang .'%' );
+			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
 		// Limit to published items. Exception when user can edit item

@@ -50,7 +50,7 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	$db		= & JFactory::getDBO();
 	$user	= & JFactory::getUser();
-	$gid	= (int) $user->get('aid');
+	
 	// Get the WHERE and ORDER BY clauses for the query
 	$params 	= & $mainframe->getParams('com_flexicontent');
 	
@@ -156,11 +156,17 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$joinaccess	= '';
 	$andaccess	= '';
 	if (!$show_noauth) {
-		if (FLEXI_ACCESS) {
+		if (FLEXI_J16GE) {
+			$aid_arr = $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			$andaccess  .= ' AND c.access IN ('.$aid_list.')';
+			$andaccess  .= ' AND a.access IN ('.$aid_list.')';
+		} else if (FLEXI_ACCESS) {
+			$aid = (int) $user->get('aid');
 			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 			$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-			$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $gid . ')';
-			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $gid . ')';
+			$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
+			$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $aid . ')';
 		} else {
 			$andaccess  .= ' AND c.access <= '.$gid;
 			$andaccess  .= ' AND a.access <= '.$gid;
@@ -169,8 +175,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 
 	// filter by active language
 	$andlang = '';
-	if (FLEXI_FISH && $filter_lang) {
-		$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
+	if ((FLEXI_FISH || FLEXI_J16GE) && $filter_lang) {
+		$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 	}
 	$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
 	$search_fields = $params->get('search_fields', '');
@@ -193,6 +199,9 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$FOPERATOR = JRequest::getVar('foperator', 'OR');
 	$items = array();
 	$resultfields = array();
+	if (FLEXI_J16GE) {
+		$custom = JRequest::getVar('custom', array());
+	}
 	JPluginHelper::importPlugin( 'flexicontent_fields');
 	$foundfields = array();
 	foreach($fields as $field) {
@@ -201,7 +210,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 		$fieldsearch = JRequest::getVar($field->name, array());
 		$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
 		if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
-			$foundfields[$field->id] = array();//var_dump($field->id, $fieldsearch[0]);echo "<br />";
+			$foundfields[$field->id] = array();
+			//var_dump($field->id, $fieldsearch[0]);echo "<br />";
 			$fieldsearch = $fieldsearch[0];
 			//echo $fieldsearch ."<br>";
 			$fieldsearch = explode(" ", $fieldsearch);
@@ -286,6 +296,8 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	}
 	return $list;
 }
-$mainframe->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
-$mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexiContentAreas' );
+
+$jAp=& JFactory::getApplication();
+$jAp->registerEvent( 'onSearch', 'plgSearchFlexiadvsearch' );
+$jAp->registerEvent( 'onSearchAreas', 'plgSearchFlexiContentAreas' );
 ?>
