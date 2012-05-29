@@ -226,7 +226,7 @@ $fields_tbl_cols = $db->loadResultArray();
 			<?php
 			$already = true;
 			$result = false;
-			if(!in_array('isadvsearch', $fields_tbl_cols)) {
+			if(!in_array('untranslatable', $fields_tbl_cols)) {
 				$already = false;
 				$query = "ALTER TABLE`#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
 				$db->setQuery($query);

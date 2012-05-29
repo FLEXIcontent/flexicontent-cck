@@ -73,6 +73,7 @@ $force_height='';//"height='$mod_height'";
 		'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
 		'rated'=>JText::_( 'FLEXI_BEST_RATED' ),
 		'added'=>	JText::_( 'FLEXI_RECENTLY_ADDED'),
+		'addedrev'=>JText::_( 'FLEXI_RECENTLY_ADDED_REVERSE' ),
 		'updated'=>JText::_( 'FLEXI_RECENTLY_UPDATED'),
 		'alpha'=>	JText::_( 'FLEXI_ALPHABETICAL'),
 		'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
