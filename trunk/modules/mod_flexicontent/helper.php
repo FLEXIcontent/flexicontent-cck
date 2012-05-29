@@ -1089,6 +1089,10 @@ class modFlexicontentHelper
 				$orderby = ' ORDER BY i.created DESC';
 				break;
 
+			case 'addedrev':
+				$orderby = ' ORDER BY i.created ASC';
+				break;
+
 			case 'updated':
 				$orderby = ' ORDER BY i.modified DESC';
 				break;
