@@ -621,7 +621,7 @@ function deleteTag(obj) {
 				?>
 				
 			<tr>
-				<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
+				<td id="fcfield-row_<?php echo $field->id; ?> class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
 					
 					<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 						<?php echo $field->label; ?>

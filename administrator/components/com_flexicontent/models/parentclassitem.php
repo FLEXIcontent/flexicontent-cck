@@ -2349,10 +2349,13 @@ class ParentClassItem extends JModel
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
 	 */
-	function getExtrafieldvalue($field_id, $version, $item_id)
+	function getExtrafieldvalue($field_id, $version, $item_id=0)
 	{
 		$item_id = (int)$item_id;
-		if(!$item_id) return array();
+		if(!$item_id)
+			$item_id = $this->_id;
+		if(!$item_id)
+			return array();
 		
 		$cparams =& $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
