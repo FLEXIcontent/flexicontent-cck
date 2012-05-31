@@ -115,7 +115,7 @@
 
 		<param name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" level="level1" menu="hide" />
 
-		<param name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_TIPLINKS" menu="hide">
+		<param name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" menu="hide">
 			<option value="0">FLEXI_No</option>
 			<option value="1">FLEXI_Yes</option>
 		</param>

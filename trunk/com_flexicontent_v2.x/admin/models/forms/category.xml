@@ -167,12 +167,10 @@
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-<!--
-			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_TIPLINKS">
+			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
--->
 
 			<field name="sep_items_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
