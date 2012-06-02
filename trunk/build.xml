@@ -3,7 +3,7 @@
 
 	<target name="build">
 
-		<propertyprompt propertyName="revision" defaultValue="build0000" promptText="Enter revision number" />	
+		<!--propertyprompt propertyName="revision" defaultValue="build0000" promptText="Enter revision number" /-->	
 		
 		<delete dir="flexipack" includeemptydirs="true" />
 		
@@ -297,7 +297,8 @@
 		<copy file="language/ru-RU/ru-RU.com_flexicontent.ini" tofile="flexipack/site/language/ru-RU.com_flexicontent.ini" />
 		<copy file="language/de-DE/de-DE.com_flexicontent.ini" tofile="flexipack/site/language/de-DE.com_flexicontent.ini" />
 		
-		<tar destfile="com_flexicontent_${revision}.tar.gz" basedir="flexipack" compression="gzip"/>
+		<!--tar destfile="com_flexicontent_${revision}.tar.gz" basedir="flexipack" compression="gzip"/-->
+		<tar destfile="com_flexicontent_j15.tar.gz" basedir="flexipack" compression="gzip"/>
 <!--
 		<tar destfile="com_flexicontent.tar" compression="gzip">
 			<fileset dir="flexipack" />

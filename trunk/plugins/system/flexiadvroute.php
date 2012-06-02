@@ -99,10 +99,11 @@ class plgSystemFlexiadvroute extends JPlugin
 	  // Get variables
 	  if (FLEXI_FISH)
 	  {
-	  	$view = JRequest::getVar('view');
+	  	$view   = JRequest::getVar('view');
 		  $option = JRequest::getVar('option');
+		  $task   = JRequest::getVar('task');
 		  $item_slug = JRequest::getVar('id');
-		  $item_id = (int) $item_slug;
+		  $item_id   = (int) $item_slug;
 		  
 		  // Execute only if current page is a FLEXIcontent items view (viewing an individual item)
 		  if ( $view != FLEXI_ITEMVIEW || $option!='com_flexicontent' ) return;
@@ -112,15 +113,17 @@ class plgSystemFlexiadvroute extends JPlugin
 			$flexi_advroute_url = $session->get('flexi_advroute_url');
 		  $view       = $flexi_advroute_url['view'];
 		  $option     = $flexi_advroute_url['option'];
+		  $task       = $flexi_advroute_url['task'];
 		  $cat_slug   = $flexi_advroute_url['cid'];
 		  $item_slug  = $flexi_advroute_url['id'];
 		  $prevlang   = $flexi_advroute_url['lang'];
 		  
-		  $flexi_advroute_url['view'] = JRequest::getVar('view');
+		  $flexi_advroute_url['view']   = JRequest::getVar('view');
 		  $flexi_advroute_url['option'] = JRequest::getVar('option');
-		  $flexi_advroute_url['id'] = JRequest::getVar('id');
-		  $flexi_advroute_url['cid'] = JRequest::getVar('cid');
-		  $flexi_advroute_url['lang'] = $currlang;
+		  $flexi_advroute_url['task']   = JRequest::getVar('task');
+		  $flexi_advroute_url['id']     = JRequest::getVar('id');
+		  $flexi_advroute_url['cid']    = JRequest::getVar('cid');
+		  $flexi_advroute_url['lang']   = $currlang;
 		  $session->set('flexi_advroute_url', $flexi_advroute_url);
 		  
 			// Detect if already redirected once, this code must be after the code setting the 'flexi_advroute_url' session variable
@@ -153,6 +156,7 @@ class plgSystemFlexiadvroute extends JPlugin
 		  $item_id = (int) ($switching_language ? $item_slug : JRequest::getVar('id'));
 		  $view    = $switching_language ? $view    : JRequest::getVar('view');
 		  $option  = $switching_language ? $option  : JRequest::getVar('option');
+		  $task    = $switching_language ? $task    : JRequest::getVar('task');
 		}
 		
 		if ( FLEXI_J16GE && $view=='category' ) {  
@@ -165,9 +169,9 @@ class plgSystemFlexiadvroute extends JPlugin
 			$app->redirect( $cat_url );
 		}
 		
-	  // Execute only if item id is set, and switching for items is enabled
-	  if (!$item_id) return;
-		if (!$this->params->get('lang_switch_items', 1)) return;
+	  if (!$item_id) return;       // Execute only if item id is set
+	  if ($task=="edit") return;   // Execute only if not in item edit form
+		if (!$this->params->get('lang_switch_items', 1)) return;   // Execute only if switching for items is enabled
 		
 	  // Execute only when not doing a task (e.g. edit)          BROKEN !!! DISABLED
 	  //if ( !empty(JRequest::getVar('task')) ) return;

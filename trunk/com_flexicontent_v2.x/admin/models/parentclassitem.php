@@ -1721,7 +1721,8 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function applyCurrentVersion(&$item, &$data)
 	{
-		$isnew = ! $item->id;
+		$app = &JFactory::getApplication();
+		$isnew = !$item->id;
 		$cparams =& $this->_cparams;
 		$nullDate	= $this->_db->getNullDate();
 		$user	=& JFactory::getUser();
@@ -1732,9 +1733,19 @@ class ParentClassItem extends JModelAdmin
 		// *********************************************************************************
 		
 		// For new items get next available ordering number
-		if (!$item->id) {
+		if ($isnew) {
 			$item->ordering = $item->getNextOrder();
 		}
+		
+		// Ignore language parent id if item language is site's (content) default language
+		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
+			$lang_parent_id = $item->lang_parent_id;
+			$item->lang_parent_id = $isnew ? 0 : $item->id;
+			if ( $item->lang_parent_id != $lang_parent_id ) {
+				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'notice' );
+			}
+		}
+		
 		
 		// Make sure the data is valid
 		if (!$item->check()) {

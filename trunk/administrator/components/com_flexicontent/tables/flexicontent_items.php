@@ -264,6 +264,8 @@ class flexicontent_items extends JTable{
 				// update #__flexicontent_items_ext table
 				$ret = $this->_db->updateObject( $this->_tbl_join, $type_ext, $this->_frn_key, $updateNulls );
 			} else {
+				if ($type_ext->lang_parent_id == 0) $type_ext->lang_parent_id = $this->id;  // case of new item we need to set lang_parent_id after initial content creation
+				
 				// insert into #__flexicontent_items_ext table
 				$type_ext->$frn_key = $this->id;
 				$ret = $this->_db->insertObject( $this->_tbl_join, $type_ext, $this->_frn_key );

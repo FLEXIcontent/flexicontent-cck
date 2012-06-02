@@ -182,6 +182,7 @@ if ($use_fields && count($fields)) {
 	<tbody>	
 	<?php
 	foreach ($this->items as $item) :
+		$thumb = '';
 		if ($image_source) {
 			$src = '';
 			if (!empty($item->image)) {

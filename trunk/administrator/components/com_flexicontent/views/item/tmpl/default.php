@@ -377,7 +377,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 										</span>
 									</label>
-									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) ) : ?>
+									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) && $this->row->id ) : ?>
 										<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 										<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->row->id; ?>" />
 									<?php else : ?>
@@ -390,6 +390,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											);
 											$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
 											$ff_lang_parent_id = new JElementItem();
+											echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 											echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
 										?>
 									<?php endif; ?>
