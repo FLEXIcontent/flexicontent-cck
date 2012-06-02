@@ -72,6 +72,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$task	= JRequest::getVar('task');
 		$user = & JFactory::getUser();
 		$model = $this->getModel('item');
+		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
@@ -131,7 +132,6 @@ class FlexicontentControllerItems extends FlexicontentController
 			switch ($task)
 			{
 				case 'apply' :
-					$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit' ;
 					$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
 					break;
 
@@ -161,7 +161,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ITEM' );
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
-			$link 	= 'index.php?option=com_flexicontent&view=item';
+			$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
 		}
 
 		$this->setRedirect($link, $msg);

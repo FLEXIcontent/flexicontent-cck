@@ -18,10 +18,16 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Added to allow the user to choose some of the pre-selected categories
+// Create some variables
 $cid = $this->params->get("cid");
 $isNew = ! JRequest::getInt('id', 0);
+
+// Language related vars
+$languages = FLEXIUtilities::getLanguages();
 $itemlang = substr($this->item->language ,0,2);
+$itemlang_name = $languages->{$this->item->language}->name;
+$itemlang_image = '<img src="'.$languages->{$this->item->language}->imgsrc.'" alt="'.$languages->{$this->item->language}->name.'" />';
+
 if (isset($this->item->item_translations)) foreach ($this->item->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 $maincatid = $this->params->get("maincatid");
 $postcats = $this->params->get("postcats", 0);
@@ -43,48 +49,47 @@ if (!$this->perms['multicat']) {
 if ($cid && $overridecatperms && $isNew) :
 	global $globalcats;
 	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
-	if (!$maincatid) $maincatid=$cids[0];  // If main category not specified then use the first in list
-	if (!in_array($maincatid, $cids)) $cids[] = $maincatid;
-	$cids_kv 	= array();
-	$options 	= array();
+	
+	// add default main category to category list if not already there
+	if ($maincatid && !in_array($maincatid, $cids)) $cids[] = $maincatid;
+	
+	// Create 2 arrays with category info used for creating the of select list of (a) main category select field (b) multi-categorys select field
 	$categories = array();
-	foreach ($cids as $cat) {
-		$cids_kv[$cat] = $globalcats[$cat]->title;
-		$categories[] = $globalcats[$cat];
+	$options 	= array();
+	foreach ($cids as $catid) {
+		$categories[] = $globalcats[$catid];
+		$options[] = JHTML::_('select.option', $catid, $globalcats[$catid]->title );
 	}
+	array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
 	
 	switch($postcats) {
 		case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
 		default:
 			$in_single_cat = ( count($cids)==1 );
-			$fixedcats = implode(', ', $cids_kv);
-			foreach ($cids_kv as $k => $v) {
-				$fixedcats .= '<input type="hidden" name="cid[]" value="'.$k.'" />';
+			
+			foreach ($cids as $catid) {
+				$cat_titles[$catid] = $globalcats[$catid]->title;
+				$fixedcats .= '<input type="hidden" name="cid[]" value="'.$catid.'" />';
 			}
+			$fixedcats .= implode(', ', $cat_titles);
+			
 			$fixedmaincat = $globalcats[$maincatid]->title;
 			$fixedmaincat .= '<input type="hidden" name="catid" value="'.$maincatid.'" />';
 			break;
 		case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
 			$in_single_cat = true;
-			$options[] = JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' );
-			foreach ($cids_kv as $k => $v) {
-				$options[] = JHTML::_('select.option', $k, $v );
-			}
+			
 			$fixedcats = '';
+			
 			$fixedmaincat = JHTML::_('select.genericlist', $options, 'catid', ' class="required" ', 'value', 'text', $maincatid );
 			break;
 		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 			$in_single_cat = false;
-			/*foreach ($cids_kv as $k => $v) {
-				$options[] = JHTML::_('select.option', $k, $v );
-			}
-			$fixedcats = JHTML::_('select.genericlist', $options, 'cid[]', 'multiple="multiple" size="6"', 'value', 'text', '' );*/
 			
 			$actions_allowed = array('core.create');
 			$class = 'class="inputbox validate" multiple="multiple" size="8"';
-			$fixedcats = flexicontent_cats::buildcatselect($categories, 'cid[]', array(), false, $class, true, true,	$actions_allowed);
+			$fixedcats = flexicontent_cats::buildcatselect($categories, 'cid[]', array(), false, $class, true, true, $actions_allowed);
 			
-			array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
 			$fixedmaincat = JHTML::_('select.genericlist', $options, 'catid', ' class="required" ', 'value', 'text', $maincatid );
 			break;
 	}
@@ -233,6 +238,10 @@ function deleteTag(obj) {
 	$allowbuttons_fe = $this->params->get('allowbuttons_fe');
 	if ( empty($allowbuttons_fe) )						$allowbuttons_fe = array();
 	else if ( ! is_array($allowbuttons_fe) )	$allowbuttons_fe = !FLEXI_J16GE ? array($allowbuttons_fe) : explode("|", $allowbuttons_fe);
+	
+	$allowlangmods_fe = $this->params->get('allowlangmods_fe');
+	if ( empty($allowlangmods_fe) )						$allowlangmods_fe = array();
+	else if ( ! is_array($allowlangmods_fe) )	$allowlangmods_fe = !FLEXI_J16GE ? array($allowlangmods_fe) : explode("|", $allowlangmods_fe);
 	?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
@@ -476,7 +485,11 @@ function deleteTag(obj) {
 				<label for="languages" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
 				</label>
-				<?php echo $this->lists['languages']; ?>
+				<?php if ( in_array( 'mod_item_lang', $allowlangmods_fe) || !$this->item->id ) : ?>
+					<?php echo $this->lists['languages']; ?>
+				<?php else: ?>
+					<?php echo $itemlang_image.' ['.$itemlang_name.']'; ?>
+				<?php endif; ?>
 			</div>
 			
 			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
@@ -487,11 +500,13 @@ function deleteTag(obj) {
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 					</span>
 				</label>
-				<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) ) : ?>
+				
+				<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) && $this->item->id ) : ?>
 					<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 					<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->item->id; ?>" />
 				<?php else : ?>
 					<?php
+					if ( in_array( 'mod_item_lang', $allowlangmods_fe) || !$this->item->id || $this->item->id==$this->item->lang_parent_id) {
 						require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
 						$attrs = array(
 							'type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",
@@ -500,7 +515,11 @@ function deleteTag(obj) {
 						);
 						$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
 						$ff_lang_parent_id = new JElementItem();
+						echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 						echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->item->lang_parent_id, $jelement, '');
+					} else {
+						echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' ).'</small>';
+					}
 					?>
 				<?php endif; ?>
 			</div>

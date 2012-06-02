@@ -398,7 +398,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 										</span>
 									</label>
-									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) ) : ?>
+									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) && $this->row->id ) : ?>
 										<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 										<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->row->id; ?>" />
 									<?php else : ?>
@@ -408,6 +408,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
 											$jAp->setUserState( $option.'.itemelement.type_id', $this->row->type_id);
 											$jAp->setUserState( $option.'.itemelement.created_by', $this->row->created_by);
+											echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 											echo $this->form->getInput('lang_parent_id');
 										?>
 									<?php endif; ?>

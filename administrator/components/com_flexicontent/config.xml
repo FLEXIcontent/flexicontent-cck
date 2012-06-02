@@ -279,12 +279,17 @@
 		<param name="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" level="level1" menu="hide" />
 		
 		<param name="allowbuttons_fe" type="fccheckbox" default=""
-			checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST" checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
+			checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
+			checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 			label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
 		<param name="usealias_fe" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="allowlangmods_fe" type="fccheckbox" default=""
+			checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
+			checkvals="mod_item_lang,mod_original_content_assoc" defaultvals="mod_item_lang"
+			label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" />
 		<param name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
