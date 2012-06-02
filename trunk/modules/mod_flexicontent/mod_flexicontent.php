@@ -19,6 +19,11 @@
 //no direct access
 defined('_JEXEC') or die('Restricted access');
 
+// Logging Info variables
+$start_microtime = microtime(true);
+global $fc_content_plg_microtime;
+$fc_content_plg_microtime = 0;
+
 global $globalcats;
 
 // initialize
@@ -87,7 +92,7 @@ $custom5 				= $params->get('custom5');
 
 // Calculate menu itemid for item links
 $menus				= & JApplication::getMenu('site', array());
-$itemid_force	= (int)$params->get('itemid_force', 1);
+$itemid_force	= (int)$params->get('itemid_force');
 if ($itemid_force==1) {
 	$Itemid					= JRequest::getInt('Itemid');
 	$menu						= & $menus->getItem($Itemid);
@@ -143,3 +148,13 @@ foreach ($catdata_arr as $i => $catdata) {
 		<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
 	</span>
 <?php endif;?>
+
+<?php
+$params =& JComponentHelper::getParams('com_flexicontent');
+if ( $params->get('print_logging_info') ) {
+	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$app = & JFactory::getApplication();
+	$msg = sprintf( 'FLEXIcontent universal module creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);
+	$app->enqueueMessage( $msg, 'notice' );
+}
+?>

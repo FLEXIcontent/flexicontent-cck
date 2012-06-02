@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1088 2012-01-08 16:40:44Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1239 2012-04-12 04:29:12Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,11 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+// Logging Info variables
+$start_microtime = microtime(true);
+global $fc_content_plg_microtime;
+$fc_content_plg_microtime = 0;
 
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
@@ -95,4 +100,12 @@ if ( $params->get('default_menuitem_nopathway',1) ) {
 		}
 	}
 }
+
+if ( $params->get('print_logging_info') ) {
+	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$app = & JFactory::getApplication();
+	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);
+	$app->enqueueMessage( $msg, 'notice' );
+}
+
 ?>

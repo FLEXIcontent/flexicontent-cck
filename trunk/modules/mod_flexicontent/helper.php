@@ -49,7 +49,7 @@ class modFlexicontentHelper
 		$add_tooltips 			= $params->get('add_tooltips', 1);
 		
 		// get other module parameters
-		$method_curlang	= (int)$params->get('method_curlang', 1);
+		$method_curlang	= (int)$params->get('method_curlang', 0);
 		
 		// standard
 		$display_title 		= $params->get('display_title');
@@ -513,17 +513,21 @@ class modFlexicontentHelper
 		// $display_category_data
 		$apply_config_per_category = (int)$params->get('apply_config_per_category', 0);
 		
-		// current item scope parameters
-		$method_curitem	= (int)$params->get('method_curitem', 1);
-			
-		// current language scope parameters
-		$method_curlang	= (int)$params->get('method_curlang', 1);
+		// *** METHODS that their 'ALL' value is 0
 		
 		// current item scope parameters
-		$method_curuserfavs = (int)$params->get('method_curuserfavs', 1);
+		$method_curitem	= (int)$params->get('method_curitem', 0);
+		
+		// current language scope parameters
+		$method_curlang	= (int)$params->get('method_curlang', 0);
+		
+		// current item scope parameters
+		$method_curuserfavs = (int)$params->get('method_curuserfavs', 0);
 		
 		// featured items scope parameters
-		$method_featured = (int)$params->get('method_featured', 1);
+		$method_featured = (int)$params->get('method_featured', 0);
+		
+		// *** METHODS that their 'ALL' value is 1, that also have behaviour variable (most of them)
 		
 		// categories scope parameters
 		$method_cat 		= (int)$params->get('method_cat', 1);

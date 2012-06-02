@@ -28,6 +28,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+		<param name="print_logging_info" type="radio" default="0" label="FLEXI_PRINT_LOGGING_INFO" description="FLEXI_PRINT_LOGGING_INFO_DESC" menu="hide">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+
 		<param name="" type="separator" default="Performance Options" level="level1" menu="hide" />
 		<param name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
 			<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>

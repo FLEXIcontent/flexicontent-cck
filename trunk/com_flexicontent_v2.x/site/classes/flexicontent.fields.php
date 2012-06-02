@@ -264,9 +264,13 @@ class FlexicontentFields
 		if (isset($field->{$method})) return $field;
 		
 		$dispatcher = &JDispatcher::getInstance();
-
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
-
+		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+		
+		// Log content plugin and other performance information
+		$print_logging_info = $flexiparams->get('print_logging_info');
+		if ($print_logging_info) 	global $fc_content_plg_microtime;
+		
 		// we append some values to the field object
 		$field->item_id 	= (int)$item->id;
 		$field->value 		= $values;
@@ -317,12 +321,16 @@ class FlexicontentFields
 				JRequest::setVar("isflexicontent", "yes");
 				
 				// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
-				if (JRequest::getVar('view')!='category' || $field->field_type!='maintext' || $field->parameters->get('trigger_plgs_incatview', 0)) {
+				if (JRequest::getVar('view')!='category' || $field->parameters->get('trigger_plgs_incatview', 1))
+				{
+					// Trigger content plugins
+					if ($print_logging_info)  $start_microtime = microtime(true);
 					if (!FLEXI_J16GE) {
 						$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 					} else {
 						$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 					}
+					if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				}
 				
 				// Set the view and option back to items and com_flexicontent
@@ -373,11 +381,16 @@ class FlexicontentFields
 				  JRequest::setVar('option', 'com_content');
 				}
 				JRequest::setVar("isflexicontent", "yes");
+				
+				// Trigger content plugins
+				if ($print_logging_info)  $start_microtime = microtime(true);
 				if (!FLEXI_J16GE) {
 					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$params, $limitstart));
 				} else {
 					$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$params, $limitstart));
 				}
+				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				
 				// Set the view and option back to items and com_flexicontent
 				if ($flexiview == FLEXI_ITEMVIEW) {
 				  JRequest::setVar('view', FLEXI_ITEMVIEW);
