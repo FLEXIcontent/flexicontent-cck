@@ -49,8 +49,33 @@ class plgFlexicontentFlexinotify extends JPlugin
 		JPlugin::loadLanguage( 'plg_flexicontent_flexinotify' );
 	}
 
+
 	/**
-	 * This method is executed just after an item is stored
+	 * This method is executed just before an item is stored
+	 *
+	 * Method is called by the model
+	 *
+	 * @param 	object		The item object.
+	 * @param 	boolean		Indicates if item is new
+	 */
+	/*function onBeforeSaveItem( &$item, $isnew ) {
+		$post = JRequest::get('post');
+		//echo "<pre>"; $post; echo "</pre>"; exit;
+		
+		//...
+		
+		if ($somethingbad) {
+			$app = &JFactory::getApplication();
+			$app->enqueueMessage( 'Saving cancel due to error ...', 'notice' );
+			return false;
+		}
+		
+		return true;
+	}*/
+	
+	
+	/**
+	 * This method is executed just after an item stored (BUT before saving fields)
 	 *
 	 * Method is called by the model
 	 *
@@ -77,6 +102,19 @@ class plgFlexicontentFlexinotify extends JPlugin
 			$this->_sendEmail($item, $sub, $pluginParams);
 		}
 	}
+	
+	
+	/**
+	 * This method is executed after item saving is complete (all data, including all item fields)
+	 *
+	 * Method is called by the model
+	 *
+	 * @param 	object		The item object.
+	 * @param 	object		The complete $_POST data
+	 */
+	/*function onCompleteSaveItem( &$item, &$fields ) {
+	}*/
+	
 	
 	function _getSubscribers($itemid)
 	{

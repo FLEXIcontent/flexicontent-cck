@@ -19,6 +19,9 @@
 //no direct access
 defined('_JEXEC') or die('Restricted access');
 
+// Logging Info variables
+$start_microtime = microtime(true);
+
 //Include the only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
@@ -40,3 +43,11 @@ if ($add_ccs && $caching) {
 
 $list = modFlexiTagCloudHelper::getTags($params, $module);
 require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));
+
+$params =& JComponentHelper::getParams('com_flexicontent');
+if ( $params->get('print_logging_info') ) {
+	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$app = & JFactory::getApplication();
+	$app->enqueueMessage( sprintf( 'FLEXIcontent tags cloud module creation is %.2f secs', $elapsed_microseconds/1000000), 'notice' );
+}
+?>

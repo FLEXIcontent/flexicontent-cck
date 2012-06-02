@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: mod_flexitagcloud.php 907 2011-09-19 00:21:53Z ggppdk $
+ * @version 1.1 $Id: mod_flexitagcloud.php 1312 2012-05-17 01:08:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,6 +18,9 @@
 
 //no direct access
 defined('_JEXEC') or die('Restricted access');
+
+// Logging Info variables
+$start_microtime = microtime(true);
 
 //Include the only once
 require_once (dirname(__FILE__).DS.'helper.php');
@@ -40,3 +43,11 @@ if ($add_ccs && $caching) {
 
 $list = modFlexiTagCloudHelper::getTags($params, $module);
 require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));
+
+$params =& JComponentHelper::getParams('com_flexicontent');
+if ( $params->get('print_logging_info') ) {
+	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$app = & JFactory::getApplication();
+	$app->enqueueMessage( sprintf( 'FLEXIcontent tags cloud module creation is %.2f secs', $elapsed_microseconds/1000000), 'notice' );
+}
+?>
