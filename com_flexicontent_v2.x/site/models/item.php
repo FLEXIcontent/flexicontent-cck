@@ -63,8 +63,9 @@ class FlexicontentModelItem extends ParentClassItem
 		$cparams = & $this->_cparams;
 		
 		$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
-		$referer = JRequest::getString('referer', JURI::base(), 'post');          // the previously viewed page (refer)
-		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_item->title;  // a basic item title string
+		$referer = $_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
+		// a basic item title string
+		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_item->title.'[id: '.$this->_item->id.']';
 		
 		// Since we will check access for VIEW (=read) only, we skip checks if TASK Variable is set,
 		// the edit() or add() or other controller task, will be responsible for checking permissions.
@@ -127,7 +128,7 @@ class FlexicontentModelItem extends ParentClassItem
 						foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published |= $globalcats[$pcid]->published;
 					}
 				}
-				$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED') . $title_str;
+				$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
 			}
 			
 			// Calculate if item is active ... and viewable is also it's (current or All) categories are published
@@ -153,7 +154,7 @@ class FlexicontentModelItem extends ParentClassItem
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str );
 			} else if ( !$item_is_published ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str );
+				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') );
 				$inactive_warning_set = true;
 			}
 			
@@ -165,7 +166,7 @@ class FlexicontentModelItem extends ParentClassItem
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str );
 			} else if ( $item_is_expired ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str );
+				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') );
 				$inactive_warning_set = true;
 			}
 			
@@ -175,14 +176,14 @@ class FlexicontentModelItem extends ParentClassItem
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str );
 			} else if ( $item_is_scheduled ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str );
+				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') );
 				$inactive_warning_set = true;
 			}
 			
 			// (d) Check that current item category or all items categories are published
 			if (!$cats_are_published && !$inactive_warning_set && !$ignore_publication) {
 				// Terminate execution with a HTTP not-found Server Error
-				JError::raiseError( 404, $cats_np_err_mssg );
+				JError::raiseError( 404, $cats_np_err_mssg . $title_str );
 			} else if( !$cats_are_published ) {
 				// Item edittable, set warning that item's (ancestor) category is unpublished
 				JError::raiseWarning( 404, $cats_np_err_mssg );
@@ -205,11 +206,7 @@ class FlexicontentModelItem extends ParentClassItem
 			if ( $version && $version!=$current_version && !$canedititem )
 			{
 				// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
-				JError::raiseNotice(403,
-					JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />".
-					JText::_('FLEXI_ALERTNOTAUTH_TASK')."<br />".
-					"Item id: ".$this->_item->id . $title_str
-				);
+				JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 				if ( $item_n_cat_active && $canviewitem ) {
 					$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug)));
 				} else {
@@ -222,10 +219,7 @@ class FlexicontentModelItem extends ParentClassItem
 				if ( !$canedititem && $isOwner )
 				{
 					// (b) redirect item owner to previous page if user cannot access (read/edit) the item
-					JError::raiseNotice(403,
-						JText::_( $item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW' )."<br />".
-						"Item id: ".$this->_item->id . $title_str
-					);
+					JError::raiseNotice(403, JText::_( $item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED' ) );
 					$app->redirect($referer);
 				}
 				else if ( $canedititem )
