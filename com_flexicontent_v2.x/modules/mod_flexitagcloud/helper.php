@@ -39,7 +39,7 @@ class modFlexiTagCloudHelper
 		// Get parameters
 		$minsize 	= (int)$params->get('min_size', '1');
 		$maxsize 	= (int)$params->get('max_size', '10');
-		$limit 		= (int)$params->get('limit', '25');
+		$limit 		= (int)$params->get('count', '25');
 		$method		= (int)$params->get('method', '1');
 		$scope		= $params->get('categories');
 		$scope		= is_array($scope) ? implode(',', $scope) : $scope;

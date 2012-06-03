@@ -34,7 +34,7 @@
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="min_size" type="text" default="1" label="FLEXI_MIN_SIZE" description="FLEXI_MIN_SIZE_DESC" />
 		<param name="max_size" type="text" default="10" label="FLEXI_MAX_SIZE" description="FLEXI_MAX_SIZE_DESC" />
-		<param name="limit" type="text" default="25" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
+		<param name="count" type="text" default="25" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 		<param name="@spacer" type="spacer" default="" label="" description="" />
 		<param name="method" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 		<param name="categories" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
