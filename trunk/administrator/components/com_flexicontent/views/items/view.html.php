@@ -236,12 +236,14 @@ class FlexicontentViewItems extends JView {
 		JToolBarHelper::spacer();
 
 		//Get data from the model
-		$rows      		= & $this->get( 'Data');
+		$rows     	= & $this->get( 'Data');
 		$pageNav 		= & $this->get( 'Pagination' );
 		$types			= & $this->get( 'Typeslist' );
 		$authors		= & $this->get( 'Authorslist' );
 		$unassociated	= & $this->get( 'UnassociatedItems' );
-		$status      	= & $this->get( 'ExtdataStatus');
+		$status				= & $this->get( 'ExtdataStatus' );
+		$extra_fields	= & $this->get( 'ItemList_ExtraFields' );
+		$this->get( 'ItemList_ExtraFieldValues' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs	= & FLEXIUtilities::getLanguages('code');
@@ -324,6 +326,7 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);
+		$this->assignRef('extra_fields' , $extra_fields);
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$this->assignRef('langs'    , $langs);
 		}

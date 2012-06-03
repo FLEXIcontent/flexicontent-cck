@@ -22,6 +22,11 @@ $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
 
+$db 		=& JFactory::getDBO();
+$config		=& JFactory::getConfig();
+$nullDate 	= $db->getNullDate();
+$user 		=& $this->user;
+
 $enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 
 $items_list_cols = 14;
@@ -29,6 +34,8 @@ if ( FLEXI_J16GE || FLEXI_FISH ) {
 	$items_list_cols++;
 	if ( $enable_translation_groups ) $items_list_cols++;
 }
+
+$items_list_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 
@@ -240,10 +247,10 @@ window.addEvent('domready', function() {
 	<table class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
-			<th width="5" class="center">
+			<th width="1%" class="center">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
-			<th width="5" class="center">
+			<th width="1%" class="center">
 				<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" />
 			</th>
 			<th class="left">
@@ -254,8 +261,13 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
+			
+    <?php foreach($this->extra_fields as $field) :?>
+			<th class="center"><?php echo $field->label; ?></td>
+		<?php endforeach; ?>
+
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th width="" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -264,7 +276,7 @@ window.addEvent('domready', function() {
 				<?php endif; ?>
 			</th>
 			<?php endif; ?>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th width="" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -272,7 +284,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th width="" nowrap="nowrap" class="center">
 				<?php echo JText::_( 'FLEXI_STATE' ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -303,7 +315,7 @@ window.addEvent('domready', function() {
 				endif;
 				?>
 			</th>
-			<th width="7%" class="center">
+			<th width="" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<th width="10%" class="left">
@@ -314,7 +326,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="7%" class="center">
+			<th width="" class="center">
 				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 				<?php if ($this->filter_authors) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -322,7 +334,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th align="center" width="85" class="center">
+			<th width="" class="center">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_CREATED', 'i.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -336,7 +348,7 @@ window.addEvent('domready', function() {
 				endif;
 				?>
 			</th>
-			<th align="center" width="85" class="center">
+			<th width="" class="center">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_REVISED', 'i.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -369,6 +381,11 @@ window.addEvent('domready', function() {
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
+
+    <?php foreach($this->extra_fields as $field) :?>
+			<td class="left"></td>
+		<?php endforeach; ?>
+
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
@@ -431,10 +448,6 @@ window.addEvent('domready', function() {
 	<tbody>
 		<?php
 		$k 			= 0;
-		$db 		=& JFactory::getDBO();
-		$config		=& JFactory::getConfig();
-		$nullDate 	= $db->getNullDate();
-		$user 		=& $this->user;
 		if (FLEXI_J16GE)
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
 		else
@@ -581,6 +594,25 @@ window.addEvent('domready', function() {
 				?>
 				
 			</td>
+
+    <?php foreach($this->extra_fields as $field) :?>
+    
+			<td align="center">
+		    <?php
+		    unset( $field->{$field->methodname} );                    // Clear display HTML just in case
+		    $field_value = & $row->extra_field_value[$field->name];   // Field value for current item
+		    
+		    if ( !empty($field_value) )
+		    {
+					// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
+					FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
+					
+					// Output the field's display HTML
+					echo @$field->{$field->methodname};
+				}
+		    ?>
+			</td>
+		<?php endforeach; ?>
 			
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">

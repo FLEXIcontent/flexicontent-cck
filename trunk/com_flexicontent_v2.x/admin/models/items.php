@@ -95,6 +95,7 @@ class FlexicontentModelItems extends JModel
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
+		$this->_extra_fields = null;
 	}
 
 	/**
@@ -108,7 +109,7 @@ class FlexicontentModelItems extends JModel
 		static $tconfig = array();
 		
 		// Lets load the Items if it doesn't already exist
-		if (empty($this->_data))
+		if ( $this->_data == null )
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
@@ -137,7 +138,105 @@ class FlexicontentModelItems extends JModel
 		}
 		return $this->_data;
 	}			
-			
+	
+	
+	/**
+	 * Method to get fields used as extra columns of the item list
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getItemList_ExtraFields()
+	{
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$flexiparams = & JComponentHelper::getParams( 'com_flexicontent' );
+		$filter_type = $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
+		
+		// Retrieve the custom field of the items list
+		// STEP 1: Get the field properties
+		if ( !empty($filter_type) ) {
+			$query = 'SELECT t.attribs FROM #__flexicontent_types AS t WHERE t.id = ' . $filter_type;
+			$this->_db->setQuery($query);
+			$type_attribs = $this->_db->loadResult();
+			if ($this->_db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
+			$tparams = new JParameter($type_attribs);
+			$im_extra_fields = $tparams->get("items_manager_extra_fields");
+			$item_instance = new stdClass();
+			$item->type_id = $filter_type;
+		} else {
+			$item_instance = null;
+			$im_extra_fields = $flexiparams->get("items_manager_extra_fields");
+		}
+		$im_extra_fields = preg_split("/[\s]*,[\s]*/", $im_extra_fields);
+		
+		foreach($im_extra_fields as $im_extra_field) {
+			@list($fieldname,$methodname) = preg_split("/[\s]*:[\s]*/", $im_extra_field);
+			$methodnames[$fieldname] = empty($methodname) ? 'display' : $methodname;
+		}
+		
+		$field_name = 'tstimga';
+		$query = ' SELECT fi.*'
+		   .' FROM #__flexicontent_fields AS fi'
+		   .' WHERE fi.name IN '. '("' . implode('","',array_keys($methodnames)) . '")'
+		   .' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
+		$this->_db->setQuery($query);
+		$extra_fields = $this->_db->loadObjectList();
+		if ($this->_db->getErrorNum()) {
+			$jAp=& JFactory::getApplication();
+			$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		}
+		foreach($extra_fields as $field) {
+			$field->methodname = $methodnames[$field->name];
+			FlexicontentFields::loadFieldConfig($field, $item_instance);
+		}
+		
+		$this->_extra_fields = & $extra_fields;
+		return $extra_fields;
+	}
+	
+	
+	/**
+	 * Method to get fields values of the fields used as extra columns of the item list
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getItemList_ExtraFieldValues()
+	{
+		if ( $this->_extra_fields== null)
+			$this->getItemList_ExtraFields();
+		if ( empty($this->_extra_fields) ) return;
+		
+		if ( $this->_data== null)
+			$this->getData();
+		if ( empty($this->_data) ) return;
+		
+		foreach($this->_data as $row)
+		{
+			foreach($this->_extra_fields as $field)
+			{
+		    // STEP 2: Get the field value for the current item
+		    $query = ' SELECT v.value'
+					 .' FROM #__flexicontent_fields_item_relations as v'
+		       .' WHERE v.item_id = '.(int)$row->id
+		       .'   AND v.field_id = '.$field->id
+		       .' ORDER BY v.valueorder';
+		    $this->_db->setQuery($query);
+		    $values = $this->_db->loadResultArray();
+				/*if ($this->_db->getErrorNum()) {
+					$jAp=& JFactory::getApplication();
+					$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+				}*/
+				$row->extra_field_value[$field->name] = $values;
+			}
+		}
+	}
+	
+	
 	/**
 	 * Method to set the default site language to an item with no language
 	 * 

@@ -57,7 +57,7 @@
 			</field>
 		
 		</fieldset>
-		<fieldset name="TYPE_DESC_CUSTOMIZE">
+		<fieldset name="type_desc_customize" label="FLEXI_TYPE_DESC_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" menu="hide" />
 			<field name="maintext_label" type="text" default="" size="90" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
@@ -78,7 +78,7 @@
 			<field name="height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
 			
 		</fieldset>
-		<fieldset name="TYPE_FIELDS1_CUSTOMIZE">
+		<fieldset name="type_fields1_customize" label="FLEXI_TYPE_FIELDS1_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2" menu="hide" />
 			<field name="title_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
@@ -111,7 +111,7 @@
 			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
 		</fieldset>
-		<fieldset name="TYPE_FIELDS2_CUSTOMIZE">
+		<fieldset name="type_fields2_customize" label="FLEXI_TYPE_FIELDS2_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_FIELD_HITS" level="level2" menu="hide" />
 			<field name="hits_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
@@ -152,7 +152,7 @@
 			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 	
 		</fieldset>
-		<fieldset name="SEO_CONF">
+		<fieldset name="seo_conf" label="FLEXI_SEO_CONF">
 			
 			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" menu="hide" />
 			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
@@ -177,7 +177,7 @@
 			</field-->
 		</fieldset>
 
-		<fieldset name="FRONTEND_ITEM_FORM">
+		<fieldset name="frontend_item_form" label="FLEXI_FRONTEND_ITEM_FORM">
 
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
@@ -190,7 +190,7 @@
 			</field>
 			<field name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_MODIFY_ITEM_LANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
-				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals="mod_item_lang"
+				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals=""
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" />
 			<field name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -219,6 +219,10 @@
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 			</field>
+		</fieldset>
+
+		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER_CONF">
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
 		</fieldset>
 
 		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
