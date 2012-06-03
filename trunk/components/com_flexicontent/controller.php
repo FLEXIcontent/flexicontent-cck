@@ -233,22 +233,46 @@ class FlexicontentController extends JController
 			// If the item isn't new, then we need to clean the cache so that our changes appear realtime
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
+		} else {
+			// Check edit privilege of new item
+			if (FLEXI_J16GE) {
+				$asset = 'com_content.article.' . $model->get('id');
+				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				// ALTERNATIVE 1
+				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				// ALTERNATIVE 2
+				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$has_edit = true;
+			} else if (FLEXI_ACCESS) {
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else {
+				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+			}
 		}
-		$task = JRequest::getVar('task');
-		if ($task=='apply') {
-			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
-			$refer = JRequest::getString('referer', '', 'post');
-			$return = '&return='.base64_encode( $refer );
-			$link .= $return;
-			$this->setRedirect($link, $msg);
-			return;
-		} else if ($task=='save_a_preview') {
-			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
-			$this->setRedirect($link, $msg);
-			return;
+		
+		// If user can edit item then allow to redirect back to the edit form depending on task variable
+		if ($has_edit)
+		{
+			$task = JRequest::getVar('task');
+			if ($task=='apply') {
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+				$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
+				$refer = JRequest::getString('referer', '', 'post');
+				$return = '&return='.base64_encode( $refer );
+				$link .= $return;
+				$this->setRedirect($link, $msg);
+				return;
+			} else if ($task=='save_a_preview') {
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
+				$this->setRedirect($link, $msg);
+				return;
+			}
 		}
+		
 		if ($user->authorize('com_flexicontent', 'state') )
 		{
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
