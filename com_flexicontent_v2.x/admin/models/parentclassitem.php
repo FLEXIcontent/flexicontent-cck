@@ -1737,7 +1737,7 @@ class ParentClassItem extends JModelAdmin
 			$item->ordering = $item->getNextOrder();
 		}
 		
-		// Ignore language parent id if item language is site's (content) default language
+		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
 		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
 			$lang_parent_id = $item->lang_parent_id;
 			$item->lang_parent_id = $isnew ? 0 : $item->id;

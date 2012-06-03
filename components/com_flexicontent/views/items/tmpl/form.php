@@ -501,8 +501,8 @@ function deleteTag(obj) {
 					</span>
 				</label>
 				
-				<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) && $this->item->id ) : ?>
-					<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
+				<?php if ( $this->row->id  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) || $this->row->language=='*') ) : ?>
+					<br/><small><?php echo JText::_( $this->row->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 					<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->item->id; ?>" />
 				<?php else : ?>
 					<?php
