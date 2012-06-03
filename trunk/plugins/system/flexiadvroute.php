@@ -176,7 +176,7 @@ class plgSystemFlexiadvroute extends JPlugin
 	  // Execute only when not doing a task (e.g. edit)          BROKEN !!! DISABLED
 	  //if ( !empty(JRequest::getVar('task')) ) return;
 		
-	  // Get translations of the item
+	  // Get associated translating item for current language
 	  $db =& JFactory::getDBO();
 	  $query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as slug"
 	  . " FROM #__content AS i "

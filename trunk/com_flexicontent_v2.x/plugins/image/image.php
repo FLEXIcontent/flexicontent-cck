@@ -735,7 +735,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		if (!file_exists($filepath)) {
-			echo "Original file seems to have been deleted, cannot find image file: ".$filepath ."<br />\n";
+			//echo "Original file seems to have been deleted, cannot find image file: ".$filepath ."<br />\n";
 			return;
 		}
 		$filesize	= getimagesize($filepath);

@@ -275,7 +275,8 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		//$params			= $data["params"];
-		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
+		$jform = JRequest::getVar( 'jform', null, 'post', 'array' );
+		$copyparams = $jform['copycid'];
 		
 		if($copyparams) {
 			$data['params'] = array();

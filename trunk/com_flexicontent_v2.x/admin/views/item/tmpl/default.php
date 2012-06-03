@@ -398,8 +398,8 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 										</span>
 									</label>
-									<?php if ( substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) && $this->row->id ) : ?>
-										<br/><small><?php echo JText::_( 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
+									<?php if ( $this->row->id  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) || $this->row->language=='*') ) : ?>
+										<br/><small><?php echo JText::_( $this->row->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 										<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->row->id; ?>" />
 									<?php else : ?>
 										<?php
