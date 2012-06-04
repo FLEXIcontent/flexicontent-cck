@@ -109,7 +109,7 @@ class FlexicontentModelItems extends JModel
 		static $tconfig = array();
 		
 		// Lets load the Items if it doesn't already exist
-		if ( $this->_data == null )
+		if ( $this->_data === null )
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
@@ -388,7 +388,7 @@ class FlexicontentModelItems extends JModel
 	function getTotal()
 	{
 		// Lets load the Items if it doesn't already exist
-		if (empty($this->_total))
+		if ( $this->_total === null )
 		{
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
@@ -446,7 +446,7 @@ class FlexicontentModelItems extends JModel
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS maincat, rel.catid AS catid, u.name AS editor, '
+		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS catid, u.name AS editor, '
 				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
 				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
 				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired,'
@@ -554,18 +554,16 @@ class FlexicontentModelItems extends JModel
 
 			if (!@$allitems) {				
 				$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'item');
-				//$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');
+				//$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');  // SHOULD not be used
 				$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'item');
-				//$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');
+				//$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');  // SHOULD not be used
 			}
 		} else if (FLEXI_ACCESS) {
 			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
 				
 			if (!@$allitems) {				
-
 				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
 				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
-
 			}
 		} else {
 			$allitems = 1;
@@ -602,7 +600,7 @@ class FlexicontentModelItems extends JModel
 						if (count($allown) > 0) {
 							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
 						}
-					} else { // standard rules for the other users
+					} else if ( ( isset($canEditOwn['category']) && count($canEditOwn['category']) ) || ( isset($canEditOwn['item']) && count($canEditOwn['item']) ) ) { // standard rules for the other users
 						$allown = array();
 						if (isset($canEditOwn['category'])) {
 							if (count($canEditOwn['category']))	$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
@@ -617,6 +615,10 @@ class FlexicontentModelItems extends JModel
 						if (count($allown) > 0) {
 							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
 						}
+					} else {
+						$jAp=& JFactory::getApplication();
+						$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'notice' );
+						$where[] = ' 0 ';
 					}
 				}
 			}

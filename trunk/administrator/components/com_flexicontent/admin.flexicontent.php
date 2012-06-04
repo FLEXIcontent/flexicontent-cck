@@ -76,8 +76,9 @@ if(!function_exists('FLEXISubmenu')) {
 			$CanImport		= 1;
 			$CanIndex		= 1;
 		}
-
+		
 		if (isset($$variable) && !$$variable) {
+			$mainframe = &JFactory::getApplication();
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		$view = JRequest::getVar('view', 'flexicontent');

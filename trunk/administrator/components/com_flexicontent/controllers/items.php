@@ -69,6 +69,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
+		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$task	= JRequest::getVar('task');
 		$user = & JFactory::getUser();
 		$model = $this->getModel('item');
@@ -113,6 +114,19 @@ class FlexicontentControllerItems extends FlexicontentController
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
 
+		// Check if item is editable till logoff
+		if (!$canEdit) {
+			$session 	=& JFactory::getSession();
+			if ($session->has('item_editable', 'flexicontent')) {
+				$item_editable = $session->get('item_editable', array(),'flexicontent');
+				$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+				if ($canEdit) {
+					// Set notice for existing item being editable till logoff 
+					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+				}
+			}
+		}
+		
 		// New item: check if user can create in at least one category
 		if ($isnew && !$canAdd) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
@@ -126,44 +140,102 @@ class FlexicontentControllerItems extends FlexicontentController
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
 			return;
 		}
-
-		if ( $model->store($post) ) {
-			
-			switch ($task)
-			{
-				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
-					break;
-
-				case 'saveandnew' :
-					if(isset($post['type_id']))
-						$link = 'index.php?option=com_flexicontent&view=item&typeid='.$post['type_id'];
-					else
-						$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
-					break;
-
-				default :
-					$link = 'index.php?option=com_flexicontent&view=items';
-					//$model->checkin();
-					break;
+		
+		// Store the form data into the item and check it in
+		if ($model->store($post)) {
+			if($isnew) {
+				$post['id'] = (int) $model->get('id');
 			}
-			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache();
-				$cache->clean('com_flexicontent_items');
-			} else {
-				$cache = &JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
-			}
-
 		} else {
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_ITEM' );
-			JError::raiseWarning( 500, $msg ." " . $model->getError() );
-			$msg = '';
-			$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
-		}
+			// Set error message about saving failed, and also the reason (=model's error message)
+			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
+			JError::raiseWarning( 500, $msg .": " . $model->getError() );
 
+			// Since an error occured, check if (a) the item is new and (b) was not created
+			if ($isnew && !$model->get('id')) {
+				JError::raiseWarning( 500, JText::_( 'FLEXI_NEW_ITEM_NOT_CREATED' ) );
+				$msg = '';
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0';
+				$this->setRedirect($link, $msg);
+				return;
+			}
+		}
+		$model->checkin();
+		
+		// Actions if a content item was created
+		if ( $model->get('id') )
+		{
+			// ******************************************************************************************
+			// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
+			// ******************************************************************************************
+			if ( !$isnew ) {
+				if (FLEXI_J16GE) {
+					$cache = FLEXIUtilities::getCache();
+					$cache->clean('com_flexicontent_items');
+				} else {
+					$cache = &JFactory::getCache('com_flexicontent_items');
+					$cache->clean();
+				}
+			}
+			
+			// ****************************************************************************************************************************
+			// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
+			// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
+			// ****************************************************************************************************************************
+			if (FLEXI_J16GE) {
+				$asset = 'com_content.article.' . $model->get('id');
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				// ALTERNATIVE 1
+				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				// ALTERNATIVE 2
+				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else if ($user->gid >= 25) {
+				$canEdit = true;
+			} else if (FLEXI_ACCESS) {
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+			} else {
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+			}
+		}		
+		
+		// *******************************************************************************************************
+		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
+		// *******************************************************************************************************
+		if ($isnew && !$canEdit)
+		{
+			// Set notice about creating an item that cannot be changed further
+			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ) );
+		} else if ( !$isnew ) {
+			if ( $cparams->get('items_session_editable', 0) ) {
+				// Allow item to be editable till logoff
+				$session 	=& JFactory::getSession();
+				$session->get('item_editable', array(),'flexicontent');
+				$item_editable[$model->get('id')]  = 1;
+				$session->set('item_editable', $item_editable, 'flexicontent');
+			}
+		}
+		
+		// ****************************************
+		// Saving is done, decide where to redirect
+		// ****************************************
+		switch ($task)
+		{
+			case 'apply' :
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
+				break;
+			case 'saveandnew' :
+				if(isset($post['type_id']))
+					$link = 'index.php?option=com_flexicontent&view=item&typeid='.$post['type_id'];
+				else
+					$link = 'index.php?option=com_flexicontent&view=item';
+				break;
+			default :
+				$link = 'index.php?option=com_flexicontent&view=items';
+				break;
+		}
+		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
 	}
 
@@ -1127,13 +1199,32 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$item = & JTable::getInstance('flexicontent_items', '');
-		if (!FLEXI_J16GE) {
-			$item->bind(JRequest::get('post'));
-			$item->checkin();
-		} else {
-			$post = JRequest::get('post');
-			$item->checkin(@$post['jform']['id']);
+		// Initialize some variables
+		$user	= & JFactory::getUser();
+
+		// Get an item model
+		$model = & $this->getModel('item');
+		
+		// CHECK-IN the item if user can edit
+		if ($model->get('id') > 1)
+		{
+			$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
+			$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
+	
+			// Check if item is editable till logoff
+			if (!$canEdit) {
+				$session 	=& JFactory::getSession();
+				if ($session->has('item_editable', 'flexicontent')) {
+					$item_editable = $session->get('item_editable', array(),'flexicontent');
+					$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+					if ($canEdit) {
+						// Set notice for existing item being editable till logoff 
+						JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+					}
+				}
+			}
+			
+			if ($canEdit) $model->checkin();
 		}
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items' );
@@ -1190,6 +1281,19 @@ class FlexicontentControllerItems extends FlexicontentController
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
 
+		// Check if item is editable till logoff
+		if (!$canEdit) {
+			$session 	=& JFactory::getSession();
+			if ($session->has('item_editable', 'flexicontent')) {
+				$item_editable = $session->get('item_editable', array(),'flexicontent');
+				$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+				if ($canEdit) {
+					// Set notice for existing item being editable till logoff 
+					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+				}
+			}
+		}
+		
 		// New item: check if user can create in at least one category
 		if ($isnew && !$canAdd) {
 			JError::raiseNotice( 500, JText::_( 'FLEXI_NO_ACCESS_CREATE' ));

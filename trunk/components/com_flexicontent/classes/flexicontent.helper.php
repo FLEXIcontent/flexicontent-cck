@@ -2370,7 +2370,7 @@ class FLEXIUtilities
 		// 3. Execute only if it exists
 		$class = "plgFlexicontent_fields{$fieldname}";
 		if(in_array($func, get_class_methods($class))) {
-			call_user_func_array(array($fc_plgs[$fieldname], $func), $args);
+			return call_user_func_array(array($fc_plgs[$fieldname], $func), $args);
 		}
 	}
 	
@@ -2412,7 +2412,7 @@ class FLEXIUtilities
 		// 3. Execute only if it exists
 		$class = "plgContent{$fieldname}";
 		if(in_array($func, get_class_methods($class))) {
-			call_user_func_array(array($content_plgs[$fieldname], $func), $args);
+			return call_user_func_array(array($content_plgs[$fieldname], $func), $args);
 		}
 	}
 	
