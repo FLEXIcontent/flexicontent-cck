@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1274 2012-05-09 05:19:03Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1334 2012-06-03 03:51:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -91,10 +91,10 @@ class FlexicontentController extends JController
 		
 		// PERFORM ACCESS CHECKS, NOTE: we need to check access again,
 		// despite having checked them on edit form load, because user may have tampered with the form ... 
-		$isNew = ((int) $post['id'] < 1);
+		$isnew = ((int) $post['id'] < 1);
 		$allowunauthorize = JFactory::getApplication()->getParams('com_flexicontent')->get('allowunauthorize', 0);
 
-		if(!$isNew) {
+		if(!$isnew) {
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
 				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
@@ -111,6 +111,14 @@ class FlexicontentController extends JController
 			} else {
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 			}
+			
+			// Check if item is editable till logoff
+			$session 	=& JFactory::getSession();
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$has_edit = isset($rendered_uneditable[$model->get('id')]);
+			}
+
 		} else {
 			if (FLEXI_J16GE) {
 				$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
@@ -129,112 +137,142 @@ class FlexicontentController extends JController
 
 
 		// Check for new content
-		if ( ($isNew && !$canAdd) || (!$isNew && !$has_edit)) {
+		if ( ($isnew && !$canAdd) || (!$isnew && !$has_edit)) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
 		}
 		
 		// Store the form data into the item and check it in
 		if ($model->store($post)) {
-			if($isNew) {
+			if($isnew) {
 				$post['id'] = (int) $model->get('id');
 			}
 		} else {
+			// Set error message about saving failed, and also the reason (=model's error message)
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
-			JError::raiseError( 500, $model->getError() );
+			JError::raiseWarning( 500, $msg .": " . $model->getError() );
+
+			// Since an error occured, check if (a) the item is new and (b) was not created
+			if ($isnew && !$model->get('id')) {
+				JError::raiseWarning( 500, JText::_( 'FLEXI_NEW_ITEM_NOT_CREATED' ) );
+				$msg = '';
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0';
+				$this->setRedirect($link, $msg);
+				return;
+			}
 		}
 		$model->checkin();
 		
-		// SEND notification EMAIL only once when editing items, (we use session to detect multiple saves)
-		$is_first_unapproved_revise = false;
 		
-		if ($post['vstate']!=2) {
-			$session 	=& JFactory::getSession();
-			$items_saved = array();
-			if ($session->has('unapproved_revises', 'flexicontent')) {
-				$unapproved_revises	= $session->get('unapproved_revises', array(), 'flexicontent');
-				$is_first_unapproved_revise = ! isset($unapproved_revises[$model->get('id')]);
-			}
-			//add item to unapproved revises of corresponding session array
-			$unapproved_revises[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-			$session->set('unapproved_revises', $unapproved_revises, 'flexicontent');
-		}
-
-		// SEND the notification EMAIL
-		if ( $isNew || $is_first_unapproved_revise )
+		// Actions if a content item was created
+		if ( $model->get('id') )
 		{
-			//Get categories for information mail
-			$query 	= 'SELECT DISTINCT c.id, c.title,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-				. ' FROM #__categories AS c'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid = '.(int) $model->get('id')
-				;
-
-			$db->setQuery( $query );
-
-			$categories = $db->loadObjectList();
-
-			//Loop through the categories to create a string
-			$n = count($categories);
-			$i = 0;
-			$catstring = '';
-			foreach ($categories as $category) {
-				$catstring .= $category->title;
-				$i++;
-				if ($i != $n) {
-					$catstring .= ', ';
+			// ********************************************************************************************
+			// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
+			// ********************************************************************************************
+			$is_first_unapproved_revise = false;  // flag
+			
+			if ($post['vstate']!=2) {
+				$session 	=& JFactory::getSession();
+				$items_saved = array();
+				if ($session->has('unapproved_revises', 'flexicontent')) {
+					$unapproved_revises	= $session->get('unapproved_revises', array(), 'flexicontent');
+					$is_first_unapproved_revise = ! isset($unapproved_revises[$model->get('id')]);
 				}
+				//add item to unapproved revises of corresponding session array
+				$unapproved_revises[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+				$session->set('unapproved_revises', $unapproved_revises, 'flexicontent');
 			}
-
-			//Get list of admins who receive system mails
-			$query 	= 'SELECT id, email, name'
-				. ' FROM #__users'
-				. ' WHERE sendEmail = 1';
-			$db->setQuery($query);
-			if (!$db->query()) {
-				JError::raiseError( 500, $db->stderr(true));
-				return;
-			}
-			$adminRows = $db->loadObjectList();
-
-			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
-			if (FLEXI_J16GE) {
-				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'message.php');
-				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'config.php');
-				$message = new MessagesModelMessage();
-			} else {
-				$message = new TableMessage($db);
-			}
-
-			// send email notification to admins
-			foreach ($adminRows as $adminRow) {
-
-				//Not really needed cause in com_message you can set to be notified about new messages by email
-				//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
-
-				$msgdata["user_id_to"] = $adminRow->id;
-				$msgdata["subject"] = ($isNew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
-				if ($isNew) {
-					$msgdata["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring);
-				} else {
-					$msgdata["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $post['title'], $catstring, $user->get('username'));
+	
+			// **********************************************************************
+			// If notification EMAIL was not already sent, then create it and send it
+			// **********************************************************************
+			if ( $isnew || $is_first_unapproved_revise )
+			{
+				//Get categories for information mail
+				$query 	= 'SELECT DISTINCT c.id, c.title,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+					. ' FROM #__categories AS c'
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+					. ' WHERE rel.itemid = '.(int) $model->get('id')
+					;
+	
+				$db->setQuery( $query );
+	
+				$categories = $db->loadObjectList();
+	
+				//Loop through the categories to create a string
+				$n = count($categories);
+				$i = 0;
+				$catstring = '';
+				foreach ($categories as $category) {
+					$catstring .= $category->title;
+					$i++;
+					if ($i != $n) {
+						$catstring .= ', ';
+					}
 				}
-				
+	
+				//Get list of admins who receive system mails
+				$query 	= 'SELECT id, email, name'
+					. ' FROM #__users'
+					. ' WHERE sendEmail = 1';
+				$db->setQuery($query);
+				if (!$db->query()) {
+					JError::raiseError( 500, $db->stderr(true));
+					return;
+				}
+				$adminRows = $db->loadObjectList();
+	
+				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
 				if (FLEXI_J16GE) {
-					$message->save($msgdata);
+					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'message.php');
+					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'config.php');
+					$message = new MessagesModelMessage();
 				} else {
-					$message->send($user->get('id'), $adminRow->id, $msgdata["subject"], $msgdata["message"]);
+					$message = new TableMessage($db);
+				}
+	
+				// send email notification to admins
+				foreach ($adminRows as $adminRow) {
+	
+					//Not really needed cause in com_message you can set to be notified about new messages by email
+					//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
+	
+					$msgdata["user_id_to"] = $adminRow->id;
+					$msgdata["subject"] = ($isnew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
+					if ($isnew) {
+						$msgdata["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring);
+					} else {
+						$msgdata["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $post['title'], $catstring, $user->get('username'));
+					}
+					
+					if (FLEXI_J16GE) {
+						$message->save($msgdata);
+					} else {
+						$message->send($user->get('id'), $adminRow->id, $msgdata["subject"], $msgdata["message"]);
+					}
 				}
 			}
-		}
-		
-		if (!$isNew) {
-			// If the item isn't new, then we need to clean the cache so that our changes appear realtime
-			$cache = &JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		} else {
-			// Check edit privilege of new item
+			
+			// ******************************************************************************************
+			// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
+			// ******************************************************************************************
+			if ( !$isnew ) {
+				if (FLEXI_J16GE) {
+					$cache = FLEXIUtilities::getCache();
+					$cache->clean('com_flexicontent_items');
+				} else {
+					$cache = &JFactory::getCache('com_flexicontent_items');
+					$cache->clean();
+				}
+			}
+			
+			
+			// ****************************************************************************************************************************
+			// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
+			// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
+			// ****************************************************************************************************************************
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
 				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
@@ -253,36 +291,46 @@ class FlexicontentController extends JController
 			}
 		}
 		
-		// If user can edit item then allow to redirect back to the edit form depending on task variable
-		if ($has_edit)
+		// *******************************************************************************************************
+		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
+		// *******************************************************************************************************
+		if ($isnew && !$has_edit)
 		{
-			$task = JRequest::getVar('task');
-			if ($task=='apply') {
-				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
-				$refer = JRequest::getString('referer', '', 'post');
-				$return = '&return='.base64_encode( $refer );
-				$link .= $return;
-				$this->setRedirect($link, $msg);
-				return;
-			} else if ($task=='save_a_preview') {
-				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
-				$this->setRedirect($link, $msg);
-				return;
-			}
+			// Set notice about creating an item that cannot be changed further
+			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ) );
+		} else if (!$isnew && !$has_edit) {
+			// Set notice for existing item being editable till logoff 
+			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+			// Allow item to be editable till logoff
+			$session 	=& JFactory::getSession();
+			$session->get('rendered_uneditable', array(),'flexicontent');
+			$rendered_uneditable[$model->get('id')]  = 1;
+			$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 		}
 		
-		if ($user->authorize('com_flexicontent', 'state') )
-		{
+		// ****************************************
+		// Saving is done, decide where to redirect
+		// ****************************************
+		$task = JRequest::getVar('task');
+		if ($task=='apply') {
+			// Save and reload the item edit form
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
+			
+			// Important pass refer back to avoid making the form itself the refer
+			$refer = JRequest::getString('referer', '', 'post');
+			$return = '&return='.base64_encode( $refer );
+			$link .= $return;
+		} else if ($task=='save_a_preview') {
+			// Save and preview the latest version
+			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
+		} else {
+			// Return to the form 's refer (previous page) after item saving
+			$msg = $isnew ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
+			$link = JRequest::getString('referer', JURI::base(), 'post');
 		}
-		else
-		{
-			$msg = $isNew ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
-		}
-
-		$link = JRequest::getString('referer', JURI::base(), 'post');
+		
 		$this->setRedirect($link, $msg);
 	}
 	
@@ -369,6 +417,13 @@ class FlexicontentController extends JController
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+			}
+			
+			// Check if item is editable till logoff
+			$session 	=& JFactory::getSession();
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$has_edit = isset($rendered_uneditable[$model->get('id')]);
 			}
 			
 			if (!$has_edit) {
@@ -497,6 +552,9 @@ class FlexicontentController extends JController
 	*/
 	function cancel()
 	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );		
+		
 		// Initialize some variables
 		$user	= & JFactory::getUser();
 
@@ -523,15 +581,17 @@ class FlexicontentController extends JController
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 			}
 			
-			if ($has_edit) {
-				$item = & JTable::getInstance('flexicontent_items', '');
-				$item_id = FLEXI_J16GE ? (int)JRequest::getVar('cid', 0) : (int)JRequest::getVar('id', 0);
-				$item->load( $item_id );
-				$item->checkin();
+			// Check if item is editable till logoff
+			$session 	=& JFactory::getSession();
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$has_edit = isset($rendered_uneditable[$model->get('id')]);
 			}
+			
+			if ($has_edit) $model->checkin();
 		}
 		
-		// If the task was edit or cancel, we go back to the item
+		// If the task was edit or cancel, we go back to the form refer
 		$referer = JRequest::getString('referer', JURI::base(), 'post');
 		$this->setRedirect($referer);
 	}
@@ -855,8 +915,6 @@ class FlexicontentController extends JController
 		$cache->clean();
 
 		$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='. $id, false), $msg );
-
-		return;
 	}
 
 	/**
@@ -887,8 +945,6 @@ class FlexicontentController extends JController
 		} else {
 			$this->setRedirect(JRoute::_('index.php?view=favourites', false), $msg );
 		}
-				
-		return;
 	}
 
 	/**

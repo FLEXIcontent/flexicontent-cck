@@ -294,7 +294,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										
 									<?php
 									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
-										echo $this->form->getInput('state') . '&nbsp;';
+										echo $this->lists['state'] . '&nbsp;';
 										if (!$this->cparams->get('auto_approve', 1)) :
 											echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 										else :
@@ -789,7 +789,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
-					<?php echo $this->form->getInput('catid');?>
+					<?php echo $this->lists['catid']; ?>
 				</td>
 			</tr>
 			<tr>
@@ -799,7 +799,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					</label>
 				</td>
 				<td style="padding-top: 5px;">
-					<?php echo $this->form->getInput('cid');?>
+					<?php echo $this->lists['cid']; ?>
 				</td>
 			</tr>
 		</table>

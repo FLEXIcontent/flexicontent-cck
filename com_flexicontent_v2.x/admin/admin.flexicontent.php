@@ -49,7 +49,9 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, tru
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($cando) {
 		$permission = FlexicontentHelperPerm::getPerm();
+		
 		if (isset($permission->$cando) && !$permission->$cando) {
+			$mainframe = &JFactory::getApplication();
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		$session  =& JFactory::getSession();

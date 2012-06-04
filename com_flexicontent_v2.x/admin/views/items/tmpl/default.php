@@ -745,7 +745,7 @@ window.addEvent('domready', function() {
 				$nr = count($row->categories);
 				$ix = 0;
 				foreach ($row->categories as $key => $category) :
-					$typeofcats = ((int)$category->id == (int)$row->maincat) ? ' maincat' : ' secondarycat';
+					$typeofcats = ((int)$category->id == (int)$row->catid) ? ' maincat' : ' secondarycat';
 					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :

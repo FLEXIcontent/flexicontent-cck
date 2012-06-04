@@ -252,28 +252,42 @@ class flexicontent_cats
 		$user =& JFactory::getUser();
 		$cid = JRequest::getVar('cid');
 		
+		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		if (FLEXI_J16GE) {
 			require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-			$usercats 		= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
 			$viewallcats	= FlexicontentHelperPerm::getPerm()->CanUserCats;
 			$viewtree			= FlexicontentHelperPerm::getPerm()->CanViewTree;
 		} else if (FLEXI_ACCESS) {
-			$usercats 		= FAccess::checkUserCats($user->gmid);
 			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
 			$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
 		} else {
 			$viewallcats	= 1;
 			$viewtree		= 1;
 		}
-
-		$catlist 	= array();
 		
+		// Filter categories by user permissions
+		if ($filter) {
+			// Get user allowed categories
+			if (FLEXI_J16GE) {
+				$usercats 	= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
+			} else if (FLEXI_ACCESS) {
+				//$usercats = FAccess::checkUserCats($user->gmid);    // Commented out to limit by Specific Actions (add,edit,editown)
+				$usercats 	= flexicontent_cats::getFAallowedCats($user->gmid, $actions_allowed);
+			}
+			// Add already selected categories to the category list
+			$selectedcats = !is_array($selected) ? array($selected) : $selected;
+			$usercats = array_unique(array_merge($selectedcats, $usercats));
+		}
+		
+		// Start category list by add appropriate prompt option at top
+		$catlist 	= array();
 		if($top == 1) {
 			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_TOPLEVEL' ));
 		} else if($top == 2) {
 			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_CAT' ));
 		}
 		
+		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
 		foreach ($list as $item) {
 			$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
 			if ((!$published) || ($published && $item->published)) {
@@ -297,11 +311,86 @@ class flexicontent_cats
 				}
 			}
 		}
+		
+		// Finally create the HTML form element
 		$idtag = preg_replace('/(\]|\[)+/', '_', $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
 		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
 	}
 	
+
+	/**
+	 * Method to get all categories where a user is allowed to do actions
+	 *
+	 * @access	public
+	 * @param	string	$aro_value		The requestor values (the groups)
+	 * @return	array	$usercats		The categories where the user is allowed to submit, edit and editown	 
+	 * @since 1.5
+	 */
+	function getFAallowedCats($aro_value, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own') )
+	{
+		global $globalcats;
+		$db =& JFactory::getDBO();
+		$newcats = array();
+		
+		// Create a limit for aco (ACTION privilege)
+		$limit_aco = array();
+		if ( in_array('core.create',$actions_allowed) )
+			$limit_aco[] = 'aco = ' . $db->Quote('add');
+		if ( in_array('core.edit',$actions_allowed) )
+			$limit_aco[] = 'aco = ' . $db->Quote('edit');
+		if ( in_array('core.edit.own',$actions_allowed) )
+			$limit_aco[] = 'aco = ' . $db->Quote('editown');
+			
+		if  (count($limit_aco) ) {
+			$limit_aco = implode(' OR ', $limit_aco);
+		} else {
+			$limit_aco = 'aco = ' . $db->Quote('add') . ' OR aco = ' . $db->Quote('edit') . ' OR aco = ' . $db->Quote('editown');
+		}
+		
+		$query	= 'SELECT COUNT(*) FROM #__flexiaccess_acl'
+				. ' WHERE acosection = ' . $db->Quote('com_content')
+				. ' AND ( ' . $limit_aco . ' )'
+				. ' AND arosection = ' . $db->Quote('users')
+				. ' AND aro IN ( ' . $aro_value . ' )'
+				. ' AND axosection = ' . $db->Quote('content')
+				. ' AND axo = ' . $db->Quote('all')
+				;
+		$db->setQuery($query);
+		if ($db->loadResult()) {
+			foreach ($globalcats as $k => $v) {
+				$newcats[] = $k;
+			}
+
+			$usercats = array_unique($newcats);
+			return $usercats;		
+		}
+		
+		$limit_aco = str_replace('add','submit',$limit_aco);    // creating for -content- axosection is 'addd' but for -category- axosection is submit
+		$query	= 'SELECT axo FROM #__flexiaccess_acl'
+				. ' WHERE acosection = ' . $db->Quote('com_content')
+				. ' AND ( ' . $limit_aco . ' )'
+				. ' AND arosection = ' . $db->Quote('users')
+				. ' AND aro IN ( ' . $aro_value . ' )'
+				. ' AND axosection = ' . $db->Quote('category')
+				;
+		$db->setQuery($query);
+		$usercats = $db->loadResultArray();
+		
+		$usercats = $usercats ? $usercats : array();
+		// we add all descendent to the array
+		foreach ($usercats as $usercat) {
+			$newcats[] = $usercat;
+			if ($globalcats[$usercat]->children) {
+				foreach ($globalcats[$usercat]->descendantsarray as $k => $v) {
+					$newcats[] = $v;
+				}
+			}
+		}
+		$usercats = array_unique($newcats);
+		return $usercats;
+	}
+
 	
 	/**
 	 * Retrieves all available values of the given field,
