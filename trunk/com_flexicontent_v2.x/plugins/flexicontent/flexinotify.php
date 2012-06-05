@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexinotify.php 660 2011-07-20 15:39:59Z ggppdk $
+ * @version 1.5 stable $Id: flexinotify.php 1333 2012-06-02 10:04:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -75,7 +75,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	
 	
 	/**
-	 * This method is executed just after an item stored (BUT before saving fields)
+	 * This method is executed just after an item stored (including custom fields)
 	 *
 	 * Method is called by the model
 	 *
@@ -105,7 +105,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	
 	
 	/**
-	 * This method is executed after item saving is complete (all data, including all item fields)
+	 * This method is executed after item saving is complete (all data, e.g. including versioning metadata)
 	 *
 	 * Method is called by the model
 	 *
