@@ -54,12 +54,16 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		} elseif (!$field->value) {
 			$field->value = array();
-			$field->value[0] = '';
+			$field->value[0]['link'] = '';
+			$field->value[0]['title'] = '';
+			$field->value[0]['hits'] = 0;
+			$field->value[0] = serialize($field->value[0]);
 		}
 
-		if ($multiple) {
-			$document	= & JFactory::getDocument();
-
+		$document	= & JFactory::getDocument();
+		
+		if ($multiple)
+		{
 			//add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
@@ -145,9 +149,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				height: 20px;
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
-			li input.urllink, li input.urltitle, li input.fcfield-button {
-				float:none;
-			} 
+			li input.urllink, li input.urltitle, li input.fcfield-button { float:none; }
 			';
 			$document->addStyleDeclaration($css);
 
@@ -173,6 +175,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else {
+			$css = 'li input.urllink, li input.urltitle { float:none; }';
+			$document->addStyleDeclaration($css);
+			
 			$field->value[0] = unserialize($field->value[0]);
 			$field->html	= '<div>Url: <input name="'.$field->name.'[0][link]" class="urllink'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['link'].'" /> Title: <input name="'.$field->name.'[0][title]" class="urltitle'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['title'].'" /><input name="'.$field->name.'[0][hits]" type="hidden" value="'.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).'" /> '.($field->value[0]['hits'] ? $field->value[0]['hits'] : 0).' '.JText::_( 'FLEXI_FIELD_HITS' ).' </div>';
 		}
