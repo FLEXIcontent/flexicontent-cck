@@ -20,6 +20,7 @@
 	</params>
 	<params group="group-email">
 		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+		<param name="default_value_title" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
 		<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
