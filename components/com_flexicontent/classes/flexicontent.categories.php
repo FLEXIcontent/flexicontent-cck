@@ -274,9 +274,11 @@ class flexicontent_cats
 				//$usercats = FAccess::checkUserCats($user->gmid);    // Commented out to limit by Specific Actions (add,edit,editown)
 				$usercats 	= flexicontent_cats::getFAallowedCats($user->gmid, $actions_allowed);
 			}
-			// Add already selected categories to the category list
-			$selectedcats = !is_array($selected) ? array($selected) : $selected;
-			$usercats = array_unique(array_merge($selectedcats, $usercats));
+			if (FLEXI_J16GE || FLEXI_ACCESS) {
+				// Add already selected categories to the category list
+				$selectedcats = !is_array($selected) ? array($selected) : $selected;
+				$usercats = array_unique(array_merge($selectedcats, $usercats));
+			}
 		}
 		
 		// Start category list by add appropriate prompt option at top
@@ -313,7 +315,8 @@ class flexicontent_cats
 		}
 		
 		// Finally create the HTML form element
-		$idtag = preg_replace('/(\]|\[)+/', '_', $name);
+		$replace_char = FLEXI_J16GE ? '_' : '';
+		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
 		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
 	}

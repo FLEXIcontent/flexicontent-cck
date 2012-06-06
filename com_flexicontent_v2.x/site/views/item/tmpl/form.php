@@ -23,10 +23,12 @@ $cid = $this->params->get("cid");
 $isNew = ! JRequest::getInt('id', 0);
 
 // Language related vars
-$languages = FLEXIUtilities::getLanguages();
-$itemlang = substr($this->item->language ,0,2);
-$itemlang_name = $languages->{$this->item->language}->name;
-$itemlang_image = '<img src="'.$languages->{$this->item->language}->imgsrc.'" alt="'.$languages->{$this->item->language}->name.'" />';
+if (FLEXI_FISH || FLEXI_J16GE) {
+	$languages = FLEXIUtilities::getLanguages();
+	$itemlang = substr($this->item->language ,0,2);
+	$itemlang_name = $languages->{$this->item->language}->name;
+	$itemlang_image = '<img src="'.$languages->{$this->item->language}->imgsrc.'" alt="'.$languages->{$this->item->language}->name.'" />';
+}
 
 if (isset($this->item->item_translations)) foreach ($this->item->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 $maincatid = $this->params->get("maincatid");
