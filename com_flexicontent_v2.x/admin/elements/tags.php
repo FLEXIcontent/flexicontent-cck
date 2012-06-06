@@ -41,7 +41,15 @@ class JFormFieldTags extends JFormField
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
-		$node	= & $this->element;
+		
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}		
+		
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_tags'
 		. ' WHERE published = 1'
@@ -56,20 +64,20 @@ class JFormFieldTags extends JFormField
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		$attribs = ' style="float:left;" ';
-		if ($node->getAttribute('multiple') && $node->getAttribute('multiple')!='false' ) {
-			$attribs .= 'multiple="true" ';
-			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($tags, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
-		if ($onchange = $node->getAttribute('onchange')) {
+		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 

@@ -18,8 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
 /**
  * Renders an Item element
  *
@@ -40,13 +43,19 @@ class JFormFieldItem extends JFormField
 
 	function getInput()
 	{
-		$node = & $this->element;
 		$doc 		=& JFactory::getDocument();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+				
+		$value = FLEXI_J16GE ? $this->value : $value;
 		
-		$element_id = $this->id;
-		
-		$fieldname	= $this->name;
-		$value			= $this->value;
+		$fieldname	= FLEXI_J16GE ? $this->name : ($control_name ? $control_name.'['.$name.']' : $name);
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
@@ -77,9 +86,9 @@ class JFormFieldItem extends JFormField
 			$('sbox-btn-close').fireEvent('click');
 		}";
 
-		$langparent_item = (boolean) $node->getAttribute('langparent_item');
-		$type_id = $node->getAttribute('type_id');
-		$created_by = $node->getAttribute('created_by');
+		$langparent_item = (boolean) @$attributes['langparent_item'];
+		$type_id = @$attributes['type_id'];
+		$created_by = @$attributes['created_by'];
 		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
 		$link .= $langparent_item ? '&langparent_item=1' : '&langparent_item=0';
 		$link .= $type_id ? '&type_id='.$type_id : '';

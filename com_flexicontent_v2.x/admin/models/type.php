@@ -321,6 +321,7 @@ class FlexicontentModelType extends JModelAdmin
 			}
 		}
 		$this->_type	=& $type;
+		$this->_id	= $type->id;
 		
 		return true;
 	}

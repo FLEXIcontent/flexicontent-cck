@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
@@ -43,13 +47,20 @@ class JElementFlexicategories extends JElement
 	{
 		static $function_added = false;
 		$doc 		=& JFactory::getDocument();
-		
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+				
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -71,17 +82,17 @@ class JElementFlexicategories extends JElement
 		}*/
 		
 		$attribs = 'style="float:left;"';
-		if ( $node->attributes('multiple') && $node->attributes('multiple')!='false' ) {
+		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .=' multiple="multiple"';
-			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="8" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<40) { ${element_id}_oldsize=$element_id.size; $element_id.size=40;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			$maximize_link = '';
 		}
 		
 		$classes = '';
-		if ( $node->attributes('required') && $node->attributes('required')!='false' ) {
+		if ( @$attributes['required'] && @$attributes['required']!='false' ) {
 			$classes .= ' required';
 		}
 		if ( $node->attributes('validation_class') ) {
@@ -89,11 +100,11 @@ class JElementFlexicategories extends JElement
 		}
 		
 		$top = false;
-		if ( $node->attributes('top') ) {
-			$top = $node->attributes('top');
+		if ( @$attributes['top'] ) {
+			$top = @$attributes['top'];
 		}
 		
-		$ffname = $node->attributes('name');
+		$ffname = @$attributes['name'];
 		$html = flexicontent_cats::buildcatselect($tree, $fieldname, $values, $top,
 			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
 			' class="inputbox '.$classes.'" '.$attribs,

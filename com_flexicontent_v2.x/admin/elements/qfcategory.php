@@ -18,8 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
 /**
  * Renders an Item element
  *
@@ -38,7 +41,8 @@ class JFormFieldQfcategory extends JFormField
 	*/
 	var	$type = 'Qfcategory';
 
-	function getInput() {
+	function getInput()
+	{
 		$doc 		=& JFactory::getDocument();
 		$value		= $this->__get('value');
 		if (!$value) $value = "";
@@ -60,7 +64,7 @@ class JFormFieldQfcategory extends JFormField
 				$('jform_request_".$node["name"]."').setProperty('value', '');
 			});
 		});
-
+		
 		function qfSelectCategory(cid, title) {
 			document.getElementById('jform_request_".$node["name"]."').value = cid;
 			document.getElementById('a_name').value = title;

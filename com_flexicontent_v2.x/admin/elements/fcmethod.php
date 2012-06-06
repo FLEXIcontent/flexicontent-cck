@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 4 $Id: fcmethod.php 567 2011-04-13 11:06:52Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: fcmethod.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -26,20 +26,78 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('radio');
+if (FLEXI_J16GE) {
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('radio');
+}
 
 class JFormFieldFcmethod extends JFormFieldRadio
 {
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	
+  var $type = 'Fcmethod';
 
-
-	function getOptions()
+	function getInput()
 	{
+		$doc 	=& JFactory::getDocument();
+		
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		$split_char = ",";
+		
+		$value = FLEXI_J16GE ? $this->value : $value;
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		//$disabled_ff = explode($split_char, @$attributes['disabled_ff']);
+		$disabled_ff = @$attributes['disabled_ff'];
+		
+		if ($disabled_ff) {
+			$dff_idtag = FLEXI_J16GE ? 'jform_params_'.$disabled_ff : 'params'.$disabled_ff;
+			$js 	= "
+function filterCategories_".$disabled_ff."(method) {
+	var cats = $('".$dff_idtag."');
+	var options = cats.getElements('option');
+	if (method == 1) {
+		cats.setProperty('disabled', 'disabled');
+		/*options.each(function(el){
+    		el.setProperty('selected', 'selected');
+		});*/
+	} else {
+		cats.setProperty('disabled', '');
+	}
+}
+window.addEvent('domready', function(){
+	filterCategories_".$disabled_ff."('".$value."');			
+});
+		";
+			$doc->addScriptDeclaration($js);
+			
+			$class = 'class="inputbox" onchange="filterCategories_'.$disabled_ff.'(this.value);"';
+		} else {
+			$class = 'class="inputbox"';
+		}
+		
+		// prepare the options 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '1', JText::_('FLEXI_ALL')); 
 		$options[] = JHTML::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
 		$options[] = JHTML::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
-
-		return $options;
+		
+		$html = JHTML::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
+		if (FLEXI_J16GE) {
+			$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
+		}
+		return $html;
 	}
 }

@@ -18,8 +18,14 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
+// Load the category class
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+
 /**
  * Renders a category list
  *
@@ -27,7 +33,6 @@ jimport('joomla.form.formfield');
  * @subpackage FLEXIcontent
  * @since 1.5
  */
-
 class JFormFieldFlexicategories extends JFormField
 {
 	/**
@@ -42,14 +47,20 @@ class JFormFieldFlexicategories extends JFormField
 	{
 		static $function_added = false;
 		$doc 		=& JFactory::getDocument();
-		$node = & $this->element;
-		
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+				
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -71,29 +82,29 @@ class JFormFieldFlexicategories extends JFormField
 		}*/
 		
 		$attribs = 'style="float:left;"';
-		if ( $node->getAttribute('multiple') && $node->getAttribute('multiple')!='false' ) {
+		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .=' multiple="multiple"';
-			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<40) { ${element_id}_oldsize=$element_id.size; $element_id.size=40;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			$maximize_link = '';
 		}
 		
 		$classes = '';
-		if ( $node->getAttribute('required') && $node->getAttribute('required')!='false' ) {
+		if ( @$attributes['required'] && @$attributes['required']!='false' ) {
 			$classes .= ' required';
 		}
-		if ( $node->getAttribute('validation_class') ) {
-			$classes .= ' '.$node->getAttribute('validation_class');
+		if ( $node->attributes('validation_class') ) {
+			$classes .= ' '.$node->attributes('validation_class');
 		}
 		
 		$top = false;
-		if ( $node->getAttribute('top') ) {
-			$top = $node->getAttribute('top');
+		if ( @$attributes['top'] ) {
+			$top = @$attributes['top'];
 		}
 		
-		$ffname = $node->getAttribute('name');
+		$ffname = @$attributes['name'];
 		$html = flexicontent_cats::buildcatselect($tree, $fieldname, $values, $top,
 			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
 			' class="inputbox '.$classes.'" '.$attribs,

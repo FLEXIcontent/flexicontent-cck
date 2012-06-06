@@ -56,6 +56,7 @@ class plgSystemFlexisystem extends JPlugin
 		// ensure the PHP version is correct
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 		
+		$app =& JFactory::getApplication();
 		$option = JRequest::getCMD('option');
 		$view   = JRequest::getVar('view', '');
 		$layout = JRequest::getVar('layout', '');
@@ -83,16 +84,17 @@ class plgSystemFlexisystem extends JPlugin
 				$globalcats = $this->getCategoriesTree();
 			}
 		}
-
-		$this->redirectAdminComContent();
-		$this->redirectSiteComContent();
+		
+		if ( $app->isAdmin() )
+			$this->redirectAdminComContent();
+		else
+			$this->redirectSiteComContent();
 	}
 	
 	function redirectAdminComContent()
 	{
 		$app 				=& JFactory::getApplication();
 		$option 			= JRequest::getCMD('option');
-		$applicationName 	= $app->getName();
 		$user 				=& JFactory::getUser();
 		
 		if (FLEXI_J16GE) {
@@ -130,7 +132,7 @@ class plgSystemFlexisystem extends JPlugin
 		
 		if (!empty($option)) {
 			// if try to access com_content you get redirected to Flexicontent items
-			if ( $option == 'com_content' && $applicationName == 'administrator' ) {
+			if ( $option == 'com_content' ) {
 				
 				// Check if a user group is groups, that are excluded from article redirection
 				if (FLEXI_J16GE) {
@@ -169,7 +171,7 @@ class plgSystemFlexisystem extends JPlugin
 				$app->redirect($urlItems,'');
 				return false;
 
-			} elseif ( $option == 'com_categories' && $applicationName == 'administrator' ) {
+			} elseif ( $option == 'com_categories' ) {
 				
 				// Check if a user group is groups, that are excluded from category redirection
 				if (FLEXI_J16GE) {
@@ -190,7 +192,7 @@ class plgSystemFlexisystem extends JPlugin
 				}
 				return false;
 				
-			} elseif ( !FLEXI_J16GE && $option == 'com_sections' && $applicationName == 'administrator' && $user->gid <= $minsecs) {
+			} elseif ( !FLEXI_J16GE && $option == 'com_sections' && $user->gid <= $minsecs) {
 				
 				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
@@ -218,12 +220,11 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$app 				=& JFactory::getApplication();
 		$option 			= JRequest::getCMD('option');
-		$applicationName 	= $app->getName();
 		$db 				=& JFactory::getDBO();
 		
 		if( !empty($option) ){
 
-			if($option == 'com_content' && $applicationName == 'site') {
+			if($option == 'com_content') {
 
 				$view = JRequest::getCMD('view');
 

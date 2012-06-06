@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: author.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: author.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,8 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 
 /**
  * Renders a author element
@@ -37,7 +39,8 @@ class JFormFieldAuthor extends JFormField
 	 */
 	var	$type = 'Author';
 
-	function getInput() {
+	function getInput()
+	{
 		$db =& JFactory::getDBO();
 
 		$query = 'SELECT DISTINCT u.id AS value, u.name AS text'

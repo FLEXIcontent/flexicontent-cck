@@ -35,11 +35,13 @@ class JElementTag extends JElement
 	* @access	protected
 	* @var		string
 	*/
-	var	$_name = 'Name';
+	var	$_name = 'Tag';
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$doc 		=& JFactory::getDocument();
+		$value = FLEXI_J16GE ? $this->value : $value;
+		
 		$fieldName	= $control_name.'['.$name.']';
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');

@@ -18,7 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 /**
  * Renders the list of the content plugins
  *
@@ -43,11 +46,17 @@ class JElementPluginlist extends JElement
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.'][]';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
+		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
+		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
+		if (!FLEXI_J16GE || !$is_multiple)
+			$fieldname .= '[]';
 		
 		$plugins 	= array();
-//		$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
+		//$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
 
 		$db =& JFactory::getDBO();
 		

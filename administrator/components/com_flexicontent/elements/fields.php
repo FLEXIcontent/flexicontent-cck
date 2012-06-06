@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 
 /**
  * Renders a fields element
@@ -39,20 +43,27 @@ class JElementFields extends JElement
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
-		$and = ((boolean)$node->attributes('isnotcore')) ? ' AND iscore = 0' : '';
-		if ((boolean)$node->attributes('fieldnameastext')) {
+		$and = ((boolean)@$attributes['isnotcore']) ? ' AND iscore = 0' : '';
+		if ((boolean)@$attributes['fieldnameastext']) {
 			$text = 'CONCAT(label, \'(\', `name`, \')\')';
 		} else {
 			$text = 'label';
 		}
-		if ((boolean)$node->attributes('fieldnameasvalue')) {
+		if ((boolean)@$attributes['fieldnameasvalue']) {
 			$ovalue = '`name`';
 		} else {
 			$ovalue = 'id';  // ELSE should always be THIS , otherwise we break compatiblity with all previous FC versions
 		}
 		
-		$isadvsearch = $node->attributes('isadvsearch');
+		$isadvsearch = @$attributes['isadvsearch'];
 		if($isadvsearch) {
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
@@ -84,20 +95,20 @@ class JElementFields extends JElement
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		$attribs = ' style="float:left;" ';
-		if ($node->attributes('multiple') && $node->attributes('multiple')!='false' ) {
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="true" ';
-			$attribs .= ($node->attributes('size')) ? ' size="'.$node->attributes('size').'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
-		if ($onchange = $node->attributes('onchange')) {
+		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 

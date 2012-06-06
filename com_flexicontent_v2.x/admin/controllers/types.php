@@ -74,7 +74,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			switch ($task)
 			{
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->getId();
+					$link = 'index.php?option=com_flexicontent&view=type&cid[]='.(int) $model->get('id');
 					break;
 
 				case 'saveandnew' :

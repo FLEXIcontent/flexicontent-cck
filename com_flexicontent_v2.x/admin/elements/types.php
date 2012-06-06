@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1081 2012-01-02 20:32:09Z ggppdk $
+ * @version 1.5 stable $Id: types.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,8 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
 /**
  * Renders a types element
  *
@@ -40,7 +43,13 @@ class JFormFieldTypes extends JFormField
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
-		$node	= & $this->element;
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
@@ -56,20 +65,20 @@ class JFormFieldTypes extends JFormField
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
-		$attribs = ' style="float:left;" ';
-		if ($node->getAttribute('multiple') && $node->getAttribute('multiple')!='false' ) {
-			$attribs .= 'multiple="true" ';
-			$attribs .= ($node->getAttribute('size')) ? ' size="'.$node->getAttribute('size').'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";
+		$attribs = 'style="float:left;"';
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
-		if ($onchange = $node->getAttribute('onchange')) {
+		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 
