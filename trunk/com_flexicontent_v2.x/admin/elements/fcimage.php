@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fcimage.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: fcimage.php 1143 2012-02-08 06:25:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,8 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
 /**
  * Renders an image element
  *
@@ -27,13 +30,14 @@ jimport('joomla.form.formfield');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- class JFormFieldFcimage extends JFormFieldList{
+ class JFormFieldFcimage extends JFormFieldList
+{
 	/**
 	 * Element name
 	 * @access	protected
 	 * @var		string
 	 */
-	protected $type = 'Fcimage';
+	var $type = 'Fcimage';
 
 	public function getOptions()
 	{
@@ -42,11 +46,17 @@ jimport('joomla.form.formfield');
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
 		$db =& JFactory::getDBO();
-		$node = &$this->element;
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$valcolumn = 'name';
-		if ($node->getAttribute('valcolumn')) {
-			$valcolumn = $node->getAttribute('valcolumn');
+		if (@$attributes['valcolumn']) {
+			$valcolumn = $attributes['valcolumn'];
 		}
 		
 		$query = 'SELECT '.$valcolumn.' AS value, label AS text'

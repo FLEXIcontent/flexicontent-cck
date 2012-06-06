@@ -41,7 +41,7 @@ class JFormFieldTag extends JFormField
 	function getInput()
 	{
 		$doc 		=& JFactory::getDocument();
-		$value		= $this->value;
+		$value = FLEXI_J16GE ? $this->value : $value;
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item =& JTable::getInstance('flexicontent_tags', '');

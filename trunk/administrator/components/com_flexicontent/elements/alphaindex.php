@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 
 /**
  * Renders an alphaindex element
@@ -26,40 +30,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementTypes extends JElement
-{
-	/**
-	 * Element name
-	 * @access	protected
-	 * @var		string
-	 */
-	var	$_name = 'Types';
 
-	function fetchElement($name, $value, &$node, $control_name)
-	{
-		$db =& JFactory::getDBO();
-		
-		$query = 'SELECT id AS value, name AS text'
-		. ' FROM #__flexicontent_types'
-		. ' WHERE published = 1'
-		. ' ORDER BY name ASC, id ASC'
-		;
-		
-		$db->setQuery($query);
-		$types = $db->loadObjectList();
-
-		$attribs = "";
-		if ($node->attributes('multiple')) {
-			$attribs .= 'multiple="true" size="10"';
-			$fieldname = $control_name.'['.$name.'][]';
-		} else {
-			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
-			$attribs .= 'class="inputbox"';
-			$fieldname = $control_name.'['.$name.']';
-		}
-		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
-	}
-}
 /**
  * Renders an alphaindex element
  *
@@ -81,12 +52,24 @@ class JElementAlphaindex extends JElement
 	{
 		$doc 		=& JFactory::getDocument();
 		$db =& JFactory::getDBO();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$options = array();
 		$options[0] = new stdClass();  $options[1] = new stdClass();  $options[2] = new stdClass();
 		$options[0]->text=JTEXT::_("FLEXI_HIDE"); $options[0]->value=0;
 		$options[1]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[1]->value=1;
 		$options[2]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[2]->value=2;
+		
+		$values  = FLEXI_J16GE ? $this->value : $value;
+		
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		$attribs = ' class="inputbox" onchange="updatealphafields(this.value);" ';
 		
@@ -113,9 +96,7 @@ class JElementAlphaindex extends JElement
 
 		$doc->addScriptDeclaration($js);
 		
-		$fieldname = $control_name.'['.$name.']';
-		
-		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $control_name.$name);
+		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }
 ?>

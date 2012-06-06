@@ -222,7 +222,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$separatorf			= $field->parameters->get( 'separatorf' ) ;
 		$opentag				= $field->parameters->get( 'opentag', '' ) ;
 		$closetag				= $field->parameters->get( 'closetag', '' ) ;
-		$default_value_title =	$field->parameters->get( 'default_value_title', '' ) ;
+		$default_value_title =	JText::_( $field->parameters->get( 'default_value_title', '' ) );
 						
 		switch($separatorf)
 		{

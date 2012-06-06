@@ -202,9 +202,24 @@ class FlexicontentHelperRoute
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		
+		// Get access level of the FLEXIcontent item
+		$db =& JFactory::getDBO();
+		$db->setQuery('SELECT access FROM #__content WHERE id='.$needles[FLEXI_ITEMVIEW]);
+		$item_acclevel = $db->loadResult();
 		
 		foreach($component_menuitems as $menuitem)
-		{								
+		{
+			// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
+			if (!FLEXI_J16GE) {
+				// In J1.5 we need menu access level lower than item access level
+				if ($menuitem->access > $item_acclevel) continue;
+			} else {
+				// In J2.5 we need menu access level public or the access level of the item
+				if ($menuitem->access!=$public_acclevel && $menuitem->access==$item_acclevel) continue;
+			}
+			
 			if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW])) {
 				if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['cid'] == $needles['category'])) {
 					$matches[1] = $menuitem; // priority 1: item id+cid
@@ -234,11 +249,28 @@ class FlexicontentHelperRoute
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
 		// multiple needles, because maybe searching for multiple categories,
 		// also earlier needles (catids) takes priority over later ones
 		foreach($needles as $needle => $cid)  {
+
+			// Get access level of the FLEXIcontent category
+			$db =& JFactory::getDBO();
+			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
+			$cat_acclevel = $db->loadResult();
+
 			foreach($component_menuitems as $menuitem) {
+
+				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
+				if (!FLEXI_J16GE) {
+					// In J1.5 we need menu access level lower than category access level
+					if ($menuitem->access > $cat_acclevel) continue;
+				} else {
+					// In J2.5 we need menu access level public or the access level of the category
+					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
+				}
+
 				if ( (@$menuitem->query['view'] == $needle) && (@$menuitem->query['cid'] == $cid) ) {
 					$match = $menuitem;
 					break;
@@ -254,12 +286,29 @@ class FlexicontentHelperRoute
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
-
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$user = &JFactory::getUser();
+		if (FLEXI_J16GE)
+			$aid_arr = $user->getAuthorisedViewLevels();
+		else
+			$aid = (int) $user->get('aid');
+		
 		// multiple needles, because maybe searching for multiple tag ids,
 		// also earlier needles (tag ids) takes priority over later ones
 		foreach($needles as $needle => $id)
 		{
 			foreach($component_menuitems as $menuitem) {
+
+				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
+				// Since tags do not have access level we will get a menu item accessible by the access levels of the current user
+				if (!FLEXI_J16GE) {
+					// In J1.5 we need menu access level lower or equal to that of the user
+					if ($menuitem->access > $aid) continue;
+				} else {
+					// In J2.5 we need a menu access level granted to the current user
+					if (!in_array($menuitem->access,$aid_arr)) continue;
+				}
+
 				if ( (@$menuitem->query['view'] == $needle) && (@$menuitem->query['id'] == $id) ) {
 					$match = $menuitem;
 					break;

@@ -276,6 +276,7 @@ class FlexicontentModelType extends JModel
 			}
 		}
 		$this->_type	=& $type;
+		$this->_id	= $type->id;
 
 		return true;
 	}

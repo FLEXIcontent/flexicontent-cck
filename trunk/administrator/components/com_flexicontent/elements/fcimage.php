@@ -18,6 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
 
 /**
  * Renders an image element
@@ -42,10 +46,17 @@ class JElementFcimage extends JElement
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
 		$db =& JFactory::getDBO();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$valcolumn = 'name';
-		if ($node->attributes('valcolumn')) {
-			$valcolumn = $node->attributes('valcolumn');
+		if (@$attributes['valcolumn']) {
+			$valcolumn = $attributes['valcolumn'];
 		}
 		
 		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
@@ -62,9 +73,7 @@ class JElementFcimage extends JElement
 			$images[] = JHTMLSelect::option($field->value, $field->text); 
 		}
 
-		$class = '';
-		
-		return JHTMLSelect::genericList($images, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
+		return JHTMLSelect::genericList($images, $control_name.'['.$name.']', $class='', 'value', 'text', $value, $control_name.$name);
 	}
 }
 ?>

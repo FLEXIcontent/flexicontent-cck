@@ -26,6 +26,11 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
+if (FLEXI_J16GE) {
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('list');
+}
+
 class JElementFcordering extends JElement
 {
 	/**
@@ -35,7 +40,7 @@ class JElementFcordering extends JElement
 	 */
 	
 	var	$_name = 'Fcordering';
-
+	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$class = 'class="inputbox" multiple="true" size="9"';
@@ -51,8 +56,6 @@ class JElementFcordering extends JElement
 		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_CAT_ORDER' ) );
 		$ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_RANDOM' ) );
 
-		$list = JHTML::_('select.genericlist', $ordering, $control_name.'['.$name.'][]', $class, 'value', 'text', $value );
-
-		return $list;
+		return JHTML::_('select.genericlist', $ordering, $control_name.'['.$name.'][]', $class, 'value', 'text', $value );
 	}
 }

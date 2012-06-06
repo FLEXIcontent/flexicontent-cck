@@ -26,13 +26,24 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+if (FLEXI_J16GE) {
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('list');
+}
 
 class JFormFieldFcordering extends JFormFieldList
 {
+	/**
+	 * Element name
+	 * @access	protected
+	 * @var		string
+	 */
+	
+	var	$type = 'Fcordering';
+	
 	function getOptions()
 	{
+
 		$ordering[] = JHTML::_('select.option',  'popular', 	JText::_( 'FLEXI_MOST_POPULAR' ) );
 		$ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_MOST_COMMENTED' ) );
 		$ordering[] = JHTML::_('select.option',  'rated',			JText::_( 'FLEXI_BEST_RATED' ) ); 

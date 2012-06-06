@@ -19,11 +19,15 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-require_once JPATH_LIBRARIES.DS.'joomla'.DS.'html'.DS.'pane.php';
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+}
+
 /**
  * Renders a multi element checkbox (array of checkboxes)
  */
-class JElementFCcheckbox extends JElement
+class JElementFccheckbox extends JElement
 {
 
  /**
@@ -32,11 +36,17 @@ class JElementFCcheckbox extends JElement
 	* @access	protected
 	* @var		string
 	*/
-	var $_name = 'FCcheckbox';
+	var $_name = 'Fccheckbox';
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		if (FLEXI_J16GE)  $node = & $this->element;
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
@@ -44,13 +54,13 @@ class JElementFCcheckbox extends JElement
 		$split_char = ",";
 		
 		// Get options and values
-		$checkoptions = explode($split_char, $node->attributes('checkoptions'));
-		$checkvals = explode($split_char, $node->attributes('checkvals'));
-		$defaultvals = explode($split_char, $node->attributes('defaultvals'));
+		$checkoptions = explode($split_char, $attributes['checkoptions']);
+		$checkvals = explode($split_char, $attributes['checkvals']);
+		$defaultvals = explode($split_char, @$attributes['defaultvals']);
 		
 		// Verify defaultvals option
 		if ( empty($defaultvals[0]) ) $defaultvals = array();
-		if ( count($defaultvals) && $node->attributes('display_useglobal') ) {
+		if ( count($defaultvals) && @$attributes['display_useglobal'] ) {
 			$defaultvals = array();
 			echo "Cannot use field option 'defaultvals' together with 'display_useglobal' 'defaultvals' cleared";
 		}
@@ -62,14 +72,19 @@ class JElementFCcheckbox extends JElement
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
 		
-		// Create checkboxes
-		$fieldname	= FLEXI_J16GE ? $this->name.'[]' : $control_name.'['.$name.'][]';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.'_'.$name;
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
+		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
+		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
+		if (!FLEXI_J16GE || !$is_multiple)
+			$fieldname .= '[]';
 		
 		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px">';
 		
 		$disable_all = '';
-		if ( $node->attributes('display_useglobal') ) {
+		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';
 			if (count($values) == 0) {
 				$check_global = ' checked="checked" ';
@@ -79,12 +94,14 @@ class JElementFCcheckbox extends JElement
 			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label>';
 		}
 
+		// Create checkboxes
 		foreach($checkoptions as $i => $o) {
 			$curr_element_id = $element_id.$i;
 			$html .= '<input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
 			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
 			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
-			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label> &nbsp; ';
+			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>';
+			$html .= FLEXI_J16GE ? ' &nbsp; ' : '';
 		}
 
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';

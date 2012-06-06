@@ -497,6 +497,7 @@ class FlexicontentModelField extends JModelAdmin
 */
 
 		$this->_field	=& $field;
+		$this->_id = $field->id;
 		
 		// append all types to the type array if the field belongs to core
 		if ($field->iscore == 1)
