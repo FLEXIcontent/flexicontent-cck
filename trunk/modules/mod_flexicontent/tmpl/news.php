@@ -193,7 +193,7 @@ $force_height='';//"height='$mod_height'";
 					<?php if ($mod_readmore_feat) : ?>
 					<span class="fc_block">
 						<span class="news_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</span>
 					</span>
 					<?php endif; ?>
