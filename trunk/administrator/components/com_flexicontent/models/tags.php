@@ -66,8 +66,8 @@ class FlexicontentModelTags extends JModel
 	function __construct()
 	{
 		parent::__construct();
-
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
@@ -186,8 +186,9 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildContentOrderBy()
 	{
-		global $mainframe, $option;
-
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 
@@ -205,8 +206,9 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildContentWhere()
 	{
-		global $mainframe, $option;
-
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_state', 'filter_state', '', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
@@ -239,7 +241,8 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildContentHaving()
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_assigned', 'filter_assigned', '', 'word' );
 		

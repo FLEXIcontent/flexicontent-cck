@@ -168,11 +168,12 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function checkin()
 	{
-		if ($this->_id) {
+		if ($this->_id)
+		{
 			$category = $this->getTable();
 			return $category->checkin($this->_id);
 		}
-		return true;
+		return false;
 	}
 
 	/**

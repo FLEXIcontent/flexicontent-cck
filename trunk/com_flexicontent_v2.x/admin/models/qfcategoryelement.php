@@ -155,7 +155,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 		$children = array();
 		
 		//set depth limit
-   		$levellimit = 10;
+		$levellimit = 10;
 		
 		foreach ($rows as $child) {
 			$parent = $child->parent_id;
@@ -168,7 +168,8 @@ class FlexicontentModelQfcategoryelement extends JModel
     	$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID=1, '', array(), $children, false, max(0, $levellimit-1));
 
     	//eventually only pick out the searched items.
-		if ($search) {
+		if ($search)
+		{
 			$list1 = array();
 
 			foreach ($search_rows as $sid )

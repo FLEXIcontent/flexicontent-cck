@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: tags.php 1341 2011-08-11 04:03:52Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -106,6 +106,9 @@ class FlexicontentModelTags extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 		}
 
 		return $this->_data;
@@ -161,7 +164,7 @@ class FlexicontentModelTags extends JModel
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
-		$query = 'SELECT t.*, u.name AS editor, COUNT(rel.tid) AS nrassigned'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.tid) AS nrassigned'
 					. ' FROM #__flexicontent_tags AS t'
 					. ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid = t.id'
 					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
@@ -185,6 +188,7 @@ class FlexicontentModelTags extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 
@@ -204,6 +208,7 @@ class FlexicontentModelTags extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_state', 'filter_state', '', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
@@ -234,7 +239,8 @@ class FlexicontentModelTags extends JModel
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentHaving() {
+	function _buildContentHaving()
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		

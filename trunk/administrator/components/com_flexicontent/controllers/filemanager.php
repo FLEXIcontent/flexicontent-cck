@@ -75,9 +75,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			//sanitize filename further and make unique
 			$params = null;
-			if (!flexicontent_upload::check( $file, $err, $params )) {
-				$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-				$filepath 	= JPath::clean($path.strtolower($filename));
+			$upload_check = flexicontent_upload::check( $file, $err, $params );
+			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
+			$filepath 	= JPath::clean($path.strtolower($filename));
+			
+			if (!$upload_check) {
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance('com_flexicontent.error.php');
@@ -93,11 +95,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					return;
 				}
 			}
-			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-			$filepath 	= JPath::clean($path.strtolower($filename));
 			
 			//get the extension to record it in the DB
-			$ext		= strtolower(flexicontent_upload::getExt($filename));
+			$ext = strtolower(flexicontent_upload::getExt($filename));
 
 			if (!JFile::upload($file['tmp_name'], $filepath)) {
 				if ($format == 'json') {
@@ -490,7 +490,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$user		= & JFactory::getUser();
 		$model	= & $this->getModel('file');
 		$task		= JRequest::getVar('task');
-		$post = JRequest::get( 'post' );
+		$post		= JRequest::get( 'post' );
 		
 		if ($model->store($post)) {
 

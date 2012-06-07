@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fileselement.php 798 2011-08-11 04:03:52Z ggppdk $
+ * @version 1.5 stable $Id: fileselement.php 1021 2011-12-05 15:25:39Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -115,6 +115,9 @@ class FlexicontentModelFileselement extends JModel
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 
@@ -183,7 +186,7 @@ class FlexicontentModelFileselement extends JModel
 			$files 		= array_unique($files);
 			$session->set('fileselement.'.$filter_item, $files);
 			$files = "'".implode("','", $files)."'";
-			$query = 'SELECT f.*, u.name AS uploader'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
 			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where
@@ -192,8 +195,8 @@ class FlexicontentModelFileselement extends JModel
 			//. $having
 			. $orderby
 			;
-		}else{
-			$query = 'SELECT f.*, u.name AS uploader'
+		} else {
+			$query = 'SELECT SQL_CALC_FOUND_ROWS f.*, u.name AS uploader'
 			. ' FROM #__flexicontent_files AS f'
 			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $where
@@ -294,7 +297,6 @@ class FlexicontentModelFileselement extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$permission = FlexicontentHelperPerm::getPerm();
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
 		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', 1, 'int' );
@@ -307,7 +309,14 @@ class FlexicontentModelFileselement extends JModel
 
 		$where = array();
 		
-		$CanViewAllFiles = $permission->CanViewAllFiles;
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+		} else if (FLEXI_ACCESS) {
+			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+		} else {
+			$CanViewAllFiles	= 1;
+		}
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;
@@ -354,6 +363,7 @@ class FlexicontentModelFileselement extends JModel
 		// FC items list sub query
 		$query	= 'SELECT i.id, i.title'
 				. ' FROM #__content AS i '
+				. (!FLEXI_J16GE ? ' WHERE i.sectionid = ' . FLEXI_SECTION : '')
 				. ' ORDER BY i.title ASC'
 				;
 		$this->_db->setQuery( $query );

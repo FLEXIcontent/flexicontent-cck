@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: filemanager.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: filemanager.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -85,12 +85,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 
 			//sanitize filename further and make unique
+			$params = null;
+			$upload_check = flexicontent_upload::check( $file, $err, $params );
 			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
 			$filepath 	= JPath::clean($path.strtolower($filename));
-			$params = null;
-			if (!flexicontent_upload::check( $file, $err, $params )) {
-				$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-				$filepath 	= JPath::clean($path.strtolower($filename));
+			
+			if (!$upload_check) {
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance('com_flexicontent.error.php');
@@ -106,11 +106,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					return;
 				}
 			}
-			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-			$filepath 	= JPath::clean($path.strtolower($filename));
 			
 			//get the extension to record it in the DB
-			$ext		= strtolower(flexicontent_upload::getExt($filename));
+			$ext = strtolower(flexicontent_upload::getExt($filename));
 
 			if (!JFile::upload($file['tmp_name'], $filepath)) {
 				if ($format == 'json') {
@@ -528,9 +526,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$user		= & JFactory::getUser();
 		$model	= & $this->getModel('file');
-		$file		= & $model->getFile();
 		$task		= JRequest::getVar('task');
-		$post = JRequest::get( 'post' );
+		$post		= JRequest::get( 'post' );
+		$file		= & $model->getFile();
 		
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');

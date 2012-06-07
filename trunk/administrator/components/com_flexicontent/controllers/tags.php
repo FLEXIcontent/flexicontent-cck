@@ -229,32 +229,6 @@ class FlexicontentControllerTags extends FlexicontentController
 	}
 
 	/**
-	 *  Add new Tag from item screen
-	 *
-	 */
-	function addtag()
-	{
-		// Check for request forgeries
-		// JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
-		$name 	= JRequest::getString('name', '');
-		$model 	= $this->getModel('tag');
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$cid = (int)$array[0];
-		$model->setId($cid);
-		if($cid==0) {
-			$result = $model->addtag($name);
-			if($result)
-				echo $model->_tag->id."|".$model->_tag->name;
-			//else echo "|";
-		} else {
-			$id = $model->get('id');
-			$name = $model->get('name');
-			echo $id."|".$name;
-		}
-	}
-
-	/**
 	 * Logic to import a tag list
 	 *
 	 * @access public
@@ -282,4 +256,36 @@ class FlexicontentControllerTags extends FlexicontentController
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TAG_TO_IMPORT' ).'</div>';
 		}
 	}
+
+
+	//*************************
+	// RAW output functions ...
+	//*************************
+	
+	/**
+	 *  Add new Tag from item screen
+	 *
+	 */
+	function addtag()
+	{
+		// Check for request forgeries
+		// JRequest::checkToken('request') or jexit( 'Invalid Token' );
+
+		$name 	= JRequest::getString('name', '');
+		$model 	= $this->getModel('tag');
+		$array = JRequest::getVar('cid',  0, '', 'array');
+		$cid = (int)$array[0];
+		$model->setId($cid);
+		if($cid==0) {
+			$result = $model->addtag($name);
+			if($result)
+				echo $model->_tag->id."|".$model->_tag->name;
+			//else echo "|";
+		} else {
+			$id = $model->get('id');
+			$name = $model->get('name');
+			echo $id."|".$name;
+		}
+	}
+
 }

@@ -31,6 +31,13 @@ jimport('joomla.application.component.model');
 class FlexicontentModelType extends JModel
 {
 	/**
+	 * Type primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+	
+	/**
 	 * Type data
 	 *
 	 * @var object
@@ -46,8 +53,15 @@ class FlexicontentModelType extends JModel
 	{
 		parent::__construct();
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		$array = JRequest::getVar('cid',  array(0), '', 'array');
+		$array = is_array($array) ? $array : array($array);
+		$id = $array[0];
+		if(!$id) {
+			$post = JRequest::get( 'post' );
+			$data = FLEXI_J16GE ? @$post['jform'] : $post;
+			$id = @$data['id'];
+		}
+		$this->setId((int)$id);
 	}
 
 	/**
@@ -59,10 +73,16 @@ class FlexicontentModelType extends JModel
 	function setId($id)
 	{
 		// Set type id and wipe data
-		$this->_id	    = $id;
-		$this->_type	= null;
+		$this->_id     = $id;
+		$this->_type   = null;
 	}
 	
+
+	/**
+	 * Method to get the type identifier
+	 *
+	 * @access	public
+	 */
 	function getId() {
 		return $this->_id;
 	}
@@ -78,7 +98,8 @@ class FlexicontentModelType extends JModel
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_loadType()) {
+		if ($this->_loadType())
+		{
 			if(isset($this->_type->$property)) {
 				return $this->_type->$property;
 			}
@@ -95,10 +116,12 @@ class FlexicontentModelType extends JModel
 	 */
 	function &getType()
 	{
-		if ($this->_loadType())
-		{
+		if ($this->_loadType()) {
+			// extra steps after loading
+			// ...
+		} else {
+			$this->_initType();
 		}
-		else  $this->_initType();
 		
 		return $this->_type;
 	}
@@ -114,7 +137,7 @@ class FlexicontentModelType extends JModel
 	function _loadType()
 	{
 		// Lets load the type if it doesn't already exist
-		if (empty($this->_type))
+		if ( $this->_type===null )
 		{
 			$query = 'SELECT *'
 					. ' FROM #__flexicontent_types'
@@ -138,15 +161,15 @@ class FlexicontentModelType extends JModel
 	function _initType()
 	{
 		// Lets load the type if it doesn't already exist
-		if (empty($this->_type))
+		if ( $this->_type===null )
 		{
 			$type = new stdClass();
 			$type->id					= 0;
-			$type->name					= null;
-			$type->alias				= null;
-			$type->published			= 1;
-			$type->attribs				= null;
-			$this->_type				= $type;
+			$type->name				= null;
+			$type->alias			= null;
+			$type->published	= 1;
+			$type->attribs		= null;
+			$this->_type			= $type;
 			return (boolean) $this->_type;
 		}
 		return true;
@@ -228,20 +251,26 @@ class FlexicontentModelType extends JModel
 	 */
 	function store($data)
 	{
-		$type  =& $this->getTable('flexicontent_types', '');
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
 
+		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
+		$type  =& $this->getTable('flexicontent_types', '');
+		
 		// bind it to the table
 		if (!$type->bind($data)) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
+		
+		// Get field attibutes, for J1.5 is params for J2.5 is attribs
+		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
 
-		$params		= JRequest::getVar( 'params', null, 'post', 'array' );
-		// Build parameter INI string
-		if (is_array($params))
+		// Build attibutes INI string
+		if (is_array($attibutes))
 		{
 			$txt = array ();
-			foreach ($params as $k => $v) {
+			foreach ($attibutes as $k => $v) {
 				if (is_array($v)) {
 					$v = implode('|', $v);
 				}
@@ -261,25 +290,40 @@ class FlexicontentModelType extends JModel
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-		$insertid = (int)$this->_db->insertid();
 		
-		// only insert default relations if the type is new
-		if ($insertid) {
-			$this->setId($insertid);
-			$core = $this->_getCoreFields();
-			foreach ($core as $fieldid) {
-				$obj = new stdClass();
-				$obj->field_id	 	= (int)$fieldid;
-				$obj->type_id		= $type->id;
-
-				$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
-			}
-		}
-		$this->_type	=& $type;
-		$this->_id	= $type->id;
-
+		$this->_type = & $type;
+		$this->_id   = $type->id;
+		
+		// Only insert default relations if the type is new
+		if ( $insertid = (int)$this->_db->insertid() )
+			$this->_addCoreFieldRelations();
+		
 		return true;
 	}
+	
+	/**
+	 * Method to add core field relation to a type
+	 *
+	 * @access	private
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function _addCoreFieldRelations()
+	{
+		$type = & $this->_type;
+		
+		// Get core fields
+		$core = $this->_getCoreFields();
+		
+		// Insert core field relations to the DB
+		foreach ($core as $fieldid) {
+			$obj = new stdClass();
+			$obj->field_id  = (int)$fieldid;
+			$obj->type_id   = $type->id;
+			$this->_db->insertObject('#__flexicontent_fields_type_relations', $obj);
+		}
+	}
+
 	
 	function addtype($name) {
 		
@@ -288,9 +332,6 @@ class FlexicontentModelType extends JModel
 		$obj->published	= 1;
 		
 		$this->store($obj);
-
-	//	$this->_db->insertObject('#__flexicontent_types', $obj);
-		
 		return true;
 	}
 

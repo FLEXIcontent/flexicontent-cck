@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: itemcompare.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: itemcompare.php 1341 2010-03-20 00:44:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -176,7 +176,8 @@ class FlexicontentModelItemcompare extends JModel
 			$item->alias				= null;
 			$item->title_alias			= null;
 			$item->text					= null;
-			//$item->sectionid			= FLEXI_SECTION;
+			if (!FLEXI_J16GE)
+				$item->sectionid	= FLEXI_SECTION;
 			$item->catid				= null;
 			$item->score				= 0;
 			$item->votecount			= 0;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: filemanager.php 798 2011-08-11 04:03:52Z ggppdk $
+ * @version 1.5 stable $Id: filemanager.php 1277 2012-05-09 21:59:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

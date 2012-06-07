@@ -28,7 +28,8 @@ jimport('joomla.application.component.modellist');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelArchive extends JModelList{
+class FlexicontentModelArchive extends JModelList
+{
 	/**
 	 * Items data
 	 *
@@ -113,6 +114,9 @@ class FlexicontentModelArchive extends JModelList{
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$db =& JFactory::getDBO();
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $db->loadResult();
 			
 			$k = 0;
 			$count = count($this->_data);
@@ -177,7 +181,7 @@ class FlexicontentModelArchive extends JModelList{
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 
-		$query = 'SELECT DISTINCT rel.itemid, i.*, u.name AS editor'
+		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, u.name AS editor'
 					. ' FROM #__content AS i'
 					. ' LEFT JOIN #__categories AS c ON i.catid=c.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -331,7 +335,8 @@ class FlexicontentModelArchive extends JModelList{
 	 * @return	object
 	 * @since	1.0
 	 */
-	function getCategories($id) {
+	function getCategories($id)
+	{
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'

@@ -41,66 +41,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Register Extra task
 		$this->registerTask( 'add'  ,     'edit' );
 		$this->registerTask( 'apply',     'save' );
-		$this->registerTask( 'duplicate', 'duplicate' );
-		$this->registerTask( 'remove',    'remove' );
 	}
-		
-	/**
-	 * Logic to duplicate a template
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function duplicate()
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$source 		= JRequest::getCmd('source');
-		$dest 			= JRequest::getCmd('dest');
-		
-		$model = $this->getModel('templates');
-		
-		if (!$model->duplicate($source, $dest)) {
-			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_CLONE', $source );
-			return;
-		} else {
-			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
-			$tmplcache->clean();
-			echo '<span class="copyok" style="margin-top:15px; display:block">'.JText::sprintf( 'FLEXI_TEMPLATE_CLONED', $source, $dest ).'</span>';
-		}
-	}
-	
-	/**
-	 * Logic to remove a template
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function remove()
-	{
-		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-		$dir = JRequest::getCmd('dir');
-
-		$model = $this->getModel('templates');
-		
-		if (!$model->delete($dir)) {
-			echo '<td colspan="5" align="center">';
-			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_DELETE', $dir );
-			echo '</td>';
-			return;
-		} else {
-			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
-			$tmplcache->clean();
-
-			echo '<td colspan="5" align="center">';
-			echo '<span class="copyok">'.JText::sprintf( 'FLEXI_TEMPLATE_DELETED', $dir ).'</span>';
-			echo '</td>';
-		}
-	}
 
 	/**
 	 * Logic to save a template
@@ -157,6 +99,68 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=templates' );
+	}
+
+
+	//*************************
+	// RAW output functions ...
+	//*************************
+
+	/**
+	 * Logic to duplicate a template
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function duplicate()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+
+		$source 		= JRequest::getCmd('source');
+		$dest 			= JRequest::getCmd('dest');
+		
+		$model = $this->getModel('templates');
+		
+		if (!$model->duplicate($source, $dest)) {
+			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_CLONE', $source );
+			return;
+		} else {
+			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache->clean();
+			echo '<span class="copyok" style="margin-top:15px; display:block">'.JText::sprintf( 'FLEXI_TEMPLATE_CLONED', $source, $dest ).'</span>';
+		}
+	}
+	
+	/**
+	 * Logic to remove a template
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function remove()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		$dir = JRequest::getCmd('dir');
+
+		$model = $this->getModel('templates');
+		
+		if (!$model->delete($dir)) {
+			echo '<td colspan="5" align="center">';
+			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_DELETE', $dir );
+			echo '</td>';
+			return;
+		} else {
+			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache->clean();
+
+			echo '<td colspan="5" align="center">';
+			echo '<span class="copyok">'.JText::sprintf( 'FLEXI_TEMPLATE_DELETED', $dir ).'</span>';
+			echo '</td>';
+		}
 	}
 
 }

@@ -68,9 +68,10 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$post = JRequest::get( 'post' );
 
 		$model = $this->getModel('type');
-
-		if ( $model->store($post) ) {
-
+		
+		$data = FLEXI_J16GE ? $post['jform'] : $post;
+		if ( $model->store($data) )
+		{
 			switch ($task)
 			{
 				case 'apply' :

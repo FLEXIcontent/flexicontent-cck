@@ -31,6 +31,13 @@ jimport('joomla.application.component.model');
 class FlexicontentModelField extends JModel
 {
 	/**
+	 * Field primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+	
+	/**
 	 * Field data
 	 *
 	 * @var object
@@ -46,8 +53,15 @@ class FlexicontentModelField extends JModel
 	{
 		parent::__construct();
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
+		$array = JRequest::getVar('cid',  array(0), '', 'array');
+		$array = is_array($array) ? $array : array($array);
+		$id = $array[0];
+		if(!$id) {
+			$post = JRequest::get( 'post' );
+			$data = FLEXI_J16GE ? @$post['jform'] : $post;
+			$id = @$data['id'];
+		}
+		$this->setId((int)$id);
 	}
 
 	/**
@@ -59,8 +73,18 @@ class FlexicontentModelField extends JModel
 	function setId($id)
 	{
 		// Set field id and wipe data
-		$this->_id	    = $id;
-		$this->_field	= null;
+		$this->_id     = $id;
+		$this->_field  = null;
+	}
+	
+
+	/**
+	 * Method to get the field identifier
+	 *
+	 * @access	public
+	 */
+	function getId() {
+		return $this->_id;
 	}
 	
 	/**
@@ -74,7 +98,8 @@ class FlexicontentModelField extends JModel
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_loadField()) {
+		if ($this->_loadField())
+		{
 			if(isset($this->_field->$property)) {
 				return $this->_field->$property;
 			}
@@ -91,14 +116,13 @@ class FlexicontentModelField extends JModel
 	 */
 	function &getField()
 	{
-		if ($this->_loadField())
-		{
-		
-		$this->_field->positions = explode("\n", $this->_field->positions);
-
+		if ($this->_loadField()) {
+			// extra steps after loading
+			$this->_field->positions = explode("\n", $this->_field->positions);
+		} else {
+			$this->_initField();
 		}
-		else  $this->_initField();
-
+		
 		return $this->_field;
 	}
 
@@ -113,7 +137,7 @@ class FlexicontentModelField extends JModel
 	function _loadField()
 	{
 		// Lets load the field if it doesn't already exist
-		if (empty($this->_field))
+		if ( $this->_field===null )
 		{
 			$query = 'SELECT *'
 					. ' FROM #__flexicontent_fields'
@@ -155,23 +179,23 @@ class FlexicontentModelField extends JModel
 	function _initField()
 	{
 		// Lets load the field if it doesn't already exist
-		if (empty($this->_field))
+		if ( $this->_field===null )
 		{
 			$field = new stdClass();
 			$field->id						= 0;
-			$field->field_type				= null;
+			$field->field_type		= null;
 			$field->name					= 'field' . ($this->_getLastId() + 1);
 			$field->label					= null;
-			$field->description				= '';
-			$field->isfilter				= 0;
-			$field->iscore					= 0;
-			$field->issearch				= 1;
-			$field->isadvsearch				= 0;
-			$field->untranslatable		= 0;
-			$field->positions				= array();
-			$field->published				= 1;
-			$field->attribs					= null;
-			$field->access					= 0;
+			$field->description		= '';
+			$field->isfilter			= 0;
+			$field->iscore				= 0;
+			$field->issearch			= 1;
+			$field->isadvsearch		= 0;
+			$field->untranslatable= 0;
+			$field->positions			= array();
+			$field->published			= 1;
+			$field->attribs				= null;
+			$field->access				= 0;
 			$this->_field					= $field;
 			return (boolean) $this->_field;
 		}
@@ -190,7 +214,8 @@ class FlexicontentModelField extends JModel
 		if ($this->_id)
 		{
 			$field = & JTable::getInstance('flexicontent_fields', '');
-			return $field->checkout($uid, $this->_id);
+			$user = &JFactory::getUser();
+			return $field->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -256,9 +281,9 @@ class FlexicontentModelField extends JModel
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
+		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$field  	=& $this->getTable('flexicontent_fields', '');
-		$types		= JRequest::getVar('tid', array(), 'post', 'array');
-		$standard	= JRequest::getVar('standard', array(), 'post', 'array');
+		$types		= $data['tid'];
 		
 		// bind it to the table
 		if (!$field->bind($data)) {
@@ -266,13 +291,14 @@ class FlexicontentModelField extends JModel
 			return false;
 		}
 		
-		$params		= JRequest::getVar( 'params', null, 'post', 'array' );
+		// Get field attibutes, for J1.5 is params for J2.5 is attribs
+		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
 
-		// Build parameter INI string
-		if (is_array($params))
+		// Build attibutes INI string
+		if (is_array($attibutes))
 		{
 			$txt = array ();
-			foreach ($params as $k => $v) {
+			foreach ($attibutes as $k => $v) {
 				if (is_array($v)) {
 					$v = implode('|', $v);
 				}
@@ -291,7 +317,7 @@ class FlexicontentModelField extends JModel
 			$this->setError($field->getError() );
 			return false;
 		}
-		
+
 		// Store it in the db
 		if (!$field->store()) {
 			$this->setError( $this->_db->getErrorMsg() );
@@ -300,29 +326,31 @@ class FlexicontentModelField extends JModel
 		
 		if (FLEXI_ACCESS) {
 			FAccess::saveaccess( $field, 'field' );
+		} else if (FLEXI_J16GE) {
+			// saving asset in J2.5 is handled by the fields table class
 		}
-
-		// Add the id to the name if it's a new field only
-		// I know it's a little tricky but it functions
-/*
-		if ($field->id == $this->_db->insertid())
-		{
-			$name = str_replace('_0', '_'.$field->id, $field->name);
-			$query 	= 'UPDATE #__flexicontent_fields'
-					. ' SET name=' . $this->_db->Quote($name)
-					. ' WHERE id = ' . (int) $field->id
-					;
-			$this->_db->setQuery($query);
-			if (!$this->_db->query()) {
-				return JError::raiseWarning( 500, $this->_db->getError() );
-			}
-		}		
-*/
-
-		$this->_field	=& $field;
-		$this->_id	= $field->id;
 		
-		// append all types to the type array if the field belongs to core
+		$this->_field = & $field;
+		$this->_id    = $field->id;
+		
+		// Assign (a) chosen types to custom field or (b) all types if field is core
+		$this->_assignTypesToField($types);
+		
+		return true;
+	}
+
+	/**
+	 * Method to assign types to a field
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function _assignTypesToField($types)
+	{
+		$field = & $this->_field;
+		
+		// Override 'types' for core fields, since the core field must be assigned to all types
 		if ($field->iscore == 1)
 		{
 			$query 	= 'SELECT id'
@@ -368,17 +396,15 @@ class FlexicontentModelField extends JModel
 				$this->_db->query();
 			}
 		}
-		
-		return true;
 	}
-	
+
 	/**
 	 * Method to get types list when performing an edit action
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ()
+	function getTypeslist()
 	{
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'

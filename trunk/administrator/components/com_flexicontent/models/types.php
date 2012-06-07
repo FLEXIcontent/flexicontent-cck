@@ -75,35 +75,6 @@ class FlexicontentModelTypes extends JModel
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$this->setId((int)$array[0]);
-
-	}
-
-	/**
-	 * Method to set the Type identifier
-	 *
-	 * @access	public
-	 * @param	int Type identifier
-	 */
-	function setId($id)
-	{
-		// Set id and wipe data
-		$this->_id   = (int)$id;
-		$this->_data = null;
-	}
-
-	/**
-	 * Method to get the Type identifier
-	 *
-	 * @access	public
-	 * @param	int Type identifier
-	 */
-	function getId()
-	{
-		// Get id
-		return $this->_id;
 	}
 
 	/**

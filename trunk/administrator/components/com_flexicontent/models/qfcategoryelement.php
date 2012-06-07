@@ -93,7 +93,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 	 */
 	function getData()
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		
 		static $items;
 
@@ -150,19 +150,19 @@ class FlexicontentModelQfcategoryelement extends JModel
 					;
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
-				
+		
 		//establish the hierarchy of the categories
 		$children = array();
 		
-    	//set depth limit
-   		$levellimit = 10;
+		//set depth limit
+		$levellimit = 10;
 		
-    	foreach ($rows as $child) {
-        	$parent = $child->parent_id;
-       		$list 	= @$children[$parent] ? $children[$parent] : array();
-        	array_push($list, $child);
-        	$children[$parent] = $list;
-    	}
+		foreach ($rows as $child) {
+			$parent = $child->parent_id;
+			$list 	= @$children[$parent] ? $children[$parent] : array();
+			array_push($list, $child);
+			$children[$parent] = $list;
+		}
     	
     	//get list of the items
     	$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
@@ -185,7 +185,7 @@ class FlexicontentModelQfcategoryelement extends JModel
 			$list = $list1;
 		}
 		
-    	$total = count( $list );
+		$total = count( $list );
 
 		jimport('joomla.html.pagination');
 		$this->_pagination = new JPagination( $total, $limitstart, $limit );

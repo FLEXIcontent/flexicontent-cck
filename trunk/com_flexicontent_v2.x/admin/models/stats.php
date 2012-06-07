@@ -47,7 +47,8 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getGeneralstats() {
+	function getGeneralstats()
+	{
 		$_items = array();
 
 		/*
@@ -126,7 +127,8 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getRating() {
+	function getRating()
+	{
 		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
@@ -245,7 +247,8 @@ class FlexicontentModelStats extends JModel
 	 * @access public
 	 * @return array
 	 */
-	function getStatestats() {  		
+	function getStatestats()
+	{  		
   		//get states
 		$query = 'SELECT state'
 			. ' FROM #__content AS i'
