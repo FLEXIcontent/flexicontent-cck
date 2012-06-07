@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: templates.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: templates.php 1031 2011-12-07 21:57:29Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,7 +42,8 @@ class FlexicontentModelTemplates extends JModel
 	 *
 	 * @since 1.0
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 	}
 

@@ -176,7 +176,8 @@ class FlexicontentModelItemcompare extends JModel
 			$item->alias				= null;
 			$item->title_alias			= null;
 			$item->text					= null;
-			$item->sectionid			= FLEXI_SECTION;
+			if (!FLEXI_J16GE)
+				$item->sectionid	= FLEXI_SECTION;
 			$item->catid				= null;
 			$item->score				= 0;
 			$item->votecount			= 0;

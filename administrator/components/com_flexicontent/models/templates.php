@@ -45,8 +45,6 @@ class FlexicontentModelTemplates extends JModel
 	function __construct()
 	{
 		parent::__construct();
-
-		global $mainframe, $option;
 	}
 
 	/**

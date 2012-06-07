@@ -2036,13 +2036,11 @@ class FlexicontentModelItems extends JModel
 	function getAdvSearchFields($key='name') {
 		$typeid = intval(@$typeid);
 		//$where = " WHERE ftrel.type_id='".(int)$typeid."' AND fi.isadvsearch='1'";
-		$where = " WHERE fi.isadvsearch='1'";
 		$query = 'SELECT fi.*'
 			.' FROM #__flexicontent_fields AS fi'
 			.' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'
 			//.' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id'
-			.$where
-			.' AND fi.published = 1'
+			.' WHERE fi.isadvsearch= 1 AND fi.published = 1'
 			.' GROUP BY fi.id'
 			.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
 		;

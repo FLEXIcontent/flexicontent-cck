@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: templates.php 494 2011-03-03 05:51:22Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: templates.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,8 +39,6 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'duplicate', 'duplicate' );
-		$this->registerTask( 'remove',    'remove' );
 	}
 		
 	/**

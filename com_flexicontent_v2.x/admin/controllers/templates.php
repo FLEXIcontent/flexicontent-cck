@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: templates.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: templates.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,7 +42,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$this->registerTask( 'add'  ,     'edit' );
 		$this->registerTask( 'apply',     'save' );
 	}
-		
+
 
 	/**
 	 * Logic to save a template

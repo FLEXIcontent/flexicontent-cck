@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: types.php 1340 2012-06-06 02:30:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -68,9 +68,10 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$post = JRequest::get( 'post' );
 
 		$model = $this->getModel('type');
-
-		if ( $model->store($post) ) {
-
+		
+		$data = FLEXI_J16GE ? $post['jform'] : $post;
+		if ( $model->store($data) )
+		{
 			switch ($task)
 			{
 				case 'apply' :
