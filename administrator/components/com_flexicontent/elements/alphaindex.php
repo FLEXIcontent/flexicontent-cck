@@ -66,7 +66,7 @@ class JElementAlphaindex extends JElement
 		$options[1]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[1]->value=1;
 		$options[2]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[2]->value=2;
 		
-		$values  = FLEXI_J16GE ? $this->value : $value;
+		$value  = FLEXI_J16GE ? $this->value : $value;
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;

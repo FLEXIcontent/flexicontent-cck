@@ -777,11 +777,14 @@ class ParentClassItem extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		$app =& JFactory::getApplication();
 		$this->getItem();
 		
-		// *****************************************************************************************************
-		// Convert parameters 'attribs' & 'metadata' to an array also set property 'cid' (form field categories)
-		// *****************************************************************************************************
+		// *********************************************************
+		// Prepare item data for being loaded into the form:
+		// (a) Convert parameters 'attribs' & 'metadata' to an array
+		// (b) Set property 'cid' (form field categories)
+		// *********************************************************
 		
 		$this->_item->itemparams = new JParameter();
 		
@@ -808,9 +811,9 @@ class ParentClassItem extends JModelAdmin
 		// Set item property 'cid' (form field categories is named cid)
 		$this->_item->cid = $this->_item->categories;
 		
-		// *************************************************************************
-		// Get the form and restore parameters as strings, also clear 'cid' property
-		// *************************************************************************
+		// ****************************************************************************
+		// Load item data into the form and restore the changes done above to item data
+		// ****************************************************************************
 		$form = $this->loadForm('com_flexicontent.item', 'item', array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form)) {
 			return false;
@@ -834,20 +837,30 @@ class ParentClassItem extends JModelAdmin
 
 		// Modify the form based on Edit State access controls.
 		if (!$this->canEditState((object) $data)) {
+			$frontend_new = !$id && $app->isSite();
+			
 			// Disable fields for display.
 			$form->setFieldAttribute('featured', 'disabled', 'true');
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
 			$form->setFieldAttribute('publish_up', 'disabled', 'true');
 			$form->setFieldAttribute('publish_down', 'disabled', 'true');
-			$form->setFieldAttribute('state', 'disabled', 'true');
-
+			if ( !$frontend_new ) {
+				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
+				$form->setFieldAttribute('state', 'disabled', 'true');   // only for existing items, not for new to allow menu item override
+			}
+			//$form->setFieldAttribute('vstate', 'disabled', 'true');  // DO not -disable- will cause problems
+			
 			// Disable fields while saving.
 			// The controller has already verified this is an article you can edit.
 			$form->setFieldAttribute('featured', 'filter', 'unset');
 			$form->setFieldAttribute('ordering', 'filter', 'unset');
 			$form->setFieldAttribute('publish_up', 'filter', 'unset');
 			$form->setFieldAttribute('publish_down', 'filter', 'unset');
-			$form->setFieldAttribute('state', 'filter', 'unset');
+			if ( !$frontend_new ) {
+				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
+				$form->setFieldAttribute('state', 'filter', 'unset');   // only for existing items, not for new to allow menu item override
+			}
+			//$form->setFieldAttribute('vstate', 'filter', 'unset');   // DO not -filter- will cause problems
 		}
 
 		return $form;
@@ -1010,6 +1023,39 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		return $allow;
+	}
+
+
+	/**
+	 * Method to test whether a record can have its state edited.
+	 *
+	 * @param	object	$record	A record object.
+	 *
+	 * @return	boolean	True if allowed to change the state of the record. Defaults to the permission set in the component.
+	 * @since	1.6
+	 */
+	protected function canEditState($record)
+	{
+		$user = JFactory::getUser();
+		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
+		$asset = 'com_content.article.' . @ $record->id;
+		$cat_asset = 'com_content.category.' . (int)@ $record->catid;
+
+		if ( !empty($record->id) )
+		{
+			// existing article.
+			return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
+		}
+		elseif ( !empty($record->catid) )
+		{
+			// new article with main category set
+			return  $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
+		}
+		else
+		{
+			// Default to component settings if neither article id nor category are set
+			return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
+		}
 	}
 
 //*************
@@ -1338,6 +1384,7 @@ class ParentClassItem extends JModelAdmin
 		$tagPos	= preg_match($pattern, $data['text']);
 		if ($tagPos == 0)	{
 			$item->introtext	= $data['text'];
+			$item->fulltext		= '';
 		} else 	{
 			list($item->introtext, $item->fulltext) = preg_split($pattern, $data['text'], 2);
 		}

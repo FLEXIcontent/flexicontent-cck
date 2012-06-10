@@ -284,8 +284,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										</label>
 										
 									<?php
-									if (($this->canPublish || $this->canPublishOwn) && ($this->row->id)) :
+									if ( $this->canPublish || $this->canPublishOwn ) :
 										echo $this->lists['state'] . '&nbsp;';
+										
 										if (!$this->cparams->get('auto_approve', 1)) :
 											echo "<br/>".JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
 										else :
