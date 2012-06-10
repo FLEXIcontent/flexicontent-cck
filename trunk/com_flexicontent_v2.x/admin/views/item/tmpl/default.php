@@ -293,8 +293,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									</span>
 										
 									<?php
-									if (($this->canPublish || $this->canPublishOwn) && ($this->form->getValue("id"))) :
-										echo $this->lists['state'] . '&nbsp;';
+									if ( $this->canPublish || $this->canPublishOwn ) :
+										echo $this->form->getInput('state') . '&nbsp;';
+										
 										if (!$this->cparams->get('auto_approve', 1)) :
 											echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 										else :

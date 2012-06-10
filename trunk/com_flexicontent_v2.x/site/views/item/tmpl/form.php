@@ -19,83 +19,8 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Create some variables
-$cid = $this->params->get("cid");
-$isNew = ! JRequest::getInt('id', 0);
-
-// Language related vars
-if (FLEXI_FISH || FLEXI_J16GE) {
-	$languages = FLEXIUtilities::getLanguages();
-	$itemlang = substr($this->item->language ,0,2);
-	$itemlang_name = $languages->{$this->item->language}->name;
-	$itemlang_image = '<img src="'.$languages->{$this->item->language}->imgsrc.'" alt="'.$languages->{$this->item->language}->name.'" />';
-}
-
-if (isset($this->item->item_translations)) foreach ($this->item->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
-$maincatid = $this->params->get("maincatid");
-$postcats = $this->params->get("postcats", 0);
-$overridecatperms = $this->params->get("overridecatperms", 1);
-$typeid = $this->item->id ? $this->item->type_id	 :  JRequest::getInt('typeid') ;
-$return = JRequest::getString('return', '', 'get');
-if ($return) {
-	$referer = base64_decode( $return );
-} else {
-	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
-}
-
-// DO NOT override user's  permission for submitting to multiple categories
-if (!$this->perms['multicat']) {
-	if ($postcats==2) $postcats = 1;
-}
-
-// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
-if ($cid && $overridecatperms && $isNew) :
-	global $globalcats;
-	$cids = !is_array($cid) ? explode(",", $cid) : $cid;
-	
-	// add default main category to category list if not already there
-	if ($maincatid && !in_array($maincatid, $cids)) $cids[] = $maincatid;
-	
-	// Create 2 arrays with category info used for creating the of select list of (a) main category select field (b) multi-categorys select field
-	$categories = array();
-	$options 	= array();
-	foreach ($cids as $catid) {
-		$categories[] = $globalcats[$catid];
-		$options[] = JHTML::_('select.option', $catid, $globalcats[$catid]->title );
-	}
-	array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
-	
-	switch($postcats) {
-		case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
-		default:
-			$in_single_cat = ( count($cids)==1 );
-			
-			foreach ($cids as $catid) {
-				$cat_titles[$catid] = $globalcats[$catid]->title;
-				$fixedcats .= '<input type="hidden" name="jform[cid][]" value="'.$catid.'" />';
-			}
-			$fixedcats .= implode(', ', $cat_titles);
-			
-			$fixedmaincat = $globalcats[$maincatid]->title;
-			$fixedmaincat .= '<input type="hidden" name="jform[catid]" value="'.$maincatid.'" />';
-			break;
-		case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
-			$in_single_cat = true;
-			
-			$fixedcats = '';
-			
-			$fixedmaincat = JHTML::_('select.genericlist', $options, 'jform[catid]', ' class="required" ', 'value', 'text', $maincatid, 'jform_catid' );
-			break;
-		case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
-			$in_single_cat = false;
-			
-			$actions_allowed = array('core.create');
-			$class = 'class="inputbox validate" multiple="multiple" size="8"';
-			$fixedcats = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', array(), false, $class, true, true, $actions_allowed);
-			
-			$fixedmaincat = JHTML::_('select.genericlist', $options, 'jform[catid]', ' class="required" ', 'value', 'text', $maincatid, 'jform_catid' );
-			break;
-	}
-endif;
+$isnew = !$this->item->id;
+$typeid = !$isnew ? $this->item->type_id : JRequest::getInt('typeid') ;
 
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
@@ -230,7 +155,7 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<?php
-	$autopublished = $this->params->get('autopublished', 0);  // Menu Item Parameter
+	$autopublished = $this->params->get('autopublished', 0) && $isnew;  // Menu Item Parameter for new items
 	$canpublish = $this->perms['canpublish'];
 	$autoapprove = 1; //$this->params->get('auto_approve', 0);  // THIS SHOULD ONLY BE USED in BACKEND ?? It may be confusing to the frontend user
 	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
@@ -249,21 +174,21 @@ function deleteTag(obj) {
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 		<div class="flexi_buttons" style="font-size:90%;">
 			
-		<?php if (in_array( 'apply', $allowbuttons_fe) ) : ?>
+		<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return Joomla.submitbutton('apply');">
-				<span class="fcbutton_apply"><?php echo JText::_( $this->item->id ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
+				<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 			</button>
 		<?php endif; ?>
 			
 		<?php if ( $typeid ) : ?>
 		
 			<button class="button" type="button" onclick="return Joomla.submitbutton('save');">
-				<span class="fcbutton_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
+				<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 			</button>
 			
 		<?php if (in_array( 'save_preview', $allowbuttons_fe) ) : ?>
 			<button class="button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
-				<span class="fcbutton_preview_save"><?php echo JText::_( $this->item->id ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
+				<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
 		<?php endif; ?>
 
@@ -273,7 +198,7 @@ function deleteTag(obj) {
 			?>
 			
 		<?php if (in_array( 'preview_latest', $allowbuttons_fe) ) : ?>
-			<?php if ( $this->item->id ) : ?>
+			<?php if ( !$isnew ) : ?>
 			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 				<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 			</button>
@@ -290,7 +215,7 @@ function deleteTag(obj) {
          
 		<br class="clear" />
 		<?php
-			$approval_msg = JText::_( $this->item->id==0 ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
+			$approval_msg = JText::_( $isnew ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
 			if ( !$canpublish && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
 		?>
 		
@@ -310,11 +235,11 @@ function deleteTag(obj) {
 				<!-- tabber start -->
 				<div class="fctabber" style=''>
 					<div class="tabbertab" style="padding: 0px;" >
-						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<h3> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 						<?php echo $this->form->getInput('title');?>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($itemlang!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
@@ -346,11 +271,11 @@ function deleteTag(obj) {
 				<!-- tabber start -->
 				<div class="fctabber" style=''>
 					<div class="tabbertab" style="padding: 0px;" >
-						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<h3> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 						<?php echo $this->form->getInput('alias');?>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($itemlang!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
@@ -384,24 +309,22 @@ function deleteTag(obj) {
 	<?php endif; ?>
 
 	
-	<?php if ($cid && $overridecatperms && $isNew) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+	<?php if ($isnew && $this->menuCats) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 			<div class="flexi_formblock">
 				<label id="jform_catid-lbl" for="jform_catid" class="flexi_label">
-					<?php echo JText::_( $in_single_cat ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
+					<?php echo JText::_( !$this->menuCats->cid ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
-				<?php echo $fixedmaincat; ?>
+				<?php echo $this->menuCats->catid; ?>
 			</div>
-		<?php if ($postcats!=1 && !$in_single_cat) : /* hide when submiting to single category, since we will only show primary category field */ ?>
+		<?php if ( $this->menuCats->cid ) : /* Check if multiple-categories field was created (it is not when submiting to single category) */ ?>
 			<div class="flexi_formblock">
 				<label id="jform_cid-lbl" for="jform_cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					<?php if ($postcats==2) : /* add "ctrl-click" tip when selecting multiple categories */ ?>
-						<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-							<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
-						</span>
-					<?php endif; ?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+					</span>
 				</label>
-				<?php echo $fixedcats; ?>
+				<?php echo $this->menuCats->cid; ?>
 			</div>
 		<?php endif; ?>
 	<?php else : ?>
@@ -475,7 +398,7 @@ function deleteTag(obj) {
 					// since if use can edit item THEN item should be updated !!!
 					$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
 	  		?>
-				<input type="hidden" id="state" name="jform[state]" value="<?php echo $this->item->id ? $this->item->state : -4; ?>" />
+				<input type="hidden" id="state" name="jform[state]" value="<?php echo !$isnew ? $this->item->state : -4; ?>" />
 				<input type="hidden" id="vstate" name="jform[vstate]" value="<?php echo $item_vstate; ?>" />
 			</div>
 	
@@ -487,10 +410,10 @@ function deleteTag(obj) {
 				<span class="flexi_label">
 					<?php echo $this->form->getLabel('language'); ?>
 				</span>
-				<?php if ( in_array( 'mod_item_lang', $allowlangmods_fe) || !$this->item->id ) : ?>
+				<?php if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew ) : ?>
 					<?php echo $this->lists['languages']; ?>
 				<?php else: ?>
-					<?php echo $itemlang_image.' ['.$itemlang_name.']'; ?>
+					<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
 				<?php endif; ?>
 			</div>
 			
@@ -503,12 +426,12 @@ function deleteTag(obj) {
 					</span>
 				</label>
 				
-				<?php if ( $this->item->id  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
+				<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
 					<br/><small><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 					<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->item->id; ?>" />
 				<?php else : ?>
 					<?php
-					if ( in_array( 'mod_item_lang', $allowlangmods_fe) || !$this->item->id || $this->item->id==$this->item->lang_parent_id) {
+					if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
 						$jAp=& JFactory::getApplication();
 						$option = JRequest::getVar('option');
 						$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
@@ -652,7 +575,7 @@ function deleteTag(obj) {
 					<!-- tabber start -->
 					<div class="fctabber" style=''>
 						<div class="tabbertab" style="padding: 0px;" >
-							<h3> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
+							<h3> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
 							<?php
 								$field_tab_labels = & $field->tab_labels;
 								$field_html       = & $field->html;
@@ -660,7 +583,7 @@ function deleteTag(obj) {
 							?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($itemlang!=$t->shortcode) : ?>
+							<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
 								<div class="tabbertab" style="padding: 0px;" >
 									<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
@@ -720,7 +643,7 @@ function deleteTag(obj) {
 		</table>
 	</fieldset>
 
-<?php elseif ($this->item->id == 0) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+<?php elseif ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 <?php else : // existing item that has no custom fields, warn the user ?>
 		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
@@ -774,11 +697,11 @@ function deleteTag(obj) {
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
-						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<h3> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 						<?php echo $this->form->getInput('metadesc'); ?>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($itemlang!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
@@ -806,11 +729,11 @@ function deleteTag(obj) {
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
-						<h3> <?php echo '-'.$itemlangname.'-'; // $t->name; ?> </h3>
+						<h3> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 						<?php echo $this->form->getInput('metakey'); ?>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($itemlang!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
@@ -926,7 +849,7 @@ function deleteTag(obj) {
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="referer" value="<?php echo $referer; ?>" />
-		<?php if ( $this->item->id==0 && $typeid ) : ?>
+		<?php if ( $isnew && $typeid ) : ?>
 			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 		<?php endif;?>
 		

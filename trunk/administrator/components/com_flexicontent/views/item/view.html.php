@@ -302,6 +302,25 @@ class FlexicontentViewItem extends JView
 					$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
 				}
 			}
+			
+			//build state list
+			$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) ); 
+			$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+			$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
+			$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
+			$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
+			if(!$canPublish && !$canPublishOwn)
+				$row->state = $row->state ? $row->state : -4;
+			$state_fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
+			$lists['state'] = JHTML::_('select.genericlist',   $state, $state_fieldname, '', 'value', 'text', $row->state );
+			
+			//build version state list
+			$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
+			
+			$vstate_fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
+			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $vstate_fieldname, '', 'value', 'text', 2 );
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
@@ -321,26 +340,6 @@ class FlexicontentViewItem extends JView
 		} else {
 			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, $class, true, true, $actions_allowed);
 		}
-		
-		//build state list
-		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) ); 
-		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
-		if(!$canPublish)
-			$row->state = $row->state ? $row->state : -4;
-			
-		$state_fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
-		$lists['state'] = JHTML::_('select.genericlist',   $state, $state_fieldname, '', 'value', 'text', $row->state );
-		
-		//build version state list
-		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
-		
-		$vstate_fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
-		$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $vstate_fieldname, '', 'value', 'text', 2 );
 		
 		//build languages list
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags

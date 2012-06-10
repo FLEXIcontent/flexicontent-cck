@@ -129,11 +129,11 @@ class flexicontent_cats
     *
     * @return array
     */
-	function getCategoriesTree( $published=null )
+	function getCategoriesTree( $published_only=null )
 	{
 		$db			=& JFactory::getDBO();
 		
-		if ($published) {
+		if ($published_only) {
 			$where[] = 'published = 1';
 		}
 		$where[] = (!FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension="'.FLEXI_CAT_EXTENSION.'"' );
@@ -245,7 +245,7 @@ class flexicontent_cats
 	 * @return void
 	 */
 	function buildcatselect($list, $name, $selected, $top,
-		$class = 'class="inputbox"', $published = false, $filter = true,
+		$class = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own')   // For item edit this should be array('core.create')
 	)
 	{
@@ -266,7 +266,7 @@ class flexicontent_cats
 		}
 		
 		// Filter categories by user permissions
-		if ($filter) {
+		if ($check_perms) {
 			// Get user allowed categories
 			if (FLEXI_J16GE) {
 				$usercats 	= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
@@ -292,10 +292,10 @@ class flexicontent_cats
 		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
 		foreach ($list as $item) {
 			$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
-			if ((!$published) || ($published && $item->published)) {
+			if ( !$check_published || ( $check_published && $item->published ) ) {
 				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
-				} else if ($filter) {
+				} else if ($check_perms) {
 					$asset = 'com_content.category.'.$item->id;
 					if (
 					(FLEXI_J16GE && !in_array($item->id, $usercats) ) ||  // if user has 'core.admin' then all cats are allowed

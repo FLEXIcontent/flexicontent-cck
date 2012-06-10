@@ -607,13 +607,16 @@ class modFlexicontentHelper
 				$where .= ' AND i.access <= '.$gid;
 			}
 		}
-
+		
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW) || ($option == 'com_nutrition' && $view == 'frAliment');
+		
 		// *** NON-STATIC behavior, get current item information ***
-		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && ((($option == 'com_flexicontent') && ($view == FLEXI_ITEMVIEW)) || (($option == 'com_nutrition') && ($view == 'frAliment'))) )  {
+		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && $isflexi_itemview ) {
 			// initialize variables
 			$cid 		= JRequest::getInt('cid');
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
+			if (!$id) return;  // new item nothing to retrieve
 			
 			$q 	 		= 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'

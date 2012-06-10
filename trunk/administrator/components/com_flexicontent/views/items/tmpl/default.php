@@ -481,10 +481,11 @@ window.addEvent('domready', function() {
 				$canPublish 		= /*$canPublishAll ||*/ in_array('publish', $rights);
 				$canPublishOwn		= (in_array('publishown', $rights) /*|| $canPublishOwnAll*/) && $row->created_by == $user->id;
 			} else {
+				// J1.5 with no FLEXIaccess, since backend users are at least 'manager', these should be true anyway
 				$canEdit		= $user->authorize('com_content', 'edit', 'content', 'all');
 				$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
 				$canPublish	=	$user->authorize('com_content', 'publish', 'content', 'all');
-				$canPublishOwn= 0;
+				$canPublishOwn= 1; // due to being backend user
 			}
 
 			$publish_up =& JFactory::getDate($row->publish_up);

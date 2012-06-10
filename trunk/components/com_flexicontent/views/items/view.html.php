@@ -496,9 +496,9 @@ class FlexicontentViewItems extends JView
 			if ($field->field_type == 'maintext')
 			{
 				if ( isset($item->item_translations) ) {
-					$itemlang = substr($item->language ,0,2);
+					$shortcode = substr($item->language ,0,2);
 					foreach ($item->item_translations as $lang_id => $t)	{
-						if ($itemlang == $t->shortcode) continue;
+						if ($shortcode == $t->shortcode) continue;
 						$field->name = array('jfdata',$t->shortcode,'text');
 						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
 						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
@@ -528,62 +528,14 @@ class FlexicontentViewItems extends JView
 		}
 		
 		// Load permissions (used by form template)
-		$perms 	= array();
-		if (FLEXI_J16GE) {
-			$perms['isSuperAdmin']= $user->authorise('core.admin', 'root.1');
-			$permission = FlexicontentHelperPerm::getPerm();
-			$perms['multicat'] = $permission->MultiCat;
-			$perms['cantags'] = $permission->CanUseTags;
-			$perms['canparams'] = $permission->CanParams;
-			$perms['cantemplates']= $permission->CanTemplates;
-			
-			//item specific permissions
-			if ( $item->id ) {
-				$asset = 'com_content.article.' . $item->id;
-				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-			} else {
-				$perms['canedit']			= $user->authorise('core.edit', 'com_flexicontent');
-				$perms['canpublish']	= $user->authorise('core.edit.state', 'com_flexicontent');
-				$perms['candelete']		= $user->authorise('core.delete', 'com_flexicontent');
-			}
-			
-			$perms['canright']		= $permission->CanConfig;
-		} else if (FLEXI_ACCESS) {
-			$perms['isSuperAdmin']= $user->gid >= 25;
-			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
-			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$perms['cantemplates']= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-
-			if ($item->id) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$perms['canedit']		= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
-				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
-				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
-			} else {
-				$perms['canedit']		= ($user->gid < 25) ? 0 : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? 0 : 1;
-				$perms['candelete']		= ($user->gid < 25) ? 0 : 1;
-				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
-			}
-		} else {
-			$perms['isSuperAdmin']= $user->gid >= 25;
-			$perms['multicat']		= 1;
-			$perms['cantags'] 		= 1;
-			$perms['canparams'] 	= 1;
-			$perms['cantemplates']= $user->gid >= 25;
-			$perms['canedit']		= ($user->gid >= 20);
-			$perms['canpublish']	= ($user->gid >= 21);
-			$perms['candelete']		= ($user->gid >= 21);
-			$perms['canright']		= ($user->gid >= 21);
-		}
+		$perms = $this->_getItemPerms($item);
 
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms);
 
+		// Get menu overridden categories/main category fields
+		$menuCats = $this->_getMenuCats($item, $perms, $params);
+		
 		// Build languages list
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		if (FLEXI_J16GE) {
@@ -594,6 +546,15 @@ class FlexicontentViewItems extends JView
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item_lang, 3);
 		} else {
 			$item->language = $site_default_lang;
+		}
+		
+		// Item language related vars
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$languages = FLEXIUtilities::getLanguages();
+			$itemlang = new stdClass();
+			$itemlang->shortcode = substr($item->language ,0,2);
+			$itemlang->name = $languages->{$item->language}->name;
+			$itemlang->image = '<img src="'.@$languages->{$item->language}->imgsrc.'" alt="'.$languages->{$item->language}->name.'" />';
 		}
 		
 		//Load the JEditor object
@@ -647,6 +608,8 @@ class FlexicontentViewItems extends JView
 		$this->assignRef('perms', 		$perms);
 		$this->assignRef('document',	$document);
 		$this->assignRef('nullDate',	$nullDate);
+		$this->assignRef('menuCats',	$menuCats);
+		$this->assignRef('itemlang',	$itemlang);
 		
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
@@ -743,7 +706,7 @@ class FlexicontentViewItems extends JView
 	}
 	
 	/**
-	 * Creates the item submit form
+	 * Creates the HTML of various form fields used in the item edit form
 	 *
 	 * @since 1.0
 	 */
@@ -820,5 +783,168 @@ class FlexicontentViewItems extends JView
 
 		return $lists;
 	}
+	
+	/**
+	 * Calculates the user permission on the given item
+	 *
+	 * @since 1.0
+	 */
+	function _getItemPerms($item)
+	{
+		$user = & JFactory::getUser();	// get current user\
+		
+		$perms 	= array();
+		if (FLEXI_J16GE) {
+			$perms['isSuperAdmin']= $user->authorise('core.admin', 'root.1');
+			$permission = FlexicontentHelperPerm::getPerm();
+			$perms['multicat'] = $permission->MultiCat;
+			$perms['cantags'] = $permission->CanUseTags;
+			$perms['canparams'] = $permission->CanParams;
+			$perms['cantemplates']= $permission->CanTemplates;
+			
+			//item specific permissions
+			if ( $item->id ) {
+				$asset = 'com_content.article.' . $item->id;
+				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
+				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+			} else {
+				// *** New item *** get general edit/publish/delete permissions
+				$perms['canedit']			= $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent');
+				$perms['canpublish']	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
+				$perms['candelete']		= $user->authorise('core.delete', 'com_flexicontent') || $user->authorise('core.delete.own', 'com_flexicontent');
+			}
+			
+			$perms['canright']		= $permission->CanConfig;
+		} else if (FLEXI_ACCESS) {
+			$perms['isSuperAdmin']= $user->gid >= 25;
+			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
+			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
+			$perms['cantemplates']= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
+
+			if ($item->id) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
+				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
+				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
+				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
+			} else {
+				// *** New item *** get general edit/publish/delete permissions
+				$canEditAll 			= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
+				$canEditOwnAll		= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
+				$perms['canedit']			= ($user->gid < 25) ? $canEditAll || $canEditOwnAll : 1;
+				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
+				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
+				$perms['canpublish']	= ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
+				$canDeletehAll 		= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
+				$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
+				$perms['candelete']		= ($user->gid < 25) ? $canDeletehAll || $canDeleteOwnAll : 1;
+				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
+			}
+		} else {
+			// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
+			$perms['isSuperAdmin']= $user->gid >= 25;
+			$perms['multicat']		= 1;
+			$perms['cantags'] 		= 1;
+			$perms['canparams'] 	= 1;
+			$perms['cantemplates']= $user->gid >= 25;
+			$perms['canedit']			= ($user->gid >= 20);
+			$perms['canpublish']	= ($user->gid >= 21);
+			$perms['candelete']		= ($user->gid >= 21);
+			$perms['canright']		= ($user->gid >= 21);
+		}
+		
+		return $perms;
+	}
+	
+	/**
+	 * Creates the (menu-overridden) categories/main category form fields for NEW item submission form
+	 *
+	 * @since 1.0
+	 */
+	function _getMenuCats($item, $perms, $params)  // menu
+	{
+		global $globalcats;
+		
+		$isnew = !$item->id;
+		
+		// Get menu parameters related to category overriding
+		$cid       = $params->get("cid");              // Overriden categories list
+		$maincatid = $params->get("maincatid");        // Default main category out of the overriden categories
+		$postcats  = $params->get("postcats", 0);      // Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
+		$override  = $params->get("overridecatperms", 1);   // Default to 1 for compatibilty with previous-version saved menu items
+		
+		// Check if item is new and overridden cats defined and cat overriding enabled
+		if ( !$isnew || empty($cid) || !$override ) return false;
+		
+		// Calculate refer parameter for returning to this page when user ends editing/submitting
+		$return = JRequest::getString('return', '', 'get');
+		if ($return) {
+			$referer = base64_decode( $return );
+		} else {
+			$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
+		}
+		
+		// DO NOT override user's permission for submitting to multiple categories
+		if (!$perms['multicat']) {
+			if ($postcats==2) $postcats = 1;
+		}
+		
+		// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
+		$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+		
+		// Add default main category to the overridden category list if not already there
+		if ($maincatid && !in_array($maincatid, $cids)) $cids[] = $maincatid;
+		
+		// Create 2 arrays with category info used for creating the of select list of (a) multi-categories select field (b) main category select field
+		$categories = array();
+		$options 	= array();
+		foreach ($cids as $catid) {
+			$categories[] = $globalcats[$catid];
+			$options[] = JHTML::_('select.option', $catid, $globalcats[$catid]->title );
+		}
+		array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
+		
+		// Field names for (a) multi-categories field and (b) main category field
+		$cid_form_fieldname   = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+		$catid_form_fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		
+		// Create form field HTML for the menu-overridden categories fields
+		switch($postcats)
+		{
+			case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
+			default:
+				// Do not create multi-category field if only one category was selected
+				if ( count($cids)>1 ) {
+					foreach ($cids as $catid) {
+						$cat_titles[$catid] = $globalcats[$catid]->title;
+						$mo_cats .= '<input type="hidden" name="'.$cid_form_fieldname.'" value="'.$catid.'" />';
+					}
+					$mo_cats .= implode(', ', $cat_titles);
+				} else {
+					$mo_cats = false;
+				}
+				
+				$mo_maincat = $globalcats[$maincatid]->title;
+				$mo_maincat .= '<input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
+				break;
+			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
+				$mo_cats = false;
+				$mo_maincat = JHTML::_('select.genericlist', $options, $catid_form_fieldname, ' class="required" ', 'value', 'text', $maincatid );
+				break;
+			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
+				$class = 'class="inputbox validate" multiple="multiple" size="8"';
+				$mo_cats = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $class, $check_published=true, $check_perms=false);
+				$mo_maincat = JHTML::_('select.genericlist', $options, $catid_form_fieldname, ' class="required" ', 'value', 'text', $maincatid );
+				break;
+		}
+		$menuCats = new stdClass();
+		$menuCats->cid   = $mo_cats;
+		$menuCats->catid = $mo_maincat;
+		
+		return $menuCats;
+	}
+	
 }
 ?>

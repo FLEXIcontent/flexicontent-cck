@@ -359,14 +359,19 @@
 		
 						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_AUTHOR_CATEGORY_PARAMS' ) . '</h3>';
 						
-						$title = JText::_( 'FLEXI_PARAMETERS_LAYOUT_STANDARD' );
+						$title = JText::_( 'FLEXI_PARAMETERS_CAT_INFO_OPTIONS' );
 						echo $this->pane->startPanel( $title, "params-std" );
 						echo $this->form_authorcat->render('authorcatparams');
 						echo $this->pane->endPanel();
 		
-						$title = JText::_( 'FLEXI_PARAMETERS_LAYOUT_COMMON' );
-						echo $this->pane->startPanel( $title, "params-common" );
-						echo $this->form_authorcat->render('authorcatparams', 'common');
+						$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
+						echo $this->pane->startPanel( $title, "params-item_list_creation" );
+						echo $this->form_authorcat->render('authorcatparams', 'item_list_creation');
+						echo $this->pane->endPanel();
+						
+						$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );
+						echo $this->pane->startPanel( $title, "params-item_filtering" );
+						echo $this->form_authorcat->render('authorcatparams', 'item_filtering');
 						echo $this->pane->endPanel();
 						
 						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
