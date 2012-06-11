@@ -57,8 +57,9 @@ class FlexicontentController extends JController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Initialize variables
-		$db			= & JFactory::getDBO();
-		$user = & JFactory::getUser();
+		$app   = &JFactory::getApplication();
+		$db    = & JFactory::getDBO();
+		$user  = & JFactory::getUser();
 		$model = $this->getModel(FLEXI_ITEMVIEW);
 		
 		// Get data from request and validate them
@@ -296,9 +297,12 @@ class FlexicontentController extends JController
 		// *******************************************************************************************************
 		if ($isnew && !$has_edit)
 		{
-			// Set notice about creating an item that cannot be changed further
-			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ) );
+			$task = JRequest::setVar('task', '');
+			// Set message about creating an item that cannot be changed further
+			$app->enqueueMessage(JText::_('FLEXI_CANNOT_CHANGE_FURTHER'), 'message' );
 		} else if (!$isnew && !$has_edit) {
+			$task = JRequest::setVar('task', '');
+			
 			// Set notice for existing item being editable till logoff 
 			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
 			// Allow item to be editable till logoff
@@ -387,9 +391,6 @@ class FlexicontentController extends JController
 			}
 		}
 		
-		//$overridecatperms	= $cparams->get("overridecatperms", 1);
-		//$allowunauthorize	= $cparams->get('allowunauthorize', 0);
-		//$notauthurl				= $cparams->get('notauthurl', '');        //  custom unauthorized page via menu item
 		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
 		
 		// Retrieve current logged user info
@@ -427,10 +428,6 @@ class FlexicontentController extends JController
 			}
 			
 			if (!$has_edit) {
-				/*if ($notauthurl) {
-					//  custom unauthorized page via menu item
-					$mainframe->redirect(JRoute::_("index.php?Itemid=".$notauthurl));
-				} else*/
 				if ($unauthorized_page) {
 					//  unauthorized page via global configuration
 					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
@@ -488,7 +485,6 @@ class FlexicontentController extends JController
 			}
 		}
 		
-		$overridecatperms	= $cparams->get("overridecatperms", 1);
 		$allowunauthorize	= $cparams->get('allowunauthorize', 0);
 		$notauthurl				= $cparams->get('notauthurl', '');          //  custom unauthorized page via menu item
 		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
@@ -504,7 +500,7 @@ class FlexicontentController extends JController
 		
 		//general access check
 		if (FLEXI_J16GE) {
-			$canAdd	= $user->authorize('core.create', 'com_flexicontent'); // && ( !$overridecatperms && $user_cats_count );
+			$canAdd	= $user->authorize('core.create', 'com_flexicontent');
 			// ALTERNATIVE 1
 			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 			$not_authorised = !$canAdd;

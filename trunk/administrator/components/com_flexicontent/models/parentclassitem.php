@@ -836,7 +836,8 @@ class ParentClassItem extends JModel
 		}
 
 		// Modify the form based on Edit State access controls.
-		if (!$this->canEditState((object) $data)) {
+		if ( !$this->canEditState( (object)$data ) )
+		{
 			$frontend_new = !$id && $app->isSite();
 			
 			// Disable fields for display.
@@ -1025,39 +1026,6 @@ class ParentClassItem extends JModel
 		return $allow;
 	}
 
-
-	/**
-	 * Method to test whether a record can have its state edited.
-	 *
-	 * @param	object	$record	A record object.
-	 *
-	 * @return	boolean	True if allowed to change the state of the record. Defaults to the permission set in the component.
-	 * @since	1.6
-	 */
-	protected function canEditState($record)
-	{
-		$user = JFactory::getUser();
-		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
-		$asset = 'com_content.article.' . @ $record->id;
-		$cat_asset = 'com_content.category.' . (int)@ $record->catid;
-
-		if ( !empty($record->id) )
-		{
-			// existing article.
-			return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-		}
-		elseif ( !empty($record->catid) )
-		{
-			// new article with main category set
-			return  $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
-		}
-		else
-		{
-			// Default to component settings if neither article id nor category are set
-			return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
-		}
-	}
-
 //*************
 // EOF of J1.6+
 //*************
@@ -1067,7 +1035,7 @@ class ParentClassItem extends JModel
 //*************
 
 	/**
-	 * Method to check if the user can add an item anywhere
+	 * Method (for J1.5) to check if the user can add an item anywhere
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -1090,7 +1058,7 @@ class ParentClassItem extends JModel
 	}
 
 	/**
-	 * Method to check if the user can edit the item
+	 * Method (for J1.5) to check if the user can edit the item
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -1124,6 +1092,68 @@ class ParentClassItem extends JModel
 //*************
 // EOF of J1.5
 //*************
+	
+	/**
+	 * Method to check if the user can edit the STATE of the item
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function canEditState($item=null, $check_cat_perm=true)
+	{
+		if ( empty($item) ) $item = & $this->_item;
+		$user = JFactory::getUser();
+		$isOwner = !empty($item->created_by) && ( $item->created_by == $user->get('id') );
+		
+		if (FLEXI_J16GE)
+		{
+			if ( !empty($item->id) )
+			{
+				// Existing item, use item specific permissions
+				$asset = 'com_content.article.' . $item->id;
+				return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
+			}
+			elseif ( $check_cat_perm && !empty($item->catid) )
+			{
+				// *** New item *** with main category set
+				$cat_asset = 'com_content.category.' . (int)@ $item->catid;
+				return $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
+			}
+			else
+			{
+				// *** New item *** get general edit/publish/delete permissions
+				return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
+			}
+		}
+		else if (FLEXI_ACCESS)
+		{
+			if ( !empty($item->id) )
+			{
+				// Existing item, use item specific permissions
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+				return ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
+			}
+			elseif ( $check_cat_perm && !empty($item->catid) )
+			{
+				// *** New item *** with main category set
+				$rights = FAccess::checkAllCategoryAccess('com_content', 'users', $user->gmid, $item->catid);
+				return ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
+			}
+			else
+			{
+				// *** New item *** get general edit/publish/delete permissions
+				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
+				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
+				return ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
+			}
+		}
+		else
+		{
+			// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
+			return ($user->gid >= 21);
+		}
+	}
 	
 	
 	/**
@@ -1184,7 +1214,7 @@ class ParentClassItem extends JModel
 			$item->attribs      = null;
 			$item->metadata     = null;
 			$item->access       = 0;
-			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : 0;
+			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : -4;
 			$item->mask         = null;
 			$item->images       = null;
 			$item->urls         = null;
@@ -1365,8 +1395,8 @@ class ParentClassItem extends JModel
 		}
 		
 		// Set back the altered categories and tags to the form data
-		$item->categories = $data['categories']  = $cats;  // Set it to real name of field: 'categories' INSTEAD OF 'cid'
-		$item->tags       = $data['tags']        = $tags;  // Set it to real name of field: 'tags'       INSTEAD OF 'tag'
+		$data['categories']  = $cats;  // Set it to real name of field: 'categories' INSTEAD OF 'cid'
+		$data['tags']        = $tags;  // Set it to real name of field: 'tags'       INSTEAD OF 'tag'
 		
 		// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
 		if (@$data['text'] && is_array($data['text'])) {
@@ -1434,6 +1464,100 @@ class ParentClassItem extends JModel
 		}		
 		
 		
+		// *******************************************************
+		// Retrieve submit configuration for new items in frontend
+		// *******************************************************
+		if ( $mainframe->isSite() && $isnew && !empty($data['submit_conf']) ) {
+			$h = $data['submit_conf'];
+			$session 	=& JFactory::getSession();
+			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+			$submit_conf = @ $item_submit_conf[$h] ;
+			
+			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
+			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
+		} else {
+			$autopublished    = 0;
+			$overridecatperms = 0;
+		}
+		
+		// **********************************
+		// Check form tampering of categories 
+		// **********************************
+		if ($overridecatperms)
+		{
+			$allowed_cid = @ $submit_conf['cids'];
+		} else {
+			
+			if (FLEXI_J16GE) {
+				$viewallcats	= FlexicontentHelperPerm::getPerm()->CanUserCats;
+			} else if (FLEXI_ACCESS) {
+				$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
+			} else {
+				$viewallcats = 1;
+			}
+			if (!$viewallcats) {
+				$actions_allowed = array('core.create');
+				if (FLEXI_J16GE) {
+					$allowed_cid 	= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
+				} else if (FLEXI_ACCESS) {
+					$allowed_cid 	= flexicontent_cats::getFAallowedCats($user->gmid, $actions_allowed);
+				}
+			}
+		}
+		
+		if ( isset($allowed_cid) ) {
+			// Check main category tampering
+			if ( !in_array($data['catid'], $allowed_cid) ) {
+				$this->setError( 'main category is not in allowed list (form tampered ?)' );
+				return false;
+			}
+
+			// Check multi category tampering
+			$postcats = @ $submit_conf['postcats'];
+			if ( $postcats==0 )
+				$data['categories'] = $allowed_cid;
+			else if ( $postcats==1 )
+				$data['categories'] = $data['catid'];
+			else
+				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
+		}
+		
+		// ***********************************************
+		// Check form tampering of state related variables
+		// ***********************************************
+		$canEditState = $this->canEditState( (object)$data, $check_cat_perm=true );
+		
+		// If cannot edit state prevent user from changing state related parameters
+		if ( !$canEditState )
+		{
+			$data['vstate'] = 1;
+			if (!FLEXI_J16GE) {
+				unset( $data['details']['publish_up'] );
+				unset( $data['details']['publish_down'] );
+			} else {
+				unset( $data['featured'] );
+				unset( $data['publish_up'] );
+				unset( $data['publish_down'] );
+			}
+			unset( $data['ordering'] );
+			unset( $data['state'] );
+		}
+		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
+		
+		// Prevent frontend user from changing the owner unless is super admin
+		if ( $mainframe->isSite() && !$isSuperAdmin )
+		{
+			if (!FLEXI_J16GE) {
+				unset( $data['details']['created_by'] );
+				unset( $data['details']['created'] );
+				unset( $data['details']['created_alias'] );
+			} else {
+				unset( $data['created_by'] );
+				unset( $data['created'] );
+				unset( $data['created_alias'] );
+			}
+		}
+		
 		// ************************************************
 		// Bind given item DATA and PARAMETERS to the model
 		// ************************************************
@@ -1482,7 +1606,7 @@ class ParentClassItem extends JModel
 		$item->publish_up = $date->toMySQL();
 
 		// -- Publish Down Date
-		if (trim($item->publish_down) == JText::_('Never') || trim( $item->publish_down ) == '')
+		if (trim($item->publish_down) == JText::_('FLEXI_NEVER') || trim( $item->publish_down ) == '')
 		{
 			$item->publish_down = $nullDate;
 		}
@@ -1538,7 +1662,7 @@ class ParentClassItem extends JModel
 		// *********************************************************************************************
 		if( !$isnew && !$data['vstate']==2 )
 		{
-			if ( $mainframe->isAdmin() )
+			if ( $canEditState )
 				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
 			else
 				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
@@ -1546,7 +1670,6 @@ class ParentClassItem extends JModel
 			$datenow =& JFactory::getDate();
 			$item->modified			= $datenow->toMySQL();
 			$item->modified_by	= $user->get('id');
-			
 		}
 		
 		// *********************************************************************************************

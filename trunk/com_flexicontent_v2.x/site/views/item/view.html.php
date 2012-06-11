@@ -361,20 +361,28 @@ class FlexicontentViewItem extends JView
 		$db					= &JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
+		if ($menu) {
+			if (FLEXI_J16GE) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+			} else {
+				$menuParams = new JParameter($menu->params);
+			}
+		}
 
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
 		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
 		if (FLEXI_J16GE && $menu) {
-			$menuParams = new JRegistry;
-			$menuParams->loadJSON($menu->params);
 			$params->merge($menuParams);
 		}
 		
 		// Initialiaze JRequest variables
 		JRequest::setVar('loadcurrent', false);  // we are in edit() task, so we load the last item version by default
-		JRequest::setVar('typeid', @$menu->query['typeid'][0]);  // This also forces zero if value not set
+		if ( isset($menu->query['typeid']) )
+			JRequest::setVar('typeid', $menu->query['typeid']);  // This also forces zero if value not set
+		$typeid = JRequest::getVar('typeid', 0);
 		
 		// Get item and model
 		$model = & $this->getModel();
@@ -406,7 +414,7 @@ class FlexicontentViewItem extends JView
 				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
+				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			} else if ($user->gid >= 25) {
 				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
@@ -460,6 +468,14 @@ class FlexicontentViewItem extends JView
 		// Create the type parameters
 		$tparams = & $this->get( 'Typeparams' );
 		$tparams = new JParameter($tparams);
+		
+		// Merge item parameters, or type/menu parameters for new item
+		if ( $isnew ) {
+			if ( $typeid ) $params->merge($tparams);     // Apply type configuration if it type is set
+			if ( $menu )   $params->merge($menuParams);  // Apply menu configuration if it menu is set, to override type configuration
+		} else {
+			$params->merge($item->parameters);
+		}
 		
 		// Check if saving an item that translates an original content in site's default language
 		$enable_translation_groups = $params->get('enable_translation_groups');
@@ -536,6 +552,9 @@ class FlexicontentViewItem extends JView
 		// Get menu overridden categories/main category fields
 		$menuCats = $this->_getMenuCats($item, $perms, $params);
 		
+		// Create and submit configuration (for new items) into the session
+		$submitConf = $this->_createSubmitConf($item, $perms, $params);
+		
 		// Build languages list
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		if (FLEXI_J16GE) {
@@ -580,11 +599,6 @@ class FlexicontentViewItem extends JView
 		$pathway =& $mainframe->getPathWay();
 		$pathway->addItem($title, '');
 		
-		// Merge item parameters
-		if (!$isnew) {
-			$params->merge($item->parameters);
-		}
-		
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
 		//JFilterOutput::objectHTMLSafe( $item );
@@ -603,13 +617,14 @@ class FlexicontentViewItem extends JView
 			$this->assignRef('usedtags',	$usedtags);
 		}
 		$this->assignRef('usedtagsdata', $usedtagsdata);
-		$this->assignRef('fields',		$fields);
-		$this->assignRef('tparams',		$tparams);
-		$this->assignRef('perms', 		$perms);
-		$this->assignRef('document',	$document);
-		$this->assignRef('nullDate',	$nullDate);
-		$this->assignRef('menuCats',	$menuCats);
-		$this->assignRef('itemlang',	$itemlang);
+		$this->assignRef('fields',     $fields);
+		$this->assignRef('tparams',    $tparams);
+		$this->assignRef('perms',      $perms);
+		$this->assignRef('document',   $document);
+		$this->assignRef('nullDate',   $nullDate);
+		$this->assignRef('menuCats',   $menuCats);
+		$this->assignRef('submitConf', $submitConf);
+		$this->assignRef('itemlang',   $itemlang);
 		
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
@@ -640,7 +655,7 @@ class FlexicontentViewItem extends JView
 			$formparams->set('created_by_alias', $item->created_by_alias);
 			$formparams->set('created', JHTML::_('date', $item->created, '%Y-%m-%d %H:%M:%S'));
 			$formparams->set('publish_up', JHTML::_('date', $item->publish_up, '%Y-%m-%d %H:%M:%S'));
-			if (JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $nullDate) {
+			if (JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down)) {
 				$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
 			} else {
 				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
@@ -789,9 +804,10 @@ class FlexicontentViewItem extends JView
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms($item)
+	function _getItemPerms( &$item)
 	{
 		$user = & JFactory::getUser();	// get current user\
+		$isOwner = ( $item->created_by == $user->get('id') );
 		
 		$perms 	= array();
 		if (FLEXI_J16GE) {
@@ -825,9 +841,9 @@ class FlexicontentViewItem extends JView
 
 			if ($item->id) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $item->created_by == $user->get('id')) || (in_array('edit', $rights)) ) : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $item->created_by == $user->get('id')) || (in_array('publish', $rights)) ) : 1;
-				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) || (in_array('delete', $rights)) ) : 1;
+				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
+				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
+				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 			} else {
 				// *** New item *** get general edit/publish/delete permissions
@@ -863,7 +879,7 @@ class FlexicontentViewItem extends JView
 	 *
 	 * @since 1.0
 	 */
-	function _getMenuCats($item, $perms, $params)  // menu
+	function _getMenuCats(&$item, $perms, $params)  // menu
 	{
 		global $globalcats;
 		
@@ -878,18 +894,8 @@ class FlexicontentViewItem extends JView
 		// Check if item is new and overridden cats defined and cat overriding enabled
 		if ( !$isnew || empty($cid) || !$override ) return false;
 		
-		// Calculate refer parameter for returning to this page when user ends editing/submitting
-		$return = JRequest::getString('return', '', 'get');
-		if ($return) {
-			$referer = base64_decode( $return );
-		} else {
-			$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
-		}
-		
 		// DO NOT override user's permission for submitting to multiple categories
-		if (!$perms['multicat']) {
-			if ($postcats==2) $postcats = 1;
-		}
+		if ( !$perms['multicat'] && $postcats==2 ) $postcats = 1;
 		
 		// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
 		$cids = !is_array($cid) ? explode(",", $cid) : $cid;
@@ -946,5 +952,42 @@ class FlexicontentViewItem extends JView
 		return $menuCats;
 	}
 	
+	
+	function _createSubmitConf( &$item, $perms, $params)
+	{
+		if ( $item->id ) return '';
+		
+		// Overriden categories list
+		$cid = $params->get("cid");
+		$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+		
+		// Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
+		$postcats = $params->get("postcats");
+		if ( !$perms['multicat'] && $postcats==2 ) $postcats = 1;
+		
+		// Default to 1 for compatibilty with previous-version saved menu items
+		$overridecatperms  = $params->get("overridecatperms", 1);
+		if ( empty($cid) ) $overridecatperms = 0;
+		
+		// Get menu parameters override parameters
+		$submit_conf = array(
+			'cids'            => $cids,
+			'maincatid'       => $params->get("maincatid"),        // Default main category out of the overriden categories
+			'postcats'        => $postcats,
+			'overridecatperms'=> $overridecatperms,
+			'autopublished'   => $params->get('autopublished', 0)  // Publish the item
+		);
+		$submit_conf_hash = md5(serialize($submit_conf));
+		
+		$session 	=& JFactory::getSession();
+		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+		$item_submit_conf[$submit_conf_hash] = $submit_conf;
+		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');
+		
+		if (FLEXI_J16GE)
+			return '<input type="hidden" name="jform[submit_conf]" value="'.$submit_conf_hash.'" >';
+		else
+			return '<input type="hidden" name="submit_conf" value="'.$submit_conf_hash.'" >';
+	}
 }
 ?>
