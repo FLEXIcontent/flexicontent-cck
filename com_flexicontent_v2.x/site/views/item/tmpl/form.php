@@ -22,6 +22,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $isnew = !$this->item->id;
 $typeid = !$isnew ? $this->item->type_id : JRequest::getInt('typeid') ;
 
+// Calculate refer parameter for returning to this page when user ends editing/submitting
+$return = JRequest::getString('return', '', 'get');
+if ($return) {
+	$referer = base64_decode( $return );
+} else {
+	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
+}
+
 if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
 	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
@@ -155,13 +163,6 @@ function deleteTag(obj) {
     <?php endif; ?>
 
 	<?php
-	$autopublished = $this->params->get('autopublished', 0) && $isnew;  // Menu Item Parameter for new items
-	$canpublish = $this->perms['canpublish'];
-	$autoapprove = 1; //$this->params->get('auto_approve', 0);  // THIS SHOULD ONLY BE USED in BACKEND ?? It may be confusing to the frontend user
-	//echo "Item Permissions:<br>\n<pre>"; print_r($this->perms); echo "</pre>";
-	//echo "Auto-Publish Parameter: $autopublished<br />";
-	//echo "Auto-Approve Parameter: $autoapprove<br />";
-
 	$allowbuttons_fe = $this->params->get('allowbuttons_fe');
 	if ( empty($allowbuttons_fe) )						$allowbuttons_fe = array();
 	else if ( ! is_array($allowbuttons_fe) )	$allowbuttons_fe = !FLEXI_J16GE ? array($allowbuttons_fe) : explode("|", $allowbuttons_fe);
@@ -216,7 +217,7 @@ function deleteTag(obj) {
 		<br class="clear" />
 		<?php
 			$approval_msg = JText::_( $isnew ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
-			if ( !$canpublish && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
+			if ( !$this->perms['canpublish'] && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
 		?>
 		
 		<fieldset class="flexi_general">
@@ -347,8 +348,12 @@ function deleteTag(obj) {
 		<?php endif; ?>
 	<?php endif; ?>
 
+	<?php if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via menu override ?>
+	
+		<input type="hidden" id="state" name="jform[state]" value="1" />
+		<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 
-	<?php if (!$autopublished && $canpublish) : // autopublished disabled, display state selection field to the user that can publish ?>
+	<?php elseif ( $this->perms['canpublish'] ) : // Display state selection field to the user that can publish ?>
 	
 			<div class="flexi_formblock">
 				<?php
@@ -359,27 +364,20 @@ function deleteTag(obj) {
 					<?php echo @$field->label ? $field->label : $this->form->getLabel('state'); ?>
 				</label>
 				<?php echo $this->form->getInput('state'); ?>
-	  		<?php	if ($autoapprove) : ?>
-	  			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
-	  		<?php	endif;?>
 			</div>
 		
-		<?php	if (!$autoapprove) :	?>
+		<?php	if (  $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0)  ) : ?>
 			<div class="flexi_formblock">
 				<label for="vstate" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_APPROVE_VERSION' );?>
 				</label>
-				<?php echo $this->lists['vstate']; ?>
+				<?php echo $this->form->getInput('vstate'); ?>
 			</div>
+		<?php	else : ?>
+	  	<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
 		<?php	endif; ?>
 		
-	<?php elseif (!$autopublished && !$canpublish) : ?>
-			<?php
-				// Enable approval if versioning disabled, this make sense,
-				// since if use can edit item THEN item should be updated !!!
-				$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
-			?>
-			
+	<?php else :  // Display message to user that he/she can not publish ?>
 			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['state'];
@@ -389,19 +387,14 @@ function deleteTag(obj) {
 					<?php echo @$field->label ? $field->label : $this->form->getLabel('state'); ?>
 				</label>
 	  		<?php 
-	  			//echo JText::_( 'FLEXI_NEEDS_APPROVAL' );
-	  			if ( !$this->item )
-	  				echo 'You cannot publish/unpublish this item, it will be reviewed by administrator';
-	  			else
-	  				echo 'You cannot publish/unpublish of this item';
-					// Enable approval if versioning disabled, this make sense,
-					// since if use can edit item THEN item should be updated !!!
+	  			echo JText::_( 'FLEXI_NEEDS_APPROVAL' );
+					// Enable approval if versioning disabled, this make sense since if use can edit item THEN item should be updated !!!
 					$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
 	  		?>
 				<input type="hidden" id="state" name="jform[state]" value="<?php echo !$isnew ? $this->item->state : -4; ?>" />
 				<input type="hidden" id="vstate" name="jform[vstate]" value="<?php echo $item_vstate; ?>" />
 			</div>
-	
+			
 	<?php endif; ?>
 	
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
@@ -427,7 +420,7 @@ function deleteTag(obj) {
 				</label>
 				
 				<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
-					<br/><small><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
+					<br/><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?>
 					<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->item->id; ?>" />
 				<?php else : ?>
 					<?php
@@ -440,7 +433,7 @@ function deleteTag(obj) {
 						echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 						echo $this->form->getInput('lang_parent_id');
 					} else {
-						echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' ).'</small>';
+						echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
 					}
 					?>
 				<?php endif; ?>
@@ -852,17 +845,12 @@ function deleteTag(obj) {
 		<?php if ( $isnew && $typeid ) : ?>
 			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 		<?php endif;?>
-		
 		<?php echo $this->form->getInput('id');?>
 		
-		<?php if ($autopublished) : // autopublish enabled ?>
-			<input type="hidden" id="state" name="jform[state]" value="<?php echo $autopublished;?>" />
-			<input type="hidden" id="vstate" name="jform[vstate]" value="2" />
-		<?php	endif; ?>
-		
 		<?php if (!$this->perms['canright']) : ?>
-				<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
+			<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
 		<?php endif; ?>
+		<?php if ( $isnew ) echo $this->submitConf; ?>
 	</form>
 </div>
 
