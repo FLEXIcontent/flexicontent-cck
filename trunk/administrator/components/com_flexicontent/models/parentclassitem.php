@@ -1078,7 +1078,7 @@ class ParentClassItem extends JModel
 			{
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid);
 				$canEdit 	= in_array('edit', $rights) /*|| $canEditAll*/;
-				$canEditOwn	= ( in_array('editown', $rights) /*|| $canEditOwnAll*/ ) && $this->_item->created_by == $user->id;
+				$canEditOwn	= ( in_array('editown', $rights) /*|| $canEditOwnAll*/ ) && $this->_item->created_by == $user->get('id');
 				if (!$canEdit && !$canEditOwn) return false;
 			}
 		} else {
@@ -1192,7 +1192,7 @@ class ParentClassItem extends JModel
 			$item->author       = null;
 			$item->text         = null;
 			$item->sectionid    = FLEXI_SECTION;
-			$item->type_id      = JRequest::getVar('typeid', 0, '', 'int');
+			$item->type_id      = JRequest::getVar('typeid', 0, '', 'int');  // Get default type from HTTP request
 			$item->typename     = null;
 			$item->typealias    = null;
 			$item->score        = 0;
@@ -1214,7 +1214,7 @@ class ParentClassItem extends JModel
 			$item->attribs      = null;
 			$item->metadata     = null;
 			$item->access       = 0;
-			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : -4;
+			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : -4;  // Use pending approval state by default
 			$item->mask         = null;
 			$item->images       = null;
 			$item->urls         = null;
@@ -1334,7 +1334,7 @@ class ParentClassItem extends JModel
 		// Initialize various variables
 		// ****************************
 		
-		$mainframe = &JFactory::getApplication();
+		$app = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 		$user	=& JFactory::getUser();
 		$cparams =& $this->_cparams;
@@ -1361,7 +1361,7 @@ class ParentClassItem extends JModel
 			$item->load( $data['id'] );
 			
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!!
-			if( !$mainframe->isAdmin() ) 
+			if( !$app->isAdmin() ) 
 				unset($data['type_id']);
 		}
 		
@@ -1467,7 +1467,7 @@ class ParentClassItem extends JModel
 		// *******************************************************
 		// Retrieve submit configuration for new items in frontend
 		// *******************************************************
-		if ( $mainframe->isSite() && $isnew && !empty($data['submit_conf']) ) {
+		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
 			$h = $data['submit_conf'];
 			$session 	=& JFactory::getSession();
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
@@ -1480,9 +1480,12 @@ class ParentClassItem extends JModel
 			$overridecatperms = 0;
 		}
 		
-		// **********************************
-		// Check form tampering of categories 
-		// **********************************
+		
+		// ***********************************************************
+		// SECURITY concern: Check form tampering of categories, of:
+		// (a) menu overridden categories for frontent item submit
+		// (b) or check user has 'create' privilege in item categories
+		// ***********************************************************
 		if ($overridecatperms)
 		{
 			$allowed_cid = @ $submit_conf['cids'];
@@ -1507,24 +1510,25 @@ class ParentClassItem extends JModel
 		
 		if ( isset($allowed_cid) ) {
 			// Check main category tampering
-			if ( !in_array($data['catid'], $allowed_cid) ) {
+			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid ) {
 				$this->setError( 'main category is not in allowed list (form tampered ?)' );
 				return false;
 			}
 
 			// Check multi category tampering
 			$postcats = @ $submit_conf['postcats'];
-			if ( $postcats==0 )
+			if ( !$isnew || empty($data['submit_conf']) || $postcats==2 )
+				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
+			else if ( $postcats==0 )
 				$data['categories'] = $allowed_cid;
 			else if ( $postcats==1 )
 				$data['categories'] = $data['catid'];
-			else
-				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
 		}
 		
-		// ***********************************************
-		// Check form tampering of state related variables
-		// ***********************************************
+		
+		// *****************************************************************
+		// SECURITY concern: Check form tampering of state related variables
+		// *****************************************************************
 		$canEditState = $this->canEditState( (object)$data, $check_cat_perm=true );
 		
 		// If cannot edit state prevent user from changing state related parameters
@@ -1545,7 +1549,7 @@ class ParentClassItem extends JModel
 		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
 		
 		// Prevent frontend user from changing the owner unless is super admin
-		if ( $mainframe->isSite() && !$isSuperAdmin )
+		if ( $app->isSite() && !$isSuperAdmin )
 		{
 			if (!FLEXI_J16GE) {
 				unset( $data['details']['created_by'] );
@@ -1557,6 +1561,7 @@ class ParentClassItem extends JModel
 				unset( $data['created_alias'] );
 			}
 		}
+		
 		
 		// ************************************************
 		// Bind given item DATA and PARAMETERS to the model
@@ -1574,23 +1579,26 @@ class ParentClassItem extends JModel
 			$item->bind($details);
 		}
 		
+		
 		// **************************************
 		// Check and correct core item properties
 		// **************************************
 			
-		// -- Modification Date and Modifier
+		// -- Modification Date and Modifier, (a) new item gets null modification date and (b) existing item get the current date
 		if ($isnew) {
 			$item->modified    = $nullDate;
 			$item->modified_by = 0;
 		} else {
 			$datenow =& JFactory::getDate();
 			$item->modified    = $datenow->toMySQL();
-			$item->modified_by = (int)$user->id;
+			$item->modified_by = $user->get('id');
 		}
 			
-		// -- Creator
-		$item->created_by 	= $item->created_by ? $item->created_by : $user->get('id');
-			
+		// -- Creator, if this is not already set, will be the current user or administrator if current user is not logged
+		if ( !$item->created_by ) {
+			$user = $user->get('id') ? $user->get('id') : JFactory::getUser( 'admin' )->get('id');
+		}
+		
 		// -- Creation Date
 		if ($item->created && strlen(trim( $item->created )) <= 10) {
 			$item->created 	.= ' 00:00:00';
@@ -1642,6 +1650,21 @@ class ParentClassItem extends JModel
 		if((count($result)>0) && in_array(false, $result)) return false;
 		
 		
+		// ******************************************************************************
+		// IF new item, create it before saving the fields (and creating the search index
+		// ******************************************************************************
+		if( $isnew )
+		{
+			if(!$this->applyCurrentVersion($item, $data)) return false;
+		}
+		
+		
+		// ****************************************************************************
+		// Save fields values to appropriate tables (versioning table or normal tables)
+		// ****************************************************************************
+		if(!$this->saveFields($isnew, $item, $data)) return false;
+		
+		
 		// **********************************************************************
 		// new item Or item version is approved ... save item to #__content table
 		// **********************************************************************
@@ -1650,11 +1673,6 @@ class ParentClassItem extends JModel
 			if(!$this->applyCurrentVersion($item, $data)) return false;
 			//echo "<pre>"; var_dump($data); exit();
 		}
-
-		// ****************************************************************************
-		// Save fields values to appropriate tables (versioning table or normal tables)
-		// ****************************************************************************
-		if(!$this->saveFields($isnew, $item, $data)) return false;
 		
 		
 		// *********************************************************************************************
@@ -1877,6 +1895,9 @@ class ParentClassItem extends JModel
 				$obj->value = serialize($data['jfdata']);
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
+			
+			// Assigned created search index into the item
+			$item->search_index = $searchindex;
 		}
 		return true;
 	}
