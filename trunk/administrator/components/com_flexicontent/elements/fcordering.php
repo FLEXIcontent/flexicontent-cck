@@ -27,6 +27,8 @@ defined('_JEXEC') or die('Restricted access');
  * @since		1.5
  */
 if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
 	jimport('joomla.form.helper');
 	JFormHelper::loadFieldClass('list');
 }

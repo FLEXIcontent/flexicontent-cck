@@ -410,8 +410,11 @@ class ParentClassItem extends JModel
 						$query->join('LEFT', '#__users AS u on u.id = a.created_by');
 
 						// Join on contact table
-						$query->select('contact.id as contactid' ) ;
-						$query->join('LEFT','#__contact_details AS contact on contact.user_id = a.created_by');
+						//$db->setQuery('SHOW TABLES LIKE "' . $config->getValue('config.dbprefix') . 'contact_details"');
+						//if ( (boolean) count($db->loadObjectList()) ) {
+						//	$query->select('contact.id as contactid' ) ;
+						//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = a.created_by');
+						//}
 
 						// Join over the categories to get parent category titles
 						$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
@@ -480,16 +483,16 @@ class ParentClassItem extends JModel
 						
 						if ($dbtype == 'mysqli') {
 							$result = mysqli_query( $db_connection , $query );
-							if ($result===false) throw new Exception("error _loadItem():: ".mysqli_error($db_connection));
+							if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
 							$data = mysqli_fetch_object($result);
 							mysqli_free_result($result);
 						} else if ($dbtype == 'mysql') {
 							$result = mysql_query( $query, $db_connection  );
-							if ($result===false) throw new Exception("error _loadItem():: ".mysql_error($db_connection));
+							if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
 							$data = mysql_fetch_object($result);
 							mysql_free_result($result);
 						} else {
-							throw new Exception( 'unreachable code in _loadItem(): direct db query, unsupported DB TYPE' );
+							throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
 						}
 					}
 					else
@@ -745,7 +748,17 @@ class ParentClassItem extends JModel
 					$this->_item = false;
 				}
 			}
+		} else {
+			$items[$this->_id] = & $this->_item;
 		}
+		
+		/*$session 	=& JFactory::getSession();
+		$postdata = $session->get('item_edit_postdata', array(), 'flexicontent');
+		if (count($postdata)) {
+			$session->set('item_edit_postdata', null, 'flexicontent');
+			// ...
+		}*/
+
 		return true;
 	}
 
@@ -845,6 +858,8 @@ class ParentClassItem extends JModel
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
 			$form->setFieldAttribute('publish_up', 'disabled', 'true');
 			$form->setFieldAttribute('publish_down', 'disabled', 'true');
+			$form->setFieldAttribute('created_by', 'disabled', 'true');
+			$form->setFieldAttribute('created_by_alias', 'disabled', 'true');
 			if ( !$frontend_new ) {
 				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
 				$form->setFieldAttribute('state', 'disabled', 'true');   // only for existing items, not for new to allow menu item override
@@ -857,6 +872,8 @@ class ParentClassItem extends JModel
 			$form->setFieldAttribute('ordering', 'filter', 'unset');
 			$form->setFieldAttribute('publish_up', 'filter', 'unset');
 			$form->setFieldAttribute('publish_down', 'filter', 'unset');
+			$form->setFieldAttribute('created_by', 'filter', 'unset');
+			$form->setFieldAttribute('created_by_alias', 'filter', 'unset');
 			if ( !$frontend_new ) {
 				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
 				$form->setFieldAttribute('state', 'filter', 'unset');   // only for existing items, not for new to allow menu item override
@@ -1071,7 +1088,7 @@ class ParentClassItem extends JModel
 		if (!$this->_loadItem() || $user->gid >= 25) {
 			return true;
 		} else if (FLEXI_ACCESS) {
-			// This should be used it bypassed individual item rights
+			// This should not be used, as it bypasses individual item rights
 			//$canEditAll			= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
 			//$canEditOwnAll	= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
 			if ($this->_item->id && $this->_item->catid)
@@ -1554,11 +1571,11 @@ class ParentClassItem extends JModel
 			if (!FLEXI_J16GE) {
 				unset( $data['details']['created_by'] );
 				unset( $data['details']['created'] );
-				unset( $data['details']['created_alias'] );
+				unset( $data['details']['created_by_alias'] );
 			} else {
 				unset( $data['created_by'] );
 				unset( $data['created'] );
-				unset( $data['created_alias'] );
+				unset( $data['created_by_alias'] );
 			}
 		}
 		
@@ -1630,18 +1647,44 @@ class ParentClassItem extends JModel
 		// auto assign the section
 		if (!FLEXI_J16GE)  $item->sectionid = FLEXI_SECTION;
 		
+		// For new items get next available ordering number
+		if ($isnew) {
+			$item->ordering = $item->getNextOrder();
+		}
+		
 		// auto assign the default language if not set
 		$default_language = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang() ;
 		$item->language   = $item->language ? $item->language : $default_language ;
 		
+		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
+		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
+			$lang_parent_id = $item->lang_parent_id;
+			$item->lang_parent_id = $isnew ? 0 : $item->id;
+			if ( $item->lang_parent_id != $lang_parent_id ) {
+				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'notice' );
+			}
+		}
 		
-		// *****************************************************************************
-		// Get version information, and force version approval ON is versioning disabled
-		// *****************************************************************************
+		
+		// ****************************************************************************************************************
+		// Get version info, force version approval ON is versioning disabled, and decide new item's current version number
+		// ****************************************************************************************************************
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$use_versioning = $cparams->get('use_versioning', 1);
+		
+		// Force item approval on when versioning disabled
 		$data['vstate'] = ( !$use_versioning ) ? 2 : $data['vstate'];
+		
+		// Decide new current version for the item, this depends if versioning is ON and if versioned is approved
+		if ( !$use_versioning ) {
+			// not using versioning, increment current version numbering
+			$item->version = $isnew ? 1 : $current_version+1;
+		} else {
+			// using versioning, increment last version numbering, or keep current version number if new version was not approved
+			$item->version = $isnew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
+		}
+		
 		
 		// ***************************************
 		// Trigger plugin Event 'onBeforeSaveItem'
@@ -1650,19 +1693,47 @@ class ParentClassItem extends JModel
 		if((count($result)>0) && in_array(false, $result)) return false;
 		
 		
-		// ******************************************************************************
-		// IF new item, create it before saving the fields (and creating the search index
-		// ******************************************************************************
+		// ************************************************************************************************************
+		// IF new item, create it before saving the fields (and constructing the search_index out of searchable fields)
+		// ************************************************************************************************************
 		if( $isnew )
 		{
-			if(!$this->applyCurrentVersion($item, $data)) return false;
+			$this->applyCurrentVersion($item, $data, $createonly=true);
 		}
 		
 		
 		// ****************************************************************************
 		// Save fields values to appropriate tables (versioning table or normal tables)
 		// ****************************************************************************
-		if(!$this->saveFields($isnew, $item, $data)) return false;
+		$files  = JRequest::get( 'files', JREQUEST_ALLOWRAW );
+		$result = $this->saveFields($isnew, $item, $data, $files);
+		if( $result=='abort' ) {
+			if ($isnew) {
+				$db = & $this->_db;
+				if (FLEXI_J16GE) {
+					$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
+					$db->query();
+				} else if (FLEXI_ACCESS) {
+					$db->setQuery('DELETE FROM #__flexiaccess_acl WHERE acosection = `com_content` AND axosection = `item` AND axo ='.$item->id);
+					$db->query();
+				}
+				$db->setQuery('DELETE FROM #__content WHERE id ='.$item->id);
+				$db->query();
+				$db->setQuery('DELETE FROM #__flexicontent_items_ext WHERE item_id='.$item->id);
+				$db->query();
+				
+				$this->setId(0);
+				$this->setError( $this->getError().' '.JText::_('FLEXI_NEW_ITEM_NOT_CREATED') );
+			} else {
+				$this->setError( $this->getError().' '.JText::_('FLEXI_EXISTING_ITEM_NOT_SAVED') );
+			}
+			
+			// Set form to reload posted data
+			/*$session 	=& JFactory::getSession();
+			$session->set('item_edit_postdata', $data, 'flexicontent');*/
+			
+			return false;
+		}
 		
 		
 		// **********************************************************************
@@ -1670,7 +1741,7 @@ class ParentClassItem extends JModel
 		// **********************************************************************
 		if( $isnew || $data['vstate']==2 )
 		{
-			if(!$this->applyCurrentVersion($item, $data)) return false;
+			if( !$this->applyCurrentVersion($item, $data) ) return false;
 			//echo "<pre>"; var_dump($data); exit();
 		}
 		
@@ -1755,7 +1826,8 @@ class ParentClassItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveFields($isnew, &$item, &$data) {
+	function saveFields($isnew, &$item, &$data, &$files)
+	{
 		$app = & JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 		$cparams =& $this->_cparams;
@@ -1789,16 +1861,16 @@ class ParentClassItem extends JModel
 		// ***************************************************************************************************************************		
 		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0);
 		
-		if($data['vstate']==2) { // the new version is approved, remove old version values from the field table
-			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-		}
-		if ($fields) {
-			$files	= JRequest::get( 'files', JREQUEST_ALLOWRAW );
-			$searchindex = '';
-			
-			foreach($fields as $field) {
+		
+		// ******************************************************************************************************************
+		// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
+		// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
+		// ******************************************************************************************************************
+		
+		if ($fields)
+		{	
+			foreach($fields as $field)
+			{
 				// In J1.6 field's posted values have different location if not CORE (aka custom field)
 				if ( $get_untraslatable_values && $field->untranslatable ) {
 					$postvalue = $field->value;
@@ -1808,19 +1880,41 @@ class ParentClassItem extends JModel
 					$postvalue = @$data['custom'][$field->name];
 				}
 				
-				// Skip fields not having value
-				if (!$postvalue) continue;
-				
 				// Trigger plugin Event 'onBeforeSaveField'
 				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$postvalue, &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postvalue, &$files[$field->name], &$item ));
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postvalue, &$files[$field->name], &$item ));
+				if ($result===false) {
+					// Field requested to abort item saving
+					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
+					return 'abort';
+				}
 				
-				// -- Add the new values to the database 
-				$postvalues = $postvalue;
-				$postvalues = is_array($postvalues) ? $postvalues : array($postvalues);
-				$i = 1;
-				
+				$postdata[$field->name] = $postvalue;
+			}
+		}
+		
+		
+		// **************************************************************************
+		// IF new version is approved, remove old version values from the field table
+		// **************************************************************************
+		if($data['vstate']==2) { // 
+			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
+		
+		
+		// *******************************************************************************************
+		// Loop through Fields saving the field values and triggering onAfterSaveField Event handlers,
+		// and save Joomfish Data (if they exist), this is for J1.5 only (stored in Joomfish DB table)
+		// *******************************************************************************************
+		if ($fields)
+		{
+			$searchindex = '';
+			
+			foreach($fields as $field)
+			{
 				// Delete field values in all translating items, if current field is untranslatable and current item version is approved
 				if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
 					if (count($translation_ids) && $field->untranslatable) {
@@ -1832,6 +1926,12 @@ class ParentClassItem extends JModel
 					}
 				}
 				
+				// Skip fields not having value
+				if (!$postdata[$field->name]) continue;
+				
+				// -- Add the new values to the database 
+				$postvalues = $this->formatToArray( $postdata[$field->name] );
+				$i = 1;
 				foreach ($postvalues as $postvalue) {
 					
 					// -- a. Add versioning values, but do not version the 'hits' field
@@ -1842,7 +1942,7 @@ class ParentClassItem extends JModel
 						$obj->valueorder	= $i;
 						$obj->version			= (int)$last_version+1;
 						
-						// Normally this is redudant, since FLEXIcontent field must have had serialized the parameters of each value already
+						// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
 						if ($use_versioning) {
 							if ( isset($obj->value) && strlen(trim($obj->value)) ) {
@@ -1874,12 +1974,17 @@ class ParentClassItem extends JModel
 				// Trigger onAfterSaveField Event
 				//$results = $dispatcher->trigger('onAfterSaveField', array( $field, &$postvalue, &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postvalue, &$files[$field->name] ));
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postvalue, &$files[$field->name] ));
+				// *** $result is ignored
 				$searchindex 	.= @$field->search;
 			}
 			
-			// Finally save a version of the posted JoomFish translated data
-			if ( !empty($data['jfdata']) && $use_versioning )
+			// **************************************************************
+			// Save other versioned item data into the field versioning table
+			// **************************************************************
+			
+			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
+			if ( FLEXI_FISH && !empty($data['jfdata']) && $use_versioning )
 			{
 				$obj = new stdClass();
 				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Joomfish translated item data
@@ -1887,7 +1992,6 @@ class ParentClassItem extends JModel
 				$obj->valueorder	= 1;
 				$obj->version			= (int)$last_version+1;
 				
-				// Normally this is redudant, since FLEXIcontent field must have had serialized the parameters of each value already
 				$item_lang = substr($item->language ,0,2);
 				$data['jfdata'][$item_lang]['alias'] = $item->alias;
 				$data['jfdata'][$item_lang]['metadesc'] = $item->metadesc;
@@ -1910,33 +2014,16 @@ class ParentClassItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function applyCurrentVersion(&$item, &$data)
+	function applyCurrentVersion(&$item, &$data, $createonly=false)
 	{
 		$app = &JFactory::getApplication();
-		$isnew = !$item->id;
 		$cparams =& $this->_cparams;
-		$nullDate	= $this->_db->getNullDate();
 		$user	=& JFactory::getUser();
 		$editjf_translations = $cparams->get('editjf_translations', 0);
 		
-		// *********************************************************************************
-		// Prepare item data for being saved and also validate them via the check() function
-		// *********************************************************************************
-		
-		// For new items get next available ordering number
-		if ($isnew) {
-			$item->ordering = $item->getNextOrder();
-		}
-		
-		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
-		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
-			$lang_parent_id = $item->lang_parent_id;
-			$item->lang_parent_id = $isnew ? 0 : $item->id;
-			if ( $item->lang_parent_id != $lang_parent_id ) {
-				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'notice' );
-			}
-		}
-		
+		// ******************************
+		// Check and store item in the db
+		// ******************************
 		
 		// Make sure the data is valid
 		if (!$item->check()) {
@@ -1944,24 +2031,6 @@ class ParentClassItem extends JModel
 			return false;
 		}
 		
-		// ******************************************************************************************************
-		// Decide new current version for the item, this depends if versioning is ON and if versioned is approved
-		// NOTE: new fields values are always stored as 'last_version' PLUS 1, when versioning is ENABLED
-		// ******************************************************************************************************
-		$last_version    = FLEXIUtilities::getLastVersions($item->id, true);
-		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$use_versioning = $cparams->get('use_versioning', 1);
-		if ( !$use_versioning ) {
-			// not using versioning, increment current version numbering
-			$item->version = $isnew ? 1 : $current_version+1;
-		} else {
-			// using versioning, increment last version numbering, or keep currennt version number if new version was not approved
-			$item->version = $isnew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
-		}
-		
-		// ********************
-		// Store item in the db
-		// ********************
 		if (!$item->store()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
@@ -1969,12 +2038,10 @@ class ParentClassItem extends JModel
 		$this->_id   = $item->id;
 		$this->_item = & $item;
 		
-		// ****************************
-		// Save joomfish data in the db
-		// ****************************
-		if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $editjf_translations )
-			$this->_saveJFdata( $data['jfdata'], $item );
 		
+		// ***********************
+		// Save access information
+		// ***********************
 		if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$canRight 	= (in_array('right', $rights) || $user->gid > 24);
@@ -1982,6 +2049,20 @@ class ParentClassItem extends JModel
 		} else if (FLEXI_J16GE) {
 			// Rules for J1.6+ are handled in the JTABLE class of the item with overriden JTable functions: bind() and store()
 		}
+		
+		
+		// ***************************
+		// If creating only return ...
+		// ***************************
+		if ($createonly) return true;
+		
+		
+		// ****************************
+		// Save joomfish data in the db
+		// ****************************
+		if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $editjf_translations )
+			$this->_saveJFdata( $data['jfdata'], $item );
+		
 		
 		// ***********************************************
 		// Delete old tag relations and Store the new ones
@@ -2601,14 +2682,15 @@ class ParentClassItem extends JModel
 		if(!$fields || $force) {
 			jimport('joomla.html.parameter');
 			$use_versioning = $this->_cparams->get('use_versioning', 1);
-			$typeid = JRequest::getVar('typeid', 0, '', 'int');
+			$typeid = $this->get('type_id');   // Get item's type_id, loading item if neccessary
+			$typeid = $typeid ? $typeid : JRequest::getVar('typeid', 0, '', 'int');
+			if (!$typeid) JError::raiseError(500, __FUNCTION__.'(): Cannot get type_id from item or typeid from HTTP Request');
+			
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$where = $typeid ? ' WHERE ftrel.type_id='.(int)$typeid : ' WHERE fi.iscore=1 OR ie.item_id = '.(int)$this->_id;
 			$query = 'SELECT fi.*'
 					.' FROM #__flexicontent_fields AS fi'
 					.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'  // Require field belonging to item type, we use join instead of left join
-					.($typeid ? '' : ' LEFT JOIN #__flexicontent_items_ext AS ie ON ftrel.type_id = ie.type_id')        // Join to get the type of the item
-					.$where
+					.' WHERE ftrel.type_id='.$typeid
 					.' AND fi.published = 1'        // Require field published
 					.' GROUP BY fi.id'
 					.' ORDER BY ftrel.ordering, fi.ordering, fi.name'

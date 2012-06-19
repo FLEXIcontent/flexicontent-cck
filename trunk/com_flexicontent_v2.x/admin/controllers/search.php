@@ -70,21 +70,26 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	}
 	function index() {
 		@ob_end_clean();
-		$items_per_call = JRequest::getVar('items_per_call', 50);
-		$itemcnt = JRequest::getVar('itemcnt', 0);
+		$items_per_call = JRequest::getVar('items_per_call', 50);  // Number of item to index per HTTP request
+		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		$itemmodel = $this->getModel('items');
-		$fields = & $itemmodel->getAdvSearchFields('id');
-		$fieldid_arr = array_keys($fields);
-		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);
+		$fields = & $itemmodel->getAdvSearchFields('id');          // Retrieve fields, that are assigned as (advanced) searchable
+		$fieldid_arr = array_keys($fields);                        // Get the field ids of the (advanced) searchable fields
+		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);  // Get the items ids that have value for any of the searchable fields
 
 		$db = &JFactory::getDBO();
 		$fields = array();
-		for($cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++) {
-			if ($cnt >= count($itemid_arr)) break;
+		for ( $cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++ )
+		{
+			// Check if items have finished, otherwise continue with -current- item
+			if ($cnt >= count($itemid_arr)) break; 
 			$itemid = $itemid_arr[$cnt];
-			foreach($fieldid_arr as $fieldid) {
+			
+			// For current item: Loop though all searchable fields according to their type
+			foreach($fieldid_arr as $fieldid)
+			{
 				if(!isset($fields[$fieldid])) {
-					$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}' AND published='1' AND isadvsearch='1';";
+					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND isadvsearch=1";
 					$db->setQuery($query);
 					if(!$fields[$fieldid] = $db->loadObject()) {
 						echo "fail|1";
@@ -116,8 +121,10 @@ class FlexicontentControllerSearch extends FlexicontentController{
 						." WHERE rel.field_id='{$fieldid}' AND rel.item_id='{$itemid}';";
 					$db->setQuery($query);
 					$values = $db->loadResultArray();
-					$values = is_array($values)?$values:array($values);
+					$values = is_array($values) ? $values : array($values);
 				}
+				
+				// Add values to advanced search index
 				$dispatcher =& JDispatcher::getInstance();
 				JPluginHelper::importPlugin('flexicontent_fields');
 				if(count($values)==1)
@@ -133,7 +140,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	function purge() {
 		$model = $this->getModel('search');
 		$model->purge();
-		$msg = 'FLEXI_ITEMS_PURGED';
+		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 }

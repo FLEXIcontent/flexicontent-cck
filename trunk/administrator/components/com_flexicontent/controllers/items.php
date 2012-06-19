@@ -153,9 +153,12 @@ class FlexicontentControllerItems extends FlexicontentController
 
 			// Since an error occured, check if (a) the item is new and (b) was not created
 			if ($isnew && !$model->get('id')) {
-				JError::raiseWarning( 500, JText::_( 'FLEXI_NEW_ITEM_NOT_CREATED' ) );
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0';
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0&typeid='.$post['type_id'];
+				$this->setRedirect($link, $msg);
+				return;
+			} else {
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
 				return;
 			}

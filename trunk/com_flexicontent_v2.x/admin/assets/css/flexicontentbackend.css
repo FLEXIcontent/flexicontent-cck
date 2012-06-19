@@ -797,7 +797,8 @@ div fieldset label {
 	clear: none;
 }
 div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
-div.panel fieldset img, div.panel fieldset button {
+div.panel fieldset img, div.panel fieldset button,
+div.fieldset_value {
 	margin:4px 1px 0px 12px!important;
 	padding:2px !important;
 	display:inline;

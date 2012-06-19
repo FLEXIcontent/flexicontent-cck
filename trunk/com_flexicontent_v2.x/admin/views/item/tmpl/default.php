@@ -100,10 +100,10 @@ if ($this->CanUseTags || $this->CanVersion) {
 ?>
 <script language="javascript" type="text/javascript">
 window.addEvent( "domready", function() {
-    var hits = new itemscreen('hits', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'items.gethits'});
+    var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'items.gethits'});
     hits.fetchscreen();
 
-    var votes = new itemscreen('votes', {id:<?php echo $this->form->getValue('id') ? $this->form->getValue('id') : 0; ?>, task:'items.getvotes'});
+    var votes = new itemscreen('votes', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'items.getvotes'});
     votes.fetchscreen();
 });
 function addToList(id, name) {
@@ -817,7 +817,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<li><?php echo $this->form->getLabel('access');?>
 			<?php echo $this->form->getInput('access');?></li>
 			<li><?php echo $this->form->getLabel('created_by');?>
-			<?php echo $this->form->getInput('created_by');?></li>
+			<?php echo $this->form->getFieldAttribute('created_by', 'disabled') ? '<div class="fieldset_value">'.$this->row->creator.'</div>' : $this->form->getInput('created_by');?></li>
 			<li><?php echo $this->form->getLabel('created_by_alias');?>
 			<?php echo $this->form->getInput('created_by_alias');?></li>
 			<li><?php echo $this->form->getLabel('created');?>
