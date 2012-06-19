@@ -44,8 +44,8 @@ if ($add_ccs && $caching) {
 $list = modFlexiTagCloudHelper::getTags($params, $module);
 require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));
 
-$params =& JComponentHelper::getParams('com_flexicontent');
-if ( $params->get('print_logging_info') ) {
+$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+if ( $flexiparams->get('print_logging_info') ) {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$app->enqueueMessage( sprintf( 'FLEXIcontent tags cloud module creation is %.2f secs', $elapsed_microseconds/1000000), 'notice' );
