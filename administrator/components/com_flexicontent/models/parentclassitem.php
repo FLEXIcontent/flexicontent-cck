@@ -1707,7 +1707,7 @@ class ParentClassItem extends JModel
 		// ****************************************************************************
 		$files  = JRequest::get( 'files', JREQUEST_ALLOWRAW );
 		$result = $this->saveFields($isnew, $item, $data, $files);
-		if( $result=='abort' ) {
+		if( $result==='abort' ) {
 			if ($isnew) {
 				$db = & $this->_db;
 				if (FLEXI_J16GE) {
