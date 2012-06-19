@@ -922,12 +922,15 @@ class modFlexicontentHelper
 				$tagged = $db->loadResultArray();
 			}
 			
-			if (isset($tagged)) {
+			if ( isset($tagged) && count($tagged) ) {
 				if ($method_tags == 2) { // exclude method
 					$where .= (count($tagged) > 1) ? ' AND i.id NOT IN ('.implode(',', $tagged).')' : ' AND i.id = '.$tagged[0];
 				} else if ($method_tags == 3) { // include method
 					$where .= (count($tagged) > 1) ? ' AND i.id IN ('.implode(',', $tagged).')' : ' AND i.id <> '.$tagged[0];
 				}
+			} else if ( isset($tagged) ) {
+				// No tagged items found abort if method is 'include' (but continue for 'exclude' method
+				if ($method_tags == 3) return;
 			}
 		}
 		
