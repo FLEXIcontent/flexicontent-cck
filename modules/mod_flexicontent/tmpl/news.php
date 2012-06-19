@@ -113,94 +113,94 @@ $force_height='';//"height='$mod_height'";
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
-				<span class="fc_block" >
-					<span class="fc_inline_block news_title">
+				<div class="fc_block" >
+					<div class="fc_inline_block news_title">
 						<?php if ($link_title_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 						<?php else : ?>	
 						<?php echo $item->title; ?>
 						<?php endif; ?>
-					</span>
-				</span>
+					</div>
+				</div>
 				<?php endif; ?>
 				<!-- EOF current item's title -->	
 				
 				<!-- BOF current item's image -->	
 				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
-				<span class="image_featured">
+				<div class="image_featured">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 					<?php else : ?>
 						<?php echo $item->image_rendered; ?>
 					<?php endif; ?>
-				</span>
+				</div>
 				
 				<?php elseif ($mod_use_image_feat && $item->image) : ?>
 				
-				<span class="image_featured">
+				<div class="image_featured">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
 					<?php else : ?>
 						<img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
-				</span>
+				</div>
 				
 				<?php endif; ?>
 				<!-- BOF current item's image -->
 				
 				<!-- BOF current item's content -->
 				<?php if ($display_date_feat || $display_text_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
-				<span class="content_featured">
+				<div class="content_featured">
 					
 					<?php if ($display_date_feat && $item->date_created) : ?>
-					<span class="fc_block">
-						<span class="fc_inline news_date created">
+					<div class="fc_block">
+						<div class="fc_inline news_date created">
 							<?php echo $item->date_created; ?>
-						</span>
-					</span>
+						</div>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_date_feat && $item->date_modified) : ?>
-					<span class="fc_block">
-						<span class="fc_inline news_date modified">
+					<div class="fc_block">
+						<div class="fc_inline news_date modified">
 							<?php echo $item->date_modified; ?>
-						</span>
-					</span>
+						</div>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_text_feat && $item->text) : ?>
-					<p class="news_text">
+					<div class="news_text">
 						<?php echo $item->text; ?>
-					</p>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
-					<span class="news_fields">
+					<div class="news_fields">
 						
 						<?php foreach ($item->fields as $k => $field) : ?>
-						<span class="field_block field_<?php echo $k; ?>">
+						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label_feat) : ?>
-							<span class="field_label"><?php echo $field->label . $text_after_label_feat; ?></span>
+							<div class="field_label"><?php echo $field->label . $text_after_label_feat; ?></div>
 							<?php endif; ?>
-							<span class="field_value"><?php echo $field->display; ?></span>
-						</span>
+							<div class="field_value"><?php echo $field->display; ?></div>
+						</div>
 						<?php endforeach; ?>
 						
-					</span>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($mod_readmore_feat) : ?>
-					<span class="fc_block">
-						<span class="news_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
-						</span>
-					</span>
+					<div class="fc_block">
+						<div class="news_readon">
+							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></div></a>
+						</div>
+					</div>
 					<?php endif; ?>
 					
-					<span class="clearfix"></span> 
+					<div class="clearfix"></div> 
 					
-				</span> <!-- EOF current item's content -->
+				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
 			</div> <!-- EOF current item -->
@@ -224,92 +224,92 @@ $force_height='';//"height='$mod_height'";
 			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4==1 || $rowcount%4==2)?'odd':'even'; ?>">
 
 					<?php if ($display_title) : ?>
-					<span class="fc_block" >
-						<span class="fc_inline_block news_title">
+					<div class="fc_block" >
+						<div class="fc_inline_block news_title">
 							<?php if ($link_title) : ?>
 							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 							<?php else : ?>	
 							<?php echo $item->title; ?>
 							<?php endif; ?>
-						</span>
-					</span>
+						</div>
+					</div>
 					<?php endif; ?>
 				
 				<!-- BOF current item's image -->	
 				<?php if ($mod_use_image && $item->image_rendered) : ?>
-				<span class="image_standard">
+				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 					<?php else : ?>
 						<?php echo $item->image_rendered; ?>
 					<?php endif; ?>
-				</span>
+				</div>
 				
 				<?php elseif ($mod_use_image && $item->image) : ?>
 				
-				<span class="image_standard">
+				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
 						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
 					<?php else : ?>
 						<img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
-				</span>
+				</div>
 				
 				<?php endif; ?>
 				<!-- BOF current item's image -->	
 				
 				<!-- BOF current item's content -->
 				<?php if ($display_date || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
-				<span class="content_standard">
+				<div class="content_standard">
 										
 					<?php if ($display_date && $item->date_created) : ?>
-					<span class="fc_block">
-						<span class="fc_inline news_date created">
+					<div class="fc_block">
+						<div class="fc_inline news_date created">
 							<?php echo $item->date_created; ?>
-						</span>
-					</span>
+						</div>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_date && $item->date_modified) : ?>
-					<span class="fc_block">
-						<span class="fc_inline news_date modified">
+					<div class="fc_block">
+						<div class="fc_inline news_date modified">
 							<?php echo $item->date_modified; ?>
-						</span>
-					</span>
+						</div>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_text && $item->text) : ?>
-					<p class="news_text">
+					<div class="news_text">
 						<?php echo $item->text; ?>
-					</p>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
-					<span class="news_fields">
+					<div class="news_fields">
 						
 						<?php foreach ($item->fields as $k => $field) : ?>
-						<span class="field_block field_<?php echo $k; ?>">
+						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label) : ?>
-							<span class="field_label"><?php echo $field->label . $text_after_label; ?></span>
+							<div class="field_label"><?php echo $field->label . $text_after_label; ?></div>
 							<?php endif; ?>
-							<span class="field_value"><?php echo $field->display; ?></span>
-						</span>
+							<div class="field_value"><?php echo $field->display; ?></div>
+						</div>
 						<?php endforeach; ?>
 						
-					</span>
+					</div>
 					<?php endif; ?>
 					
 					<?php if ($mod_readmore) : ?>
-					<span class="fc_block">
-						<span class="news_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::sprintf('Read more...'); ?></span></a>
-						</span>
-					</span>
+					<div class="fc_block">
+						<div class="news_readon">
+							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::sprintf('Read more...'); ?></div></a>
+						</div>
+					</div>
 					<?php endif; ?>
 
-					<span class="clearfix"></span> 
+					<div class="clearfix"></div> 
 					
-				</span> <!-- EOF current item's content -->
+				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
 			</div> <!-- EOF current item -->
