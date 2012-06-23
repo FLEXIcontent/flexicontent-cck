@@ -114,15 +114,11 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 		$app	= JFactory::getApplication();
 		$user	= JFactory::getUser();
 		
-		// Get language, joomfish or J1.7+ language selector will append lang variable to the URL
-		$lang = JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
-	    
+		// Get language
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
+		
 	  // COMPONENT PARAMETERS
 		$cparams 	= & $app->getParams('com_flexicontent');
 		if (!defined('FLEXI_SECTION'))

@@ -1151,17 +1151,23 @@ class flexicontent_html
 	 */
 	function getUserCurrentLang()
 	{
-		static $lang = null;
+		static $lang = null;      // A two character language tag
 		if ($lang) return $lang;
 		
-		// First try language from http request
-		$lang = JRequest::getWord('lang', '' );
-		if ( empty($lang) ) {
-			// Second get DEFAULT --USER-- language, note this is different from the default Frontend/Backend "Content" language
-			$langFactory= JFactory::getLanguage();
-			$lang = $langFactory->getTag();
-			$lang = substr($lang,0,2);
-		}
+		// Get default content language for J1.5 and CURRENT content language for J2.5
+		// NOTE: Content language can be natively switched in J2.5, by using
+		// (a) the language switcher module and (b) the Language Filter - System Plugin
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);
+		
+		// Language as set in the URL (can be switched via Joomfish in J1.5)
+		$urlLang  = JRequest::getWord('lang', '' );
+		
+		// Language from URL is used only in J1.5 -- (As said above, in J2.5 the content language can be switched natively)
+		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
+		
+		// WARNING !!!: This variable is wrongly set in J2.5, maybe correct it?
+		//JRequest::setVar('lang', $lang );
+		
 		return $lang;
 	}
 	
