@@ -713,17 +713,11 @@ class FlexicontentFields
 	 */
 	function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
 		static $tparams = array();
-		static $fdata = array();
-		static $lang=null;
-		
-		//--. Discover Content Type Id, Name, Alias
-		if ($item) {
-			$type_id = ((is_object($item)) && ($item instanceof JForm))  ?  (int)$item->getValue('type_id')  :  @(int)$item->type_id;
-			$typename = @$item->typename ? $item->typename : "__NOT_SET__";
-			$typealias = @$item->typealias ? $item->typealias : "__NOT_SET__";
-		} else {
-			$type_id = 0; $typename = $typealias = "__NOT_SET__";
-		}
+		static $tinfo   = array();
+		static $fdata   = array();
+		static $lang = null;
+		static $no_typeparams = null;
+		if ($no_typeparams) $no_typeparams = new JParameter("");
 		
 		//--. Create basic field data if no field given
 		if (!empty($name)) {
@@ -746,47 +740,51 @@ class FlexicontentFields
 		}
 		
 		//--. Get Content Type parameters
-		if (!isset($tparams[$typename]) && $type_id) {
-			$query = 'SELECT t.attribs, t.name, t.alias'
-					. ' FROM #__flexicontent_types AS t'
-					. ' WHERE t.id = ' . $type_id
-					;
+		$type_id = @$item->type_id;
+		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) ) {
+			$query = 'SELECT t.attribs, t.name, t.alias FROM #__flexicontent_types AS t WHERE t.id = ' . $type_id;
 			$db =& JFactory::getDBO();
 			$db->setQuery($query);
 			$typedata = $db->loadObject();
-			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			if ( $typedata ) {
+				$tinfo[$type_id]['typename']  = $typedata->name;
+				$tinfo[$type_id]['typealias'] = $typedata->alias;
+				$tparams[$type_id] = new JParameter($typedata->attribs);
 			}
-			$typename = $typedata->name;  // workaround for J1.6+  form not having typename property
-			$typealias = $typedata->alias;  // workaround for J1.6+  form not having typealias property
-			$tparams[$typename] = new JParameter($typedata->attribs);
 		}
 		
-		if (!isset($tparams[$typename])) {
-			$tparams[$typename] = new JParameter("");
+		if ( $type_id && isset($tinfo[$type_id]) && isset($tparams[$type_id]) ) {
+			$typename   = $tinfo[$type_id]['typename'];
+			$typealias  = $tinfo[$type_id]['typealias'];
+			$typeparams = & $tparams[$type_id];
+			$tindex = $typename.'_'.$typealias;
+		} else {
+			$typename   = '';
+			$typealias  = '';
+			$typeparams = & $no_typeparams;
+			$tindex = 'no_type';
 		}
 		
 		//--. BESIDES parameters we want to retrieve: ... Custom LABELs and DESCRIPTIONs
-		if ($field->iscore && !isset($fdata[$typealias][$field->name])) {
-			$fdata[$typealias][$field->name] = new stdClass();
+		if ($field->iscore && !isset($fdata[$tindex][$field->name])) {
+			$fdata[$tindex][$field->name] = new stdClass();
 			
 			// -- SET a type specific label for the current field
 			// a. Try field label to get for current language
-			$field_label_type = $tparams[$typename]->get($field->field_type.'_label', '');
+			$field_label_type = $tparams[$type_id]->get($field->field_type.'_label', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
 			if ($result) {
-				$fdata[$typealias][$field->name]->label = $matches[2];
+				$fdata[$tindex][$field->name]->label = $matches[2];
 			} else if ($field_label_type) {
 				// b. Try to get default for all languages
 				$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
 				if ($result) {
-					$fdata[$typealias][$field->name]->label = $matches[2];
+					$fdata[$tindex][$field->name]->label = $matches[2];
 				} else {
 					// c. Check that no languages specific string are defined
 					$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
 					if (!$result) {
-						$fdata[$typealias][$field->name]->label = $field_label_type;
+						$fdata[$tindex][$field->name]->label = $field_label_type;
 					}
 				}
 			} else {
@@ -795,20 +793,20 @@ class FlexicontentFields
 			
 			// -- SET a type specific description for the current field
 			// a. Try field description to get for current language
-			$field_desc_type = $tparams[$typename]->get($field->field_type.'_desc', '');
+			$field_desc_type = $tparams[$type_id]->get($field->field_type.'_desc', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
 			if ($result) {
-				$fdata[$typealias][$field->name]->description = $matches[2];
+				$fdata[$tindex][$field->name]->description = $matches[2];
 			} else if ($field_label_type) {
 				// b. Try to get default for all languages
 				$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
 				if ($result) {
-					$fdata[$typealias][$field->name]->description = $matches[2];
+					$fdata[$tindex][$field->name]->description = $matches[2];
 				} else {
 					// c. Check that no languages specific string are defined
 					$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
 					if (!$result) {
-						$fdata[$typealias][$field->name]->description = $field_desc_type;
+						$fdata[$tindex][$field->name]->description = $field_desc_type;
 					}
 				}
 			} else {
@@ -816,22 +814,22 @@ class FlexicontentFields
 			}
 			
 			//--. Create type specific parameters for the CORE field that we will be used by all subsequent calls to retrieve parameters
-			$fdata[$typealias][$field->name]->parameters = new JParameter($field->attribs);
+			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
 			
 			//--. In future we may automate this?, although this is faster
 			if ($field->field_type == 'voting') {
-				$voting_override_extra_votes = $tparams[$typename]->get('voting_override_extra_votes', '');
-				$voting_extra_votes          = $tparams[$typename]->get('voting_extra_votes', '');
-				$voting_main_label           = $tparams[$typename]->get('voting_main_label', '');
+				$voting_override_extra_votes = $tparams[$type_id]->get('voting_override_extra_votes', '');
+				$voting_extra_votes          = $tparams[$type_id]->get('voting_extra_votes', '');
+				$voting_main_label           = $tparams[$type_id]->get('voting_main_label', '');
 				
 				// Override --voting field-- configuration regarding extra votes
 				if ( $voting_override_extra_votes ) {
-					$fdata[$typealias][$field->name]->parameters->set('extra_votes', $voting_extra_votes );
+					$fdata[$tindex][$field->name]->parameters->set('extra_votes', $voting_extra_votes );
 					// Set a Default main label if one was not given but extra votes exist
 					$main_label = $voting_main_label ? $voting_main_label : JText::_('FLEXI_OVERALL');
 				}
 				if ( $voting_override_extra_votes ) {
-					$fdata[$typealias][$field->name]->parameters->set('main_label', $voting_main_label );
+					$fdata[$tindex][$field->name]->parameters->set('main_label', $voting_main_label );
 				}
 			}
 			
@@ -853,28 +851,28 @@ class FlexicontentFields
 			//--. Finally merge custom field parameters with the type specific parameters ones
 			if ($data) {
 				$ts_params = new JParameter($data->attribs);
-				$fdata[$typealias][$field->name]->parameters->merge($ts_params);
+				$fdata[$tindex][$field->name]->parameters->merge($ts_params);
 			} else if ($field->field_type=='maintext') {
-				$fdata[$typealias][$field->name]->parameters->set( 'use_html',  !$tparams[$typename]->get('hide_html', 0) ) ;
+				$fdata[$tindex][$field->name]->parameters->set( 'use_html',  !$tparams[$type_id]->get('hide_html', 0) ) ;
 			}
 			
-		} else if ( !isset($fdata[$typealias][$field->name]) ) {
-			$fdata[$typealias][$field->name]->parameters = new JParameter($field->attribs);
+		} else if ( !isset($fdata[$tindex][$field->name]) ) {
+			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
 		//--. Set custom label or maintain default
-		if (isset($fdata[$typealias][$field->name]->label)) {
-			$field->label = $fdata[$typealias][$field->name]->label;
+		if (isset($fdata[$tindex][$field->name]->label)) {
+			$field->label = $fdata[$tindex][$field->name]->label;
 		}
 		//--. Set custom description or maintain default
-		if (isset($fdata[$typealias][$field->name]->description)) {
-			$field->description = $fdata[$typealias][$field->name]->description;
+		if (isset($fdata[$tindex][$field->name]->description)) {
+			$field->description = $fdata[$tindex][$field->name]->description;
 		} else if (!$field->description) {
 			$field->description = '';
 		}
 		
 		//--. Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
-		$field->parameters = clone($fdata[$typealias][$field->name]->parameters);
+		$field->parameters = clone($fdata[$tindex][$field->name]->parameters);
 		
 		return $field;
 	}
