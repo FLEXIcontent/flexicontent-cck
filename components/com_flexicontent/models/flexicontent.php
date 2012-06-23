@@ -203,14 +203,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$rootcat = JRequest::getVar('rootcat',false);
 		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
 		
-		// Shortcode of the site active language (joomfish)
-		$lang	= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		// Get a 2 character language tag
+		$lang = flexicontent_html::getUserCurrentLang();
 
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
@@ -358,14 +352,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$user = & JFactory::getUser();
 		$orderby = $this->_buildItemOrderBy('subcat_');
 		
-		// Shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		// Get a 2 character language tag
+		$lang = flexicontent_html::getUserCurrentLang();
+		
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 		// show unauthorized items
@@ -455,14 +444,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$user = &JFactory::getUser();
 		$limit 		= JRequest::getVar('limit', 10);
 		
-		// shortcode of the site active language (joomfish)
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		// Get a 2 character language tag
+		$lang = flexicontent_html::getUserCurrentLang();
+		
 		// Do we filter the categories
 		$filtercat  = $params->get('filtercat', 0);
 

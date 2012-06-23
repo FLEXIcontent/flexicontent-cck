@@ -84,7 +84,9 @@ function plgSearchFlexiadvsearch( $text, $phrase='', $ordering='', $areas=null )
 	$pluginParams = new JParameter( $plugin->params );
 
 	// shortcode of the site active language (joomfish)
-	$lang 		= JRequest::getWord('lang', '' );
+	$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+	$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+	$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 
 	//$limit 			= $pluginParams->def( 'search_limit', 50 );
 	$limit 			= $pluginParams->get( 'search_limit', 50 );

@@ -730,14 +730,9 @@ class FlexicontentFields
 		}
 		
 		//--. Get a 2 character language tag
-		if (empty($lang)) {
-			$lang = JRequest::getWord('lang', '' );
-			if(empty($lang)){
-				$langFactory= JFactory::getLanguage();
-				$tagLang = $langFactory->getTag();
-				$lang = substr($tagLang ,0,2);
-			}
-		}
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 		//--. Get Content Type parameters
 		$type_id = @$item->type_id;

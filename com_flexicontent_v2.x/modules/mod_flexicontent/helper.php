@@ -652,13 +652,7 @@ class modFlexicontentHelper
 		}
 
 		// current language scope
-		$lang = JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-			$lang = substr($tagLang ,0,2);
-		}
+		$lang = flexicontent_html::getUserCurrentLang();
 		if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
 			$where .= ' AND ie.language NOT LIKE ' . $db->Quote( $lang .'%' );
 		} else if ($method_curlang == 2) { // include method  ---  include items of current language ONLY

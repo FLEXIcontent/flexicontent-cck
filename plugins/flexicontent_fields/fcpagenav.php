@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function plgFlexicontent_fieldsFcpagenav( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_fcpagenav', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_fcpagenav', JPATH_ADMINISTRATOR);
 	}
 	function onAdvSearchDisplayField(&$field, &$item) {
 		plgFlexicontent_fieldsFcpagenav::onDisplayField($field, $item);
@@ -49,12 +49,9 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$filtercat  = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
 		
 		// Get the site default language in case no language is set in the url
-		$lang 		= JRequest::getWord('lang', '' );
-		if(empty($lang)){
-			$langFactory= JFactory::getLanguage();
-			$tagLang = $langFactory->getTag();
-			$lang = substr($tagLang ,0,2);
-		}
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 		// parameters shortcuts
 		$load_css 			= $field->parameters->get('load_css', 1);

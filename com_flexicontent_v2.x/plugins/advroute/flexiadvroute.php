@@ -95,7 +95,9 @@ class plgSystemFlexiadvroute extends JPlugin
 		if ( !FLEXI_J16GE && !FLEXI_FISH )  return;
 		
 	  // Get current user language
-		$currlang = JRequest::getWord('lang', '' ) ? JRequest::getWord('lang', '' ) : substr(JFactory::getLanguage()->getTag() ,0,2);
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$currlang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 	  // Get variables
 	  if (FLEXI_FISH)

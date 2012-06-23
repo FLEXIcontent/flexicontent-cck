@@ -41,13 +41,8 @@ if ($show_alpha == 1) {
 	// Custom setting
 	$alphacharacters = $this->params->get('alphacharacters', "[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
 	
-	$lang = JRequest::getWord('lang', '' );
-	if(empty($lang)){
-		$langFactory= JFactory::getLanguage();
-		$tagLang = $langFactory->getTag();
-		//Well, the substr is not even required as flexi saves the Joomla language tag... so we could have kept the $tagLang tag variable directly.
-		$lang = substr($tagLang ,0,2);
-	}
+	// Get a 2 character language tag
+	$lang = flexicontent_html::getUserCurrentLang();
 	
 	// a. Try to get for current language
 	$result = preg_match("/(\[$lang\])=([^[]+)/i", $alphacharacters, $matches);
