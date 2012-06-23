@@ -68,13 +68,13 @@ class JElementFields extends JElement
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
 		
-		$field_type = $node->attributes('field_type');
+		$field_type = @$attributes['field_type'];
 		if($field_type) {
 			$field_type = explode(",", $field_type);
 			$and .= " AND field_type IN ('". implode("','", $field_type)."')";
 		}
 		
-		$exclude_field_type = $node->attributes('exclude_field_type');
+		$exclude_field_type =  @$attributes['exclude_field_type'];
 		if($exclude_field_type) {
 			$exclude_field_type = explode(",", $exclude_field_type);
 			$and .= " AND field_type NOT IN ('". implode("','", $exclude_field_type)."')";

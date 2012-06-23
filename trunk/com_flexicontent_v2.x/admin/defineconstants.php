@@ -19,6 +19,12 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$lhlist = array('localhost', '127.0.0.1');
+if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
+	error_reporting(E_ALL);
+	ini_set('display_errors',1);
+}
+
 // Set a default timezone if web server provider has not done so
 if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 	date_default_timezone_set('UTC');
