@@ -175,8 +175,7 @@ class FlexicontentViewCategory extends JView
 		$document->setTitle( $params->get( 'page_title' ) );
 
 		// @TODO check that as it seems to be dirty :(
-		$uri  			=& JFactory::getURI();
-		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$base = $uri->getScheme() . '://' . $uri->getHost();
 		$start = JRequest::getVar('start', '');
 		$start = $start ? "&start=".$start : "";
 		$ucanonical 	= $base . '/'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);
@@ -437,13 +436,13 @@ class FlexicontentViewCategory extends JView
 		$cat->image = $image;
 		
 		// remove previous alpha index filter
-		$uri->delVar('letter');
+		//$uri->delVar('letter');
 		
 		// remove filter variables (includes search box and sort order)
 		preg_match_all('/filter[^=]*/', $uri->toString(), $matches);
 		foreach($matches[0] as $match)
 		{
-			$uri->delVar($match);
+			//$uri->delVar($match);
 		}
 
 		//ordering
@@ -476,7 +475,7 @@ class FlexicontentViewCategory extends JView
 
 		// Create the pagination object
 		$pageNav = $model->getPagination();
-		$resultsCounter = $model->getResultsCounter();
+		$resultsCounter = $pageNav->getResultsCounter();
 
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
