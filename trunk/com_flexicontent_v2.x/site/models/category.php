@@ -235,32 +235,12 @@ class FlexicontentModelCategory extends JModel {
 	public function getPagination() {
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination)) {
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			//jimport('joomla.html.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 		return $this->_pagination;
 	}
-	
-	/**
-	 * Create and return the pagination result set counter string
-	 *
-	 * @access	public
-	 * @return	string	Pagination result set counter string
-	 * @since	1.5
-	 */
-	function getResultsCounter() {
-		// If this code is copied to the template then $this must be replaced with $this->getModel()
-		$currstart = $this->getState('limitstart') + 1;
-		$currend = $this->getState('limitstart') + $this->getState('limit');
-		$currend = ($currend > $this->getTotal()) ? $this->getTotal() : $currend;
-		
-		return $html =
-			 "<span class='item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
-			."<span class='item_total_value'>".$this->getTotal() ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
-			."<span class='item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
-			."<span class='item_total_value'>".$currstart ." - " .$currend ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
-			;
-	}	
 	
 	
 	/**
