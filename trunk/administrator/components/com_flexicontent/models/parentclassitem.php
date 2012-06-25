@@ -354,14 +354,8 @@ class ParentClassItem extends JModel
 					// **********************
 					// Item Retrieval BACKEND
 					// **********************
-					if (FLEXI_J16GE) {
-						$item = parent::getItem($this->_id);  // uses model's getTable() function
-						$result = (boolean) $item;
-					} else if ($this->_id) {
-						$item =& $this->getTable('flexicontent_items', '');
-						$result = $item->load($this->_id);  // try loading existing item data
-					}
-					
+					$item =& $this->getTable('flexicontent_items', '');
+					$result = $item->load($this->_id);  // try loading existing item data
 					if ($result===false) return false;
 				}
 				else
@@ -600,7 +594,7 @@ class ParentClassItem extends JModel
 					$query = "SELECT f.id, f.name, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 						." FROM #__flexicontent_items_versions as iv "
 						." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
-						." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1) AND iv.item_id='".$this->_id."'"
+						." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$this->_id."'"
 						." GROUP BY f.id";
 					$db->setQuery($query);
 					$fields = $db->loadObjectList();
@@ -633,6 +627,10 @@ class ParentClassItem extends JModel
 										$item->$fieldname = $fieldvalue;
 								}
 							}
+						} else if ($f->field_id==-2) {
+							// Other item properties that were versioned, such as alias, catid, meta params, attribs
+							$item_data = unserialize($f->value);
+							$item->bind($item_data);
 						} else if ($fieldname) {
 							// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
 							$item->$fieldname = $f->value;
@@ -1442,43 +1440,21 @@ class ParentClassItem extends JModel
 		// Keys that are not set will not be set, thus the previous value is maintained
 		// *******************************************************************************
 		
-		// Retrieve item parameters (array PARAMS or ATTRIBS ), and build item attribs INI string
+		// Retrieve (a) item parameters (array PARAMS or ATTRIBS ) and (b) item metadata (array METADATA or META )
 		if ( !FLEXI_J16GE ) {
-			$params = $this->formatToArray( @ $data['params'] );
+			$params   = $this->formatToArray( @ $data['params'] );
+			$metadata = $this->formatToArray( @ $data['meta'] );
 			unset($data['params']);
+			unset($data['meta']);
 		} else {
-			$params = $this->formatToArray( @ $data['attribs'] );
+			$params   = $this->formatToArray( @ $data['attribs'] );
+			$metadata = $this->formatToArray( @ $data['metadata'] );
 			unset($data['attribs']);
+			unset($data['metadata']);
 		}
 		
-		if (is_array($params))
-		{
-			$item->attribs = new JParameter($item->attribs);
-			foreach ($params as $k => $v) {
-				//$v = is_array($v) ? implode('|', $v) : $v;
-				$item->attribs->set($k, $v);
-			}
-			$item->attribs = $item->attribs->toString();
-		}
-		
-		// Retrieve metadesc and metakey item's columns, and build item metadata INI string
-		$metadata = FLEXI_J16GE ? @$data['metadata'] : @$data['meta'];
-		$metadata = $this->formatToArray( $metadata );
-
-		if (is_array($metadata))
-		{
-			$item->metadata = new JParameter($item->metadata);
-			foreach ($metadata as $k => $v) {
-				if ( $k == 'description' && !FLEXI_J16GE ) {  // is jform field in J1.6+
-					$item->metadesc = $v;
-				} elseif ( $k == 'keywords' && !FLEXI_J16GE ) {  // is jform field in J1.6+
-					$item->metakey = $v;
-				} else {
-					$item->metadata->set($k, $v);
-				}
-			}
-			$item->metadata = $item->metadata->toString();
-		}		
+		// Merge  (form posted)  item attributes and metadata parameters
+		$this->mergeAttributes($item, $params, $metadata);
 		
 		
 		// *******************************************************
@@ -1982,6 +1958,25 @@ class ParentClassItem extends JModel
 			// **************************************************************
 			// Save other versioned item data into the field versioning table
 			// **************************************************************
+			
+			// a. Save a version of item properties that do not have a corresponding CORE Field
+			$obj = new stdClass();
+			$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
+			$obj->item_id 		= $item->id;
+			$obj->valueorder	= 1;
+			$obj->version			= (int)$last_version+1;
+			
+			$item_data = array();
+			$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs');
+			if (FLEXI_J16GE) {
+				$j16ge_iproperties = array();
+				$iproperties = array_merge($iproperties, $j16ge_iproperties);
+			}
+			foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
+			
+			$obj->value = serialize( $item_data );
+			$app->enqueueMessage($obj->value, 'message' );
+			$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			
 			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
 			if ( FLEXI_FISH && !empty($data['jfdata']) && $use_versioning )
@@ -2771,6 +2766,42 @@ class ParentClassItem extends JModel
 		$value = $value ? $value : array();
 		$value = is_array($value) ? $value : array($value);
 		return $value;
+	}
+
+	/**
+	 * Helper method to bind form posted item parameters and and metadata to the item
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function mergeAttributes(&$item, &$params, &$metadata)
+	{
+		// Build item parameters INI string
+		if (is_array($params))
+		{
+			$item->attribs = new JParameter($item->attribs);
+			foreach ($params as $k => $v) {
+				//$v = is_array($v) ? implode('|', $v) : $v;
+				$item->attribs->set($k, $v);
+			}
+			$item->attribs = $item->attribs->toString();
+		}
+		
+		// Build item metadata INI string
+		if (is_array($metadata))
+		{
+			$item->metadata = new JParameter($item->metadata);
+			foreach ($metadata as $k => $v) {
+				if ( $k == 'description' && !FLEXI_J16GE ) {  // is jform field in J1.6+
+					$item->metadesc = $v;
+				} elseif ( $k == 'keywords' && !FLEXI_J16GE ) {  // is jform field in J1.6+
+					$item->metakey = $v;
+				} else {
+					$item->metadata->set($k, $v);
+				}
+			}
+			$item->metadata = $item->metadata->toString();
+		}
 	}
 	
 }
