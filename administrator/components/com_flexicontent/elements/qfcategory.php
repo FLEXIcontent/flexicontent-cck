@@ -56,7 +56,7 @@ class JElementQfcategory extends JElement
 			$value = "";
 		}
 
-		if ($node->attributes('required')) {
+		if ( $node->attributes('required') && JRequest::getVar('option')=='com_flexicontent' ) {
 			$required ="
 				$$('#toolbar-apply a.toolbar').setProperty('onclick',
 					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('apply'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
