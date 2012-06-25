@@ -45,6 +45,9 @@
 			<option value="1">FLEXI_SHOW</option>
 		</param>
 		
+		<param name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2" menu="hide" />
+		<param name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC" menu="hide" />
+		
 	<param name="" type="jparamstab" description="FLEXI_TYPE_DESC_CUSTOMIZE" />
 	
 		<param name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" menu="hide" />
