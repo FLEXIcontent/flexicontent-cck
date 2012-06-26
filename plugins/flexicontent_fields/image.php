@@ -177,10 +177,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $multiboxadded = false;
 		$mainframe = &JFactory::getApplication();
 		$view = JRequest::getVar('view');
+		$option = JRequest::getVar('option');
 		jimport('joomla.filesystem');
 
 		$values = $values ? $values : $field->value;
-
+		
+		$isItemsManager = $mainframe->isAdmin() && $view=='items' && $option=='com_flexicontent';
+		
 		// some parameter shortcuts
 		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
 		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
@@ -207,6 +210,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
 		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
+		if ($isItemsManager) { $usepopup = 1; $popuptype = 1; }
 		
 		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
@@ -235,7 +239,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// load the tooltip library if redquired
 			if ($uselegend) JHTML::_('behavior.tooltip');
 			
-			if ( $mainframe->isSite()
+			if ( ($mainframe->isSite() || $isItemsManager)
 						&& !$multiboxadded
 						&&	(  ($linkto_url && $url_target=='multibox')  ||  ($usepopup && $popuptype == 1)  )
 				 )
@@ -258,6 +262,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
 					
 					// Add js code for creating a multibox instance
+					$extra_options = '';
+					if ($isItemsManager) $extra_options .= ''
+							.',showNumbers: false'  //show numbers such as "4 of 12"
+							.',showControls: false' //show the previous/next, title, download etc
+ 							;
 					$box = "
 						window.addEvent('domready', function(){
 							//call multiBox
@@ -276,6 +285,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 								recalcTop: true,//subtract the height of controls panel from top position
 								addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
 								autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
+								".$extra_options."
 							});
 						});
 					";
@@ -302,10 +312,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/multibox.js');
 					
 					// Add js code for creating a multibox instance
+					$extra_options = $isItemsManager ? ', showNumbers: false, showControls: false' : '';
 					$box = "
 						var box = {};
 						window.addEvent('domready', function(){
-							box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true});
+							box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true".$extra_options." });
 						});
 					";
 					$document->addScriptDeclaration($box);
@@ -375,7 +386,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 								
 				// first condition is for the display for the preview feature
 				if ($mainframe->isAdmin()) {
-					$field->{$prop} = '<img class="hasTip" src="../'.$srcs.'" alt ="'.$alt.'" title="'.$tip.'" />';
+					$field->{$prop} = '
+					<a href="../'.$srcb.'" id="mb'.$id.'" class="mb" rel="[images]" >
+						<img src="../'. $srcs .'" alt ="'.$alt.'" />
+					</a>
+					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
+					';
+					//$field->{$prop} = '<img class="hasTip" src="../'.$srcs.'" alt ="'.$alt.'" title="'.$tip.'" />';
 				} else if ($linkto_url && $url_target=='multibox' && $urllink) {
 					$field->{$prop} = '
 					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$id.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>
