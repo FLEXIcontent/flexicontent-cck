@@ -40,13 +40,20 @@ class FlexicontentViewFlexicontent extends JView
 		$mainframe =& JFactory::getApplication();
 
 		//initialize variables
-		$document 	= & JFactory::getDocument();
-		$menus		= &JSite::getMenu();
-		$menu		= $menus->getActive();
+		$document = & JFactory::getDocument();
+		$menus    = & JSite::getMenu();
+		$menu     = $menus->getActive();
+		$uri      = & JFactory::getURI();
 		
-		// Get the page/component configuration
-		if (!FLEXI_J16GE)	$params = $mainframe->getParams('com_flexicontent');
-		else							$params = & JComponentHelper::getParams('com_flexicontent');
+		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
+			$menuParams = new JRegistry;
+			$menuParams->loadJSON($menu->params);
+			$params->merge($menuParams);
+		}
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -55,35 +62,23 @@ class FlexicontentViewFlexicontent extends JView
 		}
 		
 		//allow css override
-		if (!FLEXI_J16GE) {
-			if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
-			}
-		} else {
-			if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
-			}
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
 		}
-
-		$limitstart	= JRequest::getInt('limitstart');
-		$limit 		= $params->def('catlimit', 0);
-		$total		= $this->get('Total');
-		$categories	= & $this->get('Data');
-		$categories	= !is_array($categories)?array():$categories;
-
-		// Because the application sets a default page title, we need to get title right from the menu item itself
-		if (is_object( $menu )) {
-			jimport( 'joomla.html.parameter' );
-			$menu_params = new JParameter( $menu->params );		
-			
-			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	(!FLEXI_J16GE ? $menu->name: $menu->title));
-			}
-			
-		} else {
+		
+		// Get data from the model		
+		$categories = & $this->get('Data');
+		$categories = !is_array($categories)?array():$categories;
+		$total  = $this->get('Total');
+		
+		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
+		$limitstart = JRequest::getInt('limitstart');
+		$limit      = $params->def('catlimit', 0);
+		// Set a page title if one was not already set
+		if ( !$params->get('page_title') ) {
 			$params->set('page_title',	JText::_( 'FLEXICONTENT_MAIN' ));
 		}
-
+		
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
@@ -94,12 +89,11 @@ class FlexicontentViewFlexicontent extends JView
 			}
 		}
 
-		/*
-		* Handle the metadata for the categories list
-		*/
-		$document->setTitle($params->get('page_title'));
+		// Set title and metadata
+		$document->setTitle( $params->get('page_title') );
 		$document->setMetadata( 'keywords' , $params->get('page_title') );
-
+		
+		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
 			if ($mainframe->getCfg('MetaTitle') == '1') {
 					$mainframe->addMetaTag('title', $params->get('page_title'));
@@ -110,22 +104,22 @@ class FlexicontentViewFlexicontent extends JView
 			}
 		}
 		
+		// Add alternate feed link
 		if ($params->get('show_feed_link', 1) == 1) {
-			//add alternate feed link
 			$link	= '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
 			$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
-
+		
 		// Create the pagination object
 		jimport('joomla.html.pagination');
-
+		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
 		$this->assignRef('params' , 				$params);
-		$this->assignRef('categories' , 			$categories);
+		$this->assignRef('categories' , 		$categories);
 		$this->assignRef('pageNav' , 				$pageNav);
 
 		parent::display($tpl);
