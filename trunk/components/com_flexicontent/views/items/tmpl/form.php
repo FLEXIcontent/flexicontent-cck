@@ -657,7 +657,7 @@ function deleteTag(obj) {
 			// Remove xml nodes if advanced meta parameters
 			//echo "<pre>"; print_r($this->formparams->_xml); exit;
 			if ($this->params->get('usepublicationdetails_fe', 1) != 2 ) :
-				$advanced_metadata_params = array('created_by', 'created_by_alias', 'created');
+				$advanced_metadata_params = array('created_by', 'created');
 				$metadata_nodes = array();
 				foreach($this->formparams->_xml['_default']->_children as $index => $element) :
 					if ( ! in_array($element->_attributes['name'], $advanced_metadata_params))

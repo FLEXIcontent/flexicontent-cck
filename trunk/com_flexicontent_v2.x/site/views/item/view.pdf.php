@@ -32,18 +32,18 @@ class FlexicontentViewItems extends JView
 	function display($tpl = null)
 	{
 		$mainframe =& JFactory::getApplication();
-
+		$user		=& JFactory::getUser();
 		$dispatcher	=& JDispatcher::getInstance();
 
 		// Initialize some variables
 		$item 		= & $this->get('Item');
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$params 	= & $item->parameters;
 		$fields		= & $this->get( 'Extrafields' );
 
-		$tags = null;
-		$categories = null;
-		$favourites = null;
-		$favoured = null;
+		$tags = & $item->tags;
+		$categories = & $item->categories;
+		$favourites = $item->favourites;
+		$favoured = $item->favoured;
 
 		// process the new plugins
 		JPluginHelper::importPlugin('content', 'image');
@@ -64,26 +64,38 @@ class FlexicontentViewItems extends JView
 		// prepare header lines
 		$document->setHeader($this->_getHeaderText($item, $params));
 		
-		foreach ($fields as $field) {
-			if ($field->iscore == 1 || $field->field_type == ('image' || 'file')) {
-/*
-				if ($field->iscore) {
-					//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
-					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
-				} else {
-					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
-					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
-				}
-*/
+		$pdf_format_fields = trim($params->get("pdf_format_fields"));
+		$pdf_format_fields = !$pdf_format_fields ? array() : preg_split("/[\s]*,[\s]*/", $pdf_format_fields);
+		
+		$methodnames = array();
+		foreach($pdf_format_fields as $pdf_format_field) {
+			@list($fieldname,$methodname) = preg_split("/[\s]*:[\s]*/", $pdf_format_field);
+			$methodnames[$fieldname] = empty($methodname) ? 'display' : $methodname;
+		}
+		
+		// IF no fields set then just print the item's description text
+		if ( !count($pdf_format_fields) ) {
+			echo $item->text;
+			return;
+		}
+		
+		foreach ($fields as $field)
+		{
+			if ( !isset($methodnames[$field->name]) ) continue;
+			
+			if ($field->iscore) {
+				FlexicontentFields::loadFieldConfig($field, $item);
+				//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
+				FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$params, $tags, $categories, $favourites, $favoured ));
 			} else {
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
-				echo $field->label . ': ';
-				echo $field->display . '<br />';
+			}
+			if ( @$field->display ) {
+				echo '<b>'.$field->label.'</b>: ';
+				echo $field->display . '<br /><br />';
 			}
 		}
-
-		echo $item->text;
 	}
 
 	function _getHeaderText(& $item, & $params)
@@ -91,6 +103,7 @@ class FlexicontentViewItems extends JView
 		// Initialize some variables
 		$text = '';
 
+		// Display Author name
 		if ($params->get('show_author')) {
 			// Display Author name
 			$text .= "\n";

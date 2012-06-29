@@ -38,21 +38,21 @@ class FlexicontentViewCategory extends JView
 	function display( $tpl = null )
 	{
 		global $globalnoroute, $globalcats;
-		$mainframe = &JFactory::getApplication();
+		$mainframe =& JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 		JHTML::_('behavior.tooltip');
 
 		//initialize variables
-		$document 	= & JFactory::getDocument();
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-		$uri 		= & JFactory::getURI();
+		$document = & JFactory::getDocument();
+		$menus    = & JSite::getMenu();
+		$menu     = $menus->getActive();
+		$uri      = & JFactory::getURI();
 		$dispatcher	= & JDispatcher::getInstance();
 		$user		= & JFactory::getUser();
 		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
-
+		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
@@ -68,6 +68,7 @@ class FlexicontentViewCategory extends JView
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
+		
 		//allow css override
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
@@ -124,14 +125,8 @@ class FlexicontentViewCategory extends JView
 			}
 		}
 		
-		// Because the application sets a default page title, we need to get title right from the menu item itself
-		if (is_object( $menu )) {
-			$menu_params = new JParameter( $menu->params );		
-			
-			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	$category->title);
-			}
-		} else {
+		// Set a page title if one was not already set
+		if ( !$params->get('page_title') ) {
 			$params->set('page_title',	$category->title);
 		}
 		
@@ -160,7 +155,7 @@ class FlexicontentViewCategory extends JView
 			$item_depth = $params->get('item_depth', 0);
 		}
 		
-		// Respect menut item depth, defined in menu item
+		// Respect menu item depth, defined in menu item
 		for ($p=$item_depth; $p<count($parents); $p++) {
 			// Do not add the above and root categories when coming from a directory view
 			if (isset($allroots)) {
@@ -171,17 +166,19 @@ class FlexicontentViewCategory extends JView
 				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
 			}
 		}
-
-		$document->setTitle( $params->get( 'page_title' ) );
-
+		
+		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
-		$base = $uri->getScheme() . '://' . $uri->getHost();
+		$base  = $uri->getScheme() . '://' . $uri->getHost();
 		$start = JRequest::getVar('start', '');
 		$start = $start ? "&start=".$start : "";
 		$ucanonical 	= $base . '/'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
+		
+		// Set title and metadata
+		$document->setTitle( $params->get('page_title') );
 		
 		if ($category->id) {   // possibly not set for author items OR my items
 			if (FLEXI_J16GE) {

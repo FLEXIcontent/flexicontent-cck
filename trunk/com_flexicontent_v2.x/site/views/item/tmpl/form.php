@@ -656,19 +656,13 @@ function deleteTag(obj) {
 		<fieldset class="panelform">
 		<ul class="adminformlist">
 		<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ?>
-			<li><?php echo $this->form->getLabel('access');?>
-			<?php echo $this->form->getInput('access');?></li>
-			<li><?php echo $this->form->getLabel('created_by');?>
-			<?php echo $this->form->getInput('created_by');?></li>
-			<li><?php echo $this->form->getLabel('created_by_alias');?>
-			<?php echo $this->form->getInput('created_by_alias');?></li>
-			<li><?php echo $this->form->getLabel('created');?>
-			<?php echo $this->form->getInput('created');?></li>
+			<li><?php echo $this->form->getLabel('created_by')     . $this->form->getInput('created_by'); ?></li>
+			<li><?php echo $this->form->getLabel('created')        . $this->form->getInput('created');?></li>
 		<?php endif; ?>
-			<li><?php echo $this->form->getLabel('publish_up');?>
-			<?php echo $this->form->getInput('publish_up');?></li>
-			<li><?php echo $this->form->getLabel('publish_down');?>
-			<?php echo $this->form->getInput('publish_down');?></li>
+			<li><?php echo $this->form->getLabel('created_by_alias') . $this->form->getInput('created_by_alias');?></li>
+			<li><?php echo $this->form->getLabel('publish_up')       . $this->form->getInput('publish_up');?></li>
+			<li><?php echo $this->form->getLabel('publish_down')     . $this->form->getInput('publish_down');?></li>
+			<li><?php echo $this->form->getLabel('access')           . $this->form->getInput('access');?></li>
 		</ul>
 		</fieldset>
 

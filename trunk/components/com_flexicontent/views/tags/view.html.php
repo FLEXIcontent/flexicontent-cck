@@ -39,46 +39,52 @@ class FlexicontentViewTags extends JView
 		$mainframe =& JFactory::getApplication();
 
 		//initialize variables
-		$document 	= & JFactory::getDocument();
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-		$params 	= & $mainframe->getParams('com_flexicontent');
-		$uri 		= & JFactory::getURI();
-
-		$limitstart		= JRequest::getInt('limitstart');
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
-
+		$document = & JFactory::getDocument();
+		$menus    = & JSite::getMenu();
+		$menu     = $menus->getActive();
+		$uri      = & JFactory::getURI();
+		
+		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
+			$menuParams = new JRegistry;
+			$menuParams->loadJSON($menu->params);
+			$params->merge($menuParams);
+		}
+		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
+		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
 		}
-
-		$items 	= & $this->get('Data');
-		$tag		= & $this->get('Tag');
-		$total 	= & $this->get('Total');
-
-		//set 404 if category doesn't exist or access isn't permitted
+		
+		// Get data from the model		
+		$items  = & $this->get('Data');
+		$tag    = & $this->get('Tag');
+		$total  = $this->get('Total');
+		
+		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
+		$limitstart = JRequest::getInt('limitstart');
+		$limit      = $mainframe->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
+		
+		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
+		$params = & $tag->parameters;
+		
+		//set 404 if tag doesn't exist or access isn't permitted
 		if ( empty($tag) ) {
 			$tid = JRequest::getInt('id', 0);
 			return JError::raiseError( 404, JText::sprintf( 'Tag #%d not found', $tid ) );
 		}
 		
-		// Because the application sets a default page title, we need to get title right from the menu item itself
-		if (is_object( $menu )) {
-			jimport( 'joomla.html.parameter' );
-			$menu_params = new JParameter( $menu->params );		
-			$params->merge($menu_params);
-			
-			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	JText::_('FLEXI_TAGS').": ".JText::_( $tag->name ));
-			}
-			
-		} else {
+		// Set a page title if one was not already set
+		if ( !$params->get('page_title') ) {
 			$params->set('page_title',	JText::_('FLEXI_TAGS').": ".JText::_( $tag->name ));
 		}
 		
@@ -91,24 +97,32 @@ class FlexicontentViewTags extends JView
 				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
 			}
 		}
-		
-		$document->setTitle($params->get('page_title'));
-		$document->setMetadata( 'keywords' , $params->get('page_title') );
-		
-		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
-		$params = & $tag->parameters;
-		
+
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
-		$uri  			=& JFactory::getURI();
-		$base 			= $uri->getScheme() . '://' . $uri->getHost();
+		$base  = $uri->getScheme() . '://' . $uri->getHost();
 		$start = JRequest::getVar('start', '');
 		$start = $start ? "&start=".$start : "";
 		$ucanonical 	= $base .'/'. JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
-        
+		
+		// Set title and metadata
+		$document->setTitle( $params->get('page_title') );
+		$document->setMetadata( 'keywords' , $params->get('page_title') );
+		
+		// ** writting both old and new way as an example
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') {
+					$mainframe->addMetaTag('title', $params->get('page_title'));
+			}
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') {
+					$document->setMetaData('title', $params->get('page_title'));
+			}
+		}
+		
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
 		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
@@ -118,7 +132,7 @@ class FlexicontentViewTags extends JView
 		$lists['filter_order']		= $filter_order;
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
-						
+		
 		// Create the pagination object
 		jimport('joomla.html.pagination');
 		
