@@ -103,7 +103,7 @@ class FlexicontentViewTags extends JView
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
 		$start = JRequest::getVar('start', '');
 		$start = $start ? "&start=".$start : "";
-		$ucanonical 	= $base .'/'. JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
+		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}

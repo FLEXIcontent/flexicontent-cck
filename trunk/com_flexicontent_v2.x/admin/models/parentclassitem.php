@@ -630,7 +630,8 @@ class ParentClassItem extends JModelAdmin
 						} else if ($f->field_id==-2) {
 							// Other item properties that were versioned, such as alias, catid, meta params, attribs
 							$item_data = unserialize($f->value);
-							$item->bind($item_data);
+							//$item->bind($item_data);
+							foreach ($item_data as $k => $v) $item->$k = $v;
 						} else if ($fieldname) {
 							// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
 							$item->$fieldname = $f->value;

@@ -144,7 +144,7 @@ class FlexicontentController extends JController
 		}
 		
 		// Store the form data into the item and check it in
-		if ($model->store($post)) {
+		if ( $store_success = $model->store($post) ) {
 			if($isnew) {
 				$post['id'] = (int) $model->get('id');
 			}
@@ -158,14 +158,15 @@ class FlexicontentController extends JController
 				$msg = '';
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0&typeid='.$post['type_id'];
 				$this->setRedirect($link, $msg);
-				return;
 			} else {
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
-				return;
 			}
 		}
+		
+		// Check in model and return if saving has 
 		$model->checkin();
+		if ( !$store_success ) return;
 		
 		
 		// Actions if a content item was created
