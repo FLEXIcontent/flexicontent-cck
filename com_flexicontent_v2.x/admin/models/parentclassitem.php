@@ -1850,24 +1850,22 @@ class ParentClassItem extends JModelAdmin
 			{
 				// In J1.6 field's posted values have different location if not CORE (aka custom field)
 				if ( $get_untraslatable_values && $field->untranslatable ) {
-					$postvalue = $field->value;
+					$postdata[$field->name] = $field->value;
 				} else if ($field->iscore || !FLEXI_J16GE) {
-					$postvalue = @$data[$field->name];  // Value may not be used in form or may have been been skipped to maintain current value
+					$postdata[$field->name] = @$data[$field->name];  // Value may not be used in form or may have been been skipped to maintain current value
 				} else {
-					$postvalue = @$data['custom'][$field->name];
+					$postdata[$field->name] = @$data['custom'][$field->name];
 				}
 				
 				// Trigger plugin Event 'onBeforeSaveField'
-				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$postvalue, &$files[$field->name] ));
+				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postvalue, &$files[$field->name], &$item ));
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
 				if ($result===false) {
 					// Field requested to abort item saving
 					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
 					return 'abort';
 				}
-				
-				$postdata[$field->name] = $postvalue;
 			}
 		}
 		
@@ -1949,9 +1947,9 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				// Trigger onAfterSaveField Event
-				//$results = $dispatcher->trigger('onAfterSaveField', array( $field, &$postvalue, &$files[$field->name] ));
+				//$results = $dispatcher->trigger('onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postvalue, &$files[$field->name] ));
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				// *** $result is ignored
 				$searchindex 	.= @$field->search;
 			}
@@ -1976,7 +1974,6 @@ class ParentClassItem extends JModelAdmin
 			foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
 			
 			$obj->value = serialize( $item_data );
-			$app->enqueueMessage($obj->value, 'message' );
 			$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			
 			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
