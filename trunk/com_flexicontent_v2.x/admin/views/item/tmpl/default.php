@@ -463,7 +463,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 				
-				<!--fieldset-->
+				<fieldset>
 					<legend>
 						<?php echo $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
@@ -570,11 +570,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										
 								<!--/td-->
 							<!--/tr-->
+								
 						<?php
 						}
 						?>
 					<!--/table-->
-				<!--/fieldset-->
+				</fieldset>
 				<?php
 				} else if ($this->row->id == 0) {
 				?>
