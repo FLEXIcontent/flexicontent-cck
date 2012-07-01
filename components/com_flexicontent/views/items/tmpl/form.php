@@ -526,7 +526,7 @@ function deleteTag(obj) {
 
 	<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 	
-	<!--fieldset-->
+	<fieldset>
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
@@ -643,7 +643,7 @@ function deleteTag(obj) {
 			}
 			?>
 		<!--/table-->
-	<!--/fieldset-->
+	</fieldset>
 
 <?php elseif ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
