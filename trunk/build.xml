@@ -125,6 +125,9 @@
 		<copy file="administrator/language/ru-RU/ru-RU.plg_flexicontent_fields_file.ini" tofile="flexipack/plugins/file/ru-RU.plg_flexicontent_fields_file.ini" />
 		<copy file="administrator/language/de-DE/de-DE.plg_flexicontent_fields_file.ini" tofile="flexipack/plugins/file/de-DE.plg_flexicontent_fields_file.ini" />
 		
+		<copy file="plugins/flexicontent_fields/groupmarker.php" tofile="flexipack/plugins/groupmarker/groupmarker.php" />
+		<copy file="plugins/flexicontent_fields/groupmarker.xml" tofile="flexipack/plugins/groupmarker/groupmarker.xml" />
+		
 		<copy file="plugins/flexicontent_fields/image.php" tofile="flexipack/plugins/image/image.php" />
 		<copy file="plugins/flexicontent_fields/image.xml" tofile="flexipack/plugins/image/image.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_image.ini" tofile="flexipack/plugins/image/en-GB.plg_flexicontent_fields_image.ini" />

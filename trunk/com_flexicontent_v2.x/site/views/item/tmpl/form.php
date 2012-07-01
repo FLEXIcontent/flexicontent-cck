@@ -523,7 +523,7 @@ function deleteTag(obj) {
 
 	<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 	
-	<fieldset>
+	<!--fieldset-->
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
@@ -531,7 +531,7 @@ function deleteTag(obj) {
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
-		<table class="admintable" width="100%" style="border-width:0px!important;" >
+		<!--table class="admintable" width="100%" style="border-width:0px!important;" -->
 			<?php
 			$hidden = array(
 				'fcloadmodule',
@@ -552,10 +552,16 @@ function deleteTag(obj) {
 				$label_tooltip = $field->description ? 'class="flexi_label hasTip" title="'.$field->label.'::'.$field->description.'"' : ' class="flexi_label" ';
 				$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 				$not_in_tabs = "";
-				?>
 				
-			<tr>
-				<td id="fcfield-row_<?php echo $field->id; ?> class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
+				if ($field->field_type=='groupmarker') :
+					echo $field->html;
+					continue;
+				endif;
+			?>
+				
+			<!--tr-->
+				<!--td id="fcfield-row_<?php echo $field->id; ?> class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
+					<div class='clear' style='display:block; float:left; clear:both!important'></div>
 					
 					<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 						<?php echo $field->label; ?>
@@ -627,14 +633,14 @@ function deleteTag(obj) {
 				
 					</div>
 			
-				</td>
-			</tr>
+				<!--/td-->
+			<!--/tr-->
 				
 			<?php
 			}
 			?>
-		</table>
-	</fieldset>
+		<!--/table-->
+	<!--/fieldset-->
 
 <?php elseif ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
