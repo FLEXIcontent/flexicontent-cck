@@ -137,6 +137,7 @@
 	<plugin name="email" folder="plugins/email">Email field</plugin>
 	<plugin name="extendedweblink" folder="plugins/extendedweblink">Extended Weblink field</plugin>
 	<plugin name="file" folder="plugins/file">File field</plugin>
+	<plugin name="groupmarker" folder="plugins/groupmarker">Group marker</plugin>
 	<plugin name="image" folder="plugins/image">Image field</plugin>
 	<plugin name="linkslist" folder="plugins/linkslist">Links list field</plugin>
 	<plugin name="minigallery" folder="plugins/minigallery">Minigallery field</plugin>

@@ -76,7 +76,7 @@ if ($this->CanUseTags || $this->CanVersion) {
 		});
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->form->getValue("id")."&active=".$this->form->getValue("version")."&".JUtility::getToken()."=1&tmpl=component&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->row->id."&active=".$this->version."&".JUtility::getToken()."=1&tmpl=component&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
@@ -303,7 +303,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										endif;
 									else :
 										echo $this->published;
-										echo '<input type="hidden" name="jform[state]" value="'.$this->form->getValue("state").'" />';
+										echo '<input type="hidden" name="jform[state]" value="'.$this->row->state.'" />';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												// Enable approval if versioning disabled, this make sense,
 												// since if use can edit item THEN item should be updated !!!
@@ -451,7 +451,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<?php endif; ?>
 
 				<?php
-				if ($this->fields && @$this->form->getValue("type_id")) {
+				if ($this->fields && $this->row->type_id) {
 					$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						$$('#type_id').addEvent('change', function(ev) {
@@ -463,12 +463,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 				
-				<fieldset>
+				<!--fieldset-->
 					<legend>
-						<?php echo $this->form->getValue("type_id") ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
+						<?php echo $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
 					
-					<table class="admintable" width="100%">
+					<!--table class="admintable" width="100%"-->
 						<?php
 						$hidden = array(
 							'fcloadmodule',
@@ -488,10 +488,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							$label_tooltip = $field->description ? 'class="flexi_label hasTip" title="'.$field->label.'::'.$field->description.'"' : ' class="flexi_label" ';
 							$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 							$not_in_tabs = "";
-							?>
 							
-							<tr>
-								<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
+							if ($field->field_type=='groupmarker') :
+								echo $field->html;
+								continue;
+							endif;
+						?>
+							<!--tr-->
+								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
+									<div class='clear' style='display:block; float:left; clear:both!important'></div>
 									
 									<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 										<?php echo $field->label; ?>
@@ -563,16 +568,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									
 									</div>
 										
-								</td>
-							</tr>
-								
+								<!--/td-->
+							<!--/tr-->
 						<?php
 						}
 						?>
-					</table>
-				</fieldset>
+					<!--/table-->
+				<!--/fieldset-->
 				<?php
-				} else if ($this->form->getValue("id") == 0) {
+				} else if ($this->row->id == 0) {
 				?>
 					<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 				<?php
@@ -587,13 +591,13 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 		<?php
 		// used to hide "Reset Hits" when hits = 0
-		if ( !$this->form->getValue("hits") ) {
+		if ( !$this->row->hits ) {
 			$visibility = 'style="display: none; visibility: hidden;"';
 		} else {
 			$visibility = '';
 		}
 		
-		if ( !$this->form->getValue("score") ) {
+		if ( !$this->row->score ) {
 			$visibility2 = 'style="display: none; visibility: hidden;"';
 		} else {
 			$visibility2 = '';
@@ -602,14 +606,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 		<?php
-		if ( $this->form->getValue("id") ) {
+		if ( $this->row->id ) {
 		?>
 		<tr>
 			<td>
 				<strong><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?>:</strong>
 			</td>
 			<td>
-				<?php echo $this->form->getValue("id"); ?>
+				<?php echo $this->row->id; ?>
 			</td>
 		</tr>
 		<?php
@@ -638,7 +642,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<div id="hits" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resethits', '<?php echo $this->form->getValue('id'); ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
 			</td>
 		</tr>
@@ -653,7 +657,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<div id="votes" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resetvotes', '<?php echo $this->form->getValue('id'); ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('items.resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
@@ -760,7 +764,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->form->getValue('id'); ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="javascript:;" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="javascript:;" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
 				<?php }?></td>
 			</tr>
 			<?php
@@ -804,7 +808,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				</td>
 			</tr>
 		</table>
-		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
+		<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 
 		<?php
 		echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLICATION_DETAILS'), 'details-options');
@@ -947,7 +951,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 		</blockquote>
 		
-		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
+		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 		<?php
 			foreach ($this->tmpls as $tmpl) {
 				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
@@ -969,16 +973,11 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 </table>
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue('id'); ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $this->row->id; ?>" />
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
 <?php echo $this->form->getInput('hits'); ?>
-<input type="hidden" name="oldtitle" value="<?php echo $this->form->getValue('title'); ?>" />
-<input type="hidden" name="oldtext" value="<?php //echo $this->form->getValue('text'); ?>" />
-<input type="hidden" name="oldstate" value="<?php echo $this->form->getValue('state'); ?>" />
-<input type="hidden" name="oldmodified" value="<?php echo $this->form->getValue('modified'); ?>" />
-<input type="hidden" name="oldmodified_by" value="<?php echo $this->form->getValue('modified_by'); ?>" />
 </form>
 
 </div>

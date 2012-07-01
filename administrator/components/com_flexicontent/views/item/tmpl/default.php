@@ -445,12 +445,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 				
-				<fieldset>
+				<!--fieldset-->
 					<legend>
 						<?php echo $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
 					
-					<table class="admintable" width="100%">
+					<!--table class="admintable" width="100%"-->
 						<?php
 						$hidden = array(
 							'fcloadmodule',
@@ -470,10 +470,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							$label_tooltip = $field->description ? 'class="flexi_label hasTip" title="'.$field->label.'::'.$field->description.'"' : ' class="flexi_label" ';
 							$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 							$not_in_tabs = "";
-							?>
 							
-							<tr>
-								<td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'>
+							if ($field->field_type=='groupmarker') :
+								echo $field->html;
+								continue;
+							endif;
+						?>
+							<!--tr-->
+								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
+									<div class='clear' style='display:block; float:left; clear:both!important'></div>
 									
 									<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 										<?php echo $field->label; ?>
@@ -545,14 +550,14 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									
 									</div>
 										
-								</td>
-							</tr>
+								<!--/td-->
+							<!--/tr-->
 								
 						<?php
 						}
 						?>
-					</table>
-				</fieldset>
+					<!--/table-->
+				<!--/fieldset-->
 				<?php
 				} else if ($this->row->id == 0) {
 				?>
@@ -937,11 +942,6 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
 <!--input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" /-->
-<input type="hidden" name="oldtitle" value="<?php echo $this->row->title; ?>" />
-<input type="hidden" name="oldtext" value="<?php echo $this->row->text; ?>" />
-<input type="hidden" name="oldstate" value="<?php echo $this->row->state; ?>" />
-<input type="hidden" name="oldmodified" value="<?php echo $this->row->modified; ?>" />
-<input type="hidden" name="oldmodified_by" value="<?php echo $this->row->modified_by; ?>" />
 <?php if (!FLEXI_FISH) : ?>
 <input type="hidden" name="language" value="<?php echo $this->row->language; ?>" />
 <?php endif; ?>
