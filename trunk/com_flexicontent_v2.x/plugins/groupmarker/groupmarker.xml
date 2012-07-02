@@ -35,11 +35,14 @@
 			<field name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
 			<field name="cont_label"    type="text" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
 			<field name="cont_cssclass" type="text" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+			<field name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
+			<field name="custom_html_sep" type="text" default="&lt;hr/&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
 		</fieldset>
 	</fields>
 	</config>
 	
 	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_groupmarker.ini</language>
 	</languages>
 	
 </install>
