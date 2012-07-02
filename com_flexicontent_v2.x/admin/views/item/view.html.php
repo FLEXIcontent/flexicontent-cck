@@ -442,6 +442,9 @@ class FlexicontentViewItem extends JView
 		// (c) Apply Template Parameters values into the form fields structures 
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
+				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+				$jform->load($tmpl->params);
+				$tmpl->params = $jform;
 				foreach ($tmpl->params->getGroup('attribs') as $field) {
 					$fieldname =  $field->__get('fieldname');
 					$value = $row->itemparams->get($fieldname);

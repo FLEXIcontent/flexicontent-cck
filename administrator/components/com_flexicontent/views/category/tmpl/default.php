@@ -55,10 +55,7 @@ dump($this->row);
 							</label>
 						</td>
 						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-							echo $html;
-							?>
+							<?php echo JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published ); ?>
 						</td>
 					</tr>
 					<tr>
@@ -76,9 +73,7 @@ dump($this->row);
 							</label>
 						</td>
 						<td>
-							<?php				
-								echo $this->Lists['parent_id'];
-							?>
+							<?php echo $this->Lists['parent_id']; ?>
 						</td>
 					</tr>
 					<tr>
@@ -88,9 +83,7 @@ dump($this->row);
 							</label>
 						</td>
 						<td>
-							<?php				
-								echo $this->Lists['copyid'];
-							?>
+							<?php echo $this->Lists['copyid']; ?>
 						</td>
 						<td>
 						</td>
@@ -103,42 +96,42 @@ dump($this->row);
 				if (FLEXI_ACCESS && $this->CanCats) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
-					var slideaccess = new Fx.Slide('tabacces');
-					var slidenoaccess = new Fx.Slide('notabacces');
-					slideaccess.hide();
+						var slideaccess = new Fx.Slide('tabacces');
+						var slidenoaccess = new Fx.Slide('notabacces');
+						slideaccess.hide();
 						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
 							slideaccess.toggle();
 							slidenoaccess.toggle();
-							});
 						});
-					");
+					});
+				");
 				?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
-                    	<tr>
-                    		<td>
-                        		<div id="access"><?php echo $this->Lists['access']; ?></div>
-                        	</td>
-                    	</tr>
-                	</table>
+						<tr>
+							<td>
+								<div id="access"><?php echo $this->Lists['access']; ?></div>
+							</td>
+						</tr>
+					</table>
 					<div id="notabacces">
-					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-                	</div>
-                </fieldset>
-                <?php endif; ?>
+						<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					</div>
+				</fieldset>
+				<?php endif; ?>
 
 				<table class="adminform">
 					<tr>
 						<td>
 							<?php
-							// parameters : areaname, content, hidden field, width, height, rows, cols
-							echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
+								// parameters : areaname, content, hidden field, width, height, rows, cols
+								echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
 							?>
 						</td>
 					</tr>
 				</table>
-			
+				
 			</td>
 			<td valign="top" width="360" style="padding: 7px 0 0 5px">
 				<?php
