@@ -95,7 +95,7 @@ defined('_JEXEC') or die('Restricted access');
 							<?php 
 							foreach ($tmpl->params->getFieldset($name) as $field) :
 								$fieldname =  $field->__get('fieldname');
-								$value = $tmpl->params->getValue($fieldname, $name, @$this->attribs[$fieldname]);
+								$value = $tmpl->params->getValue($fieldname, $name, @$this->row->attribs[$fieldname]);
 								echo $tmpl->params->getLabel($fieldname, $name);
 								echo $tmpl->params->getInput($fieldname, $name, $value);
 							endforeach;

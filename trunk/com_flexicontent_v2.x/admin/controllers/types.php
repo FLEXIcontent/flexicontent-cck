@@ -63,14 +63,26 @@ class FlexicontentControllerTypes extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$task		= JRequest::getVar('task');
-
-		//Sanitize
-		$post = JRequest::get( 'post' );
-
 		$model = $this->getModel('type');
 		
-		$data = FLEXI_J16GE ? $post['jform'] : $post;
-		if ( $model->store($data) )
+		// Get data from request and validate them
+		if (FLEXI_J16GE) {
+			// Retrieve form data these are subject to basic filtering
+			$data   = JRequest::getVar('jform', array(), 'post', 'array');    // Core Fields and and item Parameters
+			
+			// Validate Form data for core fields and for parameters
+			$form = $model->getForm($data, false);
+			$post = & $model->validate($form, $data);
+			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
+			
+			// Some values need to be assigned after validation
+			$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+		} else {
+			// Retrieve form data these are subject to basic filtering
+			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
+		}
+		
+		if ( $model->store($post) )
 		{
 			switch ($task)
 			{

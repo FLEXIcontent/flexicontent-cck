@@ -961,16 +961,18 @@ class flexicontent_html
 		. ' WHERE published = 1'
 		. ' AND folder = ' . $db->Quote('flexicontent_fields')
 		. ' AND element <> ' . $db->Quote('core')
-		. ' ORDER BY ordering, name'
+		. ' ORDER BY name'
 		;
 		
 		$db->setQuery($query);
 		$global_field_types = $db->loadObjectList();
 		foreach($global_field_types as $field_type) {
 			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
+			$field_arr[$field_type->text] = $field_type;
 		}
+		ksort( $field_arr, SORT_STRING );
 
-		$list = JHTML::_('select.genericlist', $global_field_types, $name, $class, 'value', 'text', $selected );
+		$list = JHTML::_('select.genericlist', $field_arr, $name, $class, 'value', 'text', $selected );
 		
 		return $list;
 	}
@@ -1768,13 +1770,22 @@ class flexicontent_tmpl
 				if (!FLEXI_J16GE) {
 					$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
 				} else {
-					$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-					$themes->items->{$tmpl}->params->loadFile($tmplxml);
+					// *** This can be serialized and thus Joomla Cache will work
+					$xml = JFactory::getXMLParser('Simple');
+					$xml->loadFile($tmplxml);
+					$themes->items->{$tmpl}->params = $xml->document->toString();
+					
+					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
+					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
+					// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+					
+					//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+					//$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				}
 				foreach ($themes->items as $ilay) {
 					$parser =& JFactory::getXMLParser('Simple');		
 					$parser->loadFile($tmplxml);
-					$document 	=& $parser->document;
+					$document = & $parser->document;
 
 					$themes->items->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
 					$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
@@ -1817,13 +1828,22 @@ class flexicontent_tmpl
 				if (!FLEXI_J16GE) {
 					$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
 				} else {
-					$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-					$themes->category->{$tmpl}->params->loadFile($tmplxml);
+					// *** This can be serialized and thus Joomla Cache will work
+					$xml = JFactory::getXMLParser('Simple');
+					$xml->loadFile($tmplxml);
+					$themes->category->{$tmpl}->params = $xml->document->toString();
+					
+					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
+					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
+					// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+					
+					//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+					//$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				}
 				foreach ($themes->category as $clay) {
 					$parser =& JFactory::getXMLParser('Simple');
 					$parser->loadFile($tmplxml);
-					$document 	=& $parser->document;
+					$document = & $parser->document;
 
 					$themes->category->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
 					$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
@@ -1863,7 +1883,7 @@ class flexicontent_tmpl
 
 	function getTemplates()
 	{
-		if (FLEXI_CACHE && !FLEXI_J16GE)
+		if (FLEXI_CACHE /*&& !FLEXI_J16GE*/)
 		{
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
@@ -1875,8 +1895,8 @@ class flexicontent_tmpl
 		{
 			$tmpls = flexicontent_tmpl::parseTemplates();
 		}
-	    
-	    return $tmpls;
+		
+		return $tmpls;
 	}
 
 	function getThemes($tmpldir='')

@@ -43,15 +43,19 @@ class FlexicontentViewType extends JView {
 
 		JHTML::_('behavior.tooltip');
 
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
-
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//add js function to overload the joomla submitform
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
+		//Get data from the model
+		$model		= & $this->getModel();
+		$row     	= & $this->get( 'Type' );
+		$cid			=	FLEXI_J16GE ? $form->getValue('id') : $row->id;
+		$themes		= flexicontent_tmpl::getTemplates();
+		$tmpls		= $themes->items;
+		
 		//create the toolbar
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' );
@@ -62,15 +66,9 @@ class FlexicontentViewType extends JView {
 		JToolBarHelper::save();
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
-
-		//Get data from the model
-		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Type' );
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->items;
-
+		
 		// fail if checked out not by 'me'
-		if ($row->id) {
+		if ($cid) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
@@ -81,18 +79,27 @@ class FlexicontentViewType extends JView {
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//create the parameter form
-		$form = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'type.xml');
-		$form->loadINI($row->attribs);
+		$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
+		//$form->loadINI($row->attribs);
+		
+		// Apply Template Parameters values into the form fields structures 
 		foreach ($tmpls as $tmpl) {
-			$tmpl->params->loadINI($row->attribs);
-		}
-
+			if (FLEXI_J16GE) {
+				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+				$jform->load($tmpl->params);
+				$tmpl->params = $jform;
+				// ... values applied at the template form file
+			} else {
+				$tmpl->params->loadINI($row->attribs);
+			}
+		}		
+		
 		//assign data to template
-		$this->assignRef('row'      	, $row);
+		$this->assignRef('row'			, $row);
 		$this->assignRef('form'			, $form);
-		$this->assignRef('pane'			, $pane);
 		$this->assignRef('tmpls'		, $tmpls);
-
+		$this->assignRef('pane'			, $pane);
+		
 		parent::display($tpl);
 	}
 }

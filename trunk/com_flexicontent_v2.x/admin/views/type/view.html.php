@@ -42,15 +42,20 @@ class FlexicontentViewType extends JView {
 
 		JHTML::_('behavior.tooltip');
 
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
-
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//add js function to overload the joomla submitform
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
+		//Get data from the model
+		$model		= & $this->getModel();
+		$row     	= & $this->get( 'Item' );
+		$form			= & $this->get('Form');
+		$cid			=	FLEXI_J16GE ? $form->getValue('id') : $row->id;
+		$themes		= flexicontent_tmpl::getTemplates();
+		$tmpls		= $themes->items;
+		
 		//create the toolbar
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' );
@@ -61,26 +66,32 @@ class FlexicontentViewType extends JView {
 		JToolBarHelper::save('types.save');
 		JToolBarHelper::custom( 'types.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel('types.cancel');
-
-		//Get data from the model
-		$model		= & $this->getModel();
-		$this->form	= $this->get('Form');
-		$attribs	= $this->get('Attribs');
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->items;
-
+		
 		// fail if checked out not by 'me'
-		if ($this->form->getValue("id")) {
+		if ($cid) {
 			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $this->form->getValue("name").' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
 			}
 		}
-
+		
+		// Apply Template Parameters values into the form fields structures 
+		foreach ($tmpls as $tmpl) {
+			if (FLEXI_J16GE) {
+				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+				$jform->load($tmpl->params);
+				$tmpl->params = $jform;
+				// ... values applied at the template form file
+			} else {
+				$tmpl->params->loadINI($row->attribs);
+			}
+		}		
+		
 		//assign data to template
+		$this->assignRef('row'			, $row);
+		$this->assignRef('form'			, $form);
 		$this->assignRef('tmpls'		, $tmpls);
-		$this->assignRef('attribs'		, $attribs);
-
+		
 		parent::display($tpl);
 	}
 }
