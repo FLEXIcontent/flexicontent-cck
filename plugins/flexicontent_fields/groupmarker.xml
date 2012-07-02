@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Group Marker</name>
+	<author>ggppdk</author>
+	<creationDate>July 2012</creationDate>
+	<copyright>Copyright (C) 2012 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>ggppdk@...</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>FLEXIcontent Group Marker. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all opennings with a closing marker appropriately.</description>
+	
+	<files>
+		<filename plugin="groupmarker">groupmarker.php</filename>
+	</files>
+	
+	<params group="standard">
+		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+	</params>
+	
+	<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
+		<param name="marker_type" type="list" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
+			<option value="tabset_start"   >Tab-set: START</option>
+			<option value="tab_open"       >Tab: open</option>
+			<option value="tab_close"      >Tab: close</option>
+			<option value="tabset_end"     >Tab-set: END</option>
+			<option value="fieldset_open"  >Field-set: open</option>
+			<option value="fieldset_close" >Field-set: close</option>
+			<option value="html_separator" >Custom HTML Separator</option>
+		</param>
+		<param name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
+		<param name="cont_label"    type="text" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
+		<param name="cont_cssclass" type="text" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+		<param name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
+		<param name="custom_html_sep" type="text" default="&lt;hr/&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+	</params>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_groupmarker.ini</language>
+	</languages>
+	
+</install>
