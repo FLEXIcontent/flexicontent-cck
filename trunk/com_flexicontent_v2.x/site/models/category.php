@@ -580,13 +580,14 @@ class FlexicontentModelCategory extends JModel {
 		 */
 		if ( $cparams->get('use_filters') || $cparams->get('use_search') )
 		{
-			$filter		= JRequest::getVar('filter', NULL, 'request');
-			/*if($filter===NULL) {
-				$filter =  $session->get($option.'.category.filter');
+			if ($this->_id) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
+			} else if ($this->_authorid) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
 			} else {
-				$session->set($option.'.category.filter', $filter);
-			}*/
-
+				$filter  = JRequest::getVar('filter', NULL, 'default');
+			}
+			
 			if ($filter)
 			{
 				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
@@ -599,8 +600,13 @@ class FlexicontentModelCategory extends JModel {
 		{
 			foreach ($filters as $filtre)
 			{
-				//$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
-				$filtervalue 	= JRequest::getString('filter_'.$filtre->id, '', 'request');
+				if ($this->_id) {
+					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				} else if ($this->_authorid) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				} else {
+					$filtervalue  = JRequest::getString('filter_'.$filtre->id, '', 'default');
+				}
 				if (strlen($filtervalue)>0) {
 					$where .= $this->_getFiltered($filtre->id, $filtervalue, $filtre->field_type);
 				}

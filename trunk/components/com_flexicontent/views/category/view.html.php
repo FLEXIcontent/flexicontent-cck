@@ -441,17 +441,25 @@ class FlexicontentViewCategory extends JView
 		{
 			//$uri->delVar($match);
 		}
-
-		//ordering
-		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
-		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
-		$filter				= JRequest::getString('filter');
 		
-		$lists						= array();
-		$lists['filter_order']		= $filter_order;
-		$lists['filter_order_Dir'] 	= $filter_order_Dir;
-		$lists['filter']			= $filter;
-
+		// Build Lists
+		$lists = array();
+		
+		//ordering
+		if ($category->id) {
+			$lists['filter_order']     = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+			$lists['filter_order_Dir'] = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
+			$lists['filter']           = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter', 'filter', '', 'string' );
+		} else if ($authorid) {
+			$lists['filter_order']     = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+			$lists['filter_order_Dir'] = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
+			$lists['filter']           = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter', 'filter', '', 'string' );
+		} else {
+			$lists['filter_order']     = JRequest::getCmd('filter_order', 'i.title', 'default');
+			$lists['filter_order_Dir'] = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
+			$lists['filter']           = JRequest::getString('filter', '', 'default');
+		}
+		
 		// Add html to filter object
 		if ($filters)
 		{
@@ -461,8 +469,13 @@ class FlexicontentViewCategory extends JView
 
 			foreach ($filters as $filtre)
 			{
-				//$value		= $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
-				$value 	= JRequest::getString('filter_'.$filtre->id, '', 'request');
+				if ($category->id) {
+					$value  = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				} else if ($authorid) {
+					$value  = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+				} else {
+					$value  = JRequest::getString('filter_'.$filtre->id, '', 'default');
+				}
 				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				$fieldname = $filtre->iscore ? 'core' : $filtre->field_type;
 				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filtre, $value ) );
