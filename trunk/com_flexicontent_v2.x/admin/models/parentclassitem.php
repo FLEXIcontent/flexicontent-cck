@@ -1546,11 +1546,13 @@ class ParentClassItem extends JModelAdmin
 		if ( $app->isSite() && !$isSuperAdmin )
 		{
 			if (!FLEXI_J16GE) {
-				unset( $data['details']['created_by'] );
+				if ($isnew)  $data['details']['created_by'] = $user->get('id');
+				else         unset( $data['details']['created_by'] );
 				unset( $data['details']['created'] );
 				unset( $data['details']['created_by_alias'] );
 			} else {
-				unset( $data['created_by'] );
+				if ($isnew)  $data['created_by'] = $user->get('id');
+				else         unset( $data['created_by'] );
 				unset( $data['created'] );
 				unset( $data['created_by_alias'] );
 			}
@@ -1590,7 +1592,7 @@ class ParentClassItem extends JModelAdmin
 			
 		// -- Creator, if this is not already set, will be the current user or administrator if current user is not logged
 		if ( !$item->created_by ) {
-			$user = $user->get('id') ? $user->get('id') : JFactory::getUser( 'admin' )->get('id');
+			$item->created_by = $user->get('id') ? $user->get('id') : JFactory::getUser( 'admin' )->get('id');
 		}
 		
 		// -- Creation Date
@@ -2677,13 +2679,13 @@ class ParentClassItem extends JModelAdmin
 			$use_versioning = $this->_cparams->get('use_versioning', 1);
 			$typeid = $this->get('type_id');   // Get item's type_id, loading item if neccessary
 			$typeid = $typeid ? $typeid : JRequest::getVar('typeid', 0, '', 'int');
-			if (!$typeid) JError::raiseError(500, __FUNCTION__.'(): Cannot get type_id from item or typeid from HTTP Request');
+			//if (!$typeid) JError::raiseError(500, __FUNCTION__.'(): Cannot get type_id from item or typeid from HTTP Request');
 			
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			$query = 'SELECT fi.*'
 					.' FROM #__flexicontent_fields AS fi'
 					.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'  // Require field belonging to item type, we use join instead of left join
-					.' WHERE ftrel.type_id='.$typeid
+					.' WHERE ftrel.type_id='.$typeid.' || fi.iscore=1'
 					.' AND fi.published = 1'        // Require field published
 					.' GROUP BY fi.id'
 					.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
