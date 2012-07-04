@@ -162,28 +162,28 @@ class FlexicontentController extends JController
 		
 		$existlang	 	= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= & $model->getExistVersionsTable();
-		$existversionsdata	= & $model->getExistVersionsPopulated();
+		$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
 		$existauthors 		= & $model->getExistAuthorsTable();
 		$cachethumb			= & $model->getCacheThumbChmod();
 		
 		$oldbetafiles		= & $model->getOldBetaFiles();
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
-		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 		
-		$initialpermission	= $model->checkInitialPermission();
+		$initialpermission	= $model->checkInitialPermission();  // For J2.5
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
-		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||<br>";
+		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
-		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||
-		     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||
-		     (!$initialpermission)
+		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) ||
+		     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) || (!$cachethumb)
+				 || (!$initialpermission)
 		   ) {
 			$dopostinstall = false;
 		}
@@ -916,7 +916,7 @@ VALUES
 		if ($model->initialPermission()) {
 			echo '<span class="install-ok"></span>';
 		} else {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span><span class="button-add"><a id="initialpermission" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
 	

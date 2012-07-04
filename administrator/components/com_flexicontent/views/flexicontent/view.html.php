@@ -122,12 +122,12 @@ class FlexicontentViewFlexicontent extends JView
 			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
 			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 		= & $this->get( 'ExistVersionsTable' );
-			$existversionsdata	= & $this->get( 'ExistVersionsPopulated' );
+			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
 			$existauthors			= & $this->get( 'ExistAuthorsTable' );
-			//$cachethumb			= & $this->get( 'CacheThumbChmod' );  // For J1.7 ?
+			$cachethumb			= & $this->get( 'CacheThumbChmod' );
 			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
-			$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			//$initialpermission	= $model->checkInitialPermission();  // For J1.7
 		}
 		
@@ -261,11 +261,11 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata', $existversionsdata);
 		$this->assignRef('existauthors'			, $existauthors);
-		//$this->assignRef('cachethumb'			, $cachethumb);
+		$this->assignRef('cachethumb'				, $cachethumb);
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
-		//$this->assignRef('initialpermission'	, $initialpermission);
+		//$this->assignRef('initialpermission', $initialpermission);
 
 		// assign Rights to the template
 		$this->assignRef('CanAdd'		, $CanAdd);
