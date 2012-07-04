@@ -512,7 +512,7 @@ function deleteTag(obj) {
 		
 	<?php endif; ?>
 
-<?php if ($this->fields) : ?>
+<?php if ($this->fields && $this->item->type_id) : ?>
 
 	<?php
 		$this->document->addScriptDeclaration("
@@ -530,7 +530,7 @@ function deleteTag(obj) {
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
-			$typename = $types[$this->item->type_id]['name'];
+			$typename = @$types[$this->item->type_id]['name'];
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		

@@ -162,27 +162,28 @@ class FlexicontentController extends JController
 		
 		$existlang	 	= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= & $model->getExistVersionsTable();
-		$existversionsdata	= & $model->getExistVersionsPopulated();
+		$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
 		$existauthors 		= & $model->getExistAuthorsTable();
-		//$cachethumb			= & $model->getCacheThumbChmod();  // For J1.7 ?
+		$cachethumb			= & $model->getCacheThumbChmod();
 		
 		$oldbetafiles		= & $model->getOldBetaFiles();
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
-		$missingversion		= ($use_versioning&&$model->checkCurrentVersionData());
+		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 		
-		//$initialpermission	= $model->checkInitialPermission();  // For J1.7
+		//$initialpermission	= $model->checkInitialPermission();  // For J2.5
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
-		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion) ||<br>";
+		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 
 		$dopostinstall = true;
 		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
 		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
-		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || //(!$cachethumb) ||
-		     (!$oldbetafiles) || (!$nooldfieldsdata) || ($missingversion)
+		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) ||
+		     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) || (!$cachethumb)
+				 //|| (!$initialpermission)
 		   ) {
 			$dopostinstall = false;
 		}

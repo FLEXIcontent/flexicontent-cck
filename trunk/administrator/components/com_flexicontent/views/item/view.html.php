@@ -428,18 +428,22 @@ class FlexicontentViewItem extends JView
 		$type_default_layout = $tparams->get('ilayout', 'default');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
-		if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 		
+		// (c) Add default layout, unless all templates allowed (=array is empty)
+		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+		
+		// (d) Create array of template data according to the allowed templates for current content type
 		if ( count($allowed_tmpls) ) {
 			foreach ($tmpls_all as $tmpl) {
-				if (in_array($tmpl->name, $allowed_tmpls) )
-				$tmpls[]= $tmpl;
+				if (in_array($tmpl->name, $allowed_tmpls) ) {
+					$tmpls[]= $tmpl;
+				}
 			}
 		} else {
 			$tmpls= $tmpls_all;
 		}
 		
-		// (c) Apply Template Parameters values into the form fields structures 
+		// (e) Apply Template Parameters values into the form fields structures 
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
 				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));

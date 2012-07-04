@@ -273,7 +273,8 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<?php /*echo $this->form->getLabel('type_id');*/ ?>
 									</span>
 										
-									<?php echo $this->form->getInput('type_id'); ?>
+									<?php echo $this->lists['type']; ?>
+									<?php //echo $this->form->getInput('type_id'); ?>
 									
 									</td>
 								</tr>
@@ -454,7 +455,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				if ($this->fields && $this->row->type_id) {
 					$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
-						$$('#type_id').addEvent('change', function(ev) {
+						$$('#jformtype_id').addEvent('change', function(ev) {
 							$('fc-change-error').setStyle('display', 'block');
 							});
 						});

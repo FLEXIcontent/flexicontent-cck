@@ -189,7 +189,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		}
 	});
 <?php endif; ?>
-<?php if(!$this->cachethumb) : ?>
+<?php if (!$this->cachethumb) : ?>
 	$('cachethumb').addEvent('click', function(e) {
 		e = new Event(e).stop();
 		var url = "index.php?option=com_flexicontent&task=cachethumbchmod&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
@@ -252,7 +252,7 @@ $('oldfieldsdata').addEvent('click', function(e) {
 		}
 	});
 <?php endif; ?>
-<?php if ($this->missingversion) : ?>
+<?php if (!$this->missingversion) : ?>
 $('missingversion').addEvent('click', function(e) {
 		e = new Event(e).stop();
 		var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&format=raw&<?php echo JUtility::getToken();?>=1&tmpl=component";
@@ -390,7 +390,7 @@ $('missingversion').addEvent('click', function(e) {
 			<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
 		</td>
 		<td id="missingversion-log">
-			<?php echo !$this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+			<?php echo $this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 		</td>
 	</tr>
 	<tr>

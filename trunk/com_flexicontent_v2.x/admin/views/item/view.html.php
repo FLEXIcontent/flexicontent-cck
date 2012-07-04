@@ -92,8 +92,8 @@ class FlexicontentViewItem extends JView
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 		
 		$subscribers 	= & $this->get( 'SubscribersCount' );
+		$types				= & $this->get( 'Typeslist' );
 		if (!FLEXI_J16GE) {
-			$types			= & $this->get( 'Typeslist' );
 			$languages = & $this->get( 'Languages' );
 		}
 		$typesselected	= & $this->get( 'Typesselected' );
@@ -288,12 +288,16 @@ class FlexicontentViewItem extends JView
 		// *********************************************************************************************
 		$lists = array();
 		
+		//buid types selectlist
+		if (FLEXI_J16GE) {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, 'class="required"', true );
+		} else {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', true );
+		}
+		
 		// *** BOF: J1.5 SPECIFIC SELECT LISTS
 		if (!FLEXI_J16GE) {
-
-			//buid types selectlist
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', true );
-	
+			
 			// build granular access list
 			if (FLEXI_ACCESS) {
 				if (isset($user->level)) {
@@ -428,18 +432,22 @@ class FlexicontentViewItem extends JView
 		$type_default_layout = $tparams->get('ilayout', 'default');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
-		if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 		
+		// (c) Add default layout, unless all templates allowed (=array is empty)
+		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+		
+		// (d) Create array of template data according to the allowed templates for current content type
 		if ( count($allowed_tmpls) ) {
 			foreach ($tmpls_all as $tmpl) {
-				if (in_array($tmpl->name, $allowed_tmpls) )
-				$tmpls[]= $tmpl;
+				if (in_array($tmpl->name, $allowed_tmpls) ) {
+					$tmpls[]= $tmpl;
+				}
 			}
 		} else {
 			$tmpls= $tmpls_all;
 		}
 		
-		// (c) Apply Template Parameters values into the form fields structures 
+		// (e) Apply Template Parameters values into the form fields structures 
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
 				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
