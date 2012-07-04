@@ -761,7 +761,7 @@ class FlexicontentFields
 		}
 		
 		//--. BESIDES parameters we want to retrieve: ... Custom LABELs and DESCRIPTIONs
-		if ($field->iscore && !isset($fdata[$tindex][$field->name])) {
+		if ($type_id && $field->iscore && !isset($fdata[$tindex][$field->name])) {
 			$fdata[$tindex][$field->name] = new stdClass();
 			
 			// -- SET a type specific label for the current field
