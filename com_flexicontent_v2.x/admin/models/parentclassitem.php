@@ -1599,14 +1599,25 @@ class ParentClassItem extends JModelAdmin
 		if ($item->created && strlen(trim( $item->created )) <= 10) {
 			$item->created 	.= ' 00:00:00';
 		}
-		$date =& JFactory::getDate($item->created, $tzoffset);
+		if (FLEXI_J16GE) {
+			$date =& JFactory::getDate($item->created);
+			$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+		} else {
+			$date =& JFactory::getDate($item->created, $tzoffset);
+		}
+		
 		$item->created = $date->toMySQL();
 			
 		// -- Publish UP Date
 		if ($item->publish_up && strlen(trim( $item->publish_up )) <= 10) {
 			$item->publish_up 	.= ' 00:00:00';
 		}
-		$date =& JFactory::getDate($item->publish_up, $tzoffset);
+		if (FLEXI_J16GE) {
+			$date =& JFactory::getDate($item->publish_up);
+			$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+		} else {
+			$date =& JFactory::getDate($item->publish_up, $tzoffset);
+		}
 		$item->publish_up = $date->toMySQL();
 
 		// -- Publish Down Date
@@ -1619,7 +1630,12 @@ class ParentClassItem extends JModelAdmin
 			if (strlen(trim( $item->publish_down )) <= 10) {
 				$item->publish_down .= ' 00:00:00';
 			}
-			$date =& JFactory::getDate($item->publish_down, $tzoffset);
+			if (FLEXI_J16GE) {
+				$date =& JFactory::getDate($item->publish_down);
+				$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+			} else {
+				$date =& JFactory::getDate($item->publish_down, $tzoffset);
+			}
 			$item->publish_down = $date->toMySQL();
 		}
 		
