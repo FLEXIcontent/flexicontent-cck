@@ -18,16 +18,21 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
-	<params group="group-file">
+	<params group="group-file" addpath="/administrator/components/com_flexicontent/elements">
+		<param name="" type="separator" default="FLEXI_BASIC_PARAMS" level="level2" menu="hide" />
 		<param name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		
+		<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR" level="level2" menu="hide" />
 		<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 		<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-		
 		<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
 			<option value="0">FLEXI_SPACE</option>
 			<option value="1">FLEXI_LINE_BREAK</option>
@@ -37,6 +42,8 @@
 		</param>
 		<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 		<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+		
+		<param name="" type="separator" default="FLEXI_DISPLAY_PARAMS" level="level2" menu="hide" />
 		<param name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
 			<option value="1">FLEXI_YES</option>
 			<option value="0">FLEXI_NO</option>
@@ -53,10 +60,6 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES_AS_TIP</option>
 			<option value="2">FLEXI_YES_AS_INLINE</option>
-		</param>
-		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
 		</param>
 	</params>
 	<languages>
