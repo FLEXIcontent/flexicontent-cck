@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 919 2011-10-03 02:17:05Z ggppdk $
+ * @version 1.5 stable $Id: category.php 974 2011-11-23 09:28:28Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -16,8 +16,12 @@
  * GNU General Public License for more details.
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+$page_classes  = '';
+$page_classes .= $this->pageclass_sfx ? 'page'.$this->pageclass_sfx : '';
+$page_classes .= 'cat'.$this->category->id;
 ?>
-<div id="flexicontent" class="flexicontent">
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <!-- BOF buttons -->
 	<?php
@@ -37,10 +41,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <!-- EOF buttons -->
 
 <!-- BOF page title -->
-	<?php if ($this->params->get( 'show_page_title', 1 ) && $this->params->get('page_title') != $this->category->title) : ?>
-    <h1 class="componentheading">
-		<?php echo $this->params->get('page_title'); ?>
-	</h1>
+	<?php if ($this->params->get('show_page_heading', 1)) : ?>
+		<h1 class="componentheading">
+			<?php echo $this->params->get( 'page_heading' ) ?>
+		</h1>
 	<?php endif; ?>
 <!-- EOF page title -->
 
@@ -52,22 +56,33 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	?>
 <!-- EOF author description -->
 
-<!-- BOF category description -->
-	<?php
-	if (($this->category->id > 0) && ((!empty($this->category->image) && $this->params->get('show_description_image', 1)) || ($this->params->get('show_description', 1)) || ($this->params->get('show_cat_title', 1)))) :
-	echo $this->loadTemplate('category');
-	endif;
-	?>
-<!-- EOF category description -->
 
-<!-- BOF sub-categories -->
-	<?php 
-	//only show this part if subcategories are available
-	if (count($this->categories) && $this->category->id > 0 && $this->params->get('show_subcategories')) :
-	echo $this->loadTemplate('subcategories');
-	endif;
-	?>
-<!-- EOF sub-categories -->
+<?php if ( $this->category->id > 0) : /* Category specific data e.g. not available for -author- category view */ ?>
+
+	<!-- BOF category info -->
+		<?php
+		// Only show this part if some category info is to be printed
+		if (
+			$this->params->get('show_cat_title', 1) ||
+			($this->params->get('show_description_image', 1) && $this->category->image) ||
+			($this->params->get('show_description', 1) && $this->category->description)
+		) :
+			echo $this->loadTemplate('category');
+		endif;
+		?>
+	<!-- EOF category info -->
+	
+	<!-- BOF sub-categories info -->
+		<?php 
+		// Only show this part if subcategories are available
+		if ( count($this->categories) && $this->params->get('show_subcategories') ) :
+			echo $this->loadTemplate('subcategories');
+		endif;
+		?>
+	<!-- EOF sub-categories info -->
+	
+<?php endif; ?>
+
 
 <!-- BOF item list display -->
 	<?php echo $this->loadTemplate('items'); ?>

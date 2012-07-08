@@ -1601,7 +1601,7 @@ class ParentClassItem extends JModel
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->created);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+			$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
 		} else {
 			$date =& JFactory::getDate($item->created, $tzoffset);
 		}
@@ -1614,7 +1614,7 @@ class ParentClassItem extends JModel
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->publish_up);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+			$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
 		} else {
 			$date =& JFactory::getDate($item->publish_up, $tzoffset);
 		}
@@ -1632,7 +1632,7 @@ class ParentClassItem extends JModel
 			}
 			if (FLEXI_J16GE) {
 				$date =& JFactory::getDate($item->publish_down);
-				$date->setTimeZone( new DateTimeZone( $tzoffset ); // This seems redudant as the created date object already has set server timezone ?
+				$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
 			} else {
 				$date =& JFactory::getDate($item->publish_down, $tzoffset);
 			}

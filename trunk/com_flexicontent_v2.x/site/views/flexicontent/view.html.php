@@ -74,34 +74,64 @@ class FlexicontentViewFlexicontent extends JView
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
 		$limit      = $params->def('catlimit', 0);
-		// Set a page title if one was not already set
-		if ( !$params->get('page_title') ) {
-			$params->set('page_title',	JText::_( 'FLEXICONTENT_MAIN' ));
+		
+		
+		// **********************
+		// Calculate a page title
+		// **********************
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && $menu->query['view'] != 'flexicontent' ) {
+			$params->set('page_title',	'');
+			$params->set('pageclass_sfx',	'');
 		}
 		
+		// Set a page title if one was not already set
+		$params->def('page_title',	JText::_( 'FLEXI_CATEGORIES' ));
+		
+		
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		$doc_title = $params->get( 'page_title' );
+		
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
+		
+		// Finally, set document title
+		$document->setTitle($doc_title);
+		
 
-		// Set title and metadata
-		$document->setTitle( $params->get('page_title') );
-		$document->setMetadata( 'keywords' , $params->get('page_title') );
+		// ************************
+		// Set document's META tags
+		// ************************
 		
 		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
-			if ($mainframe->getCfg('MetaTitle') == '1') {
-					$mainframe->addMetaTag('title', $params->get('page_title'));
-			}
+			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') {
-					$document->setMetaData('title', $params->get('page_title'));
-			}
+			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
 		}
 		
 		// Add alternate feed link
@@ -117,10 +147,12 @@ class FlexicontentViewFlexicontent extends JView
 		jimport('joomla.html.pagination');
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('params' , 				$params);
 		$this->assignRef('categories' , 		$categories);
 		$this->assignRef('pageNav' , 				$pageNav);
+		$this->assignRef('pageclass_sfx' , 	$pageclass_sfx);
 
 		parent::display($tpl);
 	}

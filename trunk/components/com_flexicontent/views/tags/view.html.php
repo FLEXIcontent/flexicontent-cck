@@ -83,20 +83,67 @@ class FlexicontentViewTags extends JView
 			return JError::raiseError( 404, JText::sprintf( 'Tag #%d not found', $tid ) );
 		}
 		
-		// Set a page title if one was not already set
-		if ( !$params->get('page_title') ) {
-			$params->set('page_title',	JText::_('FLEXI_TAGS').": ".JText::_( $tag->name ));
+		
+		// **********************
+		// Calculate a page title
+		// **********************
+		$m_id = (int) @$menu->query['id'] ;
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && ($menu->query['view'] != 'tags' || $m_id != JRequest::getInt('id') ) ) {
+			$params->set('page_title',	'');
+			$params->set('pageclass_sfx',	'');
 		}
 		
+		// Set a page title if one was not already set
+		$params->def('page_title',	JText::_('FLEXI_ITEMS_WITH_TAG').": ". $tag->name );
+		
+		
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		$doc_title = $params->get( 'page_title' );
+		
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
+		
+		// Finally, set document title
+		$document->setTitle($doc_title);
+		
+
+		// ************************
+		// Set document's META tags
+		// ************************
+		
+		// ** writting both old and new way as an example
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+		}		
+		
+
 
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
@@ -108,20 +155,7 @@ class FlexicontentViewTags extends JView
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 		
-		// Set title and metadata
-		$document->setTitle( $params->get('page_title') );
-		$document->setMetadata( 'keywords' , $params->get('page_title') );
-		
-		// ** writting both old and new way as an example
-		if (!FLEXI_J16GE) {
-			if ($mainframe->getCfg('MetaTitle') == '1') {
-					$mainframe->addMetaTag('title', $params->get('page_title'));
-			}
-		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') {
-					$document->setMetaData('title', $params->get('page_title'));
-			}
-		}
+
 		
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
@@ -140,10 +174,12 @@ class FlexicontentViewTags extends JView
 		
 		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id));
 		$print_link = JRoute::_('index.php?view=tags&id='.$tag->id.'&pop=1&tmpl=component');
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('tag' , 				$tag);
 		$this->assignRef('action', 			$tag_link);  // $uri->toString()
 		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('pageclass_sfx' ,	$pageclass_sfx);
 		$this->assignRef('items' , 			$items);
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('pageNav' , 		$pageNav);
