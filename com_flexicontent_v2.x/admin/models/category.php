@@ -231,23 +231,29 @@ class FlexicontentModelCategory extends JModelAdmin
 	}
 
 	/**
-	 * Method to store the category
+	 * Method to save the form data.
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   1.6
 	 */
-	function save($data) {
+	public function save($data)
+	{
 		// Initialise variables;
 		$dispatcher = JDispatcher::getInstance();
-		$pk		= (!empty($data['id'])) ? $data['id'] : (int)$this->getState($this->getName().'.id');
-		$isNew	= true;
-		
-		$category = $this->getTable();
-		
+		$table = $this->getTable();
+		$pk = (!empty($data['id'])) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
+		$isNew = true;
+
+		// Include the content plugins for the on save events.
+		JPluginHelper::importPlugin('content');
+
 		// Load the row if saving an existing category.
-		if ($pk > 0) {
-			$category->load($pk);
+		if ($pk > 0)
+		{
+			$table->load($pk);
 			$isNew = false;
 		}
 		if(isset($_REQUEST['jform']['attribs']))
@@ -257,21 +263,17 @@ class FlexicontentModelCategory extends JModelAdmin
 			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['templates']);
 			
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if ($category->parent_id != $data['parent_id'] || $data['id'] == 0) {
-			$category->setLocation($data['parent_id'], 'last-child');
+		if ($table->parent_id != $data['parent_id'] || $data['id'] == 0)
+		{
+			$table->setLocation($data['parent_id'], 'last-child');
 		}
 
 		// Alter the title for save as copy
-		//if (!$isNew && $data['id'] == 0 && $category->parent_id == $data['parent_id']) {
-		if (JRequest::getVar('task') == 'save2copy') {
-
-			$m = null;
-			$data['alias'] = '';
-			if (preg_match('#\((\d+)\)$#', $table->title, $m)) {
-				$data['title'] = preg_replace('#\(\d+\)$#', '('.($m[1] + 1).')', $category->title);
-			} else {
-				$data['title'] .= ' (2)';
-			}
+		if (JRequest::getVar('task') == 'save2copy')
+		{
+			list($title, $alias) = $this->generateNewTitle($data['parent_id'], $data['alias'], $data['title']);
+			$data['title'] = $title;
+			$data['alias'] = $alias;
 		}
 
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
@@ -283,13 +285,14 @@ class FlexicontentModelCategory extends JModelAdmin
 			$data['params'] = array();
 		}
 
-		// bind it to the table
-		if (!$category->bind($data)) {
-			$this->setError(500, $this->_db->getErrorMsg() );
+		// Bind the data.
+		if (!$table->bind($data))
+		{
+			$this->setError($table->getError());
 			return false;
 		}
 		if ($copyparams) {
-			$category->params = $this->getParams($copyparams);
+			$table->params = $this->getParams($copyparams);
 		}
 		
 		// Bind the rules.
@@ -302,7 +305,7 @@ class FlexicontentModelCategory extends JModelAdmin
 				}
 			}
 			$rules = new JRules($data['rules']);
-			$category->setRules($rules);
+			$table->setRules($rules);
 		}
 		echo "<pre>";
 		print_r($data['rules']);
@@ -311,56 +314,64 @@ class FlexicontentModelCategory extends JModelAdmin
 		//die('die() in model');
 		
 
-		// Make sure the data is valid
-		if (!$category->check()) {
-			$this->setError($category->getError());
-			return false;
-		}
-		
-		// Trigger the onContentBeforeSave event.
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option.'.'.$this->name, &$table, $isNew));
-		if (in_array(false, $result, true)) {
+		// Check the data.
+		if (!$table->check())
+		{
 			$this->setError($table->getError());
 			return false;
 		}
 
-		// Store it in the db
-		if (!$category->store()) {
-			$this->setError(500, $this->_db->getErrorMsg() );
+		// Trigger the onContentBeforeSave event.
+		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$table, $isNew));
+		if (in_array(false, $result, true))
+		{
+			$this->setError($table->getError());
+			return false;
+		}
+
+		// Store the data.
+		if (!$table->store())
+		{
+			$this->setError($table->getError());
 			return false;
 		}
 		
+		$this->_id = $table->id;
+		$this->_category	= & $table;
+
 		// Trigger the onContentAfterSave event.
-		$dispatcher->trigger($this->event_after_save, array($this->option.'.'.$this->name, &$table, $isNew));
+		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
 
 		// Rebuild the path for the category:
-		if (!$category->rebuildPath($category->id)) {
+		if (!$table->rebuildPath($table->id))
+		{
 			$this->setError($table->getError());
 			return false;
 		}
 
 		// Rebuild the paths of the category's children:
-		if (!$category->rebuild($category->id, $category->lft, $category->level, $category->path)) {
-			$this->setError($category->getError());
+		if (!$table->rebuild($table->id, $table->lft, $table->level, $table->path))
+		{
+			$this->setError($table->getError());
 			return false;
 		}
-		$this->setState($this->getName().'.id', $category->id);
-		
-		if ($category->id)
+
+		$this->setState($this->getName() . '.id', $table->id);
+
+		if ($table->id)
 		{
 			$query 	= 'UPDATE #__categories'
 				. ' SET extension = "com_content" '
-				. ' WHERE id = ' . (int)$category->id;
+				. ' WHERE id = ' . (int)$table->id;
 				;
 		}
-		
+
 		// Clear the cache
 		$this->cleanCache();
-		//$category->checkin();
 
-		$this->_category	=& $category;
 		return true;
 	}
+	
 	
 	/**
 	 * Custom clean the cache of com_content and content modules
@@ -423,7 +434,8 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	mixed	A JForm object on success, false on failure
 	 * @since	1.6
 	 */
-	public function getForm($data = array(), $loadData = true) {
+	public function getForm($data = array(), $loadData = true)
+	{
 		// Initialise variables.
 		$extension	= $this->getState('com_flexicontent.category.extension');
 
@@ -457,7 +469,8 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	mixed	The data for the form.
 	 * @since	1.6
 	 */
-	protected function loadFormData() {
+	protected function loadFormData()
+	{
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
@@ -475,9 +488,12 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	mixed	Category data object on success, false on failure.
 	 * @since	1.6
 	 */
-	public function getItem($pk = null) {
-		$pk = $pk?$pk:$this->_id;
-		if ($result = parent::getItem($pk)) {
+	public function getItem($pk = null)
+	{
+		$pk = $pk ? $pk : $this->_id;
+		
+		if ( $result = parent::getItem($pk) )
+		{
 			// Prime required properties.
 			if (empty($result->id)) {
 				$result->parent_id	= $this->getState('com_flexicontent.category.parent_id');
@@ -551,8 +567,6 @@ class FlexicontentModelCategory extends JModelAdmin
 			$cid = JRequest::getVar('cid', array(0));
 			$pk = (int)$cid[0];
 		}
-		$this->setState($this->getName().'.id', $pk);
-
 
 		$this->setState('com_flexicontent.category.extension', $extension);
 		$parts = explode('.',$extension);
@@ -565,11 +579,40 @@ class FlexicontentModelCategory extends JModelAdmin
 		$params	= JComponentHelper::getParams('com_flexicontent');
 		$this->setState('params', $params);
 	}
-	public function getAttribs() {
+	
+	
+	public function getAttribs()
+	{
 		if($this->_category) {
 			return $this->_category->params;
 		}
 		return array();
 	}
+	
+	
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  The id of the parent.
+	 * @param   string   $alias      The alias.
+	 * @param   string   $title      The title.
+	 *
+	 * @return  array  Contains the modified title and alias.
+	 *
+	 * @since	1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+		while ($table->load(array('alias' => $alias, 'parent_id' => $parent_id)))
+		{
+			$title = JString::increment($title);
+			$alias = JString::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
+	}
+	
 }
 ?>

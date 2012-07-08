@@ -214,15 +214,14 @@ class FlexicontentModelCategory extends JModel
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ($this->_loadCategory())
-		{
+		if ($this->_id == 0) {
+			return false;
+		} else if ($this->_loadCategory()) {
 			if ($uid) {
 				return ($this->_category->checked_out && $this->_category->checked_out != $uid);
 			} else {
 				return $this->_category->checked_out;
 			}
-		} elseif ($this->_id < 1) {
-			return false;
 		} else {
 			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
 			return false;

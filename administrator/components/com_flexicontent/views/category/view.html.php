@@ -47,41 +47,65 @@ class FlexicontentViewCategory extends JView
 			$CanAddCats	= 1;
 		}
 		
-		// This also done at the controller
-		if ( !$CanCats && !$CanAddCats ) {
+		if ( !$CanCats ) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 
-		//Load pane behavior
+		// Get data from the model
+		$model		= & $this->getModel();
+		$row     	= & $this->get( 'Category' );
+		
+		$cid			=	$row->id;
+		$isNew		= !$cid;
+		$checkedOut	= $model->isCheckedOut( $user->get('id') );
+		
+		$cancreate_any = count( flexicontent_cats::getFAallowedCats($user->gmid, array('core.create')) ) ||  ($user->gid == 25);
+		
+		// Editing existing category: Check if category is already checked out by different user
+		if ($cid) {
+			if ($model->isCheckedOut( $user->get('id') )) {
+				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED BY ANOTHER ADMIN' ));
+				$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
+			}
+		}
+		
+		// Creating new category: Check if user can create at least one category
+		else {
+			if ( !$CanAddCats || !$cancreate_any ) {
+				$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+			}
+		}
+		
+		// Load pane behavior
 		jimport('joomla.html.pane');
 		//Get the route helper for the preview function
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-		//initialise variables
+		// Initialise variables
 		$editor 	= & JFactory::getEditor();
 		$document	= & JFactory::getDocument();
 		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
 		$bar			= & JToolBar::getInstance('toolbar');
 		$pane			= & JPane::getInstance('sliders');
-
-		JHTML::_('behavior.tooltip');
-
-		//add css to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		//add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-
-		//Get data from the model
-		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Category' );
-		$cid			=	$row->id;
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
-		
 		$categories = $globalcats;
 		
-		//create the toolbar
+		// Load tooltips
+		JHTML::_('behavior.tooltip');
+		
+		// Add css to document
+		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
+		// Add js function to overload the joomla submitform
+		$document->addScript('components/com_flexicontent/assets/js/admin.js');
+		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		
+		
+		// *****************
+		// Create the toolbar
+		// *****************
+		
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
 			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
@@ -96,18 +120,6 @@ class FlexicontentViewCategory extends JView
 		JToolBarHelper::save();
 		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel();
-		
-		//fail if checked out not by 'me'
-		if ($cid) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED BY ANOTHER ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
-			}
-		} else {
-			if (!$CanAddCats) {
-				$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-			}
-		}
 		
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, 'description' );
