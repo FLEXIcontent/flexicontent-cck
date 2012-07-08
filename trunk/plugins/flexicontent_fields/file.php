@@ -308,7 +308,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$field->{$prop} = implode($separatorf, $field->{$prop});
 		
 		// Field opening / closing texts
-		$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+		if ($field->{$prop})
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 	}
 	
 
