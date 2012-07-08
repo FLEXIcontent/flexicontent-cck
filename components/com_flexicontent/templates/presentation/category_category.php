@@ -21,12 +21,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 <div class="floattext">
 	<?php if ($this->params->get('show_cat_title', 1)) : ?>
-	<h2 class="flexicontent cat<?php echo $this->category->id; ?>">
+	<h2 class="cattitle">
 		<?php echo $this->escape($this->category->title); ?>
 	</h2>
 	<?php endif; ?>
 
-	<?php if (!empty($this->category->image)) : ?>
+	<?php if ($this->params->get('show_description_image', 1) && $this->category->image) : ?>
 	<div class="catimg">
 		<?php echo $this->category->image; ?>
 	</div>

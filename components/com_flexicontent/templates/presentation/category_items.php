@@ -205,7 +205,7 @@ if ($this->items) :
 		
 			<!-- BOF item title -->
 			<?php if ($this->params->get('show_title', 1)) : ?>
-			<h2 class="contentheading flexicontent"><span class='fc_item_title'>
+			<h2 class="contentheading"><span class='fc_item_title'>
 				<?php
 				if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 					echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';

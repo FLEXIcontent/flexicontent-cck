@@ -57,9 +57,11 @@ $fields = $params->get('fields');
 $fields = array_map( 'trim', explode(',', $params->get('fields')) );
 if ($fields[0]=='') $fields = array();
 
+$page_classes  = '';
+$page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
+$page_classes .= ' favourites';
 ?>
-
-<div id="flexicontent" class="flexicontent">
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <script type="text/javascript">
 	function tableOrdering( order, dir, task )
@@ -111,17 +113,15 @@ if ($fields[0]=='') $fields = array();
 	}
 </script>
 
-<?php if ($this->params->def( 'show_page_title', 1 )) : ?>
-
-    <h1 class="componentheading">
-		<?php echo $this->params->get('page_title'); ?>
+<?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
+	<h1 class="componentheading">
+		<?php echo $this->params->get('page_heading'); ?>
 	</h1>
-
+<?php else : ?>
+	<h2 class="contentheading">
+		<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>
+	</h2>
 <?php endif; ?>
-
-<h2 class="flexicontent favourites">
-	<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>
-</h2>
 
 <?php if (!count($this->items)) : ?>
 

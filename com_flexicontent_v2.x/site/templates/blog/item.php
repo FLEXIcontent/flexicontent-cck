@@ -27,9 +27,13 @@ switch ($this->params->get( 'columnmode', 2 )) {
 	default: $columnmode = ''; break;
 }
 
+$page_classes  = '';
+$page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
+$page_classes .= ' items item'.$this->item->id;
+$page_classes .= ' type'.$this->item->type_id;
 ?>
 
-<div id="flexicontent" class="flexicontent item<?php echo $this->item->id; ?> type<?php echo $this->item->type_id; ?>">
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
   <!-- BOF beforeDisplayContent -->
   <?php if ($this->item->event->beforeDisplayContent) : ?>
@@ -59,16 +63,16 @@ switch ($this->params->get( 'columnmode', 2 )) {
 	<!-- EOF buttons -->
 
 	<!-- BOF page title -->
-	<?php if ($this->params->get( 'show_page_title', 1 ) && $this->params->get('page_title') != $this->item->title) : ?>
+	<?php if ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title ) : ?>
 	<h1 class="componentheading">
-		<?php echo $this->params->get('page_title'); ?>
+		<?php echo $this->params->get('page_heading'); ?>
 	</h1>
 	<?php endif; ?>
 	<!-- EOF page title -->
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"><span class='fc_item_title'>
+	<h2 class="contentheading"><span class='fc_item_title'>
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';

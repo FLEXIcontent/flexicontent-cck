@@ -108,29 +108,68 @@ class FLEXIcontentViewSearch extends JView
 		//FlexicontentFields::getItemFields();
 		$menus	= &JSite::getMenu();
 		$menu	= $menus->getActive();
-
-		// Because the application sets a default page title, we need to get title right from the menu item itself
-		if (is_object( $menu )) {
-			$menu_params = new JParameter( $menu->params );
-			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
-			}
-		} else {
-			$params->set('page_title',	JText::_( 'FLEXI_SEARCH' ));
+		$document	= &JFactory::getDocument();
+		
+		
+		// **********************
+		// Calculate a page title
+		// **********************
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && $menu->query['view'] != 'search' ) {
+			$params->set('page_title',	'');
+			$params->set('pageclass_sfx',	'');
 		}
-
+		
+		// Set a page title if one was not already set
+		$params->def('page_title',	JText::_( 'FLEXI_SEARCH' ));
+		
+		
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		$doc_title = $params->get( 'page_title' );
+		
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
 		
-		$document	= &JFactory::getDocument();
-		$document->setTitle( $params->get( 'page_title' ) );
+		// Finally, set document title
+		$document->setTitle($doc_title);
+		
+
+		// ************************
+		// Set document's META tags
+		// ************************
+		
+		// ** writting both old and new way as an example
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+		}		
+		
+		
 
 		// Get the parameters of the active menu item
 		$params	= &$mainframe->getParams();
@@ -250,8 +289,10 @@ class FLEXIcontentViewSearch extends JView
 		$this->result	= JText::sprintf( 'FLEXI_TOTALRESULTSFOUND', $total );
 
 		$print_link = JRoute::_('&pop=1&tmpl=component&print=1');
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('print_link',  $print_link);
+		$this->assignRef('pageclass_sfx',  $pageclass_sfx);
 		$this->assignRef('pagination',  $pagination);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('results',		$results);

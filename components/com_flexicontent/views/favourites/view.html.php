@@ -61,32 +61,64 @@ class FlexicontentViewFavourites extends JView
 		$items 	= & $this->get('Data');
 		$total 	= & $this->get('Total');
 		
-		// Because the application sets a default page title, we need to get title right from the menu item itself
-		if (is_object( $menu )) {
-			jimport( 'joomla.html.parameter' );
-			$menu_params = new JParameter( $menu->params );		
-			$params->merge($menu_params);
-			
-			if (!$menu_params->get( 'page_title')) {
-				$params->set('page_title',	JText::_( 'FLEXI_MY_FAVOURITES' ));
-			}
-			
-		} else {
-			$params->set('page_title',	JText::_( 'FLEXI_MY_FAVOURITES' ));
+		
+		// **********************
+		// Calculate a page title
+		// **********************
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && $menu->query['view'] != 'favourites' ) {
+			$params->set('page_title',	'');
+			$params->set('pageclass_sfx',	'');
 		}
 		
+		// Set a page title if one was not already set
+		$params->def('page_title',	JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ));
+		
+		
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		$doc_title = $params->get( 'page_title' );
+		
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
 		
-		$document->setTitle($params->get('page_title'));
-		$document->setMetadata( 'keywords' , $params->get('page_title') );
+		// Finally, set document title
+		$document->setTitle($doc_title);
+		
+
+		// ************************
+		// Set document's META tags
+		// ************************
+		
+		// ** writting both old and new way as an example
+		if (!FLEXI_J16GE) {
+			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+		} else {
+			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+		}
 		
         
 		//ordering
@@ -106,9 +138,11 @@ class FlexicontentViewFavourites extends JView
 		
 		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites' );
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action', 			$fav_link);  // $uri->toString()
 		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('pageclass_sfx' ,	$pageclass_sfx);
 		$this->assignRef('items' , 			$items);
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('pageNav' , 		$pageNav);

@@ -1,11 +1,21 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 
-<div id='flexicontent'>
+<?php
+$page_classes  = '';
+$page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
+$page_classes .= ' search';
+?>
+
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 	
-<?php if ( $this->params->get( 'show_page_title', 1 ) ) : ?>
-<div class="componentheading<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-	<?php echo $this->params->get( 'page_title' ); ?>
-</div>
+<?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
+	<h1 class="componentheading">
+		<?php echo $this->params->get('page_heading'); ?>
+	</h1>
+<?php else : ?>
+	<h2 class="contentheading">
+		<?php echo JText::_( 'FLEXI_SEARCH' ) ;?>
+	</h2>
 <?php endif; ?>
 
 	<!-- BOF buttons -->

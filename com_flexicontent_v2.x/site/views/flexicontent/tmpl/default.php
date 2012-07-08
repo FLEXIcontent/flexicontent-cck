@@ -17,12 +17,20 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-?>
-<div id="flexicontent" class="flexicontent directory">
 
-<?php if ($this->params->def( 'show_page_title', 1 )) : ?>
-	<h2 class="componentheading flexicontent">
-		<?php echo $this->params->get('page_title'); ?>
+$page_classes  = '';
+$page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
+$page_classes .= ' directory rootcat'.$this->params->get('rootcat', FLEXI_J16GE ? 1:0);
+?>
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
+
+<?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
+	<h1 class="componentheading">
+		<?php echo $this->params->get('page_heading'); ?>
+	</h1>
+<?php else : ?>
+	<h2 class="contentheading">
+		<?php echo JText::_( 'FLEXI_CATEGORIES' ) ;?>
 	</h2>
 <?php endif; ?>
 

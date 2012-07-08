@@ -49,9 +49,9 @@ class FlexicontentViewItems extends JView
 			$this->setLayout('item');
 		}
 		
-		// Get globaltypes and make sure it is an array
+		// Get Content Types with no category links in item view pathways
 		global $globalnopath;
-		$globalnopath = !is_array($globalnopath) ? array() : $globalnopath;
+		if (!is_array($globalnopath))     $globalnopath	= array();
 		
 		// Initialize variables
 		$mainframe  = &JFactory::getApplication();
@@ -71,11 +71,11 @@ class FlexicontentViewItems extends JView
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$menuParams = new JRegistry;
-			$menuParams->loadJSON($menu->params);
-			$params->merge($menuParams);
+		if ($menu) {
+			$menuParams = new JParameter($menu->params);
+			// In J1.6+ the above function does not merge current menu item parameters,
+			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) $params->merge($menuParams);
 		}
 		
 		//add css file
@@ -83,6 +83,7 @@ class FlexicontentViewItems extends JView
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
+		
 		//allow css override
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
@@ -133,35 +134,45 @@ class FlexicontentViewItems extends JView
 		$parents	= $cats->getParentlist();
 		$depth		= $params->get('item_depth', 0);
 		
-		// !!! The triggering of the event onPrepareContent (J1.5) /onContentPrepare (J2.5) of content plugins
-		// !!! for description field (maintext) along with all other flexicontent
-		// !!! fields is handled by flexicontent.fields.php
-		// CODE REMOVED
 		
-		// Because the application sets a default page title, we need to get title right from the menu item itself
+		// **********************
+		// Calculate a page title
+		// **********************
+		$m_id  = (int) @$menu->query['id'] ;
+		$m_cid = (int) @$menu->query['cid'] ;
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && ($menu->query['view'] != FLEXI_ITEMVIEW || $m_cid != JRequest::getInt('cid') || JRequest::getInt('id') ) ) {
+			$params->set('page_title',	$item->title);
+			$params->set('pageclass_sfx',	'');
+		}
+		
 		if ($params->get('override_title', 0)) {
 			if ($params->get('custom_ititle', '')) {
 				$params->set('page_title',	$params->get('custom_ititle'));				
 			} else {
 				$params->set('page_title',	$item->title);
 			}
-		} else {
-			// Get the menu item object		
-			if (is_object($menu)) {
-				$menu_params = new JParameter( $menu->params );
-				if (!$menu_params->get( 'page_title')) {
-					$params->set('page_title',	$item->title);
-				}
-			} else {
-				$params->set('page_title',	$item->title);
-			}
 		}
 		
-		// *************************
-		// Create the document title
-		// *************************
 		
-		// First check and prepend category title
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		// Check and prepend category title
 		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
 			$parentcat = end($parents);
 			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ':"") .$params->get( 'page_title' );
@@ -169,14 +180,14 @@ class FlexicontentViewItems extends JView
 			$doc_title = $params->get( 'page_title' );
 		}
 		
-		// Second check and prepend site name
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
 		
@@ -184,23 +195,6 @@ class FlexicontentViewItems extends JView
 		$document->setTitle($doc_title);
 		
 		
-		// ****************************
-		// Set the document's META tags
-		// ****************************
-		
-		// Set item's META data: desc, keyword, title, author
-		if ($item->metadesc)		$document->setDescription( $item->metadesc );
-		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		if ($mainframe->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
-		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
-		
-		// Set remaining META keys
-		$mdata = new JParameter($item->metadata);
-		$mdata = $mdata->toArray();
-		foreach ($mdata as $k => $v)
-		{
-			if ($v)  $document->setMetadata($k, $v);
-		}
 		
 		// @TODO check that as it seems to be dirty :(
 		$uri  			=& JFactory::getURI();
@@ -288,27 +282,48 @@ class FlexicontentViewItems extends JView
 			$item_depth = $params->get('item_depth', 0);
 			if ($params->get('add_item_pathway', 1)) $item_depth++;
 		}
-
-		if (count($globalnopath) > 0) {   // ggppdk: I DO NOT understand the purpose of this IF
-			if (!in_array($item->id, $globalnopath)) {
-				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
-			}
-		} else {
-			for ($p=$item_depth; $p<count($parents); $p++) {
-				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-			}
-			if ($params->get('add_item_pathway', 1)) {
-				$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
-			}
+		
+		// Respect menu item depth, defined in menu item
+		$p = $item_depth;
+		while ( $p < count($parents) ) {
+			// For some Content Types the pathway should not be populated with category links
+			if ( in_array($item->type_id, $globalnopath) )  break;
+			
+			// Add current parent category
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			$p++;
+		}
+		if ($params->get('add_item_pathway', 1)) {
+			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug)) );
+		}
+		
+		
+		// ************************
+		// Set document's META tags
+		// ************************
+		
+		// Set item's META data: desc, keyword, title, author
+		if ($item->metadesc)		$document->setDescription( $item->metadesc );
+		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
+		if ($mainframe->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
+		
+		// Set remaining META keys
+		$mdata = new JParameter($item->metadata);
+		$mdata = $mdata->toArray();
+		foreach ($mdata as $k => $v)
+		{
+			if ($v)  $document->setMetadata($k, $v);
 		}
 		
 		$print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
 		$this->assignRef('item' , 				$item);
 		$this->assignRef('user' , 				$user);
 		$this->assignRef('params' , 			$params);
-		$this->assignRef('menu_params' , 	$menu_params);
 		$this->assignRef('print_link' , 	$print_link);
+		$this->assignRef('pageclass_sfx' ,$pageclass_sfx);
 		$this->assignRef('parentcat',			$parentcat);
 		$this->assignRef('fields',				$item->fields);
 		$this->assignRef('tmpl' ,					$tmpl);

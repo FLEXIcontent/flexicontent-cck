@@ -37,10 +37,13 @@ class FlexicontentViewCategory extends JView
 	 */
 	function display( $tpl = null )
 	{
+		// Get Non-routing Categories, and Category Tree
 		global $globalnoroute, $globalcats;
+		if (!is_array($globalnoroute))	$globalnoroute	= array();
+		if (!is_array($globalcats))     $globalcats	= array();
+		
 		$mainframe =& JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		if (!is_array($globalnoroute))	$globalnoroute	= array();
 
 		JHTML::_('behavior.tooltip');
 
@@ -56,11 +59,11 @@ class FlexicontentViewCategory extends JView
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$menuParams = new JRegistry;
-			$menuParams->loadJSON($menu->params);
-			$params->merge($menuParams);
+		if ($menu) {
+			$menuParams = new JParameter($menu->params);
+			// In J1.6+ the above function does not merge current menu item parameters,
+			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) $params->merge($menuParams);
 		}
 		
 		//add css file
@@ -125,20 +128,58 @@ class FlexicontentViewCategory extends JView
 			}
 		}
 		
-		// Set a page title if one was not already set
-		if ( !$params->get('page_title') ) {
+		
+		// **********************
+		// Calculate a page title
+		// **********************
+		$m_cid = (int) @$menu->query['cid'] ;
+		
+		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		if ( $menu && ($menu->query['view'] != 'category' || $m_cid != JRequest::getInt('cid') ) ) {
 			$params->set('page_title',	$category->title);
+			$params->set('pageclass_sfx',	'');
 		}
 		
+		// Set a page title if one was not already set
+		$params->def('page_title',	$category->title);
+		
+		
+		// *******************
+		// Create page heading
+		// *******************
+		
+		// In J1.5 parameter name is show_page_title instead of show_page_heading
+		if ( !FLEXI_J16GE )
+			$params->def('show_page_heading', $params->get('show_page_title'));
+		
+		// Prevent showing page heading if some as category title
+		if ( $params->get('page_heading') == $category->title && $params->get('show_cat_title', 1) )
+			$params->set('show_page_heading', 0);
+		
+		// Set a page heading if one was not already set
+		$params->def('page_heading', $params->get('page_title'));
+		
+		
+		// ************************************************************
+		// Create the document title, by from page title and other data
+		// ************************************************************
+		
+		$doc_title = $params->get( 'page_title' );
+		
+		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
 			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$params->set('page_title', $mainframe->getCfg('sitename') ." - ". $params->get( 'page_title' ));
+				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
 			}
 			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$params->set('page_title', $params->get( 'page_title' ) ." - ". $mainframe->getCfg('sitename'));
+				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
 			}
 		}
+		
+		// Finally, set document title
+		$document->setTitle($doc_title);
+		
 		
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
@@ -156,15 +197,14 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		// Respect menu item depth, defined in menu item
-		for ($p=$item_depth; $p<count($parents); $p++) {
+		$p = $item_depth;
+		while ( $p < count($parents) ) {
 			// Do not add the above and root categories when coming from a directory view
-			if (isset($allroots)) {
-				if (!in_array($parents[$p]->id, $roots)) {
-					$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-				}
-			} else {
-				$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
-			}
+			if ( isset($allroots) && in_array($parents[$p]->id, $roots) )  continue;
+			
+			// Add current parent category
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			$p++;
 		}
 		
 		// Add rel canonical html head link tag
@@ -177,18 +217,15 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 		
-		// Set title and metadata
-		$document->setTitle( $params->get('page_title') );
+		
+		// ************************
+		// Set document's META tags
+		// ************************
 		
 		if ($category->id) {   // possibly not set for author items OR my items
 			if (FLEXI_J16GE) {
-				if ($category->metadesc) {
-					$document->setDescription( $category->metadesc );
-				}
-				
-				if ($category->metakey) {
-					$document->setMetadata('keywords', $category->metakey);
-				}
+				if ($category->metadesc)  $document->setDescription( $category->metadesc );
+				if ($category->metakey)   $document->setMetadata('keywords', $category->metakey);
 				
 				$meta_params = new JParameter($category->metadata);
 				
@@ -202,9 +239,7 @@ class FlexicontentViewCategory extends JView
 					$document->setMetaData('author', $meta_author);
 				}
 			} else {
-				if ($mainframe->getCfg('MetaTitle') == '1') {
-					$document->setMetaData('title', $category->title);
-				}
+				if ($mainframe->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
 			}
 		}
 		
@@ -294,8 +329,8 @@ class FlexicontentViewCategory extends JView
 			$category->description 	= $category->text;
 		}
 
-		// Maybe here not to import all plugins but just those for description field ???
-		// Anyway these events are usually not very time consuming, so lets trigger all of them ???
+		// Maybe here not to import all plugins but just those for description field or add a parameter for this
+		// Anyway these events are usually not very time consuming as is the the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) 
 		JPluginHelper::importPlugin('content');
 		
 		foreach ($items as $item) 
@@ -489,9 +524,11 @@ class FlexicontentViewCategory extends JView
 
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',			$category_link);  // $uri->toString()
 		$this->assignRef('print_link' ,	$print_link);
+		$this->assignRef('pageclass_sfx' , $pageclass_sfx);
 		$this->assignRef('params' , 		$params);
 		$this->assignRef('categories' , $categories);
 		$this->assignRef('items' , 			$items);
