@@ -18,8 +18,8 @@
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="one">FLEXI_1_COL</option>
 			<option value="two">FLEXI_2_COLS</option>
-		</param> 
-	</params> 
+		</param>
+	</params>
 	<fieldgroups>
 		<group>subtitle1</group>
 		<group>subtitle2</group>

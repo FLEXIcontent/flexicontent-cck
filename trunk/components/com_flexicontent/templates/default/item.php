@@ -84,16 +84,16 @@ $page_classes .= ' type'.$this->item->type_id;
 		</div>
 	<?php endif; ?>
   <!-- EOF afterDisplayTitle -->
-
+	
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($this->item->positions['subtitle1'])) : ?>
-	<div class="lineinfo subtitle1">
+	<div class="flexi lineinfo subtitle1">
 		<?php foreach ($this->item->positions['subtitle1'] as $field) : ?>
-		<div class="element">
+		<div class="flexi element">
 			<?php if ($field->label) : ?>
-			<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 		</div>
 		<?php endforeach; ?>
 	</div>
@@ -102,13 +102,13 @@ $page_classes .= ' type'.$this->item->type_id;
 	
 	<!-- BOF subtitle2 block -->
 	<?php if (isset($this->item->positions['subtitle2'])) : ?>
-	<div class="lineinfo subtitle2">
+	<div class="flexi lineinfo subtitle2">
 		<?php foreach ($this->item->positions['subtitle2'] as $field) : ?>
-		<div class="element">
+		<div class="flexi element">
 			<?php if ($field->label) : ?>
-			<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 		</div>
 		<?php endforeach; ?>
 	</div>
@@ -117,13 +117,13 @@ $page_classes .= ' type'.$this->item->type_id;
 	
 	<!-- BOF subtitle3 block -->
 	<?php if (isset($this->item->positions['subtitle3'])) : ?>
-	<div class="lineinfo subtitle3">
+	<div class="flexi lineinfo subtitle3">
 		<?php foreach ($this->item->positions['subtitle3'] as $field) : ?>
-		<div class="element">
+		<div class="flexi element">
 			<?php if ($field->label) : ?>
-			<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 		</div>
 		<?php endforeach; ?>
 	</div>
@@ -132,12 +132,12 @@ $page_classes .= ' type'.$this->item->type_id;
 	
 	
 	<?php if ((isset($this->item->positions['image'])) || (isset($this->item->positions['top']))) : ?>
-	<div class="topblock">  <!-- NOTE: image block is inside top block ... -->
+	<div class="flexi topblock">  <!-- NOTE: image block is inside top block ... -->
 	
 	<!-- BOF image block -->
 		<?php if (isset($this->item->positions['image'])) : ?>
 			<?php foreach ($this->item->positions['image'] as $field) : ?>
-		<div class="image field_<?php echo $field->name; ?>">
+		<div class="flexi image field_<?php echo $field->name; ?>">
 			<?php echo $field->display; ?>
 			<div class="clear"></div>
 		</div>
@@ -147,15 +147,15 @@ $page_classes .= ' type'.$this->item->type_id;
 	
 	<!-- BOF top block -->
 		<?php if (isset($this->item->positions['top'])) : ?>
-		<div class="infoblock <?php echo $this->params->get('top_cols', 'two'); ?>cols">
-			<ul>
+		<div class="flexi infoblock <?php echo $this->params->get('top_cols', 'two'); ?>cols">
+			<ul class='flexi'>
 				<?php foreach ($this->item->positions['top'] as $field) : ?>
-				<li>
+				<li class='flexi'>
 					<div>
 						<?php if ($field->label) : ?>
-						<div class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+						<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 						<?php endif; ?>
-						<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+						<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 					</div>
 				</li>
 				<?php endforeach; ?>
@@ -166,15 +166,15 @@ $page_classes .= ' type'.$this->item->type_id;
 	
 	</div>
 	<?php endif; ?>
-
+	
 	<div class="clear"></div>
-
+	
 	<!-- BOF TOC -->
 	<?php if (isset($this->item->toc)) : ?>
 		<?php echo $this->item->toc; ?>
 	<?php endif; ?>
 	<!-- EOF TOC -->
-
+	
 	<!-- BOF description -->
 	<?php if (isset($this->item->positions['description'])) : ?>
 	<div class="description">
@@ -187,20 +187,20 @@ $page_classes .= ' type'.$this->item->type_id;
 	</div>
 	<?php endif; ?>
 	<!-- EOF description -->
-
+	
 	<div class="clear"></div>
-
+	
 	<!-- BOF bottom block -->
 	<?php if (isset($this->item->positions['bottom'])) : ?>
-	<div class="infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols">
-		<ul>
+	<div class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols">
+		<ul class='flexi'>
 			<?php foreach ($this->item->positions['bottom'] as $field) : ?>
-			<li>
+			<li class='flexi'>
 				<div>
 					<?php if ($field->label) : ?>
-					<div class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+					<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 					<?php endif; ?>
-					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 				</div>
 			</li>
 			<?php endforeach; ?>
