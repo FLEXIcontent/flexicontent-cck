@@ -261,6 +261,48 @@ class FlexicontentModelCategories extends JModelList
 	
 	
 	/**
+	 * Check in a category
+	 *
+	 * @since	1.6
+	 */
+	function checkin()
+	{
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$pk       = (int)$cid[0];
+		
+		// Only attempt to check the row in if it exists.
+		if ($pk)
+		{
+			$user = JFactory::getUser();
+
+			// Get an instance of the row to checkin.
+			$table = $this->getTable();
+			if (!$table->load($pk))
+			{
+				$this->setError($table->getError());
+				return false;
+			}
+
+			// Check if this is the user having previously checked out the row.
+			if ($table->checked_out > 0 && $table->checked_out != $user->get('id') && !$user->authorise('core.admin', 'com_checkin'))
+			{
+				$this->setError(JText::_('JLIB_APPLICATION_ERROR_CHECKIN_USER_MISMATCH'));
+				return false;
+			}
+
+			// Attempt to check the row in.
+			if (!$table->checkin($pk))
+			{
+				$this->setError($table->getError());
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	
+	/**
 	 * Method to remove a category
 	 *
 	 * @access	public
