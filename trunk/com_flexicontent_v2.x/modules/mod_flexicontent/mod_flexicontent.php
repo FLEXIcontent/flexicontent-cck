@@ -115,23 +115,25 @@ $list_arr = modFlexicontentHelper::getList($params);
 $catdata_arr = modFlexicontentHelper::getCategoryData($params);
 if (!$catdata_arr) $catdata_arr = array (false);
 
-// Only when caching not active, we can be xhtml compliant by inserting css file at the html head
-if ($add_ccs && !$caching && $layout) {
-	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-		// active layout css
-		$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
-	}
-	$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
+
+if ($add_ccs && $layout) {
+  if ($caching && !FLEXI_J16GE) {
+		// Work around for caching bug in J1.5
+    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+      // active layout css
+      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
+    }
+    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
+  } else {
+    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+      // active layout css
+      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
+    }
+    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
+  }
 }
 
-// Only when caching is active, we insert somewhere inside body, which is not xhtml compliant, but this is ok for all browsers
-if ($add_ccs && $caching && $layout) {
-	if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-		// active layout css
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
-	}
-	echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
-}
 
 // Tooltips
 if ($add_tooltips) JHTML::_('behavior.tooltip');

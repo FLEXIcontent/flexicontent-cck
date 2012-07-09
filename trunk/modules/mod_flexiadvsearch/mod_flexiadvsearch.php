@@ -16,25 +16,30 @@
 //no direct access
 defined('_JEXEC') or die('Restricted access');
 
-$layout 			= $params->get('layout', 'default');
-$button 			= $params->get('button', '');
-$button_text 		= $params->get('button_text', '');
-$imagebutton 		= $params->get('imagebutton', '');
-$moduleclass_sfx 	= $params->get('moduleclass_sfx', '');
-$width			 	= intval($params->get('width', 20));
-$maxlength		 	= $width > 20 ? $width : 20;
-$text			 	= $params->get('text', JText::_('search...'));
-$button_pos		 	= $params->get('button_pos', 'left');
-$linkadvsearch		= $params->get('linkadvsearch', 1);
-$linkadvsearch_txt	= $params->get('linkadvsearch_txt', 'Advanced Search');
+$layout       = $params->get('layout', 'default');
+$button       = $params->get('button', '');
+$button_text  = $params->get('button_text', '');
+$imagebutton  = $params->get('imagebutton', '');
+$width        = intval($params->get('width', 20));
+$maxlength    = $width > 20 ? $width : 20;
+$text         = $params->get('text', JText::_('search...'));
+$button_pos   = $params->get('button_pos', 'left');
+$linkadvsearch     = $params->get('linkadvsearch', 1);
+$linkadvsearch_txt = $params->get('linkadvsearch_txt', 'Advanced Search');
+$moduleclass_sfx   = $params->get('moduleclass_sfx', '');
 
 if($linkadvsearch && !trim($linkadvsearch_txt))
 	$linkadvsearch_txt = 'Advanced Search';
-if ($imagebutton) 
+
+if ($imagebutton)
 {
-    $img = JHTML::_('image.site', 'searchButton.gif', '/images/M_images/', NULL, NULL, $button_text, null, 0);
+	if (FLEXI_J16GE)
+		$img = JHtml::_('image','searchButton.gif', $button_text, NULL, true, true);
+	else
+		$img = JHTML::_('image.site', 'searchButton.gif', '/images/M_images/', NULL, NULL, $button_text, null, 0);
 }
-if($useitemid = $params->get('useitemid', '0')) 
+
+if ($useitemid = $params->get('useitemid', '0'))
 {
 	$set_Itemid		 = intval($params->get('set_itemid', 0));
 	$mitemid = $set_Itemid > 0 ? $set_Itemid : JRequest::getInt('Itemid');
