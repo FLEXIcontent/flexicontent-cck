@@ -577,8 +577,28 @@ window.addEvent('domready', function() {
 			<td width="7"><?php echo $cid_checkbox; ?></td>
 			<td align="left" class="col_title">
 				<?php
-				if ( ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) || ((!$canEdit) && (!$canEditOwn)) ) {
+				
+				// Display an icon with checkin link, if current user has checked out current item
+				if ($row->checked_out) {
+					if (FLEXI_J16GE) {
+						$canCheckin = $user->authorise('core.admin', 'checkin');
+					} else if (FLEXI_ACCESS) {
+						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+					} else {
+						$canCheckin = $user->gid >= 24;
+					}
+					if ($canCheckin && $row->checked_out == $user->id) {
+						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
+						$task_str = FLEXI_J16GE ? 'items.checkin' : 'checkin';
+						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+					}
+				}
+				
+				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+				
+				// Display title with edit link ... (item editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
