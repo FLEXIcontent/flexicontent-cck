@@ -364,7 +364,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
 				. " WHERE ie.language='' "
 				. ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
-				. (FLEXI_J16GE ? " OR i.language<>ie.language " : "")
+				. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")   // J2.5 has a language property
 				;
 			$db->setQuery($query);
 			$return = $db->loadResult();
