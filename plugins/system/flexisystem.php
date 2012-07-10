@@ -426,6 +426,91 @@ class plgSystemFlexisystem extends JPlugin
 	}
 	
 	
+	public function onAfterRender()
+	{
+		$db =& JFactory::getDBO();
+		$app = JFactory::getApplication();
+		
+		// Only execute in administrator environment ?
+		//if ($app->getName() == 'site' ) return true;
+		
+		$limit_checkout_hours   = $this->params->get('limit_checkout_hours', 1);
+		$checkin_on_session_end = $this->params->get('checkin_on_session_end', 1);
+		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
+		$max_checkout_secs  = $max_checkout_hours * 3600;
+		
+		if (!$limit_checkout_hours && !$checkin_on_session_end) return true;
+		
+		// Get current seconds
+		$date = JFactory::getDate('now');
+		$date->setOffset($app->getCfg('offset'));
+		$current_time_secs = $date->toUnix();
+		//echo $date->toFormat()." <br>";
+		
+		if ($checkin_on_session_end) {
+			$query = 'SELECT DISTINCT userid FROM #__session WHERE guest=0';
+			$db->setQuery($query);
+			$logged = $db->loadResultArray(0);
+			$logged = array_flip($logged);
+		}
+		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
+		
+		$tablenames = array('content', 'categories', 'modules', 'menu');
+		foreach ( $tablenames as $tablename ) {
+			//echo $tablename.":<br>";
+			
+			// Get checked out records
+			$query = 'SELECT id, checked_out, checked_out_time FROM #__'.$tablename.' WHERE checked_out > 0';
+			$db->setQuery($query);
+			$records = $db->loadObjectList();
+							
+			// Identify records that should be checked-in
+			$checkin_records = array();
+			foreach ($records as $record) {
+				// Check user session ended
+				if ( $checkin_on_session_end && !isset($logged[$record->checked_out]) ) {
+					//echo "USER session ended for: ".$record->checked_out." check-in record: ".$tablename.": ".$record->id."<br>";
+					$checkin_records[] = $record->id;
+					continue;
+				}
+				
+				// Check maximum checkout time
+				if ( $limit_checkout_hours) {
+					if (FLEXI_J16GE) {
+						$date = JFactory::getDate($record->checked_out_time);
+						$date->setOffset($app->getCfg('offset'));
+						$checkout_time_secs = $date->toUnix();
+						//echo $date->toFormat()." <br>";
+					} else {
+						$date = JFactory::getDate($record->checked_out_time);
+						$date->setOffset($app->getCfg('offset'));
+						$checkout_time_secs = $date->toUnix();
+						//echo $date->toFormat()." <br>";
+					}
+				
+					$checkout_secs = $current_time_secs - $checkout_time_secs;
+					if ( $checkout_secs >= $max_checkout_secs ) {
+						//echo "Check-in table record: ".$tablename.": ".$record->id.". Check-out time of ".$checkout_secs." secs exceeds maximum of ".$max_checkout_secs." secs, by user: ".$record->checked_out."<br>";
+						$checkin_records[] = $record->id;
+					} else {
+						//echo "Table record: ".$tablename.": ".$record->id.". has a check-out time of ".$checkout_secs." secs which less than maximum ".$max_checkout_secs." secs, by user: ".$record->checked_out."<br>";
+					}
+				}
+			}
+			$checkin_records = array_unique($checkin_records);
+			
+			// Check-in the records
+			if ( count($checkin_records) ) {
+				$query = 'UPDATE #__'.$tablename.' SET checked_out = 0 WHERE id IN ('.  implode(",", $checkin_records)  .')';
+				$db->setQuery($query);
+				$db->query();
+			}
+		}
+		
+		return true;
+	}
+	
+	
 	// ***********************
 	// J2.5 SPECIFIC FUNCTIONS
 	// ***********************
