@@ -16,8 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
-
+defined('_JEXEC') or die('Restricted access');
+$user       = &JFactory::getUser();
+$userId     = $user->get('id');
+?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
@@ -81,19 +83,44 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
+			$canEdit		= 1;
+			$canEditOwn	= 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
-				if ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) {
-					// echo htmlspecialchars($row->treename.$row->title, ENT_QUOTES, 'UTF-8');
-					echo $row->treename . htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+				if (FLEXI_J16GE) {
+					if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
+				} else {
+					echo $row->treename.' ';
+				}
+				
+				// Display an icon with checkin link, if current user has checked out current item
+				if ($row->checked_out) {
+					if (FLEXI_J16GE) {
+						$canCheckin = $user->authorise('core.admin', 'checkin');
+					} else if (FLEXI_ACCESS) {
+						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+					} else {
+						$canCheckin = $user->gid >= 24;
+					}
+					if ($canCheckin && $row->checked_out == $user->id) {
+						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
+						$task_str = FLEXI_J16GE ? 'categories.checkin' : 'checkin';
+						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+					}
+				}
+				
+				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
+					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+				
+				// Display title with edit link ... (item editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">
-					<?php echo $row->treename.' ';?>
 					<a href="<?php echo $link; ?>">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
@@ -101,6 +128,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				}
 				?>
 			</td>
+			
 			<td>
 				<?php
 				if (JString::strlen($row->alias) > 25) {

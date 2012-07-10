@@ -92,8 +92,8 @@ class FlexicontentViewItem extends JView
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 		
 		$subscribers 	= & $this->get( 'SubscribersCount' );
+		$types				= & $this->get( 'Typeslist' );
 		if (!FLEXI_J16GE) {
-			$types			= & $this->get( 'Typeslist' );
 			$languages = & $this->get( 'Languages' );
 		}
 		$typesselected	= & $this->get( 'Typesselected' );
@@ -288,12 +288,16 @@ class FlexicontentViewItem extends JView
 		// *********************************************************************************************
 		$lists = array();
 		
+		//buid types selectlist
+		if (FLEXI_J16GE) {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, 'class="required"', true );
+		} else {
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', true );
+		}
+		
 		// *** BOF: J1.5 SPECIFIC SELECT LISTS
 		if (!FLEXI_J16GE) {
-
-			//buid types selectlist
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', true );
-	
+			
 			// build granular access list
 			if (FLEXI_ACCESS) {
 				if (isset($user->level)) {

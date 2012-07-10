@@ -220,8 +220,60 @@ class FlexicontentControllerCategories extends FlexicontentController
 		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
+	
+	
+	/**
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$pk       = (int)$cid[0];
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', '' );
+		
+		// Only attempt to check the row in if it exists.
+		if ($pk)
+		{
+			$user = JFactory::getUser();
 
+			// Get an instance of the row to checkin.
+			$table = & JTable::getInstance('flexicontent_categories', '');
+			if (!$table->load($pk))
+			{
+				$this->setError($table->getError());
+				return;// false;
+			}
 
+			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
+			if ($table->checked_out) {
+				if (FLEXI_J16GE) {
+					$canCheckin = $user->authorise('core.admin', 'checkin');
+				} else if (FLEXI_ACCESS) {
+					$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+				} else {
+					$canCheckin = $user->gid >= 24;
+				}
+				if ( !$canCheckin && $table->checked_out != $user->id) {
+					$this->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
+					return;// false;
+				}
+			}
+
+			// Attempt to check the row in.
+			if (!$table->checkin($pk))
+			{
+				$this->setError($table->getError());
+				return;// false;
+			}
+		}
+		
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
+		return;// true;
+	}
+	
+	
 	/**
 	 * Logic to orderup a category
 	 *

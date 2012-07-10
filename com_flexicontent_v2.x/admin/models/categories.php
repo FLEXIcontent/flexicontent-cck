@@ -265,7 +265,7 @@ class FlexicontentModelCategories extends JModelList
 	 *
 	 * @since	1.6
 	 */
-	function checkin()
+	/*function checkin()
 	{
 		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$pk       = (int)$cid[0];
@@ -299,7 +299,7 @@ class FlexicontentModelCategories extends JModelList
 		}
 
 		return true;
-	}
+	}*/
 	
 	
 	/**

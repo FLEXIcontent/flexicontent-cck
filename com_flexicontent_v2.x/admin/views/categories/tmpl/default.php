@@ -94,32 +94,62 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $userId;
 			$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
 			$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
-			$canCheckin		= $user->authorise('core.admin', 'checkin') || $row->checked_out == $userId || $row->checked_out == 0;
-			$canChange		= ($canEditState || $canEditStateOwn ) && $canCheckin;
+			$canCheckin		= $user->authorise('core.admin', 'checkin') && $row->checked_out == $user->id;
+			$canChange		= ($canEditState || $canEditStateOwn ) && ($canCheckin || !$row->checked_out);
 			$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
-			<td align="left">
-				<?php //echo str_repeat('<span class="gi">|&mdash;</span>', $row->level-1) ?>
-				<?php echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
-						<?php if ($row->checked_out) : ?>
-							<?php echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin); ?>
-						<?php endif; ?>
-						<?php if ($canEdit || $canEditOwn) : ?>
-							<a href="<?php echo $link;?>">
-								<?php echo $this->escape($row->title); ?></a>
-						<?php else : ?>
-							<?php echo $this->escape($row->title); ?>
-						<?php endif; ?>
-						
-						<?php if (!empty($row->note)) : ?>
-							<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo $this->escape($row->note);?>">
-								<?php echo $infoimage; ?>
-							</span
-						<?php endif; ?>
+			<td align="left" class="col_title">
+				<?php
+				if (FLEXI_J16GE) {
+					if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
+				} else {
+					echo $row->treename.' ';
+				}
+				
+				// Display an icon with checkin link, if current user has checked out current item
+				if ($row->checked_out) {
+					if (FLEXI_J16GE) {
+						$canCheckin = $user->authorise('core.admin', 'checkin');
+					} else if (FLEXI_ACCESS) {
+						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+					} else {
+						$canCheckin = $user->gid >= 24;
+					}
+					if ($canCheckin && $row->checked_out == $user->id) {
+						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
+						$task_str = FLEXI_J16GE ? 'categories.checkin' : 'checkin';
+						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+					}
+				}
+				
+				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
+					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
+				
+				// Display title with edit link ... (item editable and not checked out)
+				} else {
+				?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">
+					<a href="<?php echo $link; ?>">
+					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+					</a></span>
+				<?php
+				}
+				?>
+				
+				<?php
+				// Display category note in a tooltip
+				if (!empty($row->note)) : ?>
+					<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo $this->escape($row->note);?>">
+						<?php echo $infoimage; ?>
+					</span
+				<?php endif; ?>
+				
 			</td>
+			
 			<td>
 				<?php
 				if (JString::strlen($row->alias) > 25) {
