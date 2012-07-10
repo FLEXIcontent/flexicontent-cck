@@ -1977,22 +1977,24 @@ class ParentClassItem extends JModelAdmin
 			// **************************************************************
 			
 			// a. Save a version of item properties that do not have a corresponding CORE Field
-			$obj = new stdClass();
-			$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
-			$obj->item_id 		= $item->id;
-			$obj->valueorder	= 1;
-			$obj->version			= (int)$last_version+1;
-			
-			$item_data = array();
-			$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs');
-			if (FLEXI_J16GE) {
-				$j16ge_iproperties = array();
-				$iproperties = array_merge($iproperties, $j16ge_iproperties);
+			if ($use_versioning) {
+				$obj = new stdClass();
+				$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
+				$obj->item_id 		= $item->id;
+				$obj->valueorder	= 1;
+				$obj->version			= (int)$last_version+1;
+				
+				$item_data = array();
+				$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs');
+				if (FLEXI_J16GE) {
+					$j16ge_iproperties = array();
+					$iproperties = array_merge($iproperties, $j16ge_iproperties);
+				}
+				foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
+				
+				$obj->value = serialize( $item_data );
+				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
-			foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
-			
-			$obj->value = serialize( $item_data );
-			$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			
 			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
 			if ( FLEXI_FISH && !empty($data['jfdata']) && $use_versioning )

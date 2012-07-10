@@ -818,7 +818,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 	
 	
-	function addCurrentVersionData($item_id = null)
+	function addCurrentVersionData($item_id = null, $clean_database = false)
 	{
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_SECTION) return true;
@@ -848,13 +848,12 @@ class FlexicontentModelFlexicontent extends JModel
 			$diff_arrays = $this->getDiffVersions();
 		} else {
 			// Get current version id of a SPECIFIC ITEM
-			$diff_arrays = FLEXIUtilities::getCurrentVersions($item_id);
+			$diff_arrays = array( FLEXIUtilities::getCurrentVersions($item_id) );
 		}
 		
 		$jcorefields = flexicontent_html::getJCoreFields();
 		$add_cats = true;
 		$add_tags = true;
-		$clean_database = false;
 		
 		// For all items not having the current version, add it
 		foreach($diff_arrays as $item)
@@ -871,14 +870,21 @@ class FlexicontentModelFlexicontent extends JModel
 						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
 						." WHERE fir.item_id=".$row->id." AND f.iscore=0";  // old versions stored categories & tags into __flexicontent_fields_item_relations
 				$db->setQuery($query);
-				$fields = $db->loadObjectList();
+				$fieldsvals = $db->loadObjectList();
 				
-				// Delete old data
-				if ($clean_database && $fields) {
+				// Delete existing unversioned (current version) field values ONLY if we are asked to 'clean' the database
+				if ($clean_database && $fieldsvals) {
 					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
 					$db->setQuery($query);
 					$db->query();
 				}
+				
+				// Delete any existing versioned field values to avoid conflicts, this maybe redudant, since they should not exist,
+				// but we do it anyway because someone may have truncated or delete records only in table 'flexicontent_versions' ...
+				// NOTE: we do not delete data with field_id negative as these exist only in the versioning table
+				$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id = '.$row->id .' AND version= '.$row->version.' AND field_id > 0';
+				$db->setQuery($query);
+				$db->query();
 				
 				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
@@ -894,7 +900,7 @@ class FlexicontentModelFlexicontent extends JModel
 				if(substr($f->value, 0, 3)!="<p>") {
 					$f->value = "<p>".$f->value."</p>";
 				}
-				$fields[] = $f;
+				$fieldsvals[] = $f;
 
 				// Add the 'categories' field to the fields array for adding to versioning table
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
@@ -912,7 +918,7 @@ class FlexicontentModelFlexicontent extends JModel
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
-				if ($add_cats) $fields[] = $f;
+				if ($add_cats) $fieldsvals[] = $f;
 				
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
@@ -924,26 +930,26 @@ class FlexicontentModelFlexicontent extends JModel
 				$f->valueorder	= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($tags);
-				if ($add_tags) $fields[] = $f;
+				if ($add_tags) $fieldsvals[] = $f;
 
 				// Add field values to field value versioning table
-				foreach($fields as $field) {
+				foreach($fieldsvals as $fieldval) {
 					// add the new values to the database 
 					$obj = new stdClass();
-					$obj->field_id   = $field->id;
+					$obj->field_id   = $fieldval->id;
 					$obj->item_id    = $row->id;
-					$obj->valueorder = $field->valueorder;
+					$obj->valueorder = $fieldval->valueorder;
 					$obj->version    = (int)$row->version;
-					$obj->value      = $field->value;
+					$obj->value      = $fieldval->value;
 					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
 					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
-					if( !$field->iscore ) {
+					if( $clean_database && !$fieldval->iscore ) { // If clean_database is on we need to re-add the deleted values
 						unset($obj->version);
 						//echo "inserting into __flexicontent_fields_item_relations<br />";
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
 					}
-					//$searchindex 	.= @$field->search;
+					//$searchindex 	.= @$fieldval->search;
 				}
 				
 				// **********************************************************************************
