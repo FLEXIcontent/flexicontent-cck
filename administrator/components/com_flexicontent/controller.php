@@ -487,7 +487,7 @@ VALUES
 		$db->setQuery($query);
 		$result = $db->query();
 		
-		// Set default language in the content db table too
+		// Set language in the content to be same as in items_ext db table
 		if (FLEXI_J16GE) {
 			$query 	= 'UPDATE #__content i '
 					. " LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "

@@ -1516,7 +1516,7 @@ class ParentClassItem extends JModel
 			else if ( $postcats==0 )
 				$data['categories'] = $allowed_cid;
 			else if ( $postcats==1 )
-				$data['categories'] = $data['catid'];
+				$data['categories'] = array($data['catid']);
 		}
 		
 		
