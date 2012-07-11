@@ -63,7 +63,7 @@ class FlexicontentModelItems extends ParentClassItem
 		$cparams = & $this->_cparams;
 		
 		$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
-		$referer = $_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
+		$referer = @$_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
 		// a basic item title string
 		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_item->title.'[id: '.$this->_item->id.']';
 		

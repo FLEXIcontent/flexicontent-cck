@@ -280,7 +280,6 @@ class FlexicontentViewItems extends JView
 			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
 		} else {
 			$item_depth = $params->get('item_depth', 0);
-			if ($params->get('add_item_pathway', 1)) $item_depth++;
 		}
 		
 		// Respect menu item depth, defined in menu item

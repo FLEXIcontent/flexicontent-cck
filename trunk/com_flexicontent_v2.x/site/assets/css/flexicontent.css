@@ -907,12 +907,15 @@ div#flexicontent table.admintable td.paramlist_key {
 	float: right !important;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 0px 0px 0px 0px !important;
+	margin: 0 !important;
 	padding: 0 !important;
-	width: 26px !important;
+	width: auto !important;
 }
 
 .statetoggler .options {
+	padding: 0 !important;
+	margin: 0 !important;
+	background: white !important;
 	position: relative !important;
 }
 
@@ -921,9 +924,12 @@ div#flexicontent table.admintable td.paramlist_key {
 	margin: 0 !important;
 	background: white !important;
 	border: 1px solid silver !important;
+	width: auto !important;
 }
 
-.statetoggler li ul li {
+.statetoggler li.topLevel, .statetoggler li ul li {
+	background: none repeat scroll 0 0 white !important;
+	overflow: visible !important;
 	width: 20px !important;
 	min-height: 20px !important;
 	display: -moz-inline-stack !important;
@@ -937,6 +943,7 @@ div#flexicontent table.admintable td.paramlist_key {
 
 .statetoggler li ul li img {
 	padding: 2px !important;
+	margin: 0px !important;
 }
 
 /*** container of message for item having default content template layout ***/
