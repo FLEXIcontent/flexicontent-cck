@@ -45,8 +45,6 @@ class FlexicontentViewCategory extends JView
 		$mainframe =& JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		JHTML::_('behavior.tooltip');
-
 		//initialize variables
 		$document = & JFactory::getDocument();
 		$menus    = & JSite::getMenu();
@@ -132,12 +130,18 @@ class FlexicontentViewCategory extends JView
 		// **********************
 		// Calculate a page title
 		// **********************
-		$m_cid = (int) @$menu->query['cid'] ;
 		
 		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
-		if ( $menu && ($menu->query['view'] != 'category' || $m_cid != JRequest::getInt('cid') ) ) {
-			$params->set('page_title',	$category->title);
-			$params->set('pageclass_sfx',	'');
+		if ( $menu ) {
+			$view_ok     = @$menu->query['view']     == 'category';
+			$cid_ok      = @$menu->query['cid']      == JRequest::getInt('cid');
+			$layout_ok   = @$menu->query['layout']   == JRequest::getVar('layout','');
+			$authorid_ok = @$menu->query['authorid'] == JRequest::getInt('authorid');
+			
+			if ( $view_ok && $cid_ok & $layout_ok && $authorid_ok ) {
+				$params->set('page_title',	$category->title);
+				$params->set('pageclass_sfx',	'');
+			}
 		}
 		
 		// Set a page title if one was not already set
