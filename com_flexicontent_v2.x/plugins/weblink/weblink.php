@@ -287,7 +287,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$n = 0;
 		foreach ($values as $value) {
 			$value = unserialize($value);
-			$field->{$prop}[]	= $value ? '<a href="' . JRoute::_( 'index.php?option=flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' ) . '" title="' . $value['title'] . '"' . $target . '>'.( $usetitle ? $value['title'] : $this->cleanurl($value['link']) ).'</a>' : '';
+			$field->{$prop}[] = $value ? '<a href="' . JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' ) . '" title="' . $value['title'] . '"' . $target . '>'.( $usetitle ? $value['title'] : $this->cleanurl($value['link']) ).'</a>' : '';
 			$n++;
 			}
 		$field->{$prop} = implode($separatorf, $field->{$prop});
