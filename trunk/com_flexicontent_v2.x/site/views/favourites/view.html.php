@@ -66,7 +66,7 @@ class FlexicontentViewFavourites extends JView
 		// Calculate a page title
 		// **********************
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
 		if ( $menu && $menu->query['view'] != 'favourites' ) {
 			$params->set('page_title',	'');
 			$params->set('pageclass_sfx',	'');
@@ -136,7 +136,7 @@ class FlexicontentViewFavourites extends JView
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
-		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites' );
+		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites', false );
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		

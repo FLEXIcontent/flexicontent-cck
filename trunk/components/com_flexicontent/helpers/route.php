@@ -75,32 +75,11 @@ class FlexicontentHelperRoute
 		// 2. Try to use current menu item if pointing to Flexicontent, (if so configure in global options)
 		$app =& JFactory::getApplication();
 		if ($default_menuitem_preference==1  &&  !$app->isAdmin()) {
-			$menu = &JSite::getMenu();
-			$activemenuItem = &$menu->getActive();
-			if ($activemenuItem) {
-				$activemenuItemId = $activemenuItem->id;
-				
-				$db 	=& JFactory::getDBO();
-				if (FLEXI_J16GE) {
-					$db->setQuery("SELECT extension_id FROM #__extensions WHERE `type`='component' AND `element`='com_flexicontent' AND client_id='1'");
-				} else {
-					$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
-				}
-				$flexi_comp_id = $db->loadResult();	
-				
-				$query 	= 'SELECT COUNT( m.id )'
-					. ' FROM #__menu as m'
-					. ' WHERE m.published=1 AND m.id="'.$activemenuItemId
-					.(!FLEXI_J16GE ? '" AND m.componentid="'.$flexi_comp_id.'"' : '" AND m.component_id="'.$flexi_comp_id.'"')
-					;
-				$db->setQuery( $query );
-				$count = $db->loadResult();
-	
-				// Use currently active ... it is pointing to FC
-				if ($count) {
-					//  USE current Active ID it maybe irrelevant
-					return  $_component_default_menuitem_id = $activemenuItem->id;
-				}
+			$menus = &JSite::getMenu();
+			$menu = &$menu->getActive();
+			if ($menu && @$menu->query['option']=='com_flexicontent' ) {
+				// USE current menu Item_id as default fallback menu Item_id, since it points to FLEXIcontent component
+				return  $_component_default_menuitem_id = $menu->id;
 			}
 		}
 		
@@ -153,18 +132,20 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 
-	function getCategoryRoute($catid, $Itemid = 0) {
+	function getCategoryRoute($catid, $Itemid = 0, $urlvars = array()) {
 		
 		$needles = array(
 			'category' => (int) $catid
 		);
-
+		
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=category&cid='.$catid;
-
+		// Append given variables
+		foreach ($urlvars as $varname => $varval) $link .= '&'.$varname.'='.$varval;
+		
 		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
-		} else if($menuitem = FlexicontentHelperRoute::_findCategory($needles)) {
+		} else if($menuitem = FlexicontentHelperRoute::_findCategory($needles, $urlvars)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
 			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
@@ -245,7 +226,7 @@ class FlexicontentHelperRoute
 		return $match;
 	}
 
-	function _findCategory($needles)
+	function _findCategory($needles, $urlvars=array())
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
@@ -271,11 +252,28 @@ class FlexicontentHelperRoute
 					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
 				}
 
-				if ( (@$menuitem->query['view'] == $needle) && (@$menuitem->query['cid'] == $cid) ) {
-					$match = $menuitem;
-					break;
+				if ( @$menuitem->query['view'] == $needle && @$menuitem->query['cid'] == $cid ) {
+					
+					// Try to match optional url variables, if these were specified
+					$all_matched = true;
+					foreach ($urlvars as $varname => $varval) {
+						$all_matched = $all_matched &&  (@$menuitem->query[$varname] == $varval);
+					}
+					
+					// all view , cid and urlvars were matched an appropriate menu item was found
+					if ($all_matched) {
+						
+						// Do not match menu items that override category configuration parameters, these items will be selectable only
+						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute()
+						if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
+						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+
+						$match = $menuitem;
+						break;
+					}
 				}
 			}
+			
 			if(isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
 		}
 

@@ -95,8 +95,11 @@ class FlexicontentViewCategory extends JView
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
 		
+		// Get URL variables
+		$cid = JRequest::getInt('cid', 0);
 		$authorid = JRequest::getInt('authorid', 0);
-		$layout = JRequest::getInt('layout', 0);
+		$layout = JRequest::getVar('layout', '');
+		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
 			$authordescr_item = & $this->get('AuthorDescrItem');
@@ -131,20 +134,29 @@ class FlexicontentViewCategory extends JView
 		// Calculate a page title
 		// **********************
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
 		if ( $menu ) {
 			$view_ok     = @$menu->query['view']     == 'category';
-			$cid_ok      = @$menu->query['cid']      == JRequest::getInt('cid');
-			$layout_ok   = @$menu->query['layout']   == JRequest::getVar('layout','');
-			$authorid_ok = @$menu->query['authorid'] == JRequest::getInt('authorid');
+			$cid_ok      = @$menu->query['cid']      == $cid;
+			$layout_ok   = @$menu->query['layout']   == $layout;
+			$authorid_ok = @$menu->query['authorid'] == $authorid;
 			
-			if ( $view_ok && $cid_ok & $layout_ok && $authorid_ok ) {
-				$params->set('page_title',	$category->title);
+			if ( !$view_ok || !$cid_ok || !$layout_ok && !$authorid_ok ) {
+				$params->set('page_title', '');
 				$params->set('pageclass_sfx',	'');
 			}
 		}
 		
 		// Set a page title if one was not already set
+		switch($layout) {
+			case ''        :  $default_title = $category->title;                  break;
+			case 'myitems' :  $default_title = JText::_('FLEXICONTENT_MYITEMS');  break;
+			case 'author'  :  $default_title = JText::_('FLEXICONTENT_AUTHOR');   break;
+			default        :  $default_title = JText::_('FLEXICONTENT_CATEGORY');
+		}
+		if ($layout && $cid) { // Special views limitted to a specific category
+			$default_title .= ' '.JText::_('FLEXI_IN').' '.$category->title;
+		}
 		$params->def('page_title',	$category->title);
 		
 		
@@ -426,7 +438,7 @@ class FlexicontentViewCategory extends JView
 		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
 		
 		$image = "";
-		if ($show_cat_image) {
+		if ($cat->id && $show_cat_image) {
 			$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
 			$image = "";
 			$cat->introtext = & $cat->description;
@@ -525,8 +537,15 @@ class FlexicontentViewCategory extends JView
 		// Create the pagination object
 		$pageNav = $model->getPagination();
 		$resultsCounter = $pageNav->getResultsCounter();
-
-		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+		
+		// Create category link
+		$Itemid = $menu ? $menu->id : 0;
+		$urlvars = array();
+		if ($layout)   $urlvars['layout']   = $layout;
+		if ($authorid) $urlvars['authorid'] = $authorid;
+		
+		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
+		
 		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		

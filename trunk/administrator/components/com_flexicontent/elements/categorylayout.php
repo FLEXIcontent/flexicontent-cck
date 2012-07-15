@@ -18,7 +18,14 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('list');
+}
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 /**
  * Renders a categorylayout element
  *
@@ -37,10 +44,18 @@ class JElementCategorylayout extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
-		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
 		$view	= JRequest::getVar('view');
+		$value = FLEXI_J16GE ? $this->value : $value;
 		
 		$lays = array();
 		foreach ($tmpls as $tmpl) {
@@ -48,6 +63,7 @@ class JElementCategorylayout extends JElement
 		}
 		$lays = implode("','", $lays);
 		
+if ( ! @$attributes['skipparams'] ) {
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
@@ -97,7 +113,8 @@ window.addEvent('domready', function(){
 });
 ";
 		$doc->addScriptDeclaration($js);
-		
+}
+	
 		if ($tmpls !== false) {
 			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
@@ -107,7 +124,23 @@ window.addEvent('domready', function(){
 			}
 		}
 		
-		return JHTMLSelect::genericList($layouts, $control_name.'['.$name.']', $class, 'value', 'text', $value, $control_name.$name);
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
+		} else {
+			$attribs .= 'class="inputbox"';
+		}
+		if ( ! @$attributes['skipparams'] )
+		{
+			$attribs .= ' onchange="activatePanel(this.value);"';
+		}
+		
+		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }
 ?>

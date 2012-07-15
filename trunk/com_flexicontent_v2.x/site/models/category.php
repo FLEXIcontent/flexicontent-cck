@@ -123,7 +123,7 @@ class FlexicontentModelCategory extends JModel {
 		} else if ($this->_layout=='myitems') {
 			$user =& JFactory::getUser();
 			if ($user->guest) {
-				JError::raiseError(404, JText::sprintf( 'USER NOT LOGGED, Please set MY ITEMs link to be displayed on logged users only', $this->_id ));
+				JError::raiseError(404, JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT'));
 			}
 			$this->_authorid = $user->id;
 		}
@@ -1045,24 +1045,33 @@ class FlexicontentModelCategory extends JModel {
 				}
 			}
 			
+			// Retrieve category parameters
 			$catparams = "";
 			if ($id) {
-				// Retrieve category parameters
 				$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 				$this->_db->setQuery($query);
 				$catparams = $this->_db->loadResult();
 			}
 			
+			
+			// Retrieve menu parameters
+			$menu = JSite::getMenu()->getActive();
+			if ($menu) {
+				if (FLEXI_J16GE) {
+					$menuParams = new JRegistry;
+					$menuParams->loadJSON($menu->params);
+				} else {
+					$menuParams = new JParameter($menu->params);
+				}
+			}
+			
+			
 			// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 			$params = clone($mainframe->getParams('com_flexicontent'));
 			
 			// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) {
-				if ($menu = JSite::getMenu()->getActive()) {
-					$menuParams = new JRegistry;
-					$menuParams->loadJSON($menu->params);
-					$params->merge($menuParams);
-				}
+			if (FLEXI_J16GE && $menu) {
+				$params->merge($menuParams);
 			}
 			
 			// b. Merge category parameters
@@ -1079,9 +1088,20 @@ class FlexicontentModelCategory extends JModel {
 				$params->merge( new JParameter($author_catparams) );
 			}
 	
-			if ($this->_layout=='myitems') {
-				$clayout = JRequest::getVar('clayout', 'default');
-				$params->set('clayout', $clayout);
+			// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+			if ( !empty($menu) ) {
+				$view_ok      = @$menu->query['view']     == 'category';
+				$cid_ok       = @$menu->query['cid']      == JRequest::getInt('cid');
+				$layout_ok    = @$menu->query['layout']   == JRequest::getVar('layout','');
+				$authorid_ok  = @$menu->query['authorid'] == JRequest::getInt('authorid');
+				// We will merge menu parameters last, thus overriding the default categories parameters if either
+				// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
+				$overrideconf = $menuParams->get('override_defaultconf',0) || JRequest::getVar('layout','')=='myitems';
+				
+				$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok && $overrideconf;
+				if ( $menu_matches ) {
+					$params->merge($menuParams);
+				}
 			}
 			
 			// Bugs of v2.0 RC2
@@ -1146,6 +1166,7 @@ class FlexicontentModelCategory extends JModel {
 		;
 		$this->_db->setQuery($query);
 		$filters = $this->_db->loadObjectList('name');
+		if (!$filters) $filters = array();
 		foreach ($filters as $filter)
 		{
 			$filter->parameters = new JParameter($filter->attribs);
