@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: categorylayout.php 967 2011-11-21 00:01:36Z ggppdk $
+ * @version 1.5 stable $Id: categorylayout.php 1243 2012-04-12 04:59:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,10 +18,14 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+if (FLEXI_J16GE) {
+	jimport('joomla.html.html');
+	jimport('joomla.form.formfield');
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('list');
+}
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 /**
  * Renders a categorylayout element
  *
@@ -38,16 +42,20 @@ class JFormFieldCategorylayout extends JFormFieldList
 	 */
 	protected $type = 'Categorylayout';
 
-	function set($property, $value) {
-		$this->$property = $value;
-	}
-	
-	function getOptions()
+	function getInput()
 	{
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls	= $themes->category;
-		$value = $this->value;
 		$view	= JRequest::getVar('view');
+		$value = FLEXI_J16GE ? $this->value : $value;
 		
 		$lays = array();
 		foreach ($tmpls as $tmpl) {
@@ -55,6 +63,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 		}
 		$lays = implode("','", $lays);
 		
+if ( ! @$attributes['skipparams'] ) {
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
@@ -104,7 +113,8 @@ window.addEvent('domready', function(){
 });
 ";
 		$doc->addScriptDeclaration($js);
-		
+}
+	
 		if ($tmpls !== false) {
 			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
@@ -114,18 +124,38 @@ window.addEvent('domready', function(){
 			}
 		}
 		
-		return $layouts;
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
+		} else {
+			$attribs .= 'class="inputbox"';
+		}
+		if ( ! @$attributes['skipparams'] )
+		{
+			$attribs .= ' onchange="activatePanel(this.value);"';
+		}
+		
+		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 	
 	function getLabel()
 	{
 		$label = $this->element['label'];
-		$class = ""; $title = "";
+		$class = "hasTip"; $title = "";
 		if ($this->element['description']) {
 			$class = "hasTip";
 			$title = JText::_($label)."::".JText::_($this->element['description']);
 		}
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
+	}
+	
+	function set($property, $value) {
+		$this->$property = $value;
 	}
 	
 }

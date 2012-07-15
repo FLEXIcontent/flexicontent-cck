@@ -1,225 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<form>
-	<name>Category Edit Form</name>
-	
-	<params addpath="/administrator/components/com_flexicontent/elements">
-
-		<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
-		<param name="" type="separator" hr="false" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
-		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_JCOMMENTS</option>
-			<option value="2">FLEXI_JOMCOMMENTS</option>
-		</param>
-		<param name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="show_feed_link" type="radio" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-				
-		<param name="" type="separator" hr="false" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
-		<param name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-		<param name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-	 	</param>
-		<param name="cat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
-			<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
-			<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
-			<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
-		</param>
-		<param name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
-			<option value="0">FLEXI_SCALE</option>
-			<option value="1">FLEXI_CROP</option>
-		</param>		
-		<param name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-		<param name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-
-	 	<param name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="trigger_onprepare_content_cat" type="radio" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-
-		<param name="" type="separator" hr="false" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" menu="hide" />
-		<param name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-	 	</param>
-<!--
-		<param name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
-	 		<option value="0">List</option>
-	 		<option value="1">Comma separated list</option>
-	 	</param>
--->
-		<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
+	<form>
+		<name>Category Edit Form</name>
 		
-		<param name="" type="separator" hr="false" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" menu="hide" />
-		<param name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-		<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-			<option value="2">Auto</option>
-		</param>
-		<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-
-	</params>
-
-
-	<params group="item_list_creation" addpath="/administrator/components/com_flexicontent/elements">
-
-		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" menu="hide" />
-		<param name="show_editbutton" type="radio" default="0" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
+		<params addpath="/administrator/components/com_flexicontent/elements">
+			
+			<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
+			<param name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" hr="false" menu="hide" />
+			<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_JCOMMENTS</option>
+				<option value="2">FLEXI_JOMCOMMENTS</option>
+			</param>
+			<param name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="show_feed_link" type="radio" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" hr="false" menu="hide" />
+			<param name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+			
+			<param name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="cat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</param>
+			<param name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</param>		
+			<param name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<param name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
+			<param name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="trigger_onprepare_content_cat" type="radio" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" hr="false" menu="hide" />
+			<param name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<!--param name="subcategories_display" type="list" default="0" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
+				<option value="0">List</option>
+				<option value="1">Comma separated list</option>
+			</param-->
+			<param name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" hr="false" menu="hide" />
+			<param name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+			<param name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+				<option value="2">Auto</option>
+			</param>
+			<param name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			
+		</params>
 		
-		<param name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS">
-			<option value="0">FLEXI_No</option>
-			<option value="1">FLEXI_Yes</option>
-		</param>
-		<param name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
-		<param name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-		</param>
 		
-		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
-		<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
-			<option value="">FLEXI_ORDER_DEFAUKT</option>
-			<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-			<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-			<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-			<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-			<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-			<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
-			<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
-			<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-			<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-			<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-		</param>
-		<param name="" type="separator" hr="false" default="FLEXI_CUSTOM_ORDER" description="" level="level3" menu="hide" />
-		<param name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
-		<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR">
-			<option value="ASC">FLEXI_ASC</option>
-			<option value="DESC">FLEXI_DESC</option>
-		</param>
-		<param name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE">
-			<option value="0">FLEXI_TEXT</option>
-			<option value="1">FLEXI_INT</option>
-		</param>
+		<params group="item_list_creation" addpath="/administrator/components/com_flexicontent/elements">
+			
+			<param name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" hr="false" menu="hide" />
+			<param name="show_editbutton" type="radio" default="0" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</param>
+			<param name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" hr="false" menu="hide" />
+			<param name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</param>
+			<param name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" hr="false" menu="hide" />
+			<param name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<param name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</param>
+			<param name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE_DESC" >
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INT</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" hr="false" menu="hide" />
+			<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
+				<option value="0">FLEXI_NO</option> 
+				<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
+				<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
+			</param>
+			<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</param>
+			
+		</params>
 		
-		<param name="" type="separator" hr="false" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
-		<param name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
-			<option value="0">FLEXI_NO</option> 
-			<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
-			<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
-		</param> 
-		<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC"  menu="hide">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_No</option>
-			<option value="1">FLEXI_Yes</option>
-		</param>
 		
-	</params>
-
-
-	<params group="item_filtering" addpath="/administrator/components/com_flexicontent/elements">
+		<params group="item_filtering" addpath="/administrator/components/com_flexicontent/elements">
+			
+			<param name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" hr="false" menu="hide" />
+			<param name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
+			<param name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
+			<param name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
+			<param name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
+			<param name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
+			<param name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" hr="false" menu="hide" />
+			<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
+				 <option value="">FLEXI_USE_GLOBAL</option>
+				 <option value="0">FLEXI_No</option>
+				 <option value="1">FLEXI_Yes</option>
+			</param>
+			<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="show_filter_labels" type="radio" default="0" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</param>
+			<param name="limit_filter_values" type="list" default="0" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
+				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
+				<!--option value="1">FLEXI_CURRCAT_FIELD_VALUES</option-->
+				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
+			</param>
+			<param name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+			<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
+		</params>
 		
-		<param name="" type="separator" hr="false" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" menu="hide" />
-		<param name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
-		<param name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
-		<param name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
-		<param name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
-		<param name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
-		<param name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+		<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
+			<param name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
+		</params> 
 		
-		<param name="" type="separator" hr="false" default="FLEXI_SEARCH_AND_FILTER" description="FLEXI_SEARCH_AND_FILTER_DESC" level="level2" menu="hide" />
-		<param name="filtercat" type="radio" default="" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
-       <option value="">FLEXI_USE_GLOBAL</option>
-       <option value="0">FLEXI_No</option>
-       <option value="1">FLEXI_Yes</option>
-    </param>
-		<param name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-	 	</param>
-		<param name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-	 	</param>
-		<param name="show_filter_labels" type="radio" default="0" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC">
-			<option value="0">FLEXI_Hide</option>
-			<option value="1">FLEXI_Show</option>
-	 	</param>
-		<param name="limit_filter_values" type="list" default="0" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
-			<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-			<!--option value="1">FLEXI_CURRCAT_FIELD_VALUES</option-->
-			<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
-		</param>
-		<param name="filters" type="filters" size="10" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
-		<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
-	</params>
-	
-	<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
-		<param name="clayout" type="categorylayout" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
-	</params> 
-
-</form>
+	</form>

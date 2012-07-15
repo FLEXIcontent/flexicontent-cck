@@ -89,7 +89,7 @@ class FlexicontentViewTags extends JView
 		// **********************
 		$m_id = (int) @$menu->query['id'] ;
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
 		if ( $menu && ($menu->query['view'] != 'tags' || $m_id != JRequest::getInt('id') ) ) {
 			$params->set('page_title',	'');
 			$params->set('pageclass_sfx',	'');
@@ -172,7 +172,7 @@ class FlexicontentViewTags extends JView
 		
 		$pageNav 	= new JPagination($total, $limitstart, $limit);
 		
-		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id));
+		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id), false);
 		$print_link = JRoute::_('index.php?view=tags&id='.$tag->id.'&pop=1&tmpl=component');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
