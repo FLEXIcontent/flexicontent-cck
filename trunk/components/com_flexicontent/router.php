@@ -28,30 +28,30 @@ function FLEXIcontentBuildRoute(&$query)
 	$segments = array();
 
 	// 1. Get a menu item based on Itemid or currently active
-	$menu = &JSite::getMenu();
+	$menus = &JSite::getMenu();
 	if (empty($query['Itemid'])) {
 		//  USE current Active ID it is now handled in route.php and also add a global config option whether to enable this
-		//$menuItem = &$menu->getActive();
-		//$query['Itemid'] = @$menuItem->id;
+		//$menu = &$menus->getActive();
+		//$query['Itemid'] = @$menu->id;
 	} else {
-		$menuItem = &$menu->getItem($query['Itemid']);
+		$menu = &$menus->getItem($query['Itemid']);
 	}
 	
 	// 2. Try to match the variables against the variables of the menuItem
-	if ( !empty($menuItem) ) {
+	if ( !empty($menu) ) {
 		$menuItem_matches = true;
 		foreach($query as $index => $value) {
 			// Do not try to match menu itemid, we retrieved the given Itemid
 			if ($index=='Itemid') continue;
 		
 			// Check that the variable exists in the menu item id
-			if (!isset($menuItem->query[$index])) {
+			if (!isset($menu->query[$index])) {
 				$menuItem_matches = false;
 				break;
 			}
 		
 			$value = in_array($index, array('id','cid')) ? (int)$query[$index] : $query[$index];
-			if ( $value != $menuItem->query[$index] ) {
+			if ( $value != $menu->query[$index] ) {
 				$menuItem_matches = false;
 				break;
 			}
@@ -156,8 +156,7 @@ function FLEXIcontentParseRoute($segments)
 	$vars = array();
 
 	// 1. Get the active menu item
-	$menu =& JSite::getMenu();
-	$item =& $menu->getActive();
+	$menu = JSite::getMenu()->getActive();
 
 	// 2. Count route segments
 	$count = count($segments);

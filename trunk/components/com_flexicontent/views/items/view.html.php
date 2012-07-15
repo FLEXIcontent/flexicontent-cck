@@ -467,9 +467,9 @@ class FlexicontentViewItems extends JView
 					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 				} else {
 					// custom unauthorized page is set in menu item parameters, retrieve url and redirect
-					$item = JSite::getMenu()->getItem($notauth_itemid);
-					$internal_link_vars = $item->component ? '&Itemid='.$notauth_itemid.'&option='.$item->component : '';
-					$notauthurl = JRoute::_($item->link.$internal_link_vars, false);
+					$notauth_menu = JSite::getMenu()->getItem($notauth_itemid);
+					$internal_link_vars = $notauth_menu->component ? '&Itemid='.$notauth_itemid.'&option='.$notauth_menu->component : '';
+					$notauthurl = JRoute::_($notauth_menu->link.$internal_link_vars, false);
 					$mainframe->redirect($notauthurl, JText::_( 'FLEXI_ALERTNOTAUTH' ));
 				}
 			}

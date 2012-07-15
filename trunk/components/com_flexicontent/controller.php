@@ -1316,8 +1316,8 @@ class FlexicontentController extends JController
 		
 		// If no current menu itemid, then set it using the first menu item that points to the search view
 		if (!JRequest::getVar('Itemid', 0)) {
-			$menu = &JSite::getMenu();
-			$items	= $menu->getItems('link', 'index.php?option=com_flexicontent&view=search');
+			$menus = &JSite::getMenu();
+			$items	= $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
 	
 			if(isset($items[0])) {
 				JRequest::setVar('Itemid', $items[0]->id);
