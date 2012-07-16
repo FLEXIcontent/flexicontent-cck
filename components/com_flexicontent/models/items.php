@@ -311,71 +311,81 @@ class FlexicontentModelItems extends ParentClassItem
 		
 		$mainframe = & JFactory::getApplication();
 		jimport('joomla.html.parameter');
-
-		// Get the page/component configuration (Priority 4) (WARNING: merges menu parameters in J1.5 but not in J1.6+)
-		$cparams = clone($mainframe->getParams('com_flexicontent'));
-		$params = & $cparams;
 		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-				$params->merge($menuParams);
-				//echo "Menu params: ".$menuParams->get('addcat_title', 'not set')."<br>";
-			}
+		
+		// **********************************************************************
+		// Retrieve RELATED parameters that will be merged into item's parameters
+		// **********************************************************************
+		
+		// Retrieve current menu parameters (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
+		$menu = JSite::getMenu()->getActive();
+		if ($menu) {
+			// In J2.5 parameters are in JSON format, but JParameter can parse JSON, nevertheless
+			// we could also use: $menuParams = new JRegistry; $menuParams->loadJSON($menu->params);
+			$menuParams = new JParameter($menu->params);
 		}
-		//echo "Component/menu params: ".$params->get('addcat_title', 'not set')."<br>";
-
-		// Merge parameters from current category (Priority 3)
+		
+		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
+		$catParams = "";
 		if ( $this->_cid ) {
-			// Retrieve ...
 			$query = 'SELECT c.params'
 					. ' FROM #__categories AS c'
 					. ' WHERE c.id = ' . (int) $this->_cid
 					;
 			$this->_db->setQuery($query);
-			$catparams = $this->_db->loadResult();
-			$catparams = new JParameter($catparams);
-			
-			// Prevent some params from propagating ...
-			$catparams->set('show_title', '');
-			
-			// Merge ...
-			$params->merge($catparams);
-			//echo "Cat params: ".$catparams->get('addcat_title', 'not set')."<br>";
+			$catParams = $this->_db->loadResult();
 		}
 		
+		// Retrieve item's Content Type parameters
 		$query = 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
 				. ' WHERE ie.item_id = ' . (int)$this->_id
 				;
 		$this->_db->setQuery($query);
-		$typeparams = $this->_db->loadResult();
+		$typeParams = $this->_db->loadResult();
 		
-		// Merge TYPE parameters into the page configuration (Priority 2)
-		$typeparams = new JParameter($typeparams);
-		$params->merge($typeparams);
-		//echo "Type params: ".$typeparams->get('addcat_title', 'not set')."<br>";
+		
+		// ***************************************************************************************************
+		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
+		// ***************************************************************************************************
+		
+		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
+			$params->merge($menuParams);
+		}
+		
+		// b. Merge parameters from current category
+		$catParams = new JParameter($catParams);
+		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
+		$params->merge($catParams);
+		
+		// c. Merge TYPE parameters into the page configuration
+		$typeParams = new JParameter($typeParams);
+		$params->merge($typeParams);
 
-		// Merge ITEM parameters into the page configuration (Priority 1)
+		// d. Merge ITEM parameters into the page configuration
 		if ( is_string($this->_item->attribs) ) {
 			$itemparams = new JParameter($this->_item->attribs);
 		} else {
 			$itemparams = & $this->_item->attribs;
 		}
 		$params->merge($itemparams);
-		//echo "Item params: ".$itemparams->get('addcat_title', 'not set')."<br>";
-		//echo "Item MERGED params: ".$params->get('addcat_title', 'not set')."<br>";
 
-		// Merge ACCESS permissions into the page configuration (Priority 0)
+		// e. Merge ACCESS permissions into the page configuration
 		if (FLEXI_J16GE) {
 			$accessperms = $this->getItemAccess();
 			$params->merge($accessperms);
 		}
 		
-		// Set the article object's parameters
+		
+		// *********************************************
+		// Finally set 'parameters' property of the item
+		// *********************************************
+		
 		$this->_item->parameters = & $params;
 	}
 	

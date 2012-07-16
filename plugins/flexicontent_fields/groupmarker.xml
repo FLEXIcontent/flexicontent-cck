@@ -22,6 +22,7 @@
 	</params>
 	
 	<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
+		
 		<param name="marker_type" type="list" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
 			<option value="tabset_start"   >Tab-set: START</option>
 			<option value="tab_open"       >Tab: open</option>
@@ -31,11 +32,14 @@
 			<option value="fieldset_close" >Field-set: close</option>
 			<option value="html_separator" >Custom HTML Separator</option>
 		</param>
+		
 		<param name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
 		<param name="cont_label"    type="text" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
 		<param name="cont_cssclass" type="text" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+		
 		<param name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
-		<param name="custom_html_sep" type="text" default="&lt;hr/&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+		<param name="custom_html_sep" type="text" default="&lt;hr style='clear:both;' /&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+		
 	</params>
 	
 	<languages>
