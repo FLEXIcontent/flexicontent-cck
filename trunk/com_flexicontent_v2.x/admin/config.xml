@@ -6,9 +6,9 @@
 			
 		<field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level1" menu="hide" />
 			
-			<field name="flexi_cat_extension" type="list" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide">
-				<option value="com_content">com_content Categories</option>
-			</field>
+			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide" />
+				<!--option value="com_content">com_content Categories</option-->
+			<!--/field-->
 			<!--field name="search_mode" type="list" default="" label="FLEXI_SELECT_SEARCH_MODE" description="FLEXI_SELECT_SEARCH_MODE_DESC"  menu="hide">
 				<option value="0">FLEXI_PLEASE_SELECT</option>
 				<option value="1">FLEXI_JOOMLA_CONTENT_SEARCH</option>
@@ -16,11 +16,6 @@
 				<option value="3">FLEXI_ADVANCED_FLEXI_SEARCH</option>
 			</field-->
 			
-			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_JCOMMENTS</option>
-				<option value="2">FLEXI_JOMCOMMENTS</option>
-			</field>
 			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" menu="hide" />
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
@@ -38,7 +33,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+			<field name="debug_initial_perms" type="radio" default="0" label="Debug Initial Permissions Creation" description="... enable to see log messages and warning of the initial permission checking and creation process" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 		<field name="" type="separator" default="Performance Options" label="" level="level1" menu="hide" />
 			
@@ -48,12 +46,8 @@
 				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</field>
-			<field name="debug_initial_perms" type="radio" default="0" label="Debug Initial Permissions Creation" description="... enable to see log messages and warning of the initial permission checking and creation process" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
-		<field name="" type="separator" default="FLEXI_SEF_URL_PATHWAY_OPTIONS" label="" level="level1" menu="hide" />
+		<field name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level1" menu="hide" />
 			
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
 			<field name="default_menuitem_preference" type="list" default="1" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
@@ -62,10 +56,6 @@
 				<option value="2">FLEXI_DMI_ID_YES</option>
 			</field>
 			<field name="default_menuitem_nopathway" type="radio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -146,12 +136,30 @@
 			
 		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level1" menu="hide" />
 			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level2" menu="hide" />
+			<field name="copytask_allow_uneditable" type="radio" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
 			<field name="items_session_editable" type="radio" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
-			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
+			<field name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="new_item_state" type="list" default="-4" label="FLEXI_NEW_ITEM_STATE" description="FLEXI_NEW_ITEM_STATE_DESC" menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="-1">FLEXI_ARCHIVED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+			</field>
 			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
 			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" menu="hide">
 				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
 				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
@@ -168,41 +176,12 @@
 				<option value="ASC">FLEXI_ITEMS_MANAGER_ORDER_DIR_NORMAL</option>
 				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
 			</field>
-			
-			<field name="copytask_allow_uneditable" type="radio" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			
-			<field name="show_title" type="radio" default="1" label="FLEXI_Show_Items_Title" description="FLEXI_SHOW_HIDE_THE_ITEMS_TITLE" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="new_item_state" type="list" default="-4" label="FLEXI_NEW_ITEM_STATE" description="FLEXI_NEW_ITEM_STATE_DESC" menu="hide">
-				<option value="1">FLEXI_PUBLISHED</option>
-				<option value="0">FLEXI_UNPUBLISHED</option>
-				<option value="-1">FLEXI_ARCHIVED</option>
-				<option value="-3">FLEXI_PENDING</option>
-				<option value="-4">FLEXI_TO_WRITE</option>
-				<option value="-5">FLEXI_IN_PROGRESS</option>
-			</field>
 			<field name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" menu="hide" />
-			<field name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			
 		<field name="" type="separator" default="FLEXI_PAGE_CONF" label="" level="level1" menu="hide" />
 			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" menu="hide" />
 			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -222,6 +201,29 @@
 			<field name="show_feed_icon" type="radio" default="1" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC" menu="hide">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
+			</field>
+			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" label="" level="level2" menu="hide" />
+			<field name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_JCOMMENTS</option>
+				<option value="2">FLEXI_JOMCOMMENTS</option>
 			</field>
 			
 			

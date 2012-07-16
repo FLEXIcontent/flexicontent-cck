@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1114 2012-01-18 14:07:18Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1384 2012-07-15 13:10:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -201,15 +201,23 @@ class FlexicontentHelperRoute
 				if ($menuitem->access!=$public_acclevel && $menuitem->access==$item_acclevel) continue;
 			}
 			
-			if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW])) {
-				if ((@$menuitem->query['view'] == FLEXI_ITEMVIEW) && (@$menuitem->query['cid'] == $needles['category'])) {
+			if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW]) {
+				if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['cid'] == $needles['category']) {
 					$matches[1] = $menuitem; // priority 1: item id+cid
 					break;
 				} else {
 					$matches[2] = $menuitem; // priority 2: item id
 					// no break continue searching for better match ...
 				}
-			} else if ((@$menuitem->query['view'] == 'category') && (@$menuitem->query['cid'] == $needles['category'])) {
+			} else if (@$menuitem->query['view'] == 'category'      // match category menu items ...
+				&& @$menuitem->query['cid'] == $needles['category']   // ... that point to item's category
+				&& @$menuitem->query['layout'] == '' // ... but do not match "author", "my items", etc, limited to the specific category
+			) {	
+				// Do not match menu items that override category configuration parameters, these items will be selectable only
+				// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
+				//if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
+				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+				
 				$matches[3] = $menuitem; // priority 3 category cid
 				// no break continue searching for better match ...
 			}
@@ -264,7 +272,7 @@ class FlexicontentHelperRoute
 					if ($all_matched) {
 						
 						// Do not match menu items that override category configuration parameters, these items will be selectable only
-						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute()
+						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
 						if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
 						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 

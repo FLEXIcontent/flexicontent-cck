@@ -24,6 +24,7 @@
 		</fieldset>
 	
 		<fieldset name="group-groupmarker" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="marker_type" type="list" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
 				<option value="tabset_start"   >Tab-set: START</option>
 				<option value="tab_open"       >Tab: open</option>
@@ -31,12 +32,16 @@
 				<option value="tabset_end"     >Tab-set: END</option>
 				<option value="fieldset_open"  >Field-set: open</option>
 				<option value="fieldset_close" >Field-set: close</option>
+				<option value="html_separator" >Custom HTML Separator</option>
 			</field>
+			
 			<field name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
 			<field name="cont_label"    type="text" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
 			<field name="cont_cssclass" type="text" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+			
 			<field name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
-			<field name="custom_html_sep" type="text" default="&lt;hr/&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+			<field name="custom_html_sep" type="text" default="&lt;hr style='clear:both;' /&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+			
 		</fieldset>
 	</fields>
 	</config>

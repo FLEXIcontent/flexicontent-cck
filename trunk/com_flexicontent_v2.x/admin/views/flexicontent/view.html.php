@@ -39,11 +39,14 @@ class FlexicontentViewFlexicontent extends JView
 	{
 		$mainframe = &JFactory::getApplication();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		
+		// Special displaying when getting flexicontent version
 		$layout = JRequest::getVar('layout', 'default');
 		if($layout=='fversion') {
 			$this->fversion($tpl, $params);
 			return;
 		}
+		
 		//Load pane behavior
 		jimport('joomla.html.pane');
 		// load the file system librairies
@@ -99,14 +102,15 @@ class FlexicontentViewFlexicontent extends JView
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
 		$existcat 	= & $this->get( 'Existcat' );
-		//$existsec 	= & $this->get( 'Existsec' );
+		if (!FLEXI_J16GE)
+			$existsec = & $this->get( 'Existsec' );
 		$existmenu 	= & $this->get( 'Existmenu' );
 		
 		// 2. OPTIONAL AUTOMATIC TASKS,
 		//  THESE ARE SEPARETELY CHECKED, AS THEY ARE NOT OBLIGATORY BUT RATHER RECOMMENDED
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
 		if (($allplgpublish===NULL) || ($allplgpublish===false)) {
-			$allplgpublish 		= & $this->get( 'AllPluginsPublished' );
+			$allplgpublish = & $this->get( 'AllPluginsPublished' );
 		}
 		$optional_tasks = !$allplgpublish; // || ..
 		
@@ -132,7 +136,8 @@ class FlexicontentViewFlexicontent extends JView
 			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
-			$initialpermission	= $model->checkInitialPermission();
+			if (FLEXI_J16GE)
+				$initialpermission	= $model->checkInitialPermission();  // For J1.7
 		}
 		
 		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER
@@ -145,10 +150,11 @@ class FlexicontentViewFlexicontent extends JView
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
 		$document->addStyleDeclaration('
-.pane-sliders {
-	margin: 0px 0 0 0 !important;
-	position: relative;
-}');
+			.pane-sliders {
+				margin: -7px 0px 0px 0px !important;
+				position: relative;
+			}'
+		);
 		
 		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
@@ -160,7 +166,8 @@ class FlexicontentViewFlexicontent extends JView
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			if($permission->CanConfig)  {
 				$toolbar=&JToolBar::getInstance('toolbar');
-				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+				if (!FLEXI_J16GE)
+					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
 				JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 			}
@@ -201,7 +208,8 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('inprogress'	, $inprogress);
 		$this->assignRef('totalrows'	, $totalrows);
 		$this->assignRef('existcat'		, $existcat);
-		//$this->assignRef('existsec'		, $existsec);
+		if (!FLEXI_J16GE)
+			$this->assignRef('existsec'		, $existsec);
 		$this->assignRef('existmenu'	, $existmenu);
 		$this->assignRef('template'		, $template);
 		$this->assignRef('params'		, $params);
@@ -228,10 +236,9 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
-		$this->assignRef('initialpermission', $initialpermission);
+		if (FLEXI_J16GE)
+			$this->assignRef('initialpermission', $initialpermission);
 		
-		$this->assignRef('document'		, $document);
-
 		// assign Rights to the template
 		$this->assignRef('permission'		, $permission);
 

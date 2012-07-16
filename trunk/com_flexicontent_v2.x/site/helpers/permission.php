@@ -92,6 +92,12 @@ class FlexicontentHelperPerm {
 			$permission->CanUpload	 			= $user->authorise('flexicontent.uploadfiles', 		'com_flexicontent'); // allow user to upload Files
 			$permission->CanViewAllFiles	= $user->authorise('flexicontent.viewallfiles',		'com_flexicontent'); // allow user to view all Files
 			
+			// AUTHORS: management tab
+			$permission->CanAuthors				= $user->authorise('core.manage', 'com_users');
+			
+			// SEARCH INDEX: management tab
+			$permission->CanIndex					= $permission->CanConfig;
+			
 			// OTHER components permissions
 			$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
 			$permission->CanComments 	= $Comments_Enabled && $user->authorise('core.manage', 'com_jcomments');

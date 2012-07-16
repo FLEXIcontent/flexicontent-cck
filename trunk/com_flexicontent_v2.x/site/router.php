@@ -37,21 +37,18 @@ function FLEXIcontentBuildRoute(&$query)
 		$menu = &$menus->getItem($query['Itemid']);
 	}
 	
-	// 2. Try to match the variables against the variables of the menuItem
+	// 2. Try to match the variables against the variables of the menu item
 	if ( !empty($menu) ) {
 		$menuItem_matches = true;
 		foreach($query as $index => $value) {
-			// Do not try to match menu itemid, we retrieved the given Itemid
+			// Skip URL query variable 'Itemid', since it does not exist PLUS we retrieve the menu item with the giveb Itemid
 			if ($index=='Itemid') continue;
-		
-			// Check that the variable exists in the menu item id
-			if (!isset($menu->query[$index])) {
-				$menuItem_matches = false;
-				break;
-			}
-		
+			
+			// id and cid query variables can be contain 'slug', so we need to typecast them into integer
 			$value = in_array($index, array('id','cid')) ? (int)$query[$index] : $query[$index];
-			if ( $value != $menu->query[$index] ) {
+			
+			// Compare current query variable against the menu query variables
+			if ( $value != @$menu->query[$index] ) {
 				$menuItem_matches = false;
 				break;
 			}
@@ -60,8 +57,10 @@ function FLEXIcontentBuildRoute(&$query)
 		// If exact menu match then unset ALL $query array, only the menu item segments will appear
 		if ($menuItem_matches) {
 			foreach($query as $index => $value) {
-				if ( $index!="option" && $index!="Itemid")
+				if ( $index!="option" && $index!="Itemid")  // do not unset option and Itemid variables, these are needed
+				{
 					unset($query[$index]);
+				}
 			}
 			return $segments;  // $segments is empty we will get variables from menuItem (it has them)
 		}
@@ -134,14 +133,14 @@ function FLEXIcontentBuildRoute(&$query)
 		break;
 	case 'favourites': case 'fileselement': case 'search': default:
 		// EXPLICIT view (will be contained in the url)
-		if($view!=='') $segments[] = $view;
+		if($view!='') $segments[] = $view;
 		if (isset($query['id'])) {
 			// COMPATIBILITY with old code of router.php ...
 			$segments[] = 'id';
 			$segments[] = $query['id'];
 			unset($query['id']);
 		}
-		// We leave $query array untouched, so that its variables will be inserted in the SEF URL as /index/value/ ...
+		// We leave remaining $query variables untouched, so that these variables will be inserted in the SEF URL as /index/value/ ...
 		break;
 	}
 	unset($query['view']);

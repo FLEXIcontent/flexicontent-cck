@@ -69,20 +69,20 @@ class FlexicontentViewItems extends JView {
 		}
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
 
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
+		$filter_type			= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
 		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
 		}
 		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 				'int' );
-		$date	 			= $mainframe->getUserStateFromRequest( $option.'.items.date', 				'date', 			1, 				'int' );
-		$startdate	 		= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 		'startdate', 		'', 			'cmd' );
+		$date	 				= $mainframe->getUserStateFromRequest( $option.'.items.date', 			'date', 			1, 				'int' );
+		$startdate	 	= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 	'startdate', 		'', 			'cmd' );
 		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $option.'.items.startdate', '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 			'enddate', 			'', 			'cmd' );
+		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 		'enddate', 			'', 			'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $option.'.items.enddate', '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', 		'', 			'int' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 			'search', 			'', 			'string' );
+		$filter_id 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 	'filter_id', 		'', 			'int' );
+		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
@@ -141,6 +141,7 @@ class FlexicontentViewItems extends JView {
 			$CanRights	= $permission->CanConfig;
 			$CanOrder		= $permission->CanOrder;
 			$CanCopy		= $permission->CanCopy;
+			$CanArchives= $permission->CanArchives;
 			
 		} else if (FLEXI_ACCESS) {
 			$CanAdd			= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
@@ -157,6 +158,7 @@ class FlexicontentViewItems extends JView {
 			$CanRights	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid)			: 1;
 			$CanOrder		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid)			: 1;
 			$CanCopy		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
+			$CanArchives= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid)		: 1;
 			
 		} else {
 			$CanAdd			= 1;
@@ -167,6 +169,7 @@ class FlexicontentViewItems extends JView {
 			$CanRights	= 1;
 			$CanOrder		= 1;
 			$CanCopy		= 1;
+			$CanArchives= 1;
 		}
 		FLEXISubmenu('notvariable');
 

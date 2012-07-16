@@ -735,9 +735,9 @@ window.addEvent('domready', function() {
 			
 			<?php if ($this->CanOrder) : ?>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'items.orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
 
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'items.orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 
