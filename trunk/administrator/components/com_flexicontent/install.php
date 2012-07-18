@@ -34,7 +34,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 	// we add the component stylesheet to the installer
 	$css = JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css'; 
-	$document =& JFactory::getDocument(); 
+	$document = JFactory::getDocument(); 
 	$document->addStyleSheet($css);	
 	
 	// load english language file for 'com_flexicontent' component then override with current language file
@@ -52,19 +52,19 @@ $error = false;
 $extensions = array();
 
 // clear a cache
-$cache = & JFactory::getCache();
+$cache = JFactory::getCache();
 $cache->clean( 'com_flexicontent' );
 $cache->clean( 'com_flexicontent_tmpl' );
 $cache->clean( 'com_flexicontent_cats' );
 $cache->clean( 'com_flexicontent_items' );
 
 // reseting post installation session variables
-$session  =& JFactory::getSession();
+$session  = JFactory::getSession();
 $session->set('flexicontent.postinstall', false);
 $session->set('flexicontent.allplgpublish', false);
 
 // fix joomla 1.5 bug
-$this->parent->getDBO =& $this->parent->getDBO();
+$this->parent->getDBO = $this->parent->getDBO();
 
 // additional extensions
 $add =& $this->manifest->getElementByPath('additional');
@@ -83,6 +83,10 @@ if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
+	if (FLEXI_J16GE) {
+		$extension['installer']->setOverwrite(true);
+		$extension['installer']->setUpgrade(true);
+	}
 	if ($extension['installer']->install($extension['folder'])) {
 		$extension['status'] = true;
 	} else {

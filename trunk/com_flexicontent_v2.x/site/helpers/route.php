@@ -38,13 +38,14 @@ class FlexicontentHelperRoute
 	/**
 	 * function to retrieve component menuitems only once;
 	 */
-	function _setComponentMenuitems ()
-	{
+	function _setComponentMenuitems () {
 		// Cache the result on multiple calls
 		static $_component_menuitems = null;
 		if ($_component_menuitems) return $_component_menuitems;
 		
 		// Get menu items pointing to the Flexicontent component
+		// NOTE: In J2.5 the method getItems() will return menu items that have language '*' (ALL) - OR - current user language,
+		// this is what we need, since using a menu item with incorrect language will cause problems withs SEF URLs ...
 		$component =& JComponentHelper::getComponent('com_flexicontent');
 		$menus	= &JApplication::getMenu('site', array());
 		$_component_menuitems	= $menus->getItems(!FLEXI_J16GE ? 'componentid' : 'component_id', $component->id);
@@ -56,37 +57,60 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover a default item id only once
 	 */
-	function _setComponentDefaultMenuitemId ()
-	{
+	function _setComponentDefaultMenuitemId () {
 		// Cache the result on multiple calls
 		static $_component_default_menuitem_id = null;
 		if ($_component_default_menuitem_id || $_component_default_menuitem_id===false) return $_component_default_menuitem_id;
 		$_component_default_menuitem_id = false;
 		
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$menus = JSite::getMenu();
 		$params =& JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
 		
-		// 1. Do not add any menu item id, if so configure in global options
+		// 1. Case 0: Do not add any menu item id, if so configure in global options
 		//    This will make 'componenent/flexicontent' appear in url if no other appropriate menu item is found
 		if ($default_menuitem_preference == 0) {
 			return $_component_default_menuitem_id=false;
 		}
 		
-		// 2. Try to use current menu item if pointing to Flexicontent, (if so configure in global options)
-		$app =& JFactory::getApplication();
-		if ($default_menuitem_preference==1  &&  !$app->isAdmin()) {
-			$menus = & JSite::getMenu();
-			$menu  = & $menus->getActive();
+		// 2. Case 1: Try to use current menu item if pointing to Flexicontent, (if so configure in global options)
+		$app = JFactory::getApplication();
+		if ($default_menuitem_preference==1) {
+			$menu  = $menus->getActive();
 			if ($menu && @$menu->query['option']=='com_flexicontent' ) {
 				// USE current menu Item_id as default fallback menu Item_id, since it points to FLEXIcontent component
 				return  $_component_default_menuitem_id = $menu->id;
 			}
 		}
 		
-		// 3. Try to get a user defined default Menu Item, (if so configure in global options)
-		if ($default_menuitem_preference==2) {
+		// 3. Case 1 or 2: Try to get a user defined default Menu Item, (if so configure in global options)
+		if ( $default_menuitem_preference==1 || $default_menuitem_preference==2 ) {
+			
+			// Get default menu item id and (a) check it exists and is active (b) points to com_flexicontent (c) has public access level
 			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
-			if ($_component_default_menuitem_id) return $_component_default_menuitem_id;
+			$menu = $menus->getItem($_component_default_menuitem_id);
+			if ( !$menu || @$menu->query['option']!='com_flexicontent' || $menu->access!=$public_acclevel ) {
+				return $_component_default_menuitem_id=false; 
+			}
+			
+			// For J1.7+ we need to get menu item associations and select the current language item
+			$curr_langtag = JFactory::getLanguage()->getTag();  // Current language tag for J2.5 but not for J1.5
+			if ( FLEXI_J16GE && $menu->language!='*' && $menu->language!=$curr_langtag )
+			{
+				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
+				$helper = new MenusHelper();
+				$associated = $helper->getAssociations($_component_default_menuitem_id);
+				
+				if ( isset($associated[$curr_langtag]) ) {
+					// Return associated menu item for current language
+					$_component_default_menuitem_id = $associated[$curr_langtag];
+				} else {
+					// No associated menu item exists pointing to the correct language
+					$_component_default_menuitem_id = false;
+				}
+			}
+			return $_component_default_menuitem_id;
 		}
 		
 		// 4. Try to get the first menu item that points to the FlexiContent Component
@@ -95,9 +119,8 @@ class FlexicontentHelperRoute
 		/*$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		if ($component_menuitems !== null && count($component_menuitems)>=1) {
 			$_component_default_menuitem_id = $component_menuitems[0]->id;
-		}*/
-		
-		return $_component_default_menuitem_id;  // If above code doesnot set this, it will contain false
+		}
+		return $_component_default_menuitem_id;*/
 	}
 	
 	/**

@@ -47,10 +47,10 @@
 		<param name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level1" menu="hide" />
 			
 			<param name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
-			<param name="default_menuitem_preference" type="list" default="1" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
-				<option value="0">FLEXI_DMI_ID_NO</option>
-				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
+			<param name="default_menuitem_preference" type="list" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
 				<option value="2">FLEXI_DMI_ID_YES</option>
+				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
+				<option value="0">FLEXI_DMI_ID_NO</option>
 			</param>
 			<param name="default_menuitem_nopathway" type="radio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
