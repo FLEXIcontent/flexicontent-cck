@@ -180,29 +180,47 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistMenuItems()
 	{
-		// Try to get id of Flexicontent component
-		$this->_db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
-		$flexi_comp_id = $this->_db->loadResult();
-		// Try to get params of Flexicontent component, and then 'default_menu_itemid' parameter
+		static $return;
+		if ($return !== null) return $return;
+		
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$app = JFactory::getApplication();
+		
+		// Get id of Flexicontent component
+		$flexi =& JComponentHelper::getComponent('com_flexicontent');
+		$flexi_comp_id = $flexi->id;
+		
+		// Get 'default_menu_itemid' parameter
 		$params =& JComponentHelper::getParams('com_flexicontent');
 		if ($params) {
+			$menus	= &JApplication::getMenu('site', array());
 			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
+			$menu = $menus->getItem($_component_default_menuitem_id);
 		} else {
 			$_component_default_menuitem_id = '';
+			return $return = false;
 		}
 		
-		$query 	= 'SELECT COUNT( * )'
-				. ' FROM #__menu as m'
-				. ' WHERE m.published=1 AND m.id="'.$_component_default_menuitem_id.'"'
-				. ' AND m.access=0 AND m.componentid="'.$flexi_comp_id.'"'
-				;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-			
-		if ($count >= 1) {
-			return true;
+		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
+		
+		// Check menu item exists
+		if ( !$menu ) {
+			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+			return $return = false;
 		}
-		return false;
+		// Check pointing to FLEXIcontent
+		if ( @$menu->query['option']!='com_flexicontent' ) {
+			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_FLEXI').$prompt, 'notice' );
+			return $return = false;
+		}
+		// Check public access level
+		if ( $menu->access!=$public_acclevel ) {
+			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_PUBLIC').$prompt, 'notice' );
+			return $return = false;
+		}
+		
+		// All checks passed
+		return $return = true;
 	}
 	
 	/**
@@ -213,7 +231,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistType() {
 		static $return;
-		if($return===NULL) {
+		if ($return === NULL) {
 			$return = false;
 			$query = 'SELECT COUNT( id )'
 			. ' FROM #__flexicontent_types'
@@ -228,7 +246,7 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if there is at least the default fields
+	 * Method to check if there is at least the default fields in the FLEXIcontent fields TABLE
 	 *
 	 * @access public
 	 * @return	boolean	True on success
@@ -236,7 +254,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistFields()
 	{
 		static $return;
-		if($return===NULL) {
+		if ($return === NULL) {
 			$return = false;
 			$query = 'SELECT COUNT( id )'
 			. ' FROM #__flexicontent_fields'
@@ -252,24 +270,28 @@ class FlexicontentModelFlexicontent extends JModel
 	}
 
 	/**
-	 * Method to check if there is at least the default fields
+	 * Method to check if there is at least the default flexicontent_fields PLUGINs
 	 *
 	 * @access public
 	 * @return	boolean	True on success
 	 */
 	function getExistFieldsPlugins()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE folder = ' . $this->_db->Quote('flexicontent_fields')
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
+		static $return;
+		if ($return === NULL) {
+			$return = false;
+			$query = 'SELECT COUNT( id )'
+				. ' FROM #__plugins'
+				. ' WHERE folder = ' . $this->_db->Quote('flexicontent_fields')
+				;
+			$this->_db->setQuery( $query );
+			$count = $this->_db->loadResult();
 			
-		if ($count > 13) {
-			return true;
+			if ($count > 13) {
+				$return = true;
+			}
 		}
-		return false;
+		return $return;
 	}
 
 	/**
@@ -280,12 +302,16 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistSearchPlugin()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE element = ' . $this->_db->Quote('flexisearch')
-		;
-		$this->_db->setQuery( $query );
-		return $this->_db->loadResult() ? true : false;
+		static $return;
+		if ($return === NULL) {
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__plugins'
+			. ' WHERE element = ' . $this->_db->Quote('flexisearch')
+			;
+			$this->_db->setQuery( $query );
+			$return = $this->_db->loadResult() ? true : false;
+		}
+		return $return;
 	}
 
 	/**
@@ -296,12 +322,16 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistSystemPlugin()
 	{
-		$query = 'SELECT COUNT( id )'
-		. ' FROM #__plugins'
-		. ' WHERE element = ' . $this->_db->Quote('flexisystem')
-		;
-		$this->_db->setQuery( $query );
-		return $this->_db->loadResult() ? true : false;
+		static $return;
+		if ($return === NULL) {
+			$query = 'SELECT COUNT( id )'
+			. ' FROM #__plugins'
+			. ' WHERE element = ' . $this->_db->Quote('flexisystem')
+			;
+			$this->_db->setQuery( $query );
+			$return = $this->_db->loadResult() ? true : false;
+		}
+		return $return;
 	}
 
 	/**
@@ -313,7 +343,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getAllPluginsPublished()
 	{
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__plugins'
 				. ' WHERE '
@@ -339,12 +369,13 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistLanguageColumn()
 	{
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
 			$result_lang_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
 			$result_tgrp_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
+			$return = $result_lang_col && $result_tgrp_col;
 		}
-		return $result_lang_col && $result_tgrp_col;
+		return $return;
 	}
 
 	/**
@@ -357,7 +388,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getItemsNoLang()
 	{
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 			$db =& JFactory::getDBO();
 			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
@@ -382,7 +413,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistVersionsTable()
 	{
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_versions');
 			$this->_db->setQuery($query);
 			$return = $this->_db->loadResult() ? true : false;
@@ -399,7 +430,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getExistAuthorsTable()
 	{
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$query = 'SHOW TABLES LIKE ' . $this->_db->Quote('%flexicontent_authors_ext');
 			$this->_db->setQuery($query);
 			$return = $this->_db->loadResult() ? true : false;
@@ -415,7 +446,7 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getExistVersionsPopulated() {
 		static $return;
-		if($return === NULL) {
+		if ($return === NULL) {
 			$query 	= 'SELECT COUNT( version )'
 					. ' FROM #__flexicontent_items_versions'
 					;
@@ -441,9 +472,13 @@ class FlexicontentModelFlexicontent extends JModel
 	 */
 	function getCacheThumbChmod()
 	{
-		// Open phpThumb cache directory
-		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-		return (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+		static $return;
+		if ($return === null) {
+			// Try to open phpThumb cache directory
+			$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+			$return = (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+		}
+		return $return;
 	}
 
 	/**
@@ -453,6 +488,8 @@ class FlexicontentModelFlexicontent extends JModel
 	 * @return	boolean	True on success
 	 */
 	function getOldBetaFiles() {
+		static $return;
+		if ($return!==null) return $return;
 		$files 	= array (
 			'author.xml',
 			'author.php',
@@ -578,7 +615,7 @@ class FlexicontentModelFlexicontent extends JModel
 	function getNoOldFieldsData()
 	{
 		static $return;
-		if($return===NULL) {
+		if ($return === NULL) {
 			$query 	= 'SELECT COUNT( item_id )'
 					. ' FROM #__flexicontent_fields_item_relations'
 					. ' WHERE field_id < 13'
