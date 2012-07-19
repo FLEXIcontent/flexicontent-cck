@@ -749,3 +749,7 @@ div.flexi_box_right {
 div.flexi_box_right {
 	float: right;
 }
+
+#adminForm a.mb, #adminForm a.mb:link, #adminForm a.mb:visited, #adminForm a.mb:hover, #adminForm a.mb:active {
+	margin: 6px 6px 4px 0;
+}

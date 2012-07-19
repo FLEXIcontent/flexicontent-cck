@@ -199,9 +199,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
 		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
+		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
 		
 		// Check and disable 'usepopup'
-		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category'));
+		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category','backend'));
 		if (FLEXI_J16GE && !is_array($popupinview)) {
 			$popupinview = explode("|", $popupinview);
 			$popupinview = ($popupinview[0]=='') ? array() : $popupinview;
@@ -210,7 +211,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
 		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
-		if ($isItemsManager) { $usepopup = 1; $popuptype = 1; }
+		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
+		
+		// FORCE multibox popup in backend ...
+		if ($isItemsManager) $popuptype = 1;
 		
 		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
@@ -341,9 +345,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
 				$desc	= @$value['desc'] ? $value['desc'] : '';
 
-				$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];
-				$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];
-				$srcb	= $field->parameters->get('dir') . '/l_' . $value['originalname'];
+				$srcb	= $field->parameters->get('dir') . '/b_' . $value['originalname'];  // backend
+				$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];  // small
+				$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];  // medium
+				$srcl	= $field->parameters->get('dir') . '/l_' . $value['originalname'];  // large
 				
 				$urllink = @$value['urllink'] ? $value['urllink'] : '';
 				if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
@@ -364,35 +369,41 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					case 1: $src = $srcs; break;
 					case 2: $src = $srcm; break;
-					case 3: $src = $srcb; $popuptype = 0; break;
+					case 3: $src = $srcl; $popuptype = 0; break;
 					default: $src = $srcs; break;
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
+				$field->{"display_backend_src"} = JURI::root().$srcb;
 				$field->{"display_small_src"} = JURI::root().$srcs;
 				$field->{"display_medium_src"} = JURI::root().$srcm;
-				$field->{"display_large_src"} = JURI::root().$srcb;
+				$field->{"display_large_src"} = JURI::root().$srcl;
+				
+				$field->{"display_backend"} = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'"'.$legend.' />';
 				$field->{"display_small"} = '<img src="'.JURI::root().$srcs.'" alt ="'.$alt.'"'.$legend.' />';
 				$field->{"display_medium"} = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'"'.$legend.' />';
-				$field->{"display_large"} = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'"'.$legend.' />';
+				$field->{"display_large"} = '<img src="'.JURI::root().$srcl.'" alt ="'.$alt.'"'.$legend.' />';
 				
 				// Check if a custom variable (display) was requested and do not render default variable
 				if ( in_array($prop,
-						array("display_small","display_medium", "display_large",
-						"display_small_src","display_medium_src", "display_large_src") )
+						array("display_backend", "display_small","display_medium", "display_large",
+						"display_backend_src", "display_small_src", "display_medium_src", "display_large_src") )
 				) {
 					return $field->{$prop};
 				}
 								
 				// first condition is for the display for the preview feature
-				if ($mainframe->isAdmin()) {
-					$field->{$prop} = '
-					<a href="../'.$srcb.'" id="mb'.$id.'" class="mb" rel="[images]" >
-						<img src="../'. $srcs .'" alt ="'.$alt.'" />
-					</a>
-					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
-					';
-					//$field->{$prop} = '<img class="hasTip" src="../'.$srcs.'" alt ="'.$alt.'" title="'.$tip.'" />';
+				if ($isItemsManager) {
+					if ($usepopup) {
+						$field->{$prop} = '
+						<a href="../'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
+							<img src="../'. $srcb .'" alt ="'.$alt.'"'.$legend.' />
+						</a>
+						<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
+						';
+					} else {
+						$field->{$prop} = '<img src="../'.$srcb.'" alt ="'.$alt.'"'.$legend.' />';
+					}
 				} else if ($linkto_url && $url_target=='multibox' && $urllink) {
 					$field->{$prop} = '
 					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$id.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>
@@ -408,20 +419,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					';
 				} else if ($usepopup && $popuptype == 1) {
 					$field->{$prop} = '
-					<a href="'.$srcb.'" id="mb'.$id.'" class="mb" rel="[images]" >
+					<a href="'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					</a>
 					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
 					';
 				} else if ($usepopup && $popuptype == 2) {
 				$field->{$prop} = '
-					<a href="'.$srcb.'" rel="rokbox['.$wl.' '.$hl.']" title="'.($desc ? $desc : $title).'">
+					<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" title="'.($desc ? $desc : $title).'">
 						<img src="'. $src .'" alt ="'.$alt.'" />
 					</a>
 					';
 				} else if ($usepopup && $popuptype == 3) {
 				$field->{$prop} = '
-					<a href="'.$srcb.'" class="jcepopup" rel="'.$field->item_id.'" title="'.($desc ? $desc : $title).'">
+					<a href="'.$srcl.'" class="jcepopup" rel="'.$field->item_id.'" title="'.($desc ? $desc : $title).'">
 						<img src="'. $src .'" alt ="'.$alt.'" />
 					</a>
 					';
@@ -619,8 +630,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$onlypath 	= $onlypath ? $onlypath : JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 		$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent') . DS);
 		$prefix		= $size . '_';
-		$w			= $field->parameters->get('w_'.$size);
-		$h			= $field->parameters->get('h_'.$size);
+		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
+		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
+		$w			= $field->parameters->get('w_'.$size, $default_widths[$size]);
+		$h			= $field->parameters->get('h_'.$size, $default_heights[$size]);
 		$crop		= $field->parameters->get('method_'.$size);
 		$quality	= $field->parameters->get('quality');
 		$usewm		= $field->parameters->get('use_watermark_'.$size);
@@ -759,17 +772,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$origsize_h = $filesize[1];
 		$origsize_w = $filesize[0];
 		
-		$sizes 		= array('l','m','s');
+		$sizes = array('l','m','s','b');
+		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
+		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
 		foreach ($sizes as $size)
 		{
 			$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . $size . '_' . $filename);
 			$thumbnail_exists = false;
 			if (file_exists($path)) {
 				$filesize = getimagesize($path);
-				$filesize_h = $filesize[1];
 				$filesize_w = $filesize[0];
-				$param_h = $field->parameters->get('h_'.$size);
-				$param_w = $field->parameters->get('w_'.$size);
+				$filesize_h = $filesize[1];
+				$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
+				$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
 				$crop = $field->parameters->get('method_'.$size);
 				$thumbnail_exists = true;
 			}
