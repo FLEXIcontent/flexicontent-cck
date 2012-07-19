@@ -41,8 +41,8 @@
 			<option value="BR">FLEXI_FIELD_BOTTOM_RIGHT</option>
 		</param>
 
-		<param name="" type="separator" default="FLEXI_LARGE_IMAGES" level="level1" menu="hide" />
-		<param name="w_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
+		<param name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level1" menu="hide" />
+		<param name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 		<param name="h_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 		<param name="method_l" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
 			<option value="0">FLEXI_SCALE</option>
@@ -54,9 +54,9 @@
 		</param>
 		<param name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
-		<param name="" type="separator" default="FLEXI_MEDIUM_IMAGES" level="level1" menu="hide" />
-		<param name="w_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
-		<param name="h_m" type="text" default="200" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+		<param name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level1" menu="hide" />
+		<param name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
+		<param name="h_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 		<param name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
@@ -67,9 +67,9 @@
 		</param>
 		<param name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
-		<param name="" type="separator" default="FLEXI_SMALL_IMAGES" level="level1" menu="hide" />
-		<param name="w_s" type="text" default="150" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
-		<param name="h_s" type="text" default="150" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+		<param name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level1" menu="hide" />
+		<param name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
+		<param name="h_s" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 		<param name="method_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
@@ -80,6 +80,19 @@
 		</param>
 		<param name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
+		<param name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level1" menu="hide" />
+		<param name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
+		<param name="h_b" type="text" default="30" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+		<param name="method_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
+			<option value="0">FLEXI_SCALE</option>
+			<option value="1">FLEXI_CROP</option>
+		</param>
+		<param name="use_watermark_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_WM" description="FLEXI_FIELD_IMAGE_USE_WM_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+		<param name="wm_b" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+
 		<param name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
 		<param name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" menu="hide" />
 		<param name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
@@ -87,7 +100,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="legendinview" type="fccheckbox" default=""
-			checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY" checkvals="items,category" defaultvals="items,category"
+			checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="items,category,backend" defaultvals="items,category,backend"
 			label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 		<param name="" type="separator" default="FLEXI_IMGFIELD_POPUP_IMAGE" level="level2" menu="hide" />
 		<param name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
@@ -95,7 +108,7 @@
 			<option value="1">FLEXI_YES</option>
 		</param>
 		<param name="popupinview" type="fccheckbox" default=""
-			checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY" checkvals="items,category" defaultvals="items,category"
+			checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="items,category,backend" defaultvals="items,category,backend"
 			label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 		<param name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
 			<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>

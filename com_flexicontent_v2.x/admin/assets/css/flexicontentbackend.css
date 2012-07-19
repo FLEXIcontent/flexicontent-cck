@@ -750,7 +750,12 @@ div.flexi_box_right {
 	float: right;
 }
 
-/******* END OF COMMON J1.5 / J1.7+ CSS ***********/
+
+#adminForm a.mb, #adminForm a.mb:link, #adminForm a.mb:visited, #adminForm a.mb:hover, #adminForm a.mb:active {
+	margin: 6px 6px 4px 0;
+}
+
+/******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/
 /*** BOF J1.7  TABLES LAYOUT ***/
