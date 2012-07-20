@@ -69,18 +69,19 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$task	= JRequest::getVar('task');
-		$user = & JFactory::getUser();
-		$model = $this->getModel('item');
+		// Initialize variables
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$task	   = JRequest::getVar('task');
+		$user    = JFactory::getUser();
+		$model   = $this->getModel('item');
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
 			// Retrieve form data these are subject to basic filtering
-			$data   = JRequest::getVar('jform', array(), 'post', 'array');    // Core Fields and and item Parameters
-			$custom = JRequest::getVar('custom', array(), 'post', 'array');   // Custom Fields
-			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');   // Joomfish Data
+			$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
+			$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
+			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
 			
 			// Validate Form data for core fields and for parameters
 			$form = $model->getForm($data, false);
@@ -88,9 +89,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
 			// Some values need to be assigned after validation
-			$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-			$post['custom']  = & $custom;            // Assign array of custom field values, they are in the custom form array instead of jform
-			$post['jfdata']  = & $jfdata;            // Assign array of Joomfish field values, they are in the jfdata form array instead of jform
+			$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+			$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
+			$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
 		} else {
 			// Retrieve form data these are subject to basic filtering
 			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
@@ -181,6 +182,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$cache->clean();
 				}
 			}
+			
 			
 			// ****************************************************************************************************************************
 			// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
@@ -857,7 +859,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 
 	/**
-	 * Logic to change the state
+	 * Logic to change the state of an item
 	 *
 	 * @access public
 	 * @return void
@@ -865,79 +867,10 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function setitemstate()
 	{
-		$db    = & JFactory::getDBO();
-		$user  = & JFactory::getUser();
-		$cid 	= JRequest::getInt( 'id', 0 );
-		$model = $this->getModel('items');
-		$state = JRequest::getVar( 'state', 0 );
-		JRequest::setVar( 'cid', $cid );
-		//@ob_end_clean();
-		
-		// Get owner and other item data
-		$q = "SELECT id, created_by, catid FROM #__content WHERE id =".$cid;
-		$db->setQuery($q);
-		$itemdata = $db->loadObjectList('id');
-		
-		$id = $cid;
-		if (FLEXI_J16GE) {
-			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-			$canPublish 		= in_array('edit.state', $rights);
-			$canPublishOwn = in_array('edit.state.own', $rights) && $itemdata[$id]->created_by == $user->id;
-		} else if (!FLEXI_ACCESS || $user->gid > 24) {
-			$canPublish = $canPublishOwn = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
-			$canPublish 		= in_array('publish', $rights);
-			$canPublishOwn	= in_array('publishown', $rights) && $itemdata[$id]->created_by == $user->id;
-		}
-		
-		// check if user can edit.state of the item
-		$access_msg = '';
-		if ( !$canPublish && !$canPublishOwn )
-		{
-			$access_msg =  JText::_( 'FLEXI_DENIED' );   // must a few words
-		}
-		else if(!$model->setitemstate($id, $state)) 
-		{
-			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
-			echo $msg . ": " .$model->getError();
-			return;
-		}
-
-		if ( $state == 1 ) {
-			$img = 'tick.png';
-			$alt = JText::_( 'FLEXI_PUBLISHED' );
-		} else if ( $state == 0 ) {
-			$img = 'publish_x.png';
-			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-		} else if ( $state == -1 ) {
-			$img = 'disabled.png';
-			$alt = JText::_( 'FLEXI_ARCHIVED' );
-		} else if ( $state == -3 ) {
-			$img = 'publish_r.png';
-			$alt = JText::_( 'FLEXI_PENDING' );
-		} else if ( $state == -4 ) {
-			$img = 'publish_y.png';
-			$alt = JText::_( 'FLEXI_TO_WRITE' );
-		} else if ( $state == -5 ) {
-			$img = 'publish_g.png';
-			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-		}
-		
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
-			$cache->clean('com_flexicontent_items');
-		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
-		}
-
-		$path = JURI::root().'components/com_flexicontent/assets/images/';
-		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />' . $access_msg;
-		exit;
+		flexicontent_html::setitemstate();
 	}
-
-
+	
+	
 	/**
 	 * Logic to change state of multiple items
 	 *
@@ -954,8 +887,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$msg = '';
 		
 		$newstate = JRequest::getVar("newstate", '');
-		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => -1 );
-		$statenames = array ( 'PE' => 'FLEXI_PENDING', 'OQ' => 'FLEXI_TO_WRITE', 'IP' => 'FLEXI_IN_PROGRESS', 'P' => 'FLEXI_PUBLISHED', 'U' => 'FLEXI_UNPUBLISHED', 'A' => 'FLEXI_ARCHIVED' );
+		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2:-1), 'T' => -2 );
+		$statenames = array ( 'PE' => 'FLEXI_PENDING', 'OQ' => 'FLEXI_TO_WRITE', 'IP' => 'FLEXI_IN_PROGRESS', 'P' => 'FLEXI_PUBLISHED', 'U' => 'FLEXI_UNPUBLISHED', 'A' => 'FLEXI_ARCHIVED', 'T' => 'FLEXI_TRASHED' );
 		
 		// check valid state
 		if ( !isset($stateids[$newstate]) ) {
@@ -973,23 +906,39 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Get owner and other item data
 			$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
 			$db->setQuery($q);
-			$itemdata = $db->loadObjectList('id');
+			$item = $db->loadObjectList('id');
 			
 			// Check authorization for publish operation
 			foreach ($cid as $id) {
+				
+				// Determine priveleges of the current user on the given item
 				if (FLEXI_J16GE) {
-					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-					$canPublish 		= in_array('edit.state', $rights);
-					$canPublishOwn = in_array('edit.state.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				} else if (!FLEXI_ACCESS || $user->gid > 24) {
-					$canPublish = $canPublishOwn = true;
+					$asset = 'com_content.article.' . $item->id;
+					$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+					$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+					// ...
+					$permission = FlexicontentHelperPerm::getPerm();
+					$has_archive    = $permission->CanArchives;
+				} else if ($user->gid >= 25) {
+					$has_edit_state = true;
+					$has_delete     = true;
+					$has_archive    = true;
 				} else if (FLEXI_ACCESS) {
-					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
-					$canPublish 		= in_array('publish', $rights);
-					$canPublishOwn	= in_array('publishown', $rights) && $itemdata[$id]->created_by == $user->id;
+					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+					$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+					$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
+					$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
+				} else {
+					$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+					$has_delete     = $user->gid >= 23; // is at least manager
+					$has_archive    = $user->gid >= 23; // is at least manager
 				}
 				
-				if ( $canPublish || $canPublishOwn ) {
+				$has_edit_state = $has_edit_state && in_array($stateids[$newstate], array(0,1,-3,-4,-5));
+				$has_delete     = $has_delete     && $stateids[$newstate] == -2;
+				$has_archive    = $has_archive    && $stateids[$newstate] == (FLEXI_J16GE ? 2:-1);
+				
+				if ( $has_edit_state || $has_delete || $has_archive ) {
 					$auth_cid[] = $id;
 				} else {
 					$non_auth_cid[] = $id;
@@ -1006,7 +955,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseNotice(500, $msg_noauth);
 		}
 		
-		// Try to delete 
+		// Set state
 		if ( count($auth_cid) ){
 			foreach ($auth_cid as $item_id) {
 				$model->setitemstate($item_id, $stateids[$newstate]);

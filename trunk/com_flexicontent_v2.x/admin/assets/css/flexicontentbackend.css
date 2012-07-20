@@ -498,7 +498,14 @@ table.adminlist thead td.filterbuttons {
 }
 table.adminlist thead td.filterbuttons input {
 	background-color: #fff;
+	border-radius: 2px;
+	font-weight: bold;
+	margin-left: 4px;
 }
+table.adminlist thead td.filterbuttons input:hover {
+	background-color: lightgray;
+}
+
 table.adminlist td.yellow,
 table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
@@ -750,6 +757,36 @@ div.flexi_box_right {
 	float: right;
 }
 
+/** FLEXIcontent radio buttons **/
+.flexi_radiotab {
+	display: inline-block !important;
+	padding: 1px 6px !important;
+	margin: 2px 0px 2px 8px !important;
+	border-radius: 4px !important;
+	border: 1px solid darkgray !important;
+	text-decoration: none !important;
+	font-weight: bold;
+}
+
+.flexi_radiotab.highlight {
+	background-color: lightgray !important;
+	color: darkred !important;
+}
+
+.flexi_radiotab.downlight {
+	background-color: white !important;
+	color: black !important;
+	cursor: pointer !important;
+}
+
+.flexi_tabbox  input {
+	display:none !important;
+}
+
+.flexi_tabbox_label {
+	font-weight: bold;
+	color: #444444;
+}
 
 #adminForm a.mb, #adminForm a.mb:link, #adminForm a.mb:visited, #adminForm a.mb:hover, #adminForm a.mb:active {
 	margin: 6px 6px 4px 0;

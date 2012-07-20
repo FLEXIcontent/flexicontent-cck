@@ -55,12 +55,12 @@ class FlexicontentController extends JController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
+		
 		// Initialize variables
-		$app   = &JFactory::getApplication();
-		$db    = & JFactory::getDBO();
-		$user  = & JFactory::getUser();
-		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDBO();
+		$user    = JFactory::getUser();
+		$model   = $this->getModel(FLEXI_ITEMVIEW);
 		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
@@ -167,7 +167,6 @@ class FlexicontentController extends JController
 		// Check in model and return if saving has 
 		$model->checkin();
 		if ( !$store_success ) return;
-		
 		
 		// Actions if a content item was created
 		if ( $model->get('id') )
@@ -948,8 +947,7 @@ class FlexicontentController extends JController
 	}
 
 	/**
-	 * Logic to change the state of an item, (copied from backend items controller)
-	 * TODO: enable this for the frontend, maybe by adding a state button like
+	 * Logic to change the state of an item
 	 *
 	 * @access public
 	 * @return void
@@ -957,71 +955,10 @@ class FlexicontentController extends JController
 	 */
 	function setitemstate()
 	{
-		$id 	= JRequest::getInt( 'id', 0 );
-		JRequest::setVar( 'cid', $id );
-
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		$item  = & $model->getItem($id);
-		$user  =& JFactory::getUser();
-		$state = JRequest::getVar( 'state', 0 );
-		@ob_end_clean();
-		
-		// Determine if current user can edit state of the given item
-		$has_edit_state = false;
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $item->id;
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-		} else if ($user->gid >= 25) {
-			$has_edit_state = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
-		} else {
-			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
-		}
-
-		// check if user can edit.state of the item
-		$access_msg = '';
-		if ( !$has_edit_state )
-		{
-			//echo JText::_( 'FLEXI_NO_ACCESS_CHANGE_STATE' );
-			$access_msg =  JText::_( 'FLEXI_DENIED' );   // must a few words
-		}
-		else if(!$model->setitemstate($id, $state)) 
-		{
-			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
-			echo $msg . ": " .$model->getError();
-			return;
-		}
-
-		if ( $state == 1 ) {
-			$img = 'tick.png';
-			$alt = JText::_( 'FLEXI_PUBLISHED' );
-		} else if ( $state == 0 ) {
-			$img = 'publish_x.png';
-			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-		} else if ( $state == -1 ) {
-			$img = 'disabled.png';
-			$alt = JText::_( 'FLEXI_ARCHIVED' );
-		} else if ( $state == -3 ) {
-			$img = 'publish_r.png';
-			$alt = JText::_( 'FLEXI_PENDING' );
-		} else if ( $state == -4 ) {
-			$img = 'publish_y.png';
-			$alt = JText::_( 'FLEXI_TO_WRITE' );
-		} else if ( $state == -5 ) {
-			$img = 'publish_g.png';
-			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-		}
-		
-		//$cache = &JFactory::getCache('com_flexicontent');
-		$cache = FLEXIUtilities::getCache();
-		$cache->clean('com_flexicontent_items');
-		$path = JURI::root().'components/com_flexicontent/assets/images/';
-		echo '<img src="'.$path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />' . $access_msg;
-		exit;
+		flexicontent_html::setitemstate();
 	}
-
+	
+	
 	/**
 	 * Download logic
 	 *

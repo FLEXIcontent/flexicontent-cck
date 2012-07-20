@@ -58,7 +58,7 @@ require_once (JPATH_COMPONENT.DS.'controller.php');
 $task = JRequest::getCmd('task');
 $tasks = explode(".", $task);
 if(count($tasks)>=2) {
-	$controller = $controller?$controller:$tasks[0];
+	$controller = @$controller ? $controller : $tasks[0];
 	$task = $tasks[1];
 	JRequest::setVar('task', $tasks[1]);
 } else {

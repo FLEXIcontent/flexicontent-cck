@@ -128,7 +128,92 @@ class flexicontent_html
 		
 		return $image;
 	}
+	
+	
+	/**
+	 * Logic to change the state of an item
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function setitemstate()
+	{
+		$id = JRequest::getInt( 'id', 0 );
+		JRequest::setVar( 'cid', $id );
+		
+		$app = JFactory::getApplication();
+		$modelname = $app->isAdmin() ? 'items' : FLEXI_ITEMVIEW;
+		$model = $this->getModel( $modelname );
+		$user = JFactory::getUser();
+		$state = JRequest::getVar( 'state', 0 );
+		
+		// Get owner and other item data
+		$db = JFactory::getDBO();
+		$q = "SELECT id, created_by, catid FROM #__content WHERE id =".$id;
+		$db->setQuery($q);
+		$item = $db->loadObject();
+		
+		// Determine priveleges of the current user on the given item
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $item->id;
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+			// ...
+			$permission = FlexicontentHelperPerm::getPerm();
+			$has_archive    = $permission->CanArchives;
+		} else if ($user->gid >= 25) {
+			$has_edit_state = true;
+			$has_delete     = true;
+			$has_archive    = true;
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+			$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
+			$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
+		} else {
+			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+			$has_delete     = $user->gid >= 23; // is at least manager
+			$has_archive    = $user->gid >= 23; // is at least manager
+		}
 
+		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
+		$has_delete     = $has_delete     && $state == -2;
+		$has_archive    = $has_archive    && $state == (FLEXI_J16GE ? 2:-1);
+		
+		// check if user can edit.state of the item
+		$access_msg = '';
+		if ( !$has_edit_state && !$has_delete && !$has_archive )
+		{
+			//echo JText::_( 'FLEXI_NO_ACCESS_CHANGE_STATE' );
+			echo JText::_( 'FLEXI_DENIED' );   // must a few words
+			return;
+		}
+		else if(!$model->setitemstate($id, $state)) 
+		{
+			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
+			echo $msg . ": " .$model->getError();
+			return;
+		}
+		
+		// Clean cache
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+		} else {
+			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache->clean();
+		}
+		
+		// Output new state icon and terminate
+		$tmpparams = new JParameter('');
+		$tmpparams->set('stateicon_popup', 'basic');
+		$stateicon = flexicontent_html::stateicon( $state, $tmpparams );
+		echo $stateicon;
+		exit;
+	}
+	
+	
 	/**
 	 * Creates the rss feed button
 	 *
@@ -293,34 +378,42 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function statebutton( $item, &$params)
+	function statebutton( $item, &$params, $addToggler=true )
 	{
 		$user = & JFactory::getUser();
 		$db   = & JFactory::getDBO();
 		$config   = & JFactory::getConfig();
 		$document = & JFactory::getDocument();
 		$nullDate = $db->getNullDate();
+		$app = JFactory::getApplication();
 		
-		// Determine if current user can edit state of the given item
-		$has_edit_state = false;
+		// Determine priveleges of the current user on the given item
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $item->id;
 			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-			// ALTERNATIVE 1
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-			//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
+			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+			// ...
+			$permission = FlexicontentHelperPerm::getPerm();
+			$has_archive    = $permission->CanArchives;
 		} else if ($user->gid >= 25) {
 			$has_edit_state = true;
+			$has_delete     = true;
+			$has_archive    = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+			$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
+			$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
 		} else {
 			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+			$has_delete     = $user->gid >= 23; // is at least manager
+			$has_archive    = $user->gid >= 23; // is at least manager
 		}
+		$canChangeState = $has_edit_state || $has_delete || $has_archive;
 		
 		static $js_and_css_added = false;
 		
-	 	if (!$js_and_css_added)
+	 	if (!$js_and_css_added && $canChangeState && $addToggler )
 	 	{
 			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
@@ -338,83 +431,76 @@ class flexicontent_html
 			$js_and_css_added = true;
 	 	}
 	 	
+		
+		// Create state icon
+		$state = $item->state;
+		$state_text ='';
+		$tmpparams = new JParameter('');
+		$tmpparams->set('stateicon_popup', 'none');
+		$stateicon = flexicontent_html::stateicon( $state, $tmpparams, $state_text );
+		
+	 	
+	 	// Calculate common variables used to produce output
+		$publish_up =& JFactory::getDate($item->publish_up);
+		$publish_down =& JFactory::getDate($item->publish_down);
+		$publish_up->setOffset($config->getValue('config.offset'));
+		$publish_down->setOffset($config->getValue('config.offset'));
+		$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
+		
+		
+		// Create publish information
+		$publish_info = '';
+		if (isset($item->publish_up)) {
+			if ($item->publish_up == $nullDate) {
+				$publish_info .= JText::_( 'FLEXI_START_ALWAYS' );
+			} else {
+				$publish_info .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
+			}
+		}
+		if (isset($item->publish_down)) {
+			if ($item->publish_down == $nullDate) {
+				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+			} else {
+				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
+			}
+		}
+		$publish_info = $state_text.'<br /><br />'.$publish_info;
+		
+		
 		// Create the state selector button and return it
-		if ($has_edit_state) {
+		if ( $canChangeState && $addToggler )
+		{
+			$separators_at = array(-5,-4);
+			// Only add user's permitted states on the current item
+			if ($has_edit_state) $state_ids   = array(1, -5, 0, -3, -4);
+			if ($has_archive)    $state_ids[] = FLEXI_J16GE ? 2:-1;
+			if ($has_delete)     $state_ids[]  = -2;
 			
-			$publish_up =& JFactory::getDate($item->publish_up);
-			$publish_down =& JFactory::getDate($item->publish_down);
-			$publish_up->setOffset($config->getValue('config.offset'));
-			$publish_down->setOffset($config->getValue('config.offset'));
-
-			$alt = "";
-			if ( $item->state == 1 ) {
-				$img = 'tick.png';
-				$alt = JText::_( 'FLEXI_PUBLISHED' );
-				$state = 1;
-			} else if ( $item->state == 0 ) {
-				$img = 'publish_x.png';
-				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-				$state = 0;
-			} else if ( $item->state == -1 ) {
-				$img = 'disabled.png';
-				$alt = JText::_( 'FLEXI_ARCHIVED' );
-				$state = -1;
-			} else if ( $item->state == -3 ) {
-				$img = 'publish_r.png';
-				$alt = JText::_( 'FLEXI_PENDING' );
-				$state = -3;
-			} else if ( $item->state == -4 ) {
-				$img = 'publish_y.png';
-				$alt = JText::_( 'FLEXI_TO_WRITE' );
-				$state = -4;
-			} else if ( $item->state == -5 ) {
-				$img = 'publish_g.png';
-				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-				$state = -5;
-			}
-
-			$times = '';
-			if (isset($item->publish_up)) {
-				if ($item->publish_up == $nullDate) {
-					$times .= JText::_( 'FLEXI_START_ALWAYS' );
-				} else {
-					$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
-				}
-			}
-			if (isset($item->publish_down)) {
-				if ($item->publish_down == $nullDate) {
-					$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-				} else {
-					$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
-				}
-			}
+			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
+			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
 			
-			$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
-			
-			$state_ids = array(1, 0, -1, -3, -4 , -5);
-			$state_names = array('FLEXI_PUBLISHED', 'FLEXI_UNPUBLISHED', 'FLEXI_ARCHIVED', 'FLEXI_PENDING', 'FLEXI_TO_WRITE', 'FLEXI_IN_PROGRESS');
-			$state_descrs = array('FLEXI_PUBLISH_THIS_ITEM', 'FLEXI_UNPUBLISH_THIS_ITEM', 'FLEXI_ARCHIVE_THIS_ITEM', 'FLEXI_SET_ITEM_PENDING', 'FLEXI_SET_ITEM_TO_WRITE', 'FLEXI_SET_ITEM_IN_PROGRESS');
-			$state_imgs = array('tick.png', 'publish_x.png', 'disabled.png', 'publish_r.png', 'publish_y.png', 'publish_g.png');			
-			
-			if ($has_edit_state) {
+			$box_css = $app->isSite() ? 'width:182px; left:-100px;' : '';
+			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			$output ='
 			<ul class="statetoggler">
 				<li class="topLevel">
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<div id="row'.$item->id.'">
-						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$times.'">
-							<img src="'.$img_path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />
+						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$publish_info.'">
+							'.$stateicon.'
 						</span>
 					</div>
 					</a>
-					<div class="options" style="width:160px; position:absolute;left:-68px;">
+					<div class="options" style="'.$box_css.'">
 						<ul>';
 						
 				foreach ($state_ids as $i => $state_id) {
+					$spacer = in_array($state_id,$separators_at) ? '' : '';
 					$output .='
 							<li>
-								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer hasTip" title="'.JText::_( 'FLEXI_ACTION' ).'::'.JText::_( $state_descrs[$i] ).'">
-									<img src="'.$img_path.$state_imgs[$i].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$i] ).'" />
+								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer hasTip" title="'.JText::_( 'FLEXI_ACTION' ).'::'.JText::_( $state_descrs[$state_id] ).'">
+									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$state_id] ).'" />
 								</a>
 							</li>';
 				}
@@ -423,19 +509,20 @@ class flexicontent_html
 					</div>
 				</li>
 			</ul>';
-			} else {
-				$output = '';/* '
-					<div id="row'.$item->id.'">
-						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$times.'">
-							<img src="'.$img_path.$img.'" width="16" height="16" border="0" alt="'.$alt.'" />
-						</span>
-					</div>';*/
-			}
 			
-			return $output;
+		} else if ($app->isAdmin()) {
+			if ($canChangeState) $publish_info .= '<br><br>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
+			$output = '
+				<div id="row'.$item->id.'">
+					<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$publish_info.'">
+						'.$stateicon.'
+					</span>
+				</div>';
+		} else {
+			$output = '';  // frontend with no permissions to edit / delete / archive
 		}
 		
-		return;
+		return $output;
 	}
 	
 	
@@ -522,47 +609,66 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function stateicon( $state, &$params)
+	function stateicon( $state, &$params, &$state_text=null )
 	{
-		$user		= & JFactory::getUser();
-
+		// Create image filename and state name
 		if ( $state == 1 ) {
 			$img = 'tick.png';
 			$alt = JText::_( 'FLEXI_PUBLISHED' );
-			$state = 1;
 		} else if ( $state == 0 ) {
 			$img = 'publish_x.png';
 			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-			$state = 0;
-		} else if ( $state == -1 ) {
-			$img = 'disabled.png';
+		} else if ( $state == (FLEXI_J16GE ? 2:-1) ) {
+			$img = 'archive.png';
 			$alt = JText::_( 'FLEXI_ARCHIVED' );
-			$state = -1;
+		} else if ( $state == -2 ) {
+			$img = 'trash.png';
+			$alt = JText::_( 'FLEXI_TRASHED' );
 		} else if ( $state == -3 ) {
 			$img = 'publish_r.png';
 			$alt = JText::_( 'FLEXI_PENDING' );
-			$state = -3;
 		} else if ( $state == -4 ) {
 			$img = 'publish_y.png';
 			$alt = JText::_( 'FLEXI_TO_WRITE' );
-			$state = -4;
 		} else if ( $state == -5 ) {
 			$img = 'publish_g.png';
 			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-			$state = -5;
-		}
-
-		$text = JText::_( 'FLEXI_STATE' );
-		
-		if ( $params->get('show_icons', 1) ) {
-			$image = JHTML::_('image.site', $img, 'components/com_flexicontent/assets/images/', NULL, NULL, $alt, 'class="editlinktip hasTip" title="'.$text.'::'.$alt.'"' );
 		} else {
-			$image = $alt;
+			$img = 'unknown.png';
+			$alt = JText::_( 'FLEXI_UNKNOWN' );
 		}
-		return $image;
-		return;
+		
+		
+		// Create popup text
+		$title = JText::_( 'FLEXI_STATE' );
+		$descr = str_replace('::', '-', $alt);
+		$state_text = $title.' : '.$descr;
+		switch ( $params->get('stateicon_popup', 'full') )
+		{
+			case 'basic':
+				$attribs = 'title="'.$state_text.'"';
+				break;
+			case 'none':
+				$attribs = '';
+				break;
+			case 'full': default:
+				$attribs = 'class="editlinktip hasTip" title="'.$title.'::'.$descr.'"';
+				break;
+		}
+		
+		// Create state icon image
+		$app = JFactory::getApplication();
+		$path = ($app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';  // no need to prefix this with JURI::root(), it will be done below 
+		if ( $params->get('show_icons', 1) ) {
+			$icon = JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs);
+		} else {
+			$icon = $descr;
+		}
+		
+		return $icon;
 	}
-
+	
+	
 	/**
 	 * Creates the ratingbar
 	 *
@@ -1137,7 +1243,8 @@ class flexicontent_html
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
 		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
+		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), JText::_( 'FLEXI_ARCHIVED' ) );
+		$state[] = JHTML::_('select.option',  -2, JText::_( 'FLEXI_TRASHED' ) );
 
 		$list = JHTML::_('select.genericlist', $state, $name, $class, 'value', 'text', $selected );
 	
