@@ -72,6 +72,7 @@ class FlexicontentViewItems extends JView {
 		$filter_type			= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
 		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
+		$filter_stategrp	= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', 	'', 			'word' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
 		}
@@ -262,7 +263,27 @@ class FlexicontentViewItems extends JView {
 		$state[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
 
 		$lists['filter_state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-				
+		
+		// build filter state group
+		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
+		{
+			$sgn[''] = JText::_( 'FLEXI_GRP_NORMAL' );
+			if ($CanDelete || $CanDeleteOwn)
+				$sgn['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
+			if ($CanArchives)
+				$sgn['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );
+			$sgn['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
+			$sgn['all']      = JText::_( 'FLEXI_GRP_ALL' );
+			
+			$stategroups = array();
+			foreach ($sgn as $i => $v) {
+				if ($filter_stategrp == $i) $v = "<span class='flexi_radiotab highlight'>".$v."</span>";
+				else                        $v = "<span class='flexi_radiotab downlight'>".$v."</span>";
+				$stategroups[] = JHTML::_('select.option', $i, $v);
+			}
+			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );
+		}
+		
 		// build the include subcats boolean list
 		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox"', $filter_subcats );
 		

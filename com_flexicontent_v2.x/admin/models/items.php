@@ -518,6 +518,7 @@ class FlexicontentModelItems extends JModel
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
+		$filter_stategrp	= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
@@ -536,8 +537,6 @@ class FlexicontentModelItems extends JModel
 
 		$where = array();
 		
-		$where[] = ' i.state != -1';
-		$where[] = ' i.state != -2';
 		if (FLEXI_J16GE) {
 			// Limit items to the children of the FLEXI_CATEGORY, currently FLEXI_CATEGORY is root category (id:1) ...
 			$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
@@ -661,19 +660,29 @@ class FlexicontentModelItems extends JModel
 			}
 		}
 		
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$where[] = 'i.state = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 'i.state = 0';
-			} else if ($filter_state == 'PE' ) {
-				$where[] = 'i.state = -3';
-			} else if ($filter_state == 'OQ' ) {
-				$where[] = 'i.state = -4';
-			} else if ($filter_state == 'IP' ) {
-				$where[] = 'i.state = -5';
-			} else if ($filter_state == 'RV' ) {
-				$where[] = 'i.state = 1 OR i.state = -5';
+		if ( $filter_stategrp=='all' ) {
+			// no limitations
+		} else if ( $filter_stategrp=='trashed' ) {
+			$where[] = 'i.state = -2';
+		} else if ( $filter_stategrp=='archived' ) {
+			$where[] = 'i.state = '.(FLEXI_J16GE ? 2:-1);
+		} else if ( $filter_stategrp=='orphan' ) {
+			$where[] = 'i.state NOT IN ('.(FLEXI_J16GE ? 2:-1).',-2,1,0,-3,-4,-5)';
+		} else {
+			if ( $filter_state ) {
+				if ( $filter_state == 'P' ) {
+					$where[] = 'i.state = 1';
+				} else if ($filter_state == 'U' ) {
+					$where[] = 'i.state = 0';
+				} else if ($filter_state == 'PE' ) {
+					$where[] = 'i.state = -3';
+				} else if ($filter_state == 'OQ' ) {
+					$where[] = 'i.state = -4';
+				} else if ($filter_state == 'IP' ) {
+					$where[] = 'i.state = -5';
+				} else if ($filter_state == 'RV' ) {
+					$where[] = 'i.state = 1 OR i.state = -5';
+				}
 			}
 		}
 		

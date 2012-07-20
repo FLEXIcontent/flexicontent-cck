@@ -41,17 +41,6 @@ $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "
 
 ?>
 <script language="javascript" type="text/javascript">
-if(MooTools.version>="1.2.4") {
-	window.addEvent('domready', function() {stateselector.init()});
-}else{
-	window.onDomReady(stateselector.init.bind(stateselector));
-}
-
-function dostate(state, id)
-{
-	var change = new processstate();
-	change.dostate( state, id );
-}
 
 function fetchcounter()
 {
@@ -425,6 +414,9 @@ window.addEvent('domready', function() {
 			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<?php if (isset($this->lists['filter_stategrp'])) : ?>
+					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
+				<?php endif; ?>
 				<span style="float:right;">
 					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
@@ -452,14 +444,6 @@ window.addEvent('domready', function() {
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
 		else
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
-		
-		// WHY IS THIS HERE ??? if we use general permissions the list will be displayed wrong or not?
-		/*if (FLEXI_ACCESS) {
-			$canEditAll 		= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-			$canEditOwnAll		= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
-			$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
-			$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-		}*/
 		
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
@@ -512,51 +496,9 @@ window.addEvent('domready', function() {
 			}
 
 			$cid_checkbox = JHTML::_('grid.checkedout', $row, $i );
-			$alt = "";
-			if ( $row->state == 1 ) {
-				$img = 'tick.png';
-				$alt = JText::_( 'FLEXI_PUBLISHED' );
-				$state = 1;
-			} else if ( $row->state == 0 ) {
-				$img = 'publish_x.png';
-				$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-				$state = 0;
-			} else if ( $row->state == -1 ) {
-				$img = 'disabled.png';
-				$alt = JText::_( 'FLEXI_ARCHIVED' );
-				$state = -1;
-			} else if ( $row->state == -3 ) {
-				$img = 'publish_r.png';
-				$alt = JText::_( 'FLEXI_PENDING' );
-				$state = -3;
-			} else if ( $row->state == -4 ) {
-				$img = 'publish_y.png';
-				$alt = JText::_( 'FLEXI_TO_WRITE' );
-				$state = -4;
-			} else if ( $row->state == -5 ) {
-				$img = 'publish_g.png';
-				$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-				$state = -5;
-			}
-
-			$times = '';
-			if (isset($row->publish_up)) {
-				if ($row->publish_up == $nullDate) {
-					$times .= JText::_( 'FLEXI_START_ALWAYS' );
-				} else {
-					$times .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
-				}
-			}
-			if (isset($row->publish_down)) {
-				if ($row->publish_down == $nullDate) {
-					$times .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-				} else {
-					$times .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
-				}
-			}
 			
 			// Check publication START/FINISH dates (publication Scheduled / Expired)
-			$is_published = in_array( $row->state, array(1,-5,-1) );
+			$is_published = in_array( $row->state, array(1, -5, (FLEXI_J16GE ? 2:-1) ) );
 			$extra_img = $extra_alt = '';
 			
 			if ( $row->publication_scheduled && $is_published ) {
@@ -651,71 +593,7 @@ window.addEvent('domready', function() {
 				<?php echo $row->type_name; ?>
 			</td>
 			<td align="center" class="col_state">
-			<?php if (($canPublish || $canPublishOwn) && ($limit <= 30)) : ?>
-			<ul style='float:left' class="statetoggler">
-				<li class="topLevel">
-					<a href="javascript:void(0);" class="opener" style="outline:none;">
-					<div id="row<?php echo $row->id; ?>">
-						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
-							<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
-						</span>
-					</div>
-					</a>
-					<div class="options">
-						<ul>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_PUBLISH_THIS_ITEM' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" />
-								</a>
-								</div>
-							</li>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('0', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_UNPUBLISH_THIS_ITEM' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" />
-								</a>	
-								</div>
-							</li>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('-1', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_ARCHIVE_THIS_ITEM' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" />
-								</a>
-								</div>
-							</li>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('-3', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_PENDING' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" />
-								</a>
-								</div>
-							</li>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('-4', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_TO_WRITE' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" />
-								</a>	
-								</div>
-							</li>
-							<li>
-								<div>
-								<a href="javascript:void(0);" onclick="dostate('-5', '<?php echo $row->id; ?>')" class="closer hasTip" title="<?php echo JText::_( 'FLEXI_ACTION' ); ?>::<?php echo JText::_( 'FLEXI_SET_ITEM_IN_PROGRESS' ); ?>">
-									<img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" />
-								</a>	
-								</div>
-							</li>
-						</ul>
-					</div>
-				</li>
-			</ul>
-			<?php else : ?>
-			<div style="float:left" id="row<?php echo $row->id; ?>">
-				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_PUBLISH_INFORMATION' );?>::<?php echo $times; ?>">
-					<img src="../components/com_flexicontent/assets/images/<?php echo $img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" />
-				</span>
-			</div>
-			<?php endif ; ?>
+			<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= 30) ); ?>
 			<?php if ($extra_img) : ?><img style='float:right;' src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="hasTip" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" /><?php endif; ?>
 			</td>
 			
@@ -742,7 +620,7 @@ window.addEvent('domready', function() {
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 
 				<?php if ($this->filter_cats == '' || $this->filter_cats == 0) : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align:center; margin-left:-20px;" />
 				<?php else : ?>
 				<input type="text" name="order[]" size="5" value="<?php echo $row->catsordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
 				<?php endif; ?>
@@ -822,20 +700,22 @@ window.addEvent('domready', function() {
 	
 	<table cellspacing="0" cellpadding="4" border="0" align="center">
 		<tr>
-			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
-		</tr>
-		<tr>
-			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/disabled.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
+		</tr><tr>
+			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+		</tr><tr>
+			<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+			<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TRASHED' ); ?>" /></td>
+			<td><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
 	

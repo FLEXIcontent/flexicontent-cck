@@ -27,7 +27,8 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerItems extends FlexicontentController {
+class FlexicontentControllerItems extends FlexicontentController
+{
 	/**
 	 * Constructor
 	 *
@@ -135,16 +136,23 @@ class FlexicontentControllerItems extends FlexicontentController {
 	function selectstate() {
 		$user	=& JFactory::getUser();
 		
+		// General permission since we do not have a specific item yet
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
-			$CanPublish = $permission->CanPublish;
+			$auth_publish = $permission->CanPublish || $permission->CanPublishOwn;
+			$auth_delete  = $permission->CanDelete  || $permission->CanDeleteOwn;
+			$auth_archive = $permission->CanArchives;
 		} else if (FLEXI_ACCESS) {
-			$CanPublish 	= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
+			$auth_publish  = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
+			$auth_delete   = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
+			$auth_archive  = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 		} else {
-			$CanPublish = 1;
+			$auth_publish = 1;
+			$auth_delete  = 1;
+			$auth_archive = 1;
 		}
 		
-		if($CanPublish) {
+		if($auth_publish || $auth_archive || $auth_delete) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -152,14 +160,20 @@ class FlexicontentControllerItems extends FlexicontentController {
 			header("Pragma: no-cache");
 
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css">';
-
-			$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'color' => 'darkgreen' );
-			$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'color' => 'darkred' );
-			$state['A'] = array( 'name' =>'FLEXI_ARCHIVED', 'desc' =>'FLEXI_ARCHIVED_STATE', 'icon' => 'disabled.png', 'color' => 'gray' );
-			$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'color' => 'darkgreen' );
-			$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'color' => 'darkred' );
-			$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_NEED_TO_BE_APPROVED', 'icon' => 'publish_r.png', 'color' => 'darkred' );
 			
+			if ($auth_publish) {
+				$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'color' => 'darkgreen' );
+				$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'color' => 'darkgreen', 'clear' => true );
+				$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'color' => 'darkred' );
+				$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_NEED_TO_BE_APPROVED', 'icon' => 'publish_r.png', 'color' => 'darkred' );
+				$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'color' => 'darkred', 'clear' => true );
+			}
+			if ($auth_archive) {
+				$state['A'] = array( 'name' =>'FLEXI_ARCHIVED', 'desc' =>'FLEXI_ARCHIVED_STATE', 'icon' => 'archive.png', 'color' => 'gray' );
+			}
+			if ($auth_delete) {
+				$state['T'] = array( 'name' =>'FLEXI_TRASHED', 'desc' =>'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'color' => 'gray' );
+			}
 			echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b><br /><br />";
 		?>
 			
@@ -185,6 +199,7 @@ class FlexicontentControllerItems extends FlexicontentController {
 					<?php echo JText::_( $statedata['name'] ); ?>
 				</a>
 		<?php
+				if ( isset($statedata['clear']) ) echo "<div style='width:100%; float: left; clear both;'></div>";
 			}
 		?>
 			
@@ -207,5 +222,4 @@ class FlexicontentControllerItems extends FlexicontentController {
 		echo count($status['no']);
 	}
 
-	
 }
