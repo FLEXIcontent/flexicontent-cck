@@ -31,7 +31,14 @@ jimport('joomla.application.component.model');
 class FlexicontentModelFlexicontent extends JModel
 {
 	/**
-	 * Data
+	 * Root category from this directory
+	 *
+	 * @var int
+	 */
+	var $_rootcat = null;
+	
+	/**
+	 * data
 	 *
 	 * @var object
 	 */
@@ -73,7 +80,16 @@ class FlexicontentModelFlexicontent extends JModel
 			$params->merge($menuParams);
 		}
 		
-		$this->_params = $params;
+		//get the root category of the directory
+		$this->_rootcat = JRequest::getVar('rootcat', false);
+		if ( $this->rootcat===false )
+			// compatibility of old saved menu items, the value is inside params instead of being URL query variable
+			$this->_rootcat = $params->get('rootcat', FLEXI_J16GE ? 1:0);
+		else
+			$params->set('rootcat', $this->_rootcat);
+		
+		//set directory parameters
+		$this->_params = & $params;
 		
 		//set limits
 		$limit 			= $params->def('catlimit', 5);
@@ -199,10 +215,6 @@ class FlexicontentModelFlexicontent extends JModel
 		$user = & JFactory::getUser();
 		$orderby = $this->_buildItemOrderBy('cat_');
 
-		// Get the root category from this directory
-		$rootcat = JRequest::getVar('rootcat',false);
-		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
-		
 		// Get a 2 character language tag
 		$lang = flexicontent_html::getUserCurrentLang();
 
@@ -265,7 +277,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. $join
 				. ' WHERE c.published = 1'
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. ' AND c.parent_id = '.$rootcat
+				. ' AND c.parent_id = '.$this->_rootcat
 				. $and
 				. $orderby
 				;
@@ -285,9 +297,6 @@ class FlexicontentModelFlexicontent extends JModel
 
 		$user = & JFactory::getUser();
 		
-		// Get the root category from this directory
-		$rootcat = JRequest::getVar('rootcat',false);
-		if(!$rootcat) $rootcat = $params->get('rootcat',FLEXI_J16GE ? 1:0);
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
@@ -314,7 +323,7 @@ class FlexicontentModelFlexicontent extends JModel
 				. $join
 				. ' WHERE c.published = 1'
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. ' AND c.parent_id = ' . $rootcat
+				. ' AND c.parent_id = ' . $this->_rootcat
 				. $and
 				;
 
