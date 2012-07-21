@@ -158,6 +158,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0&typeid='.$post['type_id'];
 				$this->setRedirect($link, $msg);
 			} else {
+				$msg = '';
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
 			}
