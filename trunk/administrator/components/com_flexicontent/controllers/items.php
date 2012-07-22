@@ -1056,6 +1056,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user	=& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model = $this->getModel('items');
+		$itemmodel = $this->getModel('item');
 		$msg = '';
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -1106,7 +1107,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		// Try to delete 
-		if ( count($auth_cid) && !$model->delete($auth_cid) ) {
+		if ( count($auth_cid) && !$model->delete($auth_cid, $itemmodel) ) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
 		} else {
 			$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );

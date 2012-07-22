@@ -31,6 +31,10 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		plgFlexicontent_fieldsText::onDisplayField($field, $item);
 	}
 	
+	// This function is called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item)
+	{
+	}
 	
 	function onDisplayField(&$field, &$item)
 	{

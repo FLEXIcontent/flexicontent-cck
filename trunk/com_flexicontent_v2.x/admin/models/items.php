@@ -669,6 +669,8 @@ class FlexicontentModelItems extends JModel
 		} else if ( $filter_stategrp=='orphan' ) {
 			$where[] = 'i.state NOT IN ('.(FLEXI_J16GE ? 2:-1).',-2,1,0,-3,-4,-5)';
 		} else {
+			$where[] = 'i.state <> -2';
+			$where[] = 'i.state <> '.(FLEXI_J16GE ? 2:-1);
 			if ( $filter_state ) {
 				if ( $filter_state == 'P' ) {
 					$where[] = 'i.state = 1';
@@ -1660,12 +1662,32 @@ class FlexicontentModelItems extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function delete($cid)
+	function delete($cid, &$itemmodel=null)
 	{
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
 			
+			// **********************************************************************************
+			// Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
+			// **********************************************************************************
+			if ($itemmodel)
+			{
+				foreach ($cid as $item_id)
+				{
+					$item = $itemmodel->getItem($item_id);
+					$fields = $itemmodel->getExtrafields($force=true);
+					foreach ($fields as $field) {
+						$field_type = $field->iscore ? 'core' : $field->field_type;
+						FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeDeleteField', array( &$field, &$item ));
+					}
+				}
+			}
+			
+			
+			// *********************************************
+			// Retrieve J2.5 asset before deleting the items
+			// *********************************************
 			if (FLEXI_J16GE) {
 				$query = 'SELECT asset_id FROM #__content'
 						. ' WHERE id IN ('. $cids .')'
@@ -1680,10 +1702,13 @@ class FlexicontentModelItems extends JModel
 				$assetidslist = implode(',', $assetids );
 			}
 			
+			
+			// **********************
+			// Remove basic item data
+			// **********************
 			$query = 'DELETE FROM #__content'
 					. ' WHERE id IN ('. $cids .')'
 					;
-
 			$this->_db->setQuery( $query );
 			
 			if(!$this->_db->query()) {
@@ -1691,19 +1716,24 @@ class FlexicontentModelItems extends JModel
 				return false;
 			}
 			
-			// remove items extended
+			
+			// *************************
+			// Remove extended item data
+			// *************************
 			$query = 'DELETE FROM #__flexicontent_items_ext'
 					. ' WHERE item_id IN ('. $cids .')'
 					;
-
 			$this->_db->setQuery( $query );
 			
 			if(!$this->_db->query()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
-			//remove assigned tag references
+			
+			
+			// ******************************
+			// Remove assigned tag references
+			// ******************************
 			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
 					.' WHERE itemid IN ('. $cids .')'
 					;
@@ -1714,7 +1744,10 @@ class FlexicontentModelItems extends JModel
 				return false;
 			}
 			
-			//remove assigned category references
+			
+			// ***********************************
+			// Remove assigned category references
+			// ***********************************
 			$query = 'DELETE FROM #__flexicontent_cats_item_relations'
 					.' WHERE itemid IN ('. $cids .')'
 					;
@@ -1725,7 +1758,10 @@ class FlexicontentModelItems extends JModel
 				return false;
 			}
 			
-			// delete also fields in fields_item relation
+			
+			// ****************************************************************
+			// Delete field data in flexicontent_fields_item_relations DB Table
+			// ****************************************************************
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations'
 					. ' WHERE item_id IN ('. $cids .')'
 					;
@@ -1735,8 +1771,11 @@ class FlexicontentModelItems extends JModel
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
-			// delete also versions
+			
+			
+			// **************************************************************************
+			// Delete VERSIONED field data in flexicontent_fields_item_relations DB Table
+			// **************************************************************************
 			$query = 'DELETE FROM #__flexicontent_items_versions'
 					. ' WHERE item_id IN ('. $cids .')'
 					;
@@ -1746,7 +1785,11 @@ class FlexicontentModelItems extends JModel
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
+			
+			
+			// ****************************
+			// Delete item version METADATA
+			// ****************************
 			$query = 'DELETE FROM #__flexicontent_versions'
 					. ' WHERE item_id IN ('. $cids .')'
 					;
@@ -1756,8 +1799,11 @@ class FlexicontentModelItems extends JModel
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
-			// delete also item ACL
+			
+			
+			// *****************************
+			// Delete item asset/ACL records
+			// *****************************
 			if (FLEXI_J16GE) {
 				$query 	= 'DELETE FROM #__assets'
 						. ' WHERE id in ('.$assetidslist.')'
@@ -1769,8 +1815,8 @@ class FlexicontentModelItems extends JModel
 						. ' AND axo IN ('. $cids .')'
 						;
 			}
-			
 			$this->_db->setQuery( $query );
+			
 			if(!$this->_db->query()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
