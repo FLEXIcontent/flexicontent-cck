@@ -158,7 +158,12 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</field>
-			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
+			<field name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULL_TEXT" description="FLEXI_FORCE_FULL_TEXT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_readmore" type="radio" default="" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>

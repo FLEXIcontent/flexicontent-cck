@@ -1433,6 +1433,7 @@ class ParentClassItem extends JModelAdmin
 			$item->fulltext		= '';
 		} else 	{
 			list($item->introtext, $item->fulltext) = preg_split($pattern, $data['text'], 2);
+			$item->fulltext = JString::strlen( trim($item->fulltext) ) ? '' : $item->fulltext;
 		}
 		
 		
@@ -1596,7 +1597,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// -- Creation Date
-		if ($item->created && strlen(trim( $item->created )) <= 10) {
+		if ($item->created && JString::strlen(trim( $item->created )) <= 10) {
 			$item->created 	.= ' 00:00:00';
 		}
 		if (FLEXI_J16GE) {
@@ -1609,7 +1610,7 @@ class ParentClassItem extends JModelAdmin
 		$item->created = $date->toMySQL();
 			
 		// -- Publish UP Date
-		if ($item->publish_up && strlen(trim( $item->publish_up )) <= 10) {
+		if ($item->publish_up && JString::strlen(trim( $item->publish_up )) <= 10) {
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		if (FLEXI_J16GE) {
@@ -1627,7 +1628,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		else if ($item->publish_down != $nullDate)
 		{
-			if (strlen(trim( $item->publish_down )) <= 10) {
+			if ( JString::strlen(trim( $item->publish_down )) <= 10 ) {
 				$item->publish_down .= ' 00:00:00';
 			}
 			if (FLEXI_J16GE) {
@@ -1938,17 +1939,17 @@ class ParentClassItem extends JModelAdmin
 						// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
 						if ($use_versioning) {
-							if ( isset($obj->value) && strlen(trim($obj->value)) ) {
+							if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
 								$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							}
 						}
 					}
-					//echo $field->field_type." - ".$field->name." - ".strlen(trim($obj->value))." ".$field->iscore."<br />";
+					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br />";
 					
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
 					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
 						unset($obj->version);
-						if ( isset($obj->value) && strlen(trim($obj->value)) ) {
+						if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
 							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							
 							// Save field value in all translating items, if current field is untranslatable
@@ -2169,6 +2170,7 @@ class ParentClassItem extends JModelAdmin
 				$jfdata['fulltext']	= '';
 			} else 	{
 				list($jfdata['introtext'], $jfdata['fulltext']) = preg_split($pattern, $jfdata['text'], 2);
+				$jfdata['fulltext'] = JString::strlen( trim($jfdata['fulltext']) ) ? '' : $jfdata['fulltext'];
 			}
 			
 			// Delete existing Joom!Fish translation data for the current item
@@ -2179,7 +2181,7 @@ class ParentClassItem extends JModelAdmin
 			// Apply new translation data
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
-				if ( !strlen(trim(str_replace("&nbsp;", "", strip_tags($jfdata[$fieldname])))) ) continue;   // skip empty content
+				if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags($jfdata[$fieldname])))) ) continue;   // skip empty content
 				//echo "<br><b>#__jf_content($fieldname) :</b><br>";
 				$query = "INSERT INTO #__jf_content (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote($jfdata[$fieldname]).", '".md5($item->{$fieldname})."', '', '$modified', '$modified_by', 1)";
@@ -2336,8 +2338,10 @@ class ParentClassItem extends JModelAdmin
 
 			if ($tagPos == 0) {
 				$row->introtext	= $text;
+				$row->fulltext  = '';
 			} else 	{
 				list($row->introtext, $row->fulltext) = preg_split($pattern, $text, 2);
+				$row->fulltext = JString::strlen( trim($row->fulltext) ) ? '' : $row->fulltext;
 			}
 		}
 		//$row->store();
@@ -2630,7 +2634,7 @@ class ParentClassItem extends JModelAdmin
 			break;
 			
 			case 'maintext': // main text
-			$value = (trim($item->fulltext) != '') ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
+			$value = JString::strlen( trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
 			$field->value = array($value);
 			break;
 		}

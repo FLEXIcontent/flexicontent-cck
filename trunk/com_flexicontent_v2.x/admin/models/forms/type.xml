@@ -22,7 +22,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
+			<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>

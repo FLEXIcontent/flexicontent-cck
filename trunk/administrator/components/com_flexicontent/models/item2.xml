@@ -29,7 +29,7 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT">
+		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
