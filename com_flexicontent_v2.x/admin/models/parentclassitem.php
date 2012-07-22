@@ -2701,21 +2701,22 @@ class ParentClassItem extends JModelAdmin
 			$use_versioning = $this->_cparams->get('use_versioning', 1);
 			$typeid = $this->get('type_id');   // Get item's type_id, loading item if neccessary
 			$typeid = $typeid ? $typeid : JRequest::getVar('typeid', 0, '', 'int');
-			//if (!$typeid) JError::raiseError(500, __FUNCTION__.'(): Cannot get type_id from item or typeid from HTTP Request');
+			$type_join = ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$typeid;
 			
 			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
-			$query = 'SELECT fi.*'
+			$query = 'SELECT  fi.*'
 					.' FROM #__flexicontent_fields AS fi'
-					.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id'  // Require field belonging to item type, we use join instead of left join
-					.' WHERE ftrel.type_id='.$typeid.' || fi.iscore=1'
-					.' AND fi.published = 1'        // Require field published
-					.' GROUP BY fi.id'
-					.' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+					.($typeid ? $type_join : '')            // Require field belonging to item type
+					.' WHERE fi.published = 1'              // Require field published
+					.($typeid ? '' : ' AND fi.iscore = 1')  // Get CORE fields when typeid not set
+					.' ORDER BY '. ($typeid ? 'ftrel.ordering, ' : '') .'fi.ordering, fi.name'
 					;
 			$this->_db->setQuery($query);
 			$fields = $this->_db->loadObjectList('name');
+			if ( $this->_db->getErrorNum() )  JFactory::getApplication()->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			
-			foreach ($fields as $field) {
+			foreach ($fields as $field)
+			{
 				$field->item_id		= (int)$this->_id;
 				// $version should be ZERO when versioning disabled, or when wanting to load the current version !!!
 				if ( (!$version || !$use_versioning) && $field->iscore) {

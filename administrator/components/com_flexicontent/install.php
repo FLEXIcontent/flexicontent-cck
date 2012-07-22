@@ -83,10 +83,6 @@ if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
 // install additional extensions
 for ($i = 0; $i < count($extensions); $i++) {
 	$extension =& $extensions[$i];
-	if (FLEXI_J16GE) {
-		$extension['installer']->setOverwrite(true);
-		$extension['installer']->setUpgrade(true);
-	}
 	if ($extension['installer']->install($extension['folder'])) {
 		$extension['status'] = true;
 	} else {
@@ -114,7 +110,7 @@ if ($error) {
 		</td>
 		<td valign="top" width="100%">
        	 	<strong>FLEXIcontent</strong><br/>
-       	 	<span>Flexible content management system for Joomla! 1.5</span><br />
+       	 	<span>Flexible content management system for Joomla! J1.5/J2.5</span><br />
         	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a><br/>
         	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
        	 	<span>Logo and icons</span><br />

@@ -34,7 +34,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 	// we add the component stylesheet to the installer
 	$css = JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css'; 
-	$document =& JFactory::getDocument(); 
+	$document = JFactory::getDocument(); 
 	$document->addStyleSheet($css);	
 	
 	// load english language file for 'com_flexicontent' component then override with current language file
@@ -52,19 +52,19 @@ $error = false;
 $extensions = array();
 
 // clear a cache
-$cache = & JFactory::getCache();
+$cache = JFactory::getCache();
 $cache->clean( 'com_flexicontent' );
 $cache->clean( 'com_flexicontent_tmpl' );
 $cache->clean( 'com_flexicontent_cats' );
 $cache->clean( 'com_flexicontent_items' );
 
 // reseting post installation session variables
-$session  =& JFactory::getSession();
+$session  = JFactory::getSession();
 $session->set('flexicontent.postinstall', false);
 $session->set('flexicontent.allplgpublish', false);
 
 // fix joomla 1.5 bug
-$this->parent->getDBO =& $this->parent->getDBO();
+$this->parent->getDBO = $this->parent->getDBO();
 
 // additional extensions
 $add_array =& $this->manifest->xpath('additional');
@@ -114,7 +114,7 @@ if ($error) {
 		</td>
 		<td valign="top" width="100%">
        	 	<strong>FLEXIcontent</strong><br/>
-       	 	<span>Flexible content management system for Joomla! J1.6/J1.7/J2.5</span><br />
+       	 	<span>Flexible content management system for Joomla! J1.5/J2.5</span><br />
         	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a><br/>
         	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
        	 	<span>Logo and icons</span><br />

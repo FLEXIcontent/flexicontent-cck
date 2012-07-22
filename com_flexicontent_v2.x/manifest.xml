@@ -2,14 +2,14 @@
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <extension type="component" version="1.6.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>15 July 2012</creationDate>
+	<creationDate>22 July 2012</creationDate>
 	<author>Emmanuel Danan</author>
 	<copyright>(C) 2009-2012 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.0 RC6 r1383</version>
-	<description>A flexible content management system for Joomla! J1.6/J1.7/J2.5</description>
+	<version>2.0 RC6 r1393</version>
+	<description>A flexible content management system for Joomla! J1.5/J2.5</description>
 
 	<languages folder="site/language">
 		<language tag="en-GB">en-GB.com_flexicontent.ini</language>
@@ -137,7 +137,7 @@
 	<plugin name="email" folder="plugins/email">Email field</plugin>
 	<plugin name="extendedweblink" folder="plugins/extendedweblink">Extended Weblink field</plugin>
 	<plugin name="file" folder="plugins/file">File field</plugin>
-	<plugin name="groupmarker" folder="plugins/groupmarker">Group marker</plugin>
+	<plugin name="groupmarker" folder="plugins/groupmarker">Group marker field</plugin>
 	<plugin name="image" folder="plugins/image">Image field</plugin>
 	<plugin name="linkslist" folder="plugins/linkslist">Links list field</plugin>
 	<plugin name="minigallery" folder="plugins/minigallery">Minigallery field</plugin>
