@@ -2467,32 +2467,32 @@ class FLEXIUtilities
 	}
 	
 	
-	function call_FC_Field_Func( $fieldname, $func, $args=null )
+	function call_FC_Field_Func( $fieldtype, $func, $args=null )
 	{
 		static $fc_plgs;
 		
-		if ( !isset( $fc_plgs[$fieldname] ) ) {
+		if ( !isset( $fc_plgs[$fieldtype] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldname);
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldname).'.php';
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldtype);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Cannot load FC Field: $fieldname\n Please correct field name"),'error');
+				$jAp->enqueueMessage(nl2br("Cannot load FC Field: $fieldtype\n Please correct field name"),'error');
 				return;
 			}
 			
 			// 2. Create plugin instance
-			$class = "plgFlexicontent_fields{$fieldname}";
+			$class = "plgFlexicontent_fields{$fieldtype}";
 			if( class_exists($class) ) {
 				// Create class name of the plugin
-				$className = 'plg'.'flexicontent_fields'.$fieldname;
+				$className = 'plg'.'flexicontent_fields'.$fieldtype;
 				// Create a plugin instance
 				$dispatcher = & JDispatcher::getInstance();
-				$fc_plgs[$fieldname] =  new $className($dispatcher, array());
+				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
-				$plugin_db_data = & JPluginHelper::getPlugin('flexicontent_fields',$fieldname);
-				$fc_plgs[$fieldname]->params = new JParameter($plugin_db_data->params);
+				$plugin_db_data = & JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
+				$fc_plgs[$fieldtype]->params = new JParameter($plugin_db_data->params);
 			} else {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
@@ -2501,40 +2501,40 @@ class FLEXIUtilities
 		}
 		
 		// 3. Execute only if it exists
-		$class = "plgFlexicontent_fields{$fieldname}";
+		$class = "plgFlexicontent_fields{$fieldtype}";
 		if(in_array($func, get_class_methods($class))) {
-			return call_user_func_array(array($fc_plgs[$fieldname], $func), $args);
+			return call_user_func_array(array($fc_plgs[$fieldtype], $func), $args);
 		}
 	}
 	
 	
 	/* !!! FUNCTION NOT DONE YET */
-	function call_Content_Plg_Func( $fieldname, $func, $args=null )
+	function call_Content_Plg_Func( $plgname, $func, $args=null )
 	{
 		static $content_plgs;
 		
-		if ( !isset( $content_plgs[$fieldname] ) ) {
+		if ( !isset( $content_plgs[$plgname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldname);
-			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($fieldname).'.php';
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($plgname);
+			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($plgname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $fieldname\n Please correct field name"),'error');
+				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Please correct field name"),'error');
 				return;
 			}
 			
 			// 2. Create plugin instance
-			$class = "plgContent{$fieldname}";
+			$class = "plgContent{$plgname}";
 			if( class_exists($class) ) {
 				// Create class name of the plugin
-				$className = 'plg'.'content'.$fieldname;
+				$className = 'plg'.'content'.$plgname;
 				// Create a plugin instance
 				$dispatcher = & JDispatcher::getInstance();
-				$content_plgs[$fieldname] =  new $className($dispatcher, array());
+				$content_plgs[$plgname] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
-				$plugin_db_data = & JPluginHelper::getPlugin('content',$fieldname);
-				$content_plgs[$fieldname]->params = new JParameter($plugin_db_data->params);
+				$plugin_db_data = & JPluginHelper::getPlugin('content',$plgname);
+				$content_plgs[$plgname]->params = new JParameter($plugin_db_data->params);
 			} else {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
@@ -2543,9 +2543,9 @@ class FLEXIUtilities
 		}
 		
 		// 3. Execute only if it exists
-		$class = "plgContent{$fieldname}";
+		$class = "plgContent{$plgname}";
 		if(in_array($func, get_class_methods($class))) {
-			return call_user_func_array(array($content_plgs[$fieldname], $func), $args);
+			return call_user_func_array(array($content_plgs[$plgname], $func), $args);
 		}
 	}
 	

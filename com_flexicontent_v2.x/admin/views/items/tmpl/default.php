@@ -75,37 +75,25 @@ function submitform(pressbutton)
 {
 	form = document.adminForm;
 	// If formvalidator activated
-	if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' )); ?>')
+	/*if( pressbutton == 'remove' ) {
+		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM__' )); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;
-		} else {
-			// Store the button task into the form
-			if (pressbutton) {
-				form.task.value=pressbutton;
-			}
+		}
+	}*/
 	
-			// Execute onsubmit
-			if (typeof form.onsubmit == "function") {
-				form.onsubmit();
-			}
-			// Submit the form
-			form.submit();
-		}
-	} else {
-		// Store the button task into the form
-		if (pressbutton) {
-			form.task.value=pressbutton;
-		}
-
-		// Execute onsubmit
-		if (typeof form.onsubmit == "function") {
-			form.onsubmit();
-		}
-		// Submit the form
-		form.submit();
+	// Store the button task into the form
+	if (pressbutton) {
+		form.task.value=pressbutton;
 	}
+
+	// Execute onsubmit
+	if (typeof form.onsubmit == "function") {
+		form.onsubmit();
+	}
+	// Submit the form
+	form.submit();
 }
 
 // delete active filter

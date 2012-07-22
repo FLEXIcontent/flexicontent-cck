@@ -217,7 +217,7 @@ class FlexicontentViewItems extends JView {
 			$ctrl_task = FLEXI_J16GE ? 'items.edit' : 'edit';
 			JToolBarHelper::editList($ctrl_task);
 		}
-		if ($CanDelete || $CanDeleteOwn) {
+		if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp == 'trashed' ) {
 			$ctrl_task = FLEXI_J16GE ? 'items.remove' : 'remove';
 			JToolBarHelper::deleteList('Are you sure?', $ctrl_task);
 		}
