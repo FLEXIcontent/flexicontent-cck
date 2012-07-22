@@ -209,7 +209,7 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</param>
-			<param name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTRO_TEXT" description="FLEXI_SHOW_HIDE_THE_INTRO_TEXT" menu="hide">
+			<param name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC" menu="hide">
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</param>

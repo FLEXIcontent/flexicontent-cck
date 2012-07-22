@@ -264,7 +264,7 @@ class FlexicontentFields
 		
 		// Append some values to the field object
 		$field->item_id 	= (int)$item->id;
-		$field->value 		= $values;
+		$field->value 		= $values;               // NOTE: currently ignored and overritten by all CORE fields
 		
 		// **********************************************************************************************
 		// Create field parameters in an optimized way, and also apply Type Customization for CORE fields
@@ -272,13 +272,18 @@ class FlexicontentFields
 		FlexicontentFields::loadFieldConfig($field, $item);
 		
 		
-		// ******************************************************************
-		// Create field html by calling the appropriate field plugin function
-		// ******************************************************************
+		// ***************************************************************************************************
+		// Create field HTML by calling the appropriate DISPLAY-CREATING field plugin method.
+		// NOTE 1: We will not pass the 'values' method parameter to the display-creating field method,
+		//         instead we have set it above as the 'value' field property
+		// NOTE 2: For CUSTOM fields the 'values' method parameter is prefered over the 'value' field property
+		//         For CORE field, both the above ('values' method parameter and 'value' field property) are
+		//         ignored and instead the other method parameters are used, along with the ITEM properties
+		// ****************************************************************************************************
 		if ($field->iscore == 1)  // CORE field
 		{
 			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
-			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ) );
+			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote, null, $method ) );
 		}
 		else                      // NON CORE field
 		{
@@ -434,7 +439,7 @@ class FlexicontentFields
 					}
 					$field = $items[$i]->fields[$f];
 					
-					// Set field values
+					// Set field values, currently, this exists for CUSTOM fields only, OR versioned CORE/CUSTOM fields too ...
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 					
 					// Render field (if already rendered above, the function will return result immediately)
