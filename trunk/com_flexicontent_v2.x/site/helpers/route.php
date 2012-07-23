@@ -46,8 +46,10 @@ class FlexicontentHelperRoute
 		// Get menu items pointing to the Flexicontent component
 		// NOTE: In J2.5 the method getItems() will return menu items that have language '*' (ALL) - OR - current user language,
 		// this is what we need, since using a menu item with incorrect language will cause problems withs SEF URLs ...
-		$component =& JComponentHelper::getComponent('com_flexicontent');
-		$menus	= &JApplication::getMenu('site', array());
+		// NOTE: In J1.5 the static method JSite::getMenu() will give an error,
+		// while JFactory::getApplication('site')->getMenu() will not return the frontend menus
+		$component = JComponentHelper::getComponent('com_flexicontent');
+		$menus = JApplication::getMenu('site', array());   // this will work in J1.5 backend too !!!
 		$_component_menuitems	= $menus->getItems(!FLEXI_J16GE ? 'componentid' : 'component_id', $component->id);
 		$_component_menuitems = $_component_menuitems ? $_component_menuitems : array();
 		
@@ -61,11 +63,15 @@ class FlexicontentHelperRoute
 		// Cache the result on multiple calls
 		static $_component_default_menuitem_id = null;
 		if ($_component_default_menuitem_id || $_component_default_menuitem_id===false) return $_component_default_menuitem_id;
-		$_component_default_menuitem_id = false;
 		
+		$_component_default_menuitem_id = false;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		$menus = JSite::getMenu();
-		$params =& JComponentHelper::getParams('com_flexicontent');
+		
+		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
+		$menus = JApplication::getMenu('site', array());   // this will work in J1.5 backend too !!!
+		
+		// Get preference for default menu item
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
 		
 		// 1. Case 0: Do not add any menu item id, if so configure in global options

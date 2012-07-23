@@ -154,7 +154,6 @@
 	<plugin name="fcloadmodule" folder="plugins/fcloadmodule">Load module field</plugin>
 	<plugin name="relateditems" folder="plugins/relateditems">Related Items field</plugin>
 	<plugin name="relateditems_backlinks" folder="plugins/relateditems_backlinks">Related Items Backlinks field</plugin>
-	<plugin name="hidden" folder="plugins/hidden">Hidden field Plugin for FLEXIcontent</plugin>
 
 	<plugin name="flexinotify" folder="plugins/flexicontent">Notifications plugin for FLEXIcontent (new!!!)</plugin>
 
