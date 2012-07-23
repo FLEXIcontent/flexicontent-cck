@@ -79,20 +79,23 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 					<tr>
 					
 					<?php if ($copy_behaviour == 'translate') : ?>
-						<td class="key"><?php echo JText::_( 'FLEXI_METHOD' ); ?></td>
-						<td>
+						<td class="key">
+							<?php echo JText::_( 'FLEXI_METHOD' ); ?>
 							<input type="hidden" name="method" value="99" /> <!-- METHOD number for traslate -->
+							<input type="hidden" name="initial_behaviour" value="copymove" /> <!-- a hidden field to give info to JS initialization code -->
+						</td>
+						<td>
 							<label for="method-duplicateoriginal">
-								<input id="method-duplicateoriginal" type="radio" name="translate_method" value="1" onclick="copyonly();" checked="checked" />
+								<input id="method-duplicateoriginal" type="radio" name="translate_method" value="1" onclick="copymove();" checked="checked" />
 								<?php echo JText::_( 'FLEXI_DUPLICATEORIGINAL' ); ?>
 							</label><br />
 							<label for="method-usejoomfish">
-								<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copyonly();" />
+								<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
 							</label><br />
 						<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : ?>
 							<label for="method-autotranslation">
-								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copyonly();" />
+								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
 							</label><br />
 						<?php endif; ?>
@@ -103,7 +106,10 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 						</td>
 					<?php else : ?>
 					
-						<td class="key"><?php echo JText::_( 'FLEXI_METHOD' ); ?></td>
+						<td class="key">
+							<?php echo JText::_( 'FLEXI_METHOD' ); ?>
+							<input type="hidden" name="initial_behaviour" value="copyonly" /> <!-- a hidden field to give info to JS initialization code -->
+						</td>
 						<td>
 							<label for="menus-copy" class="lang_box" >
 								<input id="menus-copy" type="radio" name="method" value="1" onclick="copyonly();" checked="checked" />

@@ -44,8 +44,16 @@ function secnomove() {
 }
 
 window.addEvent('domready', function(){
-	$('maincat').setProperty('disabled', 'disabled');
-	$('seccats').setProperty('disabled', 'disabled');
-	$('keepseccats0').setProperty('disabled', 'disabled');
-	$('keepseccats1').setProperty('disabled', 'disabled');
+	var initial_behaviour = $$('input[name=initial_behaviour]').get('value');
+	if      (initial_behaviour=='copyonly') copyonly();
+	else if (initial_behaviour=='copymove') copymove();
+	else if (initial_behaviour=='moveonly') moveonly();
+	
+	if (initial_behaviour!='copyonly' && $$('input[name=keepseccats]:checked').get('value') == 1) {
+		$('seccats').setProperty('disabled', 'disabled');
+	} else {
+		$('seccats').setProperty('disabled', '');
+	}
 });
+
+//var somefield = $$('input[name=somefield]:checked').map(function(e) { return e.value; });   // This is for checkboxes
