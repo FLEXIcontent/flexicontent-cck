@@ -560,9 +560,11 @@ class modFlexicontentHelper
 		$tag_ids = (!is_array($tag_ids)) ? array($tag_ids) : $tag_ids ;
 
 		// date scope parameters
-		$date_type 			= (int)$params->get('date_type', 0);
-		$bdate 				= $params->get('bdate', '');
-		$edate 				= $params->get('edate', '');
+		$date_type	= (int)$params->get('date_type', 0);
+		$bdate 			= $params->get('bdate', '');
+		$edate 			= $params->get('edate', '');
+		$raw_bdate	= $params->get('raw_bdate', 0);
+		$raw_edate	= $params->get('raw_edate', 0);
 		$behaviour_dates 	= $params->get('behaviour_dates', 0);
 		$date_compare 		= $params->get('date_compare', 0);
 		// Server date		
@@ -608,7 +610,7 @@ class modFlexicontentHelper
 			}
 		}
 		
-		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW) || ($option == 'com_nutrition' && $view == 'frAliment');
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
 		
 		// *** NON-STATIC behavior, get current item information ***
 		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && $isflexi_itemview ) {
@@ -860,39 +862,6 @@ class modFlexicontentHelper
 				} else {
 					return;
 				}
-			/*
-			** BOF adaptation spécifique pour le com_nutrition de Valérie
-			*/
-			} elseif (($option == 'com_nutrition') && ($view == 'frAliment')) {
-				// select the tags associated to the aliment
-				$query2 = 'SELECT tid' .
-						' FROM #__nut_fr_tags_item_relations' .
-						' WHERE alimentid = '.(int) $id;
-				$db->setQuery($query2);
-				$tags = $db->loadResultArray();
-				
-				unset($related);
-				if ($tags) {
-					$where2 = (count($tags) > 1) ? ' AND tid IN ('.implode(',', $tags).')' : ' AND tid = '.$tags[0];
-					
-					// select the tags associated to the item
-					$query3 = 'SELECT DISTINCT itemid' .
-							' FROM #__flexicontent_tags_item_relations' .
-							' WHERE itemid <> '.(int) $id .
-							$where2
-							;
-					$db->setQuery($query3);
-					$related = $db->loadResultArray();
-				}
-								
-				if (isset($related) && count($related)) {
-					$where .= (count($related) > 1) ? ' AND i.id IN ('.implode(',', $related).')' : ' AND i.id = '.$related[0];
-				} else {
-					return;
-				}
-			/*
-			** EOF adaptation spécifique pour le com_nutrition de Valérie
-			*/
 			} else {			
 				return;
 			}
@@ -931,18 +900,18 @@ class modFlexicontentHelper
 		// date scope
 		if (!$behaviour_dates) {
 			
-			if ($edate && !FLEXIUtilities::isSqlValidDate($edate)) {
+			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
 				$edate = '';
 			} else if ($edate) {
-				$where .= ' AND ( i.'.$comp.' = '.$db->Quote($nullDate).' OR i.'.$comp.' <= '.$db->Quote($edate).' )';
+				$where .= ' AND ( i.'.$comp.' = '.$db->Quote($nullDate).' OR i.'.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
 			}
 			
-			if ($bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
+			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
 				$bdate = '';
 			} else if ($bdate) {
-				$where .= ' AND ( i.'.$comp.' = '.$db->Quote($nullDate).' OR i.'.$comp.' >= '.$db->Quote($bdate).' )';
+				$where .= ' AND ( i.'.$comp.' = '.$db->Quote($nullDate).' OR i.'.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
 			}
 			
 		} else {

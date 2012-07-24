@@ -16,6 +16,11 @@
 //no direct access
 defined('_JEXEC') or die('Restricted access');
 
+// load english language file for 'mod_flexiadvsearch' component then override with current language file
+JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, 'en-GB', true);
+JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
+
+// initialize various variables
 $layout       = $params->get('layout', 'default');
 $button       = $params->get('button', '');
 $button_text  = $params->get('button_text', '');
@@ -45,4 +50,5 @@ if ($useitemid = $params->get('useitemid', '0'))
 	$mitemid = $set_Itemid > 0 ? $set_Itemid : JRequest::getInt('Itemid');
 }
 
+// include the helper only once
 require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
