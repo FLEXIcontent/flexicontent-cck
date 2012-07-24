@@ -241,6 +241,7 @@ class FlexicontentViewFlexicontent extends JView
 		
 		// assign Rights to the template
 		$this->assignRef('permission'		, $permission);
+		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);
 
@@ -397,7 +398,7 @@ class FlexicontentViewFlexicontent extends JView
 		if($params->get('show_updatecheck', 1) == 1) {
 			$cache = & JFactory::getCache('com_flexicontent');
 			$cache->setCaching( 1 );
-			$cache->setLifeTime( 100 );
+			$cache->setLifeTime( 600 );
 			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
 			$this->assignRef('check'		, $check);
 		}
