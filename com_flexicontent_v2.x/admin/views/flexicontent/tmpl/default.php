@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 363 2010-07-05 15:40:10Z Matthieu.26 $
+ * @version 1.5 stable $Id: default.php 1319 2012-05-26 19:27:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -28,8 +28,10 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	echo '</div>';
 	return false;
 }
+$user =& JFactory::getUser();
+$ctrl = FLEXI_J16GE ? 'items.' : '';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
-//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -159,7 +161,10 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				echo $this->loadTemplate('postinstall');
 				echo $this->pane->endPanel();
 			}
+			?>
 			
+			
+			<?php
 			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
 			echo $this->pane->startPanel( $title, 'pending' );
 			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
@@ -169,13 +174,21 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 			<?php
 					$k = 0;
 					$n = count($this->pending);
-					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->pending[$i];
-						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('edit', $rights);
-						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						$row = $this->pending[$i];
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
 						<td>
@@ -210,13 +223,21 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				<?php
 					$k = 0;
 					$n = count($this->revised);
-					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->revised[$i];
-						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('edit', $rights);
-						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -251,13 +272,21 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				<?php
 					$k = 0;
 					$n = count($this->inprogress);
-					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->inprogress[$i];
-						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('edit', $rights);
-						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -292,13 +321,21 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				<?php
 					$k = 0;
 					$n = count($this->draft);
-					$user =& JFactory::getUser();
 					for ($i=0, $n; $i < $n; $i++) {
 						$row = $this->draft[$i];
-						$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-						$canEdit 		= in_array('edit', $rights);
-						$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-						$link		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -343,19 +380,20 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
+									jQuery('#displayfversion').parent().css('height', 'auto');
 								}
 							});
 						}
 					});
 				});
 				");
-				echo $this->pane->startPane( 'stat-pane' );
 				echo $this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
 				echo "<div id=\"displayfversion\"></div>";
 				echo $this->pane->endPanel();
-				echo $this->pane->endPane();
 			}
 			?>
+				
+				<?php echo $this->pane->endPane();?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
@@ -366,6 +404,9 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 					<br />
 					Marvelic Engine<br />
 					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.">www.marvelic.co.th</a>
+					<br /><br />
+					Georgios Papadakis<br />
+					<a class="hasTip" href="mailto:ggppdk@..." title="Send me an email::Please no support request!!!">ggppdk AT ...com</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a></p>

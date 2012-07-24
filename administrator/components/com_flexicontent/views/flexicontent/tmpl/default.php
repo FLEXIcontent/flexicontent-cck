@@ -28,8 +28,12 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	echo '</div>';
 	return false;
 }
+$user =& JFactory::getUser();
+$ctrl = FLEXI_J16GE ? 'items.' : '';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
+$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
 ?>
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
@@ -198,17 +202,20 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					$k = 0;
 					$n = count($this->pending);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->pending[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->pending[$i];
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 			?>
 					<tr>
 						<td>
@@ -244,17 +251,20 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					$k = 0;
 					$n = count($this->revised);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->revised[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->revised[$i];
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -290,17 +300,20 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					$k = 0;
 					$n = count($this->inprogress);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->inprogress[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->inprogress[$i];
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -336,17 +349,20 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 					$k = 0;
 					$n = count($this->draft);
 					for ($i=0, $n; $i < $n; $i++) {
-					$row = $this->draft[$i];
-					if (FLEXI_ACCESS) {
-						$user =& JFactory::getUser();
-						$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-						$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
-						$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
-					} else {
-						$canEdit	= 1;
-						$canEditOwn	= 1;
-					}
-					$link 		= 'index.php?option=com_flexicontent&amp;controller=items&amp;task=edit&amp;cid[]='. $row->id;
+						$row = $this->draft[$i];
+						if (FLEXI_J16GE) {
+							$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
+							$canEdit 		= in_array('edit', $rights);
+							$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
+						} else if (FLEXI_ACCESS) {
+							$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
+							$canEdit 		= in_array('edit', $rights) || ($user->gid > 24);
+							$canEditOwn		= (in_array('editown', $rights) && ($row->created_by == $user->id)) || ($user->gid > 24);
+						} else {
+							$canEdit	= 1;
+							$canEditOwn	= 1;
+						}
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
 					<tr>
 						<td>
@@ -373,116 +389,38 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 				
 			<?php
 			if($this->params->get('show_updatecheck', 1) == 1) {	 
-				if($this->check['connect'] == 0) {
+				/*if(@$this->check['connect'] == 0) {
 					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
 				} else {
-					if ($this->check['current'] >= 0 ) {	 
+					if (@$this->check['current'] == 0 ) {	 
 						$title = JText::_( 'FLEXI_VERSION_OK' );
 					} else {
 						$title = JText::_( 'FLEXI_NEW_VERSION' );
 					}
-				}
-			echo $this->pane->startPane( 'stat-pane' );
-			echo $this->pane->startPanel( $title, 'updatecomponent' );
-			?>
-            
-			<?php
-				if($this->check['connect'] == 0) {
-				?>
-					<table class="adminlist">
-						<thead>
-								<tr>
-									<th colspan="2">
-									<?php echo JText::_( 'FLEXI_VERSION' ); ?>
-									</th>
-								</tr>
-						</thead>
-						<tbody>
-							<tr>
-							<td colspan="2">
-								<?php
-									echo '<b><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></b>';
-								?>
-							</td>
-							</tr>
-						</tbody>
-					</table>
-				<?php
-				} elseif ($this->check['enabled'] == 1) {
-				?>
-			
-			<table class="adminlist">
-		<thead>
-				<tr>
-					<th colspan="2">
-					<?php echo JText::_( 'FLEXI_UPDATE_CHECK' ); ?>
-					</th>
-				</tr>
-		</thead>
-		<tbody>
-			<tr>
-			<td width="33%">
-				<?php
-		  			if ($this->check['current'] == 0 ) {		  				
-						echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-checkin.png', NULL, 'width=32');
-		  			} elseif( $this->check['current'] == -1 ) {
-		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
-		  			} else {
-		  				echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
-		  			}
-		  		?>
-			</td>
-			<td>
-				<?php
-		  			if ($this->check['current'] == 0) {
-		  				echo '<strong><font color="green">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</font></strong>';
-		  			} elseif( $this->check['current'] == -1 ) {
-		  				echo '<b><font color="red">'.JText::_( 'FLEXI_OLD_VERSION_INSTALLED' ).'</font></b>';
-		  			} else {
-		  				echo '<b><font color="darkred">'.JText::_( 'You have installed a newer version than the latest officially stable version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</font></b>';
-		  			}
-		  		?>
-			</td>
-			</tr>
-			<tr>
-				<td width="33%">
-					<?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?>
-				</td>
-				<td>
-					<?php echo $this->check['version']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td width="33%">
-					<?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?>
-				</td>
-				<td>
-					<?php echo $this->check['current_version']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td width="33%">
-					<?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?>
-				</td>
-				<td>
-					<?php echo $this->check['released']; ?>
-				</td>
-			</tr>
-            
-           
-	</tbody>
-</table>
-			<?php 
-			} 
-			?>
-			<?php
-			echo $this->pane->endPanel();
+				}*/
+				$this->document->addScriptDeclaration("
+				jQuery(document).ready(function () {
+					jQuery('#updatecomponent').click(function(e){
+						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
+							jQuery('#displayfversion').html('<p class=\"qf_centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+							jQuery.ajax({
+								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
+								success: function(str) {
+									jQuery('#displayfversion').html(str);
+									jQuery('#displayfversion').parent().css('height', 'auto');
+								}
+							});
+						}
+					});
+				});
+				");
+				echo $this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
+				echo "<div id=\"displayfversion\"></div>";
+				echo $this->pane->endPanel();
 			}
-			
 			?>
-                
-				<?php echo $this->pane->endPane();
-				?>
+				
+				<?php echo $this->pane->endPane();?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>

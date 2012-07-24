@@ -212,15 +212,6 @@ class FlexicontentViewFlexicontent extends JView
 		//Create Submenu
 		FLEXISubmenu('notvariable');
 		
-		// Updatecheck
-		if($params->get('show_updatecheck', 1) == 1) {
-			$cache = & JFactory::getCache('com_flexicontent');
-			$cache->setCaching( 1 );
-			$cache->setLifeTime( 100 );
-			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
-			$this->assignRef('check'		, $check);
-		}
-		
 		// Lists
 		jimport('joomla.filesystem.folder');
 		$lists 		= array();
@@ -300,6 +291,7 @@ class FlexicontentViewFlexicontent extends JView
 		$this->assignRef('CanComments'	, $CanComments);
 		$this->assignRef('CanImport'	, $CanImport);
 		$this->assignRef('CanIndex'		, $CanIndex);
+		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);
 
@@ -456,7 +448,7 @@ class FlexicontentViewFlexicontent extends JView
 		if($params->get('show_updatecheck', 1) == 1) {
 			$cache = & JFactory::getCache('com_flexicontent');
 			$cache->setCaching( 1 );
-			$cache->setLifeTime( 100 );
+			$cache->setLifeTime( 600 );
 			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
 			$this->assignRef('check'		, $check);
 		}
