@@ -24,9 +24,12 @@ $start_microtime = microtime(true);
 global $fc_content_plg_microtime;
 $fc_content_plg_microtime = 0;
 
-global $globalcats;
+// load english language file for 'mod_flexicontent' component then override with current language file
+JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, 'en-GB', true);
+JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, null, true);
 
-// initialize
+// initialize various variables
+global $globalcats;
 $document 	=& JFactory::getDocument();
 $config 	=& JFactory::getConfig();
 $caching 	= $config->getValue('config.caching', 0);

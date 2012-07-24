@@ -32,7 +32,7 @@ if (FLEXI_J16GE) {
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JElementFcdate extends JElement
+class JFormFieldFcdate extends JFormField
 {
 	/**
 	 * Element name
@@ -40,9 +40,9 @@ class JElementFcdate extends JElement
 	 * @var		string
 	 */
 	
-	var	$_name = 'Fcdate';
+	var $type = 'Fcdate';
 
-	function fetchElement($name, $value, &$node, $control_name)
+	public function getInput()
 	{
 		$document =& JFactory::getDocument();
 		if (FLEXI_J16GE) {

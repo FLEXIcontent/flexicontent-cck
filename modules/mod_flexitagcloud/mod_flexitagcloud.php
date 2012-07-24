@@ -22,9 +22,14 @@ defined('_JEXEC') or die('Restricted access');
 // Logging Info variables
 $start_microtime = microtime(true);
 
-//Include the only once
+// load english language file for 'mod_flexitagcloud' component then override with current language file
+JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, 'en-GB', true);
+JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, null, true);
+
+// include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
+// initialize various variables
 $document 	= & JFactory::getDocument();
 $config 	=& JFactory::getConfig();
 $caching 	= $config->getValue('config.caching', 0);
