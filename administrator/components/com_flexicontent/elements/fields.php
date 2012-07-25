@@ -55,7 +55,7 @@ class JElementFields extends JElement
 		
 		$and = ((boolean)@$attributes['isnotcore']) ? ' AND iscore = 0' : '';
 		if ((boolean)@$attributes['fieldnameastext']) {
-			$text = 'CONCAT(label, \'(\', `name`, \')\')';
+			$text = 'CONCAT(label, \' [\', `name`, \']\')';
 		} else {
 			$text = 'label';
 		}
