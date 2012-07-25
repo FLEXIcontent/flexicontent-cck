@@ -68,7 +68,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="skiponempty_fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" />
+			<param name="skiponempty_fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" />
 			<param name="maxskipcount" type="text" default="50" size="4" label="FLEXI_MAX_SKIP_COUNT" description="FLEXI_MAX_SKIP_COUNT_DESC" />
 			<param name="onempty_fields_combination" type="radio" default="any" label="FLEXI_EMPTY_FIELDS_COMBINATION" description="FLEXI_EMPTY_FIELDS_COMBINATION_DESC">
 				<option value="any">FLEXI_SKIP_ON_ANY_EMPTY</option>
@@ -135,7 +135,7 @@
 				<option value="2">FLEXI_EXCLUDE</option>
 				<option value="3">FLEXI_INCLUDE</option>
 			</param>
-			<param name="authors" type="text" default="" size="60" label="FLEXI_AUTHORS" description="FLEXI_AUTHORS_DESC" />
+			<param name="authors" type="text" default="" size="50" label="FLEXI_AUTHORS" description="FLEXI_AUTHORS_DESC" />
 			<param name="behaviour_auth" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
 				<option value="1">FLEXI_SAME_AUTHOR</option>
@@ -148,7 +148,7 @@
 				<option value="2">FLEXI_EXCLUDE</option>
 				<option value="3">FLEXI_INCLUDE</option>
 			</param>
-			<param name="items" type="text" default="" size="60" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
+			<param name="items" type="text" default="" size="50" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
 			<param name="behaviour_items" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
 				<option value="1">FLEXI_RELATED_COMMON_TAGS</option>
@@ -174,11 +174,11 @@
 				<option value="0">FLEXI_DATE_STRING</option>
 				<option value="1">FLEXI_DATE_EXPRESSION</option>
 			</param>
-			<param name="bdate" type="fcdate" size="60" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" />
-			<param name="edate" type="fcdate" size="60" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" />
+			<param name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" />
+			<param name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" />
 			
-			<param name="behaviour_dates" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
-				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
+			<param name="behaviour_dates" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC">
+				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_SERVER_OR_ITEM</option>
 				<option value="1">FLEXI_OFFSET</option>
 				<option value="2">FLEXI_SAME_MONTH</option>
 				<option value="3">FLEXI_SAME_YEAR</option>
@@ -190,12 +190,14 @@
 			<param name="date_type" type="radio" default="0" label="FLEXI_DATE_TYPE" description="FLEXI_DATE_TYPE_DESC">
 				<option value="0">FLEXI_DATE_CREATED</option>
 				<option value="1">FLEXI_DATE_MODIFIED</option>
-				<option value="2">FLEXI_DATE_PUBLISHED</option>
+				<option value="2">FLEXI_DATE_PUBLISH_UP</option>
+				<option value="3">FLEXI_CUSTOM_DATE_FIELD</option>
 			</param>
-			<param name="date_compare" type="radio" default="0" label="FLEXI_DATE_COMPARE" description="FLEXI_DATE_COMPARE_DESC">
-				<option value="0">FLEXI_DATE_NOW</option>
-				<option value="1">FLEXI_DATE_ITEM</option>
+			<param name="date_compare" type="radio" default="0" label="FLEXI_DATE_COMPARE_DYNAMIC" description="FLEXI_DATE_COMPARE_DESC">
+				<option value="0">FLEXI_CURRENT_SERVER_DATE</option>
+				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</param>
+			<param name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_SELECT_DATECOMP_FIELD" description="FLEXI_SELECT_DATECOMP_FIELD_DESC" />
 		
 	  <param name="" type="jparamstab" description="FLEXI_ITEMLIST_DISPLAY_PARAMS" />
 			<param name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
@@ -390,7 +392,7 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
-			<param name="fields" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
+			<param name="fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 			
 			<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
 			<param name="use_fields_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
@@ -402,7 +404,7 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
-			<param name="fields_feat" type="textarea" cols="45" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
+			<param name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 		
 	  <param name="" type="jparamstab" description="FLEXI_CAT_DISPLAY_PARAMS" />
 		
@@ -517,11 +519,11 @@
 			<param name="more_css" type="textarea" cols="30" rows="3" default="" label="FLEXI_MOD_MORE_CSS" description="FLEXI_MOD_MORE_CSS_DESC" />
 		
 	  <param name="" type="jparamstab" description="FLEXI_CUSTOM_PARAMS" />
-			<param name="custom1" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM1" description="FLEXI_CUSTOM_DESC" />
-			<param name="custom2" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM2" description="FLEXI_CUSTOM_DESC" />
-			<param name="custom3" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM3" description="FLEXI_CUSTOM_DESC" />
-			<param name="custom4" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM4" description="FLEXI_CUSTOM_DESC" />
-			<param name="custom5" type="textarea" cols="45" rows="2" default="" label="FLEXI_CUSTOM5" description="FLEXI_CUSTOM_DESC" />
+			<param name="custom1" type="textarea" cols="35" rows="2" default="" label="FLEXI_CUSTOM1" description="FLEXI_CUSTOM_DESC" />
+			<param name="custom2" type="textarea" cols="35" rows="2" default="" label="FLEXI_CUSTOM2" description="FLEXI_CUSTOM_DESC" />
+			<param name="custom3" type="textarea" cols="35" rows="2" default="" label="FLEXI_CUSTOM3" description="FLEXI_CUSTOM_DESC" />
+			<param name="custom4" type="textarea" cols="35" rows="2" default="" label="FLEXI_CUSTOM4" description="FLEXI_CUSTOM_DESC" />
+			<param name="custom5" type="textarea" cols="35" rows="2" default="" label="FLEXI_CUSTOM5" description="FLEXI_CUSTOM_DESC" />
 		
 		<param name="" type="jparamstab" description="FLEXI_MOD_ADVANCED" />
 			<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
