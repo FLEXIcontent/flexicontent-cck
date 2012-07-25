@@ -700,9 +700,10 @@ class ParentClassItem extends JModelAdmin
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
 				$db->setQuery($query);
 				$creator_data = $db->loadResultArray();
-				$item->creator = $creator_data[0];
-				$item->creatoremail = $creator_data[0];
-	
+				$creator_found = count($creator_data);
+				$item->creator = $creator_found ? $creator_data[0] : '';
+				$item->creatoremail = $creator_found ? $creator_data[0] : '';
+				
 				// Retrieve Modifier NAME
 				if ($item->created_by == $item->modified_by) {
 					$item->modifier = $item->creator;
@@ -2094,6 +2095,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// ***********************************************************************************************************
 		// Delete only category relations which are not part of the categories array anymore to avoid loosing ordering
+		// ***********************************************************************************************************
 		$cats = $data['categories'];
 		$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
 			. ' WHERE itemid = '.$item->id
@@ -2578,67 +2580,68 @@ class ParentClassItem extends JModelAdmin
 		}
 		switch ($field->field_type) {
 			case 'created': // created
-			$field->value = array($item->created);
+			$field_value = array($item->created);
 			break;
 			
 			case 'createdby': // created by
-			$field->value = array($item->created_by);
+			$field_value = array($item->created_by);
 			break;
 
 			case 'modified': // modified
-			$field->value = array($item->modified);
+			$field_value = array($item->modified);
 			break;
 			
 			case 'modifiedby': // modified by
-			$field->value = array($item->modified_by);
+			$field_value = array($item->modified_by);
 			break;
 
 			case 'title': // title
-			$field->value = array($item->title);
+			$field_value = array($item->title);
 			break;
 
 			case 'hits': // hits
-			$field->value = array($item->hits);
+			$field_value = array($item->hits);
 			break;
 
 			case 'type': // document type
-			$field->value = array($item->type_id);
+			$field_value = array($item->type_id);
 			break;
 
 			case 'version': // version
-			$field->value = array($item->version);
+			$field_value = array($item->version);
 			break;
 
 			case 'state': // publication state
-			$field->value = array($item->state);
+			$field_value = array($item->state);
 			break;
 
 			case 'voting': // voting button // remove dummy value in next version for legacy purposes
-			$field->value = array('button'); // dummy value to force display
+			$field_value = array('button'); // dummy value to force display
 			break;
 
 			case 'favourites': // favourites button // remove dummy value in next version for legacy purposes
-			$field->value = array('button'); // dummy value to force display
+			$field_value = array('button'); // dummy value to force display
 			break;
 
 			case 'score': // voting score // remove dummy value in next version for legacy purposes
-			$field->value = array('button'); // dummy value to force display
+			$field_value = array('button'); // dummy value to force display
 			break;
 			
 			case 'categories': // assigned categories
-			$field->value = isset($item->categories) ? $item->categories : array();
+			$field_value = isset($item->categories) ? $item->categories : array();
 			break;
 
 			case 'tags': // assigned tags
-			$field->value = isset($item->tags) ? $item->tags : array();
+			$field_value = isset($item->tags) ? $item->tags : array();
 			break;
 			
 			case 'maintext': // main text
 			$value = JString::strlen( trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
-			$field->value = array($value);
+			$field_value = array($value);
 			break;
 		}
-		return array();
+		
+		return $field_value;
 	}
 	
 	
@@ -2721,7 +2724,7 @@ class ParentClassItem extends JModelAdmin
 				// $version should be ZERO when versioning disabled, or when wanting to load the current version !!!
 				if ( (!$version || !$use_versioning) && $field->iscore) {
 					// load CURRENT (non-versioned) core field from item data
-					$this->getCoreFieldValue($field, $version);
+					$field->value = $this->getCoreFieldValue($field, $version);
 				} else {
 					// Load non core field (versioned or non-versioned) OR core field (versioned only)
 					

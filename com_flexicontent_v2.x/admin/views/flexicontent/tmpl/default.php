@@ -388,7 +388,7 @@ $this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.m
 				});
 				");
 				echo $this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
-				echo "<div id=\"displayfversion\"></div>";
+				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
 				echo $this->pane->endPanel();
 			}
 			?>

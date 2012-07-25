@@ -154,7 +154,7 @@
 				<option value="0">FLEXI_No</option>
 				<option value="1">FLEXI_Yes</option>
 			</param>
-			<param name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULL_TEXT" description="FLEXI_FORCE_FULL_TEXT_DESC">
+			<param name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>

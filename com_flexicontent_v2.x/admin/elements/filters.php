@@ -41,7 +41,7 @@ class JFormFieldFilters extends JFormFieldList
 	 */
 	protected $type = 'Filters';
 
-	function getOptions()
+	function getInput()
 	{
 		$doc	= & JFactory::getDocument();
 		$db		= & JFactory::getDBO();
