@@ -60,12 +60,12 @@ class FlexicontentViewItem extends JView
 			$pane 		= & JPane::getInstance('sliders');
 		}
 		
+		JHTML::_('behavior.mootools');
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-			JHTML::_('behavior.mootools');
-			$document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+			$document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 		}
-		// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-		//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 		
 		//JHTML::_('behavior.formvalidation'); // we use custom validation class
 		JHTML::_('behavior.tooltip');

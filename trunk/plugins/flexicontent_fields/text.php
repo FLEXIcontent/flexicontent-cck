@@ -14,16 +14,16 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsText extends JPlugin{
-	
+class plgFlexicontent_fieldsText extends JPlugin
+{
 	function plgFlexicontent_fieldsText( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
-	
 	
 	function onAdvSearchDisplayField(&$field, &$item)
 	{
@@ -36,28 +36,25 @@ class plgFlexicontent_fieldsText extends JPlugin{
 	{
 	}
 	
+	// This function is called to display the field in item edit/submit form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
-		$required 			= $field->parameters->get( 'required', 0 ) ;
 		$size				= $field->parameters->get( 'size', 30 ) ;
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
+		$default_value	= $field->parameters->get( 'default_value', '' ) ;
 		$default_value_use= $field->parameters->get( 'default_value_use', '' ) ;
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
-
-		if($pretext) { $pretext = $remove_space ? '' : $pretext . ' '; }
-		if($posttext) {	$posttext = $remove_space ? ' ' : ' ' . $posttext . ' '; }
-		$required 	= $required ? ' required' : '';
-
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
+		
 		// initialise property
 		if( ( $item->version < 2 || $default_value_use > 0) && strlen($default_value)) {
 			$field->value = array();
@@ -67,14 +64,14 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			$field->value[0] = '';
 		} else {
 			for ($n=0; $n<count($field->value); $n++) {
-				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );			
+				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );
 			}
 		}
 		
+		$document	= & JFactory::getDocument();
+		
 		if ($multiple) // handle multiple records
 		{
-			$document	= & JFactory::getDocument();
-
 			//add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
@@ -89,11 +86,12 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			$document->addScriptDeclaration($js);
 
 			$js = "
-			var curRowNum".$field->id."	= ".count($field->value).";
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
 
 			function addField".$field->id."(el) {
-				if((curRowNum".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
+				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
@@ -117,24 +115,26 @@ class plgFlexicontent_fieldsText extends JPlugin{
 							this.start({ 'opacity': 1 });
 						});
 
-					curRowNum".$field->id."++;
+					rowCount".$field->id."++;       // incremented / decremented
+					uniqueRowNum".$field->id."++;   // incremented only
 					}
 				}
 
-			function deleteField".$field->id."(el) {
-				if(curRowNum".$field->id." > 1) {
-
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-					}).chain(function(){
-						row.remove();
-					});
-				curRowNum".$field->id."--;
+			function deleteField".$field->id."(el)
+			{
+				if(rowCount".$field->id." > 1)
+				{
+					var field	= $(el);
+					var row		= field.getParent();
+					var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+					
+					fx.start({
+						'height': 0,
+						'opacity': 0
+						}).chain(function(){
+							row.remove();
+						});
+					rowCount".$field->id."--;
 				}
 			}
 			";
@@ -146,7 +146,8 @@ class plgFlexicontent_fieldsText extends JPlugin{
 				clear:both;
 				list-style: none;
 				height: 20px;
-				}
+				position: relative !important;
+			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			';
 			$document->addStyleDeclaration($css);
@@ -154,16 +155,16 @@ class plgFlexicontent_fieldsText extends JPlugin{
 			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 			$n = 0;
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
-
+			
 			foreach ($field->value as $value) {
-				$field->html	.= '<li>'.$pretext.'<input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />'.$posttext.'<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span></li>';
+				$field->html	.= '<li><input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' /><input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span></li>';
 				$n++;
 			}
 			$field->html .=	'</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
-			$field->html	= '<div>'.$pretext.'<input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' />'.$posttext.'</div>';
+			$field->html	= '<div><input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' /></div>';
 		}
 	}
 
@@ -174,6 +175,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		if($field->field_type != 'text') return;
 		if(!$post) return;
 		
+		// reformat the post
 		$newpost = array();
 		$new = 0;
 		
@@ -189,23 +191,24 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		$post = $newpost;
 		
 		// create the fulltext search index
-		$searchindex = '';
-		
-		foreach ($post as $v)
-		{
-			$searchindex .= $v;
-			$searchindex .= ' ';
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			foreach($post as $i => $v)
+			{
+				$searchindex .= $v;
+				$searchindex .= ' ';
+			}
+			$searchindex .= ' | ';
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
 		}
-
-		$searchindex .= ' | ';
-
-		$field->search = $field->issearch ? $searchindex : '';
-
+		
 		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
 			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
 		}
 	}
-	
 	
 	function onIndexAdvSearch(&$field, $post) {
 		// execute the code only if the field type match the plugin type
@@ -225,12 +228,11 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		return true;
 	}
 
-
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'text') return;
-
+		
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
@@ -240,7 +242,7 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
@@ -281,13 +283,17 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		
 		// initialise property
 		$field->{$prop} = array();
-		
 		$n = 0;
-		foreach ($values as $value) {
+		foreach ($values as $value)
+		{
+			if ( empty($value) ) continue;
+			
 			$field->{$prop}[]	= strlen($values[$n]) ? $pretext.$values[$n].$posttext : '';
 			$n++;
 		}
-		if($field->{$prop}) {
+		
+		// Apply seperator and open/close tags
+		if(count($field->{$prop})) {
 			$field->{$prop}  = implode($separatorf, $field->{$prop});
 			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 		} else {
@@ -325,8 +331,8 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		
 	}
 	
-	
-	function onFLEXIAdvSearch(&$field, $fieldsearch) {
+	function onFLEXIAdvSearch(&$field, $fieldsearch)
+	{
 		if($field->field_type!='text') return;
 		$db = &JFactory::getDBO();
 		$resultfields = array();
@@ -347,5 +353,5 @@ class plgFlexicontent_fieldsText extends JPlugin{
 		}
 		$field->results = $resultfields;
 	}
-
+	
 }

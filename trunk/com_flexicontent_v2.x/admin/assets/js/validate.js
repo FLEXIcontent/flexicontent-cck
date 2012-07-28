@@ -174,11 +174,12 @@ var JFormValidator = new Class({
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
 		form.getElements('input,textarea,select,button').each(function(el){
+			el = document.id(el);
 			if (el.hasClass('required')) {
 				el.set('aria-required', 'true');
 				el.set('required', 'required');
 			}
-			if ((document.id(el).get('tag') == 'input' || document.id(el).get('tag') == 'button') && document.id(el).get('type') == 'submit') {
+			if ((el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit') {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}

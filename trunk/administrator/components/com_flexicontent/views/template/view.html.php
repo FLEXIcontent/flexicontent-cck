@@ -31,12 +31,13 @@ class FlexicontentViewTemplate extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
-
+		
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$mainframe = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
 		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');

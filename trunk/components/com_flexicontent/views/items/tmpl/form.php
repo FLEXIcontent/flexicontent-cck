@@ -30,11 +30,12 @@ if ($return) {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
 }
 
-if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-1.7.1.min.js');
-	$this->document->addCustomTag('<script>jQuery.noConflict();</script>');    // ALREADY include in above file, but done again
-}
 JHTML::_('behavior.mootools');
+if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+	// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+	//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+}
 
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {

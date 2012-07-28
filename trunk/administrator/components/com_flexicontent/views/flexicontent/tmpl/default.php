@@ -17,9 +17,12 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 $mainframe = &JFactory::getApplication();
-$template	= $mainframe->getTemplate();
-$option = JRequest::getVar('option');
+$option    = JRequest::getVar('option');
+$user      = JFactory::getUser();
+$template  = $mainframe->getTemplate();
+
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
 {
@@ -28,10 +31,17 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	echo '</div>';
 	return false;
 }
-$user =& JFactory::getUser();
+
+JHTML::_('behavior.mootools');
+if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+	$this->document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+	// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+	//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
+}
+
 $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
-$this->document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
