@@ -252,6 +252,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			break;
 		}
 		
+		static $item_field_arr = null;
 		static $js_and_css_added = false;
 		
 		$slideshowtype = $field->parameters->get( 'slideshowtype', 'Flash' );// default is normal slideshow
@@ -291,49 +292,55 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$controller = $field->parameters->get( 'controller', '1' );
 			$controller = $controller ? 'true' : 'false';
 			$otheroptions = $field->parameters->get( 'otheroptions', '' );
-			
-			$css = "
-			#$htmltag_id {
-				width: ".$w_l."px;
-				height: ".$h_l."px;
-				margin-".$marginpos.": ".(($marginval+8)*$series)."px;
-			}
-			";
-			
-			if ($thumbposition==2 || $thumbposition==4) {
-				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: 100%; width: ".($series_size+4)."px; top:0px; }";
-				$css .= "div .slideshow-thumbnails ul { width: ".$series_size."px; }";
-				$css .= "div .slideshow-thumbnails ul li {  }";
-			} else if ($thumbposition==1 || $thumbposition==3) {
-				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: ".$series_size."px; }";
-				if ($series > 1) $css .= "div .slideshow-thumbnails ul { width:100%!important; }";
-				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
-			} else { // inside TODO
-				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($marginval+8)."px; height: ".($h_s+8)."px; top:0px; z-index:100; }";
-				$css .= "div .slideshow-thumbnails ul { width: 100%!important;}";
-				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
-			}
 
-			$document->addStyleDeclaration($css);
 
-			$otheroptions .= ($otheroptions?','.$otheroptions:'');
-			$js = "
-		  	window.addEvent('domready',function(){
-				var options = {
-					delay: ".$field->parameters->get( 'delay', 4000 ).",
-					hu:'{$mediapath}/',
-					transition:'{$transition}:{$t_dir}',
-					duration: ".$field->parameters->get( 'duration', 1000 ).", 
-					width: {$w_l},
-					height: {$h_l},
-					thumbnails: {$thumbnails},
-					controller: {$controller}
-					{$otheroptions}
+			if ( !isset($item_field_arr[$item->id][$field->id]) )
+			{
+				$item_field_arr[$item->id][$field->id] = 1;
+			
+				$css = "
+				#$htmltag_id {
+					width: ".$w_l."px;
+					height: ".$h_l."px;
+					margin-".$marginpos.": ".(($marginval+8)*$series)."px;
 				}
-				show = new {$slideshowClass}('{$htmltag_id}', null, options);
-			});
-			";
-			$document->addScriptDeclaration($js);
+				";
+				
+				if ($thumbposition==2 || $thumbposition==4) {
+					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: 100%; width: ".($series_size+4)."px; top:0px; }";
+					$css .= "div .slideshow-thumbnails ul { width: ".$series_size."px; }";
+					$css .= "div .slideshow-thumbnails ul li {  }";
+				} else if ($thumbposition==1 || $thumbposition==3) {
+					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: ".$series_size."px; }";
+					if ($series > 1) $css .= "div .slideshow-thumbnails ul { width:100%!important; }";
+					$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
+				} else { // inside TODO
+					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($marginval+8)."px; height: ".($h_s+8)."px; top:0px; z-index:100; }";
+					$css .= "div .slideshow-thumbnails ul { width: 100%!important;}";
+					$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
+				}
+	
+				$document->addStyleDeclaration($css);
+	
+				$otheroptions .= ($otheroptions?','.$otheroptions:'');
+				$js = "
+			  	window.addEvent('domready',function(){
+					var options = {
+						delay: ".$field->parameters->get( 'delay', 4000 ).",
+						hu:'{$mediapath}/',
+						transition:'{$transition}:{$t_dir}',
+						duration: ".$field->parameters->get( 'duration', 1000 ).", 
+						width: {$w_l},
+						height: {$h_l},
+						thumbnails: {$thumbnails},
+						controller: {$controller}
+						{$otheroptions}
+					}
+					show = new {$slideshowClass}('{$htmltag_id}', null, options);
+				});
+				";
+				$document->addScriptDeclaration($js);
+			}
 			
 			$display = array();
 			$thumbs = array();

@@ -1,14 +1,17 @@
 /**
-* @version		$Id: validate.js 11 2009-06-14 10:25:23Z vistamedia $
-* @package		Joomla
-* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
-* Joomla! is free software. This version may have been modified pursuant
-* to the GNU General Public License, and as distributed it includes or
-* is derivative of works licensed under the GNU General Public License or
-* other free or open source software licenses.
-* See COPYRIGHT.php for copyright notices and details.
-*/
+ * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+Object.append(Browser.Features, {
+	inputemail: (function() {
+		var i = document.createElement("input");
+		i.setAttribute("type", "email");
+		return i.type !== "text";
+	})()
+});
+
+var tab_focused;
 
 /**
  * Unobtrusive Form Validation library
@@ -50,7 +53,7 @@ var JFormValidator = new Class({
 
 		this.setHandler('email',
 			function (value) {
-				regex=/^[a-zA-Z0-9._-]+@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
+				regex=/^[a-zA-Z0-9._-]+(\+[a-zA-Z0-9._-]+)*@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
 				return regex.test(value);
 			}
 		);
@@ -170,50 +173,71 @@ var JFormValidator = new Class({
 	attachToForm: function(form)
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
-		$A(form.elements).each(function(el){
-			el = $(el);
-			if ((el.get('tag') == 'input' || el.get('tag') == 'button') && el.getProperty('type') == 'submit') {
+		form.getElements('input,textarea,select,button').each(function(el){
+			if (el.hasClass('required')) {
+				el.set('aria-required', 'true');
+				el.set('required', 'required');
+			}
+			if ((document.id(el).get('tag') == 'input' || document.id(el).get('tag') == 'button') && document.id(el).get('type') == 'submit') {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}
 			} else {
 				el.addEvent('blur', function(){return document.formvalidator.validate(this);});
+				if (el.hasClass('validate-email') && Browser.Features.inputemail) {
+					el.type = 'email';
+				}
 			}
 		});
 	},
 
 	validate: function(el)
 	{
-	  // Declare the variable if not already / IE8 validation fix by ggppdk ;)
-	  el = $(el);
-	  // If the field is required make sure it has a value
-	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
-	      if ($(el).hasClass('required')) {
-	         if (!($(el).get('value')) || ($(el).get('value') == false)) {
-	            this.handleResponse(false, el);
-	            return false;
-	         }
-	      }
-	  }
-	
-	  
-	  // Only validate the field if the validate class is set
-	  var handler = (el.className && el.className.search(/validate-([a-zA-Z0-9\_\-]+)/) != -1) ? el.className.match(/validate-([a-zA-Z0-9\_\-]+)/)[1] : "";      
-	  if (handler == '') {
-	     this.handleResponse(true, el);
-	     return true;
-	  }
-	
-	  // Check the additional validation types
+		if(MooTools.version>="1.2.4") {
+		  el = document.id(el);
+			el_value = el.get('value');
+		} else {
+			document.id = $;
+		  el = document.id(el);
+			el.get = el.getProperty;
+			el.set = el.setProperty;
+			el_value = el.getValue();
+		}
+		
+		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
+		if(el.get('disabled')) {
+			this.handleResponse(true, el);
+			return true;
+		}
+
+		// If the field is required make sure it has a value
+		if (el.hasClass('required')) {
+			if(el.get('type') == 'radio' || el.get('type') == 'checkbox') {
+				// Checked specially bellow
+			}
+			else if (!el_value || el_value == false) {
+				this.handleResponse(false, el);
+				return false;
+			}
+		}
+
+		// Only validate the field if the validate class is set
+		var handler = (el.className && el.className.search(/validate-([a-zA-Z0-9\_\-]+)/) != -1) ? el.className.match(/validate-([a-zA-Z0-9\_\-]+)/)[1] : "";
+		if (handler == '') {
+			this.handleResponse(true, el);
+			return true;
+		}
+
+		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
 	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
-	     if ((handler) && (handler != 'none') && (this.handlers[handler]) && $(el).get('value')) {
-	        // Execute the validation handler and return result
-	        if (this.handlers[handler].exec($(el).get('value')) != true) {
-	           this.handleResponse(false, el);
-	           return false;
-	        }
-	     }
+			if ((handler) && (handler != 'none') && (this.handlers[handler]) && el_value) {
+				// Execute the validation handler and return result
+				if (this.handlers[handler].exec(el_value) != true) {
+					this.handleResponse(false, el);
+					return false;
+				}
+			}
 	  } else {
 	     if ((handler) && (handler != 'none') && (this.handlers[handler])) {
 	        if(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox"){
@@ -227,29 +251,30 @@ var JFormValidator = new Class({
 	     }
 	  }
 	
-	  // Return validation state
-	  this.handleResponse(true, el);
-	  return true;
+		// Return validation state
+		this.handleResponse(true, el);
+		return true;
 	},
-   
-   
+
 	isValid: function(form)
 	{
 		var valid = true;
+		tab_focused = false; // global variable defined above, we use this to focus the first tab that contains required field
 
 		// Validate form fields
-		for (var i=0;i < form.elements.length; i++) {
-			if (this.validate(form.elements[i]) == false) {
-				//alert(form.elements[i].name);
+		var elements = form.getElements('fieldset').concat(Array.from(form.elements));
+		for (var i=0;i < elements.length; i++) {
+			if (this.validate(elements[i]) == false) {
+				tab_focused = true;
 				valid = false;
 			}
 		}
 
 		// Run custom form validators if present
-		$A(this.custom).each(function(validator){
-			/*if (validator.exec() != true) {
+		new Hash(this.custom).each(function(validator){
+			if (validator.exec() != true) {
 				valid = false;
-			}*/
+			}
 		});
 
 		return valid;
@@ -257,11 +282,24 @@ var JFormValidator = new Class({
 
 	handleResponse: function(state, el)
 	{
+		// Extra code for auto-focusing the tab that contains the first field to fail the validation
+		if (typeof jQuery != 'undefined' && state === false && tab_focused === false) {
+			var tabcont = jQuery(el).closest("div.tabbertab");
+			if (tabcont.length != 0) {
+				var tabcontid = tabcont.attr('id');
+				var tabno = (tabcontid.search(/grpmarker([0-9]+)/) != -1) ? tabcontid.match(/grpmarker([0-9]+)/)[1] : "";
+				fctabber.tabShow(tabno);
+			}
+		}
+		
 		// Find the label object for the given field if it exists
 		if (!(el.labelref)) {
 			var labels = $$('label');
 			labels.each(function(label){
-				if (label.getProperty('for') == el.getProperty('name') || label.getProperty('for') == el.getProperty('id') || label.getProperty('for')+'[]' == el.getProperty('name')) {
+				if (label.get('for') == el.get('id') ||
+						label.get('for') == el.get('name') ||
+						label.get('for')+'[]' == el.get('name')
+				) {
 					el.labelref = label;
 				}
 			});
@@ -270,13 +308,17 @@ var JFormValidator = new Class({
 		// Set the element and its label (if exists) invalid state
 		if (state == false) {
 			el.addClass('invalid');
+			el.set('aria-invalid', 'true');
 			if (el.labelref) {
-				$(el.labelref).addClass('invalid');
+				document.id(el.labelref).addClass('invalid');
+				document.id(el.labelref).set('aria-invalid', 'true');
 			}
 		} else {
 			el.removeClass('invalid');
+			el.set('aria-invalid', 'false');
 			if (el.labelref) {
-				$(el.labelref).removeClass('invalid');
+				document.id(el.labelref).removeClass('invalid');
+				document.id(el.labelref).set('aria-invalid', 'false');
 			}
 		}
 	}

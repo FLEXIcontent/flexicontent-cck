@@ -233,10 +233,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			break;
 		}
 
-		
+		static $item_field_arr = null;
 		static $js_and_css_added = false;
 		
-	  
 		if ($values)
 		{
 			if (!$js_and_css_added) {
@@ -267,46 +266,51 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$thumbbox_id = "slideshowThumbbox_".$field->name."_".$item->id;
 			$mingalobj = "mingalshow_".$field->name."_".$item->id;
 			
-		  $js = "
-		  	var ".$mingalobj.";
-		  	window.addEvent('domready',function(){
-					var obj = {
-						wait: ".$field->parameters->get( 'wait', 4000 ).", 
-						effect: '".$field->parameters->get( 'effect', 'fade' )."',
-						direction: '".$field->parameters->get( 'direction', 'right' )."',
-						duration: ".$field->parameters->get( 'duration', 1000 ).", 
-						loop: ".$field->parameters->get( 'loop', 'true' ).", 
-						thumbnails: true,
-						backgroundSlider: true
-					}
-					show = new SlideShow('$htmltag_id','$slidethumb',obj);
-					show.play();
-					".$mingalobj." = show;
-				});
-			";
-			$document->addScriptDeclaration($js);
-			
-			$css = "
-			#$htmltag_id {
-				width: ".$w_l."px;
-				height: ".$h_l."px;
-				margin-".$marginpos.": 5px;
-			}
-			.mingalcontrolbox {
-				width: ".($w_l-4)."px;
-				".( ($thumbposition == 2) ? "margin-left:".($w_s+14) : "" )."px;
-				".( ($thumbposition != 3) ? "margin-top:".(4) : "" )."px;
-			}
-			";
+			if ( !isset($item_field_arr[$item->id][$field->id]) )
+			{
+				$item_field_arr[$item->id][$field->id] = 1;
+				
+			  $js = "
+			  	var ".$mingalobj.";
+			  	window.addEvent('domready',function(){
+						var obj = {
+							wait: ".$field->parameters->get( 'wait', 4000 ).", 
+							effect: '".$field->parameters->get( 'effect', 'fade' )."',
+							direction: '".$field->parameters->get( 'direction', 'right' )."',
+							duration: ".$field->parameters->get( 'duration', 1000 ).", 
+							loop: ".$field->parameters->get( 'loop', 'true' ).", 
+							thumbnails: true,
+							backgroundSlider: true
+						}
+						show = new SlideShow('$htmltag_id','$slidethumb',obj);
+						show.play();
+						".$mingalobj." = show;
+					});
+				";
+				$document->addScriptDeclaration($js);
+				
+				$css = "
+				#$htmltag_id {
+					width: ".$w_l."px;
+					height: ".$h_l."px;
+					margin-".$marginpos.": 5px;
+				}
+				.mingalcontrolbox {
+					width: ".($w_l-4)."px;
+					".( ($thumbposition == 2) ? "margin-left:".($w_s+14) : "" )."px;
+					".( ($thumbposition != 3) ? "margin-top:".(4) : "" )."px;
+				}
+				";
+		
+				if ($thumbposition == 1 || $thumbposition == 3) {
+					$css .= "#thumbnails { width: ".$w_l."px; }";
+				}
+				if ($thumbposition == 2 || $thumbposition == 4) {
+					$css .= ".$htmltag_id { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
+				}
 	
-			if ($thumbposition == 1 || $thumbposition == 3) {
-				$css .= "#thumbnails { width: ".$w_l."px; }";
+				$document->addStyleDeclaration($css);
 			}
-			if ($thumbposition == 2 || $thumbposition == 4) {
-				$css .= ".$htmltag_id { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
-			}
-
-			$document->addStyleDeclaration($css);
 			
 			$display = array();
 

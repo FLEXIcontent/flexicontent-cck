@@ -81,7 +81,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx			 = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					
 					thisNewField.getElements('input.emailaddr').setProperty('value','');
 					thisNewField.getElements('input.emailaddr').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][addr]');
@@ -155,12 +155,13 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				} else {
 					$value = array('addr' => $value, 'text' => '');
 				}
+				$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 				$field->html .= '
 				<li>
-					<span class="legende">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</span>
-					<input class="emailaddr'.$required.'" name="'.$field->name.'['.$n.'][addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
-					<span class="legende">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</span>
-					<input class="emailtext'.$required.'" name="'.$field->name.'['.$n.'][text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
+					<label class="legende" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
+					<input class="emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
+					<label class="legende" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
+					<input class="emailtext'.$required.'" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 					<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>
 				</li>';
 				$n++;
@@ -177,11 +178,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			} else {
 				$field->value[0] = array('addr' => $field->value[0], 'text' => '');
 			}
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][0]' : $field->name.'[0]';
 			$field->html	= '<div>'
 				.JText::_( 'FLEXI_FIELD_EMAILADDRESS' )
-				.': <input name="'.$field->name.'[0][addr]" class="emailaddr'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['addr'].'" /> '
+				.': <input name="'.$fieldname.'[addr]" class="emailaddr'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['addr'].'" /> '
 				.JText::_( 'FLEXI_FIELD_EMAILTITLE' )
-				.': <input name="'.$field->name.'[0][text]" class="emailtext'.$required.'" type="text" size="'.$size.'" value="'.@$field->value[0]['text'].'" />'
+				.': <input name="'.$fieldname.'[text]" class="emailtext'.$required.'" type="text" size="'.$size.'" value="'.@$field->value[0]['text'].'" />'
 				.'</div>';
 		}
 	}
@@ -197,7 +199,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 		foreach ($post as $n=>$v)
 		{
-			if ($post[$n] != '')
+			if ($post[$n]['addr'] != '')
 			{
 				$newpost[$new] = $post[$n];
 			}
