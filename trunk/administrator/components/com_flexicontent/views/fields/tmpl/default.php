@@ -242,6 +242,8 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 
 	</table>
 
+	<sup>[1]</sup> <?php echo JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'); ?><br />
+	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="fields" />

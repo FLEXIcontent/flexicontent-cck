@@ -581,7 +581,7 @@ window.addEvent('domready', function() {
 				<?php echo $row->type_name; ?>
 			</td>
 			<td align="center" class="col_state">
-			<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= 30) ); ?>
+			<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
 			<?php if ($extra_img) : ?><img style='float:right;' src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="hasTip" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" /><?php endif; ?>
 			</td>
 			
@@ -707,11 +707,12 @@ window.addEvent('domready', function() {
 		</tr>
 	</table>
 	
-	<sup>[1]</sup> Not Set. Using template defined by item's TYPE.<br />
-	<sup>[2]</sup> The inline item state opener is disabled when you are displaying more than 30 items<br />
+	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
+	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />
 	<?php if ( $enable_translation_groups )	: ?>
-		<sup>[3]</sup> Click to sort this column and group associated translations together<br />
+		<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
 	<?php endif; ?>
+	<sup>[4]</sup> <?php echo JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'); ?></><br />
 		
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

@@ -608,6 +608,14 @@ class FlexicontentControllerFields extends FlexicontentController
 			$cache->clean();
 		}
 		
+		$mainframe = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
+		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		if ($filter_type) {
+			$mainframe->setUserState( $option.'.fields.filter_type', '' );
+			$msg .= ' '.JText::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
+		}
 		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg );
 	}
 }

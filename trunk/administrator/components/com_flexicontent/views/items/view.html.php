@@ -32,16 +32,17 @@ class FlexicontentViewItems extends JView {
 	function display($tpl = null)
 	{
 		global $globalcats;
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
+		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 
 		//initialise variables
-		$user 		= & JFactory::getUser();
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$option		= JRequest::getCmd( 'option' );
-		$task		= JRequest::getVar('task', '');
-		$cid		= JRequest::getVar('cid', array());
-		$extlimit	= JRequest::getInt('extlimit', 100);
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd( 'option' );
+		$task     = JRequest::getVar('task', '');
+		$cid      = JRequest::getVar('cid', array());
+		$extlimit = JRequest::getInt('extlimit', 100);
 		
 		if($task == 'copy') {
 			$this->setLayout('copy');
@@ -54,7 +55,6 @@ class FlexicontentViewItems extends JView {
 
 		//get vars
 		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
 		$default_order = $cparams->get('items_manager_order', 'i.ordering');
 		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
 		
@@ -85,7 +85,25 @@ class FlexicontentViewItems extends JView {
 		$filter_id 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 	'filter_id', 		'', 			'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
+		
+		$inline_ss_max = 30;
+		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		{
+			$limit = $mainframe->getUserStateFromRequest( $option.'.items.limit',	'limit',	0, 'int' );
+			$notice_iss_disabled = $mainframe->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
+			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
+				$mainframe->setUserState( $option.'.items.notice_iss_disabled', 1 );
+				$mainframe->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'message');
+			}
+			
+			$notice_define_item_order = 30;
+			$notice_define_item_order = $mainframe->getUserStateFromRequest( $option.'.items.notice_define_item_order',	'notice_define_item_order',	0, 'int' );
+			if (!$notice_define_item_order) {
+				$mainframe->setUserState( $option.'.items.notice_define_item_order', 1 );
+				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'), 'message');
+			}
+		}
+		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
@@ -370,6 +388,7 @@ class FlexicontentViewItems extends JView {
 		$this->assignRef('filter_cats'		, $filter_cats);
 		$this->assignRef('filter_subcats'	, $filter_subcats);
 		$this->assignRef('filter_lang'		, $filter_lang);
+		$this->assignRef('inline_ss_max'	, $inline_ss_max);
 		$this->assignRef('scope'			, $scope);
 		$this->assignRef('search'			, $search);
 		$this->assignRef('date'				, $date);
