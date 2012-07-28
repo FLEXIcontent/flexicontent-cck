@@ -28,19 +28,24 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewTemplate extends JView {
-	function display($tpl = null) {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
 
+	function display($tpl = null)
+	{
+		
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$mainframe = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		
+		JHTML::_('behavior.mootools');
 		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-			JHTML::_('behavior.mootools');
-			$document->addScript('components/com_flexicontent/assets/js/jquery-1.6.2.min.js');
+			$document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 		}
-		$document->addCustomTag('<script>jQuery.noConflict();</script>');
+		
 		if(!isset($document->jquery_ui_core)){
 			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
 			$document->jquery_ui_core = true;
@@ -92,7 +97,6 @@ class FlexicontentViewTemplate extends JView {
 					$jssort[] = 'storeordering(jQuery("#sortable-'.$v.'"))';
 				}
 			}
-			
 			$positions = implode(',', $idsort);
 			
 			$jssort = implode("; ", $jssort);

@@ -24,28 +24,41 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
+	
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'email') return;
 		plgFlexicontent_fieldsEmail::onDisplayField($field, $item);
 	}
+	
+	// This function is called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item)
+	{
+	}
+	
+	// This function is called to display the field in item edit/submit form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'email') return;
-
+		
+		$field->label = JText::_($field->label);
+		
 		// some parameter shortcuts
 		$size				= $field->parameters->get( 'size', 30 ) ;
+		$default_value	= $field->parameters->get( 'default_value', '' ) ;
+		$default_title	= $field->parameters->get( 'default_value_title', '' ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
-		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
 		
 		// initialise property
 		if($item->version < 2 && $default_value) {
 			$field->value = array();
-			$field->value[0]['addr'] = $default_value;
-			$field->value[0]['text'] = '';
+			$field->value[0]['addr'] = JText::_($default_value);
+			$field->value[0]['text'] = JText::_($default_title);
 			$field->value[0] = serialize($field->value[0]);
 		} elseif (!$field->value) {
 			$field->value = array();
@@ -72,12 +85,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$document->addScriptDeclaration($js);
 
 			$js = "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";
-			var curRowNum".$field->id."	= ".count($field->value).";
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
 
 			function addField".$field->id."(el) {
-				if((curRowNum".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
+				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
@@ -85,6 +98,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					
 					thisNewField.getElements('input.emailaddr').setProperty('value','');
 					thisNewField.getElements('input.emailaddr').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][addr]');
+					
 					thisNewField.getElements('input.emailtext').setProperty('value','');
 					thisNewField.getElements('input.emailtext').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][text]');
 
@@ -105,24 +119,26 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 							this.start({ 'opacity': 1 });
 						});
 
-					curRowNum".$field->id."++;
+					rowCount".$field->id."++;       // incremented / decremented
+					uniqueRowNum".$field->id."++;   // incremented only
 					}
 				}
 
-			function deleteField".$field->id."(el) {
-				if(curRowNum".$field->id." > 1) {
-
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-					}).chain(function(){
-						row.destroy();
-					});
-				curRowNum".$field->id."--;
+			function deleteField".$field->id."(el)
+			{
+				if(rowCount".$field->id." > 1)
+				{
+					var field	= $(el);
+					var row		= field.getParent();
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					
+					fx.start({
+						'height': 0,
+						'opacity': 0
+						}).chain(function(){
+							row.destroy();
+						});
+					rowCount".$field->id."--;
 				}
 			}
 			";
@@ -134,14 +150,16 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				clear:both;
 				list-style: none;
 				height: 20px;
-				}
+				position: relative !important;
+			}
 			#sortables_'.$field->id.' li.sortabledisabled {
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-				}
+			}
 			#sortables_'.$field->id.' li input { cursor: text;}
-			li input.emailaddr, li input.emailtext, li input.fcfield-button {
-				float:none;
-			} 
+			label.legende, input.emailaddr, input.emailtext, input.fcfield-button {
+				float: none!important;
+				display: inline-block!important;
+			}
 			';
 			$document->addStyleDeclaration($css);
 
@@ -161,7 +179,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					<label class="legende" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
 					<input class="emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
 					<label class="legende" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
-					<input class="emailtext'.$required.'" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
+					<input class="emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 					<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>
 				</li>';
 				$n++;
@@ -170,23 +188,21 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 
 		} else { // handle single records
-			$css = 'li input.emailaddr, li input.emailtext { float:none; }';
-			$document->addStyleDeclaration($css);
-			
 			if ( @unserialize($field->value[0])!== false || $field->value[0] === 'b:0;' ) {
 				$field->value[0] = unserialize($field->value[0]);
 			} else {
 				$field->value[0] = array('addr' => $field->value[0], 'text' => '');
 			}
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][0]' : $field->name.'[0]';
-			$field->html	= '<div>'
-				.JText::_( 'FLEXI_FIELD_EMAILADDRESS' )
-				.': <input name="'.$fieldname.'[addr]" class="emailaddr'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0]['addr'].'" /> '
-				.JText::_( 'FLEXI_FIELD_EMAILTITLE' )
-				.': <input name="'.$fieldname.'[text]" class="emailtext'.$required.'" type="text" size="'.$size.'" value="'.@$field->value[0]['text'].'" />'
-				.'</div>';
+			$field->html	= '<div>
+				<label class="legende" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
+				<input class="emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$field->value[0]['addr'].'" />
+				<label class="legende" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
+				<input class="emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$field->value[0]['text'].'" />
+				</div>';
 		}
 	}
+
 
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
@@ -194,9 +210,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if($field->field_type != 'email') return;
 		if(!$post) return;
 		
+		// reformat the post
 		$newpost = array();
 		$new = 0;
-
+		
+		if(!is_array($post)) $post = array ($post);
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n]['addr'] != '')
@@ -206,26 +224,69 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$new++;
 		}
 		$post = $newpost;
-
+		
+		// create the fulltext search index
+		if ($field->issearch) {
+			$searchindex = '';
+			
+			foreach($post as $i => $v)
+			{
+				$searchindex .= $v['addr'];
+				$searchindex .= ' ';
+				$searchindex .= $v['text'];
+				$searchindex .= ' ';
+			}
+			$searchindex .= ' | ';
+			$field->search = $searchindex;
+		} else {
+			$field->search = '';
+		}
+		
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+		if($field->isadvsearch && $data['vstate']==2) {
+			plgFlexicontent_fieldsEmail::onIndexAdvSearch($field, $post);
+		}
+		
+		// Serialize multiproperty data before storing into the DB
 		foreach($post as $i => $v) {
 			$post[$i] = serialize($v);
 		}
 	}
+	
+	function onIndexAdvSearch(&$field, $post) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'email') return;
+		$db = &JFactory::getDBO();
+		$post = is_array($post)?$post:array($post);
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='email';";
+		$db->setQuery($query);
+		$db->query();
+		$i = 0;
+		foreach($post as $v) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','email','{$i}', ".$db->Quote($v).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		return true;
+	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'email') return;
-
-		$values = $values ? $values : $field->value ;
+		
+		$field->label = JText::_($field->label);
+		
+		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
-		$separatorf			= $field->parameters->get( 'separatorf' ) ;
-		$opentag				= $field->parameters->get( 'opentag', '' ) ;
-		$closetag				= $field->parameters->get( 'closetag', '' ) ;
 		$default_value_title =	JText::_( $field->parameters->get( 'default_value_title', '' ) );
-						
+		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		$usetitle			= $field->parameters->get( 'use_title', 0 ) ;
+		
 		switch($separatorf)
 		{
 			case 0:
@@ -252,8 +313,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
-
-		$field->{$prop} = array();		
+		
+		// initialise property
+		$field->{$prop} = array();
+		$n = 0;
 		foreach ($values as $value)
 		{
 			if ( empty($value) ) continue;
@@ -269,22 +332,47 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			}
 			
 			// If a custom displayed text was not set above then set it to 'default_value_title'
-			if (empty($text)) $text = $default_value_title;
+			if (empty($text)) $text = JText::_($default_value_title);
 			
 			// Created cloacked email address with custom displayed text
-			if ( !empty($text) ) {
+			if ( !empty($text) && $usetitle ) {
 				$field->{$prop}[]	= JHTML::_('email.cloak', $addr, 1, $text, 0);
 			} else {
 				$field->{$prop}[]	= JHTML::_('email.cloak', $addr);
 			}
+			$n++;
 		}
 		
 		// Apply seperator and open/close tags
-		if($field->{$prop}) {
+		if(count($field->{$prop})) {
 			$field->{$prop}  = implode($separatorf, $field->{$prop});
 			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
 	}
+	
+	function onFLEXIAdvSearch(&$field, $fieldsearch)
+	{
+		if($field->field_type!='email') return;
+		$db = &JFactory::getDBO();
+		$resultfields = array();
+		foreach($fieldsearch as $fsearch) {
+			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
+				." WHERE ai.field_id='{$field->id}' AND ai.extratable='email' AND ai.search_index like '%{$fsearch}%';";
+			$db->setQuery($query);
+			$objs = $db->loadObjectList();
+			if ($objs===false) continue;
+			$objs = is_array($objs)?$objs:array($objs);
+			foreach($objs as $o) {
+				$obj = new stdClass;
+				$obj->item_id = $o->item_id;
+				$obj->label = $field->label;
+				$obj->value = $fsearch;
+				$resultfields[] = $obj;
+			}
+		}
+		$field->results = $resultfields;
+	}
+	
 }

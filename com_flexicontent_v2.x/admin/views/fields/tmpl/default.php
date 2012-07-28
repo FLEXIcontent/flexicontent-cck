@@ -57,7 +57,7 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="<?php echo $this->permission->CanOrderFields ? '90' : '60'; ?>" class="center">
-				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
+				<?php if ( !$this->filter_type ) : ?>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					<?php
 					if ($this->permission->CanOrderFields) :
@@ -95,23 +95,27 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 		$padcount = 0;
 		foreach($this->rows as $row) {
 			$padspacer = '';
+			$row_css = '';
 			
-			if ($row->field_type=='groupmarker') {
-				$grpm_params = new JParameter($row->attribs);
-				if ( in_array ($grpm_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
-					$row_css = 'color:black;';
-				} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
-					$row_css = 'color:darkgreen;';
-					for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
-					$padcount++;
-				} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
-					$row_css = 'color:darkred;';
-					$padcount--;
+			if ( $this->filter_type ) // Create coloring and padding for groupmarker fields if filtering by specific type is enabled
+			{
+				if ($row->field_type=='groupmarker') {
+					$grpm_params = new JParameter($row->attribs);
+					if ( in_array ($grpm_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
+						$row_css = 'color:black;';
+					} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
+						$row_css = 'color:darkgreen;';
+						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
+						$padcount++;
+					} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
+						$row_css = 'color:darkred;';
+						$padcount--;
+						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
+					}
+				} else {
+					$row_css = '';
 					for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
 				}
-			} else {
-				$row_css = '';
-				for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
 			}
 			
 			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
