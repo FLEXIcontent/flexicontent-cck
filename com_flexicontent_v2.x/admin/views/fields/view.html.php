@@ -31,13 +31,14 @@ class FlexicontentViewFields extends JView {
 
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$mainframe = JFactory::getApplication();
+		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$db  		  = JFactory::getDBO();
+		$document	= JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$option   = JRequest::getVar('option');
 		
 		JHTML::_('behavior.tooltip');
 
@@ -55,7 +56,16 @@ class FlexicontentViewFields extends JView {
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 			'search', 			'', 'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
+		
+		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		{
+			$notice_content_type_order	= $mainframe->getUserStateFromRequest( $option.'.fields.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
+			if (!$notice_content_type_order) {
+				$mainframe->setUserState( $option.'.fields.notice_content_type_order', 1 );
+				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'message');
+			}
+		}
+		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
