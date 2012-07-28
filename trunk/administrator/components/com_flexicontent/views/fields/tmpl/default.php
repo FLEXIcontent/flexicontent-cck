@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
+$fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -90,14 +91,36 @@ $ctrl = FLEXI_J16GE ? 'fields.' : '';
 		$i = 0;
 		$user =& $this->user;
 		$n = count($this->rows);
+		
+		$padcount = 0;
 		foreach($this->rows as $row) {
+			$padspacer = '';
+			
+			if ($row->field_type=='groupmarker') {
+				$grpm_params = new JParameter($row->attribs);
+				if ( in_array ($grpm_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
+					$row_css = 'color:black;';
+				} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
+					$row_css = 'color:darkgreen;';
+					for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
+					$padcount++;
+				} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
+					$row_css = 'color:darkred;';
+					$padcount--;
+					for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
+				}
+			} else {
+				$row_css = '';
+				for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
+			}
+			
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
 				
 			$canEdit			= 1; //in_array('editfield', $rights);
 			$canPublish		= 1; //in_array('publishfield', $rights);
 			$canDelete		= 1; //in_array('deletefield', $rights);
 			
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=fields&amp;task='.$ctrl.'edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&'.$fields_task.'edit&cid[]='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			} else if (!$canPublish && $row->published) {   // No privilige published
@@ -137,11 +160,12 @@ $ctrl = FLEXI_J16GE ? 'fields.' : '';
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
-		<tr class="<?php echo "row$k"; ?>">
+		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
+				echo $padspacer;
 				if (
 					( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) )
 					|| !$canEdit
