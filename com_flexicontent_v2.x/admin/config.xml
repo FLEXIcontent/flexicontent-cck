@@ -351,7 +351,7 @@
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 			</field>
-			
+			<field name="form_container_css_fe" type="text" default="max-width:800px;" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" menu="hide" />
 			
 		<field name="" type="separator" default="FLEXI_CACHE_CONF" label="" level="level1" menu="hide" />
 			

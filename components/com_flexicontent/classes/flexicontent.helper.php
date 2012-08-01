@@ -1062,16 +1062,19 @@ class flexicontent_html
 		global $global_field_types;
 		$db =& JFactory::getDBO();
 		
-		$query = 'SELECT element AS value, name AS text'
-		. ' FROM #__plugins'
-		. ' WHERE published = 1'
+		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
+		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
+		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
+		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
 		. ' AND folder = ' . $db->Quote('flexicontent_fields')
 		. ' AND element <> ' . $db->Quote('core')
-		. ' ORDER BY name'
+		. ' ORDER BY text ASC'
 		;
 		
 		$db->setQuery($query);
 		$global_field_types = $db->loadObjectList();
+		
+		// This should not be neccessary as, it was already done in DB query above
 		foreach($global_field_types as $field_type) {
 			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
 			$field_arr[$field_type->text] = $field_type;

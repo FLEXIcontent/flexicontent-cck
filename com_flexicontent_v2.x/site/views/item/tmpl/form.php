@@ -155,7 +155,7 @@ function deleteTag(obj) {
 
 </script>
 
-<div id="flexicontent" class="adminForm flexi_edit" style="font-size:90%;">
+<div id="flexicontent" class="adminForm flexi_edit" style="font-size:90%;<?php echo $this->params->get('form_container_css_fe'); ?>">
 
     <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
     <h1 class="componentheading">
