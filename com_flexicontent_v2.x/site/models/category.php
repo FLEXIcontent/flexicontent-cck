@@ -502,6 +502,7 @@ class FlexicontentModelCategory extends JModel {
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$user		= & JFactory::getUser();
+		$db =& JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
