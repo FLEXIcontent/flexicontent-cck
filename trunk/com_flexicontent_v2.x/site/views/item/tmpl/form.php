@@ -534,17 +534,13 @@ function deleteTag(obj) {
 		
 		<!--table class="admintable" width="100%" style="border-width:0px!important;" -->
 			<?php
-			$hidden = array(
-				'fcloadmodule',
-				'fcpagenav',
-				'toolbar'
-			);
+			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			
 			$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 			foreach ($this->fields as $field) {
 				
 				// SKIP frontend hidden fields from this listing
-				if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('frontend_hidden')  ||  in_array($field->field_type, $hidden) ) continue;
+				if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('frontend_hidden')  ||  in_array($field->field_type, $hidden)  ||  in_array($field->formhidden, array(1,3)) ) continue;
 				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;

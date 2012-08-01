@@ -100,6 +100,14 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<tr>
 						<td class="key">
+							<?php echo $this->form->getLabel('formhidden').':'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('formhidden'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
 							<?php echo $this->form->getLabel('access').':'; ?>
 						</td>
 						<td>

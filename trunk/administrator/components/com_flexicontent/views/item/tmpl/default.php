@@ -452,16 +452,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					
 					<!--table class="admintable" width="100%"-->
 						<?php
-						$hidden = array(
-							'fcloadmodule',
-							'fcpagenav',
-							'toolbar'
-						);
+						$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
 						
 						foreach ($this->fields as $field) {
 							
 							// SKIP backend hidden fields from this listing
-							if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('backend_hidden')  ||  in_array($field->field_type, $hidden) ) continue;
+							if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('backend_hidden')  ||  in_array($field->field_type, $hidden)  ||  in_array($field->formhidden, array(2,3)) ) continue;
 							
 							// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 							if ( $this->tparams->get('hide_'.$field->field_type) ) continue;

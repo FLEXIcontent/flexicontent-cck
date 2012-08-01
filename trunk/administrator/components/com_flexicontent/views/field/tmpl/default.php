@@ -129,6 +129,16 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
+					<tr>
+						<td class="key">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_FORM_HIDDEN').'::'.JText::_('FLEXI_FORM_HIDDEN_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FORM_HIDDEN' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['formhidden']; ?>
+						</td>
+					</tr>
 					<?php if (!FLEXI_ACCESS) : ?>
 					<tr>
 						<td class="key">

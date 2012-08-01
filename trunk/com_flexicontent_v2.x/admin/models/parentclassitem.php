@@ -1921,6 +1921,14 @@ class ParentClassItem extends JModelAdmin
 					}
 				}
 				
+				// Check for frontend/backend form hidden fields fields and maintain their DB value ...
+				if (
+					( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
+				) {
+					$postdata[$field->name] = $field->value;
+				}
+				
 				// Skip fields not having value
 				if (!$postdata[$field->name]) continue;
 				

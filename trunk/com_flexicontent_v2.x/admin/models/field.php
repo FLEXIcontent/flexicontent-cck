@@ -192,6 +192,7 @@ class FlexicontentModelField extends JModelAdmin
 			$field->issearch			= 1;
 			$field->isadvsearch		= 0;
 			$field->untranslatable= 0;
+			$field->formhidden		= 0;
 			$field->positions			= array();
 			$field->published			= 1;
 			$field->attribs				= null;

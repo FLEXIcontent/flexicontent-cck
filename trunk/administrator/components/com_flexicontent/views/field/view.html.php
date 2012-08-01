@@ -122,6 +122,14 @@ class FlexicontentViewField extends JView {
 				
 		//build selectlists
 		$lists = array();
+		
+		$formhidden[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+		$formhidden[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_FRONTEND' ) );
+		$formhidden[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_BACKEND' ) );
+		$formhidden[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_BOTH' ) );
+		$formhidden_fieldname = FLEXI_J16GE ? 'jform[formhidden]' : 'formhidden';
+		$lists['formhidden'] = JHTML::_('select.genericlist',   $formhidden, $formhidden_fieldname, '', 'value', 'text', $row->formhidden );
+		
 		//build type select list
 		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
 
