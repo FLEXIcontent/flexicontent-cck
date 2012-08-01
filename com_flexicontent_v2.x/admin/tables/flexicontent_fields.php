@@ -52,6 +52,8 @@ class flexicontent_fields extends JTable
 	var $isadvsearch		= 0;
 	/** @var int */
 	var $untranslatable	= 0;
+	/** @var int */
+	var $formhidden	= 0;
 	/** @var string */
 	var $positions			= '';
 	/** @var string */

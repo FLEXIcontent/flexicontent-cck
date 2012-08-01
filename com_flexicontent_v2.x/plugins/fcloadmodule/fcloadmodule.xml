@@ -20,6 +20,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
+			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		<fieldset name="group-fcloadmodule">
