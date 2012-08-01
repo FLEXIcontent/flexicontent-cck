@@ -503,17 +503,21 @@ class modFlexicontentHelper
 		$db				=& JFactory::getDBO();
 		$user			=& JFactory::getUser();
 		$gid			= !FLEXI_J16GE ? (int)$user->get('aid')  :  max($user->getAuthorisedViewLevels());
-		$now			= $mainframe->get('requestTime');
-		$nullDate 		= $db->getNullDate();
 		$view			= JRequest::getVar('view');
-		$option			= JRequest::getVar('option');
-		$fparams 		=& $mainframe->getParams('com_flexicontent');
+		$option		= JRequest::getVar('option');
+		$fparams 	=& $mainframe->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
+		
+		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+		//  thus the items are published globally at the time the author specified in his/her local clock
+		//$now		= $mainframe->get('requestTime');
+		$now			= JFactory::getDate()->toMySQL();
+		$nullDate	= $db->getNullDate();
 		
 		// $display_category_data
 		$apply_config_per_category = (int)$params->get('apply_config_per_category', 0);
 		
-		// *** METHODS that their 'ALL' value is 0
+		// *** METHODS that their 'ALL' value is 0, (these do not use current item information)
 		
 		// current item scope parameters
 		$method_curitem	= (int)$params->get('method_curitem', 0);
@@ -526,6 +530,10 @@ class modFlexicontentHelper
 		
 		// featured items scope parameters
 		$method_featured = (int)$params->get('method_featured', 0);
+		
+		// featured items scope parameters
+		$method_states = (int)$params->get('method_states', 0);
+		$item_states   = $params->get('item_states');
 		
 		// *** METHODS that their 'ALL' value is 1, that also have behaviour variable (most of them)
 		
@@ -595,7 +603,6 @@ class modFlexicontentHelper
 
 		$where  = ' WHERE c.published = 1';
 		$where .= FLEXI_J16GE ? '' : ' AND i.sectionid = ' . FLEXI_SECTION;
-		$where .= ' AND i.state IN ( 1, -5 )';
 		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
 
@@ -687,6 +694,26 @@ class modFlexicontentHelper
 				$where .= ' AND i.featured=1';
 			} else {
 			  // All Items regardless of being featured or not
+			}
+		}
+		
+		// item states scope
+		$item_states = is_array($item_states) ? implode(',', $item_states) : $item_states;
+		if ($method_states==0) {
+		  // method normal: Published item states
+			$where .= ' AND i.state IN ( 1, -5 )';
+		} else {
+			// exclude trashed
+			$where .= ' AND i.state <> -2';
+			if ($item_states) {
+		  	if ($method_states == 1) { // exclude method  ---  exclude specified item states
+					$where .= ' AND i.state NOT IN ('. $item_states .')';
+				} else if ($method_states == 2) { // include method  ---  include specified item states
+					$where .= ' AND i.state IN ('. $item_states .')';
+				}
+			} else if ($method_states == 2) { // misconfiguration, when using include method with no state selected ...
+				echo "<b>WARNING:</b> Misconfigured item states scope, select at least one state or set states scope to Normal <small>(Published)</small><br/>";
+				return;
 			}
 		}
 		
