@@ -206,6 +206,7 @@
 			<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 			<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 		</param>
+		<param name="form_container_css_fe" type="text" default="max-width:800px;" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" menu="hide" />
 		
 	<param name="" type="jparamstab" description="FLEXI_ITEMS_MANAGER_CONF" />
 		<param name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />

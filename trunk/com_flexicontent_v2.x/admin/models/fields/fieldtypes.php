@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: itemlayout.php 171 2010-03-20 00:44:02Z emmanuel.danan $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,11 +24,11 @@ jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('list');
 
 /**
- * Renders a fields element
+ * Renders a author element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
- * @since		1.5
+ * @since		1.0
  */
 class JFormFieldFieldtypes extends JFormFieldList{
 	/**
@@ -38,42 +38,32 @@ class JFormFieldFieldtypes extends JFormFieldList{
 	 * @since	1.6
 	 */
 	protected $type = 'Fieldtypes';
-	
-	/**
-	 * Method to get the field input markup.
-	 *
-	 * @return	string	The field input markup.
-	 * @since	1.6
-	 */
-	protected function getInput() {
-		$name = $this->name;
-		$value = $this->value;
-		$attr = '';
 
-		// Initialize some field attributes.
-		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
-		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
-		$attr .= $this->element['size'] ? ' size="'.(int) $this->element['size'].'"' : '';
-		$attr .= $this->multiple ? ' multiple="multiple"' : '';
-		$options = (array) $this->getOptions();
-		return JHtml::_('select.genericlist', $options, $name, trim($attr), 'value', 'text', $value, $name);
-		//return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
-	}
 	protected function getOptions() {
+		global $global_field_types;
 		$db =& JFactory::getDBO();
-		$query = 'SELECT id AS value, name AS text'
-		. ' FROM #__flexicontent_types'
-		. ' WHERE published = 1'
-		. ' ORDER BY name ASC, id ASC'
+		
+		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
+		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
+		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
+		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+		. ' AND folder = ' . $db->Quote('flexicontent_fields')
+		. ' AND element <> ' . $db->Quote('core')
+		. ' ORDER BY text ASC'
 		;
 		
 		$db->setQuery($query);
-		$types = $db->loadObjectList();
-		return $types;
-	}
-	public function setAttributes($attribs = array()) {
-		$this->name = $attribs['name'];
-		$this->value = $attribs['value'];
-		$this->label = JText::_($attribs['label']);
+		$global_field_types = $db->loadObjectList();
+		
+		// This should not be neccessary as, it was already done in DB query above
+		foreach($global_field_types as $field_type) {
+			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
+			$field_arr[$field_type->text] = $field_type;
+		}
+		ksort( $field_arr, SORT_STRING );
+		
+		return $field_arr;
+		
 	}
 }
+?>

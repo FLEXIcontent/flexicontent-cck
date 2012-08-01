@@ -356,11 +356,11 @@ class FlexicontentController extends JController
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
 		
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
-			// Force add() TASK if layout is form
+			// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 			JRequest::setVar('task', 'add');
 			$this->add();
 		} else {
-			// Display Item
+			// Display a FLEXIcontent frontend view (category, item, favourites, etc)
 			if (JFactory::getUser()->get('id')) {
 				// WITHOUT CACHING (logged users)
 				parent::display(false);

@@ -70,6 +70,9 @@ class FlexicontentModelItemelement extends JModel
 	 */
 	function getData()
 	{
+		$user = JFactory::getUser();
+		if ( !$user->id ) return array();  // catch case of guest user submitting in frontend
+		
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_data))
 		{
@@ -94,6 +97,9 @@ class FlexicontentModelItemelement extends JModel
 	 */
 	function getTotal()
 	{
+		$user = JFactory::getUser();
+		if ( !$user->id ) return array();  // catch case of guest user submitting in frontend
+		
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_total))
 		{

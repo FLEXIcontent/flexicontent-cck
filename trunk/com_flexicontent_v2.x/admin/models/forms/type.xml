@@ -219,6 +219,7 @@
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 			</field>
+			<field name="form_container_css_fe" type="text" default="max-width:800px;" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" menu="hide" />
 		</fieldset>
 
 		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER_CONF">

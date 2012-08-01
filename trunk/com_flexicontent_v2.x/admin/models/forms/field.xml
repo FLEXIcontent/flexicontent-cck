@@ -11,7 +11,7 @@
 	<field name="asset_id" type="hidden" filter="unset" />
 	<field
 		name="field_type"
-		type="fieldtypeslist"
+		type="fieldtypes"
 		default="text"
 		label="FLEXI_FIELD_TYPE"
 		description ="FLEXI_FIELD_FIELDTYPE_DESC"
@@ -106,7 +106,7 @@
 		default="" />
 	<field
 		name="tid"
-		type="fieldtypes"
+		type="contenttypes"
 		multiple="true"
 		label="FLEXI_TYPES"
 		description=""
