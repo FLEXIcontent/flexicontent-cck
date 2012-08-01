@@ -501,10 +501,13 @@ class FlexicontentModelCategory extends JModel {
 		
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
-
 		$user		= & JFactory::getUser();
-		$now		= $mainframe->get('requestTime');
-		$nullDate	= $this->_db->getNullDate();
+		
+		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+		//  thus the items are published globally at the time the author specified in his/her local clock
+		//$now		= $mainframe->get('requestTime');
+		$now			= JFactory::getDate()->toMySQL();
+		$nullDate	= $db->getNullDate();
 		
 		$cparams = & $this->_params;                      // Get the category parameters
 		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
