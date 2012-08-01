@@ -114,6 +114,21 @@
 				<option value="2">FLEXI_INCLUDE</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_STATES_SCOPE" level="level1" menu="hide" />
+			<field name="method_states" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_STATES_DESC">
+				<option value="0">FLEXI_NORMAL_STATES</option>
+				<option value="1">FLEXI_EXCLUDE</option>
+				<option value="2">FLEXI_INCLUDE</option>
+			</field>
+			<field name="item_states" type="list" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="2">FLEXI_ARCHIVED</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
 			<field name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
