@@ -1434,7 +1434,7 @@ class ParentClassItem extends JModel
 			$item->fulltext		= '';
 		} else 	{
 			list($item->introtext, $item->fulltext) = preg_split($pattern, $data['text'], 2);
-			$item->fulltext = JString::strlen( trim($item->fulltext) ) ? '' : $item->fulltext;
+			$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
 		}
 		
 		
@@ -2180,7 +2180,7 @@ class ParentClassItem extends JModel
 				$jfdata['fulltext']	= '';
 			} else 	{
 				list($jfdata['introtext'], $jfdata['fulltext']) = preg_split($pattern, $jfdata['text'], 2);
-				$jfdata['fulltext'] = JString::strlen( trim($jfdata['fulltext']) ) ? '' : $jfdata['fulltext'];
+				$jfdata['fulltext'] = JString::strlen( trim($jfdata['fulltext']) ) ? $jfdata['fulltext'] : '';
 			}
 			
 			// Delete existing Joom!Fish translation data for the current item
@@ -2351,7 +2351,7 @@ class ParentClassItem extends JModel
 				$row->fulltext  = '';
 			} else 	{
 				list($row->introtext, $row->fulltext) = preg_split($pattern, $text, 2);
-				$row->fulltext = JString::strlen( trim($row->fulltext) ) ? '' : $row->fulltext;
+				$row->fulltext = JString::strlen( trim($row->fulltext) ) ? $row->fulltext : '';
 			}
 		}
 		//$row->store();
