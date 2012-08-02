@@ -14,7 +14,10 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin{
 	{
 		if ($field->field_type != 'groupmarker') return;
 		
-		static $cnt = 0;
+		static $tabSetCnt = -1;
+		static $tabCnt = array();
+		
+		if (!isset($tabCnt[$tabSetCnt])) $tabCnt[$tabSetCnt] = 0;
 		
 		$marker_type     = $field->parameters->get( 'marker_type' ) ;
 		$cont_label      = $field->parameters->get( 'cont_label' ) ;
@@ -25,10 +28,10 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin{
 		switch ($marker_type) {
 			case 'tabset_start':
 				$field->html .= "<div style='margin-top:24px; width:100%; float:left; clear:both;'></div>\n";
-				$field->html .= "<!-- tabber start --><div class='fctabber' class='".$cont_cssclass."' >\n";
+				$field->html .= "<!-- tabber start --><div class='fctabber' class='".$cont_cssclass."' id='grpmarker_tabset_".(++$tabSetCnt)."'>\n";
 				break;
 			case 'tab_open':
-				$field->html .= "<div class='tabbertab' style='float:left;' id='grpmarker".($cnt++)."'>\n";
+				$field->html .= "<div class='tabbertab' style='float:left;' id='grpmarker_tabset_".$tabSetCnt."_tab_".($tabCnt[$tabSetCnt]++)."'>\n";
 				$field->html .= " <h3>".JText::_( $cont_label )."</h3>\n";   // Current TAB LABEL
 				$field->html .= $cont_cssclass? " <div class='".$cont_cssclass."'></div>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'></div>\n";
 				break;

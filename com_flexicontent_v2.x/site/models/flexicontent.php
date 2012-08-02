@@ -82,7 +82,7 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		//get the root category of the directory
 		$this->_rootcat = JRequest::getVar('rootcat', false);
-		if ( $this->rootcat===false )
+		if ( $this->_rootcat===false )
 			// compatibility of old saved menu items, the value is inside params instead of being URL query variable
 			$this->_rootcat = $params->get('rootcat', FLEXI_J16GE ? 1:0);
 		else

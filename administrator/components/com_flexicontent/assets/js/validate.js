@@ -270,11 +270,14 @@ var JFormValidator = new Class({
 	{
 		// Extra code for auto-focusing the tab that contains the first field to fail the validation
 		if (typeof jQuery != 'undefined' && state === false && tab_focused === false) {
-			var tabcont = jQuery(el).closest("div.tabbertab");
-			if (tabcont.length != 0) {
-				var tabcontid = tabcont.attr('id');
-				var tabno = (tabcontid.search(/grpmarker([0-9]+)/) != -1) ? tabcontid.match(/grpmarker([0-9]+)/)[1] : "";
-				fctabber.tabShow(tabno);
+			var tab = jQuery(el).closest("div.tabbertab");
+			var tabset = jQuery(el).closest("div.tabberlive");
+			
+			if (tabset.length!=0 && tab.length!=0) {
+				var tabsetid = tabset.attr('id');
+				var tabid = tab.attr('id');
+				var tabno = (tabid.search(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/) != -1) ? tabid.match(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/)[2] : "";
+				fctabber[tabset.attr('id')].tabShow(tabno);
 			}
 		}
 		
