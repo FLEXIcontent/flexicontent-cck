@@ -54,7 +54,7 @@ form#item-form div.pane-sliders ul.adminformlist li label.hasTip {
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
 div fieldset.adminform fieldset.radio label, div fieldset.panelform fieldset.radio label {
-	min-width:10px; padding: 0px 0px 0px 0px; margin: 5px 0px 0px 0px;
+	min-width:10px; padding: 0px 10px 0px 0px; margin: 5px 0px 0px 0px;
 }
 div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }
 div fieldset select { margin:0px; }
