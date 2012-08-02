@@ -57,11 +57,22 @@ class FlexicontentController extends JController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// Initialize variables
-		$app     = JFactory::getApplication();
-		$db      = JFactory::getDBO();
-		$user    = JFactory::getUser();
-		$model   = $this->getModel(FLEXI_ITEMVIEW);
+		$app     = & JFactory::getApplication();
+		$db      = & JFactory::getDBO();
+		$user    = & JFactory::getUser();
+		$session 	=& JFactory::getSession();
+		$model   = & $this->getModel(FLEXI_ITEMVIEW);
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+		
+		// Get component parameters and merge into them the type parameters
+		$params  = $app->getParams('com_flexicontent');
+		$tparams = $model->getTypeparams();
+		$tparams = new JParameter($tparams);
+		$params->merge($tparams);
+		
+		// Get needed parameters
+		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
+		$allowunauthorize       = $params->get('allowunauthorize', 0);
 		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
@@ -94,7 +105,6 @@ class FlexicontentController extends JController
 		// PERFORM ACCESS CHECKS, NOTE: we need to check access again,
 		// despite having checked them on edit form load, because user may have tampered with the form ... 
 		$isnew = ((int) $post['id'] < 1);
-		$allowunauthorize = JFactory::getApplication()->getParams('com_flexicontent')->get('allowunauthorize', 0);
 
 		if(!$isnew) {
 			if (FLEXI_J16GE) {
@@ -115,7 +125,6 @@ class FlexicontentController extends JController
 			}
 			
 			// Check if item is editable till logoff
-			$session 	=& JFactory::getSession();
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$has_edit = isset($rendered_uneditable[$model->get('id')]);
@@ -148,6 +157,10 @@ class FlexicontentController extends JController
 		if ( $store_success = $model->store($post) ) {
 			if($isnew) {
 				$post['id'] = (int) $model->get('id');
+				// Mark item as newly submitted
+				$newly_submitted	= $session->get('newly_submitted', array(), 'flexicontent');
+				$newly_submitted[$model->get('id')] = 1;
+				$session->set('newly_submitted', $newly_submitted, 'flexicontent');
 			}
 		} else {
 			// Set error message about saving failed, and also the reason (=model's error message)
@@ -179,7 +192,6 @@ class FlexicontentController extends JController
 			$is_first_unapproved_revise = false;  // flag
 			
 			if ($post['vstate']!=2) {
-				$session 	=& JFactory::getSession();
 				$items_saved = array();
 				if ($session->has('unapproved_revises', 'flexicontent')) {
 					$unapproved_revises	= $session->get('unapproved_revises', array(), 'flexicontent');
@@ -311,7 +323,6 @@ class FlexicontentController extends JController
 			// Set notice for existing item being editable till logoff 
 			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
 			// Allow item to be editable till logoff
-			$session 	=& JFactory::getSession();
 			$session->get('rendered_uneditable', array(),'flexicontent');
 			$rendered_uneditable[$model->get('id')]  = 1;
 			$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
@@ -335,9 +346,24 @@ class FlexicontentController extends JController
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
 		} else {
-			// Return to the form 's refer (previous page) after item saving
-			$msg = $isnew ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
-			$link = JRequest::getString('referer', JURI::base(), 'post');
+			// Get items marked as newly submitted
+			$newly_submitted	= $session->get('newly_submitted', array(), 'flexicontent');
+			
+			if ( isset($newly_submitted[$model->get('id')]) && $submit_redirect_url_fe ) {
+				// Return to a custom page after creating a new item (e.g. a thanks page)
+				$link = $submit_redirect_url_fe;
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			} else {
+				// Return to the form 's refer (previous page) after item saving
+				$msg = $isnew ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
+				$link = JRequest::getString('referer', JURI::base(), 'post');
+			}
+			
+			// Clear item from being marked as newly submitted
+			if ( isset($newly_submitted[$model->get('id')]) ) {
+				unset($newly_submitted[$model->get('id')]);
+				$session->set('newly_submitted', $newly_submitted, 'flexicontent');
+			}
 		}
 		
 		$this->setRedirect($link, $msg);
@@ -385,6 +411,7 @@ class FlexicontentController extends JController
 		// Debuging message
 		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
 		
+		$session 	=& JFactory::getSession();
 		$mainframe = &JFactory::getApplication();
 		$cparams = clone($mainframe->getParams('com_flexicontent'));
 		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
@@ -426,7 +453,6 @@ class FlexicontentController extends JController
 			}
 			
 			// Check if item is editable till logoff
-			$session 	=& JFactory::getSession();
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$has_edit = isset($rendered_uneditable[$model->get('id')]);
@@ -558,6 +584,7 @@ class FlexicontentController extends JController
 		
 		// Initialize some variables
 		$user	= & JFactory::getUser();
+		$session 	=& JFactory::getSession();
 
 		// Get an item model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
@@ -583,7 +610,6 @@ class FlexicontentController extends JController
 			}
 			
 			// Check if item is editable till logoff
-			$session 	=& JFactory::getSession();
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$has_edit = isset($rendered_uneditable[$model->get('id')]);
