@@ -461,42 +461,19 @@ class ParentClassItem extends JModelAdmin
 						;
 					}
 					
+					$db->setQuery($query);
+					
 					// Try to execute query directly and load the data as an object
-					$dbtype = $config->getValue('config.dbtype');
-					if ( $task=='edit' && $option=='com_flexicontent' && in_array($dbtype, array('mysqli','mysql')) )
-					{
-						$dbprefix = $config->getValue('config.dbprefix');
-						if (FLEXI_J16GE) {
-							$query = $db->replacePrefix($query);
-							$db_connection = & $db->getConnection();
-						} else {
-							$query = str_replace("#__", $dbprefix, $query);
-							$db_connection = & $db->_resource;
-						}
-						//echo "<pre>"; print_r($query); echo "\n\n";
-						
-						if ($dbtype == 'mysqli') {
-							$result = mysqli_query( $db_connection , $query );
-							if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
-							$data = mysqli_fetch_object($result);
-							mysqli_free_result($result);
-						} else if ($dbtype == 'mysql') {
-							$result = mysql_query( $query, $db_connection  );
-							if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
-							$data = mysql_fetch_object($result);
-							mysql_free_result($result);
-						} else {
-							throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
-						}
-					}
-					else
-					{
-						$db->setQuery($query);
+					if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $config->getValue('config.dbtype') , array('mysqli','mysql') ) ) {
+						$data = & $this->directQuery($query);
+						//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
+					} else {
 						$data = $db->loadObject();
-						// Check for SQL error
-						if ($error = $db->getErrorMsg()) {
-							throw new Exception( nl2br($query."\n".$error()."\n") );
-						}
+					}
+					
+					// Check for SQL error
+					if ($error = $db->getErrorMsg()) {
+						throw new Exception( nl2br($query."\n".$error()."\n") );
 					}
 					//print_r($data); exit;
 					
@@ -2836,6 +2813,46 @@ class ParentClassItem extends JModelAdmin
 			}
 			$item->metadata = $item->metadata->toString();
 		}
+	}
+	
+	
+	/**
+	 * Helper method to execute a query directly, bypassing Joomla DB Layer
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function & directQuery($query)
+	{
+		$db = & $this->_db;
+		$config =& JFactory::getConfig();
+		$dbprefix = $config->getValue('config.dbprefix');
+		$dbtype = $config->getValue('config.dbtype');
+		
+		if (FLEXI_J16GE) {
+			$query = $db->replacePrefix($query);
+			$db_connection = & $db->getConnection();
+		} else {
+			$query = str_replace("#__", $dbprefix, $query);
+			$db_connection = & $db->_resource;
+		}
+		//echo "<pre>"; print_r($query); echo "\n\n";
+		
+		if ($dbtype == 'mysqli') {
+			$result = mysqli_query( $db_connection , $query );
+			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
+			$data = mysqli_fetch_object($result);
+			mysqli_free_result($result);
+		} else if ($dbtype == 'mysql') {
+			$result = mysql_query( $query, $db_connection  );
+			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
+			$data = mysql_fetch_object($result);
+			mysql_free_result($result);
+		} else {
+			throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
+		}
+		
+		return $data;
 	}
 	
 }

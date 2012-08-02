@@ -550,16 +550,21 @@ function tabberDeleteCookie(name, path, domain) {
   Set the tabber options (must do this before including tabber.js)
   ==================================================*/
   
-var fctabber;
+var fctabber = new Object();
+
 var tabberOptions = {
 
   'cookie':"fctabber", /* Name to use for the cookie */
 
   'onLoad': function(argsObj)
   {
-  	fctabber = argsObj.tabber;
     var t = argsObj.tabber;
     var i;
+		
+		/* Create a reference to the every tabber object that has an HTML tag id */
+  	if (t.id) {
+	  	fctabber[t.id] = argsObj.tabber;
+  	}
 
     /* Optional: Add the id of the tabber to the cookie name to allow
        for multiple tabber interfaces on the site.  If you have

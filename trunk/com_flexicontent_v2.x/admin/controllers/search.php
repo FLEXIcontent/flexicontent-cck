@@ -89,7 +89,7 @@ class FlexicontentControllerSearch extends FlexicontentController{
 			foreach($fieldid_arr as $fieldid)
 			{
 				if(!isset($fields[$fieldid])) {
-					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND isadvsearch=1";
+					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND isadvsearch=1';
 					$db->setQuery($query);
 					if(!$fields[$fieldid] = $db->loadObject()) {
 						echo "fail|1";
@@ -100,25 +100,41 @@ class FlexicontentControllerSearch extends FlexicontentController{
 				$field->item_id = $itemid;
 				$field->parameters = new JParameter($field->attribs);
 				
-				if ($field->field_type == 'tags') {
-					$query  = 'SELECT `tid` FROM #__flexicontent_tags_item_relations as rel'
-						." WHERE rel.itemid='{$itemid}';";
-					$db->setQuery($query);
-					$values = $db->loadResultArray();
-					$values = is_array($values)?$values:array($values);
-				} else if ($field->iscore) {
-					$query  = 'SELECT * FROM #__content as c'
-						." WHERE c.id='{$itemid}';";
+				// Create DB query to retrieve field values
+				$values = null;
+				if ($field->field_type == 'tags')
+				{
+					$query  = 'SELECT CONCAT_WS(\':\', t.id, t.name) AS value'
+						.' FROM #__flexicontent_tags AS t'
+						.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
+						.' WHERE rel.itemid='.$itemid;
+				}
+				else if ($field->field_type == 'categories')
+				{
+					$query  = 'SELECT CONCAT_WS(\':\', c.id, c.title) AS value'
+						.' FROM #__flexicontent_categories AS c'
+						.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
+						.' WHERE rel.itemid='.$itemid;
+				}
+				else if ($field->iscore)
+				{
+					$query  = 'SELECT *'
+						.' FROM #__content AS c'
+						.' WHERE c.id='.$itemid;
 					$db->setQuery($query);
 					$data = $db->loadObject();
-					if ( isset( $data->{$field->name} ) ) {
-						$values = $data->{$field->name};
-						$values = is_array($values)?$values:array($values);
-					} else $values=array();
-				} else {
-					$query = "SELECT `value` FROM #__flexicontent_fields_item_relations as rel "
-						." JOIN #__content as i ON i.id=rel.item_id "
-						." WHERE rel.field_id='{$fieldid}' AND rel.item_id='{$itemid}';";
+					$values = isset( $data->{$field->name} ) ? array($data->{$field->name}) : array();
+				}
+				else
+				{
+					$query = 'SELECT value'
+						.' FROM #__flexicontent_fields_item_relations as rel'
+						.' JOIN #__content as i ON i.id=rel.item_id'
+						.' WHERE rel.field_id='.$fieldid.' AND rel.item_id='.$itemid;
+				}
+				
+				// Execute query if not already done
+				if ($values === null) {
 					$db->setQuery($query);
 					$values = $db->loadResultArray();
 					$values = is_array($values) ? $values : array($values);

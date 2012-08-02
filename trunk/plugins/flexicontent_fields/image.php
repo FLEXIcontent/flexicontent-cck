@@ -82,10 +82,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->html	.= '
 				<div style="float:left; margin-right: 5px;">
 					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver;" />
-					<br />
-					<input type="checkbox" name="'.$field->name.'[remove]" value="1"'.$remove.'>'.JText::_( 'FLEXI_FIELD_REMOVE' ).'
-					<input type="checkbox" name="'.$field->name.'[delete]" value="1"'.$delete.'>'.JText::_( 'FLEXI_FIELD_DELETE' ).'
-					<input name="'.$field->name.'[originalname]" type="hidden" value="'.$value['originalname'].'" />
+					<div style="float:left; clear:both;">
+						<input type="checkbox" name="'.$field->name.'[remove]" value="1"'.$remove.' style="float:none;">'.JText::_( 'FLEXI_FIELD_REMOVE' ).'
+						<input type="checkbox" name="'.$field->name.'[delete]" value="1"'.$delete.' style="float:none;">'.JText::_( 'FLEXI_FIELD_DELETE' ).'
+						<input name="'.$field->name.'[originalname]" type="hidden" value="'.$value['originalname'].'" />
+					</div>
 				</div>
 				<div style="float:left;">
 					<table class="admintable">'.
