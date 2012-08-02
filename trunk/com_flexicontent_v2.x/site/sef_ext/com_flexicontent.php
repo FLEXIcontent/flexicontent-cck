@@ -19,6 +19,8 @@
 // no direct access
 defined ( '_JEXEC' ) or die ( 'Restricted access' );
 
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 // ------------------  standard plugin initialize function - don't change ---------------------------
 
 global $sh_LANG, $globalcats, $globalnopath, $globalnoroute;
@@ -97,10 +99,21 @@ if (!empty($fcu)) {
 	$dosef = false;
 }
 
+// Some FLEXIcontent views may only set task variable ... in this case set task variable as view
+if ( !$view && $task == 'search' ) {
+	$view == 'search';
+}
+
 // Do not convert to SEF urls, the urls for vote and favourites
 if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
 }
+
+// Do not convert to SEF urls, the urls for itemelement and search view
+if($view == 'itemelement' || $view == 'search') {
+	return;
+}
+
 
 switch ($view) {
 	
@@ -119,8 +132,12 @@ switch ($view) {
 						. ' WHERE i.id = ' . ( int ) $id;
 				$database->setQuery ( $query );
 
-				// Do not translate the items url
-				$row = $database->loadObject ( null, false );
+				// Do not translate the items url (Joomfish extended Database class and overrides the method)
+				if (!FLEXI_FISH) {
+					$row = $database->loadObject ( );
+				} else {
+					$row = $database->loadObject ( null, false );
+				}
 				
 				if ($database->getErrorNum ()) {
 					die ( $database->stderr () );
@@ -134,12 +151,14 @@ switch ($view) {
 							$ancestors = $globalcats[$catid]->ancestorsarray;
 							foreach ($ancestors as $ancestor) {
 								if (!in_array($ancestor, $globalnoroute)) {
-									if (shTranslateURL ( $option, $shLangName )) {
+									if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
+										// Translating title and Joomfish is installed
 										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 										$database->setQuery ( $query );
 										$row_cat = $database->loadObject ();
 										$title[] = $row_cat->title . '/';
 									} else {
+										// Not translating title or Joomfish not installed
 										$title[] = $globalcats[$ancestor]->title . '/';
 									}
 								}
@@ -152,10 +171,10 @@ switch ($view) {
 						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->type_id, $globalnopath)) {
 							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
 							$database->setQuery($q);
-							if (shTranslateUrl($option, $shLangName)) // V 1.2.4.m
+							if (shTranslateUrl($option, $shLangName) || !FLEXI_FISH) // V 1.2.4.m
 								$contentElement = $database->loadObject( );
 							else 
-								$contentElement = $database->loadObject(false);
+								$contentElement = $database->loadObject(null, false);
 							if ($contentElement) {
 								$foundCat = array_search($contentElement->catid, $sefConfig->shInsertNumericalIdCatList);
 								if (($foundCat !== null && $foundCat !== false) || ($sefConfig->shInsertNumericalIdCatList[0] == ''))  { // test both in case PHP < 4.2.0
@@ -199,7 +218,7 @@ switch ($view) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				foreach ($ancestors as $ancestor) {
 					if (!in_array($ancestor, $globalnoroute)) {
-						if (shTranslateURL ( $option, $shLangName )) {
+						if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
 							$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 							$database->setQuery ( $query );
 							$row = $database->loadObject ();
@@ -227,7 +246,7 @@ switch ($view) {
 					.' WHERE id = ' . ( int ) $id;
 			$database->setQuery ( $query );
 			
-			if (shTranslateURL ( $option, $shLangName )) {
+			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
 				$row = $database->loadObject ();
 			} else {
 				$row = $database->loadObject ( null, false );
