@@ -100,14 +100,10 @@ class FlexicontentViewItems extends JView
 		// 'preview' request variable will force last, and finally 'version' request variable will force specific
 		// NOTE: preview and version variables cannot be used by users that cannot edit the item
 		JRequest::setVar('loadcurrent', true);
-		$item = & $model->getItem();
 		
-		// Check that item was loaded successfully, NOTE, this maybe unreachable if getItem() already has raised an ERROR ...
-		if ($item->id == 0)
-		{
-			$id	= JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $id) );
-		}
+		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
+		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
+		$item = & $model->getItem(null, $check_view_access=2);
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
 		$params = & $item->parameters;

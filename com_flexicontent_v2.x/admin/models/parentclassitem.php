@@ -218,15 +218,9 @@ class ParentClassItem extends JModelAdmin
 		if ($pk != $this->_id) {
 			$this->setId($pk);
 		}
-
-		// --. Initialize new item 
-		if ( !$pk && $this->_initItem() )
-		{
-			// Successfully created new item, this should always succeed ...
-		}
 		
 		// --. Try to load existing item
-		else if ( $pk && $this->_loadItem() )
+		if ( $pk && $this->_loadItem() )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
@@ -238,16 +232,16 @@ class ParentClassItem extends JModelAdmin
 			}
 		}
 		
-		// --. Failed to load existing item
-		else if ($pk > 0)
+		// --. Failed to load existing item, or check_view_access indicates not to create a new item object
+		else if ( $pk || $check_view_access===2 )
 		{
-			return JError::raiseError(404, JText::_('COM_CONTENT_ERROR_ARTICLE_NOT_FOUND'). " item id: ". $pk );
+			JError::raiseError(404, JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk));
 		}
 		
-		// --. Failed to create new item, unreachable
-		else if ($pk > 0)
+		// --. Initialize new item, currently this succeeds always
+		else
 		{
-			return JError::raiseError(404, JText::_('Failed to create new item'));
+			$this->_initItem();
 		}
 		
 		// Extra Steps for Backend
@@ -478,11 +472,6 @@ class ParentClassItem extends JModelAdmin
 					//print_r($data); exit;
 					
 					if(!$data) return false; // item not found, return				
-					
-					// Check for empty data despite item id being set, and raise 404 not found Server Error
-					if ( empty($data) && @$this->_id ) {
-						JError::raiseError(404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND')."<br />"."Item id: ".@$this->_id);
-					}
 					
 					if ($version && !$data->version_id) {
 						JError::raiseNotice(10, JText::sprintf('NOTICE: Requested item version %d was not found', $version) );
