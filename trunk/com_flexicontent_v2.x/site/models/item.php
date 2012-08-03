@@ -120,7 +120,7 @@ class FlexicontentModelItem extends ParentClassItem
 			else
 			{
 				// cid is not set, we have no current category, the item is visible if it belongs to at one published category
-				$itemcats = $this->getCatsselected();
+				$itemcats = $this->_item->categories;
 				$cats_are_published = true;
 				foreach ($itemcats as $catid) {
 					$cats_are_published |= $globalcats[$catid]->published;
