@@ -137,7 +137,7 @@ class FlexicontentController extends JController
 				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
 			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
 				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
 			} else {
 				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
@@ -536,7 +536,7 @@ class FlexicontentController extends JController
 			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 			$not_authorised = !$canAdd;
 		} else if (FLEXI_ACCESS) {
-			$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+			$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
 			$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
 		} else {
 			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');

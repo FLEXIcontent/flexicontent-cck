@@ -407,9 +407,9 @@ class FlexicontentViewItem extends JView
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout') );
 		
-		// *******************************
-		// CHECK EDIT / CREATE PERMISSIONS
-		// *******************************
+		// ****************************************************************************************
+		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)
+		// ****************************************************************************************
 		
 		// new item and ownership variables
 		$isnew = !$item->id;
@@ -446,7 +446,7 @@ class FlexicontentViewItem extends JView
 				//$allowed_cats = FlexicontentHelperPerm::checkUserElementsAccess($user->get('id'), 'core.create', 'category');
 				//$can_create = count($allowed_cats) > 1;
 			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
 				$can_create = @$canAdd['content'] || @$canAdd['category'];
 			} else {
 				$can_create	= $user->authorize('com_content', 'add', 'content', 'all');
@@ -609,6 +609,9 @@ class FlexicontentViewItem extends JView
 		$pathway =& $mainframe->getPathWay();
 		$pathway->addItem($title, '');
 		
+		// Get pageclass suffix
+		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+		
 		// Ensure the row data is safe html
 		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
 		//JFilterOutput::objectHTMLSafe( $item );
@@ -635,6 +638,7 @@ class FlexicontentViewItem extends JView
 		$this->assignRef('menuCats',   $menuCats);
 		$this->assignRef('submitConf', $submitConf);
 		$this->assignRef('itemlang',   $itemlang);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 		
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
