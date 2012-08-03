@@ -565,7 +565,7 @@ class FlexicontentModelCategory extends JModel {
 				if (FLEXI_ACCESS) {
 					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
 					if ( isset($readperms['item']) && count($readperms['item']) ) {
-						$where .= ' AND ( ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) ) )';
+						$where .= ' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 					} else {
 						$where .= ' AND ( i.access <= '.$aid.' OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 					}
