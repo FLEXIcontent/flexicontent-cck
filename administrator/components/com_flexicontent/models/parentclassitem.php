@@ -1880,7 +1880,7 @@ class ParentClassItem extends JModel
 				if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
 					if (count($translation_ids) && $field->untranslatable) {
 						foreach($translation_ids as $t_item_id) {
-							$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id='.$t_item_id.' AND field_id='.$obj->field_id;
+							$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id='.$t_item_id.' AND field_id='.$field->id;
 							$this->_db->setQuery($query);
 							$this->_db->query();
 						}

@@ -93,15 +93,19 @@ class FlexicontentViewItems extends JView {
 			$notice_iss_disabled = $mainframe->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
 			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
 				$mainframe->setUserState( $option.'.items.notice_iss_disabled', 1 );
-				$mainframe->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'message');
+				$mainframe->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'notice');
+				$show_turn_off_notice = 1;
 			}
 			
 			$notice_define_item_order = 30;
 			$notice_define_item_order = $mainframe->getUserStateFromRequest( $option.'.items.notice_define_item_order',	'notice_define_item_order',	0, 'int' );
 			if (!$notice_define_item_order) {
 				$mainframe->setUserState( $option.'.items.notice_define_item_order', 1 );
-				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'), 'message');
+				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'), 'notice');
+				$show_turn_off_notice = 1;
 			}
+			if (!empty($show_turn_off_notice))
+				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 		}
 		
 		//add css and submenu to document

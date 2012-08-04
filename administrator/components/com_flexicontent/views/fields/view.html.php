@@ -62,7 +62,8 @@ class FlexicontentViewFields extends JView {
 			$notice_content_type_order	= $mainframe->getUserStateFromRequest( $option.'.fields.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order) {
 				$mainframe->setUserState( $option.'.fields.notice_content_type_order', 1 );
-				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'message');
+				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'notice');
+				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 			}
 		}
 		

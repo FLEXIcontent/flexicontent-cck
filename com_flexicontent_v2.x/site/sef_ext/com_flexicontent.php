@@ -83,12 +83,9 @@ $return 	= isset ($return) ? @$return : null;
 // V 1.2.4.m
 shRemoveFromGETVarsList('option');
 shRemoveFromGETVarsList('lang');
-if (!empty($Itemid))
-shRemoveFromGETVarsList('Itemid');
-if (!empty($limit))
-shRemoveFromGETVarsList('limit');
-if (isset($limitstart))
-shRemoveFromGETVarsList('limitstart');
+if (!empty($Itemid))      shRemoveFromGETVarsList('Itemid');
+if (!empty($limit))       shRemoveFromGETVarsList('limit');
+if (isset($limitstart))   shRemoveFromGETVarsList('limitstart');
 
 // Added for the preview feature in FLEXIcontent 1.5.5 
 if (!empty($fcu)) {
@@ -107,11 +104,6 @@ if ( !$view && $task == 'search' ) {
 // Do not convert to SEF urls, the urls for vote and favourites
 if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
-}
-
-// Do not convert to SEF urls, the urls for itemelement and search view
-if($view == 'itemelement' || $view == 'search') {
-	return;
 }
 
 
@@ -198,11 +190,20 @@ switch ($view) {
 			}
 			
 		} else {
+			return;
+			//echo $Itemid."<br>";
+			//echo $shCurrentItemid."<br>";
+			//$shCurrentItemid = $Itemid;
+			//shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
+			//$dosef = false;
+			
 			$shName = shGetComponentPrefix($option);
 			$shName = empty($shName) ? getMenuTitle($option, (isset($view) ? @$view : null), $Itemid ) : $shName;
-			if (!empty($shName) && $shName != '/') $title[] = $shName;  // V x
-			//$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_ADD'];
-	
+			if (!empty($shName) && $shName != '/')
+				echo $title[] = $shName;  // V x
+			else
+				echo $title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_ADD'];
+			
 			// Remove the vars from the url
 			shRemoveFromGETVarsList ( 'layout' );
 			shRemoveFromGETVarsList ( 'typeid' );
@@ -285,7 +286,15 @@ switch ($view) {
 	case 'fileselement' :
 		$dosef = false;
 	break;
-		
+
+	case 'itemelement' :
+		$dosef = false;
+	break;
+
+	case 'search' :
+		$dosef = false;
+	break;
+	
 	default :
 		$title [] = '/';
 	break;
