@@ -46,8 +46,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// some parameter shortcuts
 		$size				= $field->parameters->get( 'size', 30 ) ;
-		$default_value	= $field->parameters->get( 'default_value', '' ) ;
-		$default_value_use= $field->parameters->get( 'default_value_use', '' ) ;
+		
+		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -56,12 +58,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$required		= $required ? ' required' : '';
 		
 		// initialise property
-		if( ( $item->version < 2 || $default_value_use > 0) && strlen($default_value)) {
+		if (!$field->value) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
-		} elseif (!$field->value) {
-			$field->value = array();
-			$field->value[0] = '';
 		} else {
 			for ($n=0; $n<count($field->value); $n++) {
 				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );
@@ -143,10 +142,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
-				clear:both;
+				clear: both;
+				display: block;
 				list-style: none;
 				height: 20px;
-				position: relative !important;
+				position: relative;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			';
@@ -179,7 +179,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$newpost = array();
 		$new = 0;
 		
-		if(!is_array($post)) $post = array ($post);
+		// make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n] != '')
@@ -237,10 +239,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-
+		
 		// some parameter shortcuts
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value		= ($default_value_use == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
@@ -251,9 +253,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
-		// If field has no value and then use default value configured to do so
-		$values = !is_array($values) ? array($values) : $values;
-		$values = ( ( !count($values) || !strlen($values[0]) ) && ($default_value_use == 2) ) ? array ($default_value) : $values ;
+		// Handle default value loading, instead of empty value
+		$values = !is_array($values) ? array($values) : $values;     // make sure values is an array
+		$isempty = !count($values) || !strlen($values[0]);           // detect empty value
+		if ( empty($values) && !strlen($default_value) ) {
+			$field->{$prop} = '';
+			return;
+		} else{
+			$values = array($default_value);
+		}
 		
 		switch($separatorf)
 		{

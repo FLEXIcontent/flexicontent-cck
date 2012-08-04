@@ -179,7 +179,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 		}
 
-		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
+		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
+		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"fcfield-button-add\">
