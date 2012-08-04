@@ -132,6 +132,35 @@ var JFormValidator = new Class({
 			}
 		);
 
+		this.setHandler('catid',
+			function (el) {
+				var value = el.get('value');
+				
+				// Check for value for primary category was not set
+				if (!value) {
+					
+					// Retrieve selected values for secondary categories
+					if(MooTools.version>="1.2.4") {
+						var values = $('jform_cid').getSelected();
+						values = values.map( function(g) { return g.get('value'); } );
+					} else {
+						values = $('cid').getValue();
+						//  ** Alternative code **
+						//var values = $('cid').getChildren().filter( function(g) { return g.selected; } );
+						//values = values.map( function(g) { return g.getProperty('value'); } );
+					}
+					
+					// If exactly one secondary category was selected then set it as primary
+					if (values.length == 1) {
+						el.set('value', values[0]);
+						return true;
+					}
+					return false;
+				}
+				return true;
+			}
+		);
+
 		this.setHandler('selmul',
 			function (par) {
 				var nl, i;
@@ -190,7 +219,8 @@ var JFormValidator = new Class({
 			el.set = el.setProperty;
 			el_value = el.getValue();
 		}
-		
+		el_name = el.get('name');
+
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
 		if(el.get('disabled')) {
 			this.handleResponse(true, el);
@@ -214,7 +244,12 @@ var JFormValidator = new Class({
 			this.handleResponse(true, el);
 			return true;
 		}
-
+		
+		// We try to fill-in automatically the Primary Category Select Field, when it is empty
+		var auto_filled = new Object();
+		auto_filled['catid'] = 1;
+		auto_filled['jform[catid]'] = 1;
+		
 		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
 	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
@@ -224,15 +259,22 @@ var JFormValidator = new Class({
 					this.handleResponse(false, el);
 					return false;
 				}
+			} else if ( typeof auto_filled[el_name] != 'undefined' ) {
+				// Execute the validation handler and return result
+				if (this.handlers[handler].exec(el) != true) {
+					this.handleResponse(false, el);
+					return false;
+				}
 			}
 	  } else {
 	     if ((handler) && (handler != 'none') && (this.handlers[handler])) {
 	        if(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox"){
 	          if ($(el).hasClass('required')) {
-	               if (this.handlers[handler].exec(el.parentNode) != true) {
-		               this.handleResponse(false, el);
-		               return false;
-	               }
+							// Execute the validation handler and return result
+							if (this.handlers[handler].exec(el.parentNode) != true) {
+								this.handleResponse(false, el);
+								return false;
+							}
 	           }
 	        }
 	     }
