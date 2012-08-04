@@ -238,6 +238,6 @@ endif;
 		
 	<?php endif; ?>
 
-<?php else : ?>
-<div class="noitems"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
+<?php elseif ($this->getModel()->getState('limit')) : // Check case of creating a category view without items ?>
+	<div class="noitems"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
 <?php endif; ?>

@@ -178,9 +178,15 @@ class FlexicontentModelCategory extends JModel {
 	function getData()
 	{
 		$format	= JRequest::getVar('format', null);
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_data))
+		
+		// Allow limit zero to achieve a category view without items
+		if ($this->getState('limit') <= 0)
 		{
+			$this->_data = array();
+		}
+		else if (empty($this->_data))
+		{
+			// Load the content if it doesn't already exist
 			$query = $this->_buildQuery();
 
 			$this->_total = $this->_getListCount($query);
