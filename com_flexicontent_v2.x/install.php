@@ -50,6 +50,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 // init vars
 $error = false;
 $extensions = array();
+$db = &JFactory::getDBO();
 
 // clear a cache
 $cache = JFactory::getCache();
@@ -177,14 +178,21 @@ if ($error) {
 		</tr>
 	</tfoot>
 	<tbody>
-<?php
 
-// Alter table __flexicontent_files: Add description column
-$db = &JFactory::getDBO();
+<?php
+// Get DB table information
+
 $query = "SHOW COLUMNS FROM #__flexicontent_files";
 $db->setQuery($query);
 $files_tbl_cols = $db->loadResultArray();
 
+$query = "SHOW COLUMNS FROM #__flexicontent_fields";
+$db->setQuery($query);
+$fields_tbl_cols = $db->loadResultArray();
+?>
+
+<?php
+// Alter DB table flexicontent_files: Add description column
 ?>
 		<tr class="row0">
 			<td class="key">Run SQL "ALTER TABLE `..._flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`"
@@ -212,14 +220,9 @@ $files_tbl_cols = $db->loadResultArray();
 				?></span>
 			</td>
 		</tr>
+
 <?php
-
-// Alter table __flexicontent_fields: Add untranslatable column
-$db = &JFactory::getDBO();
-$query = "SHOW COLUMNS FROM #__flexicontent_fields";
-$db->setQuery($query);
-$fields_tbl_cols = $db->loadResultArray();
-
+// Alter DB table flexicontent_fields: Add untranslatable column
 ?>
 		<tr class="row1">
 			<td class="key">Run SQL "ALTER TABLE `...__flexicontent_fields` ADD `untranslatable` TEXT NOT NULL AFTER `isadvsearch`"
@@ -247,16 +250,45 @@ $fields_tbl_cols = $db->loadResultArray();
 				?></span>
 			</td>
 		</tr>
+
+<?php
+// Alter DB table flexicontent_fields: Add formhidden column
+?>
+		<tr class="row0">
+			<td class="key">Run SQL "ALTER TABLE `...__flexicontent_fields` ADD `formhidden` TEXT NOT NULL AFTER `untranslatable`"
+			<?php
+			$already = true;
+			$result = false;
+			if(!in_array('formhidden', $fields_tbl_cols)) {
+				$already = false;
+				$query = "ALTER TABLE`#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'formhidden' already exists.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'formhidden' added.");
+				} else {
+					echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+				}
+				?></span>
+			</td>
+		</tr>
 <?php
 
 // Alter table __flexicontent_fields: Add asset_id column
-$db = &JFactory::getDBO();
 $query = "SHOW COLUMNS FROM #__flexicontent_fields";
 $db->setQuery($query);
 $fields_tbl_cols = $db->loadResultArray();
 
 ?>
-		<tr class="row0">
+		<tr class="row1">
 			<td class="key">Run SQL "ALTER TABLE `..._flexicontent_fields` ADD `asset_id` INT NULL DEFAULT NULL AFTER `id`,<br> ADD UNIQUE ( `asset_id` )"
 			<?php
 			$already = true;

@@ -250,7 +250,7 @@ $fields_tbl_cols = $db->loadResultArray();
 <?php
 // Alter DB table flexicontent_fields: Add formhidden column
 ?>
-		<tr class="row1">
+		<tr class="row0">
 			<td class="key">Run SQL "ALTER TABLE `...__flexicontent_fields` ADD `formhidden` TEXT NOT NULL AFTER `untranslatable`"
 			<?php
 			$already = true;
