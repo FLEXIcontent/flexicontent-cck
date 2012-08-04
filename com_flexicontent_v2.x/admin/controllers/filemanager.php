@@ -186,6 +186,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$obj->uploaded_by		= $user->get('id');
 
 					$db->insertObject('#__flexicontent_files', $obj);
+					
+					//Get new file id
+					$file_id = (int)$db->insertid();
 
 					$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
 					
@@ -204,13 +207,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					
 					// REDIRECT
 					if ($return) {
-						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+						$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
 					}
 					return;
 				}
 			}
 		}
-		$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+		$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
 	}
 	
 	function ftpValidate()

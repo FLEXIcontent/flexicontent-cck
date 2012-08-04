@@ -24,6 +24,10 @@
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level2" menu="hide" />
 			<field name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
