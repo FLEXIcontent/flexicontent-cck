@@ -338,7 +338,7 @@ class FlexicontentViewItem extends JView
 		}
 
 		// Main category form field
-		$class = 'class="required scat"';
+		$class = 'class="scat validate-catid"';
 		if (FLEXI_J16GE) {
 			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'jform[catid]', $row->catid, 2, $class, true, true, $actions_allowed);
 		} else {

@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( empty($values) && !strlen($default_value) ) {
 			$field->{$prop} = '';
 			return;
-		} else{
+		} else if ( empty($values) && strlen($default_value) ) {
 			$values = array($default_value);
 		}
 		
