@@ -20,6 +20,11 @@
 		</param>
 	</params>
 	<params group="group-minigallery" addpath="/administrator/components/com_flexicontent/elements">
+
+		<param name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
 		<param name="" type="separator" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
 		<param name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
 			<option value="1">FLEXI_FIELD_GALLERY_TOP</option>
