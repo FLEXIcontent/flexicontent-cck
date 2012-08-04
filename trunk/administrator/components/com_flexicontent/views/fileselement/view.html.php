@@ -61,18 +61,21 @@ class FlexicontentViewFileselement extends JView
 		JHTML::_('behavior.formvalidation');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order', 		'filter_order', 	'f.filename', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter', 				'filter', 			1, 				'int' );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 	'filter_uploader', 	0, 				'int' );
-		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_url', 			'filter_url', 		'',				'word' );
-		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_secure', 		'filter_secure', 	'', 			'word' );
-		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.fileselement.filter_ext', 			'filter_ext', 		'', 			'alnum' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fileselement.search', 				'search', 			'', 			'string' );
-		$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 				'item_id', 			0,	 			'int' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		
-		$itemid 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.itemid', 'itemid', 0, 'int' );
+		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
+		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
+		$filter           = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter',           'filter',           1,           'int' );
+		$filter_uploader  = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_uploader',  'filter_uploader',  0,           'int' );
+		$filter_url       = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_url',       'filter_url',       '',          'word' );
+		$filter_secure    = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_secure',    'filter_secure',    '',          'word' );
+		$filter_ext       = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_ext',       'filter_ext',       '',          'alnum' );
+		$search           = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.search',           'search',           '',          'string' );
+		$filter_item      = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          0,           'int' );
+		$itemid 	      	= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.itemid',           'itemid',           0,           'int' );
+		$autoselect       = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
+
+    $search      = $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$newfileid   = JRequest::getInt('newfileid');
+		$newfilename = base64_decode(JRequest::getVar('newfilename', ''));
 
 		//add css and submenu to document
 		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -126,13 +129,19 @@ class FlexicontentViewFileselement extends JView
 			fileobjs = window.parent.document.getElementsByName('{$formfieldname}');
 			for(i=0,n=fileobjs.length;i<n;i++) {
 				row = document.getElementById('file'+fileobjs[i].value);
-				if((typeof row) !='undefined') {
+				if( (typeof row) != 'undefined' && row != null) {
 					row.className = 'striketext';
 				}
 			}
+			".
+			(($autoselect && $newfileid) ? "qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."');" : "")
+			."
 		});
 		";
 		$document->addScriptDeclaration($js);
+		if ($autoselect && $newfileid) {
+			$app->enqueueMessage(JText::_( 'FLEXI_UPLOADED_FILE_WAS_SELECTED' ), 'message');
+		}
 		
 		$files_selected = $model->getItemFiles($itemid);
 
