@@ -267,15 +267,15 @@ var JFormValidator = new Class({
 		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
 	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
-			if ((handler) && (handler != 'none') && (this.handlers[handler]) && el_value) {
+	  	if ( typeof auto_filled[el_name] != 'undefined' ) {
 				// Execute the validation handler and return result
-				if (this.handlers[handler].exec(el_value) != true) {
+				if (this.handlers[handler].exec(el) != true) {
 					this.handleResponse(false, el);
 					return false;
 				}
-			} else if ( typeof auto_filled[el_name] != 'undefined' ) {
+			} else if ((handler) && (handler != 'none') && (this.handlers[handler]) && el_value) {
 				// Execute the validation handler and return result
-				if (this.handlers[handler].exec(el) != true) {
+				if (this.handlers[handler].exec(el_value) != true) {
 					this.handleResponse(false, el);
 					return false;
 				}
