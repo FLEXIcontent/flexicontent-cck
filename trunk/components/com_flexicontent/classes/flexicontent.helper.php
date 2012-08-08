@@ -143,7 +143,7 @@ class flexicontent_html
 		JRequest::setVar( 'cid', $id );
 		
 		$app = JFactory::getApplication();
-		$modelname = $app->isAdmin() ? 'items' : FLEXI_ITEMVIEW;
+		$modelname = $app->isAdmin() ? 'item' : FLEXI_ITEMVIEW;
 		$model = $this->getModel( $modelname );
 		$user = JFactory::getUser();
 		$state = JRequest::getVar( 'state', 0 );

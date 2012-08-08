@@ -94,8 +94,6 @@ class FlexicontentViewItem extends JView
 			$document->addStyleDeclaration($css);
 		}
 
-		//get item data
-		
 		// we are in display() task, so we will load the current item version by default
 		// 'preview' request variable will force last, and finally 'version' request variable will force specific
 		// NOTE: preview and version variables cannot be used by users that cannot edit the item
@@ -108,9 +106,43 @@ class FlexicontentViewItem extends JView
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
 		$params = & $item->parameters;
 		
+		// ********************
+		// ITEM LAYOUT handling
+		// ********************
+		
+		// (a) Get from item parameters, allowing URL override
+		$ilayout = JRequest::getVar('ilayout', false);
+		$ilayout = $ilayout ? $ilayout : $params->get('ilayout', 'default');
+		
+		// (b) Create the type parameters
+		$tparams = & $this->get( 'Typeparams' );
+		$tparams = new JParameter($tparams);
+		
+		// (c) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
+		$allowed_tmpls = $tparams->get('allowed_ilayouts');
+		$type_default_layout = $tparams->get('ilayout', 'default');
+		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+		
+		// (d) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
+		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
+			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
+			$ilayout = $type_default_layout;
+		}
+		
+		// (e) Get cached template data
+		$themes = flexicontent_tmpl::getTemplates();
+		
+		// (f) Verify the item layout exists
+		if ( !isset($themes->items->{$ilayout}) ) {
+			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
+			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
+			$ilayout = $fixed_ilayout;
+		}
+		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout') );
+			FLEXIUtilities::loadTemplateLanguageFile( $ilayout );
 		
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
@@ -206,25 +238,24 @@ class FlexicontentViewItem extends JView
 		if ( $limitstart == 0 && FLEXIUtilities::count_new_hit($item) ) {
 			$model->hit();
 		}
-
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmplvar	= $themes->items->{$params->get('ilayout', 'default')}->tmplvar;
-
-		if ($params->get('ilayout')) {
+		
+		// Load template css/js and set template data variable
+		$tmplvar	= $themes->items->{$ilayout}->tmplvar;
+		if ($ilayout) {
 			// Add the templates css files if availables
-			if (isset($themes->items->{$params->get('ilayout')}->css)) {
-				foreach ($themes->items->{$params->get('ilayout')}->css as $css) {
+			if (isset($themes->items->{$ilayout}->css)) {
+				foreach ($themes->items->{$ilayout}->css as $css) {
 					$document->addStyleSheet($this->baseurl.'/'.$css);
 				}
 			}
 			// Add the templates js files if availables
-			if (isset($themes->items->{$params->get('ilayout')}->js)) {
-				foreach ($themes->items->{$params->get('ilayout')}->js as $js) {
+			if (isset($themes->items->{$ilayout}->js)) {
+				foreach ($themes->items->{$ilayout}->js as $js) {
 					$document->addScript($this->baseurl.'/'.$js);
 				}
 			}
 			// Set the template var
-			$tmpl = $themes->items->{$params->get('ilayout')}->tmplvar;
+			$tmpl = $themes->items->{$ilayout}->tmplvar;
 		} else {
 			$tmpl = '.items.default';
 		}
@@ -336,9 +367,9 @@ class FlexicontentViewItem extends JView
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
-		if ($params->get('ilayout')) {
-			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$params->get('ilayout'));
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$params->get('ilayout'));
+		if ($ilayout) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$ilayout);
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
 		}
 
 		parent::display($tpl);
@@ -405,7 +436,7 @@ class FlexicontentViewItem extends JView
 		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout') );
+			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
 		
 		// ****************************************************************************************
 		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)

@@ -91,9 +91,27 @@ class FlexicontentViewCategory extends JView
 		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$params	= & $category->parameters;
 		
+		// ************************
+		// CATEGORY LAYOUT handling
+		// ************************
+		
+		// (a) Get from category parameters, allowing URL override
+		$clayout = JRequest::getVar('clayout', false);
+		$clayout = $clayout ? $clayout : $params->get('clayout', 'blog');
+		
+		// (b) Get cached template data
+		$themes = flexicontent_tmpl::getTemplates();
+		
+		// (c) Verify the category layout exists
+		if ( !isset($themes->category->{$clayout}) ) {
+			$fixed_clayout = 'blog';
+			$mainframe->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
+			$clayout = $fixed_clayout;
+		}
+		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $params->get('clayout') );
+			FLEXIUtilities::loadTemplateLanguageFile( $clayout );
 		
 		// Get URL variables
 		$cid = JRequest::getInt('cid', 0);
@@ -268,8 +286,6 @@ class FlexicontentViewCategory extends JView
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 		
-		$themes		= flexicontent_tmpl::getTemplates();
-		
 		$authordescr_item_html = false;
 		if ($authordescr_item) {
 			
@@ -309,21 +325,21 @@ class FlexicontentViewCategory extends JView
 		}
 		//echo $authordescr_item_html; exit();
 		
-		if ($params->get('clayout')) {
+		if ($clayout) {
 			// Add the templates css files if availables
-			if (isset($themes->category->{$params->get('clayout')}->css)) {
-				foreach ($themes->category->{$params->get('clayout')}->css as $css) {
+			if (isset($themes->category->{$clayout}->css)) {
+				foreach ($themes->category->{$clayout}->css as $css) {
 					$document->addStyleSheet($this->baseurl.'/'.$css);
 				}
 			}
 			// Add the templates js files if availables
-			if (isset($themes->category->{$params->get('clayout')}->js)) {
-				foreach ($themes->category->{$params->get('clayout')}->js as $js) {
+			if (isset($themes->category->{$clayout}->js)) {
+				foreach ($themes->category->{$clayout}->js as $js) {
 					$document->addScript($this->baseurl.'/'.$js);
 				}
 			}
 			// Set the template var
-			$tmpl = $themes->category->{$params->get('clayout')}->tmplvar;
+			$tmpl = $themes->category->{$clayout}->tmplvar;
 		} else {
 			$tmpl = '.category.default';
 		}
@@ -578,9 +594,9 @@ class FlexicontentViewCategory extends JView
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
-		if ($params->get('clayout')) {
-			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$params->get('clayout'));
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$params->get('clayout'));
+		if ($clayout) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		}
 
 		parent::display($tpl);

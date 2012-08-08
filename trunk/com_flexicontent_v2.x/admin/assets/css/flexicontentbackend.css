@@ -903,6 +903,11 @@ div table.adminform {
 	font-size:11px;
 }
 
+div.flexi_edit table.adminform {
+	background-color: #FCFCFC;
+	font-size:11px;
+}
+
 #titleblock input, #aliasblock input {
 	font-size:10px !important; 
 }
