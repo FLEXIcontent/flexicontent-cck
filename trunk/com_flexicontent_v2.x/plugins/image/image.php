@@ -186,9 +186,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$isItemsManager = $mainframe->isAdmin() && $view=='items' && $option=='com_flexicontent';
 		
 		// some parameter shortcuts
-		$uselegend	= $field->parameters->get( 'uselegend', 1 ) ;
-		$usepopup	= $field->parameters->get( 'usepopup', 1 ) ;
-		$popuptype	= $field->parameters->get( 'popuptype', 1 ) ;
+		$uselegend  = $field->parameters->get( 'uselegend', 1 ) ;
+		$usepopup   = $field->parameters->get( 'usepopup',  1 ) ;
+		$popuptype  = $field->parameters->get( 'popuptype', 1 ) ;
+		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
 		
 		// Check and disable 'uselegend'
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
@@ -370,8 +371,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					case 1: $src = $srcs; break;
 					case 2: $src = $srcm; break;
-					case 3: $src = $srcl; $popuptype = 0; break;
+					case 3: $src = $srcl; break;   // this makes little sense, since both thumbnail and popup image are size 'large'
 					default: $src = $srcs; break;
+				}
+				
+				switch ($grouptype)
+				{
+					case 0: $group_name = ''; break;
+					case 1: $group_name = 'fcitem_'.$field->item_id; break;
+					case 2: $group_name = 'fcview_'.$view; break;
+					default: $group_name = ''; break;
 				}
 				
 				// ADD some extra (display) properties that point to all sizes
@@ -394,7 +403,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 								
 				// first condition is for the display for the preview feature
-				if ($isItemsManager) {
+				if ($isItemsManager) {    // Image displayed in backend items manager
 					if ($usepopup) {
 						$field->{$prop} = '
 						<a href="../'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
@@ -405,39 +414,49 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					} else {
 						$field->{$prop} = '<img src="../'.$srcb.'" alt ="'.$alt.'"'.$legend.' />';
 					}
-				} else if ($linkto_url && $url_target=='multibox' && $urllink) {
+				} else if ($linkto_url && $url_target=='multibox' && $urllink) {   // No image popup, instead link to URL inside a popup
 					$field->{$prop} = '
 					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$id.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					<script>document.write(\'</a>\')</script>
 					<div class="multiBoxDesc mbox_img_url mb'.$id.'">'.($desc ? $desc : $title).'</div>
 					';
-				} else if ($linkto_url && $urllink) {
+				} else if ($linkto_url && $urllink) {    // No image popup, just link to URL
 					$field->{$prop} = '
 					<a href="'.$urllink.'" target="'.$url_target.'">
 						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
 					</a>
 					';
-				} else if ($usepopup && $popuptype == 1) {
+				} else if ($usepopup && $popuptype == 1) {   // Multibox image popup
+					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop} = '
-					<a href="'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
-						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
-					</a>
-					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
-					';
-				} else if ($usepopup && $popuptype == 2) {
-				$field->{$prop} = '
-					<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" title="'.($desc ? $desc : $title).'">
-						<img src="'. $src .'" alt ="'.$alt.'" />
-					</a>
-					';
-				} else if ($usepopup && $popuptype == 3) {
-				$field->{$prop} = '
-					<a href="'.$srcl.'" class="jcepopup" rel="'.$field->item_id.'" title="'.($desc ? $desc : $title).'">
-						<img src="'. $src .'" alt ="'.$alt.'" />
-					</a>
-					';
-				} else {
+						<a href="'.$srcl.'" id="mb'.$id.'" class="mb" '.$group_str.' >
+							<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+						</a>
+						<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
+						';
+				} else if ($usepopup && $popuptype == 2) {   // Rokbox image popup
+					$group_str = '';   // no support for image grouping
+					$field->{$prop} = '
+						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.($desc ? $desc : $title).'">
+							<img src="'. $src .'" alt ="'.$alt.'" />
+						</a>
+						';
+				} else if ($usepopup && $popuptype == 3) {   // JCE popup image popup
+					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
+					$field->{$prop} = '
+						<a href="'.$srcl.'" class="jcepopup" '.$group_str.' title="'.($desc ? $desc : $title).'">
+							<img src="'. $src .'" alt ="'.$alt.'" />
+						</a>
+						';
+				} else if ($usepopup && $popuptype == 4) {   // Fancybox image popup
+					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
+					$field->{$prop} = '
+						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.($desc ? $desc : $title).'">
+							<img src="'. $src .'" alt ="'.$alt.'" />
+						</a>
+						';
+				} else {   // thumbnail without popup
 					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}
 			}

@@ -827,7 +827,8 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
-	 		JHTML::_('behavior.tooltip');
+			JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$css 	= JURI::base(true) .'/components/com_flexicontent/assets/css/fcvote.css';
 			$js		= JURI::base(true) .'/components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
@@ -944,8 +945,9 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
+			JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$document->addScript( JURI::base(true) .'/components/com_flexicontent/assets/js/fcfav.js' );
-			JHTML::_('behavior.tooltip');
 			
 			$js = "
 				var sfolder = '".JURI::base(true)."';

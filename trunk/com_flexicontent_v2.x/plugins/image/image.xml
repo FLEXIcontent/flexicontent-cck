@@ -116,6 +116,12 @@
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX</option>
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
+				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX</option>
+			</field>
+			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
+				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" menu="hide" />
 			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
