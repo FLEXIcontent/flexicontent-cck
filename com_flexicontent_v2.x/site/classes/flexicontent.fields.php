@@ -359,13 +359,12 @@ class FlexicontentFields
 			// Performance wise parameter 'trigger_plgs_incatview', recommended to be off: do not trigger content plugins on item's maintext while in category view
 			if ($flexiview!='category' || $field->parameters->get('trigger_plgs_incatview', 1))
 			{
-				// Trigger content plugins
 				if ($print_logging_info)  $start_microtime = microtime(true);
-				if (!FLEXI_J16GE) {
-					$results = $dispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart));
-				} else {
-					$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart));
-				}
+				
+				// Trigger content plugins on field's HTML display, as if they were a "joomla article"
+				if (FLEXI_J16GE) $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart));
+				else             $results = $dispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart));
+				
 				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 			

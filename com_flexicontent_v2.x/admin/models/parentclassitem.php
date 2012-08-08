@@ -442,7 +442,8 @@ class ParentClassItem extends JModelAdmin
 						. ' CASE WHEN i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' THEN 0 ELSE 1 END as publication_scheduled,'
 						. ' CASE WHEN i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' THEN 0 ELSE 1 END as publication_expired,'
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+						. ' ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count as rating_count'
 						. ($version ? ',ver.version_id' : '')
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
@@ -450,6 +451,7 @@ class ParentClassItem extends JModelAdmin
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid
 						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 						. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+						. ' LEFT JOIN #__content_rating AS v ON i.id = v.content_id'
 						. $version_join 
 						. $where
 						;
@@ -1317,6 +1319,7 @@ class ParentClassItem extends JModelAdmin
 		// Initialize various variables
 		// ****************************
 		
+		$db = & $this->_db;
 		$app = &JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 		$user	=& JFactory::getUser();
@@ -1324,6 +1327,8 @@ class ParentClassItem extends JModelAdmin
 		$nullDate	= $this->_db->getNullDate();
 		$config =& JFactory::getConfig();
 		$tzoffset = $config->getValue('config.offset');
+		$view = JRequest::getVar('view', false);
+		JRequest::setVar("isflexicontent", "yes");
 		
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
@@ -1342,6 +1347,12 @@ class ParentClassItem extends JModelAdmin
 		if ( !$isnew ) {
 			// Load existing item into the empty item model
 			$item->load( $data['id'] );
+			
+			// We need to fake joomla's states ... when triggering the before save content event
+			$fc_state = $item->state;
+			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
+			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
+			else $jm_state = $fc_state;                                      // trashed & archive states
 			
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!!
 			if( !$app->isAdmin() ) 
@@ -1649,11 +1660,29 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		
-		// ***************************************
-		// Trigger plugin Event 'onBeforeSaveItem'
-		// ***************************************
+		// **************************************************************************************************
+		// Trigger Event 'onBeforeSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// **************************************************************************************************
 		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
-		if((count($result)>0) && in_array(false, $result)) return false;
+		if((count($result)>0) && in_array(false, $result, true)) return false;   // cancel item save
+		
+		
+		// ******************************************************************************************************
+		// Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
+		// ******************************************************************************************************
+		
+		// Some compatibility steps
+		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->query(); }
+	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		
+		if (FLEXI_J16GE) $result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
+		else             $result = $dispatcher->trigger('onBeforeContentSave', array(&$item, $isnew));
+		
+		// Reverse compatibility steps
+		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );  $db->query(); }
+		JRequest::setVar('view', $view);	  JRequest::setVar('option', 'com_flexicontent');
+		
+		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
 		
 		
 		// ************************************************************************************************************
@@ -1667,12 +1696,12 @@ class ParentClassItem extends JModelAdmin
 		
 		// ****************************************************************************
 		// Save fields values to appropriate tables (versioning table or normal tables)
+		// NOTE: This allow canceling of item save operation, if 'abort' is returned
 		// ****************************************************************************
 		$files  = JRequest::get( 'files', JREQUEST_ALLOWRAW );
 		$result = $this->saveFields($isnew, $item, $data, $files);
 		if( $result==='abort' ) {
 			if ($isnew) {
-				$db = & $this->_db;
 				if (FLEXI_J16GE) {
 					$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
 					$db->query();
@@ -1724,10 +1753,24 @@ class ParentClassItem extends JModelAdmin
 			$item->modified_by	= $user->get('id');
 		}
 		
-		// *********************************************************************************************
-		// Trigger plugin Event 'onAfterSaveItem', NOTE: This event is used by e.g. 'flexinotify' plugin
-		// *********************************************************************************************
+		// *************************************************************************************************
+		// Trigger Event 'onAfterSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// *************************************************************************************************
 		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$data ));
+		
+		
+		// *****************************************************************************************************
+		// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
+		// *****************************************************************************************************
+		// Some compatibility steps
+	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+	  
+		if (FLEXI_J16GE) $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
+		else             $dispatcher->trigger('onAfterContentSave', array(&$item, $isnew));
+		
+		// Reverse compatibility steps
+		JRequest::setVar('view', $view);	  JRequest::setVar('option', 'com_flexicontent');
+		
 		
 		// *********************************************
 		// Create and store version METADATA information 
@@ -1774,9 +1817,9 @@ class ParentClassItem extends JModelAdmin
 			$this->_db->query();
 		}
 		
-		// **********************************************************
-		// Checkin item and trigger plugin Event 'onCompleteSaveItem'
-		// **********************************************************
+		// ****************************************************************************************************
+		// Trigger Event 'onCompleteSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// ****************************************************************************************************
 		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		return true;
 	}
@@ -2729,6 +2772,8 @@ class ParentClassItem extends JModelAdmin
 	function setitemstate($id, $state = 1)
 	{
 		$user = & JFactory::getUser();
+		JRequest::setVar("isflexicontent", "yes");
+		static $event_failed_notice_added = false;
 		
 		if ( $id )
 		{
@@ -2759,6 +2804,29 @@ class ParentClassItem extends JModelAdmin
 			}
 		}
 		
+		
+		// ****************************************************************
+		// Trigger Event 'onContentChangeState' of Joomla's Content plugins
+		// ****************************************************************
+		if (FLEXI_J16GE) {
+
+			// PREPARE FOR TRIGGERING content events
+			// We need to fake joomla's states ... when triggering events
+			$fc_state = $state;
+			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
+			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
+			else $jm_state = $fc_state;                                      // trashed & archive states
+			$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
+			
+		  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');		$item->state = $jm_state;
+			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
+			JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');		$item->state = $fc_state;
+			if (in_array(false, $result, true) && !$event_failed_notice_added) {
+				JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
+				$event_failed_notice_added = true;
+				return false;
+			}
+		}
 		
 		return true;
 	}

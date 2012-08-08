@@ -351,12 +351,10 @@ class FlexicontentViewCategory extends JView
 			JPluginHelper::importPlugin('content');
 	
 			// Allow to trigger content plugins on category description
-			$category->text			= $category->description;
-			if (FLEXI_J16GE) {
-				$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
-			} else {
-				$results = $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
-			}
+			// NOTE: for J2.5, we will trigger the plugins as if description text was an article text, using ... 'com_content.article'
+			$category->text = $category->description;
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
+			else              $results = $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
 			
 			$category->description 	= $category->text;
 		}

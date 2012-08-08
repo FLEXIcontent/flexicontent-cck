@@ -1623,18 +1623,30 @@ class FlexicontentModelItems extends JModel
 	 */
 	function delete($cid, &$itemmodel=null)
 	{
+		$dispatcher = & JDispatcher::getInstance();
+		$item_arr = array();
+		
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
 			
-			// **********************************************************************************
-			// Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
-			// **********************************************************************************
 			if ($itemmodel)
 			{
 				foreach ($cid as $item_id)
 				{
 					$item = $itemmodel->getItem($item_id);
+					
+					// *****************************************************************
+					// Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
+					// *****************************************************************
+					if (FLEXI_J16GE) {
+						$dispatcher->trigger($itemmodel->event_before_delete, array('com_content.article', $item));
+						$item_arr[] = clone($item);  // store object so that we can call after delete event
+					}
+					
+					// **********************************************************************************
+					// Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
+					// **********************************************************************************
 					$fields = $itemmodel->getExtrafields($force=true);
 					foreach ($fields as $field) {
 						$field_type = $field->iscore ? 'core' : $field->field_type;
@@ -1783,7 +1795,17 @@ class FlexicontentModelItems extends JModel
 
 			return true;
 		}
-
+		
+		
+		// ****************************************************************
+		// Trigger Event 'onContentAfterDelete' of Joomla's Content plugins
+		// ****************************************************************
+		if (FLEXI_J16GE) {
+			foreach($item_arr as $item) {
+				$dispatcher->trigger($itemmodel->event_after_delete, array('com_content.article', $item));
+			}
+		}
+		
 		return false;
 	}
 	
