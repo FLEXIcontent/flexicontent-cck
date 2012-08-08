@@ -884,7 +884,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$db    = & JFactory::getDBO();
 		$user  =& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(), 'post', 'array' );
-		$model = $this->getModel('items');
+		$model = $this->getModel('item');
 		$msg = '';
 		
 		$newstate = JRequest::getVar("newstate", '');
@@ -1213,7 +1213,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model = & $this->getModel('item');
 		
 		// CHECK-IN the item if user can edit
-		if ($model->get('id') > 1)
+		if ( $model->get('id') )
 		{
 			$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 			$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');

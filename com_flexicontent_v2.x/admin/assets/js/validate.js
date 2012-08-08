@@ -148,10 +148,12 @@ var JFormValidator = new Class({
 					
 					// Retrieve selected values for secondary categories
 					if(MooTools.version>="1.2.4") {
-						var values = $('jform_cid').getSelected();
+						//var values = $('jform_cid').getSelected();  // does not work in old template form overrides with no id parameter
+						var values = $$(document.getElementsByName("jform[cid][]"))[0].getSelected();
 						values = values.map( function(g) { return g.get('value'); } );
 					} else {
-						values = $('cid').getValue();
+						//values = $('cid').getValue();  // does not work in old template form overrides with no id parameter
+						var values = $$(document.getElementsByName("cid[]"))[0].getValue();
 						//  ** Alternative code **
 						//var values = $('cid').getChildren().filter( function(g) { return g.selected; } );
 						//values = values.map( function(g) { return g.getProperty('value'); } );
