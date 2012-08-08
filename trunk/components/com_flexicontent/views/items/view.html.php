@@ -267,7 +267,7 @@ class FlexicontentViewItems extends JView
 		// Anyway these events are usually not very time consuming, so lets trigger all of them ???
 		JPluginHelper::importPlugin('content');
 		
-		// Set the view and option to 'article' and 'com_content'
+		// Do some compatibility steps, Set the view and option to 'article' and 'com_content'
 		JRequest::setVar('view', 'article');
 		JRequest::setVar('option', 'com_content');
 		JRequest::setVar("isflexicontent", "yes");
@@ -275,16 +275,19 @@ class FlexicontentViewItems extends JView
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
 		
-		$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$item->params, 0));
+		else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
-		$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$item->params, 0));
+		else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->beforeDisplayContent = trim(implode("\n", $results));
 
-		$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$item->params, 0));
+		else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
-		// Set the view and option back to 'items' and 'com_flexicontent'
+		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
 	  JRequest::setVar('view', FLEXI_ITEMVIEW);
 	  JRequest::setVar('option', 'com_flexicontent');
 		
@@ -589,7 +592,10 @@ class FlexicontentViewItems extends JView
 
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms);
-
+		
+		// Get number of subscribers
+		$subscribers 	= & $this->get( 'SubscribersCount' );
+		
 		// Get menu overridden categories/main category fields
 		$menuCats = $this->_getMenuCats($item, $perms, $params);
 		
@@ -654,6 +660,7 @@ class FlexicontentViewItems extends JView
 		}
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',			$lists);
+		$this->assignRef('subscribers', $subscribers);
 		$this->assignRef('editor',		$editor);
 		$this->assignRef('user',			$user);
 		if (!FLEXI_J16GE) {  // compatibility old templates

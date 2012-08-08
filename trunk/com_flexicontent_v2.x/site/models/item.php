@@ -480,49 +480,6 @@ class FlexicontentModelItem extends ParentClassItem
 	
 	
 	/**
-	 * Method to change the state of an item
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function setitemstate($id, $state = 1)
-	{
-		$user 	=& JFactory::getUser();
-
-		if ( $id )
-		{
-			$v = FLEXIUtilities::getCurrentVersions((int)$id);
-			
-			$query = 'UPDATE #__content'
-				. ' SET state = ' . (int)$state
-				. ' WHERE id = '.(int)$id
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-			;
-			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			$query = 'UPDATE #__flexicontent_items_versions'
-				. ' SET value = ' . (int)$state
-				. ' WHERE item_id = '.(int)$id
-				. ' AND valueorder = 1'
-				. ' AND field_id = 10'
-				. ' AND version = ' . $v['version']
-				;
-			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	
-	/**
 	 * Method to get advanced search fields which belongs to the item type
 	 * 
 	 * @return object

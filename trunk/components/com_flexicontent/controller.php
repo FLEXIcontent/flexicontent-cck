@@ -624,8 +624,8 @@ class FlexicontentController extends JController
 	}
 
 	/**
-	 * Method of the voting
-	 * Deprecated to ajax voting
+	 * Method of the voting without AJAX. Exists for compatibility reasons,
+	 * since it can be called by Joomla's content vote plugin.
 	 *
 	 * @access public
 	 * @since 1.0
@@ -634,49 +634,20 @@ class FlexicontentController extends JController
 	{
 		$mainframe =& JFactory::getApplication();
 
-		$id 		= JRequest::getInt('id', 0);
-		$cid 		= JRequest::getInt('cid', 0);
-		$layout		= JRequest::getCmd('layout', 'default');
-		$vote		= JRequest::getInt('vote', 0);
-		$session 	=& JFactory::getSession();
-		$params 	= & $mainframe->getParams('com_flexicontent');
+		$id = JRequest::getInt('id', 0);
+		$cid = JRequest::getInt('cid', 0);
+		$url = JRequest::getString('url', '');
 		
-		// Check 1: try to retieve the user 's voting cookie, which is set per item id
-		$cookieName	= JUtility::getHash( $mainframe->getName() . 'flexicontentvote' . $id );
-		$voted = JRequest::getVar( $cookieName, '0', 'COOKIE', 'INT');
-
-		// Check 2: item id exists in our voting logging SESSION (array) variable 
-		$votestamp = array();
-		$votecheck = false;
-		if ($session->has('votestamp', 'flexicontent')) {
-			$votestamp = $session->get('votestamp', array(),'flexicontent');
-			$votecheck = isset($votecheck[$id]);
+		// url variable is set by Joomla's content plugin
+		if (!$url) {
+			$url = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='.$id);
 		}
-
-		if ( $voted || $votecheck )	{
-			JError::raiseWarning(JText::_( 'SOME_ERROR_CODE' ), JText::_( 'FLEXI_YOU_ALLREADY_VOTED' ));
-		} else {
-			// Set 1: he user 's voting cookie for current item id
-			setcookie( $cookieName, '1', time()+1*24*60*60*60 );
-			
-			// Set 2: the current item id, in our voting logging SESSION (array) variable  
-			$votestamp[$id] = 1;
-			$session->set('votestamp', $votestamp, 'flexicontent');
-			
 			// Finally store the vote
-			$model 	= $this->getModel(FLEXI_ITEMVIEW);
-			if ($model->storevote($id, $vote)) {
-				$msg = JText::_( 'FLEXI_VOTE COUNTED' );
-			} else {
-				$msg = JText::_( 'FLEXI_VOTE FAILURE' );
-				JError::raiseError( 500, $model->getError() );
-			}
-		}
+		JRequest::setVar('no_ajax', 1);
+		$this->ajaxvote();
 		
-		$cache = &JFactory::getCache('com_flexicontent');
-		$cache->clean();
-
-		$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='.$id.'&layout='.$layout, false), $msg );
+		$msg = '';
+		$this->setRedirect($url, $msg );
 	}
 
 	/**
@@ -738,20 +709,30 @@ class FlexicontentController extends JController
 		$db  	= &JFactory::getDBO();
 		$session 	=& JFactory::getSession();
 		
+		$no_ajax			= JRequest::getInt('no_ajax');
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
 		$xid 			= JRequest::getVar('xid');
-
+		
+		if ($no_ajax) {
+			// Joomla 's content plugin uses 'id' HTTP request variable
+			$cid = JRequest::getInt('id');
+		}
+		
 		$result	= new JObject;
 
 		if (($user_rating >= 1) and ($user_rating <= 5))
 		{
 			// Check: item id exists in our voting logging SESSION (array) variable 
 			$votestamp = $session->get('votestamp', array(),'flexicontent');
-			$votecheck = isset($votestamp[$cid]);
+			if ( !isset($votestamp[$cid]) || !is_array($votestamp[$cid]) )
+			{
+				$votestamp[$cid] = array();
+			}
+			$votecheck = isset($votestamp[$cid][$xid]);
 			
 			// Set: the current item id, in our voting logging SESSION (array) variable  
-			$votestamp[$cid] = 1;
+			$votestamp[$cid][$xid] = 1;
 			$session->set('votestamp', $votestamp, 'flexicontent');
 			
 			// Setup variables used in the db queries
@@ -786,7 +767,10 @@ class FlexicontentController extends JController
 			else
 			{
 				// Voting record exists for this item, check if user has already voted
-				if ( !$votecheck )   // it is not so good way to check using ip, since 2 users may have same IP, now using SESSION ////if ( $currip!=$votesdb->lastip ) 
+				
+				// NOTE: it is not so good way to check using ip, since 2 users may have same IP,
+				// but for compatibility with standard joomla and for stronger security we will do it
+				if ( !$votecheck && $currip!=$votesdb->lastip ) 
 				{
 					// vote accepted update DB
 					$query = " UPDATE ".$dbtbl
@@ -808,13 +792,24 @@ class FlexicontentController extends JController
 					//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * 20;
 					$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
 					$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
-					echo json_encode($result);
-					exit();
+					if ($no_ajax) {
+						$app->enqueueMessage( $result->html, 'notice' );
+						return;
+					} else {
+						echo json_encode($result);
+						exit();
+					}
 				}
 			}
 			$result->percentage = ( ((isset($votesdb->rating_sum) ? $votesdb->rating_sum : 0) + (int)$user_rating) / $result->ratingcount ) * 20;
-			$result->html 		= JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
-			echo json_encode($result);
+			$result->html = JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+			if ($no_ajax) {
+				$app->enqueueMessage( $result->html, 'notice' );
+				return;
+			} else {
+				echo json_encode($result);
+				exit();
+			}
 		}
 	}
 
