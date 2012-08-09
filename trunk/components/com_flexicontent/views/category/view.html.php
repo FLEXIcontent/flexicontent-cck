@@ -109,6 +109,9 @@ class FlexicontentViewCategory extends JView
 			$clayout = $fixed_clayout;
 		}
 		
+		// (d) finally set the template name back into the category's parameters
+		$params->set('clayout', $clayout);
+		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $clayout );

@@ -140,6 +140,9 @@ class FlexicontentViewItem extends JView
 			$ilayout = $fixed_ilayout;
 		}
 		
+		// (g) finally set the template name back into the item's parameters
+		$params->set('ilayout', $ilayout);
+		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $ilayout );
