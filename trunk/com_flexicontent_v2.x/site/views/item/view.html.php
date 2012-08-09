@@ -979,9 +979,7 @@ class FlexicontentViewItem extends JView
 		$options 	= array();
 		foreach ($cids as $catid) {
 			$categories[] = $globalcats[$catid];
-			$options[] = JHTML::_('select.option', $catid, $globalcats[$catid]->title );
 		}
-		array_unshift($options, JHTML::_( 'select.option', '', '-- '.JText::_( 'FLEXI_SELECT_CAT' ).' --' ) );
 		
 		// Field names for (a) multi-categories field and (b) main category field
 		$cid_form_fieldname   = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
@@ -1009,12 +1007,12 @@ class FlexicontentViewItem extends JView
 				break;
 			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
 				$mo_cats = false;
-				$mo_maincat = JHTML::_('select.genericlist', $options, $catid_form_fieldname, ' class="required" ', 'value', 'text', $maincatid, $catid_form_tagid );
+				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="required" ', $check_published=true, $check_perms=false);
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 				$class = 'class="validate" multiple="multiple" size="8"';
 				$mo_cats = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $class, $check_published=true, $check_perms=false);
-				$mo_maincat = JHTML::_('select.genericlist', $options, $catid_form_fieldname, ' class="validate-catid" ', 'value', 'text', $maincatid, $catid_form_tagid );
+				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="validate-catid" ', $check_published=true, $check_perms=false);
 				break;
 		}
 		$menuCats = new stdClass();
