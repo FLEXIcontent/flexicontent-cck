@@ -202,6 +202,11 @@ dump($this->row);
 				echo $this->form->render('params', 'item_filtering');
 				echo $this->pane->endPanel();
 				
+				$title = JText::_( 'FLEXI_PARAMETERS_CAT_RSS_FEEDS' );
+				echo $this->pane->startPanel( $title, "params-rss_feeds" );
+				echo $this->form->render('params', 'rss_feeds');
+				echo $this->pane->endPanel();
+				
 				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 				echo $this->form->render('params', 'templates')."<br/>";
 
