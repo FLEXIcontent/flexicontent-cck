@@ -22,6 +22,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $isnew = !$this->item->id;
 $typeid = !$isnew ? $this->item->type_id : JRequest::getInt('typeid') ;
 
+// Create info images
+$infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
+
 // Calculate refer parameter for returning to this page when user ends editing/submitting
 $return = JRequest::getString('return', '', 'get');
 if ($return) {
@@ -327,7 +330,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<label id="cid-lbl" for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+						<?php echo $infoimage; ?>
 					</span>
 				</label>
 				<?php echo $this->menuCats->cid; ?>
@@ -345,7 +348,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<label id="cid-lbl" for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
-						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_NOTES' ) ); ?>
+						<?php echo $infoimage; ?>
 					</span>
 				</label>
 				<?php echo $this->lists['cid']; ?>
@@ -417,7 +420,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
 			<div class="flexi_formblock">
-				<label for="lang_parent_id" class="flexi_label" >
+				<label id="lang_parent_id-lbl" for="lang_parent_id" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
 					<span class="editlinktip hasTip" title="::<?php echo JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' );?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
@@ -445,6 +448,29 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					}
 					?>
 				<?php endif; ?>
+			</div>
+			<?php endif; ?>
+			
+			<?php if ( $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) : ?>
+			<div class="flexi_formblock">
+				<label id="notify-lbl" for="notify" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ).':'; ?>
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
+						<?php echo $infoimage; ?>
+					</span>
+				</label>
+					
+				<input type="checkbox" name="notify" id="notify" />
+				(<?php echo $this->subscribers . ' ' . (($this->subscribers > 1) ? JText::_( 'FLEXI_SUBSCRIBERS' ) : JText::_( 'FLEXI_SUBSCRIBER' )); ?>)
+			</div>
+			<?php endif; ?>
+			
+			<?php if ($this->params->get('enable_notifications', 1) && $this->params->get('allow_designated_users_notify_fe', 0) && JPluginHelper::isEnabled('content', 'notifyarticlesubmit')) : ?>
+			<div class="flexi_formblock" style="float:left;">
+				<label id="fc_notifyarticlesubmit-lbl" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_NOTIFY_DESIGNATED_USERS' ).':'; ?>
+				</label>
+				<span id="fc_notifyarticlesubmit"></span>
 			</div>
 			<?php endif; ?>
 			
