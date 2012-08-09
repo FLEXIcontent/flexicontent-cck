@@ -155,11 +155,13 @@ $("#versioncomment").autogrow({
 })
 </script>
 <?php
-//Set the info image
-$infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
-$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
-$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
-$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
+// Create info images
+$infoimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
+$revertimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
+$viewimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
+$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
+
+// Create some variables
 $itemlang = substr($this->row->language ,0,2);
 if (isset($this->row->item_translations)) foreach ($this->row->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 ?>
@@ -185,7 +187,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											$field = $this->fields['title'];
 											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 										?>
-										<label for="title" <?php echo $label_tooltip; ?> >
+										<label id="title-lbl" for="title" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_TITLE' ).':';*/ ?>
 										</label>
@@ -222,7 +224,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<tr>
 									<td>
 										
-										<label for="alias" class="flexi_label">
+										<label id="alias-lbl" for="alias" class="flexi_label">
 										<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 										</label>
 
@@ -278,7 +280,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											$field = $this->fields['state'];
 											$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
 										?>
-										<label for="published" <?php echo $label_tooltip; ?> >
+										<label id="state-lbl" for="state" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
 											<?php /*echo JText::_( 'FLEXI_STATE' ).':';*/ ?>
 										</label>
@@ -290,18 +292,18 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										if (!$this->cparams->get('auto_approve', 1)) :
 											echo "<br/>".JText::_('FLEXI_APPROVE_VERSION') . $this->lists['vstate'];
 										else :
-											echo '<input type="hidden" name="vstate" value="2" />';
+											echo '<input type="hidden" name="vstate" id="vstate" value="2" />';
 										endif;
 									else :
 										echo $this->published;
-										echo '<input type="hidden" name="state" value="'.$this->row->state.'" />';
+										echo '<input type="hidden" name="state" id="vstate" value="'.$this->row->state.'" />';
 											if (!$this->cparams->get('auto_approve', 1)) :
 												// Enable approval if versioning disabled, this make sense,
 												// since if use can edit item THEN item should be updated !!!
 												$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
-												echo '<input type="hidden" name="vstate" value="'.$item_vstate.'" />';
+												echo '<input type="hidden" name="vstate" id="vstate" value="'.$item_vstate.'" />';
 											else :
-												echo '<input type="hidden" name="vstate" value="2" />';
+												echo '<input type="hidden" name="vstate" id="vstate" value="2" />';
 											endif;
 									endif;
 									?>
@@ -313,8 +315,8 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
-										<label for="notify" class="flexi_label">
-											<?php echo JText::_( 'FLEXI_NOTIFY' ).':'; ?>
+										<label id="jform_notify-lbl" for="jform_notify" class="flexi_label">
+											<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ).':'; ?>
 										</label>
 										
 										<input type="checkbox" name="notify" id="notify" />
@@ -326,6 +328,22 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									</td>
 								</tr>
 								<?php endif; ?>
+								
+								<?php if ($this->cparams->get('enable_notifications', 1) && JPluginHelper::isEnabled('content', 'notifyarticlesubmit')) : ?>
+								<tr>
+									<td>
+										<div class="flexi_formblock" style="float:left;">
+										<span class="flexi_label">
+											<label for="notify">
+												<?php echo JText::_( 'FLEXI_NOTIFY_DESIGNATED_USERS' ).':'; ?>
+											</label>
+										</span>
+										<span id="fc_notifyarticlesubmit"></span>
+									</div>
+									</td>
+								</tr>
+								<?php endif; ?>
+								
 							</table>
 						</td>
 						<td valign="top" align="left"">
@@ -738,12 +756,12 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $comment;?></a><?php
+				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $commentimage;?></a><?php
 				if((int)$version->nr==(int)$this->row->version) {//is current version? ?>
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $view; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revert; ?>
+					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $viewimage; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo JUtility::getToken();?>=1');" href="#" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revertimage; ?>
 				<?php }?></td>
 			</tr>
 			<?php

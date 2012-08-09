@@ -178,6 +178,14 @@
 				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
 				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals=""
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" />
+			<param name="allow_subscribers_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="allow_designated_users_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_DESIGNATED_USERS_NOTIFY" description="FLEXI_ALLOW_DESIGNATED_USERS_NOTIFY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
