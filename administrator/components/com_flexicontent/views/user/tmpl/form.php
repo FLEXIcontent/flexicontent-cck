@@ -374,8 +374,14 @@
 						echo $this->form_authorcat->render('authorcatparams', 'item_filtering');
 						echo $this->pane->endPanel();
 						
+						$title = JText::_( 'FLEXI_PARAMETERS_CAT_RSS_FEEDS' );
+						echo $this->pane->startPanel( $title, "params-rss_feeds" );
+						echo $this->form_authorcat->render('authorcatparams', 'rss_feeds');
+						echo $this->pane->endPanel();
+						
 						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
-		
+						echo $this->form_authorcat->render('authorcatparams', 'templates')."<br/>";
+						
 						foreach ($this->tmpls as $tmpl) {
 							$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 							echo $this->pane->startPanel( $title, "params-".$tmpl->name );
