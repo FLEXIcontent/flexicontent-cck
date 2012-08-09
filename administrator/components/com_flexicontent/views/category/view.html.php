@@ -59,7 +59,11 @@ class FlexicontentViewCategory extends JView
 		$isNew		= !$cid;
 		$checkedOut	= $model->isCheckedOut( $user->get('id') );
 		
-		$cancreate_any = count( flexicontent_cats::getFAallowedCats($user->gmid, array('core.create')) ) ||  ($user->gid == 25);
+		if (FLEXI_ACCESS) {
+			$cancreate_any = count( flexicontent_cats::getFAallowedCats($user->gmid, array('core.create')) ) ||  ($user->gid == 25);
+		} else {
+			$cancreate_any = 1; // all backend users
+		}
 		
 		// Editing existing category: Check if category is already checked out by different user
 		if ($cid) {
