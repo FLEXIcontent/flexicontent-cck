@@ -75,15 +75,16 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ) );
 						}
 						
-						if ($this->dopostinstall && ($this->CanCats || $this->CanAddCats) )
+						if ($this->dopostinstall && $this->CanCats)
 						{
-							if ($this->CanCats)
+							$link = 'index.php?option='.$option.'&amp;view=categories';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
+							$CanAddCats = FLEXI_J16GE ? $this->permission->CanAdd : $this->CanAddCats;
+							if ($CanAddCats)
 							{
-								$link = 'index.php?option='.$option.'&amp;view=categories';
-								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
+								$link = 'index.php?option='.$option.'&amp;view=category';
+								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 							}
-							$link = 'index.php?option='.$option.'&amp;view=category';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 						}
 						
 						if ($this->dopostinstall && $this->CanTypes)

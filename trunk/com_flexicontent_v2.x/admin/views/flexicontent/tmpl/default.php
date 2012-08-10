@@ -76,15 +76,16 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1 );
 						}
 						
-						if ($this->dopostinstall && ($this->permission->CanCats || $this->permission->CanAddCats) )
+						if ($this->dopostinstall && $this->permission->CanCats)  // this CanAdd in J2.5 and CanAddCats in J1.5
 						{
-							if ($this->permission->CanCats)
+							$link = 'index.php?option='.$option.'&amp;view=categories';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
+							$CanAddCats = FLEXI_J16GE ? $this->permission->CanAdd : $this->CanAddCats;
+							if ($CanAddCats)
 							{
-								$link = 'index.php?option='.$option.'&amp;view=categories';
-								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
+								$link = 'index.php?option='.$option.'&amp;view=category';
+								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 							}
-							$link = 'index.php?option='.$option.'&amp;view=category';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 						}
 						
 						if ($this->dopostinstall && $this->permission->CanTypes)
