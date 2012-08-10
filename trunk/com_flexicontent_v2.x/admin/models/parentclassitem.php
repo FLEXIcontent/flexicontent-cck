@@ -1741,7 +1741,7 @@ class ParentClassItem extends JModelAdmin
 		// *********************************************************************************************
 		// not new and not approving version, set modifier and modification time as if it has been saved
 		// *********************************************************************************************
-		if( !$isnew && !$data['vstate']==2 )
+		if( !$isnew && $data['vstate']!=2 )
 		{
 			if ( $canEditState )
 				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
@@ -1877,6 +1877,9 @@ class ParentClassItem extends JModelAdmin
 		{	
 			foreach($fields as $field)
 			{
+				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
+				$field->item_vstate = $data['vstate'];
+				
 				// In J1.6 field's posted values have different location if not CORE (aka custom field)
 				if ( $get_untraslatable_values && $field->untranslatable ) {
 					$postdata[$field->name] = $field->value;
@@ -1895,14 +1898,22 @@ class ParentClassItem extends JModelAdmin
 					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
 					return 'abort';
 				}
+				
+				// Get vstate property from the field object back to the data array
+				$data['vstate'] = $field->item_vstate;
 			}
+		}
+		// Check if vstate was set to 1 (no approve new version) while versioning is disabled
+		if (!$use_versioning && $data['vstate']!=2) {
+			$data['vstate'] = 2;
+			$app->enqueueMessage('vstate cannot be set to 1 (=no approve new version) when versioning is disabled', 'notice' );
 		}
 		
 		
 		// **************************************************************************
 		// IF new version is approved, remove old version values from the field table
 		// **************************************************************************
-		if($data['vstate']==2) { // 
+		if($data['vstate']==2) {
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
 			$this->_db->setQuery($query);
 			$this->_db->query();
