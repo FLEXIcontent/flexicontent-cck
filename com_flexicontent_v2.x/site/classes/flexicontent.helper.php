@@ -564,8 +564,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 			$text 		= JText::_( 'FLEXI_EDIT' );
 
-			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug
-						.'&task=edit&typeid='.$item->type_id.'&'.JUtility::getToken().'=1';
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit'.'&cid='.$item->categoryslug.'&id='.$item->slug; //.'&'.JUtility::getToken().'=1'.'&typeid='.$item->type_id
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;

@@ -406,8 +406,6 @@ class FlexicontentController extends JController
 	*/
 	function edit()
 	{
-		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );		
 		// Debuging message
 		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
 		
@@ -459,7 +457,18 @@ class FlexicontentController extends JController
 			}
 			
 			if (!$has_edit) {
-				if ($unauthorized_page) {
+				if ($user->guest) {
+					$uri		= JFactory::getURI();
+					$return		= $uri->toString();
+					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
+					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+					$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+					$url .= '&return='.base64_encode($return);
+					$url .= '&fcreturn='.base64_encode($fcreturn);
+			
+					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+					$mainframe->redirect( $url );
+				} else if ($unauthorized_page) {
 					//  unauthorized page via global configuration
 					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 					$mainframe->redirect($unauthorized_page);				
