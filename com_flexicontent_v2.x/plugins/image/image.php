@@ -81,7 +81,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$adminprefix = $app->isAdmin() ? '../' : '';
 				$field->html	.= '
 				<div style="float:left; margin-right: 5px;">
-					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver;" />
+					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver; float:left;" />
 					<div style="float:left; clear:both;">
 						<input type="checkbox" name="custom['.$field->name.'][remove]" value="1"'.$remove.' style="float:none;">'.JText::_( 'FLEXI_FIELD_REMOVE' ).' &nbsp;
 						<input type="checkbox" name="custom['.$field->name.'][delete]" value="1"'.$delete.' style="float:none;">'.JText::_( 'FLEXI_FIELD_DELETE' ).'
@@ -120,7 +120,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$class = ' class="'.$required.' "';
 			$onchange= ' onchange="';
 			$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
-			$onchange .= ($autoupload && $app->isAdmin()) ? ' submitbutton(\'apply\')"' : '';
+			$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
+			$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 			$onchange .= ' "';
 			$field->html	.= '
 			<div style="float:left; margin-right: 5px;">
