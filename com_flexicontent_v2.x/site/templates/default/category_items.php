@@ -47,7 +47,7 @@ $user =& JFactory::getUser();
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/(filter[.]*|letter)/);
+			var matches = element.name.match(/(filter[.]*|letter|clayout)/);
 			if (matches && element.value != '') {
 			  extra_action += var_sep + element.name + '=' + element.value;
 			  var_sep = '&';
@@ -73,6 +73,11 @@ $user =& JFactory::getUser();
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
 <form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
+
+<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
+	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
+<?php endif; ?>
+
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
 <div id="fc_filter" class="floattext">
 	<?php if ($this->params->get('use_search')) : ?>
