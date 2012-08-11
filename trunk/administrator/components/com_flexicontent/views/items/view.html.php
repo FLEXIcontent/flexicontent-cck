@@ -210,7 +210,7 @@ class FlexicontentViewItems extends JView {
 		}
 		
 		if ($CanAdd) {
-			$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
+			//$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
 			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
@@ -219,12 +219,7 @@ class FlexicontentViewItems extends JView {
 			//JToolBarHelper::addNew($ctrl_task);
 			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 			
-			if (FLEXI_J16GE) {
-				$toolbar->appendButton('Popup', 'new', 'JTOOLBAR_NEW', JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
-			} else {
-				// TODO implement popup chooser for J1.5 like it is for J1.6+
-				JToolBarHelper::addNew($ctrl_task);
-			}
+			$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
 			
 			if ($CanCopy) {
 				$ctrl_task = FLEXI_J16GE ? 'items.copy' : 'copy';

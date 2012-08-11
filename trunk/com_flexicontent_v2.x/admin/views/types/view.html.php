@@ -28,7 +28,9 @@ jimport( 'joomla.application.component.view');
  * @since 1.0
  */
 class FlexicontentViewTypes extends JView {
-	function display($tpl = null) {
+
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -48,8 +50,18 @@ class FlexicontentViewTypes extends JView {
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$permission = FlexicontentHelperPerm::getPerm();
 
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+		} else if (FLEXI_ACCESS) {
+			$user =& JFactory::getUser();
+			$permission->CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
+			$perms->CanConfig		= ($user->gid > 24);
+		} else {
+			$perms->CanTypes 		= 1;
+			$perms->CanConfig		= 1;
+		}
+		
 		if (!$permission->CanTypes) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}

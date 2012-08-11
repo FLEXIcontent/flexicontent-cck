@@ -1465,7 +1465,7 @@ class ParentClassItem extends JModel
 		} else {
 			
 			if (FLEXI_J16GE) {
-				$viewallcats	= FlexicontentHelperPerm::getPerm()->CanUserCats;
+				$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
 			} else if (FLEXI_ACCESS) {
 				$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
 			} else {

@@ -255,8 +255,8 @@ class flexicontent_cats
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		if (FLEXI_J16GE) {
 			require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-			$viewallcats	= FlexicontentHelperPerm::getPerm()->CanUserCats;
-			$viewtree			= FlexicontentHelperPerm::getPerm()->CanViewTree;
+			$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
+			$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
 		} else if (FLEXI_ACCESS) {
 			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
 			$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
