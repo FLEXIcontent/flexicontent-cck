@@ -42,11 +42,11 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2"  />
-			<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+			<!--field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-			</field>
+			</field-->
 			<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
