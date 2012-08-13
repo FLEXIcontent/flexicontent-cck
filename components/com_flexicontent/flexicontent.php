@@ -50,6 +50,12 @@ if (!FLEXI_ONDEMAND)
 	JPluginHelper::importPlugin('flexicontent_fields');
 JPluginHelper::importPlugin('flexicontent');
 
+// No PDF support in J2.5
+if ( FLEXI_J16GE && JRequest::getVar('format') == 'pdf' )
+{
+	JRequest::setVar('format', 'html');
+}
+
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 

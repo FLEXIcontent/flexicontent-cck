@@ -352,7 +352,7 @@ class flexicontent_html
 	 */
 	function pdfbutton( $item, &$params)
 	{
-		if ( $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
+		if ( !FLEXI_J16GE && $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
 				$image = JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));

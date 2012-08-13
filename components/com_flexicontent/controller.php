@@ -122,6 +122,7 @@ class FlexicontentController extends JController
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$has_edit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
 			// Check if item is editable till logoff
@@ -136,12 +137,20 @@ class FlexicontentController extends JController
 				// ALTERNATIVE 1
 				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
+				
+				$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
 			} else if (FLEXI_ACCESS) {
 				$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
 				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
+				
+				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
+				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
+				$canPublish	= ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
 			} else {
 				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
 				$not_authorised = ! $canAdd;
+				$canPublish	= ($user->gid >= 21);
 			}
 			if ( $allowunauthorize ) $canAdd = true;
 		}
@@ -151,6 +160,11 @@ class FlexicontentController extends JController
 		if ( ($isnew && !$canAdd) || (!$isnew && !$has_edit)) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
+		}
+		
+		// Set state of -NEW- items as "Pending Approval" for user that CANNOT publish
+		if ($isnew && !$canPublish) {
+			$post['state'] = -3;
 		}
 		
 		// Store the form data into the item and check it in
@@ -448,6 +462,7 @@ class FlexicontentController extends JController
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$has_edit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
 			// Check if item is editable till logoff
@@ -549,6 +564,7 @@ class FlexicontentController extends JController
 			$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
 		} else {
 			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+			//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
 			$not_authorised = ! $canAdd;
 		}
 		

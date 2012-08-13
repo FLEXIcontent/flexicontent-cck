@@ -907,16 +907,16 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Get owner and other item data
 			$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
 			$db->setQuery($q);
-			$item = $db->loadObjectList('id');
+			$itemdata = $db->loadObjectList('id');
 			
 			// Check authorization for publish operation
 			foreach ($cid as $id) {
 				
 				// Determine priveleges of the current user on the given item
 				if (FLEXI_J16GE) {
-					$asset = 'com_content.article.' . $item->id;
-					$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-					$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+					$asset = 'com_content.article.' . $itemdata[$id]->id;
+					$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
+					$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
 					// ...
 					$permission = FlexicontentHelperPerm::getPerm();
 					$has_archive    = $permission->CanArchives;
@@ -925,9 +925,9 @@ class FlexicontentControllerItems extends FlexicontentController
 					$has_delete     = true;
 					$has_archive    = true;
 				} else if (FLEXI_ACCESS) {
-					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-					$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
-					$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
+					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
+					$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $itemdata[$id]->created_by == $user->get('id')) ;
+					$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $itemdata[$id]->created_by == $user->get('id')) ;
 					$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
 				} else {
 					$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
