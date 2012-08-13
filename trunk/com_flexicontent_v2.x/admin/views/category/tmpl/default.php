@@ -77,7 +77,7 @@ dump($this->row);
 							</label>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('parent_id'); ?>
+							<?php echo $this->Lists['parent_id']; ?>
 						</td>
 					</tr>
 					<tr>
@@ -87,7 +87,7 @@ dump($this->row);
 							</label>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('copycid'); ?>
+							<?php echo $this->Lists['copyid']; ?>
 						</td>
 						<td>
 							<?php echo $this->form->getLabel('language'); ?>
@@ -99,7 +99,7 @@ dump($this->row);
 				</table>
 									
 				<?php
-				if ($this->permission->CanConfig) :
+				if ($this->perms->CanConfig) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');

@@ -132,7 +132,7 @@ class FlexicontentController extends JController
 
 		} else {
 			if (FLEXI_J16GE) {
-				$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getCats(array('core.create')) );
+				$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
 				// ALTERNATIVE 1
 				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
@@ -536,7 +536,7 @@ class FlexicontentController extends JController
 		// Get/Create the model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
 		
-		//$user_cats_count = count( FlexicontentHelperPerm::getCats(array('core.create')) );
+		//$user_cats_count = count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
 		
 		//general access check
 		if (FLEXI_J16GE) {

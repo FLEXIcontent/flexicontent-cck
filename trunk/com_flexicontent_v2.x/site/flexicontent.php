@@ -37,12 +37,10 @@ require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
 require_once (JPATH_COMPONENT.DS.'helpers'.DS.'route.php');
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.helper.php');
-if (FLEXI_J16GE)
-	require_once (JPATH_COMPONENT.DS.'helpers'.DS.'permission.php');
-else
-	require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.acl.php');
 require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.categories.php');
 require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
+require_once (JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.acl.php');
+require_once (JPATH_COMPONENT.DS.'helpers'.DS.'permission.php');
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');

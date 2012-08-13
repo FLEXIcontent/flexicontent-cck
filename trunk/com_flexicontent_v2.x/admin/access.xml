@@ -14,9 +14,11 @@
 		<action name="core.delete" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete" description="Allow users in the group to DELETE Items/Categories (any item) in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
 		<action name="core.delete.own" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:darkgreen&#34;&gt;inherited&lt;/span&gt;):&lt;/b&gt; delete own" description="Allow users in the group to DELETE OWNED Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
 		
+		<!-- Items/Categories: component controlled permissions -->
+		<action name="flexicontent.accesslevel" title="&lt;b&gt;Items/Categories (&lt;span style&#61;&#34;color:orange&#34;&gt;Global Only&lt;/span&gt;):&lt;/b&gt; Set Access Level" description="Allow users in the group to set the Access Level of items / categories that they can edit" />
+		
 		<!-- ITEMs: component controlled permissions -->
 		<action name="flexicontent.displayallitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Display all" description="Allow users in the group to list all Items (in items management), otherwise the user will only see the items that he/she can edit." />
-		<!--action name="flexicontent.acclevelitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of items (in items management)" /-->
 		<action name="flexicontent.copyitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Item Copy Task (in items management)" />
 		<action name="flexicontent.orderitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
 		<action name="flexicontent.paramsitem" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; set params" description="Allow users in the group to change the parameters of editable items." />
@@ -41,7 +43,6 @@
 		
 		<!-- FIELDs: management tab -->
 		<action name="flexicontent.managefields" title="&lt;b&gt;Fields: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Fields Management" />
-		<!--action name="flexicontent.acclevelfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Change Access Level" description="Allow users in the group to change the Access Level of fields (in fields management)" /-->
 		<action name="flexicontent.copyfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Field Copy Task (in fields management)" />
 		<action name="flexicontent.orderfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of fields (in fields management)" />
 		<action name="flexicontent.createfield" title="&lt;b&gt;Fields:&lt;/b&gt; create" description="Allow users in the group to create fields" />

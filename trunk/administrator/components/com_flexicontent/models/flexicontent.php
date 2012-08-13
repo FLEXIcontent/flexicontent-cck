@@ -204,8 +204,11 @@ class FlexicontentModelFlexicontent extends JModel
 		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
 		
 		// Check menu item exists
+		$config_saved = (bool) $params->get('flexi_section');
 		if ( !$menu ) {
-			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+			if ( !$config_saved ) {
+				$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+			}
 			return $return = false;
 		}
 		// Check pointing to FLEXIcontent

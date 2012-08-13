@@ -41,7 +41,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="debug_initial_perms" type="radio" default="0" label="Debug Initial Permissions Creation" description="... enable to see log messages and warning of the initial permission checking and creation process" menu="hide">
+			<field name="debug_initial_perms" type="radio" default="0" label="FLEXI_DEBUG_INITIAL_PERMS_CREATION" description="FLEXI_DEBUG_INITIAL_PERMS_CREATION_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

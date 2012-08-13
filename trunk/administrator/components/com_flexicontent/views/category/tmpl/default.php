@@ -93,7 +93,7 @@ dump($this->row);
 				</table>
 									
 				<?php
-				if (FLEXI_ACCESS && $this->CanCats) :
+				if (FLEXI_ACCESS) :
 				$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');
