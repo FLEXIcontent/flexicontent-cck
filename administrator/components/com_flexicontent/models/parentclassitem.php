@@ -895,7 +895,7 @@ class ParentClassItem extends JModel
 			}
 			// general permission is present, check that user can create item in at least one category
 			else {
-				$usercats = FlexicontentHelperPerm::getCats(array('core.create'));
+				$usercats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create'));
 				$iparams_extra->set('access-create', count($usercats));
 			}
 			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
@@ -1163,6 +1163,9 @@ class ParentClassItem extends JModel
 			// Load default empty item
 			$item =& JTable::getInstance('flexicontent_items', ''); 
 			
+			$public_accesslevel  = !FLEXI_J16GE ? 0 : 1;
+			$default_accesslevel = FLEXI_J16GE ? $app->getCfg( 'access', $public_accesslevel ) : $public_accesslevel;
+			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already
 			$item->id           = 0;
@@ -1198,7 +1201,7 @@ class ParentClassItem extends JModel
 			$item->publish_down = null;
 			$item->attribs      = null;
 			$item->metadata     = null;
-			$item->access       = 0;
+			$item->access       = $default_accesslevel;
 			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : -4;  // Use pending approval state by default
 			$item->mask         = null;
 			$item->images       = null;
@@ -1472,11 +1475,8 @@ class ParentClassItem extends JModel
 				$viewallcats = 1;
 			}
 			if (!$viewallcats) {
-				$actions_allowed = array('core.create');
-				if (FLEXI_J16GE) {
-					$allowed_cid 	= FlexicontentHelperPerm::getCats($actions_allowed, $require_all=true);
-				} else if (FLEXI_ACCESS) {
-					$allowed_cid 	= flexicontent_cats::getFAallowedCats($user->gmid, $actions_allowed);
+				if (FLEXI_J16GE || FLEXI_ACCESS) {
+					$allowed_cid 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true);
 				}
 			}
 		}

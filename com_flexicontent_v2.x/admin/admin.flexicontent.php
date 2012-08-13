@@ -25,10 +25,8 @@ require_once (JPATH_COMPONENT.DS.'defineconstants.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
-if (FLEXI_J16GE)
-	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
-else
-	require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
+require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
+require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');
@@ -49,53 +47,26 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, tru
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($cando)
 	{
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanCats		= $permission->CanCats;
-			$CanTypes		= $permission->CanTypes;
-			$CanFields	= $permission->CanFields;
-			$CanTags		= $permission->CanTags;
-			$CanAuthors	= $permission->CanAuthors;
-			$CanArchives= $permission->CanArchives;
-			$CanFiles		= $permission->CanFiles;
-			$CanStats		= $permission->CanStats;
-			$CanRights	= $permission->CanConfig;
-			$CanTemplates = $permission->CanTemplates;
-			$CanFiles		= $permission->CanFiles;
-			$CanImport	= $permission->CanImport;
-			$CanIndex		= $permission->CanIndex;
-		} else if (FLEXI_ACCESS) {
-			$user = & JFactory::getUser();
-			$CanCats 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanAuthors	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_users',        'manage', 'users', $user->gmid) : 1;
-			$CanArchives	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess',  'manage', 'users', $user->gmid) : 1;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-			$CanImport		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'import', 'users', $user->gmid) : 1;
-			$CanIndex			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'index', 'users', $user->gmid) : 1;
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			$perms = FlexicontentHelperPerm::getPerm();
 			//$CanEditPublished = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editpublished', 'users', $user->gmid) : 1;
 			//echo "<br>CanEditPublished: $CanEditPublished<br>";
 		} else {
-			$CanCats 			= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 			= 1;
-			$CanArchives	= 1;
-			$CanFiles			= 1;
-			$CanStats			= 1;
-			$CanRights		= 1;
-			$CanTemplates	= 1;
-			$CanAuthors 	= 1;
-			$CanImport		= 1;
-			$CanIndex			= 1;
+			$perms->CanCats     = 1;
+			$perms->CanTypes    = 1;
+			$perms->CanFields   = 1;
+			$perms->CanTags     = 1;
+			$perms->CanArchives = 1;
+			$perms->CanFiles    = 1;
+			$perms->CanStats    = 1;
+			$perms->CanRights   = 1;
+			$perms->CanTemplates= 1;
+			$perms->CanAuthors  = 1;
+			$perms->CanImport   = 1;
+			$perms->CanIndex    = 1;
 		}
 		
-		$authorized = FLEXI_J16GE ? (isset($permission->$cando) && !$permission->$cando) : (isset($$variable) && !$$variable);
+		$authorized = isset($perms->$cando) && !$perms->$cando;
 		if ($authorized) {
 			$mainframe = &JFactory::getApplication();
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
@@ -109,18 +80,18 @@ if(!function_exists('FLEXISubmenu')) {
 		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 		{
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-			if ($CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-			if ($CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
-			if ($CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-			if ($CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-			if ($CanAuthors && !FLEXI_J16GE)
+			if ($perms->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+			if ($perms->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+			if ($perms->CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+			if ($perms->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+			if ($perms->CanAuthors && !FLEXI_J16GE)
 				JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-			//if ($CanArchives) JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
-			if ($CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
-			if ($CanIndex)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEX' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-			if ($CanTemplates)JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-			if ($CanImport)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
-			if ($CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+			//if ($perms->CanArchives) JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
+			if ($perms->CanFiles) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+			if ($perms->CanIndex)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEX' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
+			if ($perms->CanTemplates) JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+			if ($perms->CanImport)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+			if ($perms->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
 		}
 	}
 }

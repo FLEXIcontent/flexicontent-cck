@@ -164,6 +164,13 @@ if ($error) {
 	</tbody>
 </table>
 
+<?php
+// Delete orphan entries ?
+$query="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
+$db->setQuery($query);
+$result = $db->query();
+?>
+
 <h3><?php echo JText::_('Actions'); ?></h3>
 <table class="adminlist">
 	<thead>

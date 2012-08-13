@@ -69,18 +69,18 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							$link = 'index.php?option='.$option.'&amp;view=items';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
 						}
-						if ($this->dopostinstall && $this->permission->CanAdd)
+						if ($this->dopostinstall && $this->perms->CanAdd)
 						{
 							//$link = 'index.php?option='.$option.'&amp;view=item';
 							$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1 );
 						}
 						
-						if ($this->dopostinstall && $this->permission->CanCats)  // this CanAdd in J2.5 and CanAddCats in J1.5
+						if ($this->dopostinstall && $this->perms->CanCats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=categories';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
-							$CanAddCats = FLEXI_J16GE ? $this->permission->CanAdd : $this->CanAddCats;
+							$CanAddCats = FLEXI_J16GE ? $this->perms->CanAdd : $this->perms->CanAddCats;
 							if ($CanAddCats)
 							{
 								$link = 'index.php?option='.$option.'&amp;view=category';
@@ -88,7 +88,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							}
 						}
 						
-						if ($this->dopostinstall && $this->permission->CanTypes)
+						if ($this->dopostinstall && $this->perms->CanTypes)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=types';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-types.png', JText::_( 'FLEXI_TYPES' ) );
@@ -96,7 +96,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-type-add.png', JText::_( 'FLEXI_NEW_TYPE' ) );
 						}
 						
-						if ($this->dopostinstall && $this->permission->CanFields)
+						if ($this->dopostinstall && $this->perms->CanFields)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=fields';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-fields.png', JText::_( 'FLEXI_FIELDS' ) );
@@ -104,7 +104,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-field-add.png', JText::_( 'FLEXI_NEW_FIELD' ) );
 						}
 
-						if ($this->dopostinstall && $this->permission->CanTags)
+						if ($this->dopostinstall && $this->perms->CanTags)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=tags';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tags.png', JText::_( 'FLEXI_TAGS' ) );
@@ -112,31 +112,51 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
 						}
 
-						if ($this->dopostinstall && $this->permission->CanArchives)
+						if (!FLEXI_J16GE && $this->dopostinstall && $this->perms->CanAuthors)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=users';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-authors.png', JText::_( 'FLEXI_AUTHORS' ) );
+							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users&amp;task=add';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_AUTHOR' ) );
+						}
+
+						if ($this->dopostinstall && $this->perms->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
 						}
 
-						if ($this->dopostinstall && $this->permission->CanFiles)
+						if ($this->dopostinstall && $this->perms->CanFiles)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=filemanager';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 						}
+
+						if ($this->dopostinstall && $this->perms->CanIndex)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=search';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-searchindex.png', JText::_( 'FLEXI_SEARCH_INDEX' ) );
+						}
 						
-						if ($this->dopostinstall && $this->permission->CanTemplates)
+						if ($this->dopostinstall && $this->perms->CanTemplates)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=templates';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-templates.png', JText::_( 'FLEXI_TEMPLATES' ) );
 						}
 
-						if ($this->dopostinstall && $this->permission->CanStats)
+						if ($this->dopostinstall && $this->perms->CanImport)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=import';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-import.png', JText::_( 'FLEXI_IMPORT' ) );
+						}
+
+						if ($this->dopostinstall && $this->perms->CanStats)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=stats';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 						}
 
-						if ($this->dopostinstall && $this->permission->CanPlugins)
+						if ($this->dopostinstall && $this->perms->CanPlugins)
 						{
 							$link = 'index.php?option=com_plugins&amp;filter_type=flexicontent_fields&amp;tmpl=component';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-plugins.png', JText::_( 'FLEXI_PLUGINS' ), 1 );
@@ -144,18 +164,27 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 												
 						if ( $this->dopostinstall && ($this->params->get('comments') == 1) )
 						{
-							if ($this->permission->CanComments)
+							if ($this->perms->CanComments)
 							{
 								$link = 'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent&amp;tmpl=component';
 								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_COMMENTS' ), 1 );
 							}
 						}
 						
+						if ($this->dopostinstall && FLEXI_ACCESS)
+						{
+							if ($this->perms->CanRights)
+							{
+								$link = 'index.php?option=com_flexiaccess';
+								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-permissions.png', JText::_( 'FLEXI_EDIT_ACL' ) );
+							}
+						}
 						
 						if ($this->dopostinstall && $this->params->get('support_url'))
 						{
 							$link = $this->params->get('support_url');
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-support.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
+							$help_img = FLEXI_J16GE ? 'icon-48-support.png' : 'icon-48-help.png';
+							FlexicontentViewFlexicontent::quickiconButton( $link, $help_img, JText::_( 'FLEXI_SUPPORT' ), 1 );
 						}
 						?>
 						</div>

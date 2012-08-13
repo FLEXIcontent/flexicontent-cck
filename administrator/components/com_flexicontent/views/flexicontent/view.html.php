@@ -159,47 +159,30 @@ class FlexicontentViewFlexicontent extends JView
 		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
-
-		$session  =& JFactory::getSession();
-
-		if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$CanAdd 		= ($user->gid < 25) ? ((FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid)) || (FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all'))) : 1;
-			$CanAddCats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'addcats', 'users', $user->gmid) : 1;
-			$CanCats 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-			$CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$CanFields 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'fields', 'users', $user->gmid) : 1;
-			$CanTags 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1;
-			$CanAuthors 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_users', 'manage', 'users', $user->gmid) : 1;
-			$CanArchives 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-			$CanFiles	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'files', 'users', $user->gmid) : 1;
-			$CanStats	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'stats', 'users', $user->gmid) : 1;
-			$CanRights	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
-			$CanPlugins	 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_plugins', 'manage', 'users', $user->gmid) : 1;
-			$CanComments 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_jcomments', 'manage', 'users', $user->gmid) : $CanComments;
-			$CanTemplates	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-			$CanImport		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'import', 'users', $user->gmid) : 1;
-			$CanIndex		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'index', 'users', $user->gmid) : 1;
+		
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			$perms = FlexicontentHelperPerm::getPerm();
 		} else {
-			$CanAdd			= 1;
-			$CanAddCats 	= 1;
-			$CanCats 		= 1;
-			$CanTypes 		= 1;
-			$CanFields		= 1;
-			$CanTags 		= 1;
-			$CanAuthors		= 1;
-			$CanArchives	= 1;
-			$CanFiles		= 1;
-			$CanStats		= 1;
-			$CanRights		= 1;
-			$CanPlugins		= 1;
-			$CanTemplates	= 1;
-			$CanImport		= 1;
-			$CanIndex		= 1;
+			$perms->CanAdd			= 1;
+			$perms->CanAddCats 	= 1;
+			$perms->CanCats 		= 1;
+			$perms->CanTypes 		= 1;
+			$perms->CanFields		= 1;
+			$perms->CanTags 		= 1;
+			$perms->CanAuthors	= 1;
+			$perms->CanArchives	= 1;
+			$perms->CanFiles		= 1;
+			$perms->CanStats		= 1;
+			$perms->CanRights		= 1;
+			$perms->CanPlugins	= 1;
+			$perms->CanTemplates= 1;
+			$perms->CanImport		= 1;
+			$perms->CanIndex		= 1;
+			$perms->CanConfig		= 1;
 		}
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			if ($user->gid > 24) {
+			if($perms->CanConfig)  {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				if (!FLEXI_J16GE)
 					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
@@ -275,22 +258,7 @@ class FlexicontentViewFlexicontent extends JView
 			$this->assignRef('initialpermission', $initialpermission);
 		
 		// assign Rights to the template
-		$this->assignRef('CanAdd'		, $CanAdd);
-		$this->assignRef('CanAddCats'	, $CanAddCats);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanTypes'		, $CanTypes);
-		$this->assignRef('CanFields'	, $CanFields);
-		$this->assignRef('CanTags'		, $CanTags);
-		$this->assignRef('CanAuthors'	, $CanAuthors);
-		$this->assignRef('CanArchives'	, $CanArchives);
-		$this->assignRef('CanFiles'		, $CanFiles);
-		$this->assignRef('CanTemplates'	, $CanTemplates);
-		$this->assignRef('CanStats'		, $CanStats);
-		$this->assignRef('CanRights'	, $CanRights);
-		$this->assignRef('CanPlugins'	, $CanPlugins);
-		$this->assignRef('CanComments'	, $CanComments);
-		$this->assignRef('CanImport'	, $CanImport);
-		$this->assignRef('CanIndex'		, $CanIndex);
+		$this->assignRef('perms'		, $perms);
 		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);

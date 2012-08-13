@@ -159,12 +159,30 @@ class FlexicontentViewFlexicontent extends JView
 		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
-
-		$session  =& JFactory::getSession();
-		$permission = FlexicontentHelperPerm::getPerm();
+		
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			$perms = FlexicontentHelperPerm::getPerm();
+		} else {
+			$perms->CanAdd			= 1;
+			$perms->CanAddCats 	= 1;
+			$perms->CanCats 		= 1;
+			$perms->CanTypes 		= 1;
+			$perms->CanFields		= 1;
+			$perms->CanTags 		= 1;
+			$perms->CanAuthors	= 1;
+			$perms->CanArchives	= 1;
+			$perms->CanFiles		= 1;
+			$perms->CanStats		= 1;
+			$perms->CanRights		= 1;
+			$perms->CanPlugins	= 1;
+			$perms->CanTemplates= 1;
+			$perms->CanImport		= 1;
+			$perms->CanIndex		= 1;
+			$perms->CanConfig		= 1;
+		}
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			if($permission->CanConfig)  {
+			if($perms->CanConfig)  {
 				$toolbar=&JToolBar::getInstance('toolbar');
 				if (!FLEXI_J16GE)
 					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
@@ -240,7 +258,7 @@ class FlexicontentViewFlexicontent extends JView
 			$this->assignRef('initialpermission', $initialpermission);
 		
 		// assign Rights to the template
-		$this->assignRef('permission'		, $permission);
+		$this->assignRef('perms'		, $perms);
 		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);

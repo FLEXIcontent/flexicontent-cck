@@ -208,8 +208,11 @@ class FlexicontentModelFlexicontent extends JModel
 		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
 		
 		// Check menu item exists
+		$config_saved = (bool) $params->get('flexi_cat_extension');
 		if ( !$menu ) {
-			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+			if ( !$config_saved ) {
+				$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+			}
 			return $return = false;
 		}
 		// Check pointing to FLEXIcontent
@@ -1583,7 +1586,8 @@ class FlexicontentModelFlexicontent extends JModel
 			}
 			
 			// STEP 2: we will set ACTIONS already granted in GLOBAL CONFIGURATION (this include the COMPONENT CONFIGURE 'core.admin' action)
-			// NOTE that actions that do not exist in global configuration, will not be set here, so they will default to the the setting received by STEP 1
+			// NOTE: that actions that do not exist in global configuration, will not be set here, so they will default to the the setting received by STEP 1
+			// NOTE: this was commented out and thus heritage will be used instead for existing Global ACTIONS
 			/*foreach($flexi_action_names as $action_name) {
 				if (JAccess::checkGroup($group->id, $action_name)) {
 					$flexi_rules[$action_name][$group->id] = 1;
