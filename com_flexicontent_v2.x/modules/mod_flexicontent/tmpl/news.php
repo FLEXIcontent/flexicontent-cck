@@ -57,6 +57,9 @@ $force_width_feat='';//"width='$mod_width_feat'";
 $force_height_feat='';//"height='$mod_height_feat'";
 $force_width='';//"width='$mod_width'";
 $force_height='';//"height='$mod_height'";
+
+$hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
+$hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 ?>
 
 <div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
@@ -103,7 +106,7 @@ $force_height='';//"height='$mod_height'";
 		<!-- BOF featured items -->
 		<?php if (isset($list[$ord]['featured'])) :	?>
 
-		<div class="mod_flexicontent_featured">
+		<div class="mod_flexicontent_featured" id="mod_fc_news_box_featured<?php echo $module->id ?>">
 			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php $rowtoggler = !$rowtoggler; ?>
@@ -150,7 +153,7 @@ $force_height='';//"height='$mod_height'";
 				<!-- BOF current item's image -->
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date_feat || $display_text_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
+				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured">
 					
 					<?php if ($display_date_feat && $item->date_created) : ?>
@@ -169,6 +172,22 @@ $force_height='';//"height='$mod_height'";
 					</div>
 					<?php endif; ?>
 					
+					<?php if ($display_hits_feat) : ?>
+					<div class="fc_block">
+						<div class="fc_inline news_hits">
+							<?php echo $item->hits_rendered; ?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
+					<?php if ($display_voting_feat) : ?>
+					<div class="fc_block">
+						<div class="fc_inline news_voting">
+							<?php echo $item->voting;?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
 					<?php if ($display_text_feat && $item->text) : ?>
 					<div class="news_text">
 						<?php echo $item->text; ?>
@@ -178,14 +197,15 @@ $force_height='';//"height='$mod_height'";
 					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
 					<div class="news_fields">
 						
-						<?php foreach ($item->fields as $k => $field) : ?>
+					<?php foreach ($item->fields as $k => $field) : ?>
+						<?php if ( $hide_label_onempty_feat && !strlen($field->display) ) continue; ?>
 						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label_feat) : ?>
 							<div class="field_label"><?php echo $field->label . $text_after_label_feat; ?></div>
 							<?php endif; ?>
 							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
-						<?php endforeach; ?>
+					<?php endforeach; ?>
 						
 					</div>
 					<?php endif; ?>
@@ -215,13 +235,16 @@ $force_height='';//"height='$mod_height'";
 		<?php	if (isset($list[$ord]['standard'])) : ?>
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_standard">
+		<div class="mod_flexicontent_standard" id="mod_fc_news_box_standard<?php echo $module->id ?>">
 			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php $rowcount++; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4==1 || $rowcount%4==2)?'odd':'even'; ?>">
+			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4==1 || $rowcount%4==2)?'odd':'even'; ?>"
+				onmouseover=""
+				onmouseout=""
+			>
 
 					<?php if ($display_title) : ?>
 					<div class="fc_block" >
@@ -259,9 +282,9 @@ $force_height='';//"height='$mod_height'";
 				<!-- BOF current item's image -->	
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date || $display_text || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<?php if ($display_date || $display_text || $display_hits || $display_voting || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard">
-										
+					
 					<?php if ($display_date && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline news_date created">
@@ -278,6 +301,22 @@ $force_height='';//"height='$mod_height'";
 					</div>
 					<?php endif; ?>
 					
+					<?php if ($display_hits) : ?>
+					<div class="fc_block">
+						<div class="fc_inline news_hits">
+							<?php echo $item->hits_rendered; ?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
+					<?php if ($display_voting) : ?>
+					<div class="fc_block">
+						<div class="fc_inline news_voting">
+							<?php echo $item->voting;?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
 					<?php if ($display_text && $item->text) : ?>
 					<div class="news_text">
 						<?php echo $item->text; ?>
@@ -287,7 +326,8 @@ $force_height='';//"height='$mod_height'";
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
 					<div class="news_fields">
 						
-						<?php foreach ($item->fields as $k => $field) : ?>
+					<?php foreach ($item->fields as $k => $field) : ?>
+						<?php if ( $hide_label_onempty && !strlen($field->display) ) continue; ?>
 						<div class="field_block field_<?php echo $k; ?>">
 							<?php if ($display_label) : ?>
 							<div class="field_label"><?php echo $field->label . $text_after_label; ?></div>

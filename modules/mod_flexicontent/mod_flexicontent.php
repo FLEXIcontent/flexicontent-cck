@@ -24,7 +24,7 @@ $start_microtime = microtime(true);
 global $fc_content_plg_microtime;
 $fc_content_plg_microtime = 0;
 
-// load english language file for 'mod_flexicontent' component then override with current language file
+// load english language file for 'mod_flexicontent' module then override with current language file
 JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, null, true);
 
@@ -53,8 +53,10 @@ $height 				= $params->get('height');
 // standard
 $display_title 	= $params->get('display_title',1);
 $link_title 		= $params->get('link_title');
-$display_text 	= $params->get('display_text',1);
 $display_date 	= $params->get('display_date', 1);
+$display_text 	= $params->get('display_text',1);
+$display_hits		= $params->get('display_hits',1);
+$display_voting	= $params->get('display_voting',1);
 $mod_readmore	 	= $params->get('mod_readmore',1);
 $mod_use_image 	= $params->get('mod_use_image',1);
 $mod_link_image = $params->get('mod_link_image');
@@ -64,19 +66,23 @@ $display_title_feat 	= $params->get('display_title_feat',1);
 $link_title_feat 			= $params->get('link_title_feat');
 $display_date_feat		= $params->get('display_date_feat',1);
 $display_text_feat 		= $params->get('display_text_feat',1);
+$display_hits_feat 		= $params->get('display_hits_feat',1);
+$display_voting_feat	= $params->get('display_voting_feat',1);
 $mod_readmore_feat		= $params->get('mod_readmore_feat',1);
 $mod_use_image_feat 	= $params->get('mod_use_image_feat',1);
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
 
 // get module custom fields parameters
 // standard
-$use_fields 			= $params->get('use_fields',1);
-$display_label 		= $params->get('display_label');
-$text_after_label = $params->get('text_after_label');
-$fields 					= $params->get('fields');
+$use_fields 				= $params->get('use_fields',1);
+$display_label 			= $params->get('display_label');
+$hide_label_onempty	= $params->get('hide_label_onempty');
+$text_after_label		= $params->get('text_after_label');
+$fields 						= $params->get('fields');
 // featured
 $use_fields_feat 				= $params->get('use_fields_feat',1);
 $display_label_feat 		= $params->get('display_label_feat');
+$hide_label_onempty_feat= $params->get('hide_label_onempty_feat');
 $text_after_label_feat 	= $params->get('text_after_label_feat');
 $fields_feat 						= $params->get('fields_feat');
 

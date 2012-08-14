@@ -372,27 +372,50 @@
 			</param>
 			
 			
-			<param name="" type="separator" default="FLEXI_RATINGS_PARAMS" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_VOTING_PARAMS" level="level1" menu="hide" />
 			<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
-			<param name="display_ratings" type="radio" default="1" label="FLEXI_DISPLAY_RATINGS" description="FLEXI_DISPLAY_RATINGS_DESC" >
+			<param name="display_voting" type="radio" default="1" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="ratings_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<param name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="vote_stars" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
+				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
+				<option value="5">FLEXI_VOTING_FIVE_STAR</option>
+			</param>
+			<param name="allow_vote" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" >
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="vote_conter" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
-			<param name="display_ratings_feat" type="radio" default="1" label="FLEXI_DISPLAY_RATINGS" description="FLEXI_DISPLAY_RATINGS_DESC" >
+			<param name="display_voting_feat" type="radio" default="1" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="ratings_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<param name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			
+			<param name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
+				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
+				<option value="5">FLEXI_VOTING_FIVE_STAR</option>
+			</param>
+			<param name="allow_vote_feat" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" >
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="vote_conter_feat" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			
 			<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 			<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
@@ -404,6 +427,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="hide_label_onempty" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
 			<param name="fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 			
@@ -412,11 +439,15 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="hide_label_onempty_feat" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
+			<param name="text_after_label_feat" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
 			<param name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
 		
 	  <param name="" type="jparamstab" description="FLEXI_CAT_DISPLAY_PARAMS" />
