@@ -808,19 +808,19 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='' )
+ 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='', $vote_stars=5, $allow_vote=true, $vote_counter='default' )
 	{
 		$document =& JFactory::getDocument();
 		
 		$counter 	= $field->parameters->get( 'counter', 1 );
+		if ($vote_counter != 'default' ) $counter = $vote_counter ? 1 : 0;
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
-		$dim		= $field->parameters->get( 'dimension', 25 );    	
+		$dim			= $field->parameters->get( 'dimension', 16 );
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );    	
 		$class 		= $field->name;
 		$img_path	= JURI::base(true) .'/'. $image;
 	
 		$percent = 0;
-		$stars = '';
 		
 		static $js_and_css_added = false;
 		
@@ -837,7 +837,7 @@ class flexicontent_html
 
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
-			.'.$class.' .fcvote ul {height:'.$dim.'px;width:'.(5*$dim).'px;}
+			.'.$class.' .fcvote ul {height:'.$dim.'px;}
 			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
 			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
 			';
@@ -858,17 +858,22 @@ class flexicontent_html
 			if ( $counter == 3 ) $counter = 0;
 		}
 		
+		$html_vote_links = $allow_vote ? '
+			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'_'.$xid.'">1</a></li>
+			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'_'.$xid.'">2</a></li>
+			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'_'.$xid.'">3</a></li>
+			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'_'.$xid.'">4</a></li>
+			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'_'.$xid.'">5</a></li>
+		' : '';
+		
 	 	$html='
 		<div class="'.$class.'">
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
-				.'<ul>
-    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'_'.$xid.'">1</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'_'.$xid.'">2</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'_'.$xid.'">3</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'_'.$xid.'">4</a></li>
-    				<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'_'.$xid.'">5</a></li>
+				.'<ul style="width:'.($vote_stars * $dim).'px;">
+    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>'
+    		.$html_vote_links
+				.'
 				</ul>
 	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fcvote-count">';
 		  		if ( $counter != -1 ) {

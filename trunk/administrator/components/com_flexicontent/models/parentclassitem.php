@@ -1166,6 +1166,9 @@ class ParentClassItem extends JModel
 			$public_accesslevel  = !FLEXI_J16GE ? 0 : 1;
 			$default_accesslevel = FLEXI_J16GE ? $app->getCfg( 'access', $public_accesslevel ) : $public_accesslevel;
 			
+			$draft_state = -4;  $pending_approval_state = -3;
+			$default_state = $app->isAdmin() ? $cparams->get('new_item_state', $draft_state) : $pending_approval_state;
+			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already
 			$item->id           = 0;
@@ -1202,7 +1205,7 @@ class ParentClassItem extends JModel
 			$item->attribs      = null;
 			$item->metadata     = null;
 			$item->access       = $default_accesslevel;
-			$item->state        = $app->isAdmin() ? $cparams->get('new_item_state', -4) : -4;  // Use pending approval state by default
+			$item->state        = $default_state;
 			$item->mask         = null;
 			$item->images       = null;
 			$item->urls         = null;
@@ -1517,7 +1520,7 @@ class ParentClassItem extends JModel
 				unset( $data['publish_down'] );
 			}
 			unset( $data['ordering'] );
-			unset( $data['state'] );
+			if (!$isnew) unset( $data['state'] );
 		}
 		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
 		
@@ -2782,6 +2785,8 @@ class ParentClassItem extends JModel
 	 */
 	function setitemstate($id, $state = 1)
 	{
+		$app = &JFactory::getApplication();
+		$dispatcher = & JDispatcher::getInstance();
 		$user = & JFactory::getUser();
 		JRequest::setVar("isflexicontent", "yes");
 		static $event_failed_notice_added = false;

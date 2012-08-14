@@ -57,6 +57,8 @@ class modFlexicontentHelper
 		$cuttitle 				= $params->get('cuttitle');
 		$display_date			= $params->get('display_date');
 		$display_text 		= $params->get('display_text');
+		$display_hits			= $params->get('display_hits');
+		$display_voting		= $params->get('display_voting');
 		$mod_readmore	 		= $params->get('mod_readmore');
 		$mod_cut_text 		= $params->get('mod_cut_text');
 		$mod_do_stripcat	= $params->get('mod_do_stripcat', 1);
@@ -74,6 +76,8 @@ class modFlexicontentHelper
 		$cuttitle_feat 				= $params->get('cuttitle_feat');
 		$display_date_feat		= $params->get('display_date_feat');
 		$display_text_feat 		= $params->get('display_text');
+		$display_hits_feat 		= $params->get('display_hits_feat');
+		$display_voting_feat	= $params->get('display_voting_feat');
 		$mod_readmore_feat		= $params->get('mod_readmore_feat');
 		$mod_cut_text_feat 		= $params->get('mod_cut_text_feat');
 		$mod_do_stripcat_feat	= $params->get('mod_do_stripcat_feat', 1);
@@ -97,7 +101,22 @@ class modFlexicontentHelper
 				$midata->default_image_filename = basename($midata->default_image);
 			}
 		}
-
+		
+		// Retrieve default image for the image field
+		if ($display_hits || $display_hits_feat) {
+			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="hits"';
+			$db->setQuery($query);
+			$hitsfield = $db->loadObject();
+			$hitsfield->parameters = new JParameter($hitsfield->attribs);
+		}
+		
+		if ($display_voting || $display_voting_feat) {
+			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
+			$db->setQuery($query);
+			$votingfield = $db->loadObject();
+			$votingfield->parameters = new JParameter($votingfield->attribs);
+		}
+		
 		// get module fields parameters
 		$use_fields 			= $params->get('use_fields', 1);
 		$display_label 			= $params->get('display_label');
@@ -244,7 +263,7 @@ class modFlexicontentHelper
 			  }
 			  
 				if ($row->featured)
-				{						
+				{
 					// image processing
 					$thumb = '';
 					$thumb_rendered = '';
@@ -337,6 +356,16 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
+					$lists[$ord]['featured'][$i]->hits	= $row->hits;
+					if ($display_hits_feat) {
+						$lists[$ord]['featured'][$i]->hits_rendered  = JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
+						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.' '.JTEXT::_('FLEXI_HITS').')';
+					}
+					if ($display_voting_feat) {
+						FlexicontentFields::loadFieldConfig($votingfield, $row);
+						$lists[$ord]['featured'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
+						$lists[$ord]['featured'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get(' vote_conter',1));
+					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
@@ -347,7 +376,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->access 	= $row->access;
 					$lists[$ord]['featured'][$i]->featured 	= 1;
 					
-					if ($use_fields_feat && $row->fields && $fields_feat) {
+					if ($use_fields_feat && @$row->fields && $fields_feat) {
 						foreach ($fields_feat as $field) {
 							if ($display_label_feat) {
 								$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
@@ -450,6 +479,15 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
+					if ($display_hits) {
+						$lists[$ord]['standard'][$i]->hits_rendered  = JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
+						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.' '.JTEXT::_('FLEXI_HITS').')';
+					}
+					if ($display_voting) {
+						FlexicontentFields::loadFieldConfig($votingfield, $row);
+						$lists[$ord]['standard'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
+						$lists[$ord]['standard'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get(' vote_conter',1));
+					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
@@ -460,7 +498,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->access 	= $row->access;
 					$lists[$ord]['standard'][$i]->featured 	= 0;
 	
-					if ($use_fields && $row->fields && $fields) {
+					if ($use_fields && @$row->fields && $fields) {
 						foreach ($fields as $field) {
 							if ($display_label) {
 								$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
@@ -630,13 +668,13 @@ class modFlexicontentHelper
 			$Itemid		= JRequest::getInt('Itemid');
 			if (!$id) return;  // new item nothing to retrieve
 			
-			$q 	 		= 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
+			$query = 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
 						. ' WHERE c.id = ' . $id
 						. ' GROUP BY ci.itemid'
 						;
-			$db->setQuery($q);
+			$db->setQuery($query);
 			$curitem	= $db->loadObject();
 
 			// Get item dates
@@ -719,40 +757,39 @@ class modFlexicontentHelper
 		
 		// categories scope
 		if (!$behaviour_cat) {
-			$catids_list		= is_array($catids) ? implode(',', $catids) : $catids;
+			$catids_arr		= is_array($catids) ? $catids : array($catids);
 			
 			if (!$catids && $method_cat > 1) {
 				// empty ignore and issue a warning
 				echo "<b>WARNING:</b> Misconfigured category scope, select at least one category or set category scope to ALL<br/>";
 			} else if ($method_cat == 2) { // exclude method
 				if ($apply_config_per_category) {
-					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) CURRENT CATEGORY<br/>";
+					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
 					return;
 				}
-				$where .= ' AND c.id NOT IN (' . $catids_list . ')';
+				$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
 			} else if ($method_cat == 3) { // include method
 				if (!$apply_config_per_category) {
-					$where .= ' AND c.id IN (' . $catids_list . ')';
+					$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
 				} else {
-					$catids_arr		= is_array($catids) ? $catids : array($catids);
-					foreach($catids_arr as $catid) $multiquery_cats[] = ' AND c.id = '.$catid;
+					// *** Applying configuration per category ***
+					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
+						$multiquery_cats[] = ' AND c.id = '.$catid;
 				}
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != FLEXI_ITEMVIEW)) {
+			if ( !$isflexi_itemview ) {
 				return;
 			} else {	
 				
-				if ($behaviour_cat == 2) {
-					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) CURRENT CATEGORY<br/>";
+				if ($behaviour_cat == 2 && apply_config_per_category) {
+					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
 					return;
 				}
 				
-				$menus		=& JApplication::getMenu('site', array());
-				$menu 		=& $menus->getItem($Itemid);
-				$routecat	=  @$menu->query['cid'] ? $menu->query['cid'] : 0;
-				$cid		= $cid ? $cid : ($routecat ? $routecat : $curitem->catid);
-
+				// if $cid is not set then use the main category id of the (current) item
+				$cid = $cid ? $cid : $curitem->catid;
+				
 				switch ($treeinclude) {
 					// current category only
 					case 0: 
@@ -773,15 +810,21 @@ class modFlexicontentHelper
 				}
 				
 				if ($behaviour_cat == 1) {
-					if (!$apply_config_per_category)
-						$where .= ' AND c.id IN (' . implode(',', $curritemcats) . ')';
-					else
-						foreach($catids_arr as $catid) $multiquery_cats[] = ' AND c.id = '.$catid;
+					if (!$apply_config_per_category) {
+						$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
+					} else {
+						// *** Applying configuration per category ***
+						foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
+							$multiquery_cats[] = ' AND c.id = '.$catid;
+						$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
+					}
 				} else {
-					$where .= ' AND c.id NOT IN (' . implode(',', $curritemcats) . ')';
+					$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
 				}
 			}
 		}
+		// Now check if no items need to be retrieved
+		if ($count==0) return;
 
 		// types scope
 		if (!$behaviour_types) {
@@ -795,7 +838,7 @@ class modFlexicontentHelper
 				$where .= ' AND ie.type_id IN (' . $types . ')';		
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != FLEXI_ITEMVIEW)) {
+			if ( !$isflexi_itemview ) {
 				return;
 			} else {
 				if ($behaviour_types == 1) {
@@ -817,7 +860,7 @@ class modFlexicontentHelper
 				$where .= ' AND i.created_by IN (' . $authors . ')';		
 			}
 		} else {
-			if (($option != 'com_flexicontent') || ($view != FLEXI_ITEMVIEW)) {
+			if ( !$isflexi_itemview ) {
 				return;
 			} else {			
 				if ($behaviour_types == 1) {
@@ -839,7 +882,7 @@ class modFlexicontentHelper
 				$where .= ' AND i.id IN (' . $items . ')';		
 			}
 		} else if ($behaviour_items==2) {
-			if (($option == 'com_flexicontent') && ($view == FLEXI_ITEMVIEW)) {
+			if ( $isflexi_itemview ) {
 				unset($related);
 				if (count($relitems_fields)) {
 					$where2 = (count($relitems_fields) > 1) ? ' AND field_id IN ('.implode(',', $relitems_fields).')' : ' AND field_id = '.$relitems_fields[0];
@@ -864,7 +907,7 @@ class modFlexicontentHelper
 				return;
 			}
 		} else if ($behaviour_items==1) {
-			if (($option == 'com_flexicontent') && ($view == FLEXI_ITEMVIEW)) {
+			if ( $isflexi_itemview ) {
 				// select the tags associated to the item
 				$query2 = 'SELECT tid' .
 						' FROM #__flexicontent_tags_item_relations' .
@@ -946,7 +989,7 @@ class modFlexicontentHelper
 			
 		} else {
 			
-			if ( (($option != 'com_flexicontent') || ($view != FLEXI_ITEMVIEW)) && ($date_compare == 1) )
+			if ( !$isflexi_itemview && ($date_compare == 1) )
 			{
 				return;  // date_compare == 1 means compare to current item, but current view is not an item view so we terminate
 			}
@@ -1069,6 +1112,7 @@ class modFlexicontentHelper
 				}
 				
 				$query 	= 'SELECT i.*, ie.*, count(com.object_id) AS nr, ty.name AS typename,'
+						. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
@@ -1079,6 +1123,7 @@ class modFlexicontentHelper
 						. ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+						. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 						. $join_favs
 						. $join_image
 						. $join_date
@@ -1092,6 +1137,7 @@ class modFlexicontentHelper
 
 			case 'rated':
 				$query 	= 'SELECT i.*, ie.*, (cr.rating_sum / cr.rating_count) * 20 AS votes, ty.name AS typename,'
+						. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
 						. $select_image
 						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
@@ -1102,6 +1148,7 @@ class modFlexicontentHelper
 						. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+						. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 						. $join_favs
 						. $join_image
 						. $join_date
@@ -1144,6 +1191,7 @@ class modFlexicontentHelper
 		
 		if (!isset($query)) {
 			$query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
+					. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
 					. $select_image
 					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
@@ -1153,6 +1201,7 @@ class modFlexicontentHelper
 					. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+					. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 					. $join_favs
 					. $join_image
 					. $join_date
@@ -1164,8 +1213,8 @@ class modFlexicontentHelper
 		
 		if (!isset($multiquery_cats)) $multiquery_cats = array("");
 		foreach($multiquery_cats as $cat_where) {
-			$q = str_replace('__CID_WHERE__', $cat_where, $query);
-			$db->setQuery($q, 0, $count);
+			$query = str_replace('__CID_WHERE__', $cat_where, $query);
+			$db->setQuery($query, 0, $count);
 			$rows = $db->loadObjectList();
 			if ( $db->getErrorNum() ) {
 				$jAp=& JFactory::getApplication();
@@ -1180,13 +1229,18 @@ class modFlexicontentHelper
 	function getCategoryData(&$params) {
 		if (!$params->get('apply_config_per_category', 0)) return false;
 		
-		$db =& JFactory::getDBO();
-		$cid  = JRequest::getInt('cid', 0);
-		$view = JRequest::getVar('view');
-		$config 	=& JFactory::getConfig();
-		$currcat_custom_display = $params->get('currcat_custom_display', 0);
+		$db     = & JFactory::getDBO();
+		$config = & JFactory::getConfig();
+		$view   = JRequest::getVar('view');
+		$option = JRequest::getVar('option');
 		
-		if ($currcat_custom_display) {
+		$currcat_custom_display = $params->get('currcat_custom_display', 0);
+		$isflexi_itemview       = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		
+		if ($currcat_custom_display && $isflexi_itemview) {
+			$id   = JRequest::getInt('id', 0);   // id of current item
+			$cid  = JRequest::getInt('cid', 0);  // current category id of current item
+			
 			$catconf = new stdClass();
 			$catconf->fallback_maincat  = $params->get('currcat_fallback_maincat', 0);
 			$catconf->showtitle  = $params->get('currcat_showtitle', 0);
@@ -1204,9 +1258,9 @@ class modFlexicontentHelper
 			$catconf->show_default_image = (int)$params->get('currcat_show_default_image', 0);  // parameter not added yet
 			$catconf->readmore	= (int)$params->get('currcat_currcat_readmore', 1);
 			
-			if ($catconf->display && $catconf->fallback_maincat && !$cid && $view==FLEXI_ITEMVIEW) {
-				$q = 'SELECT catid FROM #__content WHERE id = ' . $id;
-				$db->setQuery($q);
+			if ($catconf->display && $catconf->fallback_maincat && !$cid && $id) {
+				$query = 'SELECT catid FROM #__content WHERE id = ' . $id;
+				$db->setQuery($query);
 				$cid = $db->loadResult();
 			}
 			if ($cid) $cids = array($cid);
@@ -1214,8 +1268,14 @@ class modFlexicontentHelper
 		
 		if (empty($cids)) {
 			$catconf = new stdClass();
-			$cids = $params->get('catids', array());
+			
+			// Check if using a dynamic set of categories, that was decided by getItems()
+			$dynamic_cids = $params->get('dynamic_catids', false);
+			$static_cids  = $params->get('catids', array());
+			
+			$cids = $dynamic_cids ? unserialize($dynamic_cids) : $static_cids;
 			$cids = (!is_array($cids)) ? array($cids) : $cids;
+			
 			$catconf->showtitle  = $params->get('cats_showtitle', 0);
 			$catconf->showdescr  = $params->get('cats_showdescr', 0);
 			$catconf->cuttitle   = (int)$params->get('cats_cuttitle', 40);
@@ -1235,13 +1295,13 @@ class modFlexicontentHelper
 		if (empty($cids) || !count($cids)) return false;
 		
 		// initialize variables
-		$q = 'SELECT c.id, c.title, c.description, c.params '
+		$query = 'SELECT c.id, c.title, c.description, c.params '
 					. ( FLEXI_J16GE ? '' : ', c.image ' )  // NO image column in J1.6 and higher, image is in parameters
 					. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 					. ' FROM #__categories AS c'
 					. ' WHERE c.id IN (' . implode(',', $cids) . ')';
 					;
-		$db->setQuery($q);
+		$db->setQuery($query);
 		$catdata_arr = $db->loadObjectList();
 		if ( $db->getErrorNum() ) {
 			$jAp=& JFactory::getApplication();
