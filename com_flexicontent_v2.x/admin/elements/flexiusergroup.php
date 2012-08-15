@@ -1,22 +1,13 @@
 <?php
 /**
- * @version 1.5 stable $Id$
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package     Joomla.Platform
+ * @subpackage  Form
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_BASE') or die;
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.html.html');
 jimport('joomla.form.formfield');
@@ -24,52 +15,62 @@ jimport('joomla.form.helper');
 jformhelper::loadFieldClass('usergroup');
 
 /**
- * Form Field class for the Joomla Framework.
+ * Form Field class for the Joomla Platform.
+ * Supports a nested check box field listing user groups.
+ * Multiselect is available by default.
  *
- * @package		Joomla.Framework
- * @subpackage	Form
- * @since		1.6
+ * @package     Joomla.Platform
+ * @subpackage  Form
+ * @since       11.1
  */
-class JFormFieldFLEXIUsergroup extends JFormFieldUsergroup{
+class JFormFieldFLEXIUsergroup extends JFormFieldUsergroup
+{
 	/**
 	 * The form field type.
 	 *
-	 * @var		string
-	 * @since	1.6
+	 * @var    string
+	 * @since  11.1
 	 */
 	protected $type = 'FLEXIUsergroup';
 
 	/**
-	 * Method to get the field input markup.
+	 * Method to get the user group field input markup.
 	 *
-	 * @return	string	The field input markup.
-	 * @since	1.6
+	 * @return  string  The field input markup.
+	 *
+	 * @since   11.1
 	 */
-	protected function getInput() {
+	protected function getInput()
+	{
 		// Initialize variables.
-		$options = array();
+		$extra_options = array();
 		$attr = '';
 		$allowAll = false;
 
 		// Initialize some field attributes.
-		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		$attr .= $this->element['class'] ? ' class="' . (string) $this->element['class'] . '"' : '';
 		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
-		$attr .= $this->element['size'] ? ' size="'.(int) $this->element['size'].'"' : '';
+		$attr .= $this->element['size'] ? ' size="' . (int) $this->element['size'] . '"' : '';
 		$attr .= $this->multiple ? ' multiple="multiple"' : '';
 
 		// Initialize JavaScript field attributes.
-		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
+		$attr .= $this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';
 
 		// Iterate through the children and build an array of options.
-		foreach ($this->element->children() as $option) {
+		foreach ($this->element->children() as $option)
+		{
 
 			// Only add <option /> elements.
-			if ($option->getName() != 'option') {
+			if ($option->getName() != 'option')
+			{
 				continue;
 			}
 
 			// Create a new option object based on the <option /> element.
-			$tmp = JHtml::_('select.option', (string) $option['value'], JText::_(trim((string) $option)), 'value', 'text', ((string) $option['disabled']=='true'));
+			$tmp = JHtml::_(
+				'select.option', (string) $option['value'], trim((string) $option), 'value', 'text',
+				((string) $option['disabled'] == 'true')
+			);
 
 			// Set some option attributes.
 			$tmp->class = (string) $option['class'];
@@ -78,23 +79,29 @@ class JFormFieldFLEXIUsergroup extends JFormFieldUsergroup{
 			$tmp->onclick = (string) $option['onclick'];
 
 			// Add the option object to the result set.
-			$options[] = $tmp;
+			$extra_options[] = $tmp;
 		}
 		$allowAll = ((string)$this->element['allowAll']=='true') ? true : false;
 
-		return JFormFieldFLEXIUsergroup::usergroup($this->name, $this->value, $attr, $allowAll, $options, $this->id);
+		return JFormFieldFLEXIUsergroup::usergroup($this->name, $this->value, $attr, $allowAll, $extra_options, $this->id);
 	}
 	
 	/**
 	 * Displays a list of the available user groups.
 	 *
-	 * @param	string	The form field name.
-	 * @param	string	The name of the selected section.
-	 * @param	string	Additional attributes to add to the select field.
-	 * @param	boolean	True to add "All Groups" option.
-	 * @return	string	The required HTML for the SELECT tag.
+	 * @param   string   $name      The form field name.
+	 * @param   string   $selected  The name of the selected section.
+	 * @param   string   $attribs   Additional attributes to add to the select field.
+	 * @param   boolean  $allowAll  True to add "All Groups" option.
+	 *
+	 * @return  string   The required HTML for the SELECT tag.
+	 *
+	 * @see     JFormFieldUsergroup
+	 *
+	 * @since   11.1
 	 */
-	private static function usergroup($name, $selected, $attribs = '', $allowAll = true, $defaultoptions = array()) {
+	public static function usergroup($name, $selected, $attribs = '', $allowAll = true, $extra_options = array())
+	{
 		$db = JFactory::getDbo();
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
@@ -106,25 +113,23 @@ class JFormFieldFLEXIUsergroup extends JFormFieldUsergroup{
 		$options = $db->loadObjectList();
 
 		// Check for a database error.
-		if ($db->getErrorNum()) {
+		if ($db->getErrorNum())
+		{
 			JError::raiseNotice(500, $db->getErrorMsg());
 			return null;
 		}
 
-		for ($i=0,$n=count($options); $i < $n; $i++) {
-			$options[$i]->text = str_repeat('- ',$options[$i]->level).$options[$i]->text;
+		for ($i = 0, $n = count($options); $i < $n; $i++)
+		{
+			$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
 		}
 
 		// If all usergroups is allowed, push it into the array.
-		if ($allowAll) {
+		if ($allowAll)
+		{
 			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_GROUPS')));
 		}
-		$options = array_merge($defaultoptions, $options);
-		return JHtml::_('select.genericlist', $options, $name,
-			array(
-				'list.attr' => $attribs,
-				'list.select' => $selected
-			)
-		);
+		$options = array_merge($extra_options, $options);
+		return JHtml::_('select.genericlist', $options, $name, array('list.attr' => $attribs, 'list.select' => $selected));
 	}
 }

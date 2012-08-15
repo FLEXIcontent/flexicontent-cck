@@ -878,15 +878,12 @@ class flexicontent_html
 	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fcvote-count">';
 		  		if ( $counter != -1 ) {
 	  				if ( $counter != 0 ) {
-						$html .= "(";
-					 		if($rating_count!=1) {
-						 		$html .= $rating_count." ".JText::_( 'FLEXI_VOTES' );
-					 		} else { 
-				 				$html .= $rating_count." ".JText::_( 'FLEXI_VOTE' );
-	     					}
-	 	 				$html .=")";
+							$html .= "(";
+							$html .= $rating_count ? $rating_count : "0";
+							$html .= " ".JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' );
+		 	 				$html .= ")";
+						}
 					}
-				}
 	 	 	$html .='
 	 	 		</div>
  	 			<div class="clear"></div>

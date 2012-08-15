@@ -159,7 +159,7 @@ function deleteTag(obj) {
 </script>
 
 <?php
-$page_classes  = 'adminForm flexi_edit';
+$page_classes  = 'flexi_edit';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
 <div id="flexicontent" class="<?php echo $page_classes; ?>" style="font-size:90%;<?php echo $this->params->get('form_container_css_fe'); ?>">
@@ -465,15 +465,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</div>
 			<?php endif; ?>
 			
-			<?php if ($this->params->get('enable_notifications', 1) && $this->params->get('allow_designated_users_notify_fe', 0) && JPluginHelper::isEnabled('content', 'notifyarticlesubmit')) : ?>
-			<div class="flexi_formblock" style="float:left;">
-				<label id="fc_notifyarticlesubmit-lbl" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_NOTIFY_DESIGNATED_USERS' ).':'; ?>
-				</label>
-				<span id="fc_notifyarticlesubmit"></span>
-			</div>
-			<?php endif; ?>
-			
 		<?php endif; ?>
 		</fieldset>
 		
@@ -684,12 +675,17 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php echo "<br/ >"; ?>
 	<?php  echo $this->pane->startPane( 'det-pane' ); ?>
 	
-	<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
+	<?php
+	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
+	$publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
+	?>
+	
+	<?php if ($this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
 		<?php
 			// Remove xml nodes if advanced meta parameters
 			//echo "<pre>"; print_r($this->formparams->_xml); exit;
-			if ($this->params->get('usepublicationdetails_fe', 1) != 2 ) :
+			if ( !$perms['isSuperAdmin'] || !($this->params->get('usepublicationdetails_fe', 1) == 2) ) :
 				$advanced_metadata_params = array('created_by', 'created');
 				$metadata_nodes = array();
 				foreach($this->formparams->_xml['_default']->_children as $index => $element) :
