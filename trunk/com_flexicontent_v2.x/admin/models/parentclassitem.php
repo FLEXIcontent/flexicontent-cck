@@ -1354,6 +1354,11 @@ class ParentClassItem extends JModelAdmin
 			// Load existing item into the empty item model
 			$item->load( $data['id'] );
 			
+			// Get item's assigned categories
+			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
+			$db->setQuery($query);
+			$item->categories = $db->loadResultArray();
+			
 			// We need to fake joomla's states ... when triggering the before save content event
 			$fc_state = $item->state;
 			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
@@ -1363,6 +1368,8 @@ class ParentClassItem extends JModelAdmin
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!!
 			if( !$app->isAdmin() ) 
 				unset($data['type_id']);
+		} else {
+			$item->categories = array();
 		}
 		
 		
@@ -1413,11 +1420,11 @@ class ParentClassItem extends JModelAdmin
 		$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
 		$tagPos	= preg_match($pattern, $data['text']);
 		if ($tagPos == 0)	{
-			$item->introtext	= $data['text'];
-			$item->fulltext		= '';
+			$data['introtext'] = $data['text'];
+			$data['fulltext']  = '';
 		} else 	{
-			list($item->introtext, $item->fulltext) = preg_split($pattern, $data['text'], 2);
-			$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
+			list($data['introtext'], $data['fulltext']) = preg_split($pattern, $data['text'], 2);
+			$data['fulltext'] = JString::strlen( trim($data['fulltext']) ) ? $data['fulltext'] : '';
 		}
 		
 		
@@ -1468,29 +1475,24 @@ class ParentClassItem extends JModelAdmin
 		if ($overridecatperms)
 		{
 			$allowed_cid = @ $submit_conf['cids'];
-		} else {
-			
-			if (FLEXI_J16GE) {
-				$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-			} else if (FLEXI_ACCESS) {
-				$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
-			} else {
-				$viewallcats = 1;
-			}
-			if (!$viewallcats) {
-				if (FLEXI_J16GE || FLEXI_ACCESS) {
-					$allowed_cid 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true);
-				}
+		}
+		else
+		{
+			if (FLEXI_J16GE || FLEXI_ACCESS) {
+				$allowed_cid 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true);
 			}
 		}
 		
 		if ( isset($allowed_cid) ) {
+			// Add existing item's categories into the user allowed categories
+			$allowed_cid = array_merge($allowed_cid, $item->categories);
+			
 			// Check main category tampering
 			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid ) {
 				$this->setError( 'main category is not in allowed list (form tampered ?)' );
 				return false;
 			}
-
+			
 			// Check multi category tampering
 			$postcats = @ $submit_conf['postcats'];
 			if ( !$isnew || empty($data['submit_conf']) || $postcats==2 )
@@ -1505,26 +1507,28 @@ class ParentClassItem extends JModelAdmin
 		// *****************************************************************
 		// SECURITY concern: Check form tampering of state related variables
 		// *****************************************************************
-		$canEditState = $this->canEditState( (object)$data, $check_cat_perm=true );
+		$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 		
 		// If cannot edit state prevent user from changing state related parameters
 		if ( !$canEditState )
 		{
 			$data['vstate'] = 1;
 			if (!FLEXI_J16GE) {
-				unset( $data['details']['publish_up'] );
-				unset( $data['details']['publish_down'] );
+				// Behaviour is different in J1.5, it requires edit instead of edit state
+				//unset( $data['details']['publish_up'] );
+				//unset( $data['details']['publish_down'] );
+				//unset( $data['ordering'] );
 			} else {
 				unset( $data['featured'] );
 				unset( $data['publish_up'] );
 				unset( $data['publish_down'] );
+				unset( $data['ordering'] );
 			}
-			unset( $data['ordering'] );
 			if (!$isnew) unset( $data['state'] );
 		}
 		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
 		
-		// Prevent frontend user from changing the owner unless is super admin
+		// Prevent frontend user from changing the item owner and creation date unless they are super admin
 		if ( $app->isSite() && !$isSuperAdmin )
 		{
 			if (!FLEXI_J16GE) {

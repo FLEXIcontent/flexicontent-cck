@@ -159,7 +159,7 @@ function deleteTag(obj) {
 </script>
 
 <?php
-$page_classes  = 'adminForm flexi_edit';
+$page_classes  = 'flexi_edit';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
 <div id="flexicontent" class="<?php echo $page_classes; ?>" style="font-size:90%;<?php echo $this->params->get('form_container_css_fe'); ?>">
@@ -462,15 +462,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</div>
 			<?php endif; ?>
 			
-			<?php if ($this->params->get('enable_notifications', 1) && $this->params->get('allow_designated_users_notify_fe', 0) && JPluginHelper::isEnabled('content', 'notifyarticlesubmit')) : ?>
-			<div class="flexi_formblock" style="float:left;">
-				<label id="fc_notifyarticlesubmit-lbl" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_NOTIFY_DESIGNATED_USERS' ).':'; ?>
-				</label>
-				<span id="fc_notifyarticlesubmit"></span>
-			</div>
-			<?php endif; ?>
-			
 		<?php endif; ?>
 		</fieldset>
 		
@@ -680,7 +671,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 	<?php echo JHtml::_('sliders.start','plugin-sliders-'.$this->item->id, array('useCookie'=>1)); ?>
 	
-	<?php if ($this->perms['canpublish'] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
+	<?php
+	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
+	$publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
+	?>
+	
+	<?php if ($this->perms[$publication_priv] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
 		<?php		
 		$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );

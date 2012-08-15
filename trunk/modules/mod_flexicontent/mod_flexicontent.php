@@ -51,25 +51,25 @@ $height 				= $params->get('height');
 
 // get module basic fields parameters
 // standard
-$display_title 	= $params->get('display_title',1);
+$display_title 	= $params->get('display_title');
 $link_title 		= $params->get('link_title');
-$display_date 	= $params->get('display_date', 1);
-$display_text 	= $params->get('display_text',1);
-$display_hits		= $params->get('display_hits',1);
-$display_voting	= $params->get('display_voting',1);
-$mod_readmore	 	= $params->get('mod_readmore',1);
-$mod_use_image 	= $params->get('mod_use_image',1);
+$display_date 	= $params->get('display_date');
+$display_text 	= $params->get('display_text');
+$display_hits		= $params->get('display_hits');
+$display_voting	= $params->get('display_voting');
+$mod_readmore	 	= $params->get('mod_readmore');
+$mod_use_image 	= $params->get('mod_use_image');
 $mod_link_image = $params->get('mod_link_image');
 
 // featured
-$display_title_feat 	= $params->get('display_title_feat',1);
+$display_title_feat 	= $params->get('display_title_feat');
 $link_title_feat 			= $params->get('link_title_feat');
-$display_date_feat		= $params->get('display_date_feat',1);
-$display_text_feat 		= $params->get('display_text_feat',1);
-$display_hits_feat 		= $params->get('display_hits_feat',1);
-$display_voting_feat	= $params->get('display_voting_feat',1);
-$mod_readmore_feat		= $params->get('mod_readmore_feat',1);
-$mod_use_image_feat 	= $params->get('mod_use_image_feat',1);
+$display_date_feat		= $params->get('display_date_feat');
+$display_text_feat 		= $params->get('display_text_feat');
+$display_hits_feat 		= $params->get('display_hits_feat');
+$display_voting_feat	= $params->get('display_voting_feat');
+$mod_readmore_feat		= $params->get('mod_readmore_feat');
+$mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
 
 // get module custom fields parameters
