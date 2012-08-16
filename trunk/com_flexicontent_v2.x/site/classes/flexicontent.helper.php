@@ -812,7 +812,7 @@ class flexicontent_html
 	{
 		$document =& JFactory::getDocument();
 		
-		$counter 	= $field->parameters->get( 'counter', 1 );
+		$counter 	= $field->parameters->get( 'counter', 1 );   // 0: disable showing vote counter, 1: enable for main and for extra votes
 		if ($vote_counter != 'default' ) $counter = $vote_counter ? 1 : 0;
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim			= $field->parameters->get( 'dimension', 16 );
@@ -852,11 +852,14 @@ class flexicontent_html
 			$counter = -1;
 		}
 		
-		if ( (int)$xid ) { 
+		if ( (int)$xid ) {
+			// Disable showing vote counter in extra votes
 			if ( $counter == 2 ) $counter = 0;
 		} else {
+			// Disable showing vote counter in main vote
 			if ( $counter == 3 ) $counter = 0;
 		}
+		$nocursor = !$allow_vote ? 'cursor:auto;' : '';
 		
 		$html_vote_links = $allow_vote ? '
 			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'_'.$xid.'">1</a></li>
@@ -871,7 +874,7 @@ class flexicontent_html
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
 				.'<ul style="width:'.($vote_stars * $dim).'px;">
-    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;"></li>'
+    				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>'
     		.$html_vote_links
 				.'
 				</ul>
