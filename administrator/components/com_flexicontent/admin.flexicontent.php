@@ -19,6 +19,12 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$lhlist = array('localhost', '127.0.0.1');
+if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
+	error_reporting(E_ALL & ~E_STRICT);
+	ini_set('display_errors',1);
+}
+
 //include constants file
 require_once (JPATH_COMPONENT.DS.'defineconstants.php');
 //include the needed classes and helpers
