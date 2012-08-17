@@ -62,7 +62,7 @@ $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 ?>
 
-<div class="mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
+<div class="news  mod_flexicontent_wrapper  mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="news<?php echo $module->id ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)
@@ -97,7 +97,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
   	  continue;
   	}
 	?>
-	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent<?php echo ($twocols) ? ' twocol' : ''; ?>">
+	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent <?php echo ($twocols) ? 'twocol' : ''; ?>">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
@@ -106,7 +106,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		<!-- BOF featured items -->
 		<?php if (isset($list[$ord]['featured'])) :	?>
 
-		<div class="mod_flexicontent_featured" id="mod_fc_news_box_featured<?php echo $module->id ?>">
+		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
 			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php $rowtoggler = !$rowtoggler; ?>
@@ -117,7 +117,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
 				<div class="fc_block" >
-					<div class="fc_inline_block news_title">
+					<div class="fc_inline_block fcitem_title">
 						<?php if ($link_title_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 						<?php else : ?>	
@@ -158,7 +158,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_date_feat && $item->date_created) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_date created">
+						<div class="fc_inline fcitem_date created">
 							<?php echo $item->date_created; ?>
 						</div>
 					</div>
@@ -166,7 +166,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_date_feat && $item->date_modified) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_date modified">
+						<div class="fc_inline fcitem_date modified">
 							<?php echo $item->date_modified; ?>
 						</div>
 					</div>
@@ -174,7 +174,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_hits_feat) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_hits">
+						<div class="fc_inline fcitem_hits">
 							<?php echo $item->hits_rendered; ?>
 						</div>
 					</div>
@@ -182,20 +182,20 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_voting_feat) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_voting">
+						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>
 						</div>
 					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_text_feat && $item->text) : ?>
-					<div class="news_text">
+					<div class="fcitem_text">
 						<?php echo $item->text; ?>
 					</div>
 					<?php endif; ?>
 					
 					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
-					<div class="news_fields">
+					<div class="fcitem_fields">
 						
 					<?php foreach ($item->fields as $k => $field) : ?>
 						<?php if ( $hide_label_onempty_feat && !strlen($field->display) ) continue; ?>
@@ -212,7 +212,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
-						<div class="news_readon">
+						<div class="fcitem_readon">
 							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></div></a>
 						</div>
 					</div>
@@ -235,7 +235,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		<?php	if (isset($list[$ord]['standard'])) : ?>
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_standard" id="mod_fc_news_box_standard<?php echo $module->id ?>">
+		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php $rowcount++; ?>
@@ -248,7 +248,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
 					<?php if ($display_title) : ?>
 					<div class="fc_block" >
-						<div class="fc_inline_block news_title">
+						<div class="fc_inline_block fcitem_title">
 							<?php if ($link_title) : ?>
 							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 							<?php else : ?>	
@@ -287,7 +287,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_date && $item->date_created) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_date created">
+						<div class="fc_inline fcitem_date created">
 							<?php echo $item->date_created; ?>
 						</div>
 					</div>
@@ -295,7 +295,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_date && $item->date_modified) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_date modified">
+						<div class="fc_inline fcitem_date modified">
 							<?php echo $item->date_modified; ?>
 						</div>
 					</div>
@@ -303,7 +303,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_hits) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_hits">
+						<div class="fc_inline fcitem_hits">
 							<?php echo $item->hits_rendered; ?>
 						</div>
 					</div>
@@ -311,20 +311,20 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($display_voting) : ?>
 					<div class="fc_block">
-						<div class="fc_inline news_voting">
+						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>
 						</div>
 					</div>
 					<?php endif; ?>
 					
 					<?php if ($display_text && $item->text) : ?>
-					<div class="news_text">
+					<div class="fcitem_text">
 						<?php echo $item->text; ?>
 					</div>
 					<?php endif; ?>
 					
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
-					<div class="news_fields">
+					<div class="fcitem_fields">
 						
 					<?php foreach ($item->fields as $k => $field) : ?>
 						<?php if ( $hide_label_onempty && !strlen($field->display) ) continue; ?>
@@ -341,7 +341,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
-						<div class="news_readon">
+						<div class="fcitem_readon">
 							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::sprintf('Read more...'); ?></div></a>
 						</div>
 					</div>
