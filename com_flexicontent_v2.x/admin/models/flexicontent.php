@@ -1181,6 +1181,9 @@ class FlexicontentModelFlexicontent extends JModel
 	function checkInitialPermission() {
 		$debug_initial_perms = $params =& JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 		
+		static $init_required = null;
+		if ( $init_required !== null ) return $init_required;
+		
 		jimport('joomla.access.rules');
 		$db = &JFactory::getDBO();
 		$component_name = 'com_flexicontent';
@@ -1220,7 +1223,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'));
+			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$asset->id.') )' )
+			->where( 'c.extension = ' . $db->quote('com_content') );
+		
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		if (count($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
@@ -1247,8 +1252,9 @@ class FlexicontentModelFlexicontent extends JModel
 		$field_section = count($result) == 0 ? 1 : 0;
 		
 		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section <br>"; }
-
-		return ($comp_section && $category_section && $article_section && $field_section);
+		
+		$init_required = $comp_section && $category_section && $article_section && $field_section;
+		return $init_required;
 	}
 	
 	function initialPermission() {
@@ -1336,7 +1342,8 @@ class FlexicontentModelFlexicontent extends JModel
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title, c.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where('se.id is NULL')->where('c.extension = ' . $db->quote('com_content'))
+			->where( '(se.id is NULL OR se.parent_id!='.(int)$asset->id.')' )
+			->where( 'c.extension = ' . $db->quote('com_content') )
 			->order('c.level ASC');   // IMPORTANT create categories asset using increasing depth level, so that get parent assetid will not fail
 		$db->setQuery($query);
 		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
@@ -1347,23 +1354,22 @@ class FlexicontentModelFlexicontent extends JModel
 				$parentId = $this->_getAssetParentId(null, $category);
 				$name = "com_content.category.{$category->id}";
 				
-				// Test if an asset for the current CATEGORY ID already exists and load it instead of creating a new asset
-				if ( ! $asset->loadByName($name) ) {
+				// Try to load asset for the current CATEGORY ID
+				$asset_found = $asset->loadByName($name);
+				
+				if ( !$asset_found ) {
 					if ($category->asset_id) {
 						// asset name not found but category has an asset id set ?, we could delete it here
 						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
 					}
 					
-					// Initialize category asset
+					// Set id to null since we will be creating a new asset on store
 					$asset->id 		= null;
-					$asset->name	= $name;
-					$asset->title	= $category->title;
-					$asset->setLocation($parentId, 'last-child');     // Permissions of categories are inherited by parent category, or from component if no parent category exists
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
 					$asset->rules = new JRules();
-					/*
-					if ($parentId == $component_asset->id) {				
+					
+					/*if ($parentId == $component_asset->id) {				
 						$actions	= JAccess::getActions($component_name, 'category');
 						$rules 		= json_decode($component_asset->rules);		
 						foreach ($actions as $action) {
@@ -1375,28 +1381,37 @@ class FlexicontentModelFlexicontent extends JModel
 						$parent = JTable::getInstance('asset');
 						$parent->load($parentId);
 						$asset->rules = $parent->rules;
-					}
-					*/
+					}*/
 					
-					// Save the asset
-					if (!$asset->check() || !$asset->store(false)) {
-						echo $asset->getError();
-						$this->setError($asset->getError());
-						return false;
-					}
+				} else {
+					// do not change the id or rules of the asset
 				}
 				
-				// Assign the asset to the category
-				$query = $db->getQuery(true)
-					->update('#__categories')
-					->set('asset_id = ' . (int)$asset->id)
-					->where('id = ' . (int)$category->id);
-				$db->setQuery($query);
+				// Initialize appropriate asset properties
+				$asset->name	= $name;
+				$asset->title	= $category->title;
+				$asset->setLocation($parentId, 'last-child');     // Permissions of categories are inherited by parent category, or from component if no parent category exists
 				
-				if (!$db->query()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+				// Save the category asset (create or update it)
+				if (!$asset->check() || !$asset->store(false)) {
+					echo $asset->getError();
+					$this->setError($asset->getError());
 					return false;
+				}
+				
+				// Assign the asset to the category, if it is not already assigned
+				if ( !$asset_found ) {
+					$query = $db->getQuery(true)
+						->update('#__categories')
+						->set('asset_id = ' . (int)$asset->id)
+						->where('id = ' . (int)$category->id);
+					$db->setQuery($query);
+					
+					if (!$db->query()) {
+						echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+						$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+						return false;
+					}
 				}
 			}
 		}
@@ -1419,23 +1434,22 @@ class FlexicontentModelFlexicontent extends JModel
 				$parentId = $this->_getAssetParentId(null, $item);
 				$name = "com_content.article.{$item->id}";
 				
-				// Test if an asset for the current CATEGORY ID already exists and load it instead of creating a new asset
-				if ( ! $asset->loadByName($name) ) {
+				// Try to load asset for the current CATEGORY ID
+				$asset_found = $asset->loadByName($name);
+				
+				if ( !$asset_found ) {
 					if ($item->asset_id) {
 						// asset name not found but item has an asset id set ?, we could delete it here
 						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
 					}
 					
-					// Initialize item asset
+					// Set id to null since we will be creating a new asset on store
 					$asset->id 		= null;
-					$asset->name	= $name;
-					$asset->title	= $item->title;
-					$asset->setLocation($parentId, 'last-child');     // Permissions of items are inherited from their main category
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
 					$asset->rules = new JRules();
-					/*
-					if ($parentId == $component_asset->id) {				
+					
+					/*if ($parentId == $component_asset->id) {				
 						$actions	= JAccess::getActions($component_name, 'article');
 						$rules 		= json_decode($component_asset->rules);		
 						foreach ($actions as $action) {
@@ -1447,28 +1461,37 @@ class FlexicontentModelFlexicontent extends JModel
 						$parent = JTable::getInstance('asset');
 						$parent->load($parentId);
 						$asset->rules = $parent->rules;
-					}
-					*/
+					}*/
 					
-					// Save the asset
-					if (!$asset->check() || !$asset->store(false)) {
-						echo $asset->getError();
-						$this->setError($asset->getError());
-						return false;
-					}
+				} else {
+					// do not change the id or rules of the asset
 				}
 				
-				// Assign the asset to the item
-				$query = $db->getQuery(true)
-					->update('#__content')
-					->set('asset_id = ' . (int)$asset->id)
-					->where('id = ' . (int)$item->id);
-				$db->setQuery($query);
+				// Initialize appropriate asset properties
+				$asset->name	= $name;
+				$asset->title	= $item->title;
+				$asset->setLocation($parentId, 'last-child');     // Permissions of items are inherited from their main category
 				
-				if (!$db->query()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+				// Save the item asset (create or update it)
+				if (!$asset->check() || !$asset->store(false)) {
+					echo $asset->getError();
+					$this->setError($asset->getError());
 					return false;
+				}
+				
+				// Assign the asset to the item, if it is not already assigned
+				if ( !$asset_found ) {
+					$query = $db->getQuery(true)
+						->update('#__content')
+						->set('asset_id = ' . (int)$asset->id)
+						->where('id = ' . (int)$item->id);
+					$db->setQuery($query);
+					
+					if (!$db->query()) {
+						echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+						$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+						return false;
+					}
 				}
 			}
 		}
@@ -1642,10 +1665,21 @@ class FlexicontentModelFlexicontent extends JModel
 	protected function _getAssetParentId($table = null, $data = null)
 	{
 		// Initialise variables.
-		$assetId 	= null;
-		$db			= JFactory::getDbo();
+		$assetId = null;
+		$db = JFactory::getDbo();
+		static $comp_assetid = null;
+		
+		// Get asset id of the component, if we have done already
+		if ( $comp_assetid===null ) {
+			$query	= $db->getQuery(true)
+				->select('id')
+				->from('#__assets')
+				->where('name = '.$db->quote(JRequest::getCmd('option')));
+			$db->setQuery($query);
+			$comp_assetid = (int) $db->loadResult();
+		}
 
-		// This is a category under a category.
+		// This is a category under a category with id 'parent_id', or an item assigned to a category with id 'parent_id' (... see query above)
 		if ($data->parent_id > 1) {
 			// Build the query to get the asset id for the parent category.
 			$query	= $db->getQuery(true);
@@ -1662,17 +1696,9 @@ class FlexicontentModelFlexicontent extends JModel
 		
 		// This is a category that needs to parent with the extension.
 		if ($assetId === null || $assetId === false) {
-			// Build the query to get the asset id for the parent category.
-			$query	= $db->getQuery(true)
-				->select('id')
-				->from('#__assets')
-				->where('name = '.$db->quote(JRequest::getCmd('option')));
-			$db->setQuery($query);
-			if ($result = $db->loadResult()) {
-				$assetId = (int) $result;
-			}
+			$assetId = $comp_assetid;
 		}
-
+		
 		// Return the asset id.
 		return $assetId;
 		/*if ($assetId) {

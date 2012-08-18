@@ -302,15 +302,15 @@
 		<copy file="language/de-DE/de-DE.com_flexicontent.ini" tofile="flexipack/site/language/de-DE.com_flexicontent.ini" />
 		
 		<!--tar destfile="com_flexicontent_${revision}.tar.gz" basedir="flexipack" compression="gzip"/-->
-		<tar destfile="com_flexicontent_j15.tar.gz" basedir="flexipack" compression="gzip"/>
+		<!--tar destfile="com_flexicontent_j15.tar.gz" basedir="flexipack" compression="gzip"/-->
 <!--
 		<tar destfile="com_flexicontent.tar" compression="gzip">
 			<fileset dir="flexipack" />
 		</tar>
+-->
 		<zip destfile="com_flexicontent.zip">
 			<fileset dir="flexipack" />
 		</zip>
--->
 		<delete dir="flexipack" includeemptydirs="true" />
 		
 	</target>

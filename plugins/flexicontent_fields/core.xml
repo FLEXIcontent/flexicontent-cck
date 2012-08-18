@@ -106,7 +106,13 @@
 	<params group="group-voting"><!-- voting -->
 		<param name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 		<param name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-
+		<param name="counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
+			<option value="0">FLEXI_DISABLE</option>
+			<option value="1">FLEXI_ENABLE</option>
+			<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
+			<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
+		</param>
+		
 		<param name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level2" menu="hide" />
 		<param name="enable_extra_votes" type="radio" default="0" label="FLEXI_ENABLE_VOTE_EXTRA" description="FLEXI_ENABLE_VOTE_EXTRA_DESC">
 			<option value="0">FLEXI_NO</option>
