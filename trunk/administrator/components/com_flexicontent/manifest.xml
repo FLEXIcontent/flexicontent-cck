@@ -13,9 +13,6 @@
 
 	<languages folder="site/language">
 		<language tag="en-GB">en-GB.com_flexicontent.ini</language>
-		<language tag="fr-FR">fr-FR.com_flexicontent.ini</language>
-		<language tag="de-DE">de-DE.com_flexicontent.ini</language>
-		<language tag="ru-RU">ru-RU.com_flexicontent.ini</language>
 	</languages>
 
 	<files folder="site">
@@ -69,9 +66,6 @@
 		</files>
 		<languages folder="admin/language">
 			<language tag="en-GB">en-GB.com_flexicontent.ini</language>
-			<language tag="fr-FR">fr-FR.com_flexicontent.ini</language>
-			<language tag="de-DE">de-DE.com_flexicontent.ini</language>
-			<language tag="ru-RU">ru-RU.com_flexicontent.ini</language>
 		</languages>
 		<params>
 			<param name="flexi_section" default="" />
