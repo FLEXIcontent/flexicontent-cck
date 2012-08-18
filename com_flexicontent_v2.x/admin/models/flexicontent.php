@@ -210,7 +210,7 @@ class FlexicontentModelFlexicontent extends JModel
 		// Check menu item exists
 		$config_saved = (bool) $params->get('flexi_cat_extension');
 		if ( !$menu ) {
-			if ( !$config_saved ) {
+			if ( $config_saved ) {
 				$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
 			}
 			return $return = false;
