@@ -1097,7 +1097,8 @@ class modFlexicontentHelper
 			$select_image	= '';
 			$join_image		= '';
 		}
-
+		
+		$query = ""; // make sure the query variable is empty, since we will check it after switch !!
 		switch ($ordering) {
 			case 'popular':
 				$orderby = ' ORDER BY i.hits DESC';
@@ -1189,7 +1190,7 @@ class modFlexicontentHelper
 				$orderby = '';
 		}
 		
-		if (!isset($query)) {
+		if ( !$query ) {
 			$query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
 					. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
 					. $select_image

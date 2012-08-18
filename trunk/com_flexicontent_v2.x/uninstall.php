@@ -34,50 +34,46 @@ $error = false;
 $extensions = array();
 $db =& JFactory::getDBO();
 
-//if you have new flexi plugins add here: name => folder
-$flexiplugins = array(
-	"checkbox"			=>	"flexicontent_fields",
-	"checkboximage"		=>	"flexicontent_fields",
-	"core"				=>	"flexicontent_fields",
-	"date"				=>	"flexicontent_fields",
-	"email"				=>	"flexicontent_fields",
-	"file"				=>	"flexicontent_fields",
-	"image"				=>	"flexicontent_fields",
-	"radio"				=>	"flexicontent_fields",
-	"radioimage"		=>	"flexicontent_fields",
-	"select"			=>	"flexicontent_fields",
-	"selectmultiple"	=>	"flexicontent_fields",
-	"text"				=>	"flexicontent_fields",
-	"textarea"			=>	"flexicontent_fields",
-	"weblink"			=>	"flexicontent_fields",
-	"extendedweblink"	=>	"flexicontent_fields",
-	"linkslist"			=>	"flexicontent_fields",
-	"minigallery"		=>	"flexicontent_fields",
-	"toolbar"			=>	"flexicontent_fields",
-	"fcpagenav"			=>	"flexicontent_fields",
-	"fcloadmodule"		=>	"flexicontent_fields",
-	"relateditems"		=>	"flexicontent_fields",
-	"textselect"		=>	"flexicontent_fields",
-	"flexinotify"		=>	"flexicontent",
-	"flexisearch"		=>	"search",
-	"flexiadvsearch"		=>	"search",
-	"flexisystem"		=>	"system",
-	"flexiadvroute"		=>	"system"
-);
+// Restore com_content component asset, as asset parent_id, for the top-level 'com_content' categories
+$asset	= JTable::getInstance('asset');
+$asset_loaded = $asset->loadByName('com_content');  // Try to load component asset for com_content
+if (!$asset_loaded) {
+	echo '<span style="font-weight: bold; color: darkred;" >Failed to load asset for com_content</span><br/>';
+} else {
+	$query = 'UPDATE #__assets AS s'
+		.' JOIN #__categories AS c ON s.id=c.asset_id'
+		.' SET s.parent_id='.$db->Quote($asset->id)
+		.' WHERE c.parent_id=1 AND c.extension="com_content"';
+	$db->setQuery($query);
+	$db->query();
+	if ($db->getErrorNum()) {
+		echo $db->getErrorMsg();
+		echo '<span style="font-weight: bold; color: darkred;" >Failed to load asset for com_content</span><br/>';
+	} else {
+		echo '<span style="font-weight: bold; color: darkgreen;" >Restored parent asset for top level categories</span><br/>';
+	}
+}
+
+
+
 // additional extensions
 $add_array =& $this->manifest->xpath('additional');
 $add = NULL;
 if(count($add_array)) $add = $add_array[0];
-if (is_a($add, 'JXMLElement') && count($add->children())) {
-    $exts =& $add->children();
-    foreach ($exts as $ext) {
-
+if ( is_a($add, 'JXMLElement') && count($add->children()) )
+{
+	$exts =& $add->children();
+	foreach ($exts as $ext)
+	{
 		// set query
 		switch ($ext->name()) {
 			case 'plugin':
 				$attribute_name = $ext->getAttribute('name');
-				if(array_key_exists($attribute_name, $flexiplugins)) {
-					$query = 'SELECT * FROM #__extensions WHERE type='.$db->Quote($ext->name()).' AND element='.$db->Quote($ext->getAttribute('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
+				if( $ext->getAttribute('instfolder') ) {
+					$query = 'SELECT * FROM #__extensions'
+						.' WHERE type='.$db->Quote($ext->name())
+						.'  AND element='.$db->Quote($ext->getAttribute('name'))
+						.'  AND folder='.$db->Quote($ext->getAttribute('instfolder'));
 					// query extension id and client id
 					$db->setQuery($query);
 					$res = $db->loadObject();

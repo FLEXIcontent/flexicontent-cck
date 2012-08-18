@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="search" method="upgrade">
-	<name>Search - Advanced Search for FLEXIcontent</name>
+<install version="1.6" type="plugin" group="search" method="upgrade">
+	<name>PLG_SEARCH_FLEXIADVSEARCH</name>
 	<author>Suriya Kaewmungmuang</author>
 	<creationDate>29 June 2011</creationDate>
 	<copyright>Copyright (C) 2011 flexicontent.org</copyright>
@@ -8,9 +8,10 @@
 	<authorEmail>enjoyman@gmail.com</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Advanced search plugin for flexicontent.</description>
+	<description>PLG_SEARCH_FLEXIADVSEARCH_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexiadvsearch">flexiadvsearch.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<config>
 	<fields name="params">
@@ -29,8 +30,11 @@
 	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.ini</language>
+		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.sys.ini</language>
 		<language tag="de-DE">de-DE.plg_search_flexiadvsearch.ini</language>
+		<language tag="de-DE">de-DE.plg_search_flexiadvsearch.sys.ini</language>
 		<language tag="ru-RU">ru-RU.plg_search_flexiadvsearch.ini</language>
+		<language tag="ru-RU">ru-RU.plg_search_flexiadvsearch.sys.ini</language>
 	</languages>
 
 </install>

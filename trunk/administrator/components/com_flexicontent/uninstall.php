@@ -34,48 +34,22 @@ $error = false;
 $extensions = array();
 $db =& JFactory::getDBO();
 
-//if you have new flexi plugins add here: name => folder
-$flexiplugins = array(
-	"checkbox"			=>	"flexicontent_fields",
-	"checkboximage"		=>	"flexicontent_fields",
-	"core"				=>	"flexicontent_fields",
-	"date"				=>	"flexicontent_fields",
-	"email"				=>	"flexicontent_fields",
-	"file"				=>	"flexicontent_fields",
-	"image"				=>	"flexicontent_fields",
-	"radio"				=>	"flexicontent_fields",
-	"radioimage"		=>	"flexicontent_fields",
-	"select"			=>	"flexicontent_fields",
-	"selectmultiple"	=>	"flexicontent_fields",
-	"text"				=>	"flexicontent_fields",
-	"textarea"			=>	"flexicontent_fields",
-	"weblink"			=>	"flexicontent_fields",
-	"extendedweblink"	=>	"flexicontent_fields",
-	"linkslist"			=>	"flexicontent_fields",
-	"minigallery"		=>	"flexicontent_fields",
-	"toolbar"			=>	"flexicontent_fields",
-	"fcpagenav"			=>	"flexicontent_fields",
-	"fcloadmodule"		=>	"flexicontent_fields",
-	"relateditems"		=>	"flexicontent_fields",
-	"textselect"		=>	"flexicontent_fields",
-	"flexinotify"		=>	"flexicontent",
-	"flexisearch"		=>	"search",
-	"flexiadvsearch"		=>	"search",
-	"flexisystem"		=>	"system",
-	"flexiadvroute"		=>	"system"
-);
+
 // additional extensions
 $add =& $this->manifest->getElementByPath('additional');
-if (is_a($add, 'JSimpleXMLElement') && count($add->children())) {
-    $exts =& $add->children();
-    foreach ($exts as $ext) {
-
+if ( is_a($add, 'JSimpleXMLElement') && count($add->children()) )
+{
+	$exts =& $add->children();
+	foreach ($exts as $ext)
+	{
 		// set query
 		switch ($ext->name()) {
 			case 'plugin':
 				$attribute_name = $ext->attributes('name');
-				if(array_key_exists($attribute_name, $flexiplugins)) {
-					$query = 'SELECT * FROM #__plugins WHERE element='.$db->Quote($ext->attributes('name'))." AND folder='".$flexiplugins[$attribute_name]."';";
+				if( $ext->attributes('instfolder') ) {
+					$query = 'SELECT * FROM #__plugins'
+						.' WHERE element='.$db->Quote($ext->attributes('name'))
+						.'  AND folder='.$db->Quote($ext->attributes('instfolder'));
 					// query extension id and client id
 					$db->setQuery($query);
 					$res = $db->loadObject();
