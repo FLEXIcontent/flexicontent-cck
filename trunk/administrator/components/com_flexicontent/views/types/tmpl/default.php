@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access'); ?>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
 		<tr>
@@ -53,7 +53,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	<tfoot>
 		<tr>
 			<td colspan="10">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -61,9 +61,9 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	<tbody>
 		<?php
 		$k = 0;
-		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
+		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		{
 			$row = $this->rows[$i];
-
 			$link 		= 'index.php?option=com_flexicontent&amp;controller=types&amp;task=edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('grid.published', $row, $i );
 			$access 	= JHTML::_('grid.access', $row, $i );
@@ -72,7 +72,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php

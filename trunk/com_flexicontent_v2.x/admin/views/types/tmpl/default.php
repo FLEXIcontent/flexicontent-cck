@@ -61,12 +61,12 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	<tbody>
 		<?php
 		$k = 0;
-		$n=count($this->rows);
-		$i=0;
-		foreach($this->rows as $row) {
+		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		{
+			$row = $this->rows[$i];
 			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
-			$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
+			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
@@ -117,7 +117,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			</td>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
-		<?php $k = 1 - $k; $i++;} ?>
+		<?php $k = 1 - $k; } ?>
 	</tbody>
 
 	</table>

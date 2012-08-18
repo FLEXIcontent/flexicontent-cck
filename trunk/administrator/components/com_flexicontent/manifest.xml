@@ -153,7 +153,7 @@
 	<plugin name="flexinotify"     folder="plugins/flexinotify"     instfolder="flexicontent">Notifications plugin for FLEXIcontent</plugin>
 
 	<plugin name="flexisearch"     folder="plugins/search"          instfolder="search">Search plugin for FLEXIcontent</plugin>
-	<plugin name="flexiadvsearch"  folder="plugins/search"          instfolder="search">Advanced search plugin for flexicontent.</plugin>
+	<plugin name="flexiadvsearch"  folder="plugins/advsearch"       instfolder="search">Advanced search plugin for flexicontent.</plugin>
 	<plugin name="flexisystem"     folder="plugins/system"          instfolder="system">System plugin for FLEXIcontent</plugin>
 	<plugin name="flexiadvroute"   folder="plugins/advroute"        instfolder="system">System plugin for advanced FLEXIcontent routing</plugin>
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1431 2012-08-11 14:22:23Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,18 +51,15 @@ class FlexicontentViewTypes extends JView {
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-		} else if (FLEXI_ACCESS) {
-			$user =& JFactory::getUser();
-			$permission->CanTypes 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'types', 'users', $user->gmid) : 1;
-			$perms->CanConfig		= ($user->gid > 24);
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			$perms = FlexicontentHelperPerm::getPerm();
 		} else {
+			$perms = new stdClass();
 			$perms->CanTypes 		= 1;
 			$perms->CanConfig		= 1;
 		}
 		
-		if (!$permission->CanTypes) {
+		if (!$perms->CanTypes) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
@@ -77,11 +74,11 @@ class FlexicontentViewTypes extends JView {
 		JToolBarHelper::addNew('types.add');
 		JToolBarHelper::editList('types.edit');
 		JToolBarHelper::deleteList('Are you sure?', 'types.remove');
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		if($perms->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Items');
-		$this->pagination 	= & $this->get( 'Pagination' );
+		$rows             = & $this->get( 'Items');
+		$this->pagination = & $this->get( 'Pagination' );
 
 		$lists = array();
 		
