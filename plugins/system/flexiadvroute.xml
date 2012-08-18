@@ -9,13 +9,15 @@
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>2.0</version>
 	<description>System plugin for advanced FLEXIcontent routing</description>
+	
 	<files>
 		<filename plugin="flexiadvroute">flexiadvroute.php</filename>
 	</files>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_system_flexiadvroute.ini</language>
-		<language tag="fr-FR">fr-FR.plg_system_flexiadvroute.ini</language>
 	</languages>
+	
 	<params addpath="/administrator/components/com_flexicontent/elements">
 		<param name="" type="separator" default="Hide Categories from Pathway/URLs for Types" hr="false" level="level2" menu="hide" />
 		<param name="route_to_type" type="radio" default="0" label="Enable" description="">

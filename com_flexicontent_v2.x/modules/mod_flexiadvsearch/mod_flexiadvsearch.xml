@@ -18,7 +18,6 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
-		<language tag="fr-FR">languages/fr-FR.mod_flexiadvsearch.ini</language>
 	</languages>
 	
 	<config>
