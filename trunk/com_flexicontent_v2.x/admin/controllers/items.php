@@ -754,6 +754,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					
 					
 				}
+				//echo "<pre>"; print_r($data); exit;
 				
 				// Set/Force id to zero to indicate creation of new item
 				$data['id'] = 0;

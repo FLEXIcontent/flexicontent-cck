@@ -61,11 +61,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$app =& JFactory::getApplication();
 		$linkto_url = $field->parameters->get('linkto_url',0);
 		
+		// Make sure value is an array of values, not sure if this is needed
+		if ( isset($field->value['originalname']) ) $field->value = array($field->value);
+		
 		// if an image exists it display the existing image
-		if ($field->value  && @$field->value[0]!=='')
+		if ( strlen(trim(@$field->value[0]['originalname'])) )
 		{
-			if(isset($field->value['originalname']))
-				$field->value = array($field->value);
 			foreach ($field->value as $value) {
 				$value = unserialize($value);
 				
@@ -112,7 +113,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</table>
 				</div>';
 				$n++;
-				}
+			}
 		}
 		else
 		{
@@ -336,6 +337,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			foreach ($values as $value)
 			{
 				$value	= unserialize($value);
+				if ( !strlen(trim(@$value['originalname'])) ) continue;  // check for empty value
 				
 				// Check and rebuild thumbnails if needed
 				$this->rebuildThumbs($field,$value);
@@ -776,7 +778,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 	function rebuildThumbs( &$field, $value )
 	{
-		$filename = $value['originalname'];
+		$filename = trim($value['originalname']);
+		if ( !$filename ) return;  // check for empty filename
+		
 		if (empty($value['is_default_image'])) {
 			$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 			$filepath = $onlypath . $filename;
@@ -785,8 +789,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$filepath = JPATH_BASE.DS.$value['default_image'];
 		}
 		
-		if (!file_exists($filepath)) {
-			//echo "Original file seems to have been deleted, cannot find image file: ".$filepath ."<br />\n";
+		if ( !file_exists($filepath) || !is_file($filepath) ) {
+			//echo "Original file seems to have been deleted or is not a file, cannot find image file: ".$filepath ."<br />\n";
 			return;
 		}
 		$filesize	= getimagesize($filepath);
