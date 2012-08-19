@@ -1640,7 +1640,8 @@ class FlexicontentModelItems extends JModel
 					// Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
 					// *****************************************************************
 					if (FLEXI_J16GE) {
-						$dispatcher->trigger($itemmodel->event_before_delete, array('com_content.article', $item));
+						$event_before_delete = 'onContentBeforeDelete';  // NOTE: $itemmodel->event_before_delete is protected property
+						$dispatcher->trigger($event_before_delete, array('com_content.article', $item));
 						$item_arr[] = clone($item);  // store object so that we can call after delete event
 					}
 					

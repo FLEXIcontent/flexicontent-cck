@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: archive.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: archive.php 1342 2012-06-07 01:48:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -231,7 +231,7 @@ class FlexicontentModelArchive extends JModelList
 		$where = array();
 		
 		$where[] = ' i.state = -1';
-		$where[] = ' c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY);
+		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
@@ -340,7 +340,8 @@ class FlexicontentModelArchive extends JModelList
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND rel.itemid = '.(int)$id
+				. ' WHERE rel.itemid = '.(int)$id
+				. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '' )
 				;
 	
 		$this->_db->setQuery( $query );
