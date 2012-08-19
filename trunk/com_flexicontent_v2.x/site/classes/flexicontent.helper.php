@@ -2784,23 +2784,29 @@ class FLEXIUtilities
 	 * Converts a string (containing a csv file) into a array of records ( [row][col] )and returns it
 	 * @author: Klemen Nagode (in http://stackoverflow.com/)
 	 */
-	function csvstring_to_array($string, $separatorChar = ',', $enclosureChar = '"', $newlineChar = "\n") {
-	
+	function csvstring_to_array($string, $field_separator = ',', $enclosure_char = '"', $record_separator = "\n")
+	{
 		$array = array();   // [row][cols]
 		$size = strlen($string);
 		$columnIndex = 0;
 		$rowIndex = 0;
 		$fieldValue="";
 		$isEnclosured = false;
-	
+		// Field separator
+		$fld_sep_start = $field_separator{0};
+		$fld_sep_size  = strlen( $field_separator );
+		// Record (item) separator
+		$rec_sep_start = $record_separator{0};
+		$rec_sep_size  = strlen( $record_separator );
+		
 		for($i=0; $i<$size;$i++)
 		{
 			$char = $string{$i};
 			$addChar = "";
 	
 			if($isEnclosured) {
-				if($char==$enclosureChar) {
-					if($i+1<$size && $string{$i+1}==$enclosureChar) {
+				if($char==$enclosure_char) {
+					if($i+1<$size && $string{$i+1}==$enclosure_char) {
 						// escaped char
 						$addChar=$char;
 						$i++; // dont check next char
@@ -2813,18 +2819,18 @@ class FLEXIUtilities
 			}
 			else
 			{
-				if($char==$enclosureChar) {
+				if($char==$enclosure_char) {
 					$isEnclosured = true;
 				} else {
-					
-					if($char==$separatorChar) {
-		
+					if( $char==$fld_sep_start && $i+$fld_sep_size < $size && substr($string, $i,$fld_sep_size) == $field_separator ) {
+						$i = $i + ($fld_sep_size-1);
 						$array[$rowIndex][$columnIndex] = $fieldValue;
 						$fieldValue="";
-		
+						
 						$columnIndex++;
-					} elseif($char==$newlineChar) {
-						echo $char;
+					} else if( $char==$rec_sep_start && $i+$rec_sep_size < $size && substr($string, $i,$rec_sep_size) == $record_separator ) {
+						$i = $i + ($rec_sep_size-1);
+						echo "\n";
 						$array[$rowIndex][$columnIndex] = $fieldValue;
 						$fieldValue="";
 						$columnIndex=0;
