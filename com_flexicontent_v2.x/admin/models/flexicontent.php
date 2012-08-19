@@ -1382,9 +1382,8 @@ class FlexicontentModelFlexicontent extends JModel
 						$parent->load($parentId);
 						$asset->rules = $parent->rules;
 					}*/
-					
 				} else {
-					// do not change the id or rules of the asset
+					// do not change (a) the id OR (b) the rules, of the asset
 				}
 				
 				// Initialize appropriate asset properties
@@ -1400,18 +1399,16 @@ class FlexicontentModelFlexicontent extends JModel
 				}
 				
 				// Assign the asset to the category, if it is not already assigned
-				if ( !$asset_found ) {
-					$query = $db->getQuery(true)
-						->update('#__categories')
-						->set('asset_id = ' . (int)$asset->id)
-						->where('id = ' . (int)$category->id);
-					$db->setQuery($query);
-					
-					if (!$db->query()) {
-						echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-						$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-						return false;
-					}
+				$query = $db->getQuery(true)
+					->update('#__categories')
+					->set('asset_id = ' . (int)$asset->id)
+					->where('id = ' . (int)$category->id);
+				$db->setQuery($query);
+				
+				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
 				}
 			}
 		}
@@ -1462,9 +1459,8 @@ class FlexicontentModelFlexicontent extends JModel
 						$parent->load($parentId);
 						$asset->rules = $parent->rules;
 					}*/
-					
 				} else {
-					// do not change the id or rules of the asset
+					// do not change (a) the id OR (b) the rules, of the asset
 				}
 				
 				// Initialize appropriate asset properties
@@ -1480,18 +1476,16 @@ class FlexicontentModelFlexicontent extends JModel
 				}
 				
 				// Assign the asset to the item, if it is not already assigned
-				if ( !$asset_found ) {
-					$query = $db->getQuery(true)
-						->update('#__content')
-						->set('asset_id = ' . (int)$asset->id)
-						->where('id = ' . (int)$item->id);
-					$db->setQuery($query);
-					
-					if (!$db->query()) {
-						echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-						$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-						return false;
-					}
+				$query = $db->getQuery(true)
+					->update('#__content')
+					->set('asset_id = ' . (int)$asset->id)
+					->where('id = ' . (int)$item->id);
+				$db->setQuery($query);
+				
+				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
 				}
 			}
 		}

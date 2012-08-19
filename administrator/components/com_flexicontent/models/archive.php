@@ -231,7 +231,7 @@ class FlexicontentModelArchive extends JModel
 		$where = array();
 		
 		$where[] = ' i.state = -1';
-		$where[] = ' i.sectionid = ' . FLEXI_SECTION;
+		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
@@ -341,6 +341,7 @@ class FlexicontentModelArchive extends JModel
 				. ' FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int)$id
+				. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '' )
 				;
 	
 		$this->_db->setQuery( $query );
