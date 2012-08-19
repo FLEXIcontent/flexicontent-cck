@@ -618,23 +618,58 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		$link 	= 'index.php?option=com_flexicontent&view=items';
-
-		$task		= JRequest::getVar('task');
-		$model 		= $this->getModel('item');
+		
+		// Get item model
+		$model  = $this->getModel('item');
+		
+		// Set some variables
+		$link  = 'index.php?option=com_flexicontent&view=items';
+		$task  = JRequest::getVar('task');
+		$mainframe = &JFactory::getApplication();
+		
 		if ($task == 'importcsv')
 		{
-			// Retrieve form uploaded CSV file
+			// Retrieve from configuration for (a) typeid(a) main category, (b) secondaries categories
+			$type_id 	= JRequest::getInt( 'type_id', 0 );
+			$maincat 	= JRequest::getInt( 'maincat', 0 );
+			$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
+			if( !$maincat ) $maincat = @$seccats[0];
+			
+			if( !$type_id ) {
+				// Check for the required Content Type Id
+				$this->setRedirect($link, "Please select Content Type for the imported items");
+				return;
+			}
+			if( !$maincat ) {
+				// Check for the required main category
+				$this->setRedirect($link, "Please select main category for the imported items");
+				return;
+			}
+			
+			// Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
+			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/ie';
+			$replace = 'eval(\'return "$1";\')';
+			$field_separator  = preg_replace($pattern, $replace, JRequest::getVar('field_separator'));  
+			$enclosure_char   = preg_replace($pattern, $replace, JRequest::getVar('enclosure_char'));  ;
+			$record_separator = preg_replace($pattern, $replace, JRequest::getVar('record_separator'));  
+			
+			if( $field_separator=='' || $record_separator=='' ) {
+				// Check for the (required) title column
+				$this->setRedirect($link, "CSV format not valid, please enter Field Separator and Item Separator");
+				return;
+			}
+			
+			// Retrieve the uploaded CSV file
 			$csvfile = @$_FILES["csvfile"]["tmp_name"];
 			if(!is_file($csvfile)) {
 				$this->setRedirect($link, "Upload file error!");
 				return;
 			}
 			
-			// Read and parse the file
-			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile));
+			// Read & Parse the CSV file according the given format
+			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $field_separator, $enclosure_char, $record_separator);
 			
-			// alternative way of reading / parsing SCV data ...
+			// alternative way of reading / parsing CSV data ...
 			/*require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'DataSource.php');
 			$csv = new File_CSV_DataSource;
 			$csv->load($csvfile);
@@ -646,7 +681,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
 				return;
 			}
-			$columns = flexicontent_html::arrayTrim($line);*/
+			//echo "<xmp>"; var_dump($csv->getRows()); echo "</xmp>";
+			$contents = $csv->connect();*/
 			
 			// Basic error checking, for empty data
 			if(count($contents[0])<=0) {
@@ -656,59 +692,79 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// Get field names (from the header line (row 0), and remove it form the data array
 			$columns = flexicontent_html::arrayTrim($contents[0]);
-			unset($contents[0]);
+			unset($contents[0]);  //echo "<pre>"; print_r($columns); exit;
 			
 			// Check for the (required) title column
 			if(!in_array('title', $columns)) {
-				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 2.");
+				$this->setRedirect($link, "Upload file error! CSV file format is not correct 2.");
 				return;
 			}
 			
-			//echo "<xmp>"; var_dump($csv->getRows()); echo "</xmp>";
-			//$rows = $csv->connect();
-			
-			// Retrieve from configuration for (a) main category, (b) secondaries categories
-			$mainframe = &JFactory::getApplication();
-			$maincat 	= JRequest::getInt( 'maincat', '' );
-			$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
-			if(!$maincat) $maincat = @$seccats[0];
-			$vstate = $mainframe->get("auto_approve") ? 2 : 1;
-			
-			// Prepare request variable used by the item's Model
-			JRequest::setVar('catid', $maincat);
-			JRequest::setVar('cid', $seccats);
-			JRequest::setVar('vstate', $vstate );
-			JRequest::setVar('state', -4);
-
-			//while (($line = fgetcsv($fp, 0, ',', '"')) !== FALSE) {
-			//foreach($rows as $line) {
-			
-			// New item insertion LOOP (use's model's store() function to create the items)
+			// Handle each row (item) using store() method of the item model to create the items
 			$cnt = 1;
 			foreach($contents as $line)
 			{
-				// Trim item's data and set every field value as JRequest data ...
-				$data = flexicontent_html::arrayTrim($line);
-				foreach($data as $j=>$d) {
-					JRequest::setVar($columns[$j], $d);
+				// Trim item's data
+				$fields = flexicontent_html::arrayTrim($line);
+				
+				// Prepare request variable used by the item's Model
+				$data = array();
+				$data['type_id'] = $type_id;
+				$data['catid']   = $maincat;
+				$data['cid']     = $seccats;
+				$data['vstate']  = 2;
+				$data['state']   = -4;
+				
+				// Handle each field of the item
+				foreach($fields as $col_no => $field_data)
+				{
+					$fieldname = $columns[$col_no];
+					if ($fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
+						$field_values = $field_data;
+					} else {
+						// Split multi-value field
+						$vals = $field_data ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+						$vals = flexicontent_html::arrayTrim($vals);
+						unset($field_values);
+						
+						// Handle each value of the field
+						foreach ($vals as $i => $val)
+						{
+							// Split multiple property fields
+							$props = $val ? preg_split("/[\s]*!![\s]*/", $val) : array();
+							$props = flexicontent_html::arrayTrim($props);
+							unset($prop_arr);
+							
+							// Handle each property of the value
+							foreach ($props as $j => $prop) {
+								if ( preg_match( '/\[-(.*)-\]=(.*)/', $prop, $matches) ) {
+									$prop_arr[$matches[1]] = $matches[2];
+								}
+							}
+							$field_values[] = isset($prop_arr) ? $prop_arr : $val;
+						}
+					}
+					
+					// Assign array of field values to the item data row
+					if (!FLEXI_J16GE || $fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
+						$data[$fieldname] = $field_values;
+					} else {
+						$data['custom'][$fieldname] = $field_values;
+					}
+					
+					
 				}
-				// foreach($line as $k=>$d) JRequest::setVar($k, $d);
+				//echo "<pre>"; print_r($data); exit;
 				
 				// Set/Force id to zero to indicate creation of new item
-				JRequest::setVar('id', 0);
-				
-				// Sanitize data by retrieving them through JRequest ???
-				$data = JRequest::get( 'request' );
-				$data['text'] = JRequest::getVar( 'text', '', 'request', 'string', JREQUEST_ALLOWRAW );
+				$data['id'] = 0;
 				
 				// Finally try to create the item by using Item Model's store() method
 				if( !$model->store($data) ) {
-					$msg = $cnt . ". Import item with title: '" . $line['title'] . "' error" ;
-					//$msg = "Import item '" . implode(",", $line) . "' error" ;
+					$msg = $cnt . ". Import item with title: '" . $data['title'] . "' error" ;
 					JError::raiseWarning( 500, $msg ." " . $model->getError() );
 				} else {
-					$msg = $cnt . ". Import item with title: '" . $line['title'] . "' success" ;
-					//$msg = "Import item '" . implode(",", $line) . "' success" ;
+					$msg = $cnt . ". Import item with title: '" . $data['title'] . "' success" ;
 					$mainframe->enqueueMessage($msg);
 				}
 				$cnt++;

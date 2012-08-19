@@ -264,8 +264,18 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		foreach ($post as $n=>$v)
 		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($post[$n]) ) {
+				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
+					$post[$n] = unserialize($post[$n]);
+				} else {
+					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
+				}
+			}
+			
 			if ($post[$n]['link'] != '')
 			{
 				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
