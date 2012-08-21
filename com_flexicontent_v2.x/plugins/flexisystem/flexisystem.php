@@ -405,7 +405,7 @@ class plgSystemFlexisystem extends JPlugin
 		jimport('joomla.user.helper');
 		
 		$db =& JFactory::getDBO();
-		$query 	= 'SELECT id, password, gid'
+		$query 	= 'SELECT id, password'
 				. ' FROM #__users'
 				. ' WHERE username = ' . $db->Quote( $username )
 				. ' AND password = ' . $db->Quote( $password )
@@ -418,10 +418,12 @@ class plgSystemFlexisystem extends JPlugin
 			JPluginHelper::importPlugin('user');		
 			$response->username = $username;
 			$response->password = $password;
-			$options = isset($options) ? $options : array();
-			$result = $mainframe->triggerEvent('onLoginUser', array((array)$response,$options));
+			$response->language = '';
+			$options = array('action'=>'');
+			$loginEvent = FLEXI_J16GE ? 'onUserLogin' : 'onLoginUser';
+			$result = $mainframe->triggerEvent($loginEvent, array((array)$response,$options));
 		}
-
+		
 		return;
 	}
 	
