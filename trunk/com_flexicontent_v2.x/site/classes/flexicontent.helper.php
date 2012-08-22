@@ -1876,20 +1876,26 @@ class flexicontent_tmpl
 		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$templates = JFolder::folders($tmpldir);
 		
-		foreach ($templates as $tmpl) {
+		foreach ($templates as $tmpl)
+		{
+			// Parse & Load ITEM layout of current template
 			$tmplxml = $tmpldir.DS.$tmpl.DS.'item.xml';
-			if (JFile::exists($tmplxml)) {
+			if (JFile::exists($tmplxml))
+			{
+				// Parse the XML file
+				$xml = JFactory::getXMLParser('Simple');
+				$xml->loadFile($tmplxml);
+				$document = & $xml->document;
+				
 				$themes->items->{$tmpl}->name 		= $tmpl;
 				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
-				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';	
+				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';
 				if (!FLEXI_J16GE) {
 					$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
 				} else {
 					// *** This can be serialized and thus Joomla Cache will work
-					$xml = JFactory::getXMLParser('Simple');
-					$xml->loadFile($tmplxml);
-					$themes->items->{$tmpl}->params = $xml->document->toString();
+					$themes->items->{$tmpl}->params = $document->toString();
 					
 					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
 					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
@@ -1898,45 +1904,47 @@ class flexicontent_tmpl
 					//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 					//$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				}
-				foreach ($themes->items as $ilay) {
-					$parser =& JFactory::getXMLParser('Simple');		
-					$parser->loadFile($tmplxml);
-					$document = & $parser->document;
-
-					$themes->items->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
-					$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->items->{$tmpl}->email 			= @$document->email[0] ? $document->email[0]->data() : '';
-					$themes->items->{$tmpl}->license 		= @$document->license[0] ? $document->license[0]->data() : '';
-					$themes->items->{$tmpl}->version 		= @$document->version[0] ? $document->version[0]->data() : '';
-					$themes->items->{$tmpl}->release 		= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->items->{$tmpl}->description	= @$document->description[0] ? $document->description[0]->data() : '';
-					
-					$groups 	=& $document->getElementByPath('fieldgroups');
-					$pos	 	=& $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->items->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
-							$themes->items->{$tmpl}->positions[$n] = $pos[$n]->data();
-						}
+				$themes->items->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+				$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
+				$themes->items->{$tmpl}->email 			= @$document->email[0] ? $document->email[0]->data() : '';
+				$themes->items->{$tmpl}->license 		= @$document->license[0] ? $document->license[0]->data() : '';
+				$themes->items->{$tmpl}->version 		= @$document->version[0] ? $document->version[0]->data() : '';
+				$themes->items->{$tmpl}->release 		= @$document->release[0] ? $document->release[0]->data() : '';
+				$themes->items->{$tmpl}->description	= @$document->description[0] ? $document->description[0]->data() : '';
+				
+				$groups 	=& $document->getElementByPath('fieldgroups');
+				$pos	 	=& $groups->group;
+				if ($pos) {
+					for ($n=0; $n<count($pos); $n++) {
+						$themes->items->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
+						$themes->items->{$tmpl}->positions[$n] = $pos[$n]->data();
 					}
-					$css 		=& $document->getElementByPath('cssitem');
-					$cssfile	=& $css->file;
-					if ($cssfile) {
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
-						}
+				}
+				$css 		=& $document->getElementByPath('cssitem');
+				$cssfile	=& $css->file;
+				if ($cssfile) {
+					for ($n=0; $n<count($cssfile); $n++) {
+						$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 					}
-					$js 		=& $document->getElementByPath('jsitem');
-					$jsfile	=& $js->file;
-					if ($jsfile) {
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
-						}
+				}
+				$js 		=& $document->getElementByPath('jsitem');
+				$jsfile	=& $js->file;
+				if ($jsfile) {
+					for ($n=0; $n<count($jsfile); $n++) {
+						$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 					}
 				}
 			}
+			
+			// Parse & Load CATEGORY layout of current template
 			$tmplxml = $tmpldir.DS.$tmpl.DS.'category.xml';
-			if (JFile::exists($tmplxml)) {
+			if (JFile::exists($tmplxml))
+			{
+				// Parse the XML file
+				$xml = JFactory::getXMLParser('Simple');
+				$xml->loadFile($tmplxml);
+				$document = & $xml->document;
+				
 				$themes->category->{$tmpl}->name 		= $tmpl;
 				$themes->category->{$tmpl}->view 		= 'category';
 				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
@@ -1945,9 +1953,7 @@ class flexicontent_tmpl
 					$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
 				} else {
 					// *** This can be serialized and thus Joomla Cache will work
-					$xml = JFactory::getXMLParser('Simple');
-					$xml->loadFile($tmplxml);
-					$themes->category->{$tmpl}->params = $xml->document->toString();
+					$themes->category->{$tmpl}->params = $document->toString();
 					
 					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
 					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
@@ -1956,40 +1962,34 @@ class flexicontent_tmpl
 					//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 					//$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				}
-				foreach ($themes->category as $clay) {
-					$parser =& JFactory::getXMLParser('Simple');
-					$parser->loadFile($tmplxml);
-					$document = & $parser->document;
+				$themes->category->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+				$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
+				$themes->category->{$tmpl}->email 		= @$document->email[0] ? $document->email[0]->data() : '';
+				$themes->category->{$tmpl}->license 	= @$document->license[0] ? $document->license[0]->data() : '';
+				$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
+				$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
+				$themes->category->{$tmpl}->description = @$document->description[0] ? $document->description[0]->data() : '';
 
-					$themes->category->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
-					$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->category->{$tmpl}->email 		= @$document->email[0] ? $document->email[0]->data() : '';
-					$themes->category->{$tmpl}->license 	= @$document->license[0] ? $document->license[0]->data() : '';
-					$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
-					$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->category->{$tmpl}->description = @$document->description[0] ? $document->description[0]->data() : '';
-
-					$groups 	=& $document->getElementByPath('fieldgroups');
-					$pos	 	=& $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
-							$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
-						}
+				$groups 	=& $document->getElementByPath('fieldgroups');
+				$pos	 	=& $groups->group;
+				if ($pos) {
+					for ($n=0; $n<count($pos); $n++) {
+						$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
+						$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
 					}
-					$css 		=& $document->getElementByPath('csscategory');
-					$cssfile	=& $css->file;
-					if ($cssfile) {
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
-						}
+				}
+				$css 		=& $document->getElementByPath('csscategory');
+				$cssfile	=& $css->file;
+				if ($cssfile) {
+					for ($n=0; $n<count($cssfile); $n++) {
+						$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 					}
-					$js 		=& $document->getElementByPath('jscategory');
-					$jsfile	=& $js->file;
-					if ($jsfile) {
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
-						}
+				}
+				$js 		=& $document->getElementByPath('jscategory');
+				$jsfile	=& $js->file;
+				if ($jsfile) {
+					for ($n=0; $n<count($jsfile); $n++) {
+						$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 					}
 				}
 			}
