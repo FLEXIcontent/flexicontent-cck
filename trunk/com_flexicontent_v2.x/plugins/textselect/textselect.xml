@@ -84,6 +84,5 @@
 	</config>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textselect.ini</language>
-		<language tag="de-DE">de-DE.plg_flexicontent_fields_textselect.ini</language>
 	</languages>
 </install>
