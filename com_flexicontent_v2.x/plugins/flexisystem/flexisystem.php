@@ -34,8 +34,6 @@ class plgSystemFlexisystem extends JPlugin
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-
-		require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
         
