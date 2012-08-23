@@ -739,9 +739,10 @@ class FlexicontentFields
 		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
-		//--. Get Content Type parameters
+		//--. Get Content Type parameters if not already retrieved
 		$type_id = @$item->type_id;
-		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) ) {
+		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) )
+		{
 			$query = 'SELECT t.attribs, t.name, t.alias FROM #__flexicontent_types AS t WHERE t.id = ' . $type_id;
 			$db =& JFactory::getDBO();
 			$db->setQuery($query);
@@ -753,7 +754,9 @@ class FlexicontentFields
 			}
 		}
 		
-		if ( $type_id && isset($tinfo[$type_id]) && isset($tparams[$type_id]) ) {
+		//--. Set Content Type parameters otherwise set empty defaults (e.g. new item form with not typeid set)
+		if ( $type_id && isset($tinfo[$type_id]) && isset($tparams[$type_id]) )
+		{
 			$typename   = $tinfo[$type_id]['typename'];
 			$typealias  = $tinfo[$type_id]['typealias'];
 			$typeparams = & $tparams[$type_id];
@@ -765,13 +768,16 @@ class FlexicontentFields
 			$tindex = 'no_type';
 		}
 		
-		//--. BESIDES parameters we want to retrieve: ... Custom LABELs and DESCRIPTIONs
-		if ($type_id && $field->iscore && !isset($fdata[$tindex][$field->name])) {
+		//--. Extract any Custom LABELs and DESCRIPTIONs from Content Type parameters
+		if ($type_id && $field->iscore && !isset($fdata[$tindex][$field->name]))
+		{
+			// CORE field, create parameters once per field - Content Type pair
 			$fdata[$tindex][$field->name] = new stdClass();
+			$pn_prefix = $field->field_type!='maintext' ? $field->name : $field->field_type;
 			
-			// -- SET a type specific label for the current field
+			// --. SET a type specific label for the current field
 			// a. Try field label to get for current language
-			$field_label_type = $tparams[$type_id]->get($field->field_type.'_label', '');
+			$field_label_type = $tparams[$type_id]->get($pn_prefix.'_label', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
 			if ($result) {
 				$fdata[$tindex][$field->name]->label = $matches[2];
@@ -788,12 +794,12 @@ class FlexicontentFields
 					}
 				}
 			} else {
-				// Maintain field 's default label
+				// d. Maintain field 's default label
 			}
 			
-			// -- SET a type specific description for the current field
+			// --. SET a type specific description for the current field
 			// a. Try field description to get for current language
-			$field_desc_type = $tparams[$type_id]->get($field->field_type.'_desc', '');
+			$field_desc_type = $tparams[$type_id]->get($pn_prefix.'_desc', '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
 			if ($result) {
 				$fdata[$tindex][$field->name]->description = $matches[2];
@@ -810,7 +816,7 @@ class FlexicontentFields
 					}
 				}
 			} else {
-				// Maintain field 's default description
+				// d. Maintain field 's default description
 			}
 			
 			//--. Create type specific parameters for the CORE field that we will be used by all subsequent calls to retrieve parameters
@@ -857,6 +863,7 @@ class FlexicontentFields
 			}
 			
 		} else if ( !isset($fdata[$tindex][$field->name]) ) {
+			// CUSTOM field, create once per field			
 			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
