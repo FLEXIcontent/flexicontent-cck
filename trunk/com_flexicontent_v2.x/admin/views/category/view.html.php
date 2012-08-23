@@ -101,7 +101,7 @@ class FlexicontentViewCategory extends JView
 				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
 				$canedit_cat   = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
 			} else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllCategoryAccess('com_content', 'users', $user->gmid, $row->catid);
+				$rights = FAccess::checkAllCategoryAccess('com_content', 'users', $user->gmid, $row->id);
 				$canedit_cat = ($user->gid < 25) ? in_array('edit', $rights) : 1;
 			} else {
 				$canedit_cat = true;
@@ -160,8 +160,6 @@ class FlexicontentViewCategory extends JView
 		$bar			= & JToolBar::getInstance('toolbar');
 		if (!FLEXI_J16GE)
 			$pane			= & JPane::getInstance('sliders');
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->category;
 		$categories = $globalcats;
 		
 		
@@ -223,7 +221,13 @@ class FlexicontentViewCategory extends JView
 			//$form->loadINI($row->attribs);
 		}
 		
-		// Apply Template Parameters values into the form fields structures 
+		
+		// **********************************************************************************
+		// Get Templates and apply Template Parameters values into the form fields structures 
+		// **********************************************************************************
+		
+		$themes		= flexicontent_tmpl::getTemplates();
+		$tmpls		= $themes->category;
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
 				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
@@ -250,10 +254,12 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
-		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, 'parent_id', $row->parent_id, $top=1, 'class="inputbox"', $check_published, $check_perms, $actions_allowed);
+		$fieldname = FLEXI_J16GE ? 'jform[parent_id]' : 'parent_id';
+		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="inputbox"', $check_published, $check_perms, $actions_allowed);
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
-		$Lists['copyid']    = flexicontent_cats::buildcatselect($categories, 'copycid', '', $top=2, 'class="inputbox"', $check_published, $check_perms, $actions_allowed, $require_all=false);
+		$fieldname = FLEXI_J16GE ? 'jform[copycid]' : 'copycid';
+		$Lists['copyid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="inputbox"', $check_published, $check_perms, $actions_allowed, $require_all=false);
 		
 		
 		// ************************
