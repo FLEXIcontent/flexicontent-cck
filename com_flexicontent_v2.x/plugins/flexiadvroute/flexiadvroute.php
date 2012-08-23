@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexiadvroute.php 546 2011-03-27 01:26:00Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: flexiadvroute.php 1353 2012-06-23 20:47:30Z ggppdk $
  * @plugin 1.0.2
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -90,6 +90,9 @@ class plgSystemFlexiadvroute extends JPlugin
 		
 		// Execute only if some languange switcher is available
 		if ( !FLEXI_J16GE && !FLEXI_FISH )  return;
+		
+		// Execute only if not previewing
+		if (JRequest::getVar('preview') || ( JRequest::getVar('fcu') && JRequest::getVar('fcp') ) ) return;
 		
 	  // Get current user language
 		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)

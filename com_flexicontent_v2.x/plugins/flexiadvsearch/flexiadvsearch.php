@@ -101,7 +101,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
 		
 		if (is_array( $areas )) {
-			if (!array_intersect( $areas, array_keys( onSearchAreas() ) )) {
+			if (!array_intersect( $areas, array_keys( $this->onContentSearchAreas() ) )) {
 				return array();
 			}
 		}

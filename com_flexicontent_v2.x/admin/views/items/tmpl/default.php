@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1401 2012-07-28 01:33:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,9 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+global $globalcats;
+$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pageNav->limit;
 $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
@@ -27,7 +30,8 @@ $config		=& JFactory::getConfig();
 $nullDate 	= $db->getNullDate();
 $user 		=& $this->user;
 
-$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 
 $items_list_cols = 14;
 if ( FLEXI_J16GE || FLEXI_FISH ) {
@@ -38,6 +42,7 @@ if ( FLEXI_J16GE || FLEXI_FISH ) {
 $items_list_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
+$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
 
 ?>
 <script language="javascript" type="text/javascript">
@@ -542,6 +547,10 @@ window.addEvent('domready', function() {
 					</a></span>
 				<?php
 				}
+				
+				// Preview link
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) . $autologin;
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 				
 			</td>
