@@ -34,8 +34,6 @@ class plgSystemFlexisystem extends JPlugin
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-
-		require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
 	}
         
@@ -259,6 +257,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		global $globalcats;
 		$db		=& JFactory::getDBO();
+		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 
 		// get the category tree and append the ancestors to each node		
 		$query	= 'SELECT id, parent_id, published, access, title,'
@@ -288,7 +287,7 @@ class plgSystemFlexisystem extends JPlugin
 		$parents = array_unique($parents);
 
 		//get list of the items
-    $globalcats = plgSystemFlexisystem::_getCatAncestors(0, '', array(), $children, true, max(0, $levellimit-1));
+		$globalcats = plgSystemFlexisystem::_getCatAncestors($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $levellimit-1));
 
 		foreach ($globalcats as $cat) {
 			$cat->ancestorsonlyarray	= $cat->ancestors;
@@ -311,13 +310,14 @@ class plgSystemFlexisystem extends JPlugin
     */
 	function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
+		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 		if (!$ancestors) $ancestors = array();
 		
 		if (@$children[$id] && $level <= $maxlevel) {
 			foreach ($children[$id] as $v) {
 				$id = $v->id;
 				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID) {
 					$ancestors[] 	= $v->parent_id;
 				} 
 				

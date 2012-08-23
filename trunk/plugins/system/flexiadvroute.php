@@ -23,8 +23,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport( 'joomla.plugin.plugin' );
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
-//$mainframe->registerEvent('onAfterRoute', 'switchLangAssocItem');
-
 /**
  * System plugin for advanced FLEXIcontent routing
  */
@@ -92,6 +90,9 @@ class plgSystemFlexiadvroute extends JPlugin
 		
 		// Execute only if some languange switcher is available
 		if ( !FLEXI_J16GE && !FLEXI_FISH )  return;
+		
+		// Execute only if not previewing
+		if (JRequest::getVar('preview') || ( JRequest::getVar('fcu') && JRequest::getVar('fcp') ) ) return;
 		
 	  // Get current user language
 		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)

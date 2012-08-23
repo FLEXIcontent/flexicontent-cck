@@ -18,8 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// This is needed by some content plugins
+// Include com_content helper files, these are needed by some content plugins
 require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
 
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
