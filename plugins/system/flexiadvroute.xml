@@ -26,10 +26,10 @@
 		</param>
 		<param name="type_to_route" type="types" multiple="true" default="" label="Content Types" description="" />
 		
-		<param name="" type="separator" default="Hide Category Links&lt;br&gt;(Do not route to these categories)" hr="false" level="level2" menu="hide" />
+		<param name="" type="separator" default="Prevent Linking to Categories&lt;br&gt;&lt;small&gt;(e.g. categories 'Frontpage', 'Top Slideshow' )&lt;/small&gt;" description="-- Some categories are for special purposes, e.g. contain items &lt;b&gt;displayed&lt;/b&gt; in frontpage or in a Slideshow. &lt;br&gt;&lt;br&gt;-- These categories must be selected here so that they are never have links to them in the frontend, like 'Frontpage', 'Slideshow'" hr="false" level="level2" menu="hide" />
 		<param name="cats_to_exclude" type="flexicategories" multiple="true" size="24" default="" label="FLEXI_CATEGORIES" description="FLEXI_ADVROUTE_CATS_TO_EXCLUDE_DESC" />
 		
-		<param name="" type="separator" default="Language switch associated items and (for J2.5) categories too" hr="false" level="level2" menu="hide" />
+		<param name="" type="separator" default="Language switch associated items/categories&lt;br&gt;&lt;small&gt;(categories in J2.5 only)&lt;/small&gt;" description="This feature allows to be able to switch associated item/category translations, &lt;b&gt;without need&lt;/b&gt; to create associated menu items for each of the items/categories" hr="false" level="level2" menu="hide" />
 		<param name="lang_switch_items" type="radio" default="1" label="Switch items" description="Associated items that translate the same content will be on the fly switched when language changes">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

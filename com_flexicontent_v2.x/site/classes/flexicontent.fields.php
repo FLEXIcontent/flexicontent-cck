@@ -723,6 +723,8 @@ class FlexicontentFields
 		static $lang = null;
 		static $no_typeparams = null;
 		if ($no_typeparams) $no_typeparams = new JParameter("");
+		static $is_form;
+		$is_form = JRequest::getVar('edit')=='edit' && JRequest::getVar('option')=='com_flexicontent';
 		
 		//--. Create basic field data if no field given
 		if (!empty($name)) {
@@ -799,7 +801,7 @@ class FlexicontentFields
 			
 			// --. SET a type specific description for the current field
 			// a. Try field description to get for current language
-			$field_desc_type = $tparams[$type_id]->get($pn_prefix.'_desc', '');
+			$field_desc_type = $tparams[$type_id]->get($pn_prefix.($is_form ? '_desc' : '_viewdesc'), '');
 			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
 			if ($result) {
 				$fdata[$tindex][$field->name]->description = $matches[2];
