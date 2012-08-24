@@ -156,7 +156,6 @@ class flexicontent_authors_ext extends JTable
 			$filter_value = $this->$order_filter;
 			$this->reorder( $order_filter ? $this->_db->nameQuote( $order_filter ).' = '.$this->_db->Quote( $filter_value ) : '' );
 		}
-		$this->setError('');
 		return true;
 	}
   

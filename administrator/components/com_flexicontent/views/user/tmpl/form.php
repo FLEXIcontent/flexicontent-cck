@@ -360,7 +360,7 @@
 						echo '<h3 class="themes-title">' . JText::_( 'FLEXI_AUTHOR_CATEGORY_PARAMS' ) . '</h3>';
 						
 						$title = JText::_( 'FLEXI_PARAMETERS_CAT_INFO_OPTIONS' );
-						echo $this->pane->startPanel( $title, "params-std" );
+						echo $this->pane->startPanel( $title, "params-cat_info_options" );
 						echo $this->form_authorcat->render('authorcatparams');
 						echo $this->pane->endPanel();
 		

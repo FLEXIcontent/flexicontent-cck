@@ -254,8 +254,10 @@ class flexicontent_cats
 		$require_all=true   // Require (or not) all privileges present to accept a category
 	)
 	{
+		global $globalcats;
 		$user =& JFactory::getUser();
-		$cid = JRequest::getVar('cid');
+		$cid = JRequest::getVar('cid',  0, '', 'array');
+		if(!@$cid[0]) $cid = JRequest::getVar('id',  0, '', 'array');
 		
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		if (FLEXI_J16GE) {
@@ -277,7 +279,7 @@ class flexicontent_cats
 		// Filter categories by user permissions
 		if ($check_perms) {
 			if (FLEXI_J16GE || FLEXI_ACCESS) {
-				// Get user allowed categories
+				// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
 				$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
 				// Add already selected categories to the category list
 				$selectedcats = !is_array($selected) ? array($selected) : $selected;
@@ -288,33 +290,49 @@ class flexicontent_cats
 		// Start category list by add appropriate prompt option at top
 		$catlist 	= array();
 		if($top == 1) {
-			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_TOPLEVEL' ));
+			$catlist[] 	= JHTML::_( 'select.option', FLEXI_J16GE ? 1 : 0, JText::_( 'FLEXI_TOPLEVEL' ));
 		} else if($top == 2) {
 			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_CAT' ));
 		}
 		
 		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
-		foreach ($list as $item) {
-			$item->treename = str_replace("&nbsp;", " ", strip_tags($item->treename));
-			if ( !$check_published || $item->published ) {
-				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
-					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
-				} else if ($check_perms) {
-					$asset = 'com_content.category.'.$item->id;
-					if (
-					(FLEXI_J16GE && !in_array($item->id, $usercats) ) ||  // if user has 'core.admin' then all cats are allowed
-					(FLEXI_ACCESS && !in_array($item->id, $usercats) && ($user->gid < 25))
-					) {
-						if ($viewallcats) { // only disable cats in the list else don't show them at all
-							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
-						}
-					} else {
-						// FLEXIaccess rule $viewtree enables tree view
-						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
-					}
-				} else {
-					$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
+		foreach ($list as $cat) {
+			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
+			$cat_title = $viewtree ? $cat->treename : $cat->title;
+			
+			if ( !$check_published || $cat->published )
+			{	
+				// CASE 1. IN CATEGORY EDIT FORM and display FORM FIELD parent_id, ADD current category and its children as disabled
+				if ( JRequest::getVar('controller') == 'categories' && JRequest::getVar('task') == 'edit'
+							&& $top==1 && ( $cid[0] == $cat->id || in_array($cat->id, $globalcats[$cid[0]]->descendantsarray ) )
+				) {
+					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', true );
 				}
+				
+				// CASE 2: ADD only if user has permissions
+				else if ($check_perms)
+				{
+					// a. Category NOT ALLOWED
+					if (	( FLEXI_J16GE && !in_array($cat->id, $usercats) ) || ( FLEXI_ACCESS && !in_array($cat->id, $usercats) ) )
+					{
+						// Add current category to the select list as disabled if user can view all categories, OTHERWISE DO NOT ADD IT
+						if ($viewallcats)
+							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
+					}
+										
+					// b. Category ALLOWED
+					else
+					{
+						$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+					}
+				}
+				
+				// CASE 3: ADD REGARDLESS of user permissions
+				else
+				{
+					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+				}
+				
 			}
 		}
 		

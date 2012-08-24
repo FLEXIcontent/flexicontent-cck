@@ -2,7 +2,7 @@
 	<form>
 		<name>Category Edit Form</name>
 		
-		<params addpath="/administrator/components/com_flexicontent/elements">
+		<params group="cat_info_options" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
 			<param name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" hr="false" menu="hide" />

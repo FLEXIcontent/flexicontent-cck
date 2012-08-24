@@ -169,7 +169,7 @@ class FlexicontentModelCategory extends JModel
 	{
 		if ($this->_id)
 		{
-			$category = & JTable::getInstance('flexicontent_categories','');
+			$category = $this->getTable();
 			return $category->checkin($this->_id);
 		}
 		return false;
@@ -183,19 +183,21 @@ class FlexicontentModelCategory extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)
 	{
 		if ($this->_id)
 		{
-			// Make sure we have a user id to checkout the category with
-			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
-				$uid	= $user->get('id');
-			}
+			// Make sure we have an item id to checkout the category with
+			if(is_null($pk)) $pk = $this->_id;
+
+			$user	=& JFactory::getUser();
+			$uid	= $user->get('id');
+			
 			// Lets get to it and checkout the thing...
-			$category = & JTable::getInstance('flexicontent_categories','');
-			if(!$category->checkout($uid, $this->_id)) {
-				$this->setError($this->_db->getErrorMsg());
+			$category = $this->getTable();
+			if(!$category->checkout($uid, $pk))
+			{
+				$this->setError( $this->_db->getErrorMsg() );
 				return false;
 			}
 
@@ -214,7 +216,7 @@ class FlexicontentModelCategory extends JModel
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ($this->_id == 0) {
+		if ($this->_id < 1) {
 			return false;
 		} else if ($this->_loadCategory()) {
 			if ($uid) {
@@ -239,12 +241,13 @@ class FlexicontentModelCategory extends JModel
 	{
 		$category = & JTable::getInstance('flexicontent_categories','');
 		
-		// bind it to the table
-		if (!$category->bind($data)) {
-			$this->setError(500, $this->_db->getErrorMsg() );
+		// Bind the data.
+		if (!$category->bind($data))
+		{
+			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-
+		
 		if (!$category->id) {
 			$category->ordering = $category->getNextOrder();
 		}
@@ -274,13 +277,13 @@ class FlexicontentModelCategory extends JModel
 
 		// Make sure the data is valid
 		if (!$category->check()) {
-			$this->setError($category->getError());
+			$this->setError( $category->getError() );
 			return false;
 		}
 
 		// Store it in the db
 		if (!$category->store()) {
-			$this->setError(500, $this->_db->getErrorMsg() );
+			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
 		
@@ -291,6 +294,20 @@ class FlexicontentModelCategory extends JModel
 		$this->_category	=& $category;
 		
 		return true;
+	}
+	
+	
+	/**
+	 * Custom clean the cache of com_content and content modules
+	 *
+	 * @since	1.6
+	 */
+	protected function cleanCache()
+	{
+		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache->clean();
+		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache->clean();
 	}
 	
 	/**
@@ -310,7 +327,7 @@ class FlexicontentModelCategory extends JModel
 		$copyparams = $this->_db->loadResult();
 		
 		return $copyparams;
-	}	
+	}
 	
 	/**
 	 * Method to copy category parameters
@@ -333,5 +350,21 @@ class FlexicontentModelCategory extends JModel
 		}
 		return true;
 	}
+	
+	
+	/**
+	 * Returns a Table object, always creating it
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	*/
+	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
+		return JTable::getInstance($type, $prefix, $config);
+	}
+	
+	
 }
 ?>

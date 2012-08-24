@@ -36,6 +36,10 @@ class FlexicontentViewCategory extends JView
 		$user      = & JFactory::getUser();
 		$document  = & JFactory::getDocument();
 		
+		if (FLEXI_J16GE) {
+			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
+		}
 		
 		// ***********************************************************
 		// Get category data, and check if item is already checked out

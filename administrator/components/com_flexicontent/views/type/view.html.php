@@ -39,7 +39,8 @@ class FlexicontentViewType extends JView {
 		//initialise variables
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
-		$pane 		= & JPane::getInstance('sliders');
+		if (!FLEXI_J16GE)
+			$pane 		= & JPane::getInstance('sliders');
 
 		JHTML::_('behavior.tooltip');
 
@@ -51,8 +52,13 @@ class FlexicontentViewType extends JView {
 
 		//Get data from the model
 		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Type' );
-		$cid			=	FLEXI_J16GE ? $form->getValue('id') : $row->id;
+		if (FLEXI_J16GE) {
+			$row		= & $this->get( 'Item' );
+			$form		= & $this->get('Form');
+		} else {
+			$row     = & $this->get( 'Type' );
+		}
+		$cid			=	$row->id;
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
 		
@@ -62,10 +68,11 @@ class FlexicontentViewType extends JView {
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );
 		}
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel();
+		$ctrl = FLEXI_J16GE ? 'types.' : '';
+		JToolBarHelper::apply( $ctrl.'apply' );
+		JToolBarHelper::save( $ctrl.'save' );
+		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
 		// fail if checked out not by 'me'
 		if ($cid) {
@@ -74,13 +81,15 @@ class FlexicontentViewType extends JView {
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
 			}
 		}
-
-		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
-
-		//create the parameter form
-		$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
-		//$form->loadINI($row->attribs);
+		
+		if (!FLEXI_J16GE) {
+			//clean data
+			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+			
+			//create the parameter form
+			$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
+			//$form->loadINI($row->attribs);
+		}
 		
 		// Apply Template Parameters values into the form fields structures 
 		foreach ($tmpls as $tmpl) {
@@ -98,7 +107,8 @@ class FlexicontentViewType extends JView {
 		$this->assignRef('row'			, $row);
 		$this->assignRef('form'			, $form);
 		$this->assignRef('tmpls'		, $tmpls);
-		$this->assignRef('pane'			, $pane);
+		if (!FLEXI_J16GE)
+			$this->assignRef('pane'		, $pane);
 		
 		parent::display($tpl);
 	}
