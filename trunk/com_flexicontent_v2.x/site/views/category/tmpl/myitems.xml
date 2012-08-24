@@ -269,7 +269,7 @@
 		</fieldset>
 
 		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_LAYOUT_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="clayout" type="categorylayout" default="" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" skipparams="1" />
+			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" skipparams="1" />
 			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Default template parameters will be used for the choosen template. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 		</fieldset>
 	</fields>

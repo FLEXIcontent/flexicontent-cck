@@ -156,9 +156,9 @@ switch ($view) {
 								}
 							}		
 						}
-						if (!in_array($row->id, $globalnopath)) {
-							$title [] = $row->title;
-						}
+						// Add item title as URL segment
+						$title [] = $row->title;
+						
 						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
 						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->type_id, $globalnopath)) {
 							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
