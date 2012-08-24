@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: category.php 1372 2012-07-08 19:08:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -193,10 +193,12 @@ class FlexicontentModelCategory extends JModelAdmin
 
 			$user	=& JFactory::getUser();
 			$uid	= $user->get('id');
+			
 			// Lets get to it and checkout the thing...
 			$category = $this->getTable();
-			if(!$category->checkout($uid, $pk)) {
-				$this->setError($this->_db->getErrorMsg());
+			if(!$category->checkout($uid, $pk))
+			{
+				$this->setError( $this->_db->getErrorMsg() );
 				return false;
 			}
 
@@ -215,15 +217,14 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ($this->_loadCategory())
-		{
+		if ($this->_id < 1) {
+			return false;
+		} else if ($this->_loadCategory()) {
 			if ($uid) {
 				return ($this->_category->checked_out && $this->_category->checked_out != $uid);
 			} else {
 				return $this->_category->checked_out;
 			}
-		} elseif ($this->_id < 1) {
-			return false;
 		} else {
 			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
 			return false;
@@ -291,6 +292,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$this->setError($table->getError());
 			return false;
 		}
+		
 		if ($copyparams) {
 			$table->params = $this->getParams($copyparams);
 		}
@@ -368,7 +370,7 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		// Clear the cache
 		$this->cleanCache();
-
+		
 		return true;
 	}
 	
@@ -394,7 +396,8 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	string		ini string of params
 	 * @since	1.5
 	 */
-	function getParams($id) {
+	function getParams($id)
+	{
 		$query 	= 'SELECT params FROM #__categories'
 				. ' WHERE id = ' . (int)$id
 				;
@@ -425,6 +428,21 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		return true;
 	}
+	
+	
+	/**
+	 * Returns a Table object, always creating it
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	*/
+	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
+		return JTable::getInstance($type, $prefix, $config);
+	}
+	
 	
 	/**
 	 * Method to get the row form.
@@ -531,19 +549,6 @@ class FlexicontentModelCategory extends JModelAdmin
 	}
 	
 	
-	/**
-	 * Returns a Table object, always creating it
-	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 * @return	JTable	A database object
-	 * @since	1.6
-	*/
-	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
-		return JTable::getInstance($type, $prefix, $config);
-	}
-
 	/**
 	 * Auto-populate the model state.
 	 *

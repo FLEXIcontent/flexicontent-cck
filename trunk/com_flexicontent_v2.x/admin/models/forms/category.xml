@@ -38,7 +38,7 @@
 			<field name="note" type="text" label="JFIELD_NOTE_LABEL" description="JFIELD_NOTE_DESC" class="inputbox" size="40"/>
 		</fieldset>
 		
-		<fieldset name="cat_info_options">
+		<fieldset name="cat_info_options" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" hr="false" menu="hide" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">

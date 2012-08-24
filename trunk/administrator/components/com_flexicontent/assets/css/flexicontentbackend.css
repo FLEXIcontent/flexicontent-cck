@@ -402,7 +402,12 @@ h3.themes-title {
 	color: #666666;
 	background: url(../images/layout_content.png) no-repeat 0% 50%;
 	padding: 0px 0px 0px 20px;
+	font-family: Helvetica;
 }
+h3.themes-title small {
+	font-weight: normal;
+}
+
 /* Tooltip import tags */
 span.editlinktip.hasTip.tags img {
 	position: relative;

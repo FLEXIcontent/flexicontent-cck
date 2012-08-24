@@ -43,6 +43,8 @@ class JElementItemlayout extends JElement
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items ? $themes->items : array();
 		$class 	= 'class="inputbox" onchange="activatePanel(this.value);"';
+		$value = FLEXI_J16GE ? $this->value : $value;
+		$value = $value ? $value : 'default';
 		
 		$view	= JRequest::getVar('view');
 		$controller	= JRequest::getVar('controller');

@@ -169,6 +169,14 @@ class flexicontent_categories extends JTableNested
 			$this->setError(JText::sprintf( 'must contain a title', JText::_( 'FLEXI_Category' ) ));
 			return false;
 		}
+		
+		global $globalcats;
+		
+		// check for valid parent category
+		if ( $this->id && in_array($this->parent_id, $globalcats[$this->id]->descendantsarray) ) {
+			$this->setError( 'Parent of category is not allowed, you cannot move the category to be a child of itself' );
+			return false;
+		}
 
 		// check for existing name
 		/*$query = 'SELECT id'

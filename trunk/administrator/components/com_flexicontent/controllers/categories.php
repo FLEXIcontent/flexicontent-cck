@@ -321,7 +321,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 	}
 
 	/**
-	 * Logic to mass ordering categories
+	 * Logic to saver order of multiple categories at once
 	 *
 	 * @access public
 	 * @return void
@@ -332,13 +332,17 @@ class FlexicontentControllerCategories extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		// Get the arrays from the Request
 		$order 	= JRequest::getVar( 'order', array(0), 'post', 'array' );
+		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		$model = $this->getModel('categories');
 		if(!$model->saveorder($cid, $order)) {
 			$msg = '';
 			JError::raiseWarning(500, $model->getError());
+		} else {
+			$msg = 'NEW ORDERING SAVED';
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 		}
 		
 		// clean cache
@@ -346,9 +350,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$cache->clean();
 		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
-
-		$msg = 'NEW ORDERING SAVED';
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
 
 	/**

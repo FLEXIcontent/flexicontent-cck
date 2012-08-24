@@ -188,8 +188,8 @@ dump($this->row);
 				echo $this->pane->endPanel();
 
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_INFO_OPTIONS' );
-				echo $this->pane->startPanel( $title, "params-std" );
-				echo $this->form->render('params');
+				echo $this->pane->startPanel( $title, "params-cat_info_options" );
+				echo $this->form->render('params', "cat_info_options" );
 				echo $this->pane->endPanel();
 
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
