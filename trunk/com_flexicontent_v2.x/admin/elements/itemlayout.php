@@ -45,7 +45,6 @@ class JFormFieldItemlayout extends JFormFieldList
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items ? $themes->items : array();
 		$value = FLEXI_J16GE ? $this->value : $value;
-		$value = $value ? $value : 'default';
 		
 		$view	= JRequest::getVar('view');
 		$controller	= JRequest::getVar('controller');
