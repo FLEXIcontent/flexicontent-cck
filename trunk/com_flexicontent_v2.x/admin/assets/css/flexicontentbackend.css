@@ -797,6 +797,15 @@ div.flexi_box_right {
 	margin: 6px 6px 4px 0;
 }
 
+.fc_timezone_info {
+	font-size: 11px;
+	background-color: lightyellow;
+	border: 1px dashed gray;
+	width: auto;
+	padding: 2px 2%;
+	margin: 1px 8px;
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/

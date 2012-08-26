@@ -2153,7 +2153,7 @@ class FLEXIUtilities
 		
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
-		$base_dir = JPATH_COMPONENT.DS.'templates'.DS.$tmplname;
+		$base_dir = JPATH_COMPONENT_SITE.DS.'templates'.DS.$tmplname;
 		
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
 		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);           // Fallback to english language template file

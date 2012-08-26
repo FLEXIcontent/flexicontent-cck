@@ -1332,9 +1332,13 @@ class ParentClassItem extends JModelAdmin
 		$cparams =& $this->_cparams;
 		$nullDate	= $this->_db->getNullDate();
 		$config =& JFactory::getConfig();
-		$tzoffset = $config->getValue('config.offset');
 		$view = JRequest::getVar('view', false);
 		JRequest::setVar("isflexicontent", "yes");
+		
+		// Display dates inside from are in user timezone for J2.5 and in site's default timezone for J1.5
+		$site_zone = $config->getValue('config.offset');
+		$user_zone = $user->getParam('timezone', $config->getValue('config.offset'));
+		$tzoffset = FLEXI_J16GE ? $user_zone : $site_zone ;
 		
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
@@ -1587,11 +1591,10 @@ class ParentClassItem extends JModelAdmin
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->created);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
+			$date->setTimeZone( new DateTimeZone( $tzoffset ) );    // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->created, $tzoffset);
+			$date =& JFactory::getDate($item->created, $tzoffset);  // J1.5: Date from form field is in site's default timezone
 		}
-		
 		$item->created = $date->toMySQL();
 			
 		// -- Publish UP Date
@@ -1600,9 +1603,9 @@ class ParentClassItem extends JModelAdmin
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->publish_up);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
+			$date->setTimeZone( new DateTimeZone( $tzoffset ) );       // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->publish_up, $tzoffset);
+			$date =& JFactory::getDate($item->publish_up, $tzoffset);  // J1.5: Date from form field is in site's default timezone
 		}
 		$item->publish_up = $date->toMySQL();
 
@@ -1618,9 +1621,9 @@ class ParentClassItem extends JModelAdmin
 			}
 			if (FLEXI_J16GE) {
 				$date =& JFactory::getDate($item->publish_down);
-				$date->setTimeZone( new DateTimeZone( $tzoffset ) ); // This seems redudant as the created date object already has set server timezone ?
+				$date->setTimeZone( new DateTimeZone( $tzoffset ) );         // J2.5: Date from form field is in user's timezone
 			} else {
-				$date =& JFactory::getDate($item->publish_down, $tzoffset);
+				$date =& JFactory::getDate($item->publish_down, $tzoffset);  // J1.5: Date from form field is in site's default timezone
 			}
 			$item->publish_down = $date->toMySQL();
 		}
