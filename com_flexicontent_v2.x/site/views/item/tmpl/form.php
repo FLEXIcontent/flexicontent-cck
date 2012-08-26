@@ -683,6 +683,16 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		echo JHtml::_('sliders.panel', $title, 'details-options');
 		?>
 		<fieldset class="panelform">
+			<div class='fc_timezone_info'>
+			<?php
+				$tz_string = JFactory::getConfig()->getValue('config.offset');
+				$tz = new DateTimeZone( $tz_string );
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
+				$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+				$tz_info .= ' ('.$tz_string.')';
+				echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
+			?>
+			</div>
 		<ul class="adminformlist">
 		<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ?>
 			<li><?php echo $this->form->getLabel('created_by')     . $this->form->getInput('created_by'); ?></li>

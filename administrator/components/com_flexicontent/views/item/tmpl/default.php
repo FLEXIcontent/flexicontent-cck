@@ -811,6 +811,17 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 			$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
+		?>
+		
+			<div class='fc_timezone_info'>
+			<?php
+				$tz_offset = JFactory::getConfig()->getValue('config.offset');
+				$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
+				echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
+			?>
+			</div>
+			
+		<?php
 			echo $this->formparams->render('details');
 			echo $this->pane->endPanel();
 		?>

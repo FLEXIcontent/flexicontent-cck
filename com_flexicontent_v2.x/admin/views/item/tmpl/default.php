@@ -833,6 +833,16 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		endif;*/
 		?>
 		<fieldset class="panelform">
+			<div class='fc_timezone_info'>
+			<?php
+				$tz_string = JFactory::getConfig()->getValue('config.offset');
+				$tz = new DateTimeZone( $tz_string );
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
+				$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+				$tz_info .= ' ('.$tz_string.')';
+				echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '<br>', $tz_info);
+			?>
+			</div>
 		<ul class="adminformlist">
 			<li><?php echo $this->form->getLabel('access');?>
 			<?php echo $this->form->getInput('access');?></li>

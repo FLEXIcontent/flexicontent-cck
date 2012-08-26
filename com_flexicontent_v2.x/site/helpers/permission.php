@@ -133,14 +133,14 @@ class FlexicontentHelperPerm {
 	 * Lookups the categories (their IDs), that the user has access to perforn the specified action(s)
 	 *
 	 * @param object	$user             The user on which to check privileges
-	 * @param array		$action_names     The required actions
+	 * @param array		$actions_allowed  The required actions
 	 * @param bool		$require_all      True to require --all-- (Logical AND) or false to require --any-- (Logical OR)
 	 * @param bool		$check_published  True to include only published categories
 	 *
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	function getAllowedCats( &$user, $action_names=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
+	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
 	{
 		static $usercats = null;
 		$db =& JFactory::getDBO();
@@ -161,7 +161,7 @@ class FlexicontentHelperPerm {
 			$has_access = $require_all ? false : true;
 			
 			// Check all actions with Logical OR or Logical AND
-			foreach ($action_names as $action_name)
+			foreach ($actions_allowed as $action_name)
 			{
 				if ($require_all) {
 					$has_access = $has_access | $user->authorise($action_name, $asset);

@@ -133,19 +133,18 @@ class FlexicontentHelperPerm {
 	 * Lookups the categories (their IDs), that the user has access to perforn the specified action(s)
 	 *
 	 * @param object	$user             The user on which to check privileges
-	 * @param array		$action_names     The required actions
+	 * @param array		$actions_allowed  The required actions
 	 * @param bool		$require_all      True to require --all-- (Logical AND) or false to require --any-- (Logical OR)
 	 * @param bool		$check_published  True to include only published categories
 	 *
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	function getAllowedCats( &$user, $action_names=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
+	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
 	{
 		global $globalcats;
 		$db =& JFactory::getDBO();
 		$newcats = array();
-		$aro_value = $user->gmid;
 		
 		if (!FLEXI_ACCESS || $user->gid == 25) {
 			// No FLEXIaccess installed/enabled or user is super admin, return all category ids
@@ -157,6 +156,9 @@ class FlexicontentHelperPerm {
 			$usercats = array_unique($newcats);
 			return $usercats;
 		}
+		
+		// FLEXIaccess group
+		$aro_value = $user->gmid;
 		
 		// Create a limit for aco (ACTION privilege)
 		$limit_aco = array();

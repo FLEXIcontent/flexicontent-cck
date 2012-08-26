@@ -685,7 +685,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<?php
 			// Remove xml nodes if advanced meta parameters
 			//echo "<pre>"; print_r($this->formparams->_xml); exit;
-			if ( !$perms['isSuperAdmin'] || !($this->params->get('usepublicationdetails_fe', 1) == 2) ) :
+			if ( !$this->perms['isSuperAdmin'] || !($this->params->get('usepublicationdetails_fe', 1) == 2) ) :
 				$advanced_metadata_params = array('created_by', 'created');
 				$metadata_nodes = array();
 				foreach($this->formparams->_xml['_default']->_children as $index => $element) :
@@ -697,6 +697,17 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		
 			$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
 			echo $this->pane->startPanel( $title, 'details' );
+		?>
+		
+			<div class='fc_timezone_info'>
+			<?php
+				$tz_offset = JFactory::getConfig()->getValue('config.offset');
+				$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
+				echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
+			?>
+			</div>
+			
+		<?php
 			echo $this->formparams->render('details');
 			echo $this->pane->endPanel();
 		?>
