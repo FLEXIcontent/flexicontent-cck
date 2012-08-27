@@ -256,8 +256,8 @@ class flexicontent_cats
 	{
 		global $globalcats;
 		$user =& JFactory::getUser();
-		$cid = JRequest::getVar('cid',  0, '', 'array');
-		if(!@$cid[0]) $cid = JRequest::getVar('id',  0, '', 'array');
+		$cid = JRequest::getVar('cid',  0);
+		if (is_array($cid)) $cid = $cid[0];
 		
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		if (FLEXI_J16GE) {
@@ -302,9 +302,9 @@ class flexicontent_cats
 			
 			if ( !$check_published || $cat->published )
 			{	
-				// CASE 1. IN CATEGORY EDIT FORM and display FORM FIELD parent_id, ADD current category and its children as disabled
-				if ( JRequest::getVar('controller') == 'categories' && JRequest::getVar('task') == 'edit'
-							&& $top==1 && ( $cid[0] == $cat->id || in_array($cat->id, $globalcats[$cid[0]]->descendantsarray ) )
+				// CASE 1. IN CATEGORY EDIT FORM while displaying FORM FIELD parent_id, using current category and its children should be disabled as disabled
+				if ( JRequest::getVar('controller') == 'categories' && JRequest::getVar('task') == 'edit' && $cid
+							&& $top==1 && ( $cid == $cat->id || in_array($cat->id, $globalcats[$cid]->descendantsarray ) )
 				) {
 					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', true );
 				}

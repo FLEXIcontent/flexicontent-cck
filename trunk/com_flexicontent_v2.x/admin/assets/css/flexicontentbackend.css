@@ -471,6 +471,8 @@ fieldset.tmplprop legend {
 fieldset.tmplprop legend.open {
 	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
 }
+
+/* Backend Listings */
 table.adminlist thead th.left {
 	text-align: left;
 	border-bottom: none;
@@ -527,6 +529,15 @@ table.adminlist thead #filter_authors {
 table.adminlist thead #filter_cats {
 	width: 160px;
 }
+
+table.adminlist td.order {
+	width: auto !important;
+}
+
+table.adminlist td.order span {
+	width: 16px !important;
+}
+
 .novalue {
 	color: gray;
 	font-style: italic;

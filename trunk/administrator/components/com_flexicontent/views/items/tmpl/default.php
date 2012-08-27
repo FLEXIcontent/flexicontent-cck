@@ -282,7 +282,7 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'Translation Group', 'ie.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
-			<th width="<?php echo $this->CanOrder ? '90' : '60'; ?>" class="center">
+			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center">
 				<?php
 				if ($this->filter_cats == '' || $this->filter_cats == 0) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
@@ -617,7 +617,7 @@ window.addEvent('domready', function() {
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 
 				<?php if ($this->filter_cats == '' || $this->filter_cats == 0) : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align:center; margin-left:-20px;" />
+				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align:center;" />
 				<?php else : ?>
 				<input type="text" name="order[]" size="5" value="<?php echo $row->catsordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
 				<?php endif; ?>

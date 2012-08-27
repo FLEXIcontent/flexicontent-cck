@@ -249,6 +249,7 @@
 		</params>
 		
 		<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
+			<!-- Please do not change default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
 			<param name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 		</params> 
 		

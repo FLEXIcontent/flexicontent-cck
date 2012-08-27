@@ -139,7 +139,7 @@ $userId     = $user->get('id');
 				?>
 			</td>
 			<td align="center">
-				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "default <sup>[1]</sup>") ?>
+				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "blog <sup>[1]</sup>") ?>
 			</td>
 			<td align="center">
 				<?php echo $row->nrassigned?>

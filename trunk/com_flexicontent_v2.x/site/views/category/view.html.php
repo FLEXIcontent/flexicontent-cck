@@ -100,21 +100,18 @@ class FlexicontentViewCategory extends JView
 		$clayout = $clayout ? $clayout : $params->get('clayout', 'blog');
 		
 		// (b) Get cached template data
-		$themes = flexicontent_tmpl::getTemplates();
+		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($clayout) );
 		
 		// (c) Verify the category layout exists
 		if ( !isset($themes->category->{$clayout}) ) {
 			$fixed_clayout = 'blog';
 			$mainframe->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
 			$clayout = $fixed_clayout;
+			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
 		
 		// (d) finally set the template name back into the category's parameters
 		$params->set('clayout', $clayout);
-		
-		// Load Template-Specific language file to override or add new language strings
-		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $clayout );
 		
 		// Get URL variables
 		$cid = JRequest::getInt('cid', 0);
