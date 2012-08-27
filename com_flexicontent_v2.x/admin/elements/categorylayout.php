@@ -56,6 +56,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 		$tmpls	= $themes->category;
 		$view	= JRequest::getVar('view');
 		$value = FLEXI_J16GE ? $this->value : $value;
+		$value = $value ? $value : $attributes['default'];
 		
 		$lays = array();
 		foreach ($tmpls as $tmpl) {

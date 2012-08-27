@@ -1997,9 +1997,9 @@ class flexicontent_tmpl
 		return $themes;
 	}
 
-	function getTemplates()
+	function getTemplates($lang_files = 'all')
 	{
-		if (FLEXI_CACHE /*&& !FLEXI_J16GE*/)
+		if (FLEXI_CACHE)
 		{
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
@@ -2012,6 +2012,12 @@ class flexicontent_tmpl
 			$tmpls = flexicontent_tmpl::parseTemplates();
 		}
 		
+		// Load Template-Specific language file(s) to override or add new language strings
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			if ( $lang_files == 'all' ) foreach ($tmpls->category as $tmpl => $d) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
+			else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
+			else if ( is_string($lang_files) && $load_lang ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
+		}
 		return $tmpls;
 	}
 

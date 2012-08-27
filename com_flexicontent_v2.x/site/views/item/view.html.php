@@ -131,21 +131,18 @@ class FlexicontentViewItem extends JView
 		}
 		
 		// (e) Get cached template data
-		$themes = flexicontent_tmpl::getTemplates();
+		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($ilayout) );
 		
 		// (f) Verify the item layout exists
 		if ( !isset($themes->items->{$ilayout}) ) {
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
 			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
 			$ilayout = $fixed_ilayout;
+			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
 		}
 		
 		// (g) finally set the template name back into the item's parameters
-		$params->set('ilayout', $ilayout);
-		
-		// Load Template-Specific language file to override or add new language strings
-		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $ilayout );
+		$params->set('ilayout', $ilayout);		
 		
 		// Bind Fields
 		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
