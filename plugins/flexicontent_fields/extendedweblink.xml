@@ -33,6 +33,12 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<param name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_USER_CAN_SELECT</option>
+			</param>
+			
 			<param name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET" description="FLEXI_EXTWL_URLTARGET" >
 				<option value=""> - No target - </option>
 				<option value="_blank">open in new window</option>

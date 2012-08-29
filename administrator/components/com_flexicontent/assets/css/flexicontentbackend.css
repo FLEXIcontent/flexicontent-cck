@@ -713,7 +713,7 @@ div label.lang_box {
 #flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
 
 div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
-	/*margin: 2px 2px 2px 0px !important;*/
+	margin: 2px 2px 2px 0px !important;
 }
 
 #flexicontent #alias, #flexicontent #jform_alias,
@@ -808,7 +808,7 @@ div.flexi_box_right {
 	margin: 6px 6px 4px 0;
 }
 
-.fc_timezone_info {
+.fc_mini_note_box {
 	font-size: 11px;
 	background-color: lightyellow;
 	border: 1px dashed gray;

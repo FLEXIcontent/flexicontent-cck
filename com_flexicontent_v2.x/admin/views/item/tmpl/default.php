@@ -833,7 +833,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		endif;*/
 		?>
 		<fieldset class="panelform">
-			<div class='fc_timezone_info'>
+			<div class='fc_mini_note_box'>
 			<?php
 				$tz_string = JFactory::getConfig()->getValue('config.offset');
 				$tz = new DateTimeZone( $tz_string );

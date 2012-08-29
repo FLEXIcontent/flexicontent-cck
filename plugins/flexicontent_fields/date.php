@@ -41,10 +41,47 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// some parameter shortcuts
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$dateformat			= $field->parameters->get( 'date_format', '%Y-%m-%d' ) ;
-		$required 			= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$required 		= $field->parameters->get( 'required', 0 ) ;
+		$required 		= $required ? ' required' : '';
+		
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
+		$document	= & JFactory::getDocument();
+		
+		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
+		
+		$append_str = '';
+		if ($date_allowtime)
+		{
+			$append_str = JText::_('FLEXI_DATE_CAN_ENTER_TIME');
+			$append_str .= ($date_allowtime==2) ? '<br/>'.JText::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '';
+			
+			if ($use_editor_tz == 0)
+			{
+				// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
+				$timezone = FLEXI_J16GE ? 'UTC' : 0;
+				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
+			}
+			else
+			{
+				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED');
+				// Use timezone of editor, unlogged editor will use site's default timezone
+				$timezone = $user->getParam('timezone', $config->get('offset'));
+				if (FLEXI_J16GE) {
+					$tz = new DateTimeZone($timezone);
+					$tz_offset = $tz->getOffset(new JDate()) / 3600;
+				} else {
+					$tz_offset = $timezone;
+				}
+				$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 
+				$append_str .= '<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
+			}
+		}
+		$append_str = $append_str ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$append_str : '';
+		
 		// initialise property
 		if (!$field->value) {
 			$field->value = array();
@@ -53,8 +90,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
-			$document	= & JFactory::getDocument();
-
 			//add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
@@ -148,22 +183,50 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			';
-			$document->addStyleDeclaration($css);
-
-			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$n = 0;
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
-
-			foreach ($field->value as $value) {
-				$field->html .= '<li>' . JHTML::_('calendar', $value, $field->name.'[]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"') . '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span></li>';
-				$n++;
-			}
-			$field->html .=	'</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
-
-		} else { // handle single records
-			$field->html	= '<div>' . JHTML::_('calendar', $field->value[0], $field->name.'[]', $field->name, '%Y-%m-%d', 'class="'.$required.'"') .'</div>';
+			
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		} else {
+			$remove_button = '';
+			$move2 	= '';
+			$css = '';
 		}
+		
+		$document->addStyleDeclaration($css);
+		
+		$field->html = array();
+		$n = 0;
+		foreach ($field->value as $value)
+		{
+			@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
+			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
+			
+			if (!$date_allowtime || !$time) {
+				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
+			} else {
+				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
+			}
+			$calendar = JHTML::_('calendar', $date, $field->name.'[]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
+			
+			$field->html[] = $calendar . $remove_button . $move2;
+			
+			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+		}
+
+		if ($multiple) { // handle multiple records
+			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+		} else {  // handle single values
+			$field->html = '<div>' . $field->html[0] . '</div>';
+		}
+		
+		$field->html =
+			 '<div style="float:left">'
+			.' <div class="fc_mini_note_box">'.$append_str.'</div>'
+			.  $field->html
+			.'</div>';
 	}
 
 
@@ -173,6 +236,27 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if($field->field_type != 'date') return;
 		if(!$post) return;
 		
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
+		
+		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$use_editor_tz = $date_allowtime ? $use_editor_tz : 0;
+		
+		if ($use_editor_tz == 0) {
+			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
+			$tz_offset = 0;
+		} else {
+			// For logged users the date values are in user's time zone, (unlogged users will submit in site default timezone)
+			$timezone = $user->getParam('timezone', $config->get('offset'));
+			if (FLEXI_J16GE) {
+				$tz = new DateTimeZone($timezone);
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			} else {
+				$tz_offset = $timezone;
+			}
+		}
+		
 		$newpost = array();
 		$new = 0;
 		
@@ -181,7 +265,33 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		{
 			if ($post[$n] != '')
 			{
-				$newpost[$new] = $post[$n];
+				// Check if dates are allowed to have time part
+				@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
+				$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
+				
+				if (!$date_allowtime)
+				{
+					// Time part not allowed
+					$post[$n] = $date;
+				}
+				else if ($time)
+				{
+					// Time part exists
+					$post[$n] = $date.' '.$time;
+				}
+				
+				if (!$use_editor_tz || !$time)
+				{
+					// Dates have no timezone information, because either :
+					// (a) ignoring timezone OR (b) no time given
+					$newpost[$new] = $post[$n];
+				}
+				else
+				{
+					// Dates are in user's timezone, convert to UTC+0
+					$date = new JDate($post[$n], $tz_offset);
+					$newpost[$new] = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+				}
 			}
 			$new++;
 		}
@@ -232,14 +342,35 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 		$field->label = JText::_($field->label);
 		
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
+		
 		$values = $values ? $values : $field->value;
 
-		// some parameter shortcuts
-		$customdate			= $field->parameters->get( 'custom_date', '%Y-%m-%d' ) ; 
-		$dateformat			= $field->parameters->get( 'date_format', $customdate ) ;
-		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		// Value handling parameters
+		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
+		$customdate     = $field->parameters->get( 'custom_date', FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ) ;
+		$dateformat     = $field->parameters->get( 'date_format', $customdate ) ;
+		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
+		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
+		
+		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
+		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
+		$display_tz_suffix   = $field->parameters->get( 'display_tz_suffix', 1) ;
+		
+		// Prefix - Suffix - Separator parameters
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
+		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
+		
+		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		switch($separatorf)
 		{
@@ -268,23 +399,72 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			break;
 		}
 		
+		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
+		if ( !$use_editor_tz ) {
+			// Raw date output, ignore timezone (no timezone info is printed), NOTE: this is OLD BEHAVIOUR of this field
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			$tz_suffix_type = -1;
+		} else if ($user->id) {
+			$tz_suffix_type = $display_tz_logged;
+		} else {
+			$tz_suffix_type = $display_tz_guests;
+		}
+		
+		$tz_info = '';
+		switch ($tz_suffix_type)
+		{
+		default:
+		case 0:
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			//$tz_info = '';
+			break;
+		case 1:
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			//$tz_info = ' UTC+0';
+			break;
+		case 2:
+			$timezone = $config->get('offset');
+			//$tz_info = ' (site's timezone)';
+			break;
+		case 3: 
+			$timezone = $user->getParam('timezone' );
+			//$tz_info = ' (local time)';
+			break;
+		}
+		
+		// display timezone suffix if this is enabled
+		if ($display_tz_suffix && $tz_suffix_type > 0) {
+			if (FLEXI_J16GE) {
+				$tz = new DateTimeZone($timezone);
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			} else {
+				$tz_offset = $timezone;
+			}
+			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+		}
+		
 		// initialise property
 		$field->{$prop} = array();
 		
 		$n = 0;
 		foreach ($values as $value) {
-			// We must use timezone offset ZERO, because the date(-time) value is stored in its final value
-			// AND NOT as GMT-0 which would need to be converted to localtime, if not specified the JHTML-date
-			// will convert to local time using a timezone offset, giving erroneous output
-			if (!FLEXI_J16GE) {
-				$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat), $timezone_offset=0 ) : JText::_( 'FLEXI_NO_VALUE' );
-			} else {
-				// J1.6+  CANNOT USE 0 as $timezone_offset, also it is not needed ... commented out it ...
-				$field->{$prop}[]	= $values[$n] ? JHTML::_('date', $values[$n], JText::_($dateformat)/*, $timezone_offset=0*/ ) : JText::_( 'FLEXI_NO_VALUE' );
-			}
-			$n++;
+			if ( !strlen($value) ) continue;
+			
+			// Check if dates are allowed to have time part
+			if ($date_allowtime) $date = $value;
+			else @list($date, $time) = preg_split('#\s+#', $value, $limit=2);
+			
+			if ( empty($date) ) continue;
+			
+			$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
+			
+			$field->{$prop}[]	= $pretext.$date.$posttext;
+			
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		$field->{$prop} = implode($separatorf, $field->{$prop});	
+		$field->{$prop} = implode($separatorf, $field->{$prop});
+		
+		if ( !$field->{$prop} && $show_no_value ) $field->{$prop} = JText::_($no_value_msg);
 	}
 
 

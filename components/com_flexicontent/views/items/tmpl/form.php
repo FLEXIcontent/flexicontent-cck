@@ -699,7 +699,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			echo $this->pane->startPanel( $title, 'details' );
 		?>
 		
-			<div class='fc_timezone_info'>
+			<div class='fc_mini_note_box'>
 			<?php
 				$tz_offset = JFactory::getConfig()->getValue('config.offset');
 				$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;

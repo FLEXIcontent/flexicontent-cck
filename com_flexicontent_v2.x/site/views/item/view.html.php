@@ -65,7 +65,8 @@ class FlexicontentViewItem extends JView
 		$aid			= !FLEXI_J16GE ? (int) $user->get('aid') : $user->getAuthorisedViewLevels();
 		$model		= & $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
-		$cid			= JRequest::getInt('cid', 0);
+		$cid			= $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id, verifying it really belongs to current item
+		
 		$Itemid		= JRequest::getInt('Itemid', 0);
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
