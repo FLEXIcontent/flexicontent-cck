@@ -48,6 +48,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$size					= $field->parameters->get( 'size', 30 ) ;
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
+		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
 		$default_link_usage = $field->parameters->get( 'default_link_usage', 0 ) ;
 		$default_link       = ($item->version == 0 || $default_link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
@@ -192,10 +193,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			#sortables_'.$field->id.' li:only-child span.drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
-			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>';
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
+			$move2 = '';
 			$css = '';
 		}
 		
@@ -207,9 +209,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if ( empty($value) ) continue;
 			$value  = unserialize($value);
 			
+			$has_prefix = preg_match("#^http|^https|^ftp#i", $value['link']);
+			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 			
 			$link = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td><td><input class="urllink '.$required.'" name="'.$fieldname.'[link]" type="text" size="'.$size.'" value="'.$value['link'].'" /></td></tr>';
+			
+			if ($allow_relative_addrs==2) $autoprefix =
+				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ).  ':</td><td>
+					<label class="legende" for="'.$fieldname.'[autoprefix][0]">'.JText::_('FLEXI_NO').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix][0]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
+					<label class="legende" for="'.$fieldname.'[autoprefix][1]">'.JText::_('FLEXI_YES').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix][1]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
+				</td></tr>';
 			
 			if ($usetitle) $title =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ).    ':</td><td><input class="urltitle" name="'.$fieldname.'[title]" type="text" size="'.$size.'" value="'.(@$value['title'] ? $value['title'] : $default_title).'" /></td></tr>';
@@ -228,12 +238,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$field->html[] = '
 				<table class="admintable"><tbody>
 					'.$link.'
+					'.@$autoprefix.'
 					'.@$title.'
 					'.@$linktext.'
 					'.@$class.'
 					'.@$id.'
 				</tbody></table>
 				'.$remove_button.'
+				'.$move2.'
 				<input class="urlhits" name="'.$fieldname.'[hits]" type="hidden" value="'.$hits.'" />
 				<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 				';
@@ -257,6 +269,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if($field->field_type != 'extendedweblink') return;
 		if(!$post) return;
 		
+		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
+		
 		// reformat the post
 		$newpost = array();
 		$new = 0;
@@ -278,7 +292,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 			if ($post[$n]['link'] != '')
 			{
-				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
+				if ( $allow_relative_addrs ==1 || ($allow_relative_addrs==2 && @$post[$n]['autoprefix']) ) {
+					$http_prefix = '';
+				} else {
+					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
+				}
 				$newpost[$new]['link']		= $http_prefix.$post[$n]['link'];
 				$newpost[$new]['title']		= strip_tags(@$post[$n]['title']);
 				$newpost[$new]['id']			= strip_tags(@$post[$n]['id']);

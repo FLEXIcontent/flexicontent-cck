@@ -683,7 +683,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		echo JHtml::_('sliders.panel', $title, 'details-options');
 		?>
 		<fieldset class="panelform">
-			<div class='fc_timezone_info'>
+			<div class='fc_mini_note_box'>
 			<?php
 				$tz_string = JFactory::getConfig()->getValue('config.offset');
 				$tz = new DateTimeZone( $tz_string );
