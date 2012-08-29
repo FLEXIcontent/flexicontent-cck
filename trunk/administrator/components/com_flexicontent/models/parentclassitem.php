@@ -2921,6 +2921,29 @@ class ParentClassItem extends JModel
 				//$v = is_array($v) ? implode('|', $v) : $v;
 				$item->attribs->set($k, $v);
 			}
+			
+			// Clear any old parameters of all item template layouts, except the currently used one
+			if ( empty($params['ilayout']) )
+			{
+				$themes = flexicontent_tmpl::getTemplates();
+				foreach ($themes->items as $tmpl_name => $tmpl)
+				{
+					if ( $tmpl_name == $params['ilayout'] ) continue;
+					
+					$tmpl_params = $tmpl->params;
+					if (FLEXI_J16GE) {
+						$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+						$jform->load($tmpl_params);
+						foreach ($jform->getGroup('attribs') as $p) {
+							$item->attribs->set($p->fieldname, null);
+						}
+					} else {
+						foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
+							$item->attribs->set($p->_attributes['name'], null);
+						}
+					}
+				}
+			}
 			$item->attribs = $item->attribs->toString();
 		}
 		
