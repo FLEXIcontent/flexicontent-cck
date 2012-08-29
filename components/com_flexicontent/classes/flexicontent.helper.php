@@ -2857,6 +2857,22 @@ class FLEXIUtilities
 		return $array;
 	}
 	
+	/**
+	 * Helper method to format a parameter value as array
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function paramToArray($value)
+	{
+		if (FLEXI_J16GE && !is_array($value)) {
+			$value = explode("|", $value);
+			$value = ($value[0]=='') ? array() : $value;
+		} else {
+			$value = !is_array($value) ? array($value) : $value;
+		}
+		return $value;
+	}
 }
 
 
