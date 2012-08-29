@@ -23,7 +23,7 @@
 
 		<params group="group-date" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" menu="hide" />
 			<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -48,9 +48,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" menu="hide" />
 			
-			<param name="" type="separator" default="Editing" level="level3" menu="hide" />
+			<param name="" type="separator" default="Editing" level="level2" menu="hide" />
 			<param name="date_allowtime" type="radio" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -66,7 +66,7 @@
 			</param>
 			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 
-			<param name="" type="separator" default="Displaying" level="level3" menu="hide" />
+			<param name="" type="separator" default="Displaying" level="level2" menu="hide" />
 			<param name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC">
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -91,7 +91,7 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" menu="hide" />
 			<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

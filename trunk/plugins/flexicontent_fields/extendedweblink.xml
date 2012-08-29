@@ -20,14 +20,14 @@
 		</params>
 		<params group="group-extendedweblink" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" menu="hide" />
 			<param name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" menu="hide" />
 			<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -52,9 +52,9 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 			</param>
 			
-			<param name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level3" menu="hide" />
+			<param name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" menu="hide" />
 			<param name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -66,7 +66,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level3" menu="hide" />
+			<param name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level2" menu="hide" />
 			<param name="use_text" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -78,7 +78,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level3" menu="hide" />
+			<param name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level2" menu="hide" />
 			<param name="use_class" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -90,7 +90,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLID" level="level3" menu="hide" />
+			<param name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" menu="hide" />
 			<param name="use_id" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -102,7 +102,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</param>
 
-			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" menu="hide" />
 			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">

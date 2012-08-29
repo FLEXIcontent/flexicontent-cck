@@ -195,24 +195,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Check and disable 'uselegend'
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
-		if (FLEXI_J16GE && !is_array($legendinview)) {
-			$legendinview = explode("|", $legendinview);
-			$legendinview = ($legendinview[0]=='') ? array() : $legendinview;
-		} else {
-			$legendinview = !is_array($legendinview) ? array($legendinview) : $legendinview;
-		}
+		$legendinview  = FLEXIUtilities::paramToArray($legendinview);
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
 		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
 		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
 		
 		// Check and disable 'usepopup'
 		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category','backend'));
-		if (FLEXI_J16GE && !is_array($popupinview)) {
-			$popupinview = explode("|", $popupinview);
-			$popupinview = ($popupinview[0]=='') ? array() : $popupinview;
-		} else {
-			$popupinview = !is_array($popupinview) ? array($popupinview) : $popupinview;
-		}
+		$popupinview  = FLEXIUtilities::paramToArray($popupinview);
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
 		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
 		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
@@ -220,11 +210,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// FORCE multibox popup in backend ...
 		if ($isItemsManager) $popuptype = 1;
 		
-		$showtitle    = $field->parameters->get( 'showtitle', 0 ) ;
-		$showdesc	= $field->parameters->get( 'showdesc', 0 ) ;
+		$showtitle = $field->parameters->get( 'showtitle', 0 ) ;
+		$showdesc  = $field->parameters->get( 'showdesc', 0 ) ;
 		
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
+		
+		$useogp     = $field->parameters->get('useogp', 0);
+		$ogpinview  = $field->parameters->get('ogpinview', array());
+		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+		$ogpthumbsize= $field->parameters->get('ogpthumbsize', 2);
 		
 		// Allow for thumbnailing of the default image
 		if (!$values || $values[0] == '') {
@@ -397,6 +392,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->{"display_medium"} = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'"'.$legend.' />';
 				$field->{"display_large"} = '<img src="'.JURI::root().$srcl.'" alt ="'.$alt.'"'.$legend.' />';
 				
+				// Suggest image for external use, e.g. for Facebook etc
+				if ($useogp) {
+					if ( in_array($view, $ogpinview) ) {
+						switch ($ogpthumbsize)
+						{
+							case 1: $ogp_src = $field->{"display_small_src"}; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+							case 2: $ogp_src = $field->{"display_medium_src"}; break;
+							case 3: $ogp_src = $field->{"display_large_src"}; break;
+							default: $ogp_src = $field->{"display_medium_src"}; break;
+						}
+						$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
+						$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
+					}
+				}
+				
 				// Check if a custom variable (display) was requested and do not render default variable
 				if ( in_array($prop,
 						array("display_backend", "display_small","display_medium", "display_large",
@@ -404,7 +414,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				) {
 					return $field->{$prop};
 				}
-								
+				
 				// first condition is for the display for the preview feature
 				if ($isItemsManager) {    // Image displayed in backend items manager
 					if ($usepopup) {

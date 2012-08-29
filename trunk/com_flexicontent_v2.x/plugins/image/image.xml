@@ -26,11 +26,14 @@
 			</field>
 		</fieldset>
 		<fieldset name="group-image" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="default_image" type="text" default="" size="40" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
-			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" menu="hide" />
+			
+			<field name="default_image" type="text" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
+			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
-			<field name="dir" type="text" default="images/stories/flexicontent" label="FLEXI_FIELD_IMAGE_DIRECTORY" description="FLEXI_FIELD_IMAGE_DIRECTORY_DESC" />
+			<field name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_DIRECTORY" description="FLEXI_FIELD_IMAGE_DIRECTORY_DESC" />
 			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
 			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
 				<option value="*">FLEXI_FIELD_REPEAT</option>
@@ -43,7 +46,23 @@
 				<option value="BR">FLEXI_FIELD_BOTTOM_RIGHT</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_DESC" level="level1" menu="hide" />
+			<field name="useogp" type="radio" default="1" label="FLEXI_FORCE_IN_IMAGE_LISTINGS" description="FLEXI_FORCE_IN_IMAGE_LISTINGS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="ogpinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="item,category,module" defaultvals="items,category,module"
+				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
+			<field name="ogpthumbsize" type="list" default="2" label="FLEXI_IMAGE_IN_SOCIAL_LISTING" description="FLEXI_IMAGE_IN_SOCIAL_LISTING">
+				<option value="1">FLEXI_SMALL_NOT_RECOMMENDED</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_THUMBNAIL_CREATION" description="FLEXI_FIELD_THUMBNAIL_CREATION" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level2" menu="hide" />
 			<field name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 			<field name="method_l" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
@@ -54,9 +73,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
-			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level2" menu="hide" />
 			<field name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 			<field name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
@@ -67,9 +86,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
-			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level2" menu="hide" />
 			<field name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_s" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 			<field name="method_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
@@ -80,9 +99,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
 
-			<field name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level2" menu="hide" />
 			<field name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_b" type="text" default="30" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 			<field name="method_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC">
@@ -93,16 +112,17 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="wm_b" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="40" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
-
+			<field name="wm_b" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" menu="hide" />
+
 			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" menu="hide" />
 			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="legendinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="item,category,backend" defaultvals="item,category,backend"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="items,category,module,backend"
 				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 			<field name="" type="separator" default="FLEXI_IMGFIELD_POPUP_IMAGE" level="level2" menu="hide" />
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_POPUP" description="FLEXI_FIELD_IMAGE_USE_POPUP_DESC">
@@ -110,7 +130,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="popupinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_BACKEND" checkvals="item,category,backend" defaultvals="item,category,backend"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="items,category,module,backend"
 				label="FLEXI_IMGFIELD_ABOVE_IN_VIEWS" description="FLEXI_IMGFIELD_ABOVE_IN_VIEWS_DESC" />
 			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option>
@@ -125,14 +145,14 @@
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" menu="hide" />
 			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
-				<option value="1">Small</option>
-				<option value="2">Medium</option>
-				<option value="3">Large</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
 			</field>
 			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
-				<option value="1">Small</option>
-				<option value="2">Medium</option>
-				<option value="3">Large</option>
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" menu="hide" />
 			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
