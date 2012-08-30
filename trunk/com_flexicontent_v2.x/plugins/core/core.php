@@ -225,6 +225,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					}
 				}
 				
+				// Get ogp configuration
+				$useogp     = $field->parameters->get('useogp', 0);
+				$ogpinview  = $field->parameters->get('ogpinview', array());
+				$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+				$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+				
+				if ($useogp && $field->{$prop}) {
+					if ( in_array($view, $ogpinview) ) {
+						$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+						JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+					}
+				}
+				
 				break;
 		}
 	}
