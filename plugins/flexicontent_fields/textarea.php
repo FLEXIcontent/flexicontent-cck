@@ -313,7 +313,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if($field->field_type != 'textarea') return;
 		
 		// some parameter shortcuts
-
 		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
@@ -326,6 +325,32 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->{$prop}	.= $closetag;
 		} else {
 			$field->{$prop}	 = '';
+		}
+
+		// Some variables
+		$document	= & JFactory::getDocument();
+		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
+		// Get ogp configuration
+		$useogp     = $field->parameters->get('useogp', 0);
+		$ogpinview  = $field->parameters->get('ogpinview', array());
+		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+		$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+		$ogpusage   = $field->parameters->get('ogpusage', 0);
+		
+		if ($useogp && $field->{$prop}) {
+			if ( in_array($view, $ogpinview) ) {
+				switch ($ogpusage)
+				{
+					case 1: $usagetype = 'title'; break;
+					case 2: $usagetype = 'description'; break;
+					default: $usagetype = ''; break;
+				}
+				if ($usagetype) {
+					$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
+					$document->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
+				}
+			}
 		}
 	}
 	

@@ -237,11 +237,22 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
+		$values = !is_array($values) ? array($values) : $values;     // make sure values is an array
+		$isempty = !count($values) || !strlen($values[0]);           // detect empty value
 		
-		// some parameter shortcuts
+		// Handle default value loading, instead of empty value
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value		= ($default_value_use == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		if ( empty($values) && !strlen($default_value) ) {
+			$field->{$prop} = '';
+			return;
+		} else if ( empty($values) && strlen($default_value) ) {
+			$values = array($default_value);
+		}
+		
+		// some parameter shortcuts
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
@@ -252,15 +263,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
-		// Handle default value loading, instead of empty value
-		$values = !is_array($values) ? array($values) : $values;     // make sure values is an array
-		$isempty = !count($values) || !strlen($values[0]);           // detect empty value
-		if ( empty($values) && !strlen($default_value) ) {
-			$field->{$prop} = '';
-			return;
-		} else if ( empty($values) && strlen($default_value) ) {
-			$values = array($default_value);
-		}
+		// Some variables
+		$document	= & JFactory::getDocument();
+		$view 	= JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
+		// Get ogp configuration
+		$useogp     = $field->parameters->get('useogp', 0);
+		$ogpinview  = $field->parameters->get('ogpinview', array());
+		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+		$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+		$ogpusage   = $field->parameters->get('ogpusage', 0);
 		
 		switch($separatorf)
 		{
@@ -306,6 +318,21 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
+		}
+		
+		if ($useogp && $field->{$prop}) {
+			if ( in_array($view, $ogpinview) ) {
+				switch ($ogpusage)
+				{
+					case 1: $usagetype = 'title'; break;
+					case 2: $usagetype = 'description'; break;
+					default: $usagetype = ''; break;
+				}
+				if ($usagetype) {
+					$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
+					$document->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
+				}
+			}
 		}
 	}
 
