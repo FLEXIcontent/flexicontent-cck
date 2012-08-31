@@ -201,7 +201,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
 			
-			if (!$date_allowtime || !$time) {
+			if ( !$value) {
+				$date = '';
+			} else if (!$date_allowtime || !$time) {
 				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
 			} else {
 				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
@@ -292,8 +294,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					$date = new JDate($post[$n], $tz_offset);
 					$newpost[$new] = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 				}
+				$new++;
 			}
-			$new++;
 		}
 		$post = $newpost;
 		
