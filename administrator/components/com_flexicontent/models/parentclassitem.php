@@ -2935,11 +2935,13 @@ class ParentClassItem extends JModel
 						$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 						$jform->load($tmpl_params);
 						foreach ($jform->getGroup('attribs') as $p) {
-							$item->attribs->set($p->fieldname, null);
+							if (!empty($p->fieldname))
+								$item->attribs->set($p->fieldname, null);
 						}
 					} else {
 						foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
-							$item->attribs->set($p->_attributes['name'], null);
+							if (isset($p->_attributes['name']))
+								$item->attribs->set($p->_attributes['name'], null);
 						}
 					}
 				}
