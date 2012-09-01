@@ -179,6 +179,7 @@ class FlexicontentViewFlexicontent extends JView
 			$perms->CanImport		= 1;
 			$perms->CanIndex		= 1;
 			$perms->CanConfig		= 1;
+			$perms->CanComments	= 1;
 		}
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
