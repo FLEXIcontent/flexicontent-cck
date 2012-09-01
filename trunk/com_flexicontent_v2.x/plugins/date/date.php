@@ -404,7 +404,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
 		if ( !$use_editor_tz ) {
 			// Raw date output, ignore timezone (no timezone info is printed), NOTE: this is OLD BEHAVIOUR of this field
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
 			$tz_suffix_type = -1;
 		} else if ($user->id) {
 			$tz_suffix_type = $display_tz_logged;
@@ -415,7 +414,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$tz_info = '';
 		switch ($tz_suffix_type)
 		{
-		default:
+		default: // including value -1 for raw for output, see above
 		case 0:
 			$timezone = FLEXI_J16GE ? 'UTC' : 0;
 			//$tz_info = '';
@@ -440,6 +439,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$tz = new DateTimeZone($timezone);
 				$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			} else {
+				// Raw date output  // FLEXI_J16GE ? 'UTC' : 0
 				$tz_offset = $timezone;
 			}
 			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
