@@ -42,7 +42,7 @@ class JElementSeparator extends JElement
 		if ($level == 'level2') {
 			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
-			$style = 'padding: 4px 6% 4px 6%; font-weight: bold; clear:both; width:100%; display: block; float: left;';
+			$style = 'padding: 2px 6% 4px 6%; margin-top:6px; font-weight: bold; clear:both; width:auto; display: block; float: left; border:1px dashed gray;';
 		} else {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
 		}
