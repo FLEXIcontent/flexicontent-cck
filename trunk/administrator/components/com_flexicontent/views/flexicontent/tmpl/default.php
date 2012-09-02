@@ -112,7 +112,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-tag-add.png', JText::_( 'FLEXI_NEW_TAG' ) );
 						}
 
-						if (!FLEXI_J16GE && $this->dopostinstall && $this->perms->CanAuthors)
+						if ($this->dopostinstall && $this->perms->CanAuthors)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=users';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-authors.png', JText::_( 'FLEXI_AUTHORS' ) );
