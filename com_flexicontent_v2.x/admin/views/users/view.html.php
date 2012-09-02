@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id$
+* @version		$Id: view.html.php 1192 2012-03-14 09:00:59Z emmanuel.danan@gmail.com $
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -95,8 +95,8 @@ class FlexicontentViewUsers extends JView
 		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'authors' );
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
-		JToolBarHelper::addNew($contrl.'add');
-		JToolBarHelper::editList($contrl.'edit');
+		//JToolBarHelper::addNew($contrl.'add');
+		//JToolBarHelper::editList($contrl.'edit');
 		JToolBarHelper::help( 'screen.users' );
 
 		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
