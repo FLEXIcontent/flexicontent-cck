@@ -76,32 +76,53 @@ class FlexicontentControllerusers extends FlexicontentController
 	 */
 	function save()
 	{
-		global $mainframe;
-
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$option = JRequest::getCmd( 'option');
 
 		// Initialize some variables
-		$db			= & JFactory::getDBO();
-		$me			= & JFactory::getUser();
-		$acl			=& JFactory::getACL();
+		$mainframe=& JFactory::getApplication();
+		$db				= & JFactory::getDBO();
+		$me				= & JFactory::getUser();
+		$acl			= & JFactory::getACL();
 		$MailFrom	= $mainframe->getCfg('mailfrom');
 		$FromName	= $mainframe->getCfg('fromname');
 		$SiteName	= $mainframe->getCfg('sitename');
 
- 		// Create a new JUser object
-		$user = new JUser(JRequest::getVar( 'id', 0, 'post', 'int'));
+ 		// Create a new JUser object for the given user id, and calculate / retrieve some information about the user
+ 		$id = JRequest::getVar( 'id', 0, 'post', 'int');
+		$user = new JUser($id);
 		$original_gid = $user->get('gid');
+		if (FLEXI_J16GE) {
+			$isSuperAdmin = isset($user->groups[8]);
+		} else {
+			$acl				=& JFactory::getACL();
+			$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
+			$groups			= $acl->get_object_groups( $objectID, 'ARO' );
+			$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
+			$isSuperAdmin = $me->get( 'gid' ) == 25;  //$this_group == 'super administrator';
+			$isAdmin			= $me->get( 'gid' ) == 24;  //$this_group == 'administrator'
+		}
 
 		$post = JRequest::get('post');
-		$post['username']	= JRequest::getVar('username', '', 'post', 'username');
-		$post['password']	= JRequest::getVar('password', '', 'post', 'string', JREQUEST_ALLOWRAW);
-		$post['password2']	= JRequest::getVar('password2', '', 'post', 'string', JREQUEST_ALLOWRAW);
+		$data = FLEXI_J16GE ? $post['jform'] : $post;
+		if (FLEXI_J16GE) {
+			if(isset($_REQUEST['jform']['attribs'])) {
+				$data['params'] = array_merge($data['params'], $_REQUEST['jform']['attribs']);
+			}
+	
+			if(isset($_REQUEST['jform']['templates'])) {
+				$data['params'] = array_merge($data['params'], $_REQUEST['jform']['templates']);
+			}
+		} else if (!FLEXI_J16GE) {
+			$data['username']	= JRequest::getVar('username', '', 'post', 'username');
+			$data['password']	= JRequest::getVar('password', '', 'post', 'string', JREQUEST_ALLOWRAW);
+			$data['password2']	= JRequest::getVar('password2', '', 'post', 'string', JREQUEST_ALLOWRAW);
+		}
 		
-
-		if (!$user->bind($post))
+		// Bind posted data
+		if (!$user->bind($data))
 		{
 			JError::raiseWarning(0, JText::_('CANNOT SAVE THE USER INFORMATION'));
 			JError::raiseWarning(0, $user->getError());
@@ -110,33 +131,13 @@ class FlexicontentControllerusers extends FlexicontentController
 			return $this->execute('edit');
 		}
 
-		$objectID 	= $acl->get_object_id( 'users', $user->get('id'), 'ARO' );
-		$groups 	= $acl->get_object_groups( $objectID, 'ARO' );
-		$this_group = strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
-
-		if ( $user->get('id') == $me->get( 'id' ) && $user->get('block') == 1 )
+		
+		// Check if we allowed to block/unblock the user
+		if ( $user->id && ! $this->block($check_uids=$user->id, $user->get('block') ? 'block' : 'unblock' ) )
 		{
-			$msg = JText::_( 'You cannot block Yourself!' );
-			JError::raiseWarning(0, $msg);
 			return $this->execute('edit');
 		}
-		else if ( ( $this_group == 'super administrator' ) && $user->get('block') == 1 ) {
-			$msg = JText::_( 'You cannot block a Super Administrator' );
-			JError::raiseWarning(0, $msg);
-			return $this->execute('edit');
-		}
-		else if ( ( $this_group == 'administrator' ) && ( $me->get( 'gid' ) == 24 ) && $user->get('block') == 1 )
-		{
-			$msg = JText::_( 'WARNBLOCK' );
-			JError::raiseWarning(0, $msg);
-			return $this->execute('edit');
-		}
-		else if ( ( $this_group == 'super administrator' ) && ( $me->get( 'gid' ) != 25 ) )
-		{
-			$msg = JText::_( 'You cannot edit a super administrator account' );
-			JError::raiseWarning(0, $msg);
-			return $this->execute('edit');
-		}
+		
 		// Are we dealing with a new user which we need to create?
 		$isNew 	= ($user->get('id') < 1);
 		if (!$isNew)
@@ -184,7 +185,7 @@ class FlexicontentControllerusers extends FlexicontentController
 			$db->query();
 			
 			// Save new records
-			foreach ($post['groups'] as $group)
+			foreach ($data['groups'] as $group)
 			{			
 				$query = 'INSERT INTO #__flexiaccess_members'
 						. ' SET `group_id` = ' . (int)$group . ', `member_id` = ' . (int)$user->get('id')
@@ -199,8 +200,9 @@ class FlexicontentControllerusers extends FlexicontentController
 		// *** BOF AUTHOR EXTENDED DATA ***
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$author_postdata['user_id']	= $user->get('id');
-		$author_postdata['author_basicparams']	= JRequest::getVar('authorbasicparams', '', 'post', 'array');
-		$author_postdata['author_catparams']	= JRequest::getVar('authorcatparams', '', 'post', 'array');
+		$author_postdata['author_basicparams']	= $data['authorbasicparams'];
+		$author_postdata['author_catparams']	= $data['authorcatparams'];
+		//echo "<pre>"; print_r($data); exit;
 		
 		$flexiauthor_extdata = & JTable::getInstance('flexicontent_authors_ext', '');
 		
@@ -270,17 +272,18 @@ class FlexicontentControllerusers extends FlexicontentController
 		}
 		
 		
+		$ctrl = FLEXI_J16GE ? 'users.' : '';
 		switch ( $this->getTask() )
 		{
 			case 'apply':
 				$msg = JText::sprintf( 'Successfully Saved changes to User', $user->get('name') );
-				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task=edit&cid[]='. $user->get('id'), $msg );
+				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task='.$ctrl.'edit&cid[]='. $user->get('id'), $msg );
 				break;
 
 			case 'saveandnew':
 			default:
 				$msg = JText::sprintf( 'Successfully Saved User', $user->get('name') );
-				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task=add', $msg );
+				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task='.$ctrl.'add', $msg );
 				break;
 				
 			case 'save':
@@ -299,10 +302,10 @@ class FlexicontentControllerusers extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$app     = & JFactory::getApplication();
-		$db      = & JFactory::getDBO();
-		$curUser = & JFactory::getUser();
-		$curIsSuperAdmin = FLEXI_J16GE ? isset($curUser->groups[8]) : $curUser->get( 'gid' ) == 25;
+		$app   = & JFactory::getApplication();
+		$db    = & JFactory::getDBO();
+		$me    = & JFactory::getUser();
+		$curIsSuperAdmin = FLEXI_J16GE ? isset($me->groups[8]) : $me->get( 'gid' ) == 25;
 		
 		$cid = JRequest::getVar( 'cid', array(), '', 'array' );
 		JArrayHelper::toInteger( $cid );
@@ -324,11 +327,11 @@ class FlexicontentControllerusers extends FlexicontentController
 				$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
 				$groups			= $acl->get_object_groups( $objectID, 'ARO' );
 				$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
-				$isSuperAdmin = $curUser->get( 'gid' ) == 25; //$this_group == 'super administrator';
-				$isAdmin      = $curUser->get( 'gid' ) == 24; //$this_group == 'administrator';
+				$isSuperAdmin = $me->get( 'gid' ) == 25; //$this_group == 'super administrator';
+				$isAdmin      = $me->get( 'gid' ) == 24; //$this_group == 'administrator';
 			}
 			
-			if ( $id == $curUser->get( 'id' ) )
+			if ( $id == $me->get( 'id' ) )
 			{
 				$err_msg .= JText::_( 'You cannot delete Yourself!' ) ."<br>";
 			}
@@ -388,19 +391,24 @@ class FlexicontentControllerusers extends FlexicontentController
 	/**
 	 * Disables the user account
 	 */
-	function block( )
+	function block($check_uids=null, $check_task='block')
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		$app     = & JFactory::getApplication();
 		$db      = & JFactory::getDBO();
-		$curUser = & JFactory::getUser();
-		$curIsSuperAdmin = FLEXI_J16GE ? isset($curUser->groups[8]) : $curUser->get( 'gid' ) == 25;
+		$me = & JFactory::getUser();
+		$curIsSuperAdmin = FLEXI_J16GE ? isset($me->groups[8]) : $me->get( 'gid' ) == 25;
 		
-		$cid = JRequest::getVar( 'cid', array(), '', 'array' );
-		JArrayHelper::toInteger( $cid );
-		$block = JRequest::getVar('task') == 'block';
+		if (!$check_uids) {
+			$cid = JRequest::getVar( 'cid', array(), '', 'array' );
+			JArrayHelper::toInteger( $cid );
+			$block = JRequest::getVar('task') == 'block';
+		} else {
+			$cid = is_array($check_uids) ? $check_uids : array($check_uids);
+			$block = $check_task;
+		}
 		
 		if (count( $cid ) < 1) {
 			JError::raiseError(500, JText::_( 'Select a User to '.$this->getTask(), true ) );
@@ -419,11 +427,11 @@ class FlexicontentControllerusers extends FlexicontentController
 				$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
 				$groups			= $acl->get_object_groups( $objectID, 'ARO' );
 				$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
-				$isSuperAdmin = $curUser->get( 'gid' ) == 25;  //$this_group == 'super administrator';
-				$isAdmin			= $curUser->get( 'gid' ) == 24;  //$this_group == 'administrator'
+				$isSuperAdmin = $me->get( 'gid' ) == 25;  //$this_group == 'super administrator';
+				$isAdmin			= $me->get( 'gid' ) == 24;  //$this_group == 'administrator'
 			}
 			
-			if ( $id == $curUser->get( 'id' ) )
+			if ( $id == $me->get( 'id' ) )
 			{
 				$err_msg .= JText::_( 'You cannot block/unblock Yourself!' );
 			}
@@ -453,7 +461,7 @@ class FlexicontentControllerusers extends FlexicontentController
 					// cannot block last active Super Admin
 					$err_msg .= "You cannot block last active Super Administrator: ".$user->get( 'name' )."<br>";
 				}
-				else
+				else if ( !$check_uids )  // Perform block/unblock, unless checking if it is allowed
 				{
 					// disconnect user acounts active sessions
 					if ($block) $app->logout($user->id);
@@ -466,6 +474,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		}
 		
 		if ($err_msg) $app->enqueueMessage($err_msg, 'notice');
+		if ($check_uids) return (bool) ($err_msg=='');
+		
 		$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=users', $msg);
 	}
 
@@ -482,8 +492,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		$task 	= $this->getTask();
 		$cids 	= JRequest::getVar( 'cid', array(), '', 'array' );
 		$client = JRequest::getVar( 'client', 0, '', 'int' );
-		$id 	= JRequest::getVar( 'id', 0, '', 'int' );
-
+			
 		JArrayHelper::toInteger($cids);
 
 		if ( count( $cids ) < 1 ) {

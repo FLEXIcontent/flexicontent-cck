@@ -95,8 +95,8 @@ class FlexicontentViewUsers extends JView
 		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'authors' );
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
-		//JToolBarHelper::addNew($contrl.'add');
-		//JToolBarHelper::editList($contrl.'edit');
+		JToolBarHelper::addNew($contrl.'add');
+		JToolBarHelper::editList($contrl.'edit');
 		JToolBarHelper::help( 'screen.users' );
 
 		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );

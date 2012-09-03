@@ -186,9 +186,9 @@ class FlexicontentModelType extends JModelAdmin
 	{
 		if ($this->_id)
 		{
-			$type = & JTable::getInstance('flexicontent_types', '');
+			$instance = & JTable::getInstance('flexicontent_types', '');
 			$user = &JFactory::getUser();
-			return $type->checkout($user->get('id'), $this->_id);
+			return $instance->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -211,8 +211,8 @@ class FlexicontentModelType extends JModelAdmin
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$type = & JTable::getInstance('flexicontent_types', '');
-			return $type->checkout($uid, $this->_id);
+			$instance = & JTable::getInstance('flexicontent_types', '');
+			return $instance->checkout($uid, $this->_id);
 		}
 		return false;
 	}
@@ -349,52 +349,79 @@ class FlexicontentModelType extends JModelAdmin
 	
 	
 	/**
-	 * Method to get the row form.
+	 * Method to get the record form.
 	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
+	 * @param   array    $data      An optional array of data for the form to interogate.
+	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  mixed  A JForm object on success, false on failure
+	 *
+	 * @since   1.6
 	 */
-	public function getForm($data = array(), $loadData = true) {
+	public function getForm($data = array(), $loadData = true)
+	{
 		// Initialise variables.
 		$app = JFactory::getApplication();
 
 		// Get the form.
 		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
+		if (empty($form))
+		{
 			return false;
 		}
 
 		return $form;
 	}
-	
+
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
+	 * @return  mixed  The data for the form.
+	 *
+	 * @since   1.6
 	 */
-	protected function loadFormData() {
+	protected function loadFormData()
+	{
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
-		if (empty($data)) {
-			$data = $this->getItem();
+		if (empty($data))
+		{
+			$data = $this->getItem($this->_id);
 		}
 
 		return $data;
 	}
-	
+
+	/**
+	 * Override JModelAdmin::preprocessForm to ensure the correct plugin group is loaded.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $group  The name of the plugin group to import (defaults to "content").
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data)
+	{
+		parent::preprocessForm($form, $data);
+	}
+
+
 	/**
 	 * Method to get a single record.
 	 *
-	 * @param	integer	$pk	The id of the primary key.
+	 * @param   integer  $pk  The id of the primary key.
 	 *
-	 * @return	mixed	Object on success, false on failure.
-	 * @since	1.6
+	 * @return  mixed	Object on success, false on failure.
+	 *
+	 * @since   1.6
 	 */
-	public function getItem($pk = null) {
+	public function getItem($pk = null)
+	{
 		static $item;
 		if(!$item) {
 			// Initialise variables.

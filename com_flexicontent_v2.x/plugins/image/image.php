@@ -641,7 +641,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 					$mainframe->enqueueMessage($field->label . ' : ' . JText::_('Upload complete'));
 					
-					$sizes 		= array('l','m','s');
+					$sizes 		= array('l','m','s','b');
 					foreach ($sizes as $size)
 					{
 						// create the thumbnail
@@ -754,7 +754,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		// delete the thumbnails
 		$errors		= array();
-		$sizes 		= array('l','m','s');
+		$sizes 		= array('l','m','s','b');
 		foreach ($sizes as $size)
 		{
 			$path		= JPATH_SITE . DS . $field->parameters->get('dir');
