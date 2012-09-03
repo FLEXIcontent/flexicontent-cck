@@ -301,8 +301,8 @@ window.addEvent('domready', function(){
 					<?php echo JHTML::_('grid.id', $i, $row->id ); ?>
 				</td>
 				<td class="col_title">
-					<!--a href="<?php echo $link; ?>"-->
-						<?php echo $row->name; ?><!--/a-->
+					<a href="<?php echo $link; ?>">
+						<?php echo $row->name; ?></a>
 				</td>
 				<td align="center" class="col_items">
 						<?php echo $itemscount; ?>

@@ -186,9 +186,9 @@ class FlexicontentModelType extends JModel
 	{
 		if ($this->_id)
 		{
-			$type = & JTable::getInstance('flexicontent_types', '');
+			$instance = & JTable::getInstance('flexicontent_types', '');
 			$user = &JFactory::getUser();
-			return $type->checkout($user->get('id'), $this->_id);
+			return $instance->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -211,8 +211,8 @@ class FlexicontentModelType extends JModel
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$type = & JTable::getInstance('flexicontent_types', '');
-			return $type->checkout($uid, $this->_id);
+			$instance = & JTable::getInstance('flexicontent_types', '');
+			return $instance->checkout($uid, $this->_id);
 		}
 		return false;
 	}

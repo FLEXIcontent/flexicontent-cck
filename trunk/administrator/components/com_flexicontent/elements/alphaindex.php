@@ -70,6 +70,7 @@ class JElementAlphaindex extends JElement
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$element_name = FLEXI_J16GE ? $this->fieldname : $name;
 		
 		$attribs = ' class="inputbox" onchange="updatealphafields(this.value);" ';
 		
@@ -80,9 +81,9 @@ class JElementAlphaindex extends JElement
 		});
 
 		function updatealphafields(val) {
-			var aichars=document.getElementById('".$control_name."alphacharacters');
-			var aicharclasses=document.getElementById('".$control_name."alphagrpcssclasses');
-			//var aicharseparator=document.getElementById('".$control_name."alphacharseparator');
+			var aichars=document.getElementById('".str_replace($element_name, 'alphacharacters', $element_id)."');
+			var aicharclasses=document.getElementById('".str_replace($element_name, 'alphagrpcssclasses', $element_id)."');
+			//var aicharseparator=document.getElementById('".str_replace($element_name, 'alphacharseparator', $element_id)."');
 			if(val!=2) {
 				aichars.disabled=1;          aichars.style.backgroundColor='#D4D0C8';
 				aicharclasses.disabled=1;    aicharclasses.style.backgroundColor='#D4D0C88';
