@@ -757,7 +757,10 @@ class modFlexicontentHelper
 		
 		// categories scope
 		if (!$behaviour_cat) {
-			$catids_arr		= is_array($catids) ? $catids : array($catids);
+			$catids = is_array($catids) ? $catids : array($catids);
+
+			// retrieve extra categories, such children or parent categories
+			$catids_arr = modFlexicontentHelper::getExtraCats($catids, $treeinclude, array());
 			
 			if (!$catids && $method_cat > 1) {
 				// empty ignore and issue a warning
@@ -775,6 +778,7 @@ class modFlexicontentHelper
 					// *** Applying configuration per category ***
 					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
 						$multiquery_cats[] = ' AND c.id = '.$catid;
+					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
 			}
 		} else {
@@ -790,24 +794,8 @@ class modFlexicontentHelper
 				// if $cid is not set then use the main category id of the (current) item
 				$cid = $cid ? $cid : $curitem->catid;
 				
-				switch ($treeinclude) {
-					// current category only
-					case 0: 
-						$catids_arr = array($cid);
-					break;
-					case 1: // current category + children
-						$catids_arr = $globalcats[$cid]->descendantsarray;
-					break;
-					case 2: // current category + parents
-						$catids_arr = $globalcats[$cid]->ancestorsarray;
-					break;
-					case 3: // current category + children + parents
-						$catids_arr = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
-					break;
-					case 4: // all item's categories
-						$catids_arr = $curritemcats;
-					break;
-				}
+				// retrieve extra categories, such children or parent categories
+				$catids_arr = modFlexicontentHelper::getExtraCats($cid, $treeinclude, $curritemcats);
 				
 				if ($behaviour_cat == 1) {
 					if (!$apply_config_per_category) {
@@ -1290,7 +1278,7 @@ class modFlexicontentHelper
 			$catconf->image_height 	= (int)$params->get('cats_image_height', 80);
 			$catconf->image_method 	= (int)$params->get('cats_image_method', 1);
 			$catconf->show_default_image = (int)$params->get('cats_show_default_image', 0);  // parameter not added yet
-			$catconf->readmore	= (int)$params->get('cats_currcat_readmore', 1);
+			$catconf->readmore	= (int)$params->get('cats_readmore', 1);
 		}
 		
 		if (empty($cids) || !count($cids)) return false;
@@ -1378,5 +1366,39 @@ class modFlexicontentHelper
 		
 		return $catdata_arr;
 	}
+	
+	
+	// Find and return extra parent/children/etc categories of givem categories
+	function getExtraCats($cids, $treeinclude, $curritemcats)
+	{
+		global $globalcats;
+		
+		$all_cats = $cids;
+		foreach ($cids as $cid)
+		{
+			$cats = array();
+			switch ($treeinclude) {
+				// current category only
+				case 0: default: 
+					$cats = array($cid);
+				break;
+				case 1: // current category + children
+					$cats = $globalcats[$cid]->descendantsarray;
+				break;
+				case 2: // current category + parents
+					$cats = $globalcats[$cid]->ancestorsarray;
+				break;
+				case 3: // current category + children + parents
+					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
+				break;
+				case 4: // all item's categories
+					$cats = $curritemcats;
+				break;
+			}
+			$all_cats = array_merge($all_cats, $cats);
+		}
+		return array_unique($all_cats);
+	}
+	
 }
 
