@@ -134,7 +134,7 @@
 				<option value="1">FLEXI_SAME_CAT</option>
 				<option value="2">FLEXI_NOT_SAME_CAT</option>
 			</field>
-			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_CATS" description="FLEXI_INCLUDE_CATS_DESC">
+			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC">
 				<option value="0">FLEXI_NONE</option>
 				<option value="1">FLEXI_CHILDREN</option>
 				<option value="2">FLEXI_PARENTS</option>
@@ -480,6 +480,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level2" menu="hide" />
 			<field name="cats_show_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
@@ -501,10 +505,6 @@
 			</field>		
 			<field name="cats_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="cats_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 		 <field name="" type="separator" default="FLEXI_CURRCAT" level="level1" menu="hide" />
 		 
@@ -532,6 +532,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level2" menu="hide" />
 			<field name="currcat_show_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
@@ -553,10 +557,6 @@
 			</field>		
 			<field name="currcat_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="currcat_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 		</fieldset>
 
