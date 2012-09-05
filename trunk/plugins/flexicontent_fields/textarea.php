@@ -109,7 +109,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea' && $field->field_type != 'maintext') return;
 
-		$editor 	= & JFactory::getEditor();
+		$app =& JFactory::getApplication();
+		$user = JFactory::getUser();
+		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
+		$editor = & JFactory::getEditor($editor_name);
 		
 		// some parameter shortcuts
 		$cols      = $field->parameters->get( 'cols', 75 ) ;

@@ -48,6 +48,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$user = JFactory::getUser();
 		$document	= & JFactory::getDocument();
 		
+		$show_usage = $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
@@ -226,7 +227,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$field->html =
 			 '<div style="float:left">'
-			.' <div class="fc_mini_note_box">'.$append_str.'</div>'
+			.($show_usage ? ' <div class="fc_mini_note_box">'.$append_str.'</div>' : '')
 			.  $field->html
 			.'</div>';
 	}
