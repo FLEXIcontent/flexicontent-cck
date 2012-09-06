@@ -62,6 +62,29 @@ class JFormFieldFcdate extends JFormField
 		$format = '%Y-%m-%d';
 		$attribs = (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="18" ';
 		
- 		return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
+ 		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
+ 		return $this->calendar($value, $fieldname, $element_id, $format, $attribs);
 	}
+	
+	
+	function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = null)
+	{
+		JHTML::_('behavior.calendar'); //load the calendar behavior
+
+		if (is_array($attribs)) {
+			$attribs = JArrayHelper::toString( $attribs );
+		}
+		$document =& JFactory::getDocument();
+		$document->addScriptDeclaration('window.addEvent(\'domready\', function() {Calendar.setup({
+        inputField     :    "'.$id.'",     // id of the input field
+        ifFormat       :    "'.$format.'",      // format of the input field
+        button         :    "'.$id.'_img",  // trigger for the calendar (button ID)
+        align          :    "Tl",           // alignment (defaults to "Bl")
+        singleClick    :    true
+    });});');
+
+		return '<input type="text" name="'.$name.'" id="'.$id.'" value="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'" '.$attribs.' />'.
+				 '<img class="calendar" src="'.JURI::root(true).'/templates/system/images/calendar.png" alt="calendar" id="'.$id.'_img" />';
+	}
+
 }
