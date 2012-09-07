@@ -2939,9 +2939,12 @@ class ParentClassItem extends JModel
 								$item->attribs->set($p->fieldname, null);
 						}
 					} else {
-						foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
-							if (isset($p->_attributes['name']))
-								$item->attribs->set($p->_attributes['name'], null);
+						if ( !empty($tmpl_params->_xml['_default']) )  // check if parameters group is empty
+						{
+							foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
+								if (isset($p->_attributes['name']))
+									$item->attribs->set($p->_attributes['name'], null);
+							}
 						}
 					}
 				}

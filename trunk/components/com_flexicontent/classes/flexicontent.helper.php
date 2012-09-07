@@ -2873,6 +2873,30 @@ class FLEXIUtilities
 		}
 		return $value;
 	}
+	
+	/**
+	 * Suppresses given plugins (= prevents them from triggering)
+	 *
+	 * @return void
+	 * @since 1.5
+	 */
+	function suppressPlugins( $name_arr, $action ) {
+		static $plgs = array();
+		
+		foreach	($name_arr as $name)
+		{
+			if (!isset($plgs[$name])) {
+				JPluginHelper::importPlugin('content', $name);
+				$plgs[$name] = JPluginHelper::getPlugin('content', $name);
+			}
+			if ($plgs[$name] && $action=='suppress') {
+				$plgs[$name]->type = '_suppress';
+			}
+			if ($plgs[$name] && $action=='restore') {
+				$plgs[$name]->type = 'content';
+			}
+		}
+	}
 }
 
 
