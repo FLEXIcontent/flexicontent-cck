@@ -1,15 +1,19 @@
 <?php
 /**
- * @version		$Id: pagination.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla.Framework
- * @subpackage	HTML
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant
- * to the GNU General Public License, and as distributed it includes or
- * is derivative of works licensed under the GNU General Public License or
- * other free or open source software licenses.
- * See COPYRIGHT.php for copyright notices and details.
+ * @version 1.5 stable $Id: controller.php 1433 2012-08-13 22:20:28Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details.
  */
 
 // Check to ensure this file is within the rest of the framework
@@ -33,8 +37,7 @@ class FCPagination extends JPagination
 	 * @return	string	Pagination result set counter string
 	 * @since	1.5
 	 */
-	function getResultsCounter()
-	{
+	function getResultsCounter() {
 		// Initialize variables
 		$html = null;
 		$fromResult = $this->limitstart + 1;
@@ -69,28 +72,33 @@ class FCPagination extends JPagination
 	 *
 	 * @since	1.5
 	 */
-	public function _buildDataObject()
+	// ******************************************************************************************************
+	// CAUSES PROBLEM WITH SH404SEF as SH404SEF and other SEF components have custom pagination link creation
+	// ******************************************************************************************************
+	/*public function _buildDataObject()
 	{
 		$uri = clone( JFactory::getURI() );
 		$uri->delVar('limitstart');
 		$uri->delVar('start');
+		$uri->delVar('limit');
 		$uri->delVar('format');
 		$uri->delVar('lang');
 		
+		// Build the additional URL parameters string.
 		$uri_vars = $uri->getQuery($toArray = true);
-		
-		$link = '';
-		if ( count($uri_vars) ) {
+		if ( count($uri_vars) )
+		{
 			foreach ($uri_vars AS $varname => $var_value) {
 				$varvalue = JRequest::getString($varname, '', 'request');
 				$uri->setVar($varname, $varvalue);
 			}
-			$link = $uri->toString();
 		}
+		$link = $uri->toString();
+		$vchar = count($uri_vars) ? '&' : '?';
 
 		// Initialise variables.
 		$data = new stdClass;
-
+		
 		$data->all	= new JPaginationObject(JText::_('View All'));
 		if (!$this->_viewall)
 		{
@@ -109,11 +117,12 @@ class FCPagination extends JPagination
 			// Set the empty for removal from route
 			//$page = $page == 0 ? '' : $page;
 			
-			$start_str = '';
-			$previous_str = ($page  || $link=='') ? "&limitstart=".$page : "";
+			$start_str = "";
+			$previous_str = ($page > 2 || $link=='') ? $vchar."limitstart=".$page : "";
+			$previous_str .= ($page > 2 || $link=='') ? "&limit=".$this->limit : "";
 			
 			$data->start->base = '0';
-			$data->start->link = JRoute::_($link);
+			$data->start->link = JRoute::_($link.$start_str);
 			$data->previous->base = $page;
 			$data->previous->link = JRoute::_($link.$previous_str);
 		}
@@ -126,9 +135,11 @@ class FCPagination extends JPagination
 		{
 			$next = $this->get('pages.current') * $this->limit;
 			$end = ($this->get('pages.total') - 1) * $this->limit;
-
-			$next_str = ($next || $link=='') ? "&limitstart=".$next : "";
-			$end_str  = ($end  || $link=='') ? "&limitstart=".$end : "";
+			
+			$next_str = ($next || $link=='') ? $vchar."limitstart=".$next : "";
+			$next_str .= ($next || $link=='') ? "&limit=".$this->limit : "";
+			$end_str  = ($end  || $link=='') ? $vchar."limitstart=".$end : "";
+			$end_str .= ($end || $link=='') ? "&limit=".$this->limit : "";
 			
 			$data->next->base = $next;
 			$data->next->link	= JRoute::_($link.$next_str);
@@ -147,12 +158,14 @@ class FCPagination extends JPagination
 			$data->pages[$i] = new JPaginationObject($i);
 			if ($i != $this->get('pages.current') || $this->_viewall)
 			{
-				$offset_str = ($offset || $link=='') ? "&limitstart=".$offset : "";
+				$offset_str = ($offset || $link=='') ? $vchar."limitstart=".$offset : "";
+				$offset_str .= ($offset || $link=='') ? "&limit=".$this->limit : "";
+				
 				$data->pages[$i]->base = $offset;
 				$data->pages[$i]->link = JRoute::_($link.$offset_str);
 			}
 		}
 		return $data;
-	}
+	}*/
 	
 }
