@@ -269,6 +269,11 @@ class FlexicontentViewItems extends JView
 		// Anyway these events are usually not very time consuming, so lets trigger all of them ???
 		JPluginHelper::importPlugin('content');
 		
+		// Suppress some plugins from triggering for compatibility reasons, e.g.
+		// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
+		$suppress_arr = array('jcomments', 'jom_comment_bot');
+		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
+		
 		// Do some compatibility steps, Set the view and option to 'article' and 'com_content'
 		JRequest::setVar('view', 'article');
 		JRequest::setVar('option', 'com_content');
@@ -292,6 +297,9 @@ class FlexicontentViewItems extends JView
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
 	  JRequest::setVar('view', FLEXI_ITEMVIEW);
 	  JRequest::setVar('option', 'com_flexicontent');
+		
+		// Restore suppressed plugins
+		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
 		
 		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
 		$item->fields['text']->display = & $item->text;

@@ -325,6 +325,11 @@ class FlexicontentFields
 		
 		if ($field->parameters->get('trigger_onprepare_content', 0))
 		{
+			// Suppress some plugins from triggering for compatibility reasons, e.g.
+			// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
+			$suppress_arr = array('jcomments', 'jom_comment_bot');
+			FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
+		
 			$field->text = isset($field->{$method}) ? $field->{$method} : '';
 			$field->title = $item->title;
 			// need now to reduce the scope through a parameter to avoid conflicts
@@ -377,6 +382,9 @@ class FlexicontentFields
 			
 			$field->id = $field->fieldid;
 			$field->{$method} = $field->text;
+			
+			// Restore suppressed plugins
+			FLEXIUtilities::suppressPlugins( $suppress_arr,'restore' );
 		}
 	}
 
