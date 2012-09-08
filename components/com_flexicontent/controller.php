@@ -74,6 +74,20 @@ class FlexicontentController extends JController
 		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
 		$allowunauthorize       = $params->get('allowunauthorize', 0);
 		
+		// Retrieve submit configuration for new items in frontend
+		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
+			$h = $data['submit_conf'];
+			$session 	=& JFactory::getSession();
+			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+			$submit_conf = @ $item_submit_conf[$h] ;
+			
+			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
+			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
+		} else {
+			$autopublished    = 0;
+			$overridecatperms = 0;
+		}
+		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
 			// Retrieve form data these are subject to basic filtering
