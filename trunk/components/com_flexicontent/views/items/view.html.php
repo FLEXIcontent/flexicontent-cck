@@ -489,8 +489,10 @@ class FlexicontentViewItems extends JView
 				// ALTERNATIVE 1
 				//$allowed_cats = FlexicontentHelperPerm::checkUserElementsAccess($user->get('id'), 'core.create', 'category');
 				//$can_create = count($allowed_cats) > 1;
+			} else if ($user->gid >= 25) {
+				$can_create = 1;
 			} else if (FLEXI_ACCESS) {
-				$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
 				$can_create = @$canAdd['content'] || @$canAdd['category'];
 			} else {
 				$can_create	= $user->authorize('com_content', 'add', 'content', 'all');

@@ -234,7 +234,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
 												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<input id="alias" name="alias" class="inputbox required" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
+												<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
 											</div>
 											<?php foreach ($this->row->item_translations as $t): ?>
 												<?php if ($itemlang!=$t->shortcode) : ?>

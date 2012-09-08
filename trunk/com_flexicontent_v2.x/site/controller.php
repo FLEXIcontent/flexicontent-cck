@@ -109,6 +109,7 @@ class FlexicontentController extends JController
 		if(!$isnew) {
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
+				$has_publish = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $model->get('created_by') == $user->get('id'));
 				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 1
 				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
@@ -116,12 +117,16 @@ class FlexicontentController extends JController
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
+				$has_publish = true;
 				$has_edit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+				$has_publish = in_array('publish', $rights) || (in_array('publishown', $rights) && $model->get('created_by') == $user->get('id')) ;
 				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
+				$has_publish = $user->authorize('com_content', 'publish', 'content', 'all');
 				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$has_publish = ($user->gid >= 21);  // At least J1.5 Publisher
 				//$has_edit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
@@ -139,9 +144,11 @@ class FlexicontentController extends JController
 				$not_authorised = !$canAdd;
 				
 				$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
+			} else if ($user->gid >= 25) {
+				$canAdd = 1;
 			} else if (FLEXI_ACCESS) {
-				$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
-				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$canAdd = @$canAdd['content'] || @$canAdd['category'];
 				
 				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
 				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
@@ -162,9 +169,14 @@ class FlexicontentController extends JController
 			return;
 		}
 		
-		// Set state of -NEW- items as "Pending Approval" for user that CANNOT publish
-		if ($isnew && !$canPublish) {
+		// Force state of -NEW- items as "Pending Approval" for user that CANNOT publish, and autopublish via menu item is disabled
+		if ($isnew && !$canPublish && empty($autopublished) ) {
 			$post['state'] = -3;
+		}
+		
+		// Force vstate (version approval) of existing items to not approve for user that CANNOT publish
+		if (!$isnew && !$has_publish) {
+			$post['vstate'] = 1;
 		}
 		
 		// Store the form data into the item and check it in
@@ -200,28 +212,35 @@ class FlexicontentController extends JController
 		// Actions if a content item was created
 		if ( $model->get('id') )
 		{
+			// ******************************************
+			// Get needed flags regarding the saved items
+			// ******************************************
+			$approve_version = 2;
+			$pending_approval_state = -3;
+			
+			$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
+			$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
+			
+			
 			// ********************************************************************************************
 			// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
 			// ********************************************************************************************
-			$is_first_unapproved_revise = false;  // flag
-			
-			if ($post['vstate']!=2) {
-				$items_saved = array();
-				if ($session->has('unapproved_revises', 'flexicontent')) {
-					$unapproved_revises	= $session->get('unapproved_revises', array(), 'flexicontent');
-					$is_first_unapproved_revise = ! isset($unapproved_revises[$model->get('id')]);
-				}
-				//add item to unapproved revises of corresponding session array
-				$unapproved_revises[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-				$session->set('unapproved_revises', $unapproved_revises, 'flexicontent');
+			$is_first_save = false;
+			if ($session->has('saved_fcitems', 'flexicontent')) {
+				$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
+				$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
 			}
+			// Add item to saved items of the corresponding session array
+			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+			
 	
 			// **********************************************************************
 			// If notification EMAIL was not already sent, then create it and send it
 			// **********************************************************************
-			if ( $isnew || $is_first_unapproved_revise )
+			if ( $is_first_save && ($needs_publication_approval || $needs_version_reviewal) )
 			{
-				//Get categories for information mail
+				// Get categories for information mail
 				$query 	= 'SELECT DISTINCT c.id, c.title,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 					. ' FROM #__categories AS c'
@@ -233,7 +252,7 @@ class FlexicontentController extends JController
 	
 				$categories = $db->loadObjectList();
 	
-				//Loop through the categories to create a string
+				// Loop through the categories to create a string
 				$n = count($categories);
 				$i = 0;
 				$catstring = '';
@@ -245,7 +264,7 @@ class FlexicontentController extends JController
 					}
 				}
 	
-				//Get list of admins who receive system mails
+				// Get list of admins who receive system mails
 				$query 	= 'SELECT id, email, name'
 					. ' FROM #__users'
 					. ' WHERE sendEmail = 1';
@@ -265,7 +284,7 @@ class FlexicontentController extends JController
 					$message = new TableMessage($db);
 				}
 	
-				// send email notification to admins
+				// Send email notification to admins
 				foreach ($adminRows as $adminRow) {
 	
 					//Not really needed cause in com_message you can set to be notified about new messages by email
@@ -559,8 +578,10 @@ class FlexicontentController extends JController
 			// ALTERNATIVE 1
 			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 			$not_authorised = !$canAdd;
+		} else if ($user->gid >= 25) {
+			$not_authorised = 0;
 		} else if (FLEXI_ACCESS) {
-			$canAdd = ($user->gid < 25) ? FAccess::checkUserElementsAccess($user->gmid, 'submit') : 1;
+			$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
 			$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
 		} else {
 			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
