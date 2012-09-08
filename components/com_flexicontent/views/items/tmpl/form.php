@@ -281,7 +281,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<div class="fctabber" style=''>
 					<div class="tabbertab" style="padding: 0px;" >
 						<h3> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
-						<input class="inputbox required" style='margin:0px;' type="text" id="alias" name="alias" value="<?php echo $this->escape($this->item->alias); ?>" size="65" maxlength="254" />
+						<input class="inputbox" style='margin:0px;' type="text" id="alias" name="alias" value="<?php echo $this->escape($this->item->alias); ?>" size="65" maxlength="254" />
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
