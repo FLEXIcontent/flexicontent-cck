@@ -36,11 +36,11 @@ if (FLEXI_J16GE) {
 class JElementFlexiusergroup extends JElement
 {
 	/**
-	 * Element name
-	 * @access	protected
+	 * The form field type OR name
+	 * @access	public
 	 * @var		string
 	 */
-	var	$_name = 'Flexiusergroup';
+	public	$_name = 'Flexiusergroup';
 
 	/**
 	 * Method to get the user group field input markup.
@@ -145,10 +145,10 @@ class JElementFlexiusergroup extends JElement
 		if ($initial_size >= count($options) || $initial_size>= $maximize_size) $maximize_link = '';
 		
 		// Initialize some field attributes.
-		$attribs .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
+		$attribs .= ((string) @$this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
 
 		// Initialize JavaScript field attributes.
-		$attribs .= $this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
+		$attribs .= @$this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
 		
 		$classes = '';
 		if ( @$attributes['required'] && @$attributes['required']!='false' ) {

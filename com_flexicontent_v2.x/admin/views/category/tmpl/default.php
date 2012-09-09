@@ -138,6 +138,7 @@ dump($this->row);
 			</td>
 			<td valign="top" width="430" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
+				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');
 				?>
@@ -187,6 +188,7 @@ dump($this->row);
 				<?php
 				$fieldSets = $this->form->getFieldsets('params');
 				foreach ($fieldSets as $name => $fieldSet) :
+					if ($name == 'cat_notifications_conf' && ( !$this->cparams->get('enable_notifications', 0) || !$this->cparams->get('allow_cat_specific_notifications', 0) ) ) continue;
 					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :

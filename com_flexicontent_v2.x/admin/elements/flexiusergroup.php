@@ -36,9 +36,9 @@ if (FLEXI_J16GE) {
 class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 {
 	/**
-	 * The form field type.
-	 *
-	 * @var    string
+	 * The form field type OR name
+	 * @access	protected
+	 * @var		string
 	 */
 	protected $type = 'FLEXIUsergroup';
 
@@ -145,10 +145,10 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		if ($initial_size >= count($options) || $initial_size>= $maximize_size) $maximize_link = '';
 		
 		// Initialize some field attributes.
-		$attribs .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
+		$attribs .= ((string) @$this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
 
 		// Initialize JavaScript field attributes.
-		$attribs .= $this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
+		$attribs .= @$this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
 		
 		$classes = '';
 		if ( @$attributes['required'] && @$attributes['required']!='false' ) {

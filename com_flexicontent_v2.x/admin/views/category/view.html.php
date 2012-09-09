@@ -277,6 +277,7 @@ class FlexicontentViewCategory extends JView
 		$this->assignRef('perms'		, $perms);
 		$this->assignRef('editor'		, $editor);
 		$this->assignRef('tmpls'		, $tmpls);
+		$this->assignRef('cparams'	, $cparams);
 		if (!FLEXI_J16GE)
 			$this->assignRef('pane'		, $pane);
 

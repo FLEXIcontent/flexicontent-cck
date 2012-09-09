@@ -1,18 +1,6 @@
-# Allow all access
-Allow from all
-
-# Deny people from looking at the index and running SSI and CGI
-Options None
-
-# If you do not have PHP4 / PHP5 installed you will
-# need to comment out the directory below to avoid errors:
-php_flag engine off
-
-# If you have PHP3 installed make sure the directive below is
-# enabled:
-#php3_engine off
-
-# This line will redefine the mime type for the most common
-# types of scripts. It will also deliver HTML files as if they
-# are text files:
-AddType text/plain .html .htm .shtml .php .php3 .phtml .phtm .pl .py .cgi 
+# do not allow direct access and also deny scripts
+<FilesMatch ".*">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+OPTIONS -Indexes -ExecCGI
