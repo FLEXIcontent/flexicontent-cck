@@ -102,7 +102,7 @@ class FlexicontentViewUsers extends JView
 		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
 
-		$where = array(); $having = array();
+		$where = array(); $having = array(); $extra_joins = array();
 		if (isset( $search ) && $search!= '')
 		{
 			$searchEscaped = $db->Quote( '%'.$db->getEscaped( $search, true ).'%', false );
@@ -141,17 +141,13 @@ class FlexicontentViewUsers extends JView
 		
 		if ( $filter_type )
 		{
-			if ( $filter_type == 'Public Frontend' )
-			{
-				$where[] = ' a.usertype = \'Registered\' OR a.usertype = \'Author\' OR a.usertype = \'Editor\' OR a.usertype = \'Publisher\' ';
-			}
-			else if ( $filter_type == 'Public Backend' )
-			{
-				$where[] = 'a.usertype = \'Manager\' OR a.usertype = \'Administrator\' OR a.usertype = \'Super Administrator\' ';
-			}
-			else
-			{
-				$where[] = 'a.usertype = LOWER( '.$db->Quote($filter_type).' ) ';
+			if ( !FLEXI_J16GE ) {
+				if ( $filter_type == 'Public Frontend' )     $where[] = ' a.usertype = \'Registered\' OR a.usertype = \'Author\' OR a.usertype = \'Editor\' OR a.usertype = \'Publisher\' ';
+				else if ( $filter_type == 'Public Backend' ) $where[] = 'a.usertype = \'Manager\' OR a.usertype = \'Administrator\' OR a.usertype = \'Super Administrator\' ';
+				else                                         $where[] = 'a.usertype = LOWER( '.$db->Quote($filter_type).' ) ';
+			} else {
+				// Added as right join, see query bellow
+				$extra_joins[] = ' RIGHT JOIN #__user_usergroup_map AS ug ON ug.user_id = a.id AND ug.group_id='.$filter_type;
 			}
 		}
 		if ( $filter_logged == 1 )
@@ -199,6 +195,7 @@ class FlexicontentViewUsers extends JView
 		$orderby = ' ORDER BY '. $filter_order .' '. $filter_order_Dir;
 		$where = ( count( $where ) ? ' WHERE (' . implode( ') AND (', $where ) . ')' : '' );
 		$having = ( count( $having ) ? ' HAVING (' . implode( ') AND (', $having ) . ')' : '' );
+		$extra_joins = ( count( $extra_joins ) ? implode( ' ', $extra_joins ) : '' );
 		
 		// Do main query to get the authors
 		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*, COUNT(i.id) as itemscount'
@@ -209,6 +206,7 @@ class FlexicontentViewUsers extends JView
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_aro_groups AS g ON g.id = gm.group_id' : '')
 			. ' LEFT JOIN #__flexicontent_authors_ext AS ue ON a.id = ue.user_id'
 			. ' LEFT JOIN #__content AS i ON i.created_by = a.id '
+			. $extra_joins
 			. $filter
 			. $where
 			. ' GROUP BY a.id'

@@ -104,6 +104,7 @@ class FlexicontentControllerusers extends FlexicontentController
 			$isSuperAdmin = $me->get( 'gid' ) == 25;  //$this_group == 'super administrator';
 			$isAdmin			= $me->get( 'gid' ) == 24;  //$this_group == 'administrator'
 		}
+		$saving_myself = $user->id==$me->id;
 
 		$post = JRequest::get('post');
 		$data = FLEXI_J16GE ? $post['jform'] : $post;
@@ -133,9 +134,10 @@ class FlexicontentControllerusers extends FlexicontentController
 
 		
 		// Check if we allowed to block/unblock the user
-		if ( $user->id && ! $this->block($check_uids=$user->id, $user->get('block') ? 'block' : 'unblock' ) )
-		{
-			return $this->execute('edit');
+		$check_blocking = !$saving_myself || ($saving_myself && $data['block']);
+		if ( $user->id && $check_blocking) {
+			$can_block_unblock = $this->block($check_uids=$user->id, $data['block'] ? 'block' : 'unblock' ) ;
+			if ( !$can_block_unblock ) return $this->execute('edit');
 		}
 		
 		// Are we dealing with a new user which we need to create?
@@ -236,7 +238,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		}
 
 		// If updating self, load the new user object into the session
-		if ($user->get('id') == $me->get('id'))
+		// TODO: implement this for J2.5
+		if ( !FLEXI_J16GE && $saving_myself)
 		{
 			// Get an ACL object
 			$acl = &JFactory::getACL();
@@ -268,7 +271,6 @@ class FlexicontentControllerusers extends FlexicontentController
 
 			$session = &JFactory::getSession();
 			$session->set('user', $user);
-			
 		}
 		
 		
@@ -407,7 +409,7 @@ class FlexicontentControllerusers extends FlexicontentController
 			$block = JRequest::getVar('task') == 'block';
 		} else {
 			$cid = is_array($check_uids) ? $check_uids : array($check_uids);
-			$block = $check_task;
+			$block = $check_task == 'block';
 		}
 		
 		if (count( $cid ) < 1) {
