@@ -47,10 +47,11 @@ defined('_JEXEC') or die('Restricted access');
 							?>
 						</td>
 					</tr>
-				</table>			
+				</table>
 			</td>
 			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php
+				echo JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS');
 				$title = JText::_( 'FLEXI_PARAMETERS' );
 				echo $this->pane->startPane( 'det-pane' );
 				echo $this->pane->startPanel( $title, "params-page" );
@@ -60,6 +61,7 @@ defined('_JEXEC') or die('Restricted access');
 				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 				
 				echo $this->form->render('params', 'themes');
+				
 				foreach ($this->tmpls as $tmpl) {
 					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );

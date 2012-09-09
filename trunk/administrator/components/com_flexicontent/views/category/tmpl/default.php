@@ -135,6 +135,7 @@ dump($this->row);
 			</td>
 			<td valign="top" width="430" style="padding: 7px 0 0 5px">
 				<?php
+				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
 				$title = JText::_( 'FLEXI_ACCESS' );
 				echo $this->pane->startPane( 'det-pane' );
 				if (!FLEXI_ACCESS) :
@@ -206,6 +207,15 @@ dump($this->row);
 				echo $this->pane->startPanel( $title, "params-rss_feeds" );
 				echo $this->form->render('params', 'rss_feeds');
 				echo $this->pane->endPanel();
+				
+				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('allow_cat_specific_notifications', 0) )
+				{
+					$title = JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_ASSIGNED_ITEM_CONF' );
+					echo $this->pane->startPanel( $title, "params-notifications_conf" );
+					echo $this->form->render('params', 'notifications_conf');
+					echo $this->pane->endPanel();
+				}
+				
 				
 				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 				echo $this->form->render('params', 'templates')."<br/>";

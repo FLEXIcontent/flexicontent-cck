@@ -48,10 +48,11 @@ defined('_JEXEC') or die('Restricted access');
 							<?php echo $this->form->getInput('access'); ?>
 						</td>
 					</tr>
-				</table>			
+				</table>
 			</td>
 			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php
+				echo JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$fieldSets = $this->form->getFieldsets('attribs');
 				foreach ($fieldSets as $name => $fieldSet) :
@@ -109,11 +110,10 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 		</tr>
 	</table>
+
 <?php echo JHTML::_( 'form.token' ); ?>
-
-<?php echo $this->form->getInput('id'); ?>
-
 <input type="hidden" name="option" value="com_flexicontent" />
+<?php echo $this->form->getInput('id'); ?>
 <input type="hidden" name="controller" value="types" />
 <input type="hidden" name="view" value="type" />
 <input type="hidden" name="task" value="" />
