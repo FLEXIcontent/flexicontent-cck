@@ -105,7 +105,17 @@ function submitform(pressbutton)
 function delFilter(name)
 {
 	var myForm = $('adminForm');
-	$(name).setProperty('value', '');
+	if ($(name).type=='checkbox')
+		$(name).checked = '';
+	else
+		$(name).setProperty('value', '');
+}
+
+function delAllFilters() {
+	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
+	delFilter('filter_cats'); delFilter('filter_authors'); delFilter('filter_id');
+	delFilter('startdate'); delFilter('enddate');
+	<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>
 }
 
 window.addEvent('domready', function(){
@@ -403,21 +413,35 @@ window.addEvent('domready', function() {
 			</td>
 		</tr>
 
+
 		<tr>
 			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<?php if (isset($this->lists['filter_stategrp'])) : ?>
 					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
 				<?php endif; ?>
-				<span style="float:right;">
-					<input type="button" class="button" onclick="delFilter('search');delFilter('filter_type');delFilter('filter_state');delFilter('filter_cats');delFilter('filter_authors');delFilter('filter_id');delFilter('startdate');delFilter('enddate');<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+
+				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
+				<?php
+					$tz_string = JFactory::getConfig()->getValue('config.offset');
+					$tz = new DateTimeZone( $tz_string );
+					$tz_offset = $tz->getOffset(new JDate()) / 3600;
+					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+					$tz_info .= ' ('.$tz_string.')';
+					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
+				?>
+				</div>
+
 <!--
+				<span style="float:right;">
+					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+					
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
 					<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
--->
 				</span>
+-->
 			</td>
 		</tr>
 	</thead>
@@ -438,7 +462,8 @@ window.addEvent('domready', function() {
 		else
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
 		
-		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
+		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		{
 			$row = $this->rows[$i];
 
 			if (FLEXI_J16GE) {
