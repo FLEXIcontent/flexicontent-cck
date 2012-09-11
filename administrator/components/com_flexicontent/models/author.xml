@@ -3,6 +3,7 @@
 	<name>Author User Type</name>
 	<params group="author_ext_config" addpath="/administrator/components/com_flexicontent/elements">
 		<param name="authordescr_itemid" type="item" default="" label="FLEXI_AUTHOR_DETAILS_ITEM" description="FLEXI_AUTHOR_DETAILS_ITEM_DESC" />
+		<param name="max_cat_assign" type="text" default="0" label="Maximum categories per item" description="Maximum number of categories the user can assign to an item" />		
 		<param name="override_currcatconf" type="list" default="1" label="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG" description="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

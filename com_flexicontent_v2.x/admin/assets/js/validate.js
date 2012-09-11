@@ -11,7 +11,11 @@ Object.append(Browser.Features, {
 	})()
 });
 
+var flexi_j16ge = 1;
 var tab_focused;
+var max_cat_assign_fc = 0;
+var existing_cats_fc  = [];
+var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
 
 /**
  * Unobtrusive Form Validation library
@@ -147,15 +151,18 @@ var JFormValidator = new Class({
 				if (!value) {
 					
 					// Retrieve selected values for secondary categories
+					var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
+					var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
+					
 					if(MooTools.version>="1.2.4") {
-						//var values = $('jform_cid').getSelected();  // does not work in old template form overrides with no id parameter
-						var values = $$(document.getElementsByName("jform[cid][]"))[0].getSelected();
+						//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
+						var values = $$(document.getElementsByName(field_name))[0].getSelected();
 						values = values.map( function(g) { return g.get('value'); } );
 					} else {
-						//values = $('cid').getValue();  // does not work in old template form overrides with no id parameter
-						var values = $$(document.getElementsByName("cid[]"))[0].getValue();
+						//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
+						var values = $$(document.getElementsByName(field_name))[0].getValue();
 						//  ** Alternative code **
-						//var values = $('cid').getChildren().filter( function(g) { return g.selected; } );
+						//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
 						//values = values.map( function(g) { return g.getProperty('value'); } );
 					}
 					
@@ -165,6 +172,44 @@ var JFormValidator = new Class({
 						return true;
 					}
 					return false;
+				}
+				return true;
+			}
+		);
+		
+		this.setHandler('fccats',
+			function (el) {
+				//var value = el.get('value');
+				
+				// Retrieve selected values for secondary categories
+				var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
+				var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
+					
+				if(MooTools.version>="1.2.4") {
+					//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
+					var values = $$(document.getElementsByName(field_name))[0].getSelected();
+					values = values.map( function(g) { return g.get('value'); } );
+				} else {
+					//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
+					var values = $$(document.getElementsByName(field_name))[0].getValue();
+					//  ** Alternative code **
+					//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
+					//values = values.map( function(g) { return g.getProperty('value'); } );
+				}
+				
+				//console.log(values);
+				//console.log(existing_cats_fc);
+				
+				// If exactly one secondary category was selected then set it as primary
+				if (max_cat_assign_fc && values.length > max_cat_assign_fc) {
+					var existing_only = 1;
+					for (var i = 0; i < values.length; i++) {
+						existing_only = existing_only && ( jQuery.inArray(values[i], existing_cats_fc) >= 0 );
+					}
+					if (!existing_only) {
+						alert(max_cat_overlimit_msg_fc+max_cat_assign_fc);
+						return false;
+					}
 				}
 				return true;
 			}
@@ -263,8 +308,10 @@ var JFormValidator = new Class({
 		
 		// We try to fill-in automatically the Primary Category Select Field, when it is empty
 		var auto_filled = new Object();
-		auto_filled['catid'] = 1;
-		auto_filled['jform[catid]'] = 1;
+		if (flexi_j16ge)
+			auto_filled['jform[catid]'] = 1;
+		else
+			auto_filled['catid'] = 1;
 		
 		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
@@ -307,7 +354,11 @@ var JFormValidator = new Class({
 		tab_focused = false; // global variable defined above, we use this to focus the first tab that contains required field
 
 		// Validate form fields
-		var elements = form.getElements('fieldset').concat(Array.from(form.elements));
+		if (flexi_j16ge)
+			var elements = form.getElements('fieldset').concat(Array.from(form.elements));
+		else
+			var elements = form.elements;
+		
 		for (var i=0;i < elements.length; i++) {
 			if (this.validate(elements[i]) == false) {
 				tab_focused = true;
@@ -373,6 +424,12 @@ var JFormValidator = new Class({
 });
 
 document.formvalidator = null;
-window.addEvent('domready', function(){
-	document.formvalidator = new JFormValidator();
-});
+if(MooTools.version>="1.2.4") {
+	window.addEvent('domready', function(){
+		document.formvalidator = new JFormValidator();
+	});
+} else {
+	Window.onDomReady(function(){
+		document.formvalidator = new JFormValidator();
+	});
+}
