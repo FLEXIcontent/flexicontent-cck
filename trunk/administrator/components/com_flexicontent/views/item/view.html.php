@@ -327,21 +327,37 @@ class FlexicontentViewItem extends JView
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
+		
+		// Retrieve author configuration
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+		if ( $authorparams = $db->loadResult() )
+			$authorparams = new JParameter($authorparams);
+		
+		// Get author's maximum allowed categories per item and set js limitation
+		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+		$document->addScriptDeclaration('
+			max_cat_assign_fc = '.$max_cat_assign.';
+			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
+			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').'";
+		');
+		
 		$actions_allowed = array('core.create');
 		// Multi-category form field, for user allowed to use multiple categories
-		$class = 'multiple="multiple" size="20" class="mcat"';
+		$class = $max_cat_assign ? " validate-fccats mcat" : "mcat";
+		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
+		
 		if (FLEXI_J16GE) {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $class, true, true,	$actions_allowed);
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
 		} else {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $class, true, true,	$actions_allowed);
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
 		}
 
 		// Main category form field
-		$class = 'class="scat validate-catid"';
+		$attribs = 'class="scat validate-catid"';
 		if (FLEXI_J16GE) {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'jform[catid]', $row->catid, 2, $class, true, true, $actions_allowed);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'jform[catid]', $row->catid, 2, $attribs, true, true, $actions_allowed);
 		} else {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, $class, true, true, $actions_allowed);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, $attribs, true, true, $actions_allowed);
 		}
 		
 		//build languages list

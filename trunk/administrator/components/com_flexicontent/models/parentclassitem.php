@@ -1401,8 +1401,39 @@ class ParentClassItem extends JModel
 		
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
+			
 			$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
+			
+		// Check more than allowed categories
+		} else {
+			
+			// Retrieve author configuration
+			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+			if ( $authorparams = $db->loadResult() )
+				$authorparams = new JParameter($authorparams);
+			
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			
+			// Verify category limitation for current author
+			if ( $max_cat_assign ) {
+				if ( count($cats) > $max_cat_assign ) {
+					if ( count($cats) <= count($item->categories) ) {
+						$existing_only = true;
+						// Maximum number of categories is exceeded, but do not abort if only using existing categories
+						foreach ($cats as $newcat) {
+							$existing_only = $existing_only && in_array($newcat, $item->categories);
+						}
+					} else {
+						$existing_only = false;
+					}
+					if (!$existing_only) {
+						$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').$max_cat_assign);
+						return false;
+					}
+				}
+			}
 		}
 		
 		// Set back the altered categories and tags to the form data

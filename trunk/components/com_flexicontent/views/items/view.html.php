@@ -807,8 +807,11 @@ class FlexicontentViewItems extends JView
 		global $globalcats;
 		$lists = array();
 		
-		$user = & JFactory::getUser();	// get current user
-		$item = & $this->get('Item');		// get the item from the model
+		$db       = & JFactory::getDBO();
+		$user     = & JFactory::getUser();	// get current user
+		$item     = & $this->get('Item');		// get the item from the model
+		$document = & JFactory::getDocument();
+		
 		$categories = $globalcats;			// get the categories tree
 		$selectedcats = & $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
 		$actions_allowed = array('core.create');					// user actions allowed for categories
@@ -819,12 +822,27 @@ class FlexicontentViewItems extends JView
 		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
-		if ($perms['multicat']) {
-			$class = 'class="validate" multiple="multiple" size="8"';
+		if ($perms['multicat'])
+		{
+			// Retrieve author configuration
+			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+			if ( $authorparams = $db->loadResult() )
+				$authorparams = new JParameter($authorparams);
+		
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			$document->addScriptDeclaration('
+				max_cat_assign_fc = '.$max_cat_assign.';
+				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
+				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').'";
+			');
+			
+			$class = $max_cat_assign ? "mcat validate-fccats" : "validate mcat";
+			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
 			if (FLEXI_J16GE) {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $class, true, true,	$actions_allowed);
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
 			} else {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $class, true, true,	$actions_allowed);
+				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
 			}
 		}
 		
@@ -842,11 +860,11 @@ class FlexicontentViewItems extends JView
 		} else {
 			$class .= ' required';
 		}
-		$class = 'class="'.$class.'"';
+		$attribs = 'class="'.$class.'"';
 		if (FLEXI_J16GE) {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'jform[catid]', $item->catid, 2, $class, true, true, $actions_allowed);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'jform[catid]', $item->catid, 2, $attribs, true, true, $actions_allowed);
 		} else {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'catid', $item->catid, 2, $class, true, true, $actions_allowed);
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'catid', $item->catid, 2, $attribs, true, true, $actions_allowed);
 		}
 		
 		if (!FLEXI_J16GE) {
@@ -1022,8 +1040,8 @@ class FlexicontentViewItems extends JView
 				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="required" ', $check_published=true, $check_perms=false);
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
-				$class = 'class="validate" multiple="multiple" size="8"';
-				$mo_cats = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $class, $check_published=true, $check_perms=false);
+				$attribs = 'class="validate" multiple="multiple" size="8"';
+				$mo_cats = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
 				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="validate-catid" ', $check_published=true, $check_perms=false);
 				break;
 		}
