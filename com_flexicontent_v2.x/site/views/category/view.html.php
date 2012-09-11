@@ -187,10 +187,15 @@ class FlexicontentViewCategory extends JView
 		else
 			$params->def('show_page_title', $params->get('show_page_heading'));  // J2.5: to offer compatibility with old custom templates or template overrides
 		
-		// Prevent showing page heading if some as category title
+		// Prevent showing page heading if IT IS same as category title
 		if ( $params->get('page_heading') == $category->title && $params->get('show_cat_title', 1) )
 			$params->set('show_page_heading', 0);
 		
+		// if above did not set the parameter, then default to NOT showing page heading (title)
+		$params->def('show_page_heading', 0);
+		$params->def('show_page_title', 0);
+		
+		// ... the page heading text
 		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
 		
