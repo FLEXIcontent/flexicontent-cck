@@ -74,20 +74,6 @@ class FlexicontentController extends JController
 		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
 		$allowunauthorize       = $params->get('allowunauthorize', 0);
 		
-		// Retrieve submit configuration for new items in frontend
-		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
-			$h = $data['submit_conf'];
-			$session 	=& JFactory::getSession();
-			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-			$submit_conf = @ $item_submit_conf[$h] ;
-			
-			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
-			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
-		} else {
-			$autopublished    = 0;
-			$overridecatperms = 0;
-		}
-		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
 			// Retrieve form data these are subject to basic filtering
@@ -119,6 +105,20 @@ class FlexicontentController extends JController
 		// PERFORM ACCESS CHECKS, NOTE: we need to check access again,
 		// despite having checked them on edit form load, because user may have tampered with the form ... 
 		$isnew = ((int) $post['id'] < 1);
+		
+		// Retrieve submit configuration for new items in frontend
+		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
+			$h = $data['submit_conf'];
+			$session 	=& JFactory::getSession();
+			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+			$submit_conf = @ $item_submit_conf[$h] ;
+			
+			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
+			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
+		} else {
+			$autopublished    = 0;
+			$overridecatperms = 0;
+		}
 
 		if(!$isnew) {
 			if (FLEXI_J16GE) {
@@ -1351,6 +1351,62 @@ class FlexicontentController extends JController
 		JRequest::setVar('view', 'search');
 		parent::display(true);
 	}
+	
+	/*
+	 * Method to retrieve the configuration for the Content Submit/Update notifications
+	 */
+	protected function & _getNotificationsConf(&$params)
+	{
+		static $nConf = null;
+		if ($nConf) return $nConf;
+		
+		$db    = & JFactory::getDBO();
+		$model = & $this->getModel(FLEXI_ITEMVIEW);
+		
+		$nConf = new stdClass();
+		
+		$nConf->enable_notifications   = $params->get('enable_notifications', 0);
+		
+		$nConf->usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
+		$nConf->userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new', array()) );
+		$nConf->usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
+		$nConf->userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending', array()) );
+		
+		$nConf->usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
+		$nConf->userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing', array()) );
+		$nConf->usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
+		$nConf->userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal', array()) );
+		
+		$cats = $model->get('categories');
+		$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
+		$db->setQuery( $query );
+		$mcats_params = $db->loadResultArray();
+		foreach ($mcats_params as $cat_params) {
+			$cat_params = new JParameter($cat_params);
+			$cats_usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_new', array()) );
+			$cats_userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_new', array()) );
+			$cats_usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_new_pending', array()) );
+			$cats_userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_new_pending', array()) );
+			
+			$cats_usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_existing', array()) );
+			$cats_userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_existing', array()) );
+			$cats_usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_existing_reviewal', array()) );
+			$cats_userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_existing_reviewal', array()) );
+			
+			$nConf->usergrps_notify_new         = array_unique(array_merge($nConf->usergrps_notify_new,         $cats_usergrps_notify_new));
+			$nConf->userlist_notify_new         = array_unique(array_merge($nConf->userlist_notify_new,         $cats_userlist_notify_new));
+			$nConf->usergrps_notify_new_pending = array_unique(array_merge($nConf->usergrps_notify_new_pending, $cats_usergrps_notify_new_pending));
+			$nConf->userlist_notify_new_pending = array_unique(array_merge($nConf->userlist_notify_new_pending, $cats_userlist_notify_new_pending));
+			
+			$nConf->usergrps_notify_existing          = array_unique(array_merge($nConf->usergrps_notify_existing,          $cats_usergrps_notify_existing));
+			$nConf->userlist_notify_existing          = array_unique(array_merge($nConf->userlist_notify_existing,          $cats_userlist_notify_existing));
+			$nConf->usergrps_notify_existing_reviewal = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal, $cats_usergrps_notify_existing_reviewal));
+			$nConf->userlist_notify_existing_reviewal = array_unique(array_merge($nConf->userlist_notify_existing_reviewal, $cats_userlist_notify_existing_reviewal));
+		}
+		
+		return $nConf;
+	}
+
 	
 	function doPlgAct() {
 		FLEXIUtilities::doPlgAct();
