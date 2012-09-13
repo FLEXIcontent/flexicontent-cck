@@ -1166,8 +1166,14 @@ class ParentClassItem extends JModelAdmin
 			$public_accesslevel  = !FLEXI_J16GE ? 0 : 1;
 			$default_accesslevel = FLEXI_J16GE ? $app->getCfg( 'access', $public_accesslevel ) : $public_accesslevel;
 			
-			$draft_state = -4;  $pending_approval_state = -3;
-			$default_state = $app->isAdmin() ? $cparams->get('new_item_state', $draft_state) : $pending_approval_state;
+			// Decide default publication state. NOTE this will only be used if user has publish privilege, otherwise items
+			// will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
+			$draft_state = -4;  $pubished_state = 1;  //$pending_approval_state = -3;
+			if ( $app->isAdmin() ) {
+				$default_state = $cparams->get('new_item_state', $draft_state);  // Use the configured setting for backend items
+			} else {
+				$default_state = $pubished_state;  // Use published state for frontend items (for authors that can publish)
+			}
 			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already

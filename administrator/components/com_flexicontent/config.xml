@@ -349,10 +349,14 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</param>
+			<param name="allowdisablingcomments_fe" type="radio" default="0" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="usemetadata_fe" type="radio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
-				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
+				<option value="2">FLEXI_MENU_YES_ALL</option>
 			</param>
 			<param name="usepublicationdetails_fe" type="radio" default="1" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>

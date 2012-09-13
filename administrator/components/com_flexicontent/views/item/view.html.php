@@ -306,24 +306,28 @@ class FlexicontentViewItem extends JView
 				}
 			}
 			
-			//build state list
+			// build state list
+			$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
+			$state[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_UNPUBLISHED' ) );
+			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
 			$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) ); 
 			$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-			$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
-			$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-			$state[] = JHTML::_('select.option',  -1, JText::_( 'FLEXI_ARCHIVED' ) );
+			$state[] = JHTML::_('select.option',  FLEXI_J16GE ? 2:-1, JText::_( 'FLEXI_ARCHIVED' ) );
+			
 			if(!$canPublish && !$canPublishOwn)
 				$row->state = $row->state ? $row->state : -4;
 			$state_fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
 			$lists['state'] = JHTML::_('select.genericlist',   $state, $state_fieldname, '', 'value', 'text', $row->state );
 			
-			//build version state list
+			// build version approval list
+			$vstate = array();
 			$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) ); 
+			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
 			
-			$vstate_fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
-			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $vstate_fieldname, '', 'value', 'text', 2 );
+			$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
+			$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
+			$attribs = ' style ="float:left!important;" ';
+			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
