@@ -387,7 +387,7 @@
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="vote_conter" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
+			<param name="vote_counter" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
@@ -409,7 +409,7 @@
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="vote_conter_feat" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
+			<param name="vote_counter_feat" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>

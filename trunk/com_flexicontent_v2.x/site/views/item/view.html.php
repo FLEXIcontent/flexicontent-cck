@@ -608,7 +608,7 @@ class FlexicontentViewItem extends JView
 		$perms = $this->_getItemPerms($item);
 
 		// Get the edit lists
-		$lists = $this->_buildEditLists($perms);
+		$lists = $this->_buildEditLists($perms, $params);
 		
 		// Get number of subscribers
 		$subscribers 	= & $this->get( 'SubscribersCount' );
@@ -807,7 +807,7 @@ class FlexicontentViewItem extends JView
 	 *
 	 * @since 1.0
 	 */
-	function _buildEditLists($perms)
+	function _buildEditLists(& $perms, & $params)
 	{
 		global $globalcats;
 		$lists = array();
@@ -873,24 +873,44 @@ class FlexicontentViewItem extends JView
 		}
 		
 		if (!FLEXI_J16GE) {
+			// build state list
 			$state = array();
 			$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
 			$state[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
 			$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
 			$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+			$state[] = JHTML::_('select.option',  FLEXI_J16GE ? 2:-1, JText::_( 'FLEXI_ARCHIVED' ) );
 			$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );
+			
+			// build version approval list
+			$vstate = array();
+			$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+			
+			$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
+			$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
+			$attribs = ' style ="float:left!important;" ';
+			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		}
 		
-		$vstate = array();
-		$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-		$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-		if (FLEXI_J16GE) {
-			$lists['vstate'] = JHTML::_('select.genericlist', $vstate, 'jform[vstate]', '', 'value', 'text', 2 );
-		} else {
-			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, 'vstate', '', 'value', 'text', 2 );
+		$disable_comments = array();
+		$disable_comments[] = JHTML::_('select.option', '', JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+		$disable_comments[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_DISABLE' ) );
+		
+		if ( $params->get('allowdisablingcomments_fe') )
+		{
+			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
+			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
+			$isdisabled = !$params->get('comments') && strlen($params->get('comments'));
+			$fieldvalue = $isdisabled ? "0" : "";
+			
+			$fieldname = FLEXI_J16GE ? 'jform[attribs][comments]' : 'params[comments]';
+			$elementid = FLEXI_J16GE ? 'jform_attribs_comments' : 'params_comments';
+			$attribs = FLEXI_J16GE ? ' style ="float:left!important;" ' : '';
+			$lists['disable_comments'] = JHTML::_('select.radiolist', $disable_comments, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
 		}
-
+		
 		// build granular access list
 		if (FLEXI_ACCESS) {
 			if (isset($user->level)) {

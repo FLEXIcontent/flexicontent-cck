@@ -448,6 +448,15 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</div>
 			<?php endif; ?>
 			
+			<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>
+			<div class="flexi_formblock">
+				<label id="jform_attribs_comments-lbl" for="jform_attribs_comments" class="flexi_label hasTip" title="<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>::<?php echo JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' );?>" >
+					<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
+				</label>
+				<?php echo $this->lists['disable_comments']; ?>
+			</div>
+			<?php endif; ?>
+
 			<?php if ( $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) : ?>
 			<div class="flexi_formblock">
 				<label id="jform_notify-lbl" for="jform_notify" class="flexi_label">
@@ -816,6 +825,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		
 		$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 		echo JHtml::_('sliders.panel', JText::_('FLEXI_PARAMETERS') .": ". JText::_($label), $name.'-options');
+		
+		if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced') {
+			echo "This panel should be disabled, because a simple <b>comments disable parameter</b> is used instead";
+			continue;
+		}
 	?>
 		<fieldset class="panelform">
 		<?php

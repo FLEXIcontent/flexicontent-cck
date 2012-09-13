@@ -364,7 +364,7 @@ class modFlexicontentHelper
 					if ($display_voting_feat) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
 						$lists[$ord]['featured'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
-						$lists[$ord]['featured'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get(' vote_conter',1));
+						$lists[$ord]['featured'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1));
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
@@ -486,7 +486,7 @@ class modFlexicontentHelper
 					if ($display_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
 						$lists[$ord]['standard'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
-						$lists[$ord]['standard'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get(' vote_conter',1));
+						$lists[$ord]['standard'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1));
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
@@ -1247,7 +1247,7 @@ class modFlexicontentHelper
 			$catconf->show_default_image = (int)$params->get('currcat_show_default_image', 0);  // parameter not added yet
 			$catconf->readmore	= (int)$params->get('currcat_currcat_readmore', 1);
 			
-			if ($catconf->display && $catconf->fallback_maincat && !$cid && $id) {
+			if ($catconf->fallback_maincat && !$cid && $id) {
 				$query = 'SELECT catid FROM #__content WHERE id = ' . $id;
 				$db->setQuery($query);
 				$cid = $db->loadResult();

@@ -2863,8 +2863,17 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-	function paramToArray($value)
+	function paramToArray($value, $regex = "", $filterfunc = "")
 	{
+		if ($regex) {
+			$value = trim($value);
+			$value = !$value  ?  array()  :  preg_split($regex, $value);
+			print_r($value);
+		}
+		if ($filterfunc) {
+			array_map($filterfunc, $value);
+		}
+		
 		if (FLEXI_J16GE && !is_array($value)) {
 			$value = explode("|", $value);
 			$value = ($value[0]=='') ? array() : $value;

@@ -451,6 +451,15 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</div>
 			<?php endif; ?>
 			
+			<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>
+			<div class="flexi_formblock">
+				<label id="params_comments-lbl" for="params[comments]" class="flexi_label hasTip" title="<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>::<?php echo JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' );?>" >
+					<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
+				</label>
+				<?php echo $this->lists['disable_comments']; ?>
+			</div>
+			<?php endif; ?>
+
 			<?php if ( $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) : ?>
 			<div class="flexi_formblock">
 				<label id="notify-lbl" for="notify" class="flexi_label">
@@ -832,7 +841,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		if ( in_array('advanced', $useitemparams_fe) ) {
 			$title = JText::_('FLEXI_PARAMETERS') .": ". JText::_( 'FLEXI_PARAMETERS_ITEM_ADVANCED' );
 			echo $this->pane->startPanel( $title, "params-advanced" );
-			echo $this->formparams->render('params', 'advanced');
+			if ( $this->params->get('allowdisablingcomments_fe') )
+				echo "This panel should be disabled, because a simple <b>comments disable parameter</b> is used instead";
+			else
+				echo $this->formparams->render('params', 'advanced');
 			echo $this->pane->endPanel();
 		}
 
