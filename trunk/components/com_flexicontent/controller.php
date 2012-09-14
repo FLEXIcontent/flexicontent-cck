@@ -60,12 +60,17 @@ class FlexicontentController extends JController
 		$app     = & JFactory::getApplication();
 		$db      = & JFactory::getDBO();
 		$user    = & JFactory::getUser();
-		$session 	=& JFactory::getSession();
+		$config  = & JFactory::getConfig();
+		$session = & JFactory::getSession();
+		$task	   = JRequest::getVar('task');
 		$model   = & $this->getModel(FLEXI_ITEMVIEW);
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		
-		// Get component parameters and merge into them the type parameters
-		$params  = $app->getParams('com_flexicontent');
+		// Get component parameters and them merge into them the type parameters
+		$params  = new JParameter();
+		$cparams = $app->getParams('com_flexicontent');
+		$params->merge($cparams);
+		
 		$tparams = $model->getTypeparams();
 		$tparams = new JParameter($tparams);
 		$params->merge($tparams);
@@ -106,20 +111,8 @@ class FlexicontentController extends JController
 		// despite having checked them on edit form load, because user may have tampered with the form ... 
 		$isnew = ((int) $post['id'] < 1);
 		
-		// Retrieve submit configuration for new items in frontend
-		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
-			$h = $data['submit_conf'];
-			$session 	=& JFactory::getSession();
-			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-			$submit_conf = @ $item_submit_conf[$h] ;
-			
-			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
-			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
-		} else {
-			$autopublished    = 0;
-			$overridecatperms = 0;
-		}
-
+		
+		// Calculate user's privileges on current content item
 		if(!$isnew) {
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
@@ -183,15 +176,19 @@ class FlexicontentController extends JController
 			return;
 		}
 		
-		// Force state of -NEW- items as "Pending Approval" for user that CANNOT publish, and autopublish via menu item is disabled
-		if ($isnew && !$canPublish && empty($autopublished) ) {
-			$post['state'] = -3;
+		
+		// Get "BEFORE SAVE" categories for information mail
+		$before_cats = array();
+		if ( !$isnew )
+		{
+			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $model->get('id');
+			$db->setQuery( $query );
+			$before_cats = $db->loadObjectList('id');
+			$before_maincat = $model->get('catid');
 		}
 		
-		// Force vstate (version approval) of existing items to not approve for user that CANNOT publish
-		if (!$isnew && !$has_publish) {
-			$post['vstate'] = 1;
-		}
 		
 		// Store the form data into the item and check it in
 		if ( $store_success = $model->store($post) ) {
@@ -219,27 +216,19 @@ class FlexicontentController extends JController
 			}
 		}
 		
+		
 		// Check in model and return if saving has 
 		$model->checkin();
 		if ( !$store_success ) return;
 		
+		
 		// Actions if a content item was created
 		if ( $model->get('id') )
 		{
-			// ******************************************
-			// Get needed flags regarding the saved items
-			// ******************************************
-			$approve_version = 2;
-			$pending_approval_state = -3;
-			
-			$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
-			$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
-			
-			
 			// ********************************************************************************************
 			// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
 			// ********************************************************************************************
-			$is_first_save = false;
+			$is_first_save = true;
 			if ($session->has('saved_fcitems', 'flexicontent')) {
 				$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
 				$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
@@ -248,77 +237,73 @@ class FlexicontentController extends JController
 			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
 			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
 			
-	
-			// **********************************************************************
-			// If notification EMAIL was not already sent, then create it and send it
-			// **********************************************************************
-			if ( $is_first_save && ($needs_publication_approval || $needs_version_reviewal) )
-			{
-				// Get categories for information mail
-				$query 	= 'SELECT DISTINCT c.id, c.title,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-					. ' FROM #__categories AS c'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' WHERE rel.itemid = '.(int) $model->get('id')
-					;
-	
-				$db->setQuery( $query );
-	
-				$categories = $db->loadObjectList();
-	
-				// Loop through the categories to create a string
-				$n = count($categories);
-				$i = 0;
-				$catstring = '';
-				foreach ($categories as $category) {
-					$catstring .= $category->title;
-					$i++;
-					if ($i != $n) {
-						$catstring .= ', ';
-					}
+			
+			// ********************************************
+			// Get categories added / removed from the item
+			// ********************************************
+			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $model->get('id');
+			$db->setQuery( $query );
+			$after_cats = $db->loadObjectList('id');
+			if ( !$isnew ) {
+				$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
+				foreach($cats_added_ids as $cats_added_id) {
+					$cats_added_titles[] = $after_cats[$cats_added_id]->title;
 				}
-	
-				// Get list of admins who receive system mails
-				$query 	= 'SELECT id, email, name'
-					. ' FROM #__users'
-					. ' WHERE sendEmail = 1';
-				$db->setQuery($query);
-				if (!$db->query()) {
-					JError::raiseError( 500, $db->stderr(true));
-					return;
+				
+				$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
+				foreach($cats_removed_ids as $cats_removed_id) {
+					$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
 				}
-				$adminRows = $db->loadObjectList();
-	
-				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
-				if (FLEXI_J16GE) {
-					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'message.php');
-					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'models'.DS.'config.php');
-					$message = new MessagesModelMessage();
-				} else {
-					$message = new TableMessage($db);
-				}
-	
-				// Send email notification to admins
-				foreach ($adminRows as $adminRow) {
-	
-					//Not really needed cause in com_message you can set to be notified about new messages by email
-					//JUtility::sendAdminMail($adminRow->name, $adminRow->email, '', JText::_( 'FLEXI_NEW ITEM' ), $post['title'], $user->get('username'), JURI::base());
-	
-					$msgdata["user_id_to"] = $adminRow->id;
-					$msgdata["subject"] = ($isnew) ? JText::_( 'FLEXI_NEW_ITEM' ) : JText::_( 'FLEXI_ITEM_REVISED' ) ;
-					if ($isnew) {
-						$msgdata["message"] = JText::sprintf('FLEXI_ON_NEW_ITEM', $post['title'], $user->get('username'), $catstring);
-					} else {
-						$msgdata["message"] = JText::sprintf('FLEXI_ON_REVISED_ITEM', $post['title'], $catstring, $user->get('username'));
-					}
-					
-					if (FLEXI_J16GE) {
-						$message->save($msgdata);
-					} else {
-						$message->send($user->get('id'), $adminRow->id, $msgdata["subject"], $msgdata["message"]);
-					}
-				}
+				$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
+				$after_maincat = $model->get('catid');
 			}
+			
+			
+			// *******************************************************************************************************************
+			// We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+			// *******************************************************************************************************************
+			$notify_emails = array();
+			if ( $is_first_save || $cats_altered || $params->get('nf_enable_debug',0) )
+			{
+				// Get needed flags regarding the saved items
+				$approve_version = 2;
+				$pending_approval_state = -3;
+				
+				$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
+				$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
+				
+				// Get notifications configuration and select appropriate emails for current saving case
+				$nConf = & $model->getNotificationsConf($params);
+				//echo "<pre>"; print_r($nConf);
+				
+				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
+				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
+				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+				
+				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
+				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
+				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
+				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
+				//print_r($notify_emails);
+				//exit;
+			}
+			
+			
+			// *****************************************************************************************
+			// If there are emails to notify for current saving case, then send the notifications emails
+			// *****************************************************************************************
+			if ($notify_emails) {
+				// ... we use some strings from administrator part
+				// load english language file for 'com_flexicontent' component then override with current language file
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+				
+				$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
+			}
+			
 			
 			// ******************************************************************************************
 			// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
@@ -1352,61 +1337,6 @@ class FlexicontentController extends JController
 		parent::display(true);
 	}
 	
-	/*
-	 * Method to retrieve the configuration for the Content Submit/Update notifications
-	 */
-	protected function & _getNotificationsConf(&$params)
-	{
-		static $nConf = null;
-		if ($nConf) return $nConf;
-		
-		$db    = & JFactory::getDBO();
-		$model = & $this->getModel(FLEXI_ITEMVIEW);
-		
-		$nConf = new stdClass();
-		
-		$nConf->enable_notifications   = $params->get('enable_notifications', 0);
-		
-		$nConf->usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
-		$nConf->userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new', array()) );
-		$nConf->usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
-		$nConf->userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending', array()) );
-		
-		$nConf->usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
-		$nConf->userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing', array()) );
-		$nConf->usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
-		$nConf->userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal', array()) );
-		
-		$cats = $model->get('categories');
-		$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
-		$db->setQuery( $query );
-		$mcats_params = $db->loadResultArray();
-		foreach ($mcats_params as $cat_params) {
-			$cat_params = new JParameter($cat_params);
-			$cats_usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_new', array()) );
-			$cats_userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_new', array()) );
-			$cats_usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_new_pending', array()) );
-			$cats_userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_new_pending', array()) );
-			
-			$cats_usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_existing', array()) );
-			$cats_userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_existing', array()) );
-			$cats_usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('cats_usergrps_notify_existing_reviewal', array()) );
-			$cats_userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('cats_userlist_notify_existing_reviewal', array()) );
-			
-			$nConf->usergrps_notify_new         = array_unique(array_merge($nConf->usergrps_notify_new,         $cats_usergrps_notify_new));
-			$nConf->userlist_notify_new         = array_unique(array_merge($nConf->userlist_notify_new,         $cats_userlist_notify_new));
-			$nConf->usergrps_notify_new_pending = array_unique(array_merge($nConf->usergrps_notify_new_pending, $cats_usergrps_notify_new_pending));
-			$nConf->userlist_notify_new_pending = array_unique(array_merge($nConf->userlist_notify_new_pending, $cats_userlist_notify_new_pending));
-			
-			$nConf->usergrps_notify_existing          = array_unique(array_merge($nConf->usergrps_notify_existing,          $cats_usergrps_notify_existing));
-			$nConf->userlist_notify_existing          = array_unique(array_merge($nConf->userlist_notify_existing,          $cats_userlist_notify_existing));
-			$nConf->usergrps_notify_existing_reviewal = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal, $cats_usergrps_notify_existing_reviewal));
-			$nConf->userlist_notify_existing_reviewal = array_unique(array_merge($nConf->userlist_notify_existing_reviewal, $cats_userlist_notify_existing_reviewal));
-		}
-		
-		return $nConf;
-	}
-
 	
 	function doPlgAct() {
 		FLEXIUtilities::doPlgAct();

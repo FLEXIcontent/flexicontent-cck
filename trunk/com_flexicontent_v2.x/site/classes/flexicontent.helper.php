@@ -2868,7 +2868,6 @@ class FLEXIUtilities
 		if ($regex) {
 			$value = trim($value);
 			$value = !$value  ?  array()  :  preg_split($regex, $value);
-			print_r($value);
 		}
 		if ($filterfunc) {
 			array_map($filterfunc, $value);

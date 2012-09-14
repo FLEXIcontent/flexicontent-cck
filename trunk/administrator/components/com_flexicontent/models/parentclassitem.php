@@ -1565,7 +1565,12 @@ class ParentClassItem extends JModel
 				unset( $data['publish_down'] );
 				unset( $data['ordering'] );
 			}
-			if (!$isnew) unset( $data['state'] );
+			if (!$isnew)                 // Prevent changing state of existing items by users that cannot publish
+				unset( $data['state'] );
+			else if ($autopublished)     // Autopublishing new item via menu configuration
+				$data['state'] = 1;
+			else                         // Force state of -NEW- items as "Pending Approval" for user that CANNOT publish, and autopublish via menu item is disabled
+				$data['state'] = -3;
 		}
 		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
 		
@@ -3004,6 +3009,314 @@ class ParentClassItem extends JModel
 			}
 			$item->metadata = $item->metadata->toString();
 		}
+	}
+	
+	
+	/*
+	 * Method to retrieve the configuration for the Content Submit/Update notifications
+	 */
+	function & getNotificationsConf(&$params)
+	{
+		static $nConf = null;
+		if ($nConf !== null) return $nConf;
+		
+		// (a) Check if notifications are not enabled
+		if ( !$params->get('enable_notifications', 0) ) {
+			$nConf = false;
+			return $nConf;
+		}
+		
+		$db    = & JFactory::getDBO();
+		$nConf = new stdClass();
+		
+		// (b) Get Content Type specific notifications (that override global)
+		$nConf->userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
+		$nConf->userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
+		
+		$nConf->userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
+		$nConf->userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
+		
+		// (c) Get category specific notifications
+		if ( $params->get('nf_allow_cat_specific') ) 
+		{
+			$cats = $this->get('categories');
+			$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
+			$db->setQuery( $query );
+			$mcats_params = $db->loadResultArray();
+			
+			foreach ($mcats_params as $cat_params) {
+				$cat_params = new JParameter($cat_params);
+				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
+				
+				$cats_userlist_notify_new         = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_new         = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
+				$cats_userlist_notify_new_pending = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
+				
+				$cats_userlist_notify_existing          = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_existing          = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
+				$cats_userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
+				
+				$nConf->userlist_notify_new         = array_unique(array_merge($nConf->userlist_notify_new,         $cats_userlist_notify_new));
+				$nConf->usergrps_notify_new         = array_unique(array_merge($nConf->usergrps_notify_new,         $cats_usergrps_notify_new));
+				$nConf->userlist_notify_new_pending = array_unique(array_merge($nConf->userlist_notify_new_pending, $cats_userlist_notify_new_pending));
+				$nConf->usergrps_notify_new_pending = array_unique(array_merge($nConf->usergrps_notify_new_pending, $cats_usergrps_notify_new_pending));
+				
+				$nConf->userlist_notify_existing          = array_unique(array_merge($nConf->userlist_notify_existing,          $cats_userlist_notify_existing));
+				$nConf->usergrps_notify_existing          = array_unique(array_merge($nConf->usergrps_notify_existing,          $cats_usergrps_notify_existing));
+				$nConf->userlist_notify_existing_reviewal = array_unique(array_merge($nConf->userlist_notify_existing_reviewal, $cats_userlist_notify_existing_reviewal));
+				$nConf->usergrps_notify_existing_reviewal = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal, $cats_usergrps_notify_existing_reviewal));
+			}
+		}
+		
+		// (d) Convert user groups to user ids
+		$nConf_emails = new stdClass();
+		$ugrps = array(
+			'notify_new'=>'usergrps_notify_new',
+			'notify_new_pending'=>'usergrps_notify_new_pending',
+			'notify_existing'=>'usergrps_notify_existing',
+			'notify_existing_reviewal'=>'usergrps_notify_existing_reviewal'
+		);
+		
+		$ulist = array(
+			'notify_new'=>'userlist_notify_new',
+			'notify_new_pending'=>'userlist_notify_new_pending',
+			'notify_existing'=>'userlist_notify_existing',
+			'notify_existing_reviewal'=>'userlist_notify_existing_reviewal'
+		);
+		
+		foreach ($ugrps as $ntype => $ug)
+		{
+			$user_emails = array();
+			
+			// emails for user ids
+			$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
+			$db->setQuery( $query );
+			$user_emails_ulist = $db->loadResultArray();
+			if ( $db->getErrorNum() ) echo $db->stdError();
+			//print_r($user_emails_ulist);
+			
+			// emails for user groups
+			if (!FLEXI_J16GE) {
+				$query = "SELECT DISTINCT email FROM #__users WHERE gid IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+			} else {
+				$query = "SELECT DISTINCT email FROM #__users as u"
+					." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+			}
+			$db->setQuery( $query );
+			$user_emails_ugrps = $db->loadResultArray();
+			if ( $db->getErrorNum() ) echo $db->stdError();
+			//print_r($user_emails_ugrps);
+			
+			// merge them
+			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps) );
+			
+			$nConf_emails->{$ntype} = $user_emails;
+		}
+		
+		$nConf->emails = $nConf_emails;
+		
+		return $nConf;
+	}	
+
+
+	// *****************************************************************************************
+	// If there are emails to notify for current saving case, then send the notifications emails
+	// *****************************************************************************************
+	function sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, &$params)
+	{
+		if ( !count($notify_emails) ) return true;
+		
+		$app     = & JFactory::getApplication();
+		$db      = & JFactory::getDBO();
+		$user    = & JFactory::getUser();
+		$config  = & JFactory::getConfig();
+		$use_versioning = $this->_cparams->get('use_versioning', 1);
+		
+		// Get category titles of categories add / removed from the item
+		if ( !$isnew ) {
+			$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
+			foreach($cats_added_ids as $cats_added_id) {
+				$cats_added_titles[] = $after_cats[$cats_added_id]->title;
+			}
+			
+			$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
+			foreach($cats_removed_ids as $cats_removed_id) {
+				$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
+			}
+			$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
+			$after_maincat = $this->get('catid');
+		}
+		
+		// Get category titles in the case of new item or categories unchanged
+		if ( $isnew || !$cats_altered) {
+			foreach($after_cats as $after_cat) {
+				$cats_titles[] = $after_cat->title;
+			}
+		}
+		
+		// **************
+		// CREATE SUBJECT
+		// **************
+		
+		// (a) ADD INFO of being new or updated
+		$subject  = JText::_( $isnew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
+		
+		// (b) ADD INFO about editor's name and username (or being guest)
+		$subject .= !$user->id ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
+		
+		// (c) (new items) ADD INFO for content needing publication approval
+		if ($isnew) {
+			$subject .= ": ";
+			$subject .= JText::_( $needs_publication_approval ? 'FLEXI_NF_NEEDS_PUBLICATION_APPROVAL' : 'FLEXI_NF_NO_APPROVAL_NEEDED');
+		}
+		
+		// (d) (existing items with versioning) ADD INFO for content needing version reviewal
+		if ( !$isnew && $use_versioning) {
+			$subject .= ": ";
+			$subject .= JText::_( $needs_version_reviewal ? 'FLEXI_NF_NEEDS_VERSION_REVIEWAL' : 'FLEXI_NF_NO_REVIEWAL_NEEDED');
+		}
+		
+		
+		// *******************
+		// CREATE MESSAGE BODY
+		// *******************
+		
+		$nf_extra_properties = $params->get('nf_extra_properties', array('creator','modifier','created','modified','viewlink','editlinkfe','editlinkbe','introtext','fulltext'));
+		$nf_extra_properties  = FLEXIUtilities::paramToArray($nf_extra_properties);
+		
+		// ADD INFO for item title
+		$body  = JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . ": ";
+		$body .= $this->get('title'). "<br>\r\n<br>\r\n";
+		
+		// ADD INFO for author / modifier
+		if ( in_array('creator',$nf_extra_properties) )
+		{
+			$body .= JText::_( 'FLEXI_NF_CREATOR_LONG' ) . ": ";
+			$body .= $this->get('creator'). "<br>\r\n";
+		}
+		if ( in_array('modifier',$nf_extra_properties) && !$isnew )
+		{
+			$body .= JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . ": ";
+			$body .= $this->get('modifier'). "<br>\r\n";
+		}
+		$body .= "<br>\r\n";
+		
+		// ADD INFO about creation / modification times
+		if ( in_array('created',$nf_extra_properties) )
+		{
+			$date_created  =& JFactory::getDate($this->get('created'));
+			$date_created->setOffset($config->getValue('config.offset'));    // Use site's timezone
+			$body .= JText::_( 'FLEXI_NF_CREATION_TIME' ) . ": ";
+			$body .= $date_created->toFormat(). "<br>\r\n";
+		}
+		if ( in_array('modified',$nf_extra_properties) && !$isnew )
+		{
+			$date_modified =& JFactory::getDate($this->get('modified'));
+			$date_modified->setOffset($config->getValue('config.offset'));   // Use site's timezone
+			$body .= JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . ": ";
+			$body .= $date_modified->toFormat(). "<br>\r\n";
+		}
+		$body .= "<br>\r\n";
+		
+		// ADD INFO about category assignments
+		$body .= JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS');
+		if (!$isnew) {
+			$body .= " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br>\r\n &nbsp; ";
+		}
+		$body .= implode("<br>\r\n &nbsp; ", $cats_titles);
+		
+		// ADD INFO for category assignments added or removed
+		if ( !empty($cats_added_titles) && count($cats_added_titles) ) {
+			$body .= JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . " : <br>\r\n &nbsp; ";
+			$body .= implode("<br>\r\n &nbsp; ", $cats_added_titles) . "<br>\r\n";
+		}
+		if ( !empty($cats_removed_titles) &&  count($cats_removed_titles) ) {
+			$body .= JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . " : <br>\r\n &nbsp; ";
+			$body .= implode("<br>\r\n &nbsp; ", $cats_removed_titles) . "<br>\r\n";
+		}
+		$body .= "<br>\r\n<br>\r\n";
+		
+		$lang = '&lang='. substr($this->get('language') ,0,2) ;
+		
+		// ADD INFO for custom notify text
+		$subject .= JText::_( $notify_text );
+		
+		// ADD INFO for view/edit link
+		if ( in_array('viewlink',$nf_extra_properties) )
+		{
+			$body .= JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
+			$link = JRoute::_( JURI::base().FlexicontentHelperRoute::getItemRoute($this->get('slug'), $this->get('categoryslug')) . $lang);
+			$body .= $link . "<br>\r\n<br>\r\n";
+		}
+		if ( in_array('editlinkfe',$nf_extra_properties) )
+		{
+			$body .= JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
+			$link = JRoute::_( JURI::base().'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
+			$body .= $link . "<br>\r\n<br>\r\n";
+		}
+		if ( in_array('editlinkbe',$nf_extra_properties) )
+		{
+			$body .= JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . " : <br>\r\n &nbsp; ";
+			$fc_ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+			$link = JRoute::_( JURI::base().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
+			$body .= $link . "<br>\r\n<br>\r\n";
+		}
+		
+		// ADD INFO for introtext/fulltext
+		if ( $params->get('nf_add_introtext') )
+		{
+			//echo "<pre>"; print_r($this->_item); exit;
+			$body .= ' ************* '.JText::_( 'FLEXI_NF_INTROTEXT_LONG' ) . " ************* <br>\r\n &nbsp; ";
+			$body .= flexicontent_html::striptagsandcut( $this->get('introtext'), 200 );
+			$body .= "<br>\r\n *************************************************************** <br>\r\n<br>\r\n";
+		}
+		if ( $params->get('nf_add_fulltext') )
+		{
+			$body .= ' ************* '.JText::_( 'FLEXI_NF_FULLTEXT_LONG' ) . " ************* <br>\r\n &nbsp; ";
+			$body .= flexicontent_html::striptagsandcut( $this->get('fulltext'), 200 );
+			$body .= "<br>\r\n *************************************************************** <br>\r\n<br>\r\n";
+		}
+
+
+		// Send email
+		jimport( 'joomla.utilities.utility' );
+		$send_result = JUtility::sendMail(
+			$from = $config->getValue( 'config.mailfrom' ),
+			$fromname = $config->getValue( 'config.fromname' ),
+			$recipient = $params->get('nf_send_as_bcc', 0) ? $from : $notify_emails,
+			$subject,	$body, $html_mode=true, $cc=null,
+			$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null,
+			$attachment=null, $replyto=null, $replytoname=null);
+		
+		$debug_str = ""
+			."<br>FROM: $from"
+			."<br>FROMNAME:  $fromname <br>"
+			."<br>RECIPIENTS: " .implode(",", $recipient)
+			."<br>BCC:". implode(",",$bcc)."<br>"
+			."<br>SUBJECT: $subject <br>"
+			."<br>BODY:<br> $body <br>"
+			;
+		
+		if ($send_result) {
+			// OK
+			if ($params->get('nf_enable_debug',0)) {
+				$app->enqueueMessage("Sending notification emails success", 'message' );
+				$app->enqueueMessage($debug_str, 'message' );
+			}
+		} else {
+			// NOT OK
+			if ($params->get('nf_enable_debug',0)) {
+				$app->enqueueMessage("Sending notification emails success", 'warning' );
+				$app->enqueueMessage($debug_str, 'message' );
+			}
+		}
+		return $send_result;
 	}
 	
 	
