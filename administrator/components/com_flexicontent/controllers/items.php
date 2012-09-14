@@ -70,11 +70,24 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// Initialize variables
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$app     = & JFactory::getApplication();
+		$db      = & JFactory::getDBO();
+		$user    = & JFactory::getUser();
+		$config  = & JFactory::getConfig();
+		$session = & JFactory::getSession();
 		$task	   = JRequest::getVar('task');
-		$user    = JFactory::getUser();
 		$model   = $this->getModel('item');
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+		
+		// Get component parameters and them merge into them the type parameters
+		$params  = new JParameter();
+		$cparams = $app->getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		$tparams = $model->getTypeparams();
+		$tparams = new JParameter($tparams);
+		$params->merge($tparams);
+		
 		
 		// Get data from request and validate them
 		if (FLEXI_J16GE) {
@@ -114,13 +127,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
-
+		
 		// Check if item is editable till logoff
 		if (!$canEdit) {
-			$session 	=& JFactory::getSession();
-			if ($session->has('item_editable', 'flexicontent')) {
-				$item_editable = $session->get('item_editable', array(),'flexicontent');
-				$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 				if ($canEdit) {
 					// Set notice for existing item being editable till logoff 
 					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
@@ -128,19 +140,35 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 		
+		
 		// New item: check if user can create in at least one category
 		if ($isnew && !$canAdd) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
 			return;
 		}
-
+		
+		
 		// Existing item: Check if user can edit current item
 		if (!$isnew && !$canEdit) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
 			return;
 		}
+		
+		
+		// Get "BEFORE SAVE" categories for information mail
+		$before_cats = array();
+		if ( !$isnew )
+		{
+			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $model->get('id');
+			$db->setQuery( $query );
+			$before_cats = $db->loadObjectList('id');
+			$before_maincat = $model->get('catid');
+		}
+		
 		
 		// Store the form data into the item and check it in
 		if ( $store_success = $model->store($post) ) {
@@ -164,13 +192,95 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 		
+		
 		// Check in model and return if saving has 
 		$model->checkin();
 		if ( !$store_success ) return;
 		
+		
 		// Actions if a content item was created
 		if ( $model->get('id') )
 		{
+			// ********************************************************************************************
+			// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
+			// ********************************************************************************************
+			$is_first_save = true;
+			if ($session->has('saved_fcitems', 'flexicontent')) {
+				$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
+				$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
+			}
+			// Add item to saved items of the corresponding session array
+			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+			
+			
+			// ********************************************
+			// Get categories added / removed from the item
+			// ********************************************
+			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $model->get('id');
+			$db->setQuery( $query );
+			$after_cats = $db->loadObjectList('id');
+			if ( !$isnew ) {
+				$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
+				foreach($cats_added_ids as $cats_added_id) {
+					$cats_added_titles[] = $after_cats[$cats_added_id]->title;
+				}
+				
+				$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
+				foreach($cats_removed_ids as $cats_removed_id) {
+					$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
+				}
+				$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
+				$after_maincat = $model->get('catid');
+			}
+			
+			
+			// *******************************************************************************************************************
+			// We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+			// *******************************************************************************************************************
+			$notify_emails = array();
+			if ( $is_first_save || $cats_altered || $params->get('nf_enable_debug',0) )
+			{
+				// Get needed flags regarding the saved items
+				$approve_version = 2;
+				$pending_approval_state = -3;
+				
+				$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
+				$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
+				
+				// Get notifications configuration and select appropriate emails for current saving case
+				$nConf = & $model->getNotificationsConf($params);
+				//echo "<pre>"; print_r($nConf);
+				
+				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
+				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
+				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+				
+				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
+				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
+				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
+				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
+				//print_r($notify_emails);
+				//exit;
+			}
+			
+			
+			// *****************************************************************************************
+			// If there are emails to notify for current saving case, then send the notifications emails
+			// *****************************************************************************************
+			if ($notify_emails) {
+				// ... we use some strings from administrator part
+				// load english language file for 'com_flexicontent' component then override with current language file
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+				
+				$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
+			}
+			
+			
 			// ******************************************************************************************
 			// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
 			// ******************************************************************************************
@@ -218,9 +328,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			if ( $cparams->get('items_session_editable', 0) ) {
 				// Allow item to be editable till logoff
 				$session 	=& JFactory::getSession();
-				$session->get('item_editable', array(),'flexicontent');
-				$item_editable[$model->get('id')]  = 1;
-				$session->set('item_editable', $item_editable, 'flexicontent');
+				$session->get('rendered_uneditable', array(),'flexicontent');
+				$rendered_uneditable[$model->get('id')]  = 1;
+				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 			}
 		}
 		
@@ -1277,9 +1387,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Check if item is editable till logoff
 			if (!$canEdit) {
 				$session 	=& JFactory::getSession();
-				if ($session->has('item_editable', 'flexicontent')) {
-					$item_editable = $session->get('item_editable', array(),'flexicontent');
-					$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+				if ($session->has('rendered_uneditable', 'flexicontent')) {
+					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 					if ($canEdit) {
 						// Set notice for existing item being editable till logoff 
 						JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
@@ -1347,9 +1457,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check if item is editable till logoff
 		if (!$canEdit) {
 			$session 	=& JFactory::getSession();
-			if ($session->has('item_editable', 'flexicontent')) {
-				$item_editable = $session->get('item_editable', array(),'flexicontent');
-				$canEdit = isset($item_editable[$model->get('id')]) && $item_editable[$model->get('id')];
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 				if ($canEdit) {
 					// Set notice for existing item being editable till logoff 
 					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
