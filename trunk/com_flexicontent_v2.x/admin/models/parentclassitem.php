@@ -3095,23 +3095,31 @@ class ParentClassItem extends JModelAdmin
 			$user_emails = array();
 			
 			// emails for user ids
-			$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
-			$db->setQuery( $query );
-			$user_emails_ulist = $db->loadResultArray();
-			if ( $db->getErrorNum() ) echo $db->stdError();
-			//print_r($user_emails_ulist);
-			
-			// emails for user groups
-			if (!FLEXI_J16GE) {
-				$query = "SELECT DISTINCT email FROM #__users WHERE gid IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
-			} else {
-				$query = "SELECT DISTINCT email FROM #__users as u"
-					." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+			$user_emails_ulist = array();
+			if ( count( $nConf->{$ulist[$ntype]} ) )
+			{
+				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
+				$db->setQuery( $query );
+				$user_emails_ulist = $db->loadResultArray();
+				if ( $db->getErrorNum() ) echo $db->stdError();
+				//print_r($user_emails_ulist);
 			}
-			$db->setQuery( $query );
-			$user_emails_ugrps = $db->loadResultArray();
-			if ( $db->getErrorNum() ) echo $db->stdError();
-			//print_r($user_emails_ugrps);
+			
+			$user_emails_ugrps = array();
+			if ( count( $nConf->{$ugrps[$ntype]} ) )
+			{
+				// emails for user groups
+				if (!FLEXI_J16GE) {
+					$query = "SELECT DISTINCT email FROM #__users WHERE gid IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+				} else {
+					$query = "SELECT DISTINCT email FROM #__users as u"
+						." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+				}
+				$db->setQuery( $query );
+				$user_emails_ugrps = $db->loadResultArray();
+				if ( $db->getErrorNum() ) echo $db->stdError();
+				//print_r($user_emails_ugrps);
+			}
 			
 			// merge them
 			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps) );
