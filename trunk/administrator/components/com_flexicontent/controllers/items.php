@@ -81,7 +81,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Get component parameters and them merge into them the type parameters
 		$params  = new JParameter();
-		$cparams = $app->getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
 		$tparams = $model->getTypeparams();

@@ -761,17 +761,23 @@ class FlexicontentModelItems extends JModel
 		{
 			for( $i=0; $i < $copynr; $i++ )
 			{
-				$item =& JTable::getInstance('flexicontent_items', '');
+				// (a) Get existing item
+				$item = & JTable::getInstance('flexicontent_items', '');
 				$item->load($itemid);
-				
+				// Some shortcuts
 				$sourceid 	= (int)$item->id;
 				$curversion = (int)$item->version;
 				
-				//Save target item
-				$row  				=& JTable::getInstance('flexicontent_items', '');
-				$row 					= $item;
-				$row->id 				= null;
-				$row->item_id 	= null;
+				// (b) We create copy so that the original data are always available
+				$row = clone($item);
+				
+				// (c) Force creation & assigning of new records by cleaning the primary keys
+				$row->id 				= null;    // force creation of new record in _content DB table
+				$row->item_id 	= null;    // force creation of new record in _flexicontent_ext DB table
+				if (FLEXI_J16GE)
+					$row->asset_id 	= null;  // force creation of new record in _assets DB table
+					
+				// (d) Start altering the properties of the cloned item
 				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
 				$row->hits 			= 0;
 				$row->version 	= 1;

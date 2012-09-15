@@ -66,11 +66,17 @@ class FlexicontentController extends JController
 		$model   = & $this->getModel(FLEXI_ITEMVIEW);
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		
-		// Get component parameters and them merge into them the type parameters
-		$params  = new JParameter();
-		$cparams = $app->getParams('com_flexicontent');
-		$params->merge($cparams);
+		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($app->getParams('com_flexicontent'));
 		
+		if ($menu) {
+			$menuParams = new JParameter($menu->params);
+			// In J1.6+ the above function does not merge current menu item parameters,
+			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) $params->merge($menuParams);
+		}
+		
+		// Merge the type parameters
 		$tparams = $model->getTypeparams();
 		$tparams = new JParameter($tparams);
 		$params->merge($tparams);
