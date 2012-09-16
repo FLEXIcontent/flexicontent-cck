@@ -210,44 +210,56 @@ class plgSystemFlexisystem extends JPlugin
 	
 	function redirectSiteComContent()
 	{
-		//include the route helper
+		//include the route helper files
+		require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		
 		//get the section associated with flexicontent
-		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$flexisection 	= $flexiparams->get('flexi_section');
+		$flexiparams	= & JComponentHelper::getParams('com_flexicontent');
+		$flexisection	= $flexiparams->get('flexi_section');
 		
-		$app 				=& JFactory::getApplication();
-		$option 			= JRequest::getCMD('option');
-		$db 				=& JFactory::getDBO();
+		$app 		= & JFactory::getApplication();
+		$option	= JRequest::getCMD('option');
+		$view		= JRequest::getCMD('view');
+		$db 		= & JFactory::getDBO();
 		
-		if( !empty($option) ){
-
-			if($option == 'com_content') {
-
-				$view = JRequest::getCMD('view');
-
-				if( $view == 'article' ){
-					$id 		= JRequest::getInt('id');
-					$itemslug 	= JRequest::getVar('id');
-					$catslug	= JRequest::getVar('catid');
-					// Warning current menu item id must not be passed to the routing functions since it points to com_content , and thus it will break FC SEF URLs
-					$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
-					
-					if (!FLEXI_J16GE) {
-						$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
-						$section = $db->loadResult();
-						$in_limits = ($section == $flexisection);
-					} else {
-						$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
-						$maincat = $db->loadResult();
-						$in_limits = ($maincat>=FLEXI_LFT_CATEGORY && $maincat<=FLEXI_RGT_CATEGORY);
-					}
-					
-					if ($in_limits) {
-						$app->redirect($urlItem);
-						return false;
-					}
-					
+		if($option == 'com_content' && $view == 'article' )
+		{
+			$id 		= JRequest::getInt('id');
+			
+			if (!FLEXI_J16GE) {
+				$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
+				$section = $db->loadResult();
+				$in_limits = ($section == $flexisection);
+			} else {
+				$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
+				$maincat = $db->loadResult();
+				$in_limits = ($maincat>=FLEXI_LFT_CATEGORY && $maincat<=FLEXI_RGT_CATEGORY);
+			}
+			
+			if ( $this->params->get('redirect_method_fe', 1) == 1)
+			{
+	      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+	     
+	      // set request:
+	      JRequest::set( $newRequest, 'get');
+	     
+	      // set also in router, for best compatibility
+	      $router = $app->getRouter();
+	      $router->setVars( $newRequest, false);
+				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
+				
+	    } else {
+				$itemslug 	= JRequest::getVar('id');
+				$catslug	= JRequest::getVar('catid');
+			
+				// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs
+				$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
+				$urlItem 	= JRoute::_($urlItem);
+				
+				if ($in_limits) {
+					$app->enqueueMessage( "Redirected to com_flexicontent item view instead of com_content article view", 'message');
+					$app->redirect($urlItem);
 				}
 			}
 		}
