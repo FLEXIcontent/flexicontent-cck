@@ -30,16 +30,16 @@ jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('spacer');
 
 $css="
-div#module-sliders ul.adminformlist li label.hasTip {
+div.pane-sliders ul.adminformlist li label.hasTip {
 	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: bold;
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
-div#module-sliders ul.adminformlist li ul#rules label.hasTip {
+div.pane-sliders ul.adminformlist li ul#rules label.hasTip {
 	display:inherit; padding: inherit; margin: inherit; text-align: inherit;	width: inherit; font-weight: inherit;
 	background-color: inherit; border-width: 0px; color: inherit;
 }
-div#module-sliders ul.adminformlist li select { margin-bottom: 0px;}
-div#module-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
+div.pane-sliders ul.adminformlist li select { margin-bottom: 0px;}
+div.pane-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
 
 div.current ul.config-option-list li label.hasTip {
 	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: bold;
