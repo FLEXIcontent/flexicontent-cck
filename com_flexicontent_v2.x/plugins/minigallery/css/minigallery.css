@@ -233,6 +233,8 @@ div div.slideshow-thumbnails ul li {
 	float: left!important;
 	list-style: none!important;
 	margin:1px!important;
+	padding:0px !important;
+	background:none !important;
 }
 
 div div.slideshow-thumbnails ul {

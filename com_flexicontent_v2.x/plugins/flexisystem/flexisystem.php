@@ -237,18 +237,19 @@ class plgSystemFlexisystem extends JPlugin
 				$in_limits = ($maincat>=FLEXI_LFT_CATEGORY && $maincat<=FLEXI_RGT_CATEGORY);
 			}
 			
-			if ( $this->params->get('redirect_method_fe', 1) == 1)
+			if (!$in_limits) return;
+			
+			if ($this->params->get('redirect_method_fe', 1) == 1)
 			{
+	      // Set new request variables
 	      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
-	     
-	      // set request:
 	      JRequest::set( $newRequest, 'get');
 	     
-	      // set also in router, for best compatibility
+	      // Set variable also in the router, for best compatibility
 	      $router = $app->getRouter();
 	      $router->setVars( $newRequest, false);
-				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
 				
+				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
 	    } else {
 				$itemslug 	= JRequest::getVar('id');
 				$catslug	= JRequest::getVar('catid');
@@ -257,10 +258,8 @@ class plgSystemFlexisystem extends JPlugin
 				$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
 				$urlItem 	= JRoute::_($urlItem);
 				
-				if ($in_limits) {
-					$app->enqueueMessage( "Redirected to com_flexicontent item view instead of com_content article view", 'message');
-					$app->redirect($urlItem);
-				}
+				//$app->enqueueMessage( "Redirected to com_flexicontent item view instead of com_content article view", 'message');
+				$app->redirect($urlItem);
 			}
 		}
 	}
