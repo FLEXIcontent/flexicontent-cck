@@ -31,7 +31,7 @@ JFormHelper::loadFieldClass('spacer');
 
 $css="
 div.pane-sliders ul.adminformlist li label.hasTip {
-	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: bold;
+	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:132px; font-weight: bold;
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
 div.pane-sliders ul.adminformlist li ul#rules label.hasTip {

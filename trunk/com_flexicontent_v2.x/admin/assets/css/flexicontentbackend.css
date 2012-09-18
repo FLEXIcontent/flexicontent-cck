@@ -864,7 +864,7 @@ div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl {
 	color: #666666;
 	font-weight: normal;
 	text-align: right;
-	width: 140px;
+	width: 132px;
 	overflow:hidden;
 }
 
@@ -898,7 +898,7 @@ fieldset.panelform select, fieldset.panelform img, fieldset.panelform button {
 }
 
 div fieldset.panelform label {
-	min-width:140px;
+	min-width:132px;
 	text-align: right;
 }
 
