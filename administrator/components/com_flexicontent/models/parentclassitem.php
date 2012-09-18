@@ -199,7 +199,7 @@ class ParentClassItem extends JModel
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getItem($pk=null, $check_view_access=true)
+	function &getItem($pk=null, $check_view_access=true, $no_cache=false)
 	{
 		$app =& JFactory::getApplication();
 		$cparams   =& $this->_cparams;
@@ -220,7 +220,7 @@ class ParentClassItem extends JModel
 		}
 		
 		// --. Try to load existing item
-		if ( $pk && $this->_loadItem() )
+		if ( $pk && $this->_loadItem($no_cache) )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
@@ -261,7 +261,7 @@ class ParentClassItem extends JModel
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem()
+	function _loadItem( $no_cache=false )
 	{
 		if(!$this->_id) return false;  // Only try to load existing item
 		
@@ -270,7 +270,7 @@ class ParentClassItem extends JModel
 		// (b1) use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
 		// (b2) or call getItem($pk, $check_view_access=true) passing the item id and maybe also disabling read access checkings, to avoid unwanted messages/errors
 		static $items = array();
-		if ( isset($items[$this->_id]) ) {
+		if ( isset($items[$this->_id]) && $no_cache==false ) {
 			$this->_item = & $items[$this->_id];
 			return (boolean) $this->_item;
 		}
@@ -3259,20 +3259,20 @@ class ParentClassItem extends JModel
 		if ( in_array('viewlink',$nf_extra_properties) )
 		{
 			$body .= JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
-			$link = JRoute::_( JURI::base().FlexicontentHelperRoute::getItemRoute($this->get('slug'), $this->get('categoryslug')) . $lang);
+			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid')) . $lang);
 			$body .= $link . "<br>\r\n<br>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )
 		{
 			$body .= JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
-			$link = JRoute::_( JURI::base().'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
+			$link = JRoute::_( JURI::root(false).'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
 			$body .= $link . "<br>\r\n<br>\r\n";
 		}
 		if ( in_array('editlinkbe',$nf_extra_properties) )
 		{
 			$body .= JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . " : <br>\r\n &nbsp; ";
 			$fc_ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
-			$link = JRoute::_( JURI::base().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
+			$link = JRoute::_( JURI::root(false).'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
 			$body .= $link . "<br>\r\n<br>\r\n";
 		}
 		
