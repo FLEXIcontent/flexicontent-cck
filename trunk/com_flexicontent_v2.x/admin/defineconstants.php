@@ -85,6 +85,6 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'item' );
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/');
 
 // Version constants
-define('FLEXI_VERSION',	'2.0');
-define('FLEXI_RELEASE',	'RC8 (r1475)');
+define('FLEXI_VERSION',	'2.0.0');
+define('FLEXI_RELEASE',	'RC8 (r1486)');
 ?>

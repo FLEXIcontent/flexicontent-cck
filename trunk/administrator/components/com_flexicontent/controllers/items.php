@@ -170,12 +170,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// Store the form data into the item and check it in
-		if ( $store_success = $model->store($post) ) {
-			if($isnew) {
-				$post['id'] = (int) $model->get('id');
-			}
-		} else {
+		// ****************************************
+		// Try to store the form data into the item
+		// ****************************************
+		if ( ! $model->store($post) )
+		{
 			// Set error message about saving failed, and also the reason (=model's error message)
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
 			JError::raiseWarning( 500, $msg .": " . $model->getError() );
@@ -190,132 +189,141 @@ class FlexicontentControllerItems extends FlexicontentController
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
 			}
+			
+			// Saving has failed check-in and return, (above redirection will be used)
+			$model->checkin();
+			return;
 		}
 		
 		
-		// Check in model and return if saving has 
+		// **************************************************
+		// Check in model and get item id in case of new item
+		// **************************************************
 		$model->checkin();
-		if ( !$store_success ) return;
+		$post['id'] = $isnew ? (int) $model->get('id') : $post['id'];
 		
 		
-		// Actions if a content item was created
-		if ( $model->get('id') )
+		// ************************************************************
+		// First force reloading the item to make sure data are current
+		// ************************************************************
+		$model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		
+		
+		// ********************************************************************************************
+		// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
+		// ********************************************************************************************
+		$is_first_save = true;
+		if ($session->has('saved_fcitems', 'flexicontent')) {
+			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
+			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
+		}
+		// Add item to saved items of the corresponding session array
+		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+		
+		
+		// ********************************************
+		// Get categories added / removed from the item
+		// ********************************************
+		$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+			. ' WHERE rel.itemid = '.(int) $model->get('id');
+		$db->setQuery( $query );
+		$after_cats = $db->loadObjectList('id');
+		if ( !$isnew ) {
+			$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
+			foreach($cats_added_ids as $cats_added_id) {
+				$cats_added_titles[] = $after_cats[$cats_added_id]->title;
+			}
+			
+			$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
+			foreach($cats_removed_ids as $cats_removed_id) {
+				$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
+			}
+			$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
+			$after_maincat = $model->get('catid');
+		}
+		
+		
+		// *******************************************************************************************************************
+		// We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+		// *******************************************************************************************************************
+		$notify_emails = array();
+		if ( $is_first_save || $cats_altered || $params->get('nf_enable_debug',0) )
 		{
-			// ********************************************************************************************
-			// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
-			// ********************************************************************************************
-			$is_first_save = true;
-			if ($session->has('saved_fcitems', 'flexicontent')) {
-				$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
-				$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
-			}
-			// Add item to saved items of the corresponding session array
-			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+			// Get needed flags regarding the saved items
+			$approve_version = 2;
+			$pending_approval_state = -3;
 			
+			$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
+			$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
 			
-			// ********************************************
-			// Get categories added / removed from the item
-			// ********************************************
-			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. ' WHERE rel.itemid = '.(int) $model->get('id');
-			$db->setQuery( $query );
-			$after_cats = $db->loadObjectList('id');
-			if ( !$isnew ) {
-				$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
-				foreach($cats_added_ids as $cats_added_id) {
-					$cats_added_titles[] = $after_cats[$cats_added_id]->title;
-				}
-				
-				$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
-				foreach($cats_removed_ids as $cats_removed_id) {
-					$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
-				}
-				$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
-				$after_maincat = $model->get('catid');
-			}
+			// Get notifications configuration and select appropriate emails for current saving case
+			$nConf = & $model->getNotificationsConf($params);
+			//echo "<pre>"; print_r($nConf);
 			
+			if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
+			else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+			else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
+			else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
 			
-			// *******************************************************************************************************************
-			// We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
-			// *******************************************************************************************************************
-			$notify_emails = array();
-			if ( $is_first_save || $cats_altered || $params->get('nf_enable_debug',0) )
-			{
-				// Get needed flags regarding the saved items
-				$approve_version = 2;
-				$pending_approval_state = -3;
-				
-				$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
-				$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
-				
-				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = & $model->getNotificationsConf($params);
-				//echo "<pre>"; print_r($nConf);
-				
-				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
-				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
-				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
-				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
-				
-				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
-				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
-				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
-				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
-				//print_r($notify_emails);
-				//exit;
-			}
+			if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
+			else if ($isnew)                   $notify_text = $params->get('text_notify_new');
+			else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
+			else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
+			//print_r($notify_emails);
+			//exit;
+		}
+		
+		
+		// *****************************************************************************************
+		// If there are emails to notify for current saving case, then send the notifications emails
+		// *****************************************************************************************
+		if ($notify_emails) {
+			// ... we use some strings from administrator part
+			// load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 			
-			
-			// *****************************************************************************************
-			// If there are emails to notify for current saving case, then send the notifications emails
-			// *****************************************************************************************
-			if ($notify_emails) {
-				// ... we use some strings from administrator part
-				// load english language file for 'com_flexicontent' component then override with current language file
-				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-				JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-				
-				$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
-			}
-			
-			
-			// ******************************************************************************************
-			// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
-			// ******************************************************************************************
-			if ( !$isnew ) {
-				if (FLEXI_J16GE) {
-					$cache = FLEXIUtilities::getCache();
-					$cache->clean('com_flexicontent_items');
-				} else {
-					$cache = &JFactory::getCache('com_flexicontent_items');
-					$cache->clean();
-				}
-			}
-			
-			
-			// ****************************************************************************************************************************
-			// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
-			// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
-			// ****************************************************************************************************************************
+			$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
+		}
+		
+		
+		// ******************************************************************************************
+		// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
+		// ******************************************************************************************
+		if ( !$isnew ) {
 			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else if ($user->gid >= 25) {
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$cache = FLEXIUtilities::getCache();
+				$cache->clean('com_flexicontent_items');
 			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				$cache = &JFactory::getCache('com_flexicontent_items');
+				$cache->clean();
 			}
-		}		
+		}
+		
+		
+		// ****************************************************************************************************************************
+		// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
+		// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
+		// ****************************************************************************************************************************
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $model->get('id');
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+			// ALTERNATIVE 1
+			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			// ALTERNATIVE 2
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+		} else if ($user->gid >= 25) {
+			$canEdit = true;
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+			$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+		} else {
+			$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+		}
+		
 		
 		// *******************************************************************************************************
 		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
@@ -333,6 +341,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 			}
 		}
+		
 		
 		// ****************************************
 		// Saving is done, decide where to redirect
