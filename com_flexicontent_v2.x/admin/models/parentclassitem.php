@@ -72,7 +72,7 @@ class ParentClassItem extends JModelAdmin
 	 *
 	 * @since 1.0
 	 */
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		
@@ -1327,6 +1327,7 @@ class ParentClassItem extends JModelAdmin
 			JRequest::checkToken() or jexit( 'Invalid Token' );
 		}
 		
+		
 		// ****************************
 		// Initialize various variables
 		// ****************************
@@ -1405,6 +1406,14 @@ class ParentClassItem extends JModelAdmin
 			$cats[] =  $data['catid'];
 		}
 		
+		
+		// *****************************
+		// Retrieve author configuration
+		// *****************************
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+		if ( $authorparams = $db->loadResult() )
+			$authorparams = new JParameter($authorparams);
+		
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
 			
@@ -1413,11 +1422,6 @@ class ParentClassItem extends JModelAdmin
 			
 		// Check more than allowed categories
 		} else {
-			
-			// Retrieve author configuration
-			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-			if ( $authorparams = $db->loadResult() )
-				$authorparams = new JParameter($authorparams);
 			
 			// Get author's maximum allowed categories per item and set js limitation
 			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
@@ -1591,6 +1595,19 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		
+		// ***********************************************************
+		// SECURITY concern: Check form tampering of allowed languages
+		// ***********************************************************
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $row->language;
+		if ( $allowed_langs && !in_array($data['language'], $allowed_langs) ) {
+			$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
+			unset($data['language']);
+			if ($isnew) return false;
+		}
+		
+		
 		// ************************************************
 		// Bind given item DATA and PARAMETERS to the model
 		// ************************************************
@@ -1687,7 +1704,7 @@ class ParentClassItem extends JModelAdmin
 			$lang_parent_id = $item->lang_parent_id;
 			$item->lang_parent_id = $isnew ? 0 : $item->id;
 			if ( $item->lang_parent_id != $lang_parent_id ) {
-				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'notice' );
+				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'message' );
 			}
 		}
 		
@@ -1710,6 +1727,13 @@ class ParentClassItem extends JModelAdmin
 			// using versioning, increment last version numbering, or keep current version number if new version was not approved
 			$item->version = $isnew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
 		}
+		
+		
+		// *********************************************************************************************
+		// Make sure we import flexicontent AND content plugins since we will be triggering their events
+		// *********************************************************************************************
+		JPluginHelper::importPlugin('flexicontent');
+		JPluginHelper::importPlugin('content');
 		
 		
 		// **************************************************************************************************
@@ -2874,7 +2898,9 @@ class ParentClassItem extends JModelAdmin
 		// Trigger Event 'onContentChangeState' of Joomla's Content plugins
 		// ****************************************************************
 		if (FLEXI_J16GE) {
-
+			// Make sure we import flexicontent AND content plugins since we will be triggering their events
+			JPluginHelper::importPlugin('content');
+			
 			// PREPARE FOR TRIGGERING content events
 			// We need to fake joomla's states ... when triggering events
 			$fc_state = $state;
