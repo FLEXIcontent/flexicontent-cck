@@ -311,11 +311,14 @@ class FlexicontentFields
 	 */
 	function triggerContentPlugins( &$field, &$item, $method ) 
 	{
+		$debug = false;
+		
 		// ***********************************************************************
 		// We use a custom Dispatcher to allow selective Content Plugin triggering
 		// ***********************************************************************
-		require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'dispatcher.php');
-		$dispatcher = & FCDispatcher::getInstance();
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'dispatcher.php');
+		$dispatcher = & JDispatcher::getInstance();
+		$fcdispatcher = & FCDispatcher::getInstance_FC($debug);
 		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
@@ -330,11 +333,16 @@ class FlexicontentFields
 			$field->text = isset($field->{$method}) ? $field->{$method} : '';
 			$field->title = $item->title;
 			
+			if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
+			
 			// Make sure the necessary plugin are already loaded
 			if (!$field->parameters->get('plugins')) {
+				
 				$plg_arr = null;
 				JPluginHelper::importPlugin('content', $plugin = null, $autocreate = true, $dispatcher);
+				
 			} else {
+				
 				if (FLEXI_J16GE) {
 					$plg_arr = explode('|',$field->parameters->get('plugins'));
 				} else if ( !is_array($field->parameters->get('plugins')) ) {
@@ -342,9 +350,9 @@ class FlexicontentFields
 				} else {
 					$plg_arr = $field->parameters->get('plugins');
 				}
-				foreach ($plg_arr as $plg) {
+				foreach ($plg_arr as $plg)
 					JPluginHelper::importPlugin('content', $plg, $autocreate = true, $dispatcher);
-				}
+				
 			}
 			
 			// Suppress some plugins from triggering for compatibility reasons, e.g.
@@ -372,8 +380,8 @@ class FlexicontentFields
 				if ($print_logging_info)  $start_microtime = microtime(true);
 				
 				// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-				if (FLEXI_J16GE) $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
-				else             $results = $dispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), $plg_arr);
+				if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
+				else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
 				
 				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
