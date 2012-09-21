@@ -619,18 +619,6 @@ class FlexicontentViewItem extends JView
 		// Create and submit configuration (for new items) into the session
 		$submitConf = $this->_createSubmitConf($item, $perms, $params);
 		
-		// Build languages list
-		$site_default_lang = flexicontent_html::getSiteDefaultLang();
-		if (FLEXI_J16GE) {
-			$item_lang = $isnew ? $site_default_lang : $item->language;
-			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item_lang, 3);
-		} else if (FLEXI_FISH) {
-			$item_lang = $isnew ? $site_default_lang : $item->language;
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item_lang, 3);
-		} else {
-			$item->language = $site_default_lang;
-		}
-		
 		// Item language related vars
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$languages = FLEXIUtilities::getLanguages();
@@ -822,6 +810,13 @@ class FlexicontentViewItem extends JView
 		$actions_allowed = array('core.create');					// user actions allowed for categories
 		$types = & $this->get( 'Typeslist' );
 		$typesselected = '';
+		$isnew = !$item->id;
+		
+		// Retrieve author configuration
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+		if ( $authorparams = $db->loadResult() )
+			$authorparams = new JParameter($authorparams);
+		//echo "<pre>"; print_r($authorparams); exit;
 		
 		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;
 		
@@ -829,11 +824,6 @@ class FlexicontentViewItem extends JView
 		$lists['cid'] = '';
 		if ($perms['multicat'])
 		{
-			// Retrieve author configuration
-			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-			if ( $authorparams = $db->loadResult() )
-				$authorparams = new JParameter($authorparams);
-		
 			// Get author's maximum allowed categories per item and set js limitation
 			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
 			$document->addScriptDeclaration('
@@ -922,6 +912,21 @@ class FlexicontentViewItem extends JView
 			$lists['access'] = JHTML::_('list.accesslevel', $item);
 		}
 
+		// Build languages list
+		$site_default_lang = flexicontent_html::getSiteDefaultLang();
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
+		if (FLEXI_J16GE) {
+			$item_lang = $isnew ? $site_default_lang : $item->language;
+			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item_lang, 3, $allowed_langs);
+		} else if (FLEXI_FISH) {
+			$item_lang = $isnew ? $site_default_lang : $item->language;
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item_lang, 3, $allowed_langs);
+		} else {
+			$item->language = $site_default_lang;
+		}
+		
 		return $lists;
 	}
 	

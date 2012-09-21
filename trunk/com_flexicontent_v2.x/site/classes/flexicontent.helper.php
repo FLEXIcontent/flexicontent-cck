@@ -1156,24 +1156,33 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	function buildlanguageslist($name, $class, $selected, $type = 1)
+	function buildlanguageslist($name, $class, $selected, $type = 1, $allowed_langs = null)
 	{
 		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 		
-		$languages = FLEXIUtilities::getlanguageslist();
+		$all_langs = FLEXIUtilities::getlanguageslist();
+		$user_langs = array();
+		if ($allowed_langs) {
+			foreach ($all_langs as $index => $lang)
+				if ( in_array($lang->code, $allowed_langs) )
+					$user_langs[$index] = $lang;
+		}	else {
+			$user_langs = & $all_langs;
+		}
 		
+		$langs = array();
 		switch ($type)
 		{
 			case 1:
-				foreach ($languages as $lang) {
+				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
 				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
 				break;
 			case 2:
 				$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
-				foreach ($languages as $lang) {
+				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
 				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
@@ -1182,7 +1191,7 @@ class flexicontent_html
 				$checked	= '';
 				$list		= '';
 				
-				foreach ($languages as $lang) {
+				foreach ($user_langs as $lang) {
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
@@ -1205,7 +1214,7 @@ class flexicontent_html
 				$list 	.= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
 				$list 	.= '</label><br />';
 
-				foreach ($languages as $lang) {
+				foreach ($user_langs as $lang) {
 					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
 					if($lang->shortcode=="*") {
@@ -1220,7 +1229,7 @@ class flexicontent_html
 				break;
 			case 5:
 				$list		= '';
-				foreach ($languages as $lang) {
+				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
 					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';

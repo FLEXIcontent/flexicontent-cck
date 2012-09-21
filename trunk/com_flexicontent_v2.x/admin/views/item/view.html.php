@@ -365,11 +365,15 @@ class FlexicontentViewItem extends JView
 		}
 		
 		//build languages list
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $row->language;
+		
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		$language_fieldname = FLEXI_J16GE ? 'jform[language]' : 'language';
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $row->language, 3);
+			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $row->language, 3, $allowed_langs);
 		} else {
 			$row->language = flexicontent_html::getSiteDefaultLang();
 		}
