@@ -19,7 +19,11 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
+
+JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
+JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 ?>
+
 <script type="text/javascript">
 	function tableOrdering( order, dir, task )
 	{
@@ -274,8 +278,154 @@ if ($this->items) :
 	</div>
 	<?php endif; ?>
 	<!-- EOF subtitle3 block -->
+
+
+
+<div class='fctabber' class='".$class."'><!-- tabber start -->
 	
+<!-- BOF subtitle_tab1 block -->
+<?php if (isset($item->positions['subtitle_tab1'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab1</h3><!-- tab title -->
 	
+	<div class="flexi lineinfo subtitle_tab1">
+		<?php foreach ($item->positions['subtitle_tab1'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab1 block -->	
+
+
+<!-- BOF subtitle_tab2 block -->
+<?php if (isset($item->positions['subtitle_tab2'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab2</h3><!-- tab title -->
+	
+	<div class="flexi lineinfo subtitle_tab2">
+		<?php foreach ($item->positions['subtitle_tab2'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab2 block -->	
+
+
+<!-- BOF subtitle_tab3 block -->
+<?php if (isset($item->positions['subtitle_tab3'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab3</h3><!-- tab title -->
+	
+	<div class="flexi lineinfo subtitle_tab3">
+		<?php foreach ($item->positions['subtitle_tab3'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab3 block -->	
+
+
+<!-- BOF subtitle_tab4 block -->
+<?php if (isset($item->positions['subtitle_tab4'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab4</h3><!-- tab title -->
+	
+	<div class="flexi lineinfo subtitle_tab4">
+		<?php foreach ($item->positions['subtitle_tab4'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab4 block -->	
+
+
+<!-- BOF subtitle_tab5 block -->
+<?php if (isset($item->positions['subtitle_tab5'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab5</h3><!-- tab title -->
+	
+	<div class="flexi lineinfo subtitle_tab5">
+		<?php foreach ($item->positions['subtitle_tab5'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab5 block -->	
+
+
+<!-- BOF subtitle_tab6 block -->
+<?php if (isset($item->positions['subtitle_tab6'])) : ?>
+
+ <div class='tabbertab'><!-- tab start -->
+	<h3>subtitle_tab6</h3><!-- tab title -->
+	
+	<div class="flexi lineinfo subtitle_tab6">
+		<?php foreach ($item->positions['subtitle_tab6'] as $field) : ?>
+		<div class="flexi element">
+			<?php if ($field->label) : ?>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<?php endif; ?>
+			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	
+ </div><!-- tab end -->
+
+<?php endif; ?>
+<!-- EOF subtitle_tab6 block -->	
+	
+ </div><!-- tab end -->
+ 
+</div><!-- tabber end -->
+
+
+
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 	<div class="flexi topblock">  <!-- NOTE: image block is inside top block ... -->
 	
