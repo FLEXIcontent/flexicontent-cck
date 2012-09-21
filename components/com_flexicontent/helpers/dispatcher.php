@@ -83,7 +83,6 @@ class FCDispatcher extends JDispatcher
 	}
 	
 	
-
 	/**
 	 * Find custom method names for content events
 	 *
@@ -186,14 +185,13 @@ class FCDispatcher extends JDispatcher
 				{
 					if (function_exists($observer['handler']))
 					{
+						// Check for selective plugin triggering
 						if ( $plg_names && !in_array(@$this->prepContentFuncs[ $observer['handler'] ], $plg_names) ) {
 							continue;
 						}
 						if ($this->debug) {
-							if ( @$this->prepContentFuncs[ $observer['handler'] ] )
-								echo $this->prepContentFuncs[ $observer['handler'] ]." <br>";
-							else
-								echo $observer['handler'];
+							echo @$this->prepContentFuncs[ $observer['handler'] ] ?
+								$this->prepContentFuncs[ $observer['handler'] ]."<br>" : $observer['handler']."<br>";
 						}
 						
 						$result[] = call_user_func_array($observer['handler'], $args);
@@ -229,12 +227,11 @@ class FCDispatcher extends JDispatcher
 					 */
 					if (method_exists($observer, $event))
 					{
+						// Check for selective plugin triggering
 						$curplg = strtolower(str_ireplace('plgContent', '', get_class($observer)));
-						
 						if ( $plg_names && !in_array($curplg, $plg_names) ) {
 							continue;
 						}
-						
 						if ($this->debug) echo $curplg."<br>";
 						
 						$args['event'] = $event;

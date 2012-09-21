@@ -26,26 +26,75 @@ jimport('joomla.event.dispatcher');
  */
 class FCDispatcher extends JDispatcher
 {
+	protected $prepContentFuncs = null;
+	protected $debug = false;
+	
 	/**
-	 * Stores the singleton instance of the dispatcher.
+	 * Constructor
 	 *
-	 * @var    JDispatcher
-	 * @since  11.3
+	 * @access	protected
 	 */
-	protected static $fcinstance = null;
-	
-	
-	public static function getInstance()
+	function __construct( $debug=false )
 	{
-		if (self::$fcinstance === null)
-		{
-			self::$fcinstance = new FCDispatcher;
+		parent::__construct();
+		$this->debug = $debug;
+		
+		if ( !$this->prepContentFuncs ) {
+			$plgs = JPluginHelper::getPlugin('content');
+			$this->prepContentFuncs = array();
+			
+			if ($this->debug) {
+				echo "<b>Finding custom method names for content events</b>:<br>";
+			}
+			
+			foreach ($plgs as $plg) {
+				$content_plgs[] = $plg->name;
+				$this->findPrepContFuncs($plg);
+			}
+		}
+	}
+	
+	
+	function & getInstance_FC($debug)
+	{
+		static $instance;
+
+		if (!is_object($instance)) {
+			$instance = new FCDispatcher($debug);
 		}
 
-		return self::$fcinstance;
+		return $instance;
 	}
+	
+	
+	/**
+	 * Find custom method names for content events
+	 *
+	 */
+	function findPrepContFuncs($plugin)
+	{
+		$plugin->type = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->type);
+		$plugin->name  = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->name);
 
-
+		if ($this->debug) echo $plugin->name;
+		
+		$path	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.DS.$plugin->name.'.php';
+		$plugin_code = file_get_contents($path);
+		$fname_pattern='[\s]*[\'"]([a-zA-Z]+)[\'"][\s]*';
+		
+		if ( preg_match_all('/->registerEvent[\s]*\('.$fname_pattern.','.$fname_pattern.'\)/', $plugin_code, $matches) )
+		{
+			foreach($matches[1] as $i => $event) {
+				if ($event=='onContentPrepare') {
+					$this->prepContentFuncs[$matches[2][$i]] = $plugin->name;
+					if ($this->debug) echo " ==> ".$matches[2][$i];
+				}
+			}
+		}
+		if ($this->debug) echo "<br>";
+	}
+	
+	
 	/**
 	 * Triggers an event by dispatching arguments to all observers that handle
 	 * the event and returning their return values. This overriden function allows selective triggering
@@ -59,6 +108,10 @@ class FCDispatcher extends JDispatcher
 	 */
 	public function trigger($event, $args = array(), $plg_names=null)
 	{
+		if ($this->debug) {
+			echo $plg_names ? "(".implode(',', $plg_names).")<br>" : "(ALL)<br>";
+		}
+		
 		// Initialise variables.
 		$result = array();
 
@@ -69,6 +122,10 @@ class FCDispatcher extends JDispatcher
 		$args = (array) $args;
 
 		$event = strtolower($event);
+		
+		// Get static properties to use from JDispatcher class
+		$this->_methods   = & $this->getInstance()->_methods;
+		$this->_observers = & $this->getInstance()->_observers;
 
 		// Check if any plugins are attached to the event.
 		if (!isset($this->_methods[$event]) || empty($this->_methods[$event]))
@@ -84,22 +141,34 @@ class FCDispatcher extends JDispatcher
 			{
 				continue;
 			}
-			
-			// Check for selective plugin triggering
-			if ( $plg_names && !in_array($this->_observers[$key]->get('_name'), $plg_names) ) {
-				//echo "<br>".get_class($this->_observers[$key]); 	echo "<br>"; print_r( $this->_observers[$key]->get('_name') );
-				continue;
-			}
 
 			// Fire the event for an object based observer.
 			if (is_object($this->_observers[$key]))
 			{
+				// Check for selective plugin triggering
+				if ( $plg_names && !in_array($this->_observers[$key]->get('_name'), $plg_names) )
+				{
+					continue;
+				}
+				if ($this->debug) {
+					echo $this->_observers[$key]->get('_name')."<br>";
+				}
+				
 				$args['event'] = $event;
 				$value = $this->_observers[$key]->update($args);
 			}
 			// Fire the event for a function based observer.
 			elseif (is_array($this->_observers[$key]))
 			{
+				// Check for selective plugin triggering
+				if ( $plg_names && !in_array(@$this->prepContentFuncs[ $this->_observers[$key]['handler'] ], $plg_names) ) {
+					continue;
+				}
+				if ($this->debug) {
+					echo @$this->prepContentFuncs[ $this->_observers[$key]['handler'] ] ?
+						$this->prepContentFuncs[ $this->_observers[$key]['handler'] ] ."<br>" : $this->_observers[$key]['handler'] ."<br>";
+				}
+				
 				$value = call_user_func_array($this->_observers[$key]['handler'], $args);
 			}
 			if (isset($value))
@@ -109,6 +178,6 @@ class FCDispatcher extends JDispatcher
 		}
 
 		return $result;
-	}	
+	}
 	
 }

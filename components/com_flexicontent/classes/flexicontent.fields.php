@@ -317,12 +317,8 @@ class FlexicontentFields
 		// We use a custom Dispatcher to allow selective Content Plugin triggering
 		// ***********************************************************************
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'dispatcher.php');
-		if (!FLEXI_J16GE) {
-			$dispatcher = & JDispatcher::getInstance();
-			$fcdispatcher = & FCDispatcher::getInstance_FC($debug);
-		} else {
-			$dispatcher = & FCDispatcher::getInstance();
-		}
+		$dispatcher = & JDispatcher::getInstance();
+		$fcdispatcher = & FCDispatcher::getInstance_FC($debug);
 		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
@@ -384,7 +380,7 @@ class FlexicontentFields
 				if ($print_logging_info)  $start_microtime = microtime(true);
 				
 				// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-				if (FLEXI_J16GE) $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
+				if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
 				else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
 				
 				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
