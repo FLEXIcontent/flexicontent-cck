@@ -955,3 +955,33 @@ div#flexicontent table.admintable td.paramlist_key {
 #editor-xtd-buttons {
 }
 
+
+/* Rules for frontend basic tabbing in templates */
+#flexicontent .tabberlive {
+	margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
+}
+
+#flexicontent .fctabber {
+	overflow:visible; width:5000px;
+}
+
+#flexicontent .fieldvaltabber {
+	width:auto;
+	float:left;
+	margin: -12px 0px 6px 1px;
+	padding: 0px;
+	border-width:0px;
+}
+
+#flexicontent ul.tabbernav li.tabberactive a, #flexicontent ul.tabbernav li.tabberactive a:hover {
+	background-color: darkred;
+	color: white;
+	border-bottom: 1px solid darkred;
+}
+
+#flexicontent ul.tabbernav {
+	border-bottom: 1px solid #777788 !important;
+	font: bold 12px Verdana,sans-serif !important;
+	margin: 0 !important;
+	padding: 3px 0px 0px 0px !important;
+}
