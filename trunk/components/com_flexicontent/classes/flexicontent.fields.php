@@ -303,7 +303,7 @@ class FlexicontentFields
 	
 	
 	/**
-	 * Method to trigger content plugins on text of fields
+	 * Method to selectively trigger content plugins for the text of the specified field
 	 * 
 	 * @access public
 	 * @return object
@@ -311,10 +311,19 @@ class FlexicontentFields
 	 */
 	function triggerContentPlugins( &$field, &$item, $method ) 
 	{
-		// *************
-		// Get variables
-		// *************
-		$dispatcher = &JDispatcher::getInstance();
+		$debug = false;
+		
+		// ***********************************************************************
+		// We use a custom Dispatcher to allow selective Content Plugin triggering
+		// ***********************************************************************
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'dispatcher.php');
+		if (!FLEXI_J16GE) {
+			$dispatcher = & JDispatcher::getInstance();
+			$fcdispatcher = & FCDispatcher::getInstance_FC($debug);
+		} else {
+			$dispatcher = & FCDispatcher::getInstance();
+		}
+		
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $flexiparams->get('print_logging_info');
@@ -325,17 +334,19 @@ class FlexicontentFields
 		
 		if ($field->parameters->get('trigger_onprepare_content', 0))
 		{
-			// Suppress some plugins from triggering for compatibility reasons, e.g.
-			// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
-			$suppress_arr = array('jcomments', 'jom_comment_bot');
-			FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
-		
 			$field->text = isset($field->{$method}) ? $field->{$method} : '';
 			$field->title = $item->title;
-			// need now to reduce the scope through a parameter to avoid conflicts
+			
+			if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
+			
+			// Make sure the necessary plugin are already loaded
 			if (!$field->parameters->get('plugins')) {
-				JPluginHelper::importPlugin('content');
+				
+				$plg_arr = null;
+				JPluginHelper::importPlugin('content', $plugin = null, $autocreate = true, $dispatcher);
+				
 			} else {
+				
 				if (FLEXI_J16GE) {
 					$plg_arr = explode('|',$field->parameters->get('plugins'));
 				} else if ( !is_array($field->parameters->get('plugins')) ) {
@@ -343,10 +354,15 @@ class FlexicontentFields
 				} else {
 					$plg_arr = $field->parameters->get('plugins');
 				}
-				foreach ($plg_arr as $plg) {
-					JPluginHelper::importPlugin('content', $plg);
-				}
+				foreach ($plg_arr as $plg)
+					JPluginHelper::importPlugin('content', $plg, $autocreate = true, $dispatcher);
+				
 			}
+			
+			// Suppress some plugins from triggering for compatibility reasons, e.g.
+			// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
+			$suppress_arr = array('jcomments', 'jom_comment_bot');
+			FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
 			$field->slug = $item->slug;
 			$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
 			$field->catid = $item->catid;
@@ -368,8 +384,8 @@ class FlexicontentFields
 				if ($print_logging_info)  $start_microtime = microtime(true);
 				
 				// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-				if (FLEXI_J16GE) $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart));
-				else             $results = $dispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart));
+				if (FLEXI_J16GE) $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
+				else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
 				
 				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
