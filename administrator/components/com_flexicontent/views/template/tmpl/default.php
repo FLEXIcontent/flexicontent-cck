@@ -186,7 +186,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 							
 							if ($posrow) {
 								// we are inside field group row, start it or continue with next field group
-								echo ($posrow_prev != $posrow)  ?  "<table width='100%'><tr><td>\n"  :  "</td><td>\n";
+								echo ($posrow_prev != $posrow)  ?  "<table width='100%' cellpadding='0' cellspacing='0'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
 							}
 							
 						?>
