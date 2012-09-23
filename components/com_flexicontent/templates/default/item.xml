@@ -19,26 +19,42 @@
 			<option value="one">FLEXI_1_COL</option>
 			<option value="two">FLEXI_2_COLS</option>
 		</param>
+		
+		<param name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" hr="false" />
 		<param name="subtitle_tab1_label" type="text" default="TAB01" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="subtitle_tab2_label" type="text" default="TAB02" label="Label for Tab 2" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="subtitle_tab3_label" type="text" default="TAB03" label="Label for Tab 3" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="subtitle_tab4_label" type="text" default="TAB04" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="subtitle_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="subtitle_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		
+		<param name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" hr="false" />
+		<param name="bottom_tab1_label" type="text" default="TAB01" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<param name="bottom_tab2_label" type="text" default="TAB02" label="Label for Tab 2" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<param name="bottom_tab3_label" type="text" default="TAB03" label="Label for Tab 3" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<param name="bottom_tab4_label" type="text" default="TAB04" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<param name="bottom_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<param name="bottom_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
 	</params>
 	<fieldgroups>
 		<group>subtitle1</group>
 		<group>subtitle2</group>
 		<group>subtitle3</group>
-		<group>subtitle_tab1</group>
-		<group>subtitle_tab2</group>
-		<group>subtitle_tab3</group>
-		<group>subtitle_tab4</group>
-		<group>subtitle_tab5</group>
-		<group>subtitle_tab6</group>
-		<group>image</group>
-		<group>top</group>
+		<group posrow="subtitle">subtitle_tab1</group>
+		<group posrow="subtitle">subtitle_tab2</group>
+		<group posrow="subtitle">subtitle_tab3</group>
+		<group posrow="subtitle">subtitle_tab4</group>
+		<group posrow="subtitle">subtitle_tab5</group>
+		<group posrow="subtitle">subtitle_tab6</group>
+		<group posrow="img_top">image</group>
+		<group posrow="img_top">top</group>
 		<group>description</group>
+		<group posrow="bottom">bottom_tab1</group>
+		<group posrow="bottom">bottom_tab2</group>
+		<group posrow="bottom">bottom_tab3</group>
+		<group posrow="bottom">bottom_tab4</group>
+		<group posrow="bottom">bottom_tab5</group>
+		<group posrow="bottom">bottom_tab6</group>
 		<group>bottom</group>
 		<group>renderonly</group>
 	</fieldgroups>	

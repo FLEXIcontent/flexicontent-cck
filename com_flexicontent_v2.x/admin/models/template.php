@@ -111,6 +111,7 @@ class FlexicontentModelTemplate extends JModel
 		$query  = 'SELECT *'
 				. ' FROM #__flexicontent_fields'
 				. ' WHERE published = 1'
+				. ' AND field_type <> "groupmarker" '
 				. ' ORDER BY label ASC'
 				;
 		$this->_db->setQuery($query);
