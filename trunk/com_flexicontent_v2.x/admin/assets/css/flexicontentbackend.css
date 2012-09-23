@@ -817,6 +817,14 @@ div.flexi_box_right {
 	margin: 1px 8px;
 }
 
+.fieldgrprow_cell {
+	padding-right: 6px;
+}
+
+.fieldgrprow_cell:last {
+	padding-right: 0px;
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/

@@ -19,16 +19,16 @@
 defined('_JEXEC') or die('Restricted access'); ?>
 
 <?php
- $basetemplates = array('default', 'blog', 'faq', 'presentation');
+ $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
 ?>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="40"></th>
+			<th width="42"></th>
 			<th class="title" align="left"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_ITEM' ); ?></th>
 			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_CAT' ); ?></th>

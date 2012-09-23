@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<author>George Papadakis</author>
+	<website>www.flexicontent.org</website>
+	<email>flexicontentcck@gmail.com</email>
+	<license>GPLv3</license>
+	<version>1.0</version>
+	<release>21 September 2012</release>
+	<description>Modular item layout with tabbed positions, suitable for faq, file manager, or directory</description>
+	<fields name="attribs">
+		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+		<field name="top_cols" type="list" default="two" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="one">FLEXI_1_COL</option>
+			<option value="two">FLEXI_2_COLS</option>
+		</field>
+		<field name="bottom_cols" type="list" default="two" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="one">FLEXI_1_COL</option>
+			<option value="two">FLEXI_2_COLS</option>
+		</field>
+		
+		<field name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" hr="false" />
+		<field name="subtitle_tab1_label" type="text" default="TAB01" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="subtitle_tab2_label" type="text" default="TAB02" label="Label for Tab 2" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="subtitle_tab3_label" type="text" default="TAB03" label="Label for Tab 3" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="subtitle_tab4_label" type="text" default="TAB04" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="subtitle_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="subtitle_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		
+		<field name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" hr="false" />
+		<field name="bottom_tab1_label" type="text" default="TAB01" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="bottom_tab2_label" type="text" default="TAB02" label="Label for Tab 2" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="bottom_tab3_label" type="text" default="TAB03" label="Label for Tab 3" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="bottom_tab4_label" type="text" default="TAB04" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="bottom_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		<field name="bottom_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		</fieldset>
+	</fields>
+	<fieldgroups>
+		<group>subtitle1</group>
+		<group>subtitle2</group>
+		<group>subtitle3</group>
+		<group posrow="subtitle">subtitle_tab1</group>
+		<group posrow="subtitle">subtitle_tab2</group>
+		<group posrow="subtitle">subtitle_tab3</group>
+		<group posrow="subtitle">subtitle_tab4</group>
+		<group posrow="subtitle">subtitle_tab5</group>
+		<group posrow="subtitle">subtitle_tab6</group>
+		<group posrow="img_top">image</group>
+		<group posrow="img_top">top</group>
+		<group>description</group>
+		<group posrow="bottom">bottom_tab1</group>
+		<group posrow="bottom">bottom_tab2</group>
+		<group posrow="bottom">bottom_tab3</group>
+		<group posrow="bottom">bottom_tab4</group>
+		<group posrow="bottom">bottom_tab5</group>
+		<group posrow="bottom">bottom_tab6</group>
+		<group>bottom</group>
+		<group>renderonly</group>
+	</fieldgroups>	
+	<cssitem>
+		<file>css/item.css</file>
+	</cssitem>
+	<jsitem>
+	</jsitem>	
+</form>
