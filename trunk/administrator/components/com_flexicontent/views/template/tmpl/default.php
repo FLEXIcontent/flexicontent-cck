@@ -24,7 +24,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	}
 </script>
 
-<form action="index.php" method="post" name="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellpadding="0" cellspacing="0" width="100%">
 		<tr>
@@ -174,13 +174,29 @@ defined('_JEXEC') or die('Restricted access'); ?>
 					<?php
 					if (isset($this->layout->positions)) :
 						$count=-1;
-						foreach ($this->layout->positions as $pos) : ?>
+						foreach ($this->layout->positions as $pos) :
+							$count++;
+							
+							$pos_css = "";
+							$posrow_prev = @$posrow;
+							$posrow = isset($this->layout->attributes[$count]['posrow'] )  ?  $this->layout->attributes[$count]['posrow'] : '';
+							
+							// Detect field group row change and close previous row if open
+							echo ($posrow_prev && $posrow_prev != $posrow)  ?  "</td></tr></table>\n"  :  "";
+							
+							if ($posrow) {
+								// we are inside field group row, start it or continue with next field group
+								echo ($posrow_prev != $posrow)  ?  "<table width='100%'><tr><td>\n"  :  "</td><td>\n";
+							}
+							
+						?>
+						
 						<div class="postitle"><?php echo $pos; ?></div>
+						
 						<?php
-						$count++;
-						if ( isset($this->layout->attributes[$count]) && isset($this->layout->attributes[$count]['readonly']) ) {
+						if ( isset($this->layout->attributes[$count]['readonly']) ) {
 							switch ($this->layout->view) {
-								case 'items': $msg='in the <b>Item Type</b> configuration and/or in each individual <b>Item</b>'; break;
+								case FLEXI_ITEMVIEW: $msg='in the <b>Item Type</b> configuration and/or in each individual <b>Item</b>'; break;
 								case 'category': $msg='in each individual <b>Category</b>'; break;
 								default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
 							}
@@ -188,7 +204,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 							continue;
 						}
 						?>
-						<ul id="sortable-<?php echo $pos; ?>" class="positions">
+						<ul id="sortable-<?php echo $pos; ?>" class="positions" >
 						<?php
 						if (isset($this->fbypos[$pos])) :
 							foreach ($this->fbypos[$pos]->fields as $f) :
@@ -206,9 +222,11 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						<input type="hidden" name="<?php echo $pos; ?>" id="<?php echo $pos; ?>" value="" />
 					<?php 
 						endforeach;
+						// Close any field group line that it is still open
+						echo @$posrow ? "</td></tr></table>\n" : "";
 					else :
 						echo JText::_('FLEXI_NO_GROUPS_AVAILABLE');
-					endif;	
+					endif;
 					?>
 				</fieldset>
 			</td>

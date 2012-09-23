@@ -134,151 +134,53 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 	<!-- EOF subtitle3 block -->
 
 
+	<div class="clear"></div>
 
-<div class='fctabber' class='".$class."'><!-- tabber start -->
+<?php
+$tabcount = 6;
+
+// Find if at least one tabbed position is used
+for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['subtitle_tab'.$tc]);
+
+if (@$createtabs) :
+	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
 	
-<!-- BOF subtitle_tab1 block -->
-<?php if (isset($this->item->positions['subtitle_tab1'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab1</h3><!-- tab title -->
+	for ($tc=1; $tc<=$tabcount; $tc++) :
+		$tabpos_name  = 'subtitle_tab'.$tc;
+		$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
+		if (isset($this->item->positions[$tabpos_name])):
+?>
 	
-	<div class="flexi lineinfo subtitle_tab1">
-		<?php foreach ($this->item->positions['subtitle_tab1'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
+		<!-- BOF subtitle_tabN block -->
+		<div class='tabbertab'><!-- tab start -->
+			
+			<h3><?php echo $tabpos_name; ?></h3><!-- tab title -->
+			
+			<div class="flexi lineinfo <?php echo $tabpos_name; ?>">
+				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
+				<div class="flexi element">
+					<?php if ($field->label) : ?>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<?php endif; ?>
+					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
+				<?php endforeach; ?>
+			</div>
+			
+		</div><!-- tab end -->
+		 
+		<?php endif; ?>
+		<!-- EOF subtitle_tabN block -->	
 	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab1 block -->	
-
-
-<!-- BOF subtitle_tab2 block -->
-<?php if (isset($this->item->positions['subtitle_tab2'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab2</h3><!-- tab title -->
-	
-	<div class="flexi lineinfo subtitle_tab2">
-		<?php foreach ($this->item->positions['subtitle_tab2'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab2 block -->	
+	<?php endfor; ?>
+		
+<?php
+	echo '</div><!-- tabber end -->'."\n";
+endif;
+?>
 
 
-<!-- BOF subtitle_tab3 block -->
-<?php if (isset($this->item->positions['subtitle_tab3'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab3</h3><!-- tab title -->
-	
-	<div class="flexi lineinfo subtitle_tab3">
-		<?php foreach ($this->item->positions['subtitle_tab3'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab3 block -->	
-
-
-<!-- BOF subtitle_tab4 block -->
-<?php if (isset($this->item->positions['subtitle_tab4'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab4</h3><!-- tab title -->
-	
-	<div class="flexi lineinfo subtitle_tab4">
-		<?php foreach ($this->item->positions['subtitle_tab4'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab4 block -->	
-
-
-<!-- BOF subtitle_tab5 block -->
-<?php if (isset($this->item->positions['subtitle_tab5'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab5</h3><!-- tab title -->
-	
-	<div class="flexi lineinfo subtitle_tab5">
-		<?php foreach ($this->item->positions['subtitle_tab5'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab5 block -->	
-
-
-<!-- BOF subtitle_tab6 block -->
-<?php if (isset($this->item->positions['subtitle_tab6'])) : ?>
-
- <div class='tabbertab'><!-- tab start -->
-	<h3>subtitle_tab6</h3><!-- tab title -->
-	
-	<div class="flexi lineinfo subtitle_tab6">
-		<?php foreach ($this->item->positions['subtitle_tab6'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	
- </div><!-- tab end -->
-
-<?php endif; ?>
-<!-- EOF subtitle_tab6 block -->	
-	
- </div><!-- tab end -->
- 
-</div><!-- tabber end -->
-
-
+	<div class="clear"></div>
 
 	<?php if ((isset($this->item->positions['image'])) || (isset($this->item->positions['top']))) : ?>
 	<div class="flexi topblock">  <!-- NOTE: image block is inside top block ... -->
@@ -339,6 +241,53 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 	
 	<div class="clear"></div>
 	
+
+<?php
+$tabcount = 6;
+
+// Find if at least one tabbed position is used
+for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['bottom_tab'.$tc]);
+
+if (@$createtabs) :
+	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
+	
+	for ($tc=1; $tc<=$tabcount; $tc++) :
+		$tabpos_name  = 'bottom_tab'.$tc;
+		$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
+		if (isset($this->item->positions[$tabpos_name])):
+?>
+	
+		<!-- BOF bottom_tabN block -->
+		<div class='tabbertab'><!-- tab start -->
+			
+			<h3><?php echo $tabpos_name; ?></h3><!-- tab title -->
+			
+			<div class="flexi lineinfo <?php echo $tabpos_name; ?>">
+				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
+				<div class="flexi element">
+					<?php if ($field->label) : ?>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<?php endif; ?>
+					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
+				<?php endforeach; ?>
+			</div>
+			
+		</div><!-- tab end -->
+		 
+		<?php endif; ?>
+		<!-- EOF bottom_tabN block -->	
+	
+	<?php endfor; ?>
+		
+<?php
+	echo '</div><!-- tabber end -->'."\n";
+endif;
+?>
+
+
+	<div class="clear"></div>
+
 	<!-- BOF bottom block -->
 	<?php if (isset($this->item->positions['bottom'])) : ?>
 	<div class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols">
