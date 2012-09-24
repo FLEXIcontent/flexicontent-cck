@@ -32,10 +32,33 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function onDisplayField(&$field, $item)
 	{
 		if($field->field_type != 'image') return;
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$field->label = JText::_($field->label);
+		
+		// some parameter shortcuts
+		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval     = $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 1);
 		$always_allow_removal = $field->parameters->get('always_allow_removal', 0);
+		
+		// optional properies configuration
+		$linkto_url = $field->parameters->get('linkto_url',0);
+		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
+		$title_usage = $field->parameters->get( 'title_usage', 0 ) ;
+		$desc_usage  = $field->parameters->get( 'desc_usage', 0 ) ;
+		
+		$default_alt    = ($item->version == 0 || $alt_usage > 0) ? $field->parameters->get( 'default_alt', '' ) : '';
+		$default_title  = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_desc   = ($item->version == 0 || $desc_usage > 0) ? $field->parameters->get( 'default_desc', '' ) : '';
+		
+		$usealt    = $field->parameters->get( 'use_alt', 1 ) ;
+		$usetitle  = $field->parameters->get( 'use_title', 1 ) ;
+		$usedesc   = $field->parameters->get( 'use_desc', 1 ) ;
+		
+		
+		$app      = & JFactory::getApplication();
+		$document = & JFactory::getDocument();
 		
 		$js = "
 			function fx_img_toggle_required (obj_changed, obj_req_toggle) {
@@ -47,89 +70,240 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					obj_req_toggle.className='required';
 				}
 			}
+			
+			function fx_toggle_upload_select_tbl (obj_changed, obj_disp_toggle) {
+				if (obj_changed.checked)
+					obj_disp_toggle.setStyle('display', 'table');
+				else
+					obj_disp_toggle.setStyle('display', 'none');
+			}
 			";
-		$document	= & JFactory::getDocument();
 		$document->addScriptDeclaration($js);
-
-		$field->label = JText::_($field->label);
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'image') return;
 		
 		$n = 0;
 		$field->html = '';
 		$select = $this->buildSelectList( $field );
-		$app =& JFactory::getApplication();
-		$linkto_url = $field->parameters->get('linkto_url',0);
 		
-		// Make sure value is an array of values, not sure if this is needed
-		if ( isset($field->value['originalname']) ) $field->value = array($field->value);
 		
-		// if an image exists it display the existing image
-		if ( strlen(trim(@$field->value[0]['originalname'])) )
-		{
-			foreach ($field->value as $value) {
-				$value = unserialize($value);
-				
-				// Check and rebuild thumbnails if needed
-				$this->rebuildThumbs($field,$value);
-				
-				$image = $value['originalname'];
-				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';				
-				if ($always_allow_removal)
-					$remove = '';
-				else
-					$remove = $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
-				$adminprefix = $app->isAdmin() ? '../' : '';
-				$field->html	.= '
-				<div style="float:left; margin-right: 5px;">
-					<img src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver; float:left;" />
-					<div style="float:left; clear:both;">
-						<input type="checkbox" name="custom['.$field->name.'][remove]" value="1"'.$remove.' style="float:none;">'.JText::_( 'FLEXI_FIELD_REMOVE' ).' &nbsp;
-						<input type="checkbox" name="custom['.$field->name.'][delete]" value="1"'.$delete.' style="float:none;">'.JText::_( 'FLEXI_FIELD_DELETE' ).'
-						<input name="custom['.$field->name.'][originalname]" type="hidden" value="'.$value['originalname'].'" />
-					</div>
-				</div>
-				<div style="float:left;">
-					<table class="admintable">'.
-					($linkto_url ? '
-						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-							<td><input size="40" name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
-						</tr>'
-						:
-						'').'
-						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
-							<td><input size="40" name="custom['.$field->name.'][alt]" value="'.$value['alt'].'" type="text" /></td>
-						</tr>
-						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-							<td><input size="40" name="custom['.$field->name.'][title]" value="'.$value['title'].'" type="text" /></td>
-						</tr>
-						<tr>
-							<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-							<td><textarea name="custom['.$field->name.'][desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
-						</tr>
-					</table>
-				</div>';
-				$n++;
-			}
+		// Make sure value is an array of values
+		if ( !$field->value ) {
+			$field->value = array();
+			$field->value[0]['originalname'] = '';
+			$field->value[0] = serialize($field->value[0]);
 		}
-		else
+		
+		
+		if ($multiple) // handle multiple records
 		{
-			// else display the form for adding a new image
+			//add the drag and drop sorting feature
+			$js = "
+			window.addEvent('domready', function(){
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+					});			
+				});
+			";
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScriptDeclaration($js);
+			
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			
+			$js = "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxVal".$field->id."		= ".$maxval.";
+
+			function addField".$field->id."(el) {
+				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
+
+					var thisField 	 = $(el).getPrevious().getLast();
+					var thisNewField = thisField.clone();
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					
+					thisNewField.getElements('input.newfile').setProperty('value','');
+					thisNewField.getElements('input.newfile').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+']');
+					
+					thisNewField.getElements('input.originalname').setProperty('value','');
+					thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
+					
+					thisNewField.getElements('select.existingname').setProperty('value','');
+					thisNewField.getElements('select.existingname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
+					
+					if (thisNewField.getElement('img.preview_image')) {
+						var tmpDiv = new Element('div',{html:'<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>'});
+						tmpDiv.getFirst().replaces( thisNewField.getElement('img.preview_image') );
+					}
+					thisNewField.getElement('div.delrem_box').destroy();
+					
+					thisNewField.getElements('table.img_upload_select').setProperty('id','upload_select_tbl_'+uniqueRowNum".$field->id.");
+					thisNewField.getElements('table.img_upload_select').setStyle('display', 'table');
+					";
+					
+			if ($linkto_url) $js .= "
+					thisNewField.getElements('input.imglink').setProperty('value','');
+					thisNewField.getElements('input.imglink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
+					";
+					
+			if ($usealt) $js .= "
+					thisNewField.getElements('input.imgalt').setProperty('value','".$default_alt."');
+					thisNewField.getElements('input.imgalt').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
+					";
+					
+			if ($usetitle) $js .= "
+					thisNewField.getElements('input.imgtitle').setProperty('value','".$default_title."');
+					thisNewField.getElements('input.imgtitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+					";
+					
+			if ($usedesc) $js .= "
+					thisNewField.getElements('textarea.imgdesc').setProperty('value','".$default_desc."');
+					thisNewField.getElements('textarea.imgdesc').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
+					";
+					
+			$js .= "
+					thisNewField.injectAfter(thisField);
+		
+					new Sortables($('sortables_".$field->id."'), {
+						'constrain': true,
+						'clone': true,
+						'handle': '.fcfield-drag'
+					});			
+
+					fx.start({ 'opacity': 1 }).chain(function(){
+						this.setOptions({duration: 600});
+						this.start({ 'opacity': 0 });
+						})
+						.chain(function(){
+							this.setOptions({duration: 300});
+							this.start({ 'opacity': 1 });
+						});
+
+					rowCount".$field->id."++;       // incremented / decremented
+					uniqueRowNum".$field->id."++;   // incremented only
+				}
+			}
+
+			function deleteField".$field->id."(el)
+			{
+				if(rowCount".$field->id." > 1)
+				{
+					var field	= $(el);
+					var row		= field.getParent();
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					
+					fx.start({
+						'height': 0,
+						'opacity': 0
+						}).chain(function(){
+							row.destroy();
+						});
+					rowCount".$field->id."--;
+				}
+			}
+			";
+			$document->addScriptDeclaration($js);
+			
+			$css = '
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' li {
+				clear: both;
+				display: block;
+				list-style: none;
+				position: relative;
+			}
+			#sortables_'.$field->id.' li input { cursor: text;}
+			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
+			';
+			
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$css = '';
+		}
+		
+		$document->addStyleDeclaration($css);
+		
+		$adminprefix = $app->isAdmin() ? '../' : '';
+		$n = 0;
+		foreach ($field->value as $value) {
+			$value = unserialize($value);
+			
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
+			
 			$class = ' class="'.$required.' "';
 			$onchange= ' onchange="';
 			$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
 			$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
 			$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 			$onchange .= ' "';
-			$field->html	.= '
+			
+			
+			if ( strlen(trim($value['originalname'])) ) {
+				// Check and rebuild thumbnails if needed
+				$this->rebuildThumbs($field,$value);
+				
+				$image = $value['originalname'];
+				
+				$delete = $this->canDeleteImage( $field, $image ) ? '' : ' disabled="disabled"';
+				$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;">';
+				$delete .= '<label style="display:inline;" for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE' ).'</label>';
+				
+				$remove = $always_allow_removal ? '' : $this->canDeleteImage( $field, $image ) ? ' disabled="disabled"' : '';
+				$remove = '<input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove.' style="display:inline;">';
+				$remove .= '<label style="display:inline;" for="'.$elementid.'_remove">'.JText::_( 'FLEXI_FIELD_REMOVE' ).'</label>';
+				
+				$change = '<input class="imgchange" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\'upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;">';
+				$change .= '<label style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'Change' ).'</label>';
+				
+				$originalname = '<input name="'.$fieldname.'[originalname]" type="hidden" value="'.$value['originalname'].'" />';
+				
+				$imgpreview = '<img class="preview_image" src="'.$adminprefix.$field->parameters->get('dir').'/s_'.$value['originalname'].'" style="border: 1px solid silver; float:left;" />';
+			} else {
+				$delete = $remove = $change = '';
+				$originalname = '';
+				$imgpreview = '<div class="empty_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
+			}
+			
+			if ($linkto_url) $urllink =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
+					<td><input class="imglink" size="40" name="'.$fieldname.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
+				</tr>';
+			if ($usealt) $alt =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
+					<td><input class="imgalt" size="40" name="'.$fieldname.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" /></td>
+				</tr>';
+			if ($usetitle) $title =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+					<td><input class="imgtitle" size="40" name="'.$fieldname.'[title]" value="'.(isset($value['title']) ? $value['title'] : $default_title).'" type="text" /></td>
+				</tr>';
+			if ($usedesc) $desc =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
+				</tr>';
+			
+			$field->html[] = '
 			<div style="float:left; margin-right: 5px;">
-				<div class="empty_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>
+				'.$imgpreview.'
+				'.$originalname.'
+				<div style="float:left; clear:both;" class="delrem_box">
+					'.$remove.'<br/>
+					'.$delete.'<br/>
+					'.$change.'
+				</div>
 			</div>
-			<div style="float:left;">
-				<table class="admintable">
+			'.$remove_button.'
+			<div style="float:right;">
+				<table class="admintable img_upload_select" id="upload_select_tbl_'.$n.'" style="display:none;" ><tbody>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_MAXSIZE' ).':</td>
 						<td>'.($field->parameters->get('upload_maxsize') / 1000000).' M</td>
@@ -140,34 +314,33 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'" id="'.$field->name.'_newfile"  class="'.$required.'" '.$onchange.' type="file" /></td>
+						<td><input name="'.$field->name.'['.$n.']" id="'.$field->name.'_newfile"  class="newfile '.$required.'" '.$onchange.' type="file" /></td>
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).':</td>
-						<td>'.$select.'</td>
-					</tr>'.
-					($linkto_url ? '
-					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
-						<td><input size="40" name="custom['.$field->name.'][urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
-					</tr>'
-					:
-					'').'
-					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
-						<td><input size="40" name="custom['.$field->name.'][alt]" type="text" /></td>
+						<td>'.str_replace('__FORMFLDNAME__', $fieldname.'[existingname]', $select).'</td>
 					</tr>
-					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-						<td><input size="40" name="custom['.$field->name.'][title]" type="text" /></td>
-					</tr>
-					<tr>
-						<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-						<td><textarea name="custom['.$field->name.'][desc]" rows="2" cols="30" />'.(isset($value['desc']) ? $value['desc'] : '').'</textarea></td>
-					</tr>
-				</table>
+				</tbody></table>
+				<table class="admintable"><tbody>
+					'.@$urllink.'
+					'.@$alt.'
+					'.@$title.'
+					'.@$desc.'
+				</tbody></table>
 			</div>
+			'.$move2.'
 			';
+			
+			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+		}
+		
+		if ($multiple) { // handle multiple records
+			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD' ).' -- " />';
+		} else {  // handle single values
+			$field->html = $field->html[0];
 		}
 	}
 
@@ -178,20 +351,97 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if($field->field_type != 'image') return;
 
 		static $multiboxadded = false;
-		$mainframe = &JFactory::getApplication();
-		$view = JRequest::getVar('view');
-		$option = JRequest::getVar('option');
-		jimport('joomla.filesystem');
-
+		
 		$values = $values ? $values : $field->value;
 		
-		$isItemsManager = $mainframe->isAdmin() && $view=='items' && $option=='com_flexicontent';
+		$multiple    = $field->parameters->get( 'allow_multiple', 1 ) ;
+		
+		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
+		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
+		$default_alt = ($alt_usage == 2)  ?  $field->parameters->get( 'default_alt', '' ) : '';
+		
+		$usetitle      = $field->parameters->get( 'use_title', 1 ) ;
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_title', '' )) : '';
+		
+		$usedesc       = $field->parameters->get( 'use_desc', 1 ) ;
+		$desc_usage    = $field->parameters->get( 'desc_usage', 0 ) ;
+		$default_desc  = ($desc_usage == 2)  ?  $field->parameters->get( 'default_desc', '' ) : '';
+		
+		// Separators / enclosing characters
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
+		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag			= $field->parameters->get( 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		
+		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '&nbsp;';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = '&nbsp;|&nbsp;';
+			break;
+
+			case 3:
+			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
+
+		// Allow for thumbnailing of the default image
+		if (!$values || $values[0] == '') {
+			$default_image = $field->parameters->get( 'default_image', '');
+			if ( $default_image !== '' ) {
+				$values[0] = array();
+				$values[0]['is_default_image'] = true;
+				$values[0]['default_image'] = $default_image;
+				$values[0]['originalname'] = basename($default_image);
+				$values[0]['alt'] = $default_alt;
+				$values[0]['title'] = $default_title;
+				$values[0]['desc'] = $default_desc;
+				$values[0]['urllink'] = '';
+				$values[0] = serialize($values[0]);
+				$field->value[0] = $values[0];
+			}
+		}
+		
+		// Check for no values and return empty display
+		if ( !$values || !$values[0]) {
+			$field->{$prop} = '';
+			return;
+		}
+		
+		$app       = & JFactory::getApplication();
+		$document	 = & JFactory::getDocument();
+		$view      = JRequest::getVar('view');
+		$option    = JRequest::getVar('option');
+		jimport('joomla.filesystem');
+		
+		$isItemsManager = $app->isAdmin() && $view=='items' && $option=='com_flexicontent';
 		
 		// some parameter shortcuts
 		$uselegend  = $field->parameters->get( 'uselegend', 1 ) ;
 		$usepopup   = $field->parameters->get( 'usepopup',  1 ) ;
 		$popuptype  = $field->parameters->get( 'popuptype', 1 ) ;
 		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
+		$grouptype = $multiple ? 0 : $grouptype;  // Field in gallery mode: Force grouping of images per field (current item)
 		
 		// Check and disable 'uselegend'
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
@@ -210,6 +460,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// FORCE multibox popup in backend ...
 		if ($isItemsManager) $popuptype = 1;
 		
+		// remaining parameters shortcuts
 		$showtitle = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc  = $field->parameters->get( 'showdesc', 0 ) ;
 		
@@ -221,266 +472,299 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
 		$ogpthumbsize= $field->parameters->get('ogpthumbsize', 2);
 		
-		// Allow for thumbnailing of the default image
-		if (!$values || $values[0] == '') {
-			$default_image = $field->parameters->get( 'default_image', '');
-			if ( $default_image !== '' ) {
-				$values[0] = array();
-				$values[0]['is_default_image'] = true;
-				$values[0]['default_image'] = $default_image;
-				$values[0]['originalname'] = basename($default_image);
-				$values[0]['title'] = $values[0]['alt'] = $values[0]['desc'] = $values[0]['urllink'] = '';
-				$values[0] = serialize($values[0]);
-				$field->value[0] = $values[0];
+		// load the tooltip library if redquired
+		if ($uselegend) JHTML::_('behavior.tooltip');
+		
+		if ( ($app->isSite() || $isItemsManager)
+					&& !$multiboxadded
+					&&	(  ($linkto_url && $url_target=='multibox')  ||  ($usepopup && $popuptype == 1)  )
+			 )
+		{
+			JHTML::_('behavior.mootools');
+			
+			// Multibox integration use different version for FC v2x
+			if (FLEXI_J16GE) {
+				
+				// Include MultiBox CSS files
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
+				
+				// NEW ie6 hack
+				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
+					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+				}  // This is the new code for new multibox version, old multibox hack is the following lines
+				
+				// Include MultiBox Javascript files
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
+				
+				// Add js code for creating a multibox instance
+				$extra_options = '';
+				if ($isItemsManager) $extra_options .= ''
+						.',showNumbers: false'  //show numbers such as "4 of 12"
+						.',showControls: false' //show the previous/next, title, download etc
+						;
+				$box = "
+					window.addEvent('domready', function(){
+						//call multiBox
+						var initMultiBox = new multiBox({
+							mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
+							container: $(document.body),//where to inject multiBox
+							descClassName: 'multiBoxDesc',//the class name of the description divs
+							path: './Files/',//path to mp3 and flv players
+							useOverlay: true,//use a semi-transparent background. default: false;
+							maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
+							addDownload: false,//do you want the files to be downloadable?
+							pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
+							addRollover: true,//add rollover fade to each multibox link
+							addOverlayIcon: true,//adds overlay icons to images within multibox links
+							addChain: true,//cycle through all images fading them out then in
+							recalcTop: true,//subtract the height of controls panel from top position
+							addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
+							autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
+							".$extra_options."
+						});
+					});
+				";
+				$document->addScriptDeclaration($box);
+			} else {
+				
+				// Include MultiBox CSS files
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/multibox.css');
+				
+				// OLD ie6 hack
+				$csshack = '
+				<!--[if lte IE 6]>
+				<style type="text/css">
+				.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
+					behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
+				}
+				</style>
+				<![endif]-->
+				';
+				$document->addCustomTag($csshack);
+				
+				// Include MultiBox Javascript files
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/overlay.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/multibox.js');
+				
+				// Add js code for creating a multibox instance
+				$extra_options = $isItemsManager ? ', showNumbers: false, showControls: false' : '';
+				$box = "
+					var box = {};
+					window.addEvent('domready', function(){
+						box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true".$extra_options." });
+					});
+				";
+				$document->addScriptDeclaration($box);
 			}
+
+			$multiboxadded = 1;
 		}
 		
-		if ($values && $values[0] != '')
+		$i = -1;
+		foreach ($values as $value)
 		{
-			$document	= & JFactory::getDocument();
+			$value	= unserialize($value);
+			if ( !strlen(trim(@$value['originalname'])) ) continue;  // check for empty value
+			$i++;
 			
-			// load the tooltip library if redquired
-			if ($uselegend) JHTML::_('behavior.tooltip');
+			// Check and rebuild thumbnails if needed
+			$this->rebuildThumbs($field,$value);
 			
-			if ( ($mainframe->isSite() || $isItemsManager)
-						&& !$multiboxadded
-						&&	(  ($linkto_url && $url_target=='multibox')  ||  ($usepopup && $popuptype == 1)  )
-				 )
-			{
-				JHTML::_('behavior.mootools');
-				
-				// Multibox integration use different version for FC v2x
-				if (FLEXI_J16GE) {
-					
-					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
-					
-					// NEW ie6 hack
-					if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-						$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
-					}  // This is the new code for new multibox version, old multibox hack is the following lines
-					
-					// Include MultiBox Javascript files
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
-					
-					// Add js code for creating a multibox instance
-					$extra_options = '';
-					if ($isItemsManager) $extra_options .= ''
-							.',showNumbers: false'  //show numbers such as "4 of 12"
-							.',showControls: false' //show the previous/next, title, download etc
- 							;
-					$box = "
-						window.addEvent('domready', function(){
-							//call multiBox
-							var initMultiBox = new multiBox({
-								mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
-								container: $(document.body),//where to inject multiBox
-								descClassName: 'multiBoxDesc',//the class name of the description divs
-								path: './Files/',//path to mp3 and flv players
-								useOverlay: true,//use a semi-transparent background. default: false;
-								maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
-								addDownload: false,//do you want the files to be downloadable?
-								pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
-								addRollover: true,//add rollover fade to each multibox link
-								addOverlayIcon: true,//adds overlay icons to images within multibox links
-								addChain: true,//cycle through all images fading them out then in
-								recalcTop: true,//subtract the height of controls panel from top position
-								addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
-								autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
-								".$extra_options."
-							});
-						});
-					";
-					$document->addScriptDeclaration($box);
-				} else {
-					
-					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/multibox.css');
-					
-					// OLD ie6 hack
-					$csshack = '
-					<!--[if lte IE 6]>
-					<style type="text/css">
-					.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
-						behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
-					}
-					</style>
-					<![endif]-->
-					';
-					$document->addCustomTag($csshack);
-					
-					// Include MultiBox Javascript files
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/overlay.js');
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/multibox.js');
-					
-					// Add js code for creating a multibox instance
-					$extra_options = $isItemsManager ? ', showNumbers: false, showControls: false' : '';
-					$box = "
-						var box = {};
-						window.addEvent('domready', function(){
-							box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true".$extra_options." });
-						});
-					";
-					$document->addScriptDeclaration($box);
-				}
+			$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . 'l_' . $value['originalname']);
+			$size	= getimagesize($path);
+			$hl 	= $size[1];
+			$wl 	= $size[0];
+			$title	= @$value['title'] ? $value['title'] : '';
+			$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
+			$desc	= @$value['desc'] ? $value['desc'] : '';
 
-				$multiboxadded = 1;
+			$srcb	= $field->parameters->get('dir') . '/b_' . $value['originalname'];  // backend
+			$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];  // small
+			$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];  // medium
+			$srcl	= $field->parameters->get('dir') . '/l_' . $value['originalname'];  // large
+			
+			$urllink = @$value['urllink'] ? $value['urllink'] : '';
+			if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
+			
+			$tip	= $title . '::' . $desc;
+			$id		= $field->item_id . '_' . $field->id . '_' . $i;
+			$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
+			
+			$view 	= JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+			
+			$thumb_size = 0;
+			if ($view == 'category')
+				$thumb_size =  $field->parameters->get('thumbincatview',2);
+			if($view == FLEXI_ITEMVIEW)
+				$thumb_size =  $field->parameters->get('thumbinitemview',1);
+			switch ($thumb_size)
+			{
+				case 1: $src = $srcs; break;
+				case 2: $src = $srcm; break;
+				case 3: $src = $srcl; break;   // this makes little sense, since both thumbnail and popup image are size 'large'
+				default: $src = $srcs; break;
 			}
 			
-			$i = 0;
-			foreach ($values as $value)
+			switch ($grouptype)
 			{
-				$value	= unserialize($value);
-				if ( !strlen(trim(@$value['originalname'])) ) continue;  // check for empty value
-				
-				// Check and rebuild thumbnails if needed
-				$this->rebuildThumbs($field,$value);
-				
-				$path	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS . 'l_' . $value['originalname']);
-				$size	= getimagesize($path);
-				$hl 	= $size[1];
-				$wl 	= $size[0];
-				$title	= @$value['title'] ? $value['title'] : '';
-				$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
-				$desc	= @$value['desc'] ? $value['desc'] : '';
-
-				$srcb	= $field->parameters->get('dir') . '/b_' . $value['originalname'];  // backend
-				$srcs	= $field->parameters->get('dir') . '/s_' . $value['originalname'];  // small
-				$srcm	= $field->parameters->get('dir') . '/m_' . $value['originalname'];  // medium
-				$srcl	= $field->parameters->get('dir') . '/l_' . $value['originalname'];  // large
-				
-				$urllink = @$value['urllink'] ? $value['urllink'] : '';
-				if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
-				
-				$tip	= $title . '::' . $desc;
-				$id		= $field->item_id . '_' . $field->id . '_' . $i;
-				$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
-				$i++;
-				
-				$view 	= JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
-				
-				$thumb_size = 0;
-				if ($view == 'category')
-					$thumb_size =  $field->parameters->get('thumbincatview',2);
-				if($view == FLEXI_ITEMVIEW)
-					$thumb_size =  $field->parameters->get('thumbinitemview',1);
-				switch ($thumb_size)
-				{
-					case 1: $src = $srcs; break;
-					case 2: $src = $srcm; break;
-					case 3: $src = $srcl; break;   // this makes little sense, since both thumbnail and popup image are size 'large'
-					default: $src = $srcs; break;
-				}
-				
-				switch ($grouptype)
-				{
-					case 0: $group_name = ''; break;
-					case 1: $group_name = 'fcitem_'.$field->item_id; break;
-					case 2: $group_name = 'fcview_'.$view; break;
-					default: $group_name = ''; break;
-				}
-				
-				// ADD some extra (display) properties that point to all sizes
-				$field->{"display_backend_src"} = JURI::root().$srcb;
-				$field->{"display_small_src"} = JURI::root().$srcs;
-				$field->{"display_medium_src"} = JURI::root().$srcm;
-				$field->{"display_large_src"} = JURI::root().$srcl;
-				
-				$field->{"display_backend"} = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'"'.$legend.' />';
-				$field->{"display_small"} = '<img src="'.JURI::root().$srcs.'" alt ="'.$alt.'"'.$legend.' />';
-				$field->{"display_medium"} = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'"'.$legend.' />';
-				$field->{"display_large"} = '<img src="'.JURI::root().$srcl.'" alt ="'.$alt.'"'.$legend.' />';
-				
-				// Suggest image for external use, e.g. for Facebook etc
-				if ($useogp) {
-					if ( in_array($view, $ogpinview) ) {
-						switch ($ogpthumbsize)
-						{
-							case 1: $ogp_src = $field->{"display_small_src"}; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-							case 2: $ogp_src = $field->{"display_medium_src"}; break;
-							case 3: $ogp_src = $field->{"display_large_src"}; break;
-							default: $ogp_src = $field->{"display_medium_src"}; break;
-						}
-						$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
-						$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
+				case 0: $group_name = 'fcitem_'.$field->id; break;
+				case 1: $group_name = 'fcitem_'.$field->item_id; break;
+				case 2: $group_name = 'fcview_'.$view; break;
+				default: $group_name = ''; break;
+			}
+			
+			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
+			$field->{"display_backend_src"} = JURI::root().$srcb;
+			$field->{"display_small_src"} = JURI::root().$srcs;
+			$field->{"display_medium_src"} = JURI::root().$srcm;
+			$field->{"display_large_src"} = JURI::root().$srcl;
+			
+			// Suggest image for external use, e.g. for Facebook etc
+			if (!$isItemsManager && $useogp) {
+				if ( in_array($view, $ogpinview) ) {
+					switch ($ogpthumbsize)
+					{
+						case 1: $ogp_src = $field->{"display_small_src"}; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+						case 2: $ogp_src = $field->{"display_medium_src"}; break;
+						case 3: $ogp_src = $field->{"display_large_src"}; break;
+						default: $ogp_src = $field->{"display_medium_src"}; break;
 					}
+					$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
+					$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
 				}
+			}
+			
+			// Check if a custom URL-only (display) variable was requested and return it here,
+			// without rendering the extra image parameters like legend, pop-up, etc
+			if ( in_array($prop, array("display_backend_src", "display_small_src", "display_medium_src", "display_large_src") ) ) {
+				return $field->{$prop};
+			}
+			
+			switch ($prop)
+			{
+				case 'display_backend':
+					$img_legend   = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'"'.$legend.' />';
+					$img_nolegend = '<img src="'.JURI::root().$srcb.'" alt ="'.$alt.'" />';
+					break;
+				case 'display_small':
+					$img_legend   = '<img src="'.JURI::root().$srcs.'" alt ="'.$alt.'"'.$legend.' />';
+					$img_nolegend = '<img src="'.JURI::root().$srcs.'" alt ="'.$alt.'" />';
+					break;
+				case 'display_medium':
+					$img_legend   = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'"'.$legend.' />';
+					$img_nolegend = '<img src="'.JURI::root().$srcm.'" alt ="'.$alt.'" />';
+					break;
+				case 'display_large':
+					$img_legend   = '<img src="'.JURI::root().$srcl.'" alt ="'.$alt.'"'.$legend.' />';
+					$img_nolegend = '<img src="'.JURI::root().$srcl.'" alt ="'.$alt.'" />';
+					break;
+				case 'display': default:
+					$_src = $isItemsManager ? $srcb : $src;
+					$img_legend   = '<img src="'.JURI::root().$_src.'" alt ="'.$alt.'"'.$legend.' />';
+					$img_nolegend = '<img src="'.JURI::root().$_src.'" alt ="'.$alt.'" />';
+					break;
+			}
+			
+			
+			// *********************************************
+			// FINALLY CREATE the field display variable ...
+			// *********************************************
+			
+			if ($isItemsManager) {
 				
-				// Check if a custom variable (display) was requested and do not render default variable
-				if ( in_array($prop,
-						array("display_backend", "display_small","display_medium", "display_large",
-						"display_backend_src", "display_small_src", "display_medium_src", "display_large_src") )
-				) {
-					return $field->{$prop};
-				}
+				// CASE 1: Handle image displayed in backend items manager
 				
-				// first condition is for the display for the preview feature
-				if ($isItemsManager) {    // Image displayed in backend items manager
-					if ($usepopup) {
-						$field->{$prop} = '
-						<a href="../'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
-							<img src="../'. $srcb .'" alt ="'.$alt.'"'.$legend.' />
-						</a>
-						<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
-						';
-					} else {
-						$field->{$prop} = '<img src="../'.$srcb.'" alt ="'.$alt.'"'.$legend.' />';
-					}
-				} else if ($linkto_url && $url_target=='multibox' && $urllink) {   // No image popup, instead link to URL inside a popup
+				if ($usepopup) {
 					$field->{$prop} = '
+					<a href="../'.$srcl.'" id="mb'.$id.'" class="mb" rel="[images]" >
+						'.$img_legend.'
+					</a>
+					<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
+					';
+				} else {
+					$field->{$prop} = $img_legend;
+				}
+				return;  // Single image always ...
+				
+			} else if ($linkto_url && $urllink) {
+				
+				// CASE 2: Handle linking to a URL instead of image zooming popup
+				
+				if ($url_target=='multibox') {  // (a) Link to URL that opens inside a popup
+					$field->{$prop}[] = '
 					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$id.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>
-						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+						'.$img_legend.'
 					<script>document.write(\'</a>\')</script>
 					<div class="multiBoxDesc mbox_img_url mb'.$id.'">'.($desc ? $desc : $title).'</div>
 					';
-				} else if ($linkto_url && $urllink) {    // No image popup, just link to URL
-					$field->{$prop} = '
+				} else {    // (b) Just link to URL
+					$field->{$prop}[] = '
 					<a href="'.$urllink.'" target="'.$url_target.'">
-						<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+						'.$img_legend.'
 					</a>
 					';
-				} else if ($usepopup && $popuptype == 1) {   // Multibox image popup
+				}
+				
+			} else if ($usepopup) {
+				
+				// CASE 3: Handle image zooming popup
+				
+				// no popup if image is the largest one
+				if ($prop=='display_large') {
+					$field->{$prop}[] = $img_legend;
+					continue;
+				}
+					
+				if ($usepopup && $popuptype == 1) {   // Multibox image popup
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-					$field->{$prop} = '
+					$field->{$prop}[] = '
 						<a href="'.$srcl.'" id="mb'.$id.'" class="mb" '.$group_str.' >
-							<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />
+							'.$img_legend.'
 						</a>
 						<div class="multiBoxDesc mb'.$id.'">'.($desc ? $desc : $title).'</div>
 						';
 				} else if ($usepopup && $popuptype == 2) {   // Rokbox image popup
 					$group_str = '';   // no support for image grouping
-					$field->{$prop} = '
+					$field->{$prop}[] = '
 						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.($desc ? $desc : $title).'">
-							<img src="'. $src .'" alt ="'.$alt.'" />
+							'.$img_nolegend.'
 						</a>
 						';
 				} else if ($usepopup && $popuptype == 3) {   // JCE popup image popup
 					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
-					$field->{$prop} = '
+					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="jcepopup" '.$group_str.' title="'.($desc ? $desc : $title).'">
-							<img src="'. $src .'" alt ="'.$alt.'" />
+							'.$img_nolegend.'
 						</a>
 						';
 				} else if ($usepopup && $popuptype == 4) {   // Fancybox image popup
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
-					$field->{$prop} = '
+					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.($desc ? $desc : $title).'">
-							<img src="'. $src .'" alt ="'.$alt.'" />
+							'.$img_nolegend.'
 						</a>
 						';
-				} else {   // thumbnail without popup
-					$field->{$prop} = '<img src="'. $src .'" alt ="'.$alt.'"'.$legend.' />';
 				}
+				
+			} else {
+				// CASE 4: Thumbnail without popup
+				$field->{$prop}[] = $img_nolegend;
 			}
-			if ($showtitle || $showdesc) $field->{$prop} = '<div class="fcimg_tooltip_data">'.$field->{$prop};
-			if ($showtitle) $field->{$prop} .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
-			if ($showdesc) $field->{$prop} .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
-			if ($showtitle || $showdesc) $field->{$prop} .= '</div>';
+			
+			if ($showtitle || $showdesc) $field->{$prop}[$i] = '<div class="fcimg_tooltip_data">'.$field->{$prop}[$i];
+			if ($showtitle) $field->{$prop}[$i] .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
+			if ($showdesc) $field->{$prop}[$i] .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
+			if ($showtitle || $showdesc) $field->{$prop}[$i] .= '</div>';
+		}
+		
+		// Apply seperator and open/close tags
+		if(count($field->{$prop})) {
+			$field->{$prop}  = implode($separatorf, $field->{$prop});
+			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
-		// some parameter shortcuts
 	}
 	
 	function onBeforeSaveField($field, &$post, &$file)
@@ -489,51 +773,98 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if($field->field_type != 'image') return;
 		if(!$post) return;
 
-		$mainframe = &JFactory::getApplication();
+		$app = &JFactory::getApplication();
+		
+		// Rearrange file array so that file properties are group per image number
+		$files = array();
+		foreach( $file as $key => $all ) {
+			foreach( $all as $i => $val ) {
+				$files[$i][$key] = $val;
+			}
+		}
+		
+		//echo "<pre>"; print_r($file);
+		//echo "<pre>"; print_r($post); exit;
+		
+		// Handle uploading / removing / deleting / replacing image files
+		$n = 0;
+		$new = array();
+    foreach ($post as $i => $data)
+    {
+			// (a) Handle uploading a new original file
+			$this->uploadOriginalFile($field, $data, $files[$i]);
+			
+			if ( $data['originalname'] || $data['existingname'] ) {
+				// (b) Handle removing image assignment OR deleting the image file
+				if ($data['originalname'])
+				{
+					if ( @$data['delete'] )
+					{
+						$filename = $data['originalname'];
+						$this->removeOriginalFile( $field, $filename );
+						//$app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Deleted image from server storage'));
+					}
+					elseif ( @$data['remove'] )
+					{
+						//if ( !$data['existingname'] ) $app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Removed image assignment to the field'));
+					}
+				}
+				
+				// (c) Handle replacing image with a new existing image
+				if ( $data['existingname'] ) {
+					//echo "<pre>"; print_r($data); exit;
+					$data['originalname'] = $data['existingname'];
+					unset($data['existingname']);
+					$post[$i] = $data;
+				} else if ( @$data['delete'] || @$data['remove'] ) {
+					$post[$i] = '';
+				} else {
+					$post[$i] = $data;
+				}
+				
+			} else {
+				// No original file posted discard current image row
+				$post[$i] = '';
+			}
+			
+			// Add image entry to a new array skipping empty image entries
+			if ($post[$i]) {
+				$new[$n] = serialize($post[$i]);
+				$n++;
+			}
+		}
+		
 		
 		// create the fulltext search index
 		if ($field->issearch) {
 			$searchindex = '';
-			
-			$searchindex .= $post['alt'];
-			$searchindex .= ' ';
-			$searchindex .= $post['title'];
-			$searchindex .= ' ';
-			$searchindex .= $post['desc'];
-			$searchindex .= ' | ';
-	
+			foreach ($post as $value) {
+				if ( !$value ) continue;
+				
+				$searchindex .= @$value['alt'];
+				$searchindex .= ' ';
+				$searchindex .= @$value['title'];
+				$searchindex .= ' ';
+				$searchindex .= @$value['desc'];
+				$searchindex .= ' | ';
+			}
 			$field->search = $searchindex;
 		} else {
 			$field->search = '';
 		}
-
-		// Upload the original file
-		$this->uploadOriginalFile($field, $post, $file);
-		if ($post['originalname'])
-		{
-			if (@$post['delete'] == 1)
-			{
-				$filename = $post['originalname'];
-				$this->removeOriginalFile( $field, $filename );
-				$post = '';
-				$mainframe->enqueueMessage($field->label . ' : ' . JText::_('Images succesfully removed'));
-			}
-			elseif (@$post['remove'] == 1)
-			{
-				$post = '';
-			} else {
-				// we serialize this array to keep it's properties.
-				$post = serialize($post);
-			}
-		} else {
-			// unset $post because no file was posted
-			$post = '';
+		
+		$data	= JRequest::getVar('jform', array(), 'post', 'array');
+		if($field->isadvsearch && $data['vstate']==2) {
+			plgFlexicontent_fieldsExtendedweblink::onIndexAdvSearch($field, $post);
 		}
+		
+		// Assigned the new image data array
+		$post = $new;
 	}
 	
 	function uploadOriginalFile($field, &$post, $file)
 	{
-		$mainframe = &JFactory::getApplication();
+		$app = &JFactory::getApplication();
 		
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$err		= null;
@@ -639,7 +970,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 					$db->insertObject('#__flexicontent_files', $obj);
 
-					$mainframe->enqueueMessage($field->label . ' : ' . JText::_('Upload complete'));
+					$app->enqueueMessage($field->label . ' : ' . JText::_('Upload complete'));
 					
 					$sizes 		= array('l','m','s','b');
 					foreach ($sizes as $size)
@@ -887,16 +1218,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_FIELD_PLEASE_SELECT'));
-		$class = ' class="'.$required.' "';
-		$onchange= ' onchange="';
+		$class = ' class="existingname"';
+		$onchange = ' onchange="';
 		$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'_newfile\')); ' : '';
 		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
 		$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 		$onchange .= ' "';
+		$attribs = $onchange." ".$class;
 		foreach ($values as $value) {
 			$options[] = JHTML::_('select.option', $value, $value); 
 		}
-		$list	= JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][originalname]', $onchange, 'value', 'text', '');
+		//$formfldname = FLEXI_J16GE ? 'custom['.$field->name.'][originalname]'  :  $field->name.'[existingname]';
+		$formfldname = '__FORMFLDNAME__';
+		$list	= JHTML::_('select.genericlist', $options, $formfldname, $attribs, 'value', 'text', '');
 
 		return $list;
 	}

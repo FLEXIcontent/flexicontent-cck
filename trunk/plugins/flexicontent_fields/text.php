@@ -95,7 +95,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
 					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					thisNewField.getFirst().setProperty('value','');
+					
+					thisNewField.getFirst().setProperty('value','');  /* First element is the text input field, second is e.g remove button */
 
 					thisNewField.injectAfter(thisField);
 		
@@ -116,8 +117,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 					rowCount".$field->id."++;       // incremented / decremented
 					uniqueRowNum".$field->id."++;   // incremented only
-					}
 				}
+			}
 
 			function deleteField".$field->id."(el)
 			{
@@ -149,22 +150,42 @@ class plgFlexicontent_fieldsText extends JPlugin
 				position: relative;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
+			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
-			$document->addStyleDeclaration($css);
-
-			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$n = 0;
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 			
-			foreach ($field->value as $value) {
-				$field->html	.= '<li><input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' /><input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span></li>';
-				$n++;
-			}
-			$field->html .=	'</ul>';
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$css = '';
+		}
+		
+		$document->addStyleDeclaration($css);
+		
+		$field->html = array();
+		$n = 0;
+		foreach ($field->value as $value) {
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+			
+			$field->html[] = '
+				<input name="'.$fieldname.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
+				'.$remove_button.'
+				'.$move2.'
+				';
+			
+			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+		}
+		
+		if ($multiple) { // handle multiple records
+			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
-
-		} else { // handle single records
-			$field->html	= '<div><input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$field->value[0].'"'.$required.' /></div>';
+		} else {  // handle single values
+			$field->html = '<div>'.$field->html[0].'</div>';
 		}
 	}
 

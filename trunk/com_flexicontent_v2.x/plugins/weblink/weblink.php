@@ -84,6 +84,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -97,17 +99,17 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 					
 					thisNewField.getElements('input.urllink').setProperty('value','');
-					thisNewField.getElements('input.urllink').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][link]');
+					thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 					";
 					
 			if ($usetitle) $js .= "
 					thisNewField.getElements('input.urltitle').setProperty('value','');
-					thisNewField.getElements('input.urltitle').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][title]');
+					thisNewField.getElements('input.urltitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 					";
 					
 			$js .= "
 					thisNewField.getElements('input.urlhits').setProperty('value','0');
-					thisNewField.getElements('input.urlhits').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][hits]');
+					thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 					
 					thisNewField.getElements('span span').set('html','0');  // Set hits to zero for new row value
 
@@ -130,8 +132,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 					rowCount".$field->id."++;       // incremented / decremented
 					uniqueRowNum".$field->id."++;   // incremented only
-					}
 				}
+			}
 
 			function deleteField".$field->id."(el)
 			{
@@ -166,12 +168,16 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
+			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
-			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>';
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
+			$move2 = '';
 			$css = '';
 		}
 		
@@ -213,7 +219,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				'.@$title.'
 				'.$hits.'
 				'.$remove_button.'
-			';
+				'.$move2.'
+				';
+			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}

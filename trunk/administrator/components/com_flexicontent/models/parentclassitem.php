@@ -1600,7 +1600,7 @@ class ParentClassItem extends JModel
 		// ***********************************************************
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		if (!$isnew && $allowed_langs) $allowed_langs[] = $row->language;
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
 		if ( $allowed_langs && !in_array($data['language'], $allowed_langs) ) {
 			$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
 			unset($data['language']);
