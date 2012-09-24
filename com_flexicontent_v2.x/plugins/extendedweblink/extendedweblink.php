@@ -45,9 +45,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
-		$size					= $field->parameters->get( 'size', 30 ) ;
-		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
+		$size			= $field->parameters->get( 'size', 30 ) ;
+		$multiple	= $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval		= $field->parameters->get( 'max_values', 0 ) ;
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
 		$default_link_usage = $field->parameters->get( 'default_link_usage', 0 ) ;
@@ -95,6 +95,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -108,32 +110,32 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
 					
 					thisNewField.getElements('input.urllink').setProperty('value','".$default_link."');
-					thisNewField.getElements('input.urllink').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][link]');
+					thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 					";
 					
 			if ($usetitle) $js .= "
 					thisNewField.getElements('input.urltitle').setProperty('value','".$default_title."');
-					thisNewField.getElements('input.urltitle').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][title]');
+					thisNewField.getElements('input.urltitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 					";
 					
 			if ($usetext) $js .= "
 					thisNewField.getElements('input.urllinktext').setProperty('value','".$default_text."');
-					thisNewField.getElements('input.urllinktext').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][linktext]');
+					thisNewField.getElements('input.urllinktext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
 					";
 					
 			if ($useclass) $js .= "
 					thisNewField.getElements('input.urlclass').setProperty('value','".$default_class."');
-					thisNewField.getElements('input.urlclass').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][class]');
+					thisNewField.getElements('input.urlclass').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 					";
 					
 			if ($useid) $js .= "
 					thisNewField.getElements('input.urlid').setProperty('value','".$default_id."');
-					thisNewField.getElements('input.urlid').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][id]');
+					thisNewField.getElements('input.urlid').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
 					";
 					
 			$js .= "
 					thisNewField.getElements('input.urlhits').setProperty('value','0');
-					thisNewField.getElements('input.urlhits').setProperty('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][hits]');
+					thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 					
 					thisNewField.getElements('span span').set('html','0');  // Set hits to zero for new row value
 
@@ -156,8 +158,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 					rowCount".$field->id."++;       // incremented / decremented
 					uniqueRowNum".$field->id."++;   // incremented only
-					}
 				}
+			}
 
 			function deleteField".$field->id."(el)
 			{
@@ -189,8 +191,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: right; }
-			#sortables_'.$field->id.' li:only-child span.drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -207,7 +209,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$n = 0;
 		foreach ($field->value as $value) {
 			if ( empty($value) ) continue;
-			$value  = unserialize($value);
+			$value = unserialize($value);
 			
 			$has_prefix = preg_match("#^http|^https|^ftp#i", $value['link']);
 			
@@ -249,6 +251,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				<input class="urlhits" name="'.$fieldname.'[hits]" type="hidden" value="'.$hits.'" />
 				<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 				';
+			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
@@ -256,7 +259,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if ($multiple) { // handle multiple records
 			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}

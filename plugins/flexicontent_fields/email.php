@@ -45,9 +45,9 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
-		$size      = $field->parameters->get( 'size', 30 ) ;
-		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
+		$size			= $field->parameters->get( 'size', 30 ) ;
+		$multiple	= $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval		= $field->parameters->get( 'max_values', 0 ) ;
 		
 		$default_value    = ($item->version == 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
@@ -58,8 +58,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$required		= $field->parameters->get( 'required', 0 ) ;
 		$required		= $required ? ' required' : '';
 		
-		// initialise property
-		if (!$field->value) {
+		// Initialise property with default value
+		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['addr'] = JText::_($default_value);
 			$field->value[0]['text'] = JText::_($default_title);
@@ -83,6 +83,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -96,12 +98,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					
 					thisNewField.getElements('input.emailaddr').setProperty('value','');
-					thisNewField.getElements('input.emailaddr').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][addr]');
+					thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 					";
 					
 			if ($usetitle) $js .= "
 					thisNewField.getElements('input.emailtext').setProperty('value','');
-					thisNewField.getElements('input.emailtext').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+'][text]');
+					thisNewField.getElements('input.emailtext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 					";
 					
 			$js .= "
@@ -124,8 +126,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 					rowCount".$field->id."++;       // incremented / decremented
 					uniqueRowNum".$field->id."++;   // incremented only
-					}
 				}
+			}
 
 			function deleteField".$field->id."(el)
 			{
@@ -160,12 +162,16 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
+			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
-			$move2 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" /><span class="fcfield-drag">'.$move2.'</span>';
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
+			$move2 = '';
 			$css = '';
 		}
 		
@@ -201,7 +207,9 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				'.$addr.'
 				'.@$text.'
 				'.$remove_button.'
-			';
+				'.$move2.'
+				';
+			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}

@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if($field->field_type != 'date') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
 		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
@@ -105,13 +105,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$document->addScriptDeclaration($js);
 
 			$js = "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";
-			var curRowNum".$field->id."	= ".count($field->value).";
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
-			var test = 1;
 
 			function addField".$field->id."(el) {
-				if((curRowNum".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
+				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
@@ -132,8 +131,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
         				align:			'Tl',
         				singleClick:	true
 					});
-    				
-    					new Sortables($('sortables_".$field->id."'), {
+					
+					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
 						'handle': '.fcfield-drag'
@@ -148,25 +147,26 @@ class plgFlexicontent_fieldsDate extends JPlugin
 							this.start({ 'opacity': 1 });
 						});
 
-					curRowNum".$field->id."++;
-					uniqueRowNum".$field->id."++;
-					}
+					rowCount".$field->id."++;       // incremented / decremented
+					uniqueRowNum".$field->id."++;   // incremented only
 				}
+			}
 
-			function deleteField".$field->id."(el) {
-				if(curRowNum".$field->id." > 1) {
-
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-					}).chain(function(){
-						row.remove();
-					});
-				curRowNum".$field->id."--;
+			function deleteField".$field->id."(el)
+			{
+				if(rowCount".$field->id." > 1)
+				{
+					var field	= $(el);
+					var row		= field.getParent();
+					var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+					
+					fx.start({
+						'height': 0,
+						'opacity': 0
+						}).chain(function(){
+							row.remove();
+						});
+					rowCount".$field->id."--;
 				}
 			}
 			";
@@ -175,21 +175,26 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
 			#sortables_'.$field->id.' li {
-				clear:both;
-				list-style:none;
+				clear: both;
+				display: block;
+				list-style: none;
+				position: relative;
 				height:20px;
-				}
+			}
 			#sortables_'.$field->id.' li.sortabledisabled {
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-				}
+			}
 			#sortables_'.$field->id.' li input { cursor: text;}
+			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
 			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
-			$move2 	= '';
+			$move2 = '';
 			$css = '';
 		}
 		
@@ -211,12 +216,16 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 			$calendar = JHTML::_('calendar', $date, $field->name.'[]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
 			
-			$field->html[] = $calendar . $remove_button . $move2;
+			$field->html[] =
+				$calendar.'
+				'.$remove_button.'
+				'.$move2.'
+				';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-
+		
 		if ($multiple) { // handle multiple records
 			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
