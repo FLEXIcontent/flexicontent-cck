@@ -146,7 +146,9 @@ class FCDispatcher extends JDispatcher
 			if (is_object($this->_observers[$key]))
 			{
 				// Check for selective plugin triggering
-				if ( $plg_names && !in_array($this->_observers[$key]->get('_name'), $plg_names) )
+				$cname = get_class($this->_observers[$key]);
+				$cname = strtolower(str_ireplace('plgContent', '', $cname));
+				if ( $plg_names && !in_array($cname, $plg_names) )
 				{
 					continue;
 				}
