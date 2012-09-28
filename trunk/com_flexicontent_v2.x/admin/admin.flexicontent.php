@@ -33,6 +33,7 @@ require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php'
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
 require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
+require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'route.php');
 
 // Set the table directory
 JTable::addIncludePath(JPATH_COMPONENT.DS.'tables');

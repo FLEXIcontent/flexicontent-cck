@@ -140,9 +140,6 @@ class FlexicontentViewCategory extends JView
 		// Load pane behavior
 		jimport('joomla.html.pane');
 		
-		// Get the route helper for the preview function
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		
 		// Load tooltips
 		JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');

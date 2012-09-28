@@ -767,7 +767,7 @@ class ParentClassItem extends JModelAdmin
 		// (b) Set property 'cid' (form field categories)
 		// *********************************************************
 		
-		$this->_item->itemparams = new JParameter();
+		$this->_item->itemparams = new JParameter("");
 		
 		if ($this->_id) {
 			// Convert the attribs
