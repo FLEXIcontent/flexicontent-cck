@@ -30,10 +30,11 @@ class FlexicontentViewUsers extends JView
 	function display($tpl = null)
 	{
 		$mainframe = & JFactory::getApplication();
-		$option    = & JRequest::get('option');
+		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$db				=& JFactory::getDBO();
 		$document	= & JFactory::getDocument();
+		$option    = & JRequest::get('option');
 		$currentUser	=& JFactory::getUser();
 		$acl			=& JFactory::getACL();
 		
@@ -58,6 +59,16 @@ class FlexicontentViewUsers extends JView
 			$search = str_replace(array('=', '<'), '', $search);
 		}
 		$search = JString::strtolower($search);
+		
+		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		{
+			$notice_author_with_items_only	= $mainframe->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
+			if (!$notice_author_with_items_only) {
+				$mainframe->setUserState( $option.'.users.notice_author_with_items_only', 1 );
+				$mainframe->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'), 'notice');
+				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+			}
+		}
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -81,9 +92,9 @@ class FlexicontentViewUsers extends JView
 			}
 		}
 		if ($search || $filter_itemscount) {
-			$js .= "$$('.col_title').each(function(el){ el.addClass('yellow'); });";
+			$js .= "$$('.col_itemscount').each(function(el){ el.addClass('yellow'); });";
 		} else {
-			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
+			$js .= "$$('.col_itemscount').each(function(el){ el.removeClass('yellow'); });";
 		}
 		$js .= "});";
 		$document->addScriptDeclaration($js);

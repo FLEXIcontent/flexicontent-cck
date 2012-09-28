@@ -105,14 +105,7 @@
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE</option>
 			</param>
-			<param name="item_states" type="list" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC">
-				<option value="1">FLEXI_PUBLISHED</option>
-				<option value="-5">FLEXI_IN_PROGRESS</option>
-				<option value="0">FLEXI_UNPUBLISHED</option>
-				<option value="-3">FLEXI_PENDING</option>
-				<option value="-4">FLEXI_TO_WRITE</option>
-				<option value="-1">FLEXI_ARCHIVED</option>
-			</param>
+			<param name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" />
 			
 			<param name="" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
 			<param name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />

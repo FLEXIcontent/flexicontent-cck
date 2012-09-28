@@ -80,7 +80,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		
 		// Get component parameters and them merge into them the type parameters
-		$params  = new JParameter();
+		$params  = new JParameter("");
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		

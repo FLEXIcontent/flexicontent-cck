@@ -211,7 +211,7 @@ window.addEvent('domready', function(){
 				<?php echo JText::_( 'Filter' ); ?>:
 				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" style='width:140px;' onchange="document.adminForm.submit();" />
 			</td>
-			<td class="left" class="col_items">
+			<td class="left" class="col_itemscount">
 				<?php echo $this->lists['filter_itemscount']; ?>
 			</td>
 			<td class="left"></td>
@@ -238,7 +238,7 @@ window.addEvent('domready', function(){
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 
-				<div class='fc_mini_note_box' style='float:right;clear:both;'>
+				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
 					$tz_offset = JFactory::getConfig()->getValue('config.offset');
 					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
@@ -314,7 +314,7 @@ window.addEvent('domready', function(){
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->name; ?></a>
 				</td>
-				<td align="center" class="col_items">
+				<td align="center" class="col_itemscount">
 						<?php echo $itemscount; ?>
 				</td>
 				<td>
