@@ -445,8 +445,8 @@ class FlexicontentViewCategory extends JView
 		}
 		
 		// category image
-		$show_cat_image = $params->get('show_description_image', 0);  // bad named maybe
-		$cat_image_source = $params->get('cat_image_source', 0);
+		$show_cat_image = $params->get('show_description_image', 0);  // we use different name for variable
+		$cat_image_source = $params->get('cat_image_source', 2); // 0: extract, 1: use param, 2: use both
 		$cat_link_image = $params->get('cat_link_image', 1);
 		$cat_image_method = $params->get('cat_image_method', 1);
 		$cat_image_width = $params->get('cat_image_width', 80);
