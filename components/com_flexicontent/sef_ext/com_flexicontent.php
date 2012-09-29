@@ -96,6 +96,17 @@ if (!empty($fcu)) {
 	$dosef = false;
 }
 
+if (FLEXI_J16GE) {
+	$item_segs = array(5=>0, 1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
+	$cats_in_itemlnk = (isset($item_segs[$sefConfig->includeContentCat])) ? $item_segs[$sefConfig->includeContentCat] : 999;
+
+	$cat_segs = array(1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
+	$cats_in_catlnk = (isset($cat_segs[$sefConfig->includeContentCatCategories])) ? $cat_segs[$sefConfig->includeContentCatCategories] : 999;
+} else {
+	$item_segs = 999;
+	$cats_in_catlnk = 999;
+}
+
 // Some FLEXIcontent views may only set task variable ... in this case set task variable as view
 if ( !$view && $task == 'search' ) {
 	$view == 'search';
@@ -141,6 +152,7 @@ switch ($view) {
 						
 						if (@$globalcats[$catid]->ancestorsarray) {
 							$ancestors = $globalcats[$catid]->ancestorsarray;
+							$cat_titles = array();
 							foreach ($ancestors as $ancestor) {
 								if (!in_array($ancestor, $globalnoroute)) {
 									if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
@@ -148,13 +160,26 @@ switch ($view) {
 										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 										$database->setQuery ( $query );
 										$row_cat = $database->loadObject ();
-										$title[] = $row_cat->title . '/';
+										$cat_titles[] = $row_cat->title . '/';
 									} else {
 										// Not translating title or Joomfish not installed
-										$title[] = $globalcats[$ancestor]->title . '/';
+										$cat_titles[] = $globalcats[$ancestor]->title . '/';
 									}
 								}
-							}		
+							}
+							$first_url_cat = ($cats_in_itemlnk >= 0) ? count($cat_titles) - $cats_in_itemlnk : 0;
+							$first_url_cat = ($first_url_cat < 0) ? 0 : $first_url_cat;
+							
+							$last_url_cat  = ($cats_in_itemlnk >= 0) ? count($cat_titles)-1 : -($cats_in_itemlnk + 1);
+							$last_url_cat  = ($last_url_cat > count($cat_titles)-1) ? count($cat_titles)-1 : $last_url_cat;
+							/*echo count($cat_titles) . "<br><pre>"; print_r($cat_titles);
+							echo "cats_in_itemlnk: ".$cats_in_itemlnk . "<br>";
+							echo "first_url_cat: ". $first_url_cat . "<br>";
+							echo "last_url_cat: ". $last_url_cat . "<br>";*/
+							for($ccnt = $first_url_cat; $ccnt <= $last_url_cat; $ccnt++ ) $title[] = $cat_titles[$ccnt];
+							/*print_r($title);
+							die($row->title);
+							exit;*/
 						}
 						// Add item title as URL segment
 						$title [] = $row->title;
@@ -217,18 +242,29 @@ switch ($view) {
 
 			if (@$globalcats[$cid]->ancestorsarray) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
+				$cat_titles = array();
 				foreach ($ancestors as $ancestor) {
 					if (!in_array($ancestor, $globalnoroute)) {
 						if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
 							$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 							$database->setQuery ( $query );
 							$row = $database->loadObject ();
-							$title[] = $row->title . '/';
+							$cat_titles[] = $row->title . '/';
 						} else {
-							$title[] = $globalcats[$ancestor]->title . '/';
+							$cat_titles[] = $globalcats[$ancestor]->title . '/';
 						}
 					}
-				}		
+				}
+				$curr_cat_title = count($cat_titles) ? array_pop($cat_titles) : null;
+				
+				$first_url_cat = ($cats_in_catlnk >= 0) ? count($cat_titles) - $cats_in_catlnk : 0;
+				$first_url_cat = ($first_url_cat < 0) ? 0 : $first_url_cat;
+				
+				$last_url_cat  = ($cats_in_catlnk >= 0) ? count($cat_titles)-1 : -($cats_in_catlnk + 1);
+				$last_url_cat  = ($last_url_cat > count($cat_titles)-1) ? count($cat_titles)-1 : $last_url_cat;
+				
+				for($ccnt = $first_url_cat; $ccnt <= $last_url_cat; $ccnt++ ) $title[] = $cat_titles[$ccnt];
+				if ($curr_cat_title) $title[] = $curr_cat_title;
 			} else {
 				$title [] = '/';
 			}
