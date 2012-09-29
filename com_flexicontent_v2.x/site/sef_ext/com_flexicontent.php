@@ -103,7 +103,7 @@ if (FLEXI_J16GE) {
 	$cat_segs = array(1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
 	$cats_in_catlnk = (isset($cat_segs[$sefConfig->includeContentCatCategories])) ? $cat_segs[$sefConfig->includeContentCatCategories] : 999;
 } else {
-	$item_segs = 999;
+	$cats_in_itemlnk = 999;
 	$cats_in_catlnk = 999;
 }
 
@@ -126,7 +126,7 @@ switch ($view) {
 		
 			if (!$task) {
 			
-				$query	= 'SELECT i.id, i.title, i.catid, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
+				$query	= 'SELECT i.id, i.title, i.alias, i.catid, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 						. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
@@ -160,10 +160,11 @@ switch ($view) {
 										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 										$database->setQuery ( $query );
 										$row_cat = $database->loadObject ();
-										$cat_titles[] = $row_cat->title . '/';
+										$cat_titles[] = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
 									} else {
+										list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
 										// Not translating title or Joomfish not installed
-										$cat_titles[] = $globalcats[$ancestor]->title . '/';
+										$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
 									}
 								}
 							}
@@ -182,7 +183,9 @@ switch ($view) {
 							exit;*/
 						}
 						// Add item title as URL segment
-						$title [] = $row->title;
+						$row_title  = $sefConfig->UseAlias ? $row->alias : $row->title;
+						$row_title .= $sefConfig->ContentTitleInsertArticleId ? "-".$row->id : "";
+						$title [] = $row_title;
 						
 						// V 1.2.4.j 2007/04/11 : numerical ID, on some categories only
 						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->type_id, $globalnopath)) {
@@ -249,9 +252,11 @@ switch ($view) {
 							$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 							$database->setQuery ( $query );
 							$row = $database->loadObject ();
-							$cat_titles[] = $row->title . '/';
+							$cat_titles[] = ($sefConfig->useCatAlias ? $row->alias : $row->title) . '/';
 						} else {
-							$cat_titles[] = $globalcats[$ancestor]->title . '/';
+							list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
+							// Not translating title or Joomfish not installed
+							$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
 						}
 					}
 				}
