@@ -18,40 +18,63 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 jimport('joomla.plugin.plugin');
 
-$mainframe->registerEvent( 'onSearch', 'plgSearchFlexisearch' );
-$mainframe->registerEvent( 'onSearchAreas', 'plgSearchFlexisearchAreas' );
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
-require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-//Load the Plugin language file out of the administration
-JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
+
+/**
+ * Content Search plugin
+ *
+ * @package		FLEXIcontent.Plugin
+ * @subpackage	Search.flexisearch
+ * @since		1.6
+ */
+class plgSearchFlexisearch extends JPlugin
+{
+	public function __construct(& $subject, $config)
+	{
+		parent::__construct($subject, $config);
+		$extension_name = 'plg_search_flexisearch';
+		//$this->loadLanguage();
+		//$this->loadLanguage( '$extension_name, JPATH_ADMINISTRATOR);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB'	, true);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null		, true);
+	}
 	
-	function _getAreas(){
-		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
-		
+	
+	function _getAreas()
+	{
 		$areas = array();
-		if ($params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
-		if ($params->get('search_desc',	1)) {$areas['FlexisearchDesc'] = JText::_('FLEXI_STDSEARCH_DESC');}
-		if ($params->get('search_fields',	1)) {$areas['FlexisearchFields'] = JText::_('FLEXI_STDSEARCH_FIELDS');}
-		if ($params->get('search_meta',	1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
-		if ($params->get('search_tags',	1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
+		if ($this->params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
+		if ($this->params->get('search_desc',		1)) {$areas['FlexisearchDesc'] = JText::_('FLEXI_STDSEARCH_DESC');}
+		if ($this->params->get('search_fields',	1)) {$areas['FlexisearchFields'] = JText::_('FLEXI_STDSEARCH_FIELDS');}
+		if ($this->params->get('search_meta',		1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
+		if ($this->params->get('search_tags',		1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
+		
+		// Goto last element of array and add to it 2 line breaks
 		end($areas);
 		$areas[key($areas)]=current($areas).'<br><br>';
+		
 		return $areas;
 	}
-
-	function _getContentTypes(){
-		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
 	
-		$typeIds = $params->get('search_types',	'');
+	
+	function _getContentTypes()
+	{
+		// Get allowed search types
+		$typeIds = $this->params->get('search_types',	'');
 		$typesarray = array();
-		preg_match_all('/\b\d+\b/',$typeIds, $typesarray);
+		preg_match_all('/\b\d+\b/', $typeIds, $typesarray);
+		
 		$wheres=array();
-		foreach ($typesarray[0] as $key=>$typeID){
+		foreach ($typesarray[0] as $key=>$typeID)
+		{
 			$wheres[]='t.id = '.$typeID;
 		}
 		$whereTypes =  $wheres ? '(' . implode(') OR (', $wheres) . ')' : '';
@@ -68,35 +91,33 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 		$ContentType = array();
 		if (isset($list)){
 			foreach($list as $item){
-				$ContentType['FlexisearchType'.$item->id]=$item->name.'<br>';
+				$ContentType['FlexisearchType'.$item->id]=$item->name.'<br>'; // add a line break too
 			}
 		}
+		
+		// Goto last element of array and add to it one more line breaks
 		end($ContentType);
 		$ContentType[key($ContentType)]=current($ContentType).'<br>';
+		
 		return $ContentType;
 	
 	}
+	
 	/*
 	 * @return array of search areas
 	 */
-	function &plgSearchFlexisearchAreas()
+	function onContentSearchAreas()
 	{
 		static $areas = array();
 		
-		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
-		
-		$areas = $params->get('search_select_types',	1) ? _getAreas() + _getContentTypes() : _getAreas();
-		return $areas;			
+		$areas = $this->params->get('search_select_types',	1) ? $this->_getAreas() + $this->_getContentTypes() :  $this->_getAreas();
+		return $areas;
 	}
 	
-	if (!function_exists('plgSearchContentAreas')) {
-		function &plgSearchContentAreas()
-		{
-			static $areas = array();
-			return $areas;			
-		}
-	}
+	// Also add J1.5 function signature
+	function onSearchAreas() { return $this->onContentSearchAreas(); }
 	
+
 	/**
 	 * Content Search method
 	 * The sql must return the following fields that are used in a common display
@@ -106,10 +127,8 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 	 * @param string ordering option, newest|oldest|popular|alpha|category
 	 * @param mixed An array if restricted to areas, null if search all
 	 */
-	function plgSearchFlexisearch( $text, $phrase='', $ordering='', $areas=null )
+	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$params = (FLEXI_J16GE) ? $this->params : new JParameter( JPluginHelper::getPlugin('search', 'flexisearch')->params );
-		
 		$db		= JFactory::getDbo();
 		$app	= JFactory::getApplication();
 		$user	= JFactory::getUser();
@@ -127,20 +146,19 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 
 		$searchText = $text;
 		
-		$AllAreas=array_keys(FLEXI_J16GE ? $this->_getAreas() : _getAreas());
-		$AllTypes=array_keys(FLEXI_J16GE ? $this->_getContentTypes() : _getContentTypes());
-			
+		$AllAreas = array_keys( $this->_getAreas() );
+		$AllTypes = array_keys( $this->_getContentTypes() );
+		
 		if (is_array($areas)) {
 			// search in selected areas
-			$searchAreas = array_intersect($areas, $AllAreas);
-			$searchTypes = array_intersect($areas, $AllTypes);
+			$searchAreas = array_intersect( $areas, $AllAreas );
+			$searchTypes = array_intersect( $areas, $AllTypes );
 			
-			if (!$searchAreas && !$searchTypes) {
-				return array();
-			}
+			if (!$searchAreas && !$searchTypes)  return array();
+			
 			if (!$searchAreas) {$searchAreas = $AllAreas;}
 			if (!$searchTypes) {$searchTypes = $AllTypes;}
-		}else{
+		} else {
 			// search in all avaliable areas if no selected ones
 			$searchAreas = $AllAreas;
 			$searchTypes = $AllTypes;
@@ -152,8 +170,8 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 		
 		$types= implode(', ',$searchTypes);
 
-		$filter_lang	= $params->def('filter_lang',	1);
-		$limit				= $params->def('search_limit', 50);
+		$filter_lang	= $this->params->def('filter_lang',	1);
+		$limit				= $this->params->def('search_limit', 50);
 
 		// Dates for publish up & down items
 		$nullDate		= $db->getNullDate();
@@ -197,7 +215,9 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 				}
 				break;
 		}
-		if (!$where) {return array();}
+		
+		if (!@$where) {return array();}
+		
 		//if ( empty($where) ) $where = '1';
 		
 		switch ($ordering) {
@@ -287,7 +307,7 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 				. ' GROUP BY a.id '
 				. ' ORDER BY '. $order
 				;
-			//echo "<pre>".$query."</pre>";
+			//echo "<pre style='white-space:normal!important;'>".$query."</pre>";
 			
 			$db->setQuery($query, 0, $limit);
 			$list = $db->loadObjectList();
@@ -300,11 +320,11 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 				foreach($list as $key => $item)
 				{
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
-					if($item->sectionid==FLEXI_SECTION)
+					if($item->sectionid==FLEXI_SECTION || FLEXI_J16GE)
 						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
 					else
 						$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
-					if (searchHelper::checkNoHTML($item, $searchText, array('text', 'title', 'metadesc', 'metakey', 'tagname', 'field' ))) {
+					if (searchHelper::checkNoHTML($item, $searchText, array('title', 'metadesc', 'metakey', 'tagname', 'field', 'text' ))) {
 						$results[$item->id] = $item;
 					}
 				}
@@ -313,3 +333,11 @@ JPlugin::loadLanguage( 'plg_search_flexisearch', JPATH_ADMINISTRATOR);
 
 		return $results;
 	}
+	
+	
+	// Also add J1.5 function signature
+	function onSearch( $text, $phrase='', $ordering='', $areas=null )
+	{
+		return $this->onContentSearch( $text, $phrase, $ordering, $areas );
+	}
+}

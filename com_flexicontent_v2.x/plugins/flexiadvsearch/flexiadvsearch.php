@@ -20,8 +20,10 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.plugin.plugin' );
+
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-require_once JPATH_SITE.'/components/com_content/router.php';
 
 
 /**
@@ -44,7 +46,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 	public function __construct(& $subject, $config)
 	{
 		parent::__construct($subject, $config);
-		$this->loadLanguage( 'plg_search_flexiadvsearch', JPATH_ADMINISTRATOR);  // $this->loadLanguage();
+		$extension_name = 'plg_search_flexiadvsearch';
+		//$this->loadLanguage();
+		//$this->loadLanguage( '$extension_name, JPATH_ADMINISTRATOR);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB'	, true);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null		, true);
 	}
 
 	/**
@@ -58,7 +64,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 	}
 	
 	// Also add J1.5 function signature
-	function onSearchAreas() { $this->onContentSearchAreas(); }
+	function onSearchAreas() { return $this->onContentSearchAreas(); }
 
 	/**
 	 * Search method
@@ -77,8 +83,22 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		$db		= & JFactory::getDBO();
 		$user	= & JFactory::getUser();
+		$menus    = & JSite::getMenu();
+		$menu     = $menus->getActive();
 		
-		// Get the WHERE and ORDER BY clauses for the query
+		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		if ($menu) {
+			$menuParams = new JParameter($menu->params);
+			// In J1.6+ the above function does not merge current menu item parameters,
+			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
+			if (FLEXI_J16GE) $params->merge($menuParams);
+		}
+		
+		// ***********************************************
+		// Create WHERE and ORDER BY clauses for the query
+		// ***********************************************
 		$params 	= & $mainframe->getParams('com_flexicontent');
 		
 		if($cantypes = $params->get('cantypes', 1)) {
@@ -333,22 +353,27 @@ class plgSearchFlexiadvsearch extends JPlugin
 	// Also add J1.5 function signature
 	function onSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$this->onContentSearch( $text, $phrase, $ordering, $areas );
+		return $this->onContentSearch( $text, $phrase, $ordering, $areas );
 	}
 }
 
-// The commented code just below, is needed because triggerEvent() checks if function exists outside the class ...
-// We have choosen a different approach, to use the naming exactly as joomla events
+
+
+// When not having exactly named CLASS function, but in J1.5 (only) the triggerEvent() checks if functions being registered
+// as Event Listener methods, exist outside the class, so we must define wrapper classes outside the class,
+// these can be used by triggerEvent and will only contain a call to the respective class method
+
+// A different approach is to create wrapper class methods, that have the name of the event, we did this above
 
 /*if (!function_exists('onContentSearchAreas')) {
 	function onContentSearchAreas() {
-		//plgSearchFlexiadvsearch::onContentSearchAreas();
+		//return plgSearchFlexiadvsearch::onContentSearchAreas();
 	}
 }
 
 if (!function_exists('onContentSearch')) {
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null ) {
-		//plgSearchFlexiadvsearch::onContentSearch( $text, $phrase, $ordering, $areas );
+		//return plgSearchFlexiadvsearch::onContentSearch( $text, $phrase, $ordering, $areas );
 	}
 }
 

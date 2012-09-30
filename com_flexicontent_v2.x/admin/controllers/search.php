@@ -27,7 +27,8 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerSearch extends FlexicontentController{
+class FlexicontentControllerSearch extends FlexicontentController
+{
 	/**
 	 * Constructor
 	 *
@@ -36,7 +37,8 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	function __construct() {
 		parent::__construct();
 	}
-
+	
+	
 	/**
 	 * count the rows
 	 *
@@ -44,7 +46,8 @@ class FlexicontentControllerSearch extends FlexicontentController{
 	 * @return void
 	 * @since 1.0
 	 */
-	function countrows() {
+	function countrows()
+	{
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
 		//$params =& JComponentHelper::getParams( 'com_flexicontent' );
@@ -68,7 +71,10 @@ class FlexicontentControllerSearch extends FlexicontentController{
 		//}
 		exit;
 	}
-	function index() {
+	
+	
+	function index()
+	{
 		@ob_end_clean();
 		$items_per_call = JRequest::getVar('items_per_call', 50);  // Number of item to index per HTTP request
 		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
@@ -116,6 +122,12 @@ class FlexicontentControllerSearch extends FlexicontentController{
 						.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
 						.' WHERE rel.itemid='.$itemid;
 				}
+				else if ($field->field_type == 'maintext')
+				{
+					$query  = 'SELECT CONCAT_WS(\' \', c.introtext, c.fulltext) AS value'
+						.' FROM #__content AS c'
+						.' WHERE c.id='.$itemid;
+				}
 				else if ($field->iscore)
 				{
 					$query  = 'SELECT *'
@@ -153,7 +165,9 @@ class FlexicontentControllerSearch extends FlexicontentController{
 		exit;
 	}
 	
-	function purge() {
+	
+	function purge()
+	{
 		$model = $this->getModel('search');
 		$model->purge();
 		$msg = JText::_('FLEXI_ITEMS_PURGED');
