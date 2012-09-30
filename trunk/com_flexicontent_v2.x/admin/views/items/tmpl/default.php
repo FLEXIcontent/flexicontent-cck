@@ -25,15 +25,15 @@ $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
 
-$db 		=& JFactory::getDBO();
-$config		=& JFactory::getConfig();
-$nullDate 	= $db->getNullDate();
-$user 		=& $this->user;
+$db 			= & JFactory::getDBO();
+$config		= & JFactory::getConfig();
+$nullDate	= $db->getNullDate();
+$user 		= & $this->user;
 
 $enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 $autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 
-$items_list_cols = 14;
+$items_list_cols = 15;
 if ( FLEXI_J16GE || FLEXI_FISH ) {
 	$items_list_cols++;
 	if ( $enable_translation_groups ) $items_list_cols++;
@@ -245,6 +245,7 @@ window.addEvent('domready', function() {
 			<th width="1%" class="center">
 				<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" />
 			</th>
+			<th width="1%" class="center">&nbsp;</th>
 			<th class="left">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
@@ -369,6 +370,7 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr id="filterline">
+			<td width="1%" class="center">&nbsp;</td>
 			<td class="left col_title" colspan="3">
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
@@ -424,12 +426,18 @@ window.addEvent('domready', function() {
 
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
+				if (FLEXI_J16GE) {
 					$tz_string = JFactory::getConfig()->getValue('config.offset');
 					$tz = new DateTimeZone( $tz_string );
 					$tz_offset = $tz->getOffset(new JDate()) / 3600;
 					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 					$tz_info .= ' ('.$tz_string.')';
 					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
+				} else {
+					$tz_offset = JFactory::getConfig()->getValue('config.offset');
+					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
+					echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
+				}
 				?>
 				</div>
 
@@ -535,6 +543,12 @@ window.addEvent('domready', function() {
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $cid_checkbox; ?></td>
+			<td width="1%">
+				<?php
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) . $autologin;
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
+				?>
+			</td>
 			<td align="left" class="col_title">
 				<?php
 				
@@ -572,10 +586,6 @@ window.addEvent('domready', function() {
 					</a></span>
 				<?php
 				}
-				
-				// Preview link
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) . $autologin;
-				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 				
 			</td>

@@ -64,7 +64,7 @@ class FlexicontentController extends JController
 		$session = & JFactory::getSession();
 		$task	   = JRequest::getVar('task');
 		$model   = & $this->getModel(FLEXI_ITEMVIEW);
-		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($app->getParams('com_flexicontent'));
@@ -208,11 +208,11 @@ class FlexicontentController extends JController
 			// Since an error occured, check if (a) the item is new and (b) was not created
 			if ($isnew && !$model->get('id')) {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&id=0&typeid='.$post['type_id'].'&'. JUtility::getToken() .'=1';;
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'add&id=0&typeid='.$post['type_id'].'&'. JUtility::getToken() .'=1';
 				$this->setRedirect($link, $msg);
 			} else {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&id='.$model->get('id').'&'. JUtility::getToken() .'=1';;
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&id='.$model->get('id').'&'. JUtility::getToken() .'=1';
 				$this->setRedirect($link, $msg);
 			}
 			

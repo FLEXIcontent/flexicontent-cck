@@ -27,8 +27,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTags extends JView {
-	function display($tpl = null) {
+class FlexicontentViewTags extends JView
+{
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -63,14 +65,26 @@ class FlexicontentViewTags extends JView {
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
 		if ($permission->CanConfig) {
 			$toolbar =&JToolBar::getInstance('toolbar');
-			$toolbar->appendButton('Popup',  'import', 'FLEXI_IMPORT', JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 400, 400);
+			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 430, 500);
 		}
-		JToolBarHelper::publishList('tags.publish');
-		JToolBarHelper::unpublishList('tags.unpublish');
-		JToolBarHelper::addNew('tags.add');
-		JToolBarHelper::editList('tags.edit');
-		JToolBarHelper::deleteList('Are you sure?', 'tags.remove');
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		
+		if (FLEXI_J16GE) {
+			JToolBarHelper::publishList('tags.publish');
+			JToolBarHelper::unpublishList('tags.unpublish');
+			JToolBarHelper::addNew('tags.add');
+			JToolBarHelper::editList('tags.edit');
+			JToolBarHelper::deleteList('Are you sure?', 'tags.remove');
+		} else {
+			JToolBarHelper::publishList();
+			JToolBarHelper::unpublishList();
+			JToolBarHelper::addNew();
+			JToolBarHelper::editList();
+			JToolBarHelper::deleteList();
+		}
+		
+		if($permission->CanConfig) {
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');

@@ -27,8 +27,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewArchive extends JView {
-	function display($tpl = null) {
+class FlexicontentViewArchive extends JView
+{
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -58,8 +60,13 @@ class FlexicontentViewArchive extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
-		JToolBarHelper::unarchiveList('archive.unarchive');
-		JToolBarHelper::deleteList('Are you sure?', 'archive.remove');
+		if (FLEXI_J16GE) {
+			JToolBarHelper::unarchiveList('archive.unarchive');
+			JToolBarHelper::deleteList('Are you sure?', 'archive.remove');
+		} else {
+			JToolBarHelper::unarchiveList();
+			JToolBarHelper::deleteList();
+		}
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model

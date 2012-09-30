@@ -29,7 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewTagelement extends JView {
 
-	function display($tpl = null) {
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -49,9 +50,8 @@ class FlexicontentViewTagelement extends JView {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet('templates/'.$template.'/css/general.css');
-
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		//Get data from the model
 		$rows      	= & $this->get( 'Data');

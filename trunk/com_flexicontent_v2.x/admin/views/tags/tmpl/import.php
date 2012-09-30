@@ -23,18 +23,28 @@ window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
 		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
+
+		new Request.HTML({
+			 url: this.get('action'),
+		   evalScripts: true,
+		   update: $('log-bind'),
+		   data: $('adminForm')
+		}).send();
 		
-		this.send({
-			update: 	$('log-bind')
-		});
 	});
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&task=tags.import&layout=import&tmpl=component" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&task=tags.import&layout=import&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
-		<legend><?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?><span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="text-decoration: none; color: #333;"><img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/></span></legend><br />
+		<legend>
+			<?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?>
+			<span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="text-decoration: none; color: #333;">
+				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
+			</span>
+		</legend>
+		<br />
 		<textarea id="taglist" name="taglist" rows="20" cols="52"></textarea>
 	</fieldset>
 	<table width="100%" align="center">
@@ -51,7 +61,7 @@ window.addEvent('domready', function(){
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="controller" value="tags" />
-<input type="hidden" name="view" value="tags" />
-<input type="hidden" name="tags.task" value="import" />
+<input type="hidden" name="task" value="tags.import" />
+<input type="hidden" name="layout" value="import" />
+<input type="hidden" name="format" value="raw" />
 </form>

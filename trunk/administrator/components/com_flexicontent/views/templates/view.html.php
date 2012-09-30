@@ -27,11 +27,12 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTemplates extends JView {
-
+class FlexicontentViewTemplates extends JView
+{
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db  		= & JFactory::getDBO();
@@ -45,7 +46,16 @@ class FlexicontentViewTemplates extends JView {
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/silveripe.js' );
 
+		$permission = FlexicontentHelperPerm::getPerm();
+
+		if (!$permission->CanTemplates) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
+		
+		//Create Submenu
 		FLEXISubmenu('CanTemplates');
+		
+		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );

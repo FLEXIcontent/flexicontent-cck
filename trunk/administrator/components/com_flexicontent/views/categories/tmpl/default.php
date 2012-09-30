@@ -18,7 +18,14 @@
 
 defined('_JEXEC') or die('Restricted access');
 $user       = &JFactory::getUser();
-$userId     = $user->get('id');
+$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
+$autologin= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+
+
+$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+
+$image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
+$infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -41,6 +48,7 @@ $userId     = $user->get('id');
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
+			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
@@ -57,7 +65,7 @@ $userId     = $user->get('id');
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="11">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -89,6 +97,12 @@ $userId     = $user->get('id');
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
+			<td width="1%" >
+				<?php
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getCategoryRoute($row->id)) . $autologin;
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
+				?>
+			</td>
 			<td align="left">
 				<?php
 				if (FLEXI_J16GE) {
@@ -164,8 +178,8 @@ $userId     = $user->get('id');
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php 
-		$k = 1 - $k;
-        $i++;
+			$k = 1 - $k;
+			$i++;
 		} 
 		?>
 	</tbody>

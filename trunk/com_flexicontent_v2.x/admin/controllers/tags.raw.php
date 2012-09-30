@@ -37,8 +37,42 @@ class FlexicontentControllerTags extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
+		
+		// Register Extra task
+		$this->registerTask( 'import', 			'import' );
 	}
+	
+	
+	/**
+	 * Logic to import a tag list
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function import( )
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$list		= JRequest::getVar( 'taglist', null, 'post', 'string' );
 
+		$model	= $this->getModel('tags');		
+		$logs 	= $model->importList($list);
+		
+		if ($logs) {
+			if ($logs['success']) {
+				echo '<div class="copyok">'.JText::sprintf( 'FLEXI_TAG_IMPORT_SUCCESS', $logs['success'] ).'</div>';
+			}
+			if ($logs['error']) {
+				echo '<div class="copywarn>'.JText::sprintf( 'FLEXI_TAG_IMPORT_FAILED', $logs['error'] ).'</div>';
+			}
+		} else {
+			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TAG_TO_IMPORT' ).'</div>';
+		}
+	}
+	
+	
 	/**
 	 *  Add new Tag from item screen
 	 *

@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
 <?php	/*<div class="form-filter" style="float: left;">
 		<label for="filter_search"><?php echo JText::sprintf('FINDER_SEARCH_LABEL', JText::_('FINDER_ITEMS')); ?></label>
 		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->get('filter.search'); ?>" class="text_area" onchange="document.adminForm.submit();" />
@@ -43,19 +43,19 @@ defined('_JEXEC') or die('Restricted access');
 					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_INDEX', 'l.title', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX'), 'l.title', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="20%">
-					<?php echo JHTML::_('grid.sort', 'Item', 'l.state', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'l.state', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'FLEXI_EXTRA_TABLE', 'l.type_id', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_TABLE'), 'l.type_id', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="5%">
-					<?php echo JHTML::_('grid.sort', 'FLEXI_EXTRA_PK_ID', 'l.url', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_PK_ID'), 'l.url', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap">
-					<?php echo JHTML::_('grid.sort', 'FLEXI_SEARCH_INDEX', 'l.indexdate', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), 'l.indexdate', 'ASC', 'f.field_id'); ?>
 				</th>
 			</tr>
 		</thead>

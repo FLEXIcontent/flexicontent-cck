@@ -27,9 +27,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewEditacl extends JView {
-
-	function display($tpl = null) {
+class FlexicontentViewEditacl extends JView
+{
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
