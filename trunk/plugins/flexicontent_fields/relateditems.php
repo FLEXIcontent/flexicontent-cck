@@ -106,13 +106,13 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			$field->html = 'User not allowed to see category tree';
 			return;
 		}
-    //ob_start();		print_r($field->value);		$field->html = ob_get_contents();    ob_end_clean();
-    
+		//ob_start();		print_r($field->value);		$field->html = ob_get_contents();    ob_end_clean();
+		
 		// CATEGORY SCOPE
-    $where = "";
-    $allowed_cats = $disallowed_cats = false;
-    
- 		if(!is_array($catids)) $catids = explode(",", $catids);
+		$where = "";
+		$allowed_cats = $disallowed_cats = false;
+		
+		if(!is_array($catids)) $catids = explode(",", $catids);
 		if ($usesubcats) {
 			// Find descendants of the categories
 			$subcats = array();
@@ -122,23 +122,23 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			$catids = array_unique($subcats);
 		}
 		
-    if ( $method_cat == 3 ) {  // include method
-    	$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
-    } else if ( $method_cat == 2 ) {  // exclude method
-    	$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
-    } else if (!$viewallcats) {
-    	$allowed_cats = $usercats;
-    }
+		if ( $method_cat == 3 ) {  // include method
+			$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
+		} else if ( $method_cat == 2 ) {  // exclude method
+			$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
+		} else if (!$viewallcats) {
+			$allowed_cats = $usercats;
+		}
 		if ( $allowed_cats && ( !count($allowed_cats) || empty($allowed_cats[0]) ) ) $allowed_cats = false;
 		if ( $disallowed_cats && ( !count($disallowed_cats) || empty($disallowed_cats[0]) ) ) $disallowed_cats = false;
-    
+		
 		if ( $allowed_cats ) {
 			$where .= ($where=="") ? "" : " AND ";
-			$where .= " c.catid IN (".implode(',',$allowed_cats ).") ";
+			$where .= " rel.catid IN (".implode(',',$allowed_cats ).") ";
 		}
 		if ( $disallowed_cats ) {
 			$where .= ($where=="") ? "" : " AND ";
-			$where .= " c.catid NOT IN (".implode(',',$disallowed_cats ).") ";
+			$where .= " rel.catid NOT IN (".implode(',',$disallowed_cats ).") ";
 		}
 		
 		// TYPE SCOPE
@@ -163,10 +163,10 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			$where .= " c.state IN (1, -5) ";
 		}
 		
-    if ($where!="") $where = " WHERE " . $where;
-    
+		if ($where!="") $where = " WHERE " . $where;
+		
 		$orderby 	= $this->_buildItemOrderBy($order);
-    
+		
 		$query = "SELECT c.title, c.id, c.catid, c.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, c.alias FROM #__content AS c "
 			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on c.id=ie.item_id " : "")
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel on c.id=rel.itemid '
@@ -264,9 +264,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			}
 		}
 		
+		$fieldname = FLEXI_J16GE ? 'custom['.$ri_field_name.'][]' : $ri_field_name.'[]';
+		
 		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
 		
-		$field->html .= '<select id="'.$ri_field_name.'" name="'.$ri_field_name.'[]" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;" '.$size.' >';
+		$field->html .= '<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="min-width:140px;display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
