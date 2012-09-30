@@ -491,6 +491,7 @@ class FlexicontentViewCategory extends JView
 				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 				$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			}
+			$cat->image_src = @$src;  // Also add image category URL for developers
 			
 			if ($image) {
 				$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
