@@ -31,7 +31,8 @@ class FlexicontentViewQfcategoryelement extends JView {
 
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$db			= & JFactory::getDBO();
@@ -50,8 +51,7 @@ class FlexicontentViewQfcategoryelement extends JView {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.'/css/general.css');
-
+		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		//Get data from the model

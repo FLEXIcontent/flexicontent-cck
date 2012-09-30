@@ -228,6 +228,13 @@ class FlexicontentControllerTags extends FlexicontentController
 		parent::display();
 	}
 
+
+
+	//*************************
+	// RAW output functions ...
+	//*************************
+	
+	 
 	/**
 	 * Logic to import a tag list
 	 *
@@ -256,11 +263,7 @@ class FlexicontentControllerTags extends FlexicontentController
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TAG_TO_IMPORT' ).'</div>';
 		}
 	}
-
-
-	//*************************
-	// RAW output functions ...
-	//*************************
+	
 	
 	/**
 	 *  Add new Tag from item screen

@@ -43,7 +43,7 @@ class FlexicontentViewStats extends JView
 		//initialise variables
 		$document	= & JFactory::getDocument();
 		$pane   	= & JPane::getInstance('Tabs');
-		//$user 		= & JFactory::getUser();
+		$user 		= & JFactory::getUser();
 		
 		// Get data from the model
 		$genstats 	= & $this->get( 'Generalstats' );
@@ -55,21 +55,29 @@ class FlexicontentViewStats extends JView
 		$votesstats	= & $this->get( 'Votesstats' );
 		$creators	= & $this->get( 'Creators' );
 		$editors	= & $this->get( 'Editors' );
+		
+		$permission = FlexicontentHelperPerm::getPerm();
 
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
 		JToolBarHelper::Back();
+		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
+		if (!$permission->CanStats) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
+		
+		//Create Submenu
 		FLEXISubmenu('CanStats');
 
-		$this->assignRef('pane'			, $pane);
+		$this->assignRef('pane'				, $pane);
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
-		$this->assignRef('rating'		, $rating);
-		$this->assignRef('worstrating'	, $worstrating);
+		$this->assignRef('rating'			, $rating);
+		$this->assignRef('worstrating', $worstrating);
 		$this->assignRef('favoured'		, $favoured);
 		$this->assignRef('statestats'	, $statestats);
 		$this->assignRef('votesstats'	, $votesstats);

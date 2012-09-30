@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id$
+ * @version 1.5 stable $Id: view.html.php 1402 2012-07-28 14:24:36Z ggppdk $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -33,12 +33,11 @@ class FLEXIcontentViewSearch extends JView
 		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
 
 		FLEXISubmenu('notvariable');
 		
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), 'searchtext.png' );
+		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), FLEXI_J16GE ? 'searchtext.png' : 'searchindex' );
 		
 		// Configure the toolbar.
 		$this->setToolbar();
@@ -65,17 +64,8 @@ class FLEXIcontentViewSearch extends JView
 		$toolbar = &JToolBar::getInstance('toolbar');
 
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_START', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component', 500, 210);
-		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_PURGE_INDEX', 'search.purge', false);
-		/*$toolbar->appendButton('Separator', 'divider');
-
-		JToolBarHelper::publishList('index.publish', 'Publish');
-		JToolBarHelper::unpublishList('index.unpublish', 'Unpublish');
-		JToolBarHelper::deleteList('Are you sure?', 'index.delete', 'Delete');
-
-		$toolbar->appendButton('Separator', 'divider');
-		$toolbar->appendButton('Popup', 'config', 'FINDER_OPTIONS', 'index.php?option=com_finder&view=config&tmpl=component', 570, 500);
-		$toolbar->appendButton('Popup', 'help', 'FINDER_ABOUT', 'index.php?option=com_finder&view=about&tmpl=component', 550, 500);
-		*/
+		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_PURGE_INDEX', FLEXI_J16GE ? 'search.purge' : 'purge', false);
+		
 		$user = &JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');

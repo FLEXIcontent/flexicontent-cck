@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: tags.php 1342 2012-06-07 01:48:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -42,7 +42,6 @@ class FlexicontentControllerTags extends FlexicontentController
 		$this->registerTask( 'add'  ,			'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 		'save' );
-		$this->registerTask( 'import', 			'import' );
 	}
 
 	/**
@@ -228,32 +227,4 @@ class FlexicontentControllerTags extends FlexicontentController
 		parent::display();
 	}
 
-	/**
-	 * Logic to import a tag list
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function import( )
-	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
-		$list		= JRequest::getVar( 'taglist', null, 'post', 'string' );
-
-		$model	= $this->getModel('tags');		
-		$logs 	= $model->importList($list);
-		
-		if ($logs) {
-			if ($logs['success']) {
-				echo '<div class="copyok">'.JText::sprintf( 'FLEXI_TAG_IMPORT_SUCCESS', $logs['success'] ).'</div>';
-			}
-			if ($logs['error']) {
-				echo '<div class="copywarn>'.JText::sprintf( 'FLEXI_TAG_IMPORT_FAILED', $logs['error'] ).'</div>';
-			}
-		} else {
-			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TAG_TO_IMPORT' ).'</div>';
-		}
-	}
 }

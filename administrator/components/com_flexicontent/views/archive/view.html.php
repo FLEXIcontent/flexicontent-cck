@@ -27,11 +27,12 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewArchive extends JView {
-
+class FlexicontentViewArchive extends JView
+{
 	function display($tpl = null)
 	{
-		global $mainframe, $option;
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
 
 		//initialise variables
 		$user 		= & JFactory::getUser();
@@ -48,17 +49,29 @@ class FlexicontentViewArchive extends JView {
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$permission = FlexicontentHelperPerm::getPerm();
 
+		if (!$permission->CanArchives) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
+		
+		//Create Submenu
 		FLEXISubmenu('CanArchives');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
-		JToolBarHelper::unarchiveList();
-		JToolBarHelper::deleteList();
+		if (FLEXI_J16GE) {
+			JToolBarHelper::unarchiveList('archive.unarchive');
+			JToolBarHelper::deleteList('Are you sure?', 'archive.remove');
+		} else {
+			JToolBarHelper::unarchiveList();
+			JToolBarHelper::deleteList();
+		}
+		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows			= & $this->get( 'Data');
+		$pageNav	= & $this->get( 'Pagination' );
 		
 		// search filter
 		$lists['search']= $search;

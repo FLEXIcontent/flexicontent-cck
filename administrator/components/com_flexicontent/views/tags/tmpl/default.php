@@ -16,9 +16,16 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
+defined('_JEXEC') or die('Restricted access');
 
-<form action="index.php" method="post" name="adminForm">
+$user			= JFactory::getUser();
+$cparams	= & JComponentHelper::getParams( 'com_flexicontent' );
+$autologin= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+
+$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+?>
+
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
 		<tr>
@@ -40,6 +47,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
+			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -50,7 +58,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="8">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -58,17 +66,25 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 	<tbody>
 		<?php
+		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
 		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
-			$link 		= 'index.php?option=com_flexicontent&amp;controller=tags&amp;task=edit&amp;cid[]='. $row->id;
-			$published 	= JHTML::_('grid.published', $row, $i );
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			$link 		= 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;cid[]='. $row->id;
+			if (FLEXI_J16GE)	$published	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
+			else							$published	= JHTML::_('grid.published', $row, $i );
+			$checked	= JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
+			<td width="1%" >
+				<?php
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getTagRoute($row->id)) . $autologin;
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
+				?>
+			</td>
 			<td align="left">
 				<?php
 				if ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) {

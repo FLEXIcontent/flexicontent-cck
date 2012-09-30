@@ -27,9 +27,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTemplates extends JView {
-
-	function display($tpl = null) {
+class FlexicontentViewTemplates extends JView
+{
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
@@ -58,7 +59,7 @@ class FlexicontentViewTemplates extends JView {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );
-
+		
 		$tmpldirectory 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
 		$source			= JRequest::getString('source', '');
 		$dest			= $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';

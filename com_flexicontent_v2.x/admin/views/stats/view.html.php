@@ -28,13 +28,15 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewStats extends JView{
+class FlexicontentViewStats extends JView
+{
 	/**
 	 * Creates the Entrypage
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null ) {
+	function display( $tpl = null )
+	{
 		//Load pane behavior
 		jimport('joomla.html.pane');
 
@@ -64,8 +66,6 @@ class FlexicontentViewStats extends JView{
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
-		$permission = FlexicontentHelperPerm::getPerm();
-
 		if (!$permission->CanStats) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
@@ -73,11 +73,11 @@ class FlexicontentViewStats extends JView{
 		//Create Submenu
 		FLEXISubmenu('CanStats');
 
-		$this->assignRef('pane'			, $pane);
+		$this->assignRef('pane'				, $pane);
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
-		$this->assignRef('rating'		, $rating);
-		$this->assignRef('worstrating'	, $worstrating);
+		$this->assignRef('rating'			, $rating);
+		$this->assignRef('worstrating', $worstrating);
 		$this->assignRef('favoured'		, $favoured);
 		$this->assignRef('statestats'	, $statestats);
 		$this->assignRef('votesstats'	, $votesstats);

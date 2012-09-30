@@ -1,4 +1,23 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
+<?php
+/**
+ * @version 1.5 stable $Id: default.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+defined('_JEXEC') or die('Restricted access');
+?>
 
 <form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
 <?php	/*<div class="form-filter" style="float: left;">
@@ -24,19 +43,19 @@
 					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'Field', 'l.title', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX'), 'l.title', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="20%">
-					<?php echo JHTML::_('grid.sort', 'Item', 'l.state', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'l.state', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', 'Extra Table', 'l.type_id', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_TABLE'), 'l.type_id', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap" width="5%">
-					<?php echo JHTML::_('grid.sort', 'Extra PK ID', 'l.url', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_PK_ID'), 'l.url', 'ASC', 'f.field_id'); ?>
 				</th>
 				<th nowrap="nowrap">
-					<?php echo JHTML::_('grid.sort', 'Search Index', 'l.indexdate', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), 'l.indexdate', 'ASC', 'f.field_id'); ?>
 				</th>
 			</tr>
 		</thead>
@@ -46,7 +65,7 @@
 				<td align="center" colspan="7">
 					<?php
 					if ($this->total == 0) {
-						echo JText::_('NO DATA');
+						echo JText::_('FLEXI_NO_DATA');
 						//echo JText::_('FINDER_INDEX_TIP');
 					} else {
 						echo JText::_('FINDER_INDEX_NO_CONTENT');
