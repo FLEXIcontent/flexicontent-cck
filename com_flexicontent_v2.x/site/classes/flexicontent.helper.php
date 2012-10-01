@@ -1202,7 +1202,7 @@ class flexicontent_html
 					} else if (@$lang->imgsrc) {
 						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					} else {
-						echo $lang->name;
+						$list 	.= $lang->name;
 					}	
 					$list 	.= '</label>';
 					$checked	= '';
@@ -1222,7 +1222,7 @@ class flexicontent_html
 					} else if (@$lang->imgsrc) {
 						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					} else {
-						echo $lang->name;
+						$list 	.= $lang->name;
 					}	
 					$list 	.= '</label><br />';
 				}
@@ -1238,7 +1238,7 @@ class flexicontent_html
 					} else if (@$lang->imgsrc) {
 						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					} else {
-						echo $lang->name;
+						$list 	.= $lang->name;
 					}	
 					$list 	.= '</label><br />';
 				}

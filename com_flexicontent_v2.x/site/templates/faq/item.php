@@ -20,6 +20,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl; // for backwards compatiblity
 
+// USE HTML5 or XHTML
+$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+if ($html5) {  /* BOF html5  */
+	echo $this->loadTemplate('html5');
+} else {
+
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' items item'.$this->item->id;
@@ -27,7 +33,9 @@ $page_classes .= ' type'.$this->item->type_id;
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
+
 ?>
+
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
@@ -143,7 +151,7 @@ $tabcount = 6;
 for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['subtitle_tab'.$tc]);
 
 if (@$createtabs) :
-	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
+	echo '	<div class="fctabber"><!-- tabber start -->'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'subtitle_tab'.$tc;
@@ -249,7 +257,7 @@ $tabcount = 6;
 for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['bottom_tab'.$tc]);
 
 if (@$createtabs) :
-	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
+	echo '	<div class="fctabber"><!-- tabber start -->'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'bottom_tab'.$tc;
@@ -338,3 +346,5 @@ endif;
   <!-- EOF afterDisplayContent -->
 	
 </div>
+
+<?php } /* EOF if html5  */ ?>

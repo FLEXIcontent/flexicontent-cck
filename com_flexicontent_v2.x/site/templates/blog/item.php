@@ -20,6 +20,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl; // for backwards compatiblity
 
+// USE HTML5 or XHTML
+$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+if ($html5) {  /* BOF html5  */
+	echo $this->loadTemplate('html5');
+} else {
+
 // Set the class for controlling number of columns in custom field blocks
 switch ($this->params->get( 'columnmode', 2 )) {
 	case 0: $columnmode = 'singlecol'; break;
@@ -37,7 +43,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
   <!-- BOF beforeDisplayContent -->
   <?php if ($this->item->event->beforeDisplayContent) : ?>
-		<div class='fc_beforeDisplayContent' style='clear:both;'>
+		<div class="fc_beforeDisplayContent group">
 			<?php echo $this->item->event->beforeDisplayContent; ?>
 		</div>
 	<?php endif; ?>
@@ -72,7 +78,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading"><span class='fc_item_title'>
+	<h2 class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -86,7 +92,7 @@ $page_classes .= ' type'.$this->item->type_id;
 	
   <!-- BOF afterDisplayTitle -->
   <?php if ($this->item->event->afterDisplayTitle) : ?>
-		<div class='fc_afterDisplayTitle' style='clear:both;'>
+		<div class="fc_afterDisplayTitle group">
 			<?php echo $this->item->event->afterDisplayTitle; ?>
 		</div>
 	<?php endif; ?>
@@ -94,7 +100,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF item informations -->
 	<?php if ((intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($this->item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($this->item->modified) !=0))) : ?>
-	<p class="iteminfo">
+	<p class="iteminfo  group">
 		
 		<?php if (($this->params->get('show_author')) && ($this->item->creator != "")) : ?>
 		<span class="createdline">
@@ -141,7 +147,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF item rating, favourites -->
 	<?php if (($this->params->get('show_vote', 1)) || ($this->params->get('show_favs', 1)))  : ?>
-	<div class="itemactions">
+	<div class="itemactions  group">
 		
 		<?php if ($this->params->get('show_vote', 1)) : ?>
 		<span class="voting">
@@ -168,7 +174,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF beforedescription block -->
 	<?php if (isset($this->item->positions['beforedescription'])) : ?>
-	<div class="customblock beforedescription">
+	<div class="customblock beforedescription  group">
 		<?php foreach ($this->item->positions['beforedescription'] as $field) : ?>
 		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -182,7 +188,7 @@ $page_classes .= ' type'.$this->item->type_id;
 	<!-- EOF beforedescription block -->
 
 	<!-- BOF description block -->
-	<div class="description">
+	<div class="description  group">
 	<?php FlexicontentFields::getFieldDisplay($this->item, 'text', $values=null, $method='display'); ?>
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
@@ -190,7 +196,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF afterdescription block -->
 	<?php if (isset($this->item->positions['afterdescription'])) : ?>
-	<div class="customblock afterdescription">
+	<div class="customblock afterdescription  group">
 		<?php foreach ($this->item->positions['afterdescription'] as $field) : ?>
 		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -201,11 +207,12 @@ $page_classes .= ' type'.$this->item->type_id;
 		<?php endforeach; ?>
 	</div>
 	<?php endif; ?>
+
 	<!-- EOF afterdescription block -->
 	
 	<!-- BOF item categories, tags -->
 	<?php if (($this->params->get('show_tags', 1)) || ($this->params->get('show_category', 1)))  : ?>
-	<div class="itemadditionnal">
+	<div class="itemadditionnal group">
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<span class="categories">
 			<?php FlexicontentFields::getFieldDisplay($this->item, 'categories', $values=null, $method='display'); ?>
@@ -227,7 +234,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 	<!-- BOF comments -->
 	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
-	<div class="comments">
+	<div class="comments group">
 	<?php
 		if ($this->params->get('comments') == 1) :
 			if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
@@ -249,10 +256,12 @@ $page_classes .= ' type'.$this->item->type_id;
 
   <!-- BOF afterDisplayContent -->
   <?php if ($this->item->event->afterDisplayContent) : ?>
-		<div class='fc_afterDisplayContent' style='clear:both;'>
+		<div class="fc_afterDisplayContent group">
 			<?php echo $this->item->event->afterDisplayContent; ?>
 		</div>
 	<?php endif; ?>
   <!-- EOF afterDisplayContent -->
 	
 </div>
+
+<?php } /* EOF if html5  */ ?>

@@ -1,4 +1,4 @@
-/* Blog Template */
+/* Blog Theme : item template CSS file */
 
 /********************************************************************/
 /*** Part 1, CSS rules for fields display via Template parameters ***/
@@ -144,6 +144,37 @@
 /* Field value when having no label */
 .customblock .fcvalue.nolabel {
 	width: 100%!important;
+}
+
+/* "micro" clearfix http://nicolasgallagher.com/micro-clearfix-hack/  */
+
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+.group:before,
+.group:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.group:after {
+    clear: both;
+}
+
+/**
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.group {
+	/* for IE 6/7 */
+    *zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
+    /* non-JS fallback */
+    *zoom: 1;
 }
 
 

@@ -1,38 +1,56 @@
-div#flexicontent
-{ /*overflow: hidden;*/ /* clearing in beez */ }
+/* Blog Theme : category template CSS file */
 
-div#flexicontent .clear
-{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
+#flexicontent .clear { 
+	border: 0; clear: both; 
+	float: none; 
+	font-size: 1px; 
+	height: 0; 
+	line-height: 1px; 
+	margin: 0; 
+	padding: 0; 
+	visibility: hidden;
+}
 
-div#flexicontent .floattext:after /* ie fix in conditional comments (html source) */
-{content: "."; display: block; height: 0; clear: both; visibility: hidden;}
+#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
+	content: "."; 
+	display: block; 
+	height: 0; 
+	clear: both; 
+	visibility: hidden;
+}
 
-div#flexicontent .floattext
-{ display:block; /* safari */ }
+#flexicontent .floattext { 
+	display:block; /* safari */
+}
 
 /**
  * @section buttons
  *
  * print, pdf, ...
  */
-div#flexicontent .buttons
-{ float: right; }
+#flexicontent .buttons { 
+	float: right;
+}
 
-div#flexicontent .buttons img
-{ border: none; }
+#flexicontent .buttons img { 
+ border: none; 
+}
 
-div#flexicontent .buttons a
-{ padding: 0 0 0 5px; height: 16px; line-height: 16px; }
+#flexicontent .buttons a { 
+	padding: 0 0 0 5px; 
+	height: 16px; 
+	line-height: 16px; 
+}
 
 
 /**
  * @section headlines
  *
  */
-div#flexicontent h2 {
+#flexicontent h2 {
 }
 
-div#flexicontent h2 img {
+#flexicontent h2 img {
 border: none;
 }
 
@@ -58,7 +76,7 @@ div.pageslinks {
 	float: left;
 	width: 100%;
 }
-div#flexicontent .pagescounter {
+#flexicontent .pagescounter {
 	text-align: center;
 }
 
@@ -67,22 +85,22 @@ div#flexicontent .pagescounter {
  * @section Categoryview
  *
  */
-div#flexicontent .catimg {
+#flexicontent .catimg {
 margin: 0 0.5em 0.5em 0;
 float: left;
 position: relative;
 }
 
-div#flexicontent .catimg p {
+#flexicontent .catimg p {
 font-size: 0.9em; line-height: 180%;
 margin: 0 0 0.5em 0;
 }
 
-div#flexicontent .catdescription {
+#flexicontent .catdescription {
 margin: 0 0 0.5em 0;
 }
 
-div#flexicontent .subcategories {
+#flexicontent .subcategories {
 /* font-size: 1.2em; font-weight: bold; */
 border-bottom: 2px solid #ddd;
 padding:0.5em 0.3em; margin: 0.8em 0;
@@ -92,7 +110,7 @@ padding:0.5em 0.3em; margin: 0.8em 0;
  * @section FLEXIcontent Item
  *
  */
-div#flexicontent .taglist {
+#flexicontent .taglist {
 margin: 5px 0 10px; padding: 0 5px;
 }
 
@@ -105,19 +123,19 @@ div.subcategorieslist {
 margin: 0 0 1em 0;
 }
 
-div#flexicontent #fc_filter {
+#flexicontent #fc_filter {
 margin: 0 0 1em 0; padding: 0.5em;
 border: solid 1px #ddd;
 }
 
-div#flexicontent .fc_fleft {
+#flexicontent .fc_fleft {
 float: left;
 }
 
-div#flexicontent .fc_fright {
+#flexicontent .fc_fright {
 float: right;
 }
-div#flexicontent .fc_fright .filter {
+#flexicontent .fc_fright .filter {
 margin-left: 10px;
 }
 
@@ -259,4 +277,47 @@ div.image.left {
 .lineinfo .element .value {
 	display: block;
 	float: left;
+}
+
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top:0;
+	margin-bottom:0;
+}
+
+/* ===============================================
+   "micro" clearfix 
+   http://nicolasgallagher.com/micro-clearfix-hack/
+=============================================== */
+
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+.group:before,
+.group:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.group:after {
+    clear: both;
+}
+
+/**
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.group {
+	/* for IE 6/7 */
+    *zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
+    /* non-JS fallback */
+    *zoom: 1;
 }

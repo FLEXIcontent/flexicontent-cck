@@ -240,10 +240,7 @@ foreach ($cat_items as $catid => $items) :
 			
 <?php
 	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns['aftertitle'])) :
-		echo "<span style='font-weight:bold; color:red;'>No columns selected forcing the display of item title. Please:<br>\n
-		1. enable display of item title in category parameters<br>\n
-		2. OR add fields to the category Layout of the template assigned to this category<br>\n
-		3. OR set category parameters to display 0 items per page</span>";
+		echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
 		$this->params->set('show_title', 1);
 	endif;
 ?>

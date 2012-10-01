@@ -6,13 +6,19 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description>This layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
+	<description>This HTML5 layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="show_field_labels_row" type="list" default="1" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
+		</field>
+		
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
 		</field>
 		</fieldset>
 	</fields>

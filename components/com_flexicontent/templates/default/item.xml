@@ -6,7 +6,7 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description>Modular item layout with tabbed positions, suitable for faq, file manager, or directory</description>
+	<description>Modular HTML5 item layout with tabbed positions, suitable for faq, file manager, or directory</description>
 	<params addpath="/administrator/components/com_flexicontent/elements">
 		<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 		<param name="top_cols" type="list" default="two" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC">
@@ -35,6 +35,12 @@
 		<param name="bottom_tab4_label" type="text" default="TAB04" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="bottom_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<param name="bottom_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+		
+		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<param name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
+		</param>
 	</params>
 	<fieldgroups>
 		<group>subtitle1</group>

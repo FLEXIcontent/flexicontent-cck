@@ -6,7 +6,7 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description>Category layout similar to the Joomla blog layout. Title, description and image are set as category parameters</description>
+	<description>Category HTML5 layout similar to the Joomla blog layout. Title, description and image are set as category parameters</description>
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="lead_num" type="text" size="3" default="1" label="FLEXI_NUM_LEADING" description="FLEXI_NUM_LEADING_DESC" />
@@ -83,6 +83,12 @@
 		<field name="intro_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
+		</field>
+		
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
 		</field>
 		</fieldset>
 	</fields>

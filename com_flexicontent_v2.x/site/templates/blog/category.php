@@ -17,9 +17,16 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// USE HTML5 or XHTML
+$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+if ($html5) {  /* BOF html5  */
+	echo $this->loadTemplate('html5');
+} else {
+
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' category cat'.$this->category->id;
+
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
@@ -105,3 +112,5 @@ $page_classes .= ' category cat'.$this->category->id;
 <!-- EOF pagination -->
 
 </div>
+
+<?php } /* EOF if html5  */ ?>

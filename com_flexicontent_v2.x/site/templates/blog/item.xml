@@ -6,7 +6,7 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description></description>
+	<description>HTML5 layout</description>
 	<fields name="attribs">
 		<fieldset name="attribs">
 		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
@@ -59,6 +59,11 @@
 			<option value="2">FLEXI_COLUMN_MODE_FORCE_AUTO_COLS</option>
 		</field>
 		
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
+		</field>
 		</fieldset>
 	</fields> 
 	<fieldgroups>
