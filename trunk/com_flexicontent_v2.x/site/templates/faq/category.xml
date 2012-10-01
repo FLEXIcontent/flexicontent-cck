@@ -6,7 +6,7 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description>This layout presents category items as faq like listings. Each field put in the aftertitle position will be rendered in a separate row</description>
+	<description>This HTML5 layout presents category items as faq like listings. Each field put in the aftertitle position will be rendered in a separate row</description>
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="description_cut_text" type="text" size="3" default="180" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
@@ -15,6 +15,12 @@
 			<option value="2">FLEXI_2_COLS</option>
 			<option value="3">FLEXI_3_COLS</option>
 			<option value="4">FLEXI_4_COLS</option>
+		</field>
+		
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
 		</field>
 		</fieldset>
 	</fields>

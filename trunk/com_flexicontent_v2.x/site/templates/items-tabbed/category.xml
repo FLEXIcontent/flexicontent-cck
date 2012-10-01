@@ -6,7 +6,7 @@
 	<license>GPLv2</license>
 	<version>1.0</version>
 	<release>05 december 2011</release>
-	<description>This layout presents category items in a modular layout AND placing them (the category items) inside tabs.</description>
+	<description>This HTML5 layout presents category items in a modular layout AND placing them (the category items) inside tabs.</description>
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
@@ -19,6 +19,12 @@
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="one">FLEXI_1_COL</option>
 			<option value="two">FLEXI_2_COLS</option>
+		</field>
+		
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
 		</field>
 		</fieldset>
 	</fields>

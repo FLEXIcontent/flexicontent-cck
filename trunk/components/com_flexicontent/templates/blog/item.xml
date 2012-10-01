@@ -6,8 +6,8 @@
 	<license>GPLv2</license>
 	<version>1.1</version>
 	<release>25 november 2009</release>
-	<description></description>
-    <params>  
+	<description>HTML5 layout</description>
+	<params>  
 		<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 		<param name="show_author" type="list" default="1" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
@@ -58,6 +58,11 @@
 			<option value="2">FLEXI_COLUMN_MODE_FORCE_AUTO_COLS</option>
 		</param>
 		
+		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<param name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="0">FLEXI_XHTML</option>
+			<option value="1">FLEXI_HTML5</option>
+		</param>
 	</params> 
 	<fieldgroups>
 		<group readonly="true">fields_top</group>
