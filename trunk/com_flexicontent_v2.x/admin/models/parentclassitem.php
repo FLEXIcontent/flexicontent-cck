@@ -559,6 +559,11 @@ class ParentClassItem extends JModelAdmin
 				$fields = array();
 				if ($use_versioning && $version) 
 				{
+					// Overcome possible group concat limitation
+					$query="SET SESSION group_concat_max_len = 1000000";
+					$db->setQuery($query);
+					$db->query();
+					
 					$query = "SELECT f.id, f.name, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 						." FROM #__flexicontent_items_versions as iv "
 						." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
