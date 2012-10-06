@@ -87,7 +87,7 @@ class modFlexicontentHelper
 		$mod_height_feat 		= (int)$params->get('mod_height_feat', 140);
 		$mod_method_feat 		= (int)$params->get('mod_method_feat', 1);
 
-		// Retrieve default image for the image field
+		// Retrieve default image for the image field and also create field parameters so that they can be used
 		if ($mod_image) {
 			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
 			$db->setQuery($query);
@@ -272,13 +272,13 @@ class modFlexicontentHelper
 
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							
 						} else if ($mod_image_custom_url) {
 							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							
 							$h		= '&amp;h=' . $mod_height_feat;
 							$w		= '&amp;w=' . $mod_width_feat;
@@ -295,7 +295,12 @@ class modFlexicontentHelper
 							$src = '';
 							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
-								$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+								if ( $midata->params->get('image_source') )
+									//$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/original/'. $image['originalname'];
+									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/l_'. $image['originalname'];
+								else
+									//$src	= JURI::base(true) .'/'. $flexiparams->get('file_path') .'/'. $image['originalname'];   // original file maybe too large and slow down the thumbnail creation
+									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/l_'. $image['originalname'];      // faster original file maybe too large
 							} else if (!empty($midata->default_image_filepath)) {
 								$src	= $midata->default_image_filepath;
 							}
@@ -382,6 +387,8 @@ class modFlexicontentHelper
 								$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
 							}
 							$lists[$ord]['featured'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
+							$lists[$ord]['featured'][$i]->fields[$field]->name = $row->fields[$field]->name;
+							$lists[$ord]['featured'][$i]->fields[$field]->id   = $row->fields[$field]->id;
 						}
 					}
 					
@@ -395,13 +402,13 @@ class modFlexicontentHelper
 							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							
 						} else if ($mod_image_custom_url) {
 							
 							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
-							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname);
+							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							
 							$h		= '&amp;h=' . $mod_height_feat;
 							$w		= '&amp;w=' . $mod_width_feat;
@@ -418,7 +425,12 @@ class modFlexicontentHelper
 							$src = '';
 							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
-								$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+								if ( $midata->params->get('image_source') )
+									//$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/original/'. $image['originalname'];
+									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/l_'. $image['originalname'];
+								else
+									//$src	= JURI::base(true) .'/'. $flexiparams->get('file_path') .'/'. $image['originalname'];   // original file maybe too large and slow down the thumbnail creation
+									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/l_'. $image['originalname'];      // faster original file maybe too large
 							} else if (!empty($midata->default_image_filepath)) {
 								$src	= $midata->default_image_filepath;
 							}
@@ -504,6 +516,8 @@ class modFlexicontentHelper
 								$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
 							}
 							$lists[$ord]['standard'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
+							$lists[$ord]['standard'][$i]->fields[$field]->name = $row->fields[$field]->name;
+							$lists[$ord]['standard'][$i]->fields[$field]->id   = $row->fields[$field]->id;
 						}
 					}
 	
