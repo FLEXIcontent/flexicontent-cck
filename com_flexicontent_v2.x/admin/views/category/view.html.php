@@ -105,15 +105,15 @@ class FlexicontentViewCategory extends JView
 				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
 				$canedit_cat   = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
 			} else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllCategoryAccess('com_content', 'users', $user->gmid, $row->id);
-				$canedit_cat = ($user->gid < 25) ? in_array('edit', $rights) : 1;
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, 0,$row->id);
+				$canedit_cat = ($user->gid < 25) ? (in_array('edit', $rights) || in_array('editown', $rights)) : 1;
 			} else {
 				$canedit_cat = true;
 			}
 		}
 		
 		// Get if we can create inside at least one (com_content) category
-		if (FLEXI_J16GE || FLEXI_J16GE) {
+		if (FLEXI_J16GE) {
 			$cancreate_in_cats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed = array('core.create') );
 			$cancreate_cat  = count($cancreate_in_cats);
 		} else {
@@ -122,13 +122,15 @@ class FlexicontentViewCategory extends JView
 		
 		// Creating new category: Check if user can create inside any existing category
 		if ( $isNew && !$cancreate_cat ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
+			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : ""); 
+			JError::raiseWarning( 403, $acc_msg);
 			$mainframe->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 		
 		// Editing existing category: Check if user can edit existing (current) category
 		if ( !$isNew && !$canedit_cat ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
+			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". JText::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
+			JError::raiseWarning( 403, $acc_msg);
 			$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 		
