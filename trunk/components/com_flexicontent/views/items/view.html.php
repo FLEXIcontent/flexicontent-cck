@@ -42,7 +42,7 @@ class FlexicontentViewItems extends JView
 		jimport( 'joomla.html.parameter' );
 		
 		// check for form layout
-		if($this->getLayout() == 'form') {
+		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) ) {
 			$this->_displayForm($tpl);
 			return;
 		} else {

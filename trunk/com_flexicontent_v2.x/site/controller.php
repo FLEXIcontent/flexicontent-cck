@@ -546,7 +546,7 @@ class FlexicontentController extends JController
 		$view->setModel($model, true);
 
 		// Set the layout
-		$view->setLayout('form');
+		$view->setLayout( JRequest::getVar('layout','form') );
 
 		// Display the view
 		$view->display();
@@ -626,7 +626,7 @@ class FlexicontentController extends JController
 		$view->setModel($model, true);
 
 		// Set the layout
-		$view->setLayout('form');
+		$view->setLayout( JRequest::getVar('layout','form') );
 
 		// Display the view
 		$view->display();
