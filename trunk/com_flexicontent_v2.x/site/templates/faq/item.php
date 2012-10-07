@@ -33,9 +33,7 @@ $page_classes .= ' type'.$this->item->type_id;
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
-
 ?>
-
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 

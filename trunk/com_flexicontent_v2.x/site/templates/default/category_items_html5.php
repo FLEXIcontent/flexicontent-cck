@@ -77,7 +77,7 @@ $user =& JFactory::getUser();
 	<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="" class="group well">
 
 	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
-	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
+		<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
 	<?php endif; ?>
 
 	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
@@ -85,55 +85,62 @@ $user =& JFactory::getUser();
 		<?php if ($this->params->get('use_search')) : ?>
 		<div class="fc_fleft">
 			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area input-medium search-query" />
-			<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?><br /><?php endif; ?>
+			<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
+				<br />
+			<?php endif; ?>
 			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 		</div>
 		<?php endif; ?>
 		<?php if ($this->params->get('use_filters', 0) && $this->filters) : ?>
-            <!--div class="fc_fright"-->
-            <?php
-            foreach ($this->filters as $filt) :
-                if (empty($filt->html)) continue;
-                // Add form preparation
-                if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-                    $filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
-                } else {
-                    $filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
-                }
-                ?>
-                <span class="filter" style="white-space: nowrap;">
-                    <?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
-                    <span class="filter_label">
-                    <?php echo $filt->label; ?>
-                    </span>
-                    <?php endif; ?>
-                    <span class="filter_field">
-                    <?php echo $filt->html; ?>
-                    </span>
-                </span>
-            <?php endforeach; ?>
-        
-            <?php if (!$this->params->get('use_search')) : ?>
-            <button class="btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-            <?php endif; ?>
-            <!--/div-->
+	
+		<!--div class="fc_fright"-->
+		<?php
+		foreach ($this->filters as $filt) :
+			if (empty($filt->html)) continue;
+			// Add form preparation
+			if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
+				$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
+			} else {
+				$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
+			}
+		?>
+			<span class="filter" style="white-space: nowrap;">
+			
+				<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
+					<span class="filter_label">
+					<?php echo $filt->label; ?>
+					</span>
+				<?php endif; ?>
+			
+				<span class="filter_field">
+				<?php echo $filt->html; ?>
+				</span>
+			
+			</span>
+		<?php endforeach; ?>
+	
+		<?php if (!$this->params->get('use_search')) : ?>
+			<button class="btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+		<?php endif; ?>
+		<!--/div-->
+
 		<?php endif; ?>
 	</div>
 	<?php endif; ?>
 	<?php
-    if ($this->params->get('show_alpha', 1)) :
-        echo $this->loadTemplate('alpha_html5');
-    endif;
-    ?>
-    <input type="hidden" name="option" value="com_flexicontent" />
-    <input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-    <input type="hidden" name="filter_order_Dir" value="" />
-    <input type="hidden" name="view" value="category" />
-    <input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
-    <input type="hidden" name="task" value="" />
-    <input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
-    <input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
+	if ($this->params->get('show_alpha', 1)) :
+		echo $this->loadTemplate('alpha_html5');
+	endif;
+	?>
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
+	<input type="hidden" name="filter_order_Dir" value="" />
+	<input type="hidden" name="view" value="category" />
+	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
+	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 </form>
 <?php endif; ?>
 
@@ -181,15 +188,15 @@ endif;
 
 	<?php if ($this->params->get('show_title', 1) || count($columns)) : ?>
 	
-    <!-- BOF items total-->
-    <?php if ($this->params->get('show_item_total', 1)) : ?>
-    <div id="item_total" class="item_total group">
-        <?php	//echo $this->pageNav->getResultsCounter(); // Alternative way of displaying total (via joomla pagination class) ?>
-        <?php echo $this->resultsCounter; // custom Results Counter ?>
-    </div>
+		<!-- BOF items total-->
+		<?php if ($this->params->get('show_item_total', 1)) : ?>
+		<div id="item_total" class="item_total group">
+			<?php	//echo $this->pageNav->getResultsCounter(); // Alternative way of displaying total (via joomla pagination class) ?>
+			<?php echo $this->resultsCounter; // custom Results Counter ?>
+		</div>
     </aside>
-    <?php endif; ?>
-    <!-- BOF items total-->
+		<?php endif; ?>
+		<!-- BOF items total-->
     		
 		<table id="flexitable" class="table table-striped flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo @$this->category->name; ?>">
    		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>

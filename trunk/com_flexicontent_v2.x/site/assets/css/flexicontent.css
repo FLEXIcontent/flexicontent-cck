@@ -985,3 +985,9 @@ div#flexicontent table.admintable td.paramlist_key {
 	margin: 0 !important;
 	padding: 3px 0px 0px 0px !important;
 }
+
+.fc_field_image {
+	padding: 1px !important;
+	border: 1px solid lightgray !important;
+	border-radius: 4px !important;
+}
