@@ -220,15 +220,27 @@ if ($this->limitstart == 0) :
 					if ($this->params->get('lead_use_image', 1)) :
 						if ($this->params->get('lead_image')) :
 							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('lead_image'), $values=null, $method='display');
-							if (!empty($items[$i]->fields[$this->params->get('lead_image')]->value[0])) :
-								$dir{$i}	= $items[$i]->fields[$this->params->get('lead_image')]->parameters->get('dir');
-								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('lead_image')]->value[0]);
-								$image{$i}	= $value{$i}['originalname'];
-								$scr{$i}	= $dir{$i}.($this->params->get('lead_image_size') ? '/'.$this->params->get('lead_image_size').'_' : '/l_').$image{$i};
+							
+							$img_field_name = $this->params->get('lead_image');
+							$img_field = & $items[$i]->fields[$img_field_name];
+							$img_field_size = $this->params->get('lead_image_size');
+							$img_field_size = $img_field_size ? $img_field_size : 'l';
+							if ( !empty($img_field->value[0]) ) :
+							
+								$value{$i} = unserialize($img_field->value[0]);
+								
+								if ( $img_field->parameters->get('image_source') ) {
+									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
+								} else {
+									$dir{$i}	 = $img_field->parameters->get('dir');
+								}
+								
+								$image{$i} = $value{$i}['originalname'];
+								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};
 							else :
 								$scr{$i}	= '';
 							endif;
-							$src = $scr{$i};
+							$src = str_replace('\\','/', $scr{$i});
 						else :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
@@ -492,15 +504,27 @@ if ($this->limitstart == 0) :
 					if ($this->params->get('intro_use_image', 1)) :
 						if ($this->params->get('intro_image')) :
 							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('intro_image'), $values=null, $method='display');
-							if (!empty($items[$i]->fields[$this->params->get('intro_image')]->value[0])) :
-								$dir{$i}	= $items[$i]->fields[$this->params->get('intro_image')]->parameters->get('dir');
-								$value{$i} 	= unserialize($items[$i]->fields[$this->params->get('intro_image')]->value[0]);
-								$image{$i}	= $value{$i}['originalname'];
-								$scr{$i}	= $dir{$i}.($this->params->get('intro_image_size') ? '/'.$this->params->get('intro_image_size').'_' : '/l_').$image{$i};
+							
+							$img_field_name = $this->params->get('intro_image');
+							$img_field = & $items[$i]->fields[$img_field_name];
+							$img_field_size = $this->params->get('intro_image_size');
+							$img_field_size = $img_field_size ? $img_field_size : 'l';
+							if ( !empty($img_field->value[0]) ) :
+							
+								$value{$i} = unserialize($img_field->value[0]);
+								
+								if ( $img_field->parameters->get('image_source') ) {
+									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
+								} else {
+									$dir{$i}	 = $img_field->parameters->get('dir');
+								}
+								
+								$image{$i} = $value{$i}['originalname'];
+								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};									
 							else :
 								$scr{$i}	= '';
 							endif;
-							$src = $scr{$i};
+							$src = str_replace('\\','/', $scr{$i});
 						else :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
