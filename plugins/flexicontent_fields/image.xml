@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Image</name>
-	<author>Emmanuel Danan</author>
+	<name>FLEXIcontent - Image / Image Gallery</name>
+	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>
@@ -27,17 +27,27 @@
 			
 			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 			
-			<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
+			<param name="image_source" type="radio" default="0" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
+				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
+				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+			</param>
+			<param name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<param name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_VARIOUS_BASIC_LABEL" description="" level="level2" />
 			<param name="default_image" type="text" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<param name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<param name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<param name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
-			<param name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_DIRECTORY" description="FLEXI_FIELD_IMAGE_DIRECTORY_DESC" />
+			<param name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_FOLDER" description="FLEXI_FIELD_IMAGE_FOLDER_DESC" />
 			<param name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
 			<param name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
 				<option value="*">FLEXI_FIELD_REPEAT</option>
@@ -143,7 +153,7 @@
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
 				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX</option>
 			</param>
-			<param name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_DESC">
+			<param name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
 				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
@@ -172,13 +182,9 @@
 			
 			<param name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" />
 
-			<param name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" description="" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level2" menu="hide" />
 			
-			<param name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_USE_AUTOUPLOAD_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="list_all_media_files" type="radio" default="0" label="FLEXI_LIST_ALL_MEDIA_FILES" description="FLEXI_LIST_ALL_MEDIA_FILES_DESC">
+			<param name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_AUTOUPLOAD_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
@@ -186,16 +192,26 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="limit_by_uploader" type="radio" default="0" label="FLEXI_LIMIT_BY_UPLOADER" description="FLEXI_LIMIT_BY_UPLOADER_DESC">
+			
+			<param name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" menu="hide" />
+			<param name="list_all_media_files" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC">
+				<option value="0">FLEXI_FIELD_CURRENT_FIELD</option>
+				<option value="1">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
+			</param>
+			<param name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC">
+				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
+				<option value="0">FLEXI_FIELD_ANY_USER</option>
+			</param>
+
+
+			<param name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level2" menu="hide" />
+			
+			<param name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE" description="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			
-			
+
+
 			<param name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" menu="hide" />
@@ -252,7 +268,7 @@
 			</param>
 			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
+			<param name="separatorf" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>

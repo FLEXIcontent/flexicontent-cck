@@ -116,7 +116,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						{
 							$link = 'index.php?option='.$option.'&amp;view=users';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-authors.png', JText::_( 'FLEXI_AUTHORS' ) );
-							$link = 'index.php?option='.$option.'&amp;view=user&amp;controller=users&amp;task=add';
+							$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=users.add' : 'controller=users&amp;task=add');
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_AUTHOR' ) );
 						}
 

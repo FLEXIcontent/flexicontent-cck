@@ -177,28 +177,38 @@ var JFormValidator = new Class({
 				// Retrieve selected values for secondary categories
 				var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
 				var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
+				var field_name_catid = flexi_j16ge ? 'jform[catid]' : 'catid';
 					
 				if(MooTools.version>="1.2.4") {
 					//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
 					var values = $$(document.getElementsByName(field_name))[0].getSelected();
 					values = values.map( function(g) { return g.get('value'); } );
+					
+					var value_catid = $$(document.getElementsByName(field_name_catid))[0].getSelected();
+					value_catid = value_catid.map( function(g) { return g.get('value'); } );
+					value_catid = value_catid[0];
 				} else {
 					//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
 					var values = $$(document.getElementsByName(field_name))[0].getValue();
 					//  ** Alternative code **
 					//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
 					//values = values.map( function(g) { return g.getProperty('value'); } );
+					
+					var value_catid = $$(document.getElementsByName(field_name_catid))[0].getValue();
 				}
 				
 				//console.log(values);
 				//console.log(existing_cats_fc);
 				
-				// If exactly one secondary category was selected then set it as primary
-				if (max_cat_assign_fc && values.length > max_cat_assign_fc) {
+				var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) >= 0) )  ?  0 : 1;
+				
+				// Check if the number of categories is over the allowed limit for current user
+				if (max_cat_assign_fc && (values.length+add_val) > max_cat_assign_fc) {
 					var existing_only = 1;
 					for (var i = 0; i < values.length; i++) {
 						existing_only = existing_only && ( jQuery.inArray(values[i], existing_cats_fc) >= 0 );
 					}
+					existing_only = existing_only && ( jQuery.inArray(value_catid, existing_cats_fc) >= 0 );
 					if (!existing_only) {
 						alert(max_cat_overlimit_msg_fc+max_cat_assign_fc);
 						return false;

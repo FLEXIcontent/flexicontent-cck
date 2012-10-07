@@ -162,6 +162,96 @@ class FlexicontentModelFileselement extends JModel
 	}
 
 	/**
+	 * Method to get files having the given extensions from a given folder
+	 *
+	 * @access private
+	 * @return integer
+	 * @since 1.0
+	 */
+	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='jpg,jpeg,gif,png')
+	{
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
+		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $append_item, $append_field, $folder_param_name);
+		//echo $gallery_folder ."<br />";
+		
+		// Create folder for current language
+		if (!is_dir($gallery_folder)) {
+			mkdir($gallery_folder);
+		}
+		
+		// Get all image files with a .jpg extension.
+		$images = glob($gallery_folder . "/*.{".$exts."}", GLOB_BRACE);
+		
+		// Get image names
+		$rows = array();
+		foreach($images as $i => $image) {
+			$pinfo = pathinfo($image);
+			//echo "<pre>"; print_r($pinfo); exit;
+			$row = new stdClass();
+			$row->ext = $pinfo['extension'];
+			$row->filename = $pinfo['filename'].".".$pinfo['extension'];
+			$row->size = sprintf("%.0f KB", (filesize($image) / 1024) );
+			$row->altname = $pinfo['filename'];
+			$row->uploader = '-';
+			$row->uploaded = date("F d Y H:i:s.", filectime($image) );
+			$row->id = $i;
+			$rows[] = $row;
+		}
+		
+		return $rows;
+	}
+	
+	
+	/**
+	 * Method to get field parameters
+	 *
+	 * @access	public
+	 * @param	int file identifier
+	 */
+	function & getFieldParams($fieldid)
+	{
+		static $field_params = null;
+		if ($field_params) return $field_params;
+		
+		$field_name = $this->getFieldName($fieldid);
+		
+		$db =& JFactory::getDBO();
+		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field_name."'";
+		$db->setQuery($query);
+		$data = $db->loadObject();
+		
+		//print_r($data);
+		
+		if ($db->getErrorNum()) {
+			echo $query."<br /><br />".$db->getErrorMsg()."<br />";
+		}
+		
+		$field_params = new JParameter($data->attribs);
+		return $field_params;
+	}
+	
+	
+	/**
+	 * Method to get the folder path defined in a field
+	 *
+	 * @access	public
+	 * @param	int file identifier
+	 */
+	function getFieldFolderPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir')
+	{
+		$field_params = & $this->getFieldParams($fieldid);
+		$gallery_path = JPATH_SITE.DS.$field_params->get($folder_param_name, 'images/stories/flexicontent') . '/';
+		if ($append_item) $gallery_path .= 'item_' . $itemid;
+		if ($append_field) $gallery_path .= '_field_' . $fieldid;
+		$gallery_path .= '/original';		
+		return str_replace('\\','/', $gallery_path);
+	}		
+	
+
+
+	/**
 	 * Method to build the query for the files
 	 *
 	 * @access private
@@ -210,7 +300,7 @@ class FlexicontentModelFileselement extends JModel
 	function getItemFiles($filter_item=0) {
 		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		//$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', 0, 'int' );
+		//$filter_item 		= $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', 0, 'int' );
 		if($filter_item) {
 			$where		= $this->_buildContentWhere();
 			$db = JFactory::getDBO();
