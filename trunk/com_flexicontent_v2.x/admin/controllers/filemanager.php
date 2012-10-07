@@ -63,12 +63,35 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 		
+		$option		= JRequest::getVar( 'option');
 		$file 		= JRequest::getVar( 'Filedata', '', 'files', 'array' );
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filedesc	= JRequest::getVar( 'file-desc', '');
+		$fieldid	= JRequest::getVar( 'fieldid', 0);
+		$itemid		= JRequest::getVar( 'itemid', 0);
+		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		$err		= null;
+		
+		
+		// *****************************************
+		// Check that a file was provided / uploaded
+		// *****************************************
+		if ( !isset($file['name']) )
+		{
+			JError::raiseWarning(100, JText::_( 'Filename has invalid characters (or other error occured)' ));
+			$this->setRedirect( $_SERVER['HTTP_REFERER'], '' );
+			return;
+		}
+		
+		if ($file_mode == 'folder_mode') {
+			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$itemid;
+			$path = $mainframe->getUserState( $upload_path_var, '' ).DS;
+			$mainframe->setUserState( $upload_path_var, '');
+		} else {
+			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+		}
 		
 		jimport('joomla.utilities.date');
 
@@ -80,140 +103,117 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		jimport('joomla.filesystem.file');
 		$file['name']	= JFile::makeSafe($file['name']);
 
-		if (isset($file['name'])) {
 
-			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
-
-			//sanitize filename further and make unique
-			$params = null;
-			$upload_check = flexicontent_upload::check( $file, $err, $params );
-			$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-			$filepath 	= JPath::clean($path.strtolower($filename));
+		//sanitize filename further and make unique
+		$params = null;
+		$upload_check = flexicontent_upload::check( $file, $err, $params );
+		$filename 	= flexicontent_upload::sanitize($path, $file['name']);
+		$filepath 	= JPath::clean($path.strtolower($filename));
 			
-			if (!$upload_check) {
-				if ($format == 'json') {
-					jimport('joomla.error.log');
-					$log = &JLog::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
-					header('HTTP/1.0 415 Unsupported Media Type');
-					die('Error. Unsupported Media Type!');
-				} else {
-					JError::raiseNotice(100, JText::_($err));
-					// REDIRECT
-					if ($return) {
-						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
-					}
-					return;
-				}
-			}
-			
-			//get the extension to record it in the DB
-			$ext = strtolower(flexicontent_upload::getExt($filename));
-
-			if (!JFile::upload($file['tmp_name'], $filepath)) {
-				if ($format == 'json') {
-					jimport('joomla.error.log');
-					$log = &JLog::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
-					header('HTTP/1.0 409 Conflict');
-					jexit('Error. File already exists');
-				} else {
-					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
-					// REDIRECT
-					if ($return) {
-						$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
-					}
-					return;
-				}
+		if (!$upload_check) {
+			if ($format == 'json') {
+				jimport('joomla.error.log');
+				$log = &JLog::getInstance('com_flexicontent.error.php');
+				$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
+				header('HTTP/1.0 415 Unsupported Media Type');
+				die('Error. Unsupported Media Type!');
 			} else {
-				if ($format == 'json') {
+				JError::raiseNotice(100, JText::_($err));
+				// REDIRECT
+				if ($return) {
+					$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+				}
+				return;
+			}
+		}
+			
+		//get the extension to record it in the DB
+		$ext = strtolower(flexicontent_upload::getExt($filename));
+
+		// Upload Failed
+		if (!JFile::upload($file['tmp_name'], $filepath)) {
+			if ($format == 'json') {
+				jimport('joomla.error.log');
+				$log = &JLog::getInstance('com_flexicontent.error.php');
+				$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
+				header('HTTP/1.0 409 Conflict');
+				jexit('Error. File already exists');
+			} else {
+				JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
+				// REDIRECT
+				if ($return) {
+					$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+				}
+				return;
+			}
+				
+		// Upload Successful
+		} else {
+				
+			// a. Database mode
+			if ($file_mode == 'db_mode')
+			{
+				if ($format == 'json')
+				{
 					jimport('joomla.error.log');
 					$log = &JLog::getInstance();
 					$log->addEntry(array('comment' => $filepath));
-					
-					$db 	= &JFactory::getDBO();
-					$user	= &JFactory::getUser();
-					$config = &JFactory::getConfig();
-
-					$tzoffset = $config->getValue('config.offset');
-					$date = & JFactory::getDate( 'now', -$tzoffset);
-
-					$obj = new stdClass();
-					$obj->filename 			= $filename;
-					$obj->altname 			= $file['altname'];
-					$obj->url			= 0;
-					$obj->secure			= $secure;
-					$obj->ext			= $ext;
-					$obj->description		= $filedesc;
-					$obj->hits			= 0;
-					$obj->uploaded			= $date->toMySQL();
-					$obj->uploaded_by		= $user->get('id');
-
-					$db->insertObject('#__flexicontent_files', $obj);
-					
-					$option = JRequest::getVar('option');
-					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
-					if($filter_item) {
-						$session = JFactory::getSession();
-						$files = $session->get('fileselement.'.$filter_item, null);
-
-						if(!$files) {
-							$files = array();
-						}
-						$files[] = $db->insertid();
-						$session->set('fileselement.'.$filter_item, $files);
-					}
-
-					jexit('Upload complete');
-				} else {
-
-					$db 	= &JFactory::getDBO();
-					$user	= &JFactory::getUser();
-					$config = &JFactory::getConfig();
-
-					$tzoffset = $config->getValue('config.offset');
-					$date = & JFactory::getDate( 'now', -$tzoffset);
-
-					$obj = new stdClass();
-					$obj->filename 			= $filename;
-					$obj->altname 			= $file['altname'];
-					$obj->url			= 0;
-					$obj->secure			= $secure;
-					$obj->ext			= $ext;
-					$obj->hits			= 0;
-					$obj->description		= $filedesc;
-					$obj->uploaded			= $date->toMySQL();
-					$obj->uploaded_by		= $user->get('id');
-
-					$db->insertObject('#__flexicontent_files', $obj);
-					
-					//Get new file id
-					$file_id = (int)$db->insertid();
-
-					$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
-					
-					$option = JRequest::getVar('option');
-					$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
-					if($filter_item) {
-						$session = JFactory::getSession();
-						$files = $session->get('fileselement.'.$filter_item, null);
-
-						if(!$files) {
-							$files = array();
-						}
-						$files[] = $db->insertid();
-						$session->set('fileselement.'.$filter_item, $files);
-					}
-					
-					// REDIRECT
-					if ($return) {
-						$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
-					}
-					return;
 				}
+					
+				$db 	= &JFactory::getDBO();
+				$user	= &JFactory::getUser();
+				$config = &JFactory::getConfig();
+
+				$tzoffset = $config->getValue('config.offset');
+				$date = & JFactory::getDate( 'now', -$tzoffset);
+
+				$obj = new stdClass();
+				$obj->filename 			= $filename;
+				$obj->altname 			= $file['altname'];
+				$obj->url			= 0;
+				$obj->secure			= $secure;
+				$obj->ext			= $ext;
+				$obj->hits			= 0;
+				$obj->description		= $filedesc;
+				$obj->uploaded			= $date->toMySQL();
+				$obj->uploaded_by		= $user->get('id');
+					
+				// Insert file record in DB
+				$db->insertObject('#__flexicontent_files', $obj);
+					
+				// Get id of new file record
+				$file_id = (int)$db->insertid();
+
+				$option = JRequest::getVar('option');
+				$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
+				if($filter_item) {
+					$session = JFactory::getSession();
+					$files = $session->get('fileselement.'.$filter_item, null);
+
+					if(!$files) {
+						$files = array();
+					}
+					$files[] = $db->insertid();
+					$session->set('fileselement.'.$filter_item, $files);
+				}
+				
+			// b. Custom Folder mode
+			} else {
+				$file_id = 0;
 			}
+				
+			// JSON output: Terminate printing a message
+			if ($format == 'json') {
+				jexit('Upload complete');
+				
+			// Normal output: Redirect setting a message
+			} else {
+				$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
+				if ( !$return ) return;  // No return URL
+				$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
+			}
+				
 		}
-		$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
 	}
 	
 	function ftpValidate()
@@ -279,7 +279,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$mainframe->enqueueMessage(JText::_( 'FLEXI_FILE_ADD_SUCCESS' ));
 
 		$option = JRequest::getVar('option');
-		$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.items', 'items', '', 'int' );
+		$filter_item = $mainframe->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
 		if($filter_item) {
 			$session = JFactory::getSession();
 			$files = $session->get('fileselement.'.$filter_item, null);
@@ -457,7 +457,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&task=filemanager.edit', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+			$edit_task = FLEXI_J16GE ? "task=filemanager.edit" : "controller=filemanager&task=edit";
+			$this->setRedirect( 'index.php?option=com_flexicontent&'.$edit_task, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
 		}
 
 		$model->checkout( $user->get('id') );
@@ -478,8 +479,34 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$user		= & JFactory::getUser();
+		$db =& JFactory::getDBO();
 		$model	= & $this->getModel('file');
 		$file		= & $model->getFile();
+		$app = & JFactory::getApplication();
+		
+		$fieldid   = JRequest::getVar( 'fieldid', 0);
+		$itemid    = JRequest::getVar( 'itemid', 0);
+		$file_mode = JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
+		
+		if ($file_mode) {
+			$filename = JRequest::getVar( 'filename' );
+			
+			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
+			$field = $db->loadObject();
+			$field->parameters = new JParameter($field->attribs);			
+			$field->item_id = $itemid;
+			
+			$result = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array( &$field, $filename ) );
+			
+			if ( !$result ) {
+				JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_CLEANUP_ORIGINAL_FILE' ) .": ". $path);
+				$msg = '';
+			} else {
+				$msg = JText::_( 'FLEXI_FILES_DELETED' );
+			}
+			$this->setRedirect( $_SERVER['HTTP_REFERER'].'&delfilename='.base64_encode($filename), $msg );
+			return;
+		}
 		
 		// calculate access
 		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
@@ -495,7 +522,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model 		= $this->getModel('filemanager');
-
+		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
@@ -550,7 +577,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			switch ($task)
 			{
 				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&task=filemanager.edit&cid[]='.(int) $model->get('id');
+					$edit_task = FLEXI_J16GE ? "task=filemanager.edit" : "controller=filemanager&task=edit";
+					$link = 'index.php?option=com_flexicontent&'.$edit_task.'&cid[]='.(int) $model->get('id');
 					break;
 
 				default :

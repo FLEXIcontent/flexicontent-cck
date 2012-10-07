@@ -825,6 +825,16 @@ div.flexi_box_right {
 	padding-right: 0px;
 }
 
+div#cpanel div.icon {
+	margin: 7px;
+}
+
+div#cpanel div.icon  a {
+	border: 1px solid lightgray;
+	border-radius: 8px;
+}
+
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/

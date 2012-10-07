@@ -288,7 +288,7 @@
 			
 		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level1" menu="hide" />
 			
-			<field name="upload_extensions" type="text" size="50" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" menu="hide" />
+			<field name="upload_extensions" type="text" size="50" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP,ICS" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" menu="hide" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" menu="hide" />
 			<field name="file_path" type="text" size="50" default="components/com_flexicontent/uploads" label="FLEXI_PATH_TO_FILE_FOLDER" description="FLEXI_TIPFILEFOLDER" menu="hide" />
 			<field name="media_path" type="text" size="50" default="components/com_flexicontent/medias" label="FLEXI_PATH_TO_MEDIA_FOLDER" description="FLEXI_TIPMEDIAFOLDER" menu="hide" />

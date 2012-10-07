@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: addfiles.php 376 2010-08-24 04:12:01Z enjoyman $
+ * @version 1.5 stable $Id: addfiles.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,12 +17,13 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$ctrl_task   = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 ?>
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr>
 		<td>
 		<?php if ($this->require_ftp): ?>
-		<form action="index.php?option=com_flexicontent&amp;task=filemanager.ftpValidate" name="ftpForm" id="ftpForm" method="post">
+		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>ftpValidate" name="ftpForm" id="ftpForm" method="post">
 		<fieldset title="<?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?>">
                     <legend><?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?></legend>
                     <?php echo JText::_( 'FLEXI_DESCFTP' ); ?>
@@ -51,7 +52,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
             <?php endif; ?>
 
 	    <!-- File Upload Form -->
-            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;task=filemanager.upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
+            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo JUtility::getToken();?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
                 <fieldset>
                     <legend><?php echo JText::_( 'FLEXI_UPLOAD_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
                     <fieldset class="actions">
