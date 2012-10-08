@@ -39,8 +39,8 @@ if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 1 );
 
 // Set file manager paths
 $params =& JComponentHelper::getParams('com_flexicontent');
-if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
-if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
+if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		JPath::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
+if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPath::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
 $view = JRequest::getCmd('view',null);
@@ -86,5 +86,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/'
 
 // Version constants
 define('FLEXI_VERSION',	'2.0.0');
-define('FLEXI_RELEASE',	'RC9 (r1513)');
+define('FLEXI_RELEASE',	'RC9 (r1514)');
 ?>

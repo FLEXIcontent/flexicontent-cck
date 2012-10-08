@@ -325,7 +325,7 @@ class FlexicontentViewItem extends JView
 			
 			$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
 			$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
-			$attribs = ' style ="float:left!important;" ';
+			$attribs = '';   // this is not right for J1.5' style ="float:left!important;" ';  
 			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS

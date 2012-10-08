@@ -243,9 +243,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
+				var field	= $(el);
+				
+				if(rowCount".$field->id." == 1)
 				{
-					var field	= $(el);
+					addField".$field->id."(field.getParent().getParent().getParent().getElement('input.fcfield-addvalue'));
+				}
+				
+				if(rowCount".$field->id." > 0)
+				{
 					var row		= field.getParent();
 					if (MooTools.version>='1.2.4') {
 						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
@@ -295,7 +301,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align: left; }
-			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
+			#sortables_'.$field->id.' li:only-child span.fcfield-drag { display:none; }
+			/*#sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }*/
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -351,6 +358,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$n = 0;
 		$count_vals = 0;
 		$image_added = false;
+		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
 			$value = unserialize($value);
@@ -376,10 +384,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Check and rebuild thumbnails if needed
 			$rebuild_res = $this->rebuildThumbs($field,$value);
-
-			// Check to skip current value, if  (a) rebuilding thumbnails failed (e.g. file has been deleted)  AND  (b) at least ONE image or an empty image container has been added
-			if ( !$rebuild_res && ($image_added || $count_vals < count($field->value) ) ) continue;
-			if ( !$rebuild_res ) $image_name = '';
+			
+			// Check if rebuilding thumbnails failed (e.g. file has been deleted)  
+			if ( !$rebuild_res ) {
+				// For non-empty value set a message when we have examined all values
+				if ($image_name) $skipped_vals[] = $image_name;
+				
+				// Skip current value but add and an empty image container if no other image exists
+				if ($image_added || $count_vals < count($field->value) ) {
+					continue;
+				} else {
+					$image_name = '';
+				}
+			}
 			
 			// Add current image or add an empty image container
 			$delete = $remove = $change = '';
@@ -491,6 +508,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}
+		
+		if ( count($skipped_vals) )
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
@@ -1465,8 +1485,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Eliminate duplicate records in the array
-		$values = array_unique($values);
 		sort($values);
+		$values = array_unique($values);
+		
+		// Eliminate records that have no original files
+		$securepath = JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$new_values = array();
+		foreach($values as $value) {
+			$filepath = $securepath . $value;
+			if (file_exists($filepath)) {
+				$new_values[] = $value;
+			}
+		}
+		$values = $new_values;
 		
 		// Create attributes of the drop down field for selecting existing images
 		$class = ' class="existingname"';
