@@ -283,7 +283,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -304,9 +303,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
+		// Common JS/CSS
+		$js .= "
+			function qmAssignFile".$field->id."(tagid, file, file_url) {
+				var obj = $(tagid).getParent().getParent().getParent().getElement('.existingname');
+				var prv_obj = $(tagid.replace('existingname','preview_image'));
+				var elementid = tagid.replace('_existingname','');
+				
+				if (file != '') obj.value = file;
+				
+				if (prv_obj) {
+					if (MooTools.version>='1.2.4') {
+						var tmpDiv = new Element('div',{html:'<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />'});
+						tmpDiv.getFirst().replaces( prv_obj );
+					} else {
+						var tmpDiv = new Element('div', {}).setHTML('<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />');
+						tmpDiv.getFirst().injectAfter( prv_obj );
+						prv_obj.remove();
+					}
+				}
+				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
+			}		
+		";
+		
+		$document->addScriptDeclaration($js);
 		$document->addStyleDeclaration($css);
 		
 		if ( $image_source ) {
@@ -325,8 +349,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$thumb_h = $field->parameters->get( 'h_small', 90 );
 		
 		$n = 0;
-		foreach ($field->value as $value) {
+		$count_vals = 0;
+		$image_added = false;
+		foreach ($field->value as $value)
+		{
 			$value = unserialize($value);
+			$count_vals++;
 			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
@@ -346,12 +374,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			$image_name = trim($value['originalname']);
 			
+			// Check and rebuild thumbnails if needed
+			$rebuild_res = $this->rebuildThumbs($field,$value);
+
+			// Check to skip current value, if  (a) rebuilding thumbnails failed (e.g. file has been deleted)  AND  (b) at least ONE image or an empty image container has been added
+			if ( !$rebuild_res && ($image_added || $count_vals < count($field->value) ) ) continue;
+			if ( !$rebuild_res ) $image_name = '';
+			
+			// Add current image or add an empty image container
 			if ( $image_name ) {
-				// Check and rebuild thumbnails if needed
-				$rebuild_res = $this->rebuildThumbs($field,$value);
-				
-				// Skip delete files or file that could not have their thumbs created
-				if ( $rebuild_res===false ) continue;
 				
 				$delete = $this->canDeleteImage( $field, $image_name ) ? '' : ' disabled="disabled"';
 				$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;">';
@@ -370,7 +401,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$img_link .= ($image_source ? '/item_'.$item->id . '_field_'.$field->id : "");
 				$img_link .= '/s_'.$value['originalname'];
 				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
+				
 			} else {
+				
 				$delete = $remove = $change = '';
 				$originalname = '';
 				$imgpreview = '<div class="empty_image" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
@@ -444,6 +477,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			';
 			
 			$n++;
+			$image_added = true;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
@@ -466,8 +500,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$values = $values ? $values : $field->value;
 		
-		$multiple    = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple     = $field->parameters->get( 'allow_multiple', 0 ) ;
 		$image_source = $field->parameters->get('image_source', 0);
+		$dir          = $field->parameters->get('dir');
 		
 		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
 		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
@@ -517,29 +552,45 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
-
-		// Allow for thumbnailing of the default image
-		if (!$values || $values[0] == '') {
-			$default_image = $field->parameters->get( 'default_image', '');
-			if ( $default_image !== '' ) {
-				$values[0] = array();
-				$values[0]['is_default_image'] = true;
-				$values[0]['default_image'] = $default_image;
-				$values[0]['originalname'] = basename($default_image);
-				$values[0]['alt'] = $default_alt;
-				$values[0]['title'] = $default_title;
-				$values[0]['desc'] = $default_desc;
-				$values[0]['urllink'] = '';
-				$values[0] = serialize($values[0]);
-				$field->value[0] = $values[0];
-			}
+		
+		// Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
+		$default_image = $field->parameters->get( 'default_image', '');
+		if ( $default_image ) {
+			$default_image_val = array();
+			$default_image_val['is_default_image'] = true;
+			$default_image_val['default_image'] = $default_image;
+			$default_image_val['originalname'] = basename($default_image);
+			$default_image_val['alt'] = $default_alt;
+			$default_image_val['title'] = $default_title;
+			$default_image_val['desc'] = $default_desc;
+			$default_image_val['urllink'] = '';
+			$default_image_val = serialize($default_image_val);
 		}
 		
-		// Check for no values and return empty display
-		if ( !$values || !$values[0]) {
+		// Check for no values and no default image, and return empty display
+		if ( (!$values || !count($values)) && empty($default_image_val) ) {
 			$field->{$prop} = '';
 			return;
 		}
+		
+		// Check for deleted image files or imagefiles that cannot be thumbnailed,
+		// rebuilding thumbnails as needed, and then assigning checked values to a new array
+		$checked_arr = array();
+		foreach ($values as $index => $value) {
+			$value	= unserialize($value);
+			if ( $this->rebuildThumbs($field,$value) )  $checked_arr[] = $values[$index];
+		}
+		$values = & $checked_arr;
+		
+		// Allow for thumbnailing of the default image
+		if ( !count($values) ) {
+			if ( $default_image_val ) {
+				$values = array($default_image_val);
+				$value	= unserialize($default_image_val);
+				$this->rebuildThumbs($field,$value);
+			}
+		}
+		$field->value = $values;
 		
 		$app       = & JFactory::getApplication();
 		$document	 = & JFactory::getDocument();
@@ -684,22 +735,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ( !strlen(trim(@$value['originalname'])) ) continue;
 			$i++;
 			
-			
-			// Check and rebuild thumbnails if needed
-			$rebuild_res = $this->rebuildThumbs($field,$value);
-			
-			
-			// Skip delete files or file that could not have their thumbs created
-			if ( $rebuild_res===false ) continue;
-			
-			
 			// Create path to the image file
-			if ( $image_source ) {
-				$img_folder  = $field->parameters->get('dir') .DS. 'item_'.$item->id . '_field_'.$field->id;
-				$img_urlpath = $field->parameters->get('dir') . '/item_'.$item->id . '_field_'.$field->id;
+			if ( !$image_source || !empty($value['is_default_image']) ) {
+				$img_folder  = $dir;
+				$img_urlpath = $dir;
 			} else {
-				$img_folder  = $field->parameters->get('dir');
-				$img_urlpath = $field->parameters->get('dir');
+				$img_folder  = $dir .DS. 'item_'.$item->id . '_field_'.$field->id;
+				$img_urlpath = $dir . '/item_'.$item->id . '_field_'.$field->id;
 			}
 			$path	= JPath::clean(JPATH_SITE .DS. $img_folder .DS. 'l_' . $value['originalname']);
 			
@@ -1140,18 +1182,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	}
 
 
-	function create_thumb( &$field, $filename, $size, $onlypath='' ) {
+	function create_thumb( &$field, $filename, $size, $onlypath='', $destpath='' ) {
+		
 		// some parameters for phpthumb
 		jimport('joomla.filesystem.file');
-		$ext 		= strtolower(JFile::getExt($filename));
-		$onlypath 	= $onlypath ? $onlypath : JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
 		
-		if ( $field->parameters->get('image_source', 0) ) {
-			$destpath = JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id;
-			$destpath = JPath::clean(str_replace('\\','/', $destpath)).DS;
-		} else {
-			$destpath	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('dir') . DS);
-		}
+		$image_source = $field->parameters->get('image_source', 0);
+		$dir = $field->parameters->get('dir', 0);
+		$ext = strtolower(JFile::getExt($filename));
+		
+		$onlypath = $onlypath ? $onlypath : JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		
+		$destpath = $destpath ? $destpath : JPath::clean( JPATH_SITE .DS. $dir .DS );
 		
 		$prefix		= $size . '_';
 		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
@@ -1159,11 +1201,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$w			= $field->parameters->get('w_'.$size, $default_widths[$size]);
 		$h			= $field->parameters->get('h_'.$size, $default_heights[$size]);
 		$crop		= $field->parameters->get('method_'.$size);
-		$quality	= $field->parameters->get('quality');
-		$usewm		= $field->parameters->get('use_watermark_'.$size);
-		$wmfile		= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_'.$size));
+		$quality= $field->parameters->get('quality');
+		$usewm	= $field->parameters->get('use_watermark_'.$size);
+		$wmfile	= JPath::clean(JPATH_SITE . DS . $field->parameters->get('wm_'.$size));
 		$wmop		= $field->parameters->get('wm_opacity');
-		$wmpos		= $field->parameters->get('wm_position');
+		$wmpos	= $field->parameters->get('wm_position');
 	
 		// create the folder if it doesnt exists
 		if (!JFolder::exists($destpath)) 
@@ -1294,24 +1336,31 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$filename = trim($value['originalname']);
 		if ( !$filename ) return;  // check for empty filename
 		
+		$image_source = $field->parameters->get('image_source', 0);
+		$dir = $field->parameters->get('dir');
 		
 		// ******************************
 		// Find out path to original file
 		// ******************************
 		if (empty($value['is_default_image'])) {
 			
-			if ( $field->parameters->get('image_source', 0) ) {
-				$onlypath = JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id .DS. 'original';
-				$onlypath = JPath::clean(str_replace('\\','/', $onlypath)).DS;
+			if ( $image_source ) {
+				$onlypath  = JPath::clean( JPATH_SITE .DS. $dir .DS. 'item_'.$field->item_id . '_field_'.$field->id .DS. 'original' .DS );
+				$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS. 'item_'.$field->item_id . '_field_'.$field->id .DS );
 			} else {
-				$onlypath 	= JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+				$onlypath  = JPath::clean( COM_FLEXICONTENT_FILEPATH .DS );
+				$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 			}
-			$filepath = $onlypath . $filename;
+			
+			$filepath    = JPath::clean( $onlypath . $filename );
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir . ($image_source ?  DS. 'item_'.$field->item_id . '_field_'.$field->id  :  "") .DS );
 			
 		} else {
+			$onlypath  = JPath::clean( JPATH_BASE .DS. dirname($value['default_image']) .DS );
+			$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 			
-			$onlypath = JPATH_BASE.DS.dirname($value['default_image']).DS;
-			$filepath = JPATH_BASE.DS.$value['default_image'];
+			$filepath  = JPath::clean( JPATH_BASE .DS. $value['default_image'] );
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 		}
 		
 		if ( !file_exists($filepath) || !is_file($filepath) ) {
@@ -1333,7 +1382,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		foreach ($sizes as $size)
 		{
-			$path	= JPath::clean(JPATH_SITE .DS. $field->parameters->get('dir') .DS. $size . '_' . $filename);
+			$path	= JPath::clean( $thumbpath .DS. $size . '_' . $filename);
+			
 			$thumbnail_exists = false;
 			if (file_exists($path)) {
 				$filesize = getimagesize($path);
@@ -1361,9 +1411,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				 )
 			 {
 				//echo "SIZE: $size CROP: $crop OLDSIZE(w,h): $filesize_w,$filesize_h  NEWSIZE(w,h): $param_w,$param_h <br />";
-				$this->create_thumb( $field, $filename, $size, $onlypath );
+				$this->create_thumb( $field, $filename, $size, $onlypath, $destpath );
 			}
 		}
+		
+		return true;
 	}
 
 
