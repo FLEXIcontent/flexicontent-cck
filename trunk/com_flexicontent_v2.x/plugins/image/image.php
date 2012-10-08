@@ -382,18 +382,22 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ( !$rebuild_res ) $image_name = '';
 			
 			// Add current image or add an empty image container
+			$delete = $remove = $change = '';
 			if ( $image_name ) {
 				
-				$delete = $this->canDeleteImage( $field, $image_name ) ? '' : ' disabled="disabled"';
-				$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;">';
-				$delete .= '<label style="display:inline;" for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE' ).'</label>';
-				
-				$remove = $always_allow_removal ? '' : $this->canDeleteImage( $field, $image_name ) ? ' disabled="disabled"' : '';
-				$remove = '<input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove.' style="display:inline;">';
-				$remove .= '<label style="display:inline;" for="'.$elementid.'_remove">'.JText::_( 'FLEXI_FIELD_REMOVE' ).'</label>';
+				if ( !$multiple) {
+					if ( !$image_source ) {
+						$delete = $this->canDeleteImage( $field, $image_name ) ? '' : ' disabled="disabled"';
+						$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;">';
+						$delete .= '<label style="display:inline;" for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE_FILE' ).'</label>';
+					}
+					$remove = $always_allow_removal ? '' : $this->canDeleteImage( $field, $image_name ) ? ' disabled="disabled"' : '';
+					$remove = '<input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove.' style="display:inline;">';
+					$remove .= '<label style="display:inline;" for="'.$elementid.'_remove">'.JText::_( 'FLEXI_FIELD_REMOVE_VALUE' ).'</label>';
+				}
 				
 				$change = '<input class="imgchange" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;">';
-				$change .= '<label style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'Change' ).'</label>';
+				$change .= '<label style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_FIELD_CHANGE_VALUE' ).'</label>';
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
@@ -404,7 +408,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 			} else {
 				
-				$delete = $remove = $change = '';
 				$originalname = '';
 				$imgpreview = '<div class="empty_image" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
@@ -983,7 +986,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Handle uploading / removing / deleting / replacing image files
 		$n = 0;
-		$new = array();
+		
+		// reformat the post
+		$newpost = array();
+		$new = 0;
     foreach ($post as $i => $data)
     {
 			// (a) Handle uploading a new original file
@@ -1010,25 +1016,22 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					//echo "<pre>"; print_r($data); exit;
 					$data['originalname'] = $data['existingname'];
 					unset($data['existingname']);
-					$post[$i] = $data;
 				} else if ( @$data['delete'] || @$data['remove'] ) {
-					$post[$i] = '';
-				} else {
-					$post[$i] = $data;
+					$data = '';
 				}
 				
 			} else {
 				// No original file posted discard current image row
-				$post[$i] = '';
+				$data = '';
 			}
 			
 			// Add image entry to a new array skipping empty image entries
-			if ($post[$i]) {
-				$new[$n] = serialize($post[$i]);
-				$n++;
+			if ($data) {
+				$newpost[$new] = $data;
+				$new++;
 			}
 		}
-		
+		$post = $newpost;
 		
 		// create the fulltext search index
 		if ($field->issearch) {
@@ -1053,9 +1056,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			plgFlexicontent_fieldsExtendedweblink::onIndexAdvSearch($field, $post);
 		}
 		
-		// Assigned the new image data array
-		$post = $new;
+		// Serialize multiproperty data before storing into the DB
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
+		}
 	}
+	
 	
 	function uploadOriginalFile($field, &$post, $file)
 	{

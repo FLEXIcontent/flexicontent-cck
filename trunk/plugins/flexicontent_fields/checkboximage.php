@@ -242,13 +242,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 
 		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
 		if (empty($listelements[count($listelements)-1])) {
-				unset($listelements[count($listelements)-1]);
+			unset($listelements[count($listelements)-1]);
 		}
 
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
-			}
+		}
 
 		$display = array();
 		foreach ($listarrays as $listarray) {
@@ -258,11 +258,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			for($n=0, $c=count($values); $n<$c; $n++) {
 				if ($values[$n] == $listarray[0]) {
 					$display[] = '<img src="'.$imgsrc.'" class="hasTip" title="'.$field->label.'::'.$listarray[1].'" alt="'.$listarray[1].'" />';
-					}
-				} 
+				}
+			} 
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			}
-			
+		}
+		
 		$field->{$prop} = implode($separatorf, $display);
 	}
 
