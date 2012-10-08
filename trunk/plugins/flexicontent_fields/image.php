@@ -520,6 +520,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if($field->field_type != 'image') return;
 
 		static $multiboxadded = false;
+		static $lightboxadded = false;
 		
 		$values = $values ? $values : $field->value;
 		
@@ -748,6 +749,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$multiboxadded = 1;
 		}
 		
+		if ( ($app->isSite() || $isItemsManager)
+					&& !$lightboxadded
+					&&	(  ($linkto_url && $url_target=='lightbox')  ||  ($usepopup && $popuptype == 5)  )
+			 )
+		{
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/lightbox/css/lightbox.css');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/prototype.js');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/scriptaculous.js?load=effects');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/lightbox.js');
+			
+			$lightboxadded = 1;
+		}
 		
 		$i = -1;
 		$field->{$prop} = array();
@@ -953,6 +966,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.($desc ? $desc : $title).'">
+							'.$img_nolegend.'
+						</a>
+						';
+				} else if ($usepopup && $popuptype == 5) {   // lightbox Widgetkit
+					$group_str = $group_name ? 'rel="lightbox['.$group_name.']"' : '';
+					$field->{$prop}[] = '
+						<a href="'.$srcl.'" class="" '.$group_str.' title="'.($desc ? $desc : $title).'">
 							'.$img_nolegend.'
 						</a>
 						';
