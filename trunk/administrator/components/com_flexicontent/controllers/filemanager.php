@@ -455,6 +455,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
 		
 		$user		= & JFactory::getUser();
 		$db =& JFactory::getDBO();

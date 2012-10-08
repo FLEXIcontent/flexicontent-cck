@@ -22,6 +22,12 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.application.component.model');
 jimport('joomla.filesystem.file');
 
+if ( JFactory::getApplication()->isSite() ) {
+	// needed for frontend
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+}
+
 /**
  * FLEXIcontent Component Fileselement Model
  *
@@ -178,7 +184,7 @@ class FlexicontentModelFileselement extends JModel
 		
 		// Create folder for current language
 		if (!is_dir($gallery_folder)) {
-			mkdir($gallery_folder);
+			mkdir($gallery_folder, $mode = 0755, $recursive=true);
 		}
 		
 		// Get all image files with a .jpg extension.
