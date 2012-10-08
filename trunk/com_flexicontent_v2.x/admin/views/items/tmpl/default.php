@@ -370,8 +370,7 @@ window.addEvent('domready', function() {
 		</tr>
 
 		<tr id="filterline">
-			<td width="1%" class="center">&nbsp;</td>
-			<td class="left col_title" colspan="3">
+			<td class="left col_title" colspan="4">
 			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
