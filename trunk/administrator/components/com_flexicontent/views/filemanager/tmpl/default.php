@@ -250,7 +250,7 @@ $permissions = FlexicontentHelperPerm::getPerm();
 						<input type="submit" id="file-dir-submit" style="margin: 5px 0 0 150px;" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
 					</fieldset>
 				</fieldset>
-                <input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
+				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
 			<?php
 			echo $this->pane->endPanel();

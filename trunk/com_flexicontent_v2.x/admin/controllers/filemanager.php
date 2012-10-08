@@ -489,7 +489,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$itemid    = JRequest::getVar( 'itemid', 0);
 		$file_mode = JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		
-		if ($file_mode) {
+		if ($file_mode == 'folder_mode') {
 			$filename = JRequest::getVar( 'filename' );
 			
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
@@ -505,7 +505,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			} else {
 				$msg = JText::_( 'FLEXI_FILES_DELETED' );
 			}
-			$this->setRedirect( $_SERVER['HTTP_REFERER'].'&delfilename='.base64_encode($filename), $msg );
+			$vc_start = mb_strrpos('?', $_SERVER['HTTP_REFERER']) ? '&' : '?'; 
+			$this->setRedirect( $_SERVER['HTTP_REFERER'].$vc_start.'delfilename='.base64_encode($filename), $msg );
 			return;
 		}
 		
