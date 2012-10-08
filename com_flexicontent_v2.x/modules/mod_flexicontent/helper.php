@@ -89,11 +89,11 @@ class modFlexicontentHelper
 
 		// Retrieve default image for the image field and also create field parameters so that they can be used
 		if ($mod_image) {
-			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
+			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
 			$db->setQuery($query);
 			$midata = new stdClass();
-			$midata->params = $db->loadResult();
-			$midata->params = new JParameter($midata->params);
+			$midata = $db->loadObject();
+			$midata->params = new JParameter($midata->attribs);
 			
 			$midata->default_image = $midata->params->get( 'default_image', '');
 			if ( $midata->default_image !== '' ) {
@@ -291,18 +291,28 @@ class modFlexicontentHelper
 
 							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else if ($mod_image) {
-						
+							
+							FlexicontentFields::getFieldDisplay($row, $midata->name, null, 'display', 'module');
 							$src = '';
 							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
-								if ( $midata->params->get('image_source') )
+								if ( $midata->params->get('image_source') ) {
 									//$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/original/'. $image['originalname'];
 									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/l_'. $image['originalname'];
-								else
+									$path	= JPATH_SITE .DS. $midata->params->get('dir') .DS. 'item_'.$row->id.'_field_'.$mod_image  .DS. 'l_'. $image['originalname'];
+								} else {
 									//$src	= JURI::base(true) .'/'. $flexiparams->get('file_path') .'/'. $image['originalname'];   // original file maybe too large and slow down the thumbnail creation
 									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/l_'. $image['originalname'];      // faster original file maybe too large
-							} else if (!empty($midata->default_image_filepath)) {
-								$src	= $midata->default_image_filepath;
+									$path	= JPATH_SITE .DS. $midata->params->get('dir') .DS. 'l_'. $image['originalname'];
+								}
+							}
+							
+							if ( empty($row->image) || !JFile::exists($path) ) {
+								if (!empty($midata->default_image_filepath)) {
+									$src = $midata->default_image_filepath;
+								} else {
+									$src = '';
+								}
 							}
 							
 							if ($src) {
@@ -422,17 +432,27 @@ class modFlexicontentHelper
 							$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 						} else if ($mod_image) {
 							
+							FlexicontentFields::getFieldDisplay($row, $midata->name, null, 'display', 'module');
 							$src = '';
 							if (!empty($row->image)) {
 								$image	= unserialize($row->image);
-								if ( $midata->params->get('image_source') )
+								if ( $midata->params->get('image_source') ) {
 									//$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/original/'. $image['originalname'];
 									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/'. 'item_'.$row->id.'_field_'.$mod_image  .'/l_'. $image['originalname'];
-								else
+									$path	= JPATH_SITE .DS. $midata->params->get('dir') .DS. 'item_'.$row->id.'_field_'.$mod_image  .DS. 'l_'. $image['originalname'];
+								} else {
 									//$src	= JURI::base(true) .'/'. $flexiparams->get('file_path') .'/'. $image['originalname'];   // original file maybe too large and slow down the thumbnail creation
 									$src	= JURI::base(true) .'/'. $midata->params->get('dir') .'/l_'. $image['originalname'];      // faster original file maybe too large
-							} else if (!empty($midata->default_image_filepath)) {
-								$src	= $midata->default_image_filepath;
+									$path	= JPATH_SITE .DS. $midata->params->get('dir') .DS. 'l_'. $image['originalname'];
+								}
+							}
+							
+							if ( empty($row->image) || !JFile::exists($path) ) {
+								if (!empty($midata->default_image_filepath)) {
+									$src = $midata->default_image_filepath;
+								} else {
+									$src = '';
+								}
 							}
 							
 							if ($src) {

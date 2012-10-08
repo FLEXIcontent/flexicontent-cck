@@ -229,7 +229,7 @@ if ($this->limitstart == 0) :
 							
 								$value{$i} = unserialize($img_field->value[0]);
 								
-								if ( $img_field->parameters->get('image_source') ) {
+								if ( $img_field->parameters->get('image_source') && empty($img_field->value[0]['is_default_value'] ) ) {
 									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
 								} else {
 									$dir{$i}	 = $img_field->parameters->get('dir');
@@ -513,14 +513,14 @@ if ($this->limitstart == 0) :
 							
 								$value{$i} = unserialize($img_field->value[0]);
 								
-								if ( $img_field->parameters->get('image_source') ) {
+								if ( $img_field->parameters->get('image_source') && empty($img_field->value[0]['is_default_value'] ) ) {
 									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
 								} else {
 									$dir{$i}	 = $img_field->parameters->get('dir');
 								}
 								
 								$image{$i} = $value{$i}['originalname'];
-								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};									
+								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};
 							else :
 								$scr{$i}	= '';
 							endif;
