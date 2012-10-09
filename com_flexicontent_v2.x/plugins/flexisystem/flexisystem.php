@@ -34,7 +34,10 @@ class plgSystemFlexisystem extends JPlugin
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
+		$extension_name = 'com_flexicontent';
+		//JPlugin::loadLanguage($extension_name, JPATH_SITE);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB'	, true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
 	}
         
 	function onAfterInitialise()
@@ -42,10 +45,19 @@ class plgSystemFlexisystem extends JPlugin
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
 		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
+		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		
 		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
+		
+		// Redirect PDF format to HTML
+		if (FLEXI_J16GE && redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
+			$app =& JFactory::getApplication();
+			JRequest::setVar('format', 'html');
+			//$app->enqueueMessage('flexisystem: PDF generation is no longer supported, the HTML version is displayed instead');
+		}
+		
 		return;	
 	}
 	
