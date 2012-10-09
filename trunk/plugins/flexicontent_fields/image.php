@@ -520,7 +520,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if($field->field_type != 'image') return;
 
 		static $multiboxadded = false;
-		static $lightboxadded = false;
+		static $fancyboxadded = false;
 		
 		$values = $values ? $values : $field->value;
 		
@@ -750,16 +750,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		if ( ($app->isSite() || $isItemsManager)
-					&& !$lightboxadded
-					&&	(  ($linkto_url && $url_target=='lightbox')  ||  ($usepopup && $popuptype == 5)  )
+					&& !$fancyboxadded
+					&&	(  /*($linkto_url && $url_target=='fancybox')  ||*/  ($usepopup && $popuptype == 4)  )
 			 )
 		{
-			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/lightbox/css/lightbox.css');
-			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/prototype.js');
-			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/scriptaculous.js?load=effects');
-			$document->addScript(JURI::root().'components/com_flexicontent/librairies/lightbox/js/lightbox.js');
+			// Add mousewheel plugin (this is optional)
+			//$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery-1.8.2.min.js');
+			$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-1.8.2.min.js');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
 			
-			$lightboxadded = 1;
+			// Add fancyBox
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.css?v=2.1.1');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.pack.js?v=2.1.1');
+			
+			// Optionally add helpers - button, thumbnail and/or media
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.4');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.4');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.4');
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7');
+
+			$js = "
+			window.addEvent('domready', function(){
+					jQuery('.fancybox').fancybox();
+				});
+			";
+			$document->addScriptDeclaration($js);
+			
+			$fancyboxadded = 1;
 		}
 		
 		$i = -1;
@@ -966,13 +984,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.($desc ? $desc : $title).'">
-							'.$img_nolegend.'
-						</a>
-						';
-				} else if ($usepopup && $popuptype == 5) {   // lightbox Widgetkit
-					$group_str = $group_name ? 'rel="lightbox['.$group_name.']"' : '';
-					$field->{$prop}[] = '
-						<a href="'.$srcl.'" class="" '.$group_str.' title="'.($desc ? $desc : $title).'">
 							'.$img_nolegend.'
 						</a>
 						';

@@ -150,12 +150,10 @@
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_POPUP_TYPE" description="FLEXI_FIELD_IMAGE_POPUP_TYPE_DESC">
-				<!--option value="1">FLEXI_FIELD_IMAGE_MULTIBOX</option-->
-				<option value="1">MultiBox (Built-in)</option-->
-				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX</option>
-				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX</option>
-				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX</option>
-				<option value="5">LightBox (Built-in)</option>
+				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
+				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
+				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
 			</field>
 			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED_DESC">
 				<option value="0">FLEXI_NO</option>

@@ -991,3 +991,5 @@ div#flexicontent table.admintable td.paramlist_key {
 	border: 1px solid lightgray !important;
 	border-radius: 4px !important;
 }
+
+div.fancybox-wrap a { background: none!important;}
