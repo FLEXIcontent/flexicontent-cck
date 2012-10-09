@@ -34,7 +34,10 @@ class plgSystemFlexiadvroute extends JPlugin
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-		JPlugin::loadLanguage('com_flexicontent', JPATH_SITE);
+		$extension_name = 'com_flexicontent';
+		//JPlugin::loadLanguage($extension_name, JPATH_SITE);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB'	, true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
 	}
 	
 	/**

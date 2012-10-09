@@ -42,6 +42,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
+			
+			<field name="redirect_pdf_format" type="radio" default="1" label="Redirect pdf format" description="Joomla 2.5 does not support PDF natively, this provides a solution for J1.5 upgraded sites that used it, by redirecting to HTML version">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 		</fieldset>
 	</fields>
