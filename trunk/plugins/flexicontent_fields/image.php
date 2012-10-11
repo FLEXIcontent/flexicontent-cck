@@ -749,14 +749,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$multiboxadded = 1;
 		}
 		
-		if ( ($app->isSite() || $isItemsManager)
-					&& !$fancyboxadded
-					&&	(  /*($linkto_url && $url_target=='fancybox')  ||*/  ($usepopup && $popuptype == 4)  )
-			 )
+		if ( $app->isSite() && !$fancyboxadded &&	$usepopup && $popuptype == 4 )
 		{
+			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+				$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+			}
+			
 			// Add mousewheel plugin (this is optional)
-			//$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery-1.8.2.min.js');
-			$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-1.8.2.min.js');
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
 			
 			// Add fancyBox
@@ -779,6 +780,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			$fancyboxadded = 1;
 		}
+
+
+		if ( $app->isSite() && !$fancyboxadded &&	$usepopup && $popuptype == 4 )
+		{
+			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+				$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+			}
+
+			// Add fancyBox
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/basic.css');
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/galleriffic-2.css');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.galleriffic.js');
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js');
+		}
+		
 		
 		$i = -1;
 		$field->{$prop} = array();
@@ -991,7 +1009,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 			} else {
 				// CASE 4: Thumbnail without popup
-				$field->{$prop}[] = $img_nolegend;
+				$field->{$prop}[] = $img_legend;
 			}
 			
 			if ( ($showtitle && $title ) || ($showdesc && $desc) )
@@ -1296,6 +1314,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$phpThumb->setSourceFilename($filepath);
 		$phpThumb->setParameter('config_output_format', "$ext");
+		//if ( $ext=='gif' ) $phpThumb->setParameter('fltr', 'rcd|256|0');
 		$phpThumb->setParameter('w', $width);
 		$phpThumb->setParameter('h', $height);
 		if ($usewm == 1)

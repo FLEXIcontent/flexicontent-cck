@@ -39,6 +39,26 @@ class FlexicontentViewTemplate extends JView {
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		
+		JHTML::_('behavior.mootools');
+		$use_jquery_sortable = FLEXI_J16GE ? true : false;
+		
+		
+		if ($use_jquery_sortable) {
+			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+				$document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+			}
+		
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
+			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
+		} else {
+			// mootools sortable
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+		}
+		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
 		
@@ -70,73 +90,114 @@ class FlexicontentViewTemplate extends JView {
 			}
 			foreach ($idsort as $k => $v) {
 				if ($k > 1) {
-					$jssort[] = 'results('.$k.',\''.$v.'\')';
+					$jssort[] = $use_jquery_sortable  ?  'storeordering(jQuery("#sortable-'.$v.'"))'  :  'results('.$k.',\''.$v.'\')';
 				}
 			}
 			$positions = implode(',', $idsort);
 			
 			$jssort = implode("; ", $jssort);
-			$moosort = implode("','", $sort);
-			$js = "
-			var my = '';
-			window.addEvent('domready', function(){
-				var mySortables = new Sortables('.positions', {
-					constrain: false,
-					clone: false,
-					revert: true,
-					onComplete: storeordering
+			$sortable_ids = "#".implode(",#", $sort);
+			
+			if ($use_jquery_sortable) {
+				$js = "
+				jQuery(function() {
+					my = jQuery( \"$sortable_ids\" ).sortable({
+						connectWith: \"".$sortable_ids."\",
+						update: function(event, ui) {
+							if(ui.sender) {
+								storeordering(jQuery(ui.sender));
+							}else{
+								storeordering(jQuery(ui.item).parent());
+							}
+						}
+					});
+					initordering();
 				});
-				my = mySortables;
-				storeordering();
+				function storeordering(parent_element) {
+					hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
+					fields = new Array();
+					i = 0;
+					parent_element.children('li').each(function(){
+						fields[i++] = jQuery(this).attr('id').replace('field_', '');
+					});
+					jQuery(hidden_id).val(fields.join(','))
+				}
+				";
+			} else {
+				$js = "
+				var my = '';
+				window.addEvent('domready', function(){
+					var mySortables = new Sortables('.positions', {
+						constrain: false,
+						clone: false,
+						revert: true,
+						onComplete: storeordering
+					});
+					my = mySortables;
+					storeordering();
 
-				var slideaccess = new Fx.Slide('propvisible');
-				var slidenoaccess = new Fx.Slide('propnovisible');
-				var legend = $$('fieldset.tmplprop legend');
-				slidenoaccess.hide();
-				legend.addEvent('click', function(ev) {
-					legend.toggleClass('open');
-					slideaccess.toggle();
-					slidenoaccess.toggle();
+					var slideaccess = new Fx.Slide('propvisible');
+					var slidenoaccess = new Fx.Slide('propnovisible');
+					var legend = $$('fieldset.tmplprop legend');
+					slidenoaccess.hide();
+					legend.addEvent('click', function(ev) {
+						legend.toggleClass('open');
+						slideaccess.toggle();
+						slidenoaccess.toggle();
+					});
+
+
 				});
 
-
-			});
-
-			function results(i, field) {
-				var res = my.serialize(i, function(element, index){
-				return element.getProperty('id').replace('field_','');
-			}).join(',');
-				$(field).value = res;
+				function results(i, field) {
+					var res = my.serialize(i, function(element, index){
+					return element.getProperty('id').replace('field_','');
+				}).join(',');
+					$(field).value = res;
+				}
+				";
 			}
-			";
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration( $js );
 		}
-
+		
+		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$permission = FlexicontentHelperPerm::getPerm();
 
+		if (!$permission->CanTemplates) {
+			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		}
+		
+		//Create Submenu
 		FLEXISubmenu('CanTemplates');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::cancel();
+		if (FLEXI_J16GE) {
+			JToolBarHelper::apply('templates.apply');
+			JToolBarHelper::save('templates.save');
+			JToolBarHelper::cancel('templates.cancel');
+		} else {
+			JToolBarHelper::apply();
+			JToolBarHelper::save();
+			JToolBarHelper::cancel();
+		}
 		
 		//assign data to template
 		$this->assignRef('layout'   	, $layout);
 		$this->assignRef('fields'   	, $fields);
 		$this->assignRef('user'     	, $user);
 		$this->assignRef('type'     	, $type);
-		$this->assignRef('folder'		, $folder);
-		$this->assignRef('jssort'		, $jssort);
+		$this->assignRef('folder'			, $folder);
+		$this->assignRef('jssort'			, $jssort);
 		$this->assignRef('positions'	, $positions);
-		$this->assignRef('used'			, $used);
-		$this->assignRef('fbypos'		, $fbypos);
+		$this->assignRef('used'				, $used);
+		$this->assignRef('fbypos'			, $fbypos);
+		$this->assignRef('use_jquery_sortable' , $use_jquery_sortable);
 
 		parent::display($tpl);
 	}

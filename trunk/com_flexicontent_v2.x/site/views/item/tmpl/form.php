@@ -804,8 +804,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<?php endforeach; ?>
 			
 		<?php endif; ?>
-		
-		</fieldset>
+		</ul>
+	</fieldset>
 	<?php } ?>
 	
 	

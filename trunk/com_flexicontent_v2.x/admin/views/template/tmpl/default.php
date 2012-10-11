@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access'); ?>
 
 <script language="javascript" type="text/javascript">
-	function initordering() {
+	function <?php echo $this->use_jquery_sortable ? 'initordering' : 'storeordering'; ?>() {
 	<?php echo $this->jssort . ';' ; ?>
 	}
 </script>
