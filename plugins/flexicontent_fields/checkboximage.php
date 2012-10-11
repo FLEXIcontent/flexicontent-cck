@@ -109,11 +109,12 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$field->html	= JHTML::_('select.genericlist', $options, $field->name.'[]', 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value);
 		} else {
 			$i = 0;
-			$options  = "";
+			$options = "";
 			foreach ($listarrays as $listarray) {
 				// get the image src
 				$prefix = $mainframe->isAdmin() ? '../':'';
 				$imgsrc =  $prefix . $imagedir . $listarray[2] ;
+				
 				$checked  = "";
 				for($n=0, $c=count($field->value); $n<$c; $n++) {
 					if ($field->value[$n] == $listarray[0]) {
@@ -121,10 +122,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 					}
 				}
 				$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-				$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($listarray[1]).'"><input type="checkbox" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
+				$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="checkbox" name="'.$field->name.'[]" class="'.$required.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 				$i++;
 			}
-			$field->html	= $options;
+			$field->html = $options;
 		}
 	}
 
@@ -201,9 +202,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 
 		$field->label = JText::_($field->label);
 		
-		$values = $values ? $values : $field->value;
-
 		$mainframe =& JFactory::getApplication();
+
+		$values = $values ? $values : $field->value;
+		$values = $values ? $values : array();
+
 
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
@@ -251,6 +254,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		}
 
 		$display = array();
+		$display_index = array();
 		foreach ($listarrays as $listarray) {
 			// get the image src
 			$prefix = $mainframe->isAdmin() ? '../':'';
@@ -258,11 +262,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			for($n=0, $c=count($values); $n<$c; $n++) {
 				if ($values[$n] == $listarray[0]) {
 					$display[] = '<img src="'.$imgsrc.'" class="hasTip" title="'.$field->label.'::'.$listarray[1].'" alt="'.$listarray[1].'" />';
+					$display_index[] = $listarray[0];
 				}
-			} 
+			}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
 		}
 		
+		$field->display_index = implode($separatorf, $val_index);
 		$field->{$prop} = implode($separatorf, $display);
 	}
 

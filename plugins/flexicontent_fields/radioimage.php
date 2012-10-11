@@ -38,6 +38,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if($field->field_type != 'radioimage') return;
 		
 		$field->label = JText::_($field->label);
+
 		$mainframe =& JFactory::getApplication();
 
 		// Import the file system library
@@ -102,7 +103,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			$options = array(); 
 			if($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			foreach ($listarrays as $listarray) {
-				$options[] = JHTML::_('select.option', $listarray[0], JText::_($listarray[1])); 
+				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]); 
 			}
 			$field->html	= JHTML::_('select.genericlist', $options, $field->name, 'class="'.$required.'"', 'value', 'text', $field->value);
 		} else {
@@ -116,7 +117,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 				$checked  = "";
 				if ($listarray[0] == $field->value[0]) {
 					$checked = ' checked="checked"';
-					}
+				}
 				$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
 				$options .= '<label class="hasTip" title="'.$field->label.'::'.$listarray[1].'"><input type="radio" class="'.$required.'" name="'.$field->name.'" value="'.$listarray[0].'" id="'.$field->name.'_'.$i.'"'.$checked.' />'.$img.'</label>'.$separator;			 
 				$i++;
@@ -161,6 +162,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		} else {
 			$field->search = '';
 		}
+		
 		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
 			plgFlexicontent_fieldsRadioimage::onIndexAdvSearch($field, $advsearchindex_values);
 		}
@@ -196,9 +198,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		$mainframe =& JFactory::getApplication();
 
 		$values = $values ? $values : $field->value;
+		$values = $values ? $values : array();
 
-		// Import the file system library
-		jimport('joomla.filesystem.file');
 
 		// some parameter shortcuts
 		$field_elements		= $field->parameters->get( 'field_elements' ) ;
@@ -207,19 +208,16 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
 		if (empty($listelements[count($listelements)-1])) {
-				unset($listelements[count($listelements)-1]);
+			unset($listelements[count($listelements)-1]);
 		}
 
 		$listarrays = array();
 		foreach ($listelements as $listelement) {
 			$listarrays[] = explode("::", $listelement);
-			}
+		}
 
-		$i = 1;
-		$options = '';
 		$display = null;
-		if ($values)
-		{
+		$display_index = null;
 		foreach ($listarrays as $listarray) {
 			// get the image src
 			$prefix = $mainframe->isAdmin() ? '../':'';
@@ -227,11 +225,12 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 
 			if ($listarray[0] == $values[0]) {
 				$display = '<img src="'.$imgsrc.'" class="hasTip" title="'.$field->label.'::'.$listarray[1].'" alt="'.$listarray[1].'" />';
-				}
+				$display_index = $listarray[0];
+			}
 			$img = '<img src="'.$imgsrc.'" alt="'.$listarray[1].'" />';
-			$i++;
-			}			
-		}	
+		}
+		
+		$field->display_index = $display_index ? $display_index : '';
 		$field->{$prop}	= $display ? $display : '';
 	}
 
@@ -270,12 +269,14 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// *** Create the select form field used for filtering
 		$options = array();
 		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		
 		foreach($results as $result) {
 			if (!trim($result->value)) continue;
 			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 		}
 		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
 		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		
 	}
 	
 	

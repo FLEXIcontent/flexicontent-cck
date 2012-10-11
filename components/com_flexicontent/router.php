@@ -37,6 +37,10 @@ function FLEXIcontentBuildRoute(&$query)
 		$menu = &$menus->getItem($query['Itemid']);
 	}
 	
+	$mview = (empty($menu->query['view'])) ? null : $menu->query['view'];
+	$mcid  = (empty($menu->query['cid']))  ? null : $menu->query['cid'];
+	$mid   = (empty($menu->query['id']))   ? null : $menu->query['id'];
+	
 	// 2. Try to match the variables against the variables of the menu item
 	if ( !empty($menu) ) {
 		$menuItem_matches = true;
@@ -98,7 +102,7 @@ function FLEXIcontentBuildRoute(&$query)
 		//TODO something if needed
 		break;*/
 	case FLEXI_ITEMVIEW:
-		if (isset($query['cid']))	{
+		if ( isset($query['cid']) && ($mcid != $query['cid']  ||  $mview != 'category') )	{  // cid EXISTs and doesnot much cid variable of current menu item
 			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
 			$segments[] = $query['cid'];
 			$segments[] = @$query['id'];  // Required ... 
