@@ -1638,7 +1638,7 @@ class flexicontent_html
 	{
 		$not_in_tabs = "";
 		
-		$output = "<!-- tabber start --><div class='fctabber' class='".$class."'>"."\n";
+		$output = "<!-- tabber start --><div class='fctabber ".$class."'>"."\n";
 		
 		foreach ($field_html as $i => $html) {
 			// Hide field when it has no label, and skip creating tab

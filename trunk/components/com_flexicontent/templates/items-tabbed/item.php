@@ -149,7 +149,7 @@ $tabcount = 6;
 for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['subtitle_tab'.$tc]);
 
 if (@$createtabs) :
-	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
+	echo '	<div class="fctabber"><!-- tabber start -->'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'subtitle_tab'.$tc;
@@ -255,7 +255,7 @@ $tabcount = 6;
 for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->item->positions['bottom_tab'.$tc]);
 
 if (@$createtabs) :
-	echo '	<div class="fctabber" class="fctabber"><!-- tabber start -->'."\n";
+	echo '	<div class="fctabber"><!-- tabber start -->'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'bottom_tab'.$tc;
