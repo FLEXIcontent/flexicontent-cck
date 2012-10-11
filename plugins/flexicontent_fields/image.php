@@ -405,15 +405,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if ( !$multiple) {
 					if ( !$image_source ) {
 						$delete = $this->canDeleteImage( $field, $image_name ) ? '' : ' disabled="disabled"';
-						$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;">';
+						$delete = '<input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete.' style="display:inline;" />';
 						$delete .= '<label style="display:inline;" for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE_FILE' ).'</label>';
 					}
 					$remove = $always_allow_removal ? '' : $this->canDeleteImage( $field, $image_name ) ? ' disabled="disabled"' : '';
-					$remove = '<input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove.' style="display:inline;">';
+					$remove = '<input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove.' style="display:inline;" />';
 					$remove .= '<label style="display:inline;" for="'.$elementid.'_remove">'.JText::_( 'FLEXI_FIELD_REMOVE_VALUE' ).'</label>';
 				}
 				
-				$change = '<input class="imgchange" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;">';
+				$change = '<input class="imgchange" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;" />';
 				$change .= '<label style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_FIELD_CHANGE_VALUE' ).'</label>';
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
@@ -447,7 +447,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($usedesc) $desc =
 				'<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="30" />'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
+					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="30" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
 			
 			$curr_select = str_replace('__FORMFLDNAME__', $fieldname.'[existingname]', $select);

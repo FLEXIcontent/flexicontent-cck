@@ -97,7 +97,7 @@ class modFlexicontentHelper
 			
 			$midata->default_image = $midata->params->get( 'default_image', '');
 			if ( $midata->default_image !== '' ) {
-				$midata->default_image_filepath = JPATH_BASE.DS.$midata->default_image;
+				$midata->default_image_urlpath = JURI::base(true).'/'.str_replace('\\', '/', $midata->default_image);
 				$midata->default_image_filename = basename($midata->default_image);
 			}
 		}
@@ -308,8 +308,8 @@ class modFlexicontentHelper
 							}
 							
 							if ( empty($row->image) || !JFile::exists($path) ) {
-								if (!empty($midata->default_image_filepath)) {
-									$src = $midata->default_image_filepath;
+								if (!empty($midata->default_image_urlpath)) {
+									$src = $midata->default_image_urlpath;
 								} else {
 									$src = '';
 								}
@@ -448,8 +448,8 @@ class modFlexicontentHelper
 							}
 							
 							if ( empty($row->image) || !JFile::exists($path) ) {
-								if (!empty($midata->default_image_filepath)) {
-									$src = $midata->default_image_filepath;
+								if (!empty($midata->default_image_urlpath)) {
+									$src = $midata->default_image_urlpath;
 								} else {
 									$src = '';
 								}
@@ -1171,7 +1171,6 @@ class modFlexicontentHelper
 						. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
 						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-						. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 						. $join_favs
 						. $join_image
 						. $join_date

@@ -453,7 +453,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>
 			<div class="flexi_formblock">
-				<label id="params_comments-lbl" for="params[comments]" class="flexi_label hasTip" title="<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>::<?php echo JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' );?>" >
+				<label id="params_comments-title" class="flexi_label hasTip" title="<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>::<?php echo JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' );?>" >
 					<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
 				</label>
 				<?php echo $this->lists['disable_comments']; ?>
@@ -878,11 +878,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				echo $this->pane->endPanel();
 			endforeach;
 		endif;
+		echo JHtml::_('sliders.end');
 	?>
 	
-	<?php endif; ?>
-	
-	<?php echo $this->pane->endPane(); ?>
+<?php endif; // end cantemplate and selecttheme_fe ?>
+
 	
 <?php	endif; // end of existing item ?>
 

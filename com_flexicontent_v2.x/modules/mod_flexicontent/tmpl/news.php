@@ -213,7 +213,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></div></a>
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -342,7 +342,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><div><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></div></a>
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>

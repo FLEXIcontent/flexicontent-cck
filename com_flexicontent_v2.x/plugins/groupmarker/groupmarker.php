@@ -28,7 +28,7 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin{
 		switch ($marker_type) {
 			case 'tabset_start':
 				$field->html .= "<div style='margin-top:24px; width:100%; float:left; clear:both;'></div>\n";
-				$field->html .= "<!-- tabber start --><div class='fctabber' class='".$cont_cssclass."' id='grpmarker_tabset_".(++$tabSetCnt)."'>\n";
+				$field->html .= "<!-- tabber start --><div class='fctabber ".$cont_cssclass."' id='grpmarker_tabset_".(++$tabSetCnt)."'>\n";
 				break;
 			case 'tab_open':
 				$field->html .= "<div class='tabbertab' style='float:left;' id='grpmarker_tabset_".$tabSetCnt."_tab_".($tabCnt[$tabSetCnt]++)."'>\n";
