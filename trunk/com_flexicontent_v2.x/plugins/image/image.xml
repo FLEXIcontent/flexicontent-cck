@@ -90,6 +90,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_l" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_l.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="copy_original_l" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level2" />
 			<field name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -103,6 +108,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_m" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_m.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="copy_original_m" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level2" />
 			<field name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -116,6 +126,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_s" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="copy_original_s" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level2" />
 			<field name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -129,6 +144,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="wm_b" type="text" default="plugins/flexicontent_fields/image/watermarks/wm_s.png" size="60" label="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" />
+			<field name="copy_original_b" type="radio" default="1" label="FLEXI_COPY_ORIGINAL" description="FLEXI_COPY_ORIGINAL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
+			</field>
 			
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" />

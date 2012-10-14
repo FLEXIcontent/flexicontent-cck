@@ -1044,7 +1044,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Rearrange file array so that file properties are group per image number
 		$files = array();
-		foreach( $file as $key => $all ) {
+		if ($file) foreach( $file as $key => $all ) {
 			foreach( $all as $i => $val ) {
 				$files[$i][$key] = $val;
 			}
@@ -1062,19 +1062,24 @@ class plgFlexicontent_fieldsImage extends JPlugin
     foreach ($post as $i => $data)
     {
 			// (a) Handle uploading a new original file
-			$this->uploadOriginalFile($field, $data, $files[$i]);
+			if ( isset($files[$i]) ) $this->uploadOriginalFile($field, $data, $files[$i]);
+			
+			// Defaut values for unset required properties of values
+			$data['originalname'] = isset($data['originalname']) ? $data['originalname'] : '';
+			$data['delete'] = isset($data['delete']) ? $data['delete'] : false;
+			$data['remove'] = isset($data['remove']) ? $data['remove'] : false;
 			
 			if ( $data['originalname'] || $data['existingname'] ) {
 				// (b) Handle removing image assignment OR deleting the image file
 				if ($data['originalname'])
 				{
-					if ( @$data['delete'] )
+					if ( $data['delete'] )
 					{
 						$filename = $data['originalname'];
 						$this->removeOriginalFile( $field, $filename );
 						//$app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Deleted image from server storage'));
 					}
-					elseif ( @$data['remove'] )
+					elseif ( $data['remove'] )
 					{
 						//if ( !$data['existingname'] ) $app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Removed image assignment to the field'));
 					}
@@ -1085,7 +1090,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					//echo "<pre>"; print_r($data); exit;
 					$data['originalname'] = $data['existingname'];
 					unset($data['existingname']);
-				} else if ( @$data['delete'] || @$data['remove'] ) {
+				} else if ( $data['delete'] || $data['remove'] ) {
 					$data = '';
 				}
 				
@@ -1256,7 +1261,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	}
 
 
-	function create_thumb( &$field, $filename, $size, $onlypath='', $destpath='' ) {
+	function create_thumb( &$field, $filename, $size, $onlypath='', $destpath='', $copy_original=0 ) {
 		
 		// some parameters for phpthumb
 		jimport('joomla.filesystem.file');
@@ -1297,8 +1302,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				JPath::setPermissions($destpath, '0666', '0777'); 
 		}
 		
-		// create the thumnails using phpthumb $filename
-		$this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
+		if ($copy_original) {
+			JFile::copy( $onlypath.$filename,  $destpath.$prefix.$filename );
+		} else {
+			// create the thumnails using phpthumb $filename
+			$this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
+		}
 	}
 
 
@@ -1314,7 +1323,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$phpThumb->setSourceFilename($filepath);
 		$phpThumb->setParameter('config_output_format', "$ext");
-		//if ( $ext=='gif' ) $phpThumb->setParameter('fltr', 'rcd|256|0');
+		//if ( $ext=='gif' )  // Force maximum color for GIF images?
+		//	$phpThumb->setParameter('fltr', 'rcd|256|1');
 		$phpThumb->setParameter('w', $width);
 		$phpThumb->setParameter('h', $height);
 		if ($usewm == 1)
@@ -1464,11 +1474,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$filesize = getimagesize($path);
 				$filesize_w = $filesize[0];
 				$filesize_h = $filesize[1];
-				$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
-				$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
-				$crop = $field->parameters->get('method_'.$size);
 				$thumbnail_exists = true;
 			}
+			
+			$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
+			$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
+			$crop = $field->parameters->get('method_'.$size);
+			$usewm = $field->parameters->get('use_watermark_'.$size);
+			$copyorg = $field->parameters->get('copy_original_'.$size, 1);
+			$copy_original = ($copyorg==2) || ($origsize_w == $param_w && $origsize_h == $param_h && !$usewm && $copyorg==1);
 			
 			// Check if size of file is not same as parameters and recreate the thumbnail
 			if (
@@ -1486,7 +1500,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				 )
 			 {
 				//echo "SIZE: $size CROP: $crop OLDSIZE(w,h): $filesize_w,$filesize_h  NEWSIZE(w,h): $param_w,$param_h <br />";
-				$this->create_thumb( $field, $filename, $size, $onlypath, $destpath );
+				$this->create_thumb( $field, $filename, $size, $onlypath, $destpath, $copy_original );
 			}
 		}
 		
