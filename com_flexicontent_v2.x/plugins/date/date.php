@@ -46,6 +46,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
+		$app      = & JFactory::getApplication();
 		$document	= & JFactory::getDocument();
 		
 		$show_usage = $field->parameters->get( 'show_usage', 0 ) ;
@@ -202,17 +203,24 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
+		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
 			@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
 			
-			if ( !$value) {
+			$valid_date = true;
+			try {
+				if ( !$value) {
+					$date = '';
+				} else if (!$date_allowtime || !$time) {
+					$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
+				} else {
+					$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
+				}
+			} catch ( Exception $e ) {
+				if ($value) $skipped_vals[] = $value;
 				$date = '';
-			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
-			} else {
-				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
 			}
 			$calendar = JHTML::_('calendar', $date, 'custom['.$field->name.'][]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
 			
@@ -239,6 +247,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			.($show_usage ? ' <div class="fc_mini_note_box">'.$append_str.'</div>' : '')
 			.  $field->html
 			.'</div>';
+			
+		if ( count($skipped_vals) )
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
 
 
@@ -468,7 +479,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			
 			if ( empty($date) ) continue;
 			
-			$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
+			try {
+				$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
+			} catch ( Exception $e ) {
+				$valid_date = false;
+				$date = '';
+			}
 			
 			$field->{$prop}[]	= $pretext.$date.$posttext;
 			
