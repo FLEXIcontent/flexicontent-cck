@@ -139,7 +139,7 @@ class plgSearchFlexisearch extends JPlugin
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 	  // COMPONENT PARAMETERS
-		$cparams 	= & $app->getParams('com_flexicontent');
+		$cparams 	= $app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent');
 		if (!defined('FLEXI_SECTION'))
 			define('FLEXI_SECTION', $cparams->get('flexi_section'));		// define section
 		$show_noauth = $cparams->get('show_noauth', 0);		// items the user cannot see ...
@@ -268,7 +268,10 @@ class plgSearchFlexisearch extends JPlugin
 	
 		// filter by active language
 		$andlang = '';
-		if (FLEXI_FISH && $filter_lang) {
+		if (	$app->isSite() &&
+					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
+					$filter_lang
+		) {
 			$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 		}
 	
@@ -320,7 +323,7 @@ class plgSearchFlexisearch extends JPlugin
 				foreach($list as $key => $item)
 				{
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
-					if($item->sectionid==FLEXI_SECTION || FLEXI_J16GE)
+					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION )
 						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
 					else
 						$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));

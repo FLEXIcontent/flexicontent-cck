@@ -79,7 +79,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$mainframe = &JFactory::getApplication();
+		$app = &JFactory::getApplication();
 		
 		$db		= & JFactory::getDBO();
 		$user	= & JFactory::getUser();
@@ -87,7 +87,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$menu     = $menus->getActive();
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		$params = clone($app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent'));
 		
 		if ($menu) {
 			$menuParams = new JParameter($menu->params);
@@ -99,7 +99,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ***********************************************
 		// Create WHERE and ORDER BY clauses for the query
 		// ***********************************************
-		$params 	= & $mainframe->getParams('com_flexicontent');
 		
 		if($cantypes = $params->get('cantypes', 1)) {
 			$fieldtypes = JRequest::getVar('fieldtypes', array());
@@ -227,7 +226,10 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// filter by active language
 		$andlang = '';
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filter_lang) {
+		if (	$app->isSite() &&
+					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
+					$filter_lang
+		) {
 			$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
