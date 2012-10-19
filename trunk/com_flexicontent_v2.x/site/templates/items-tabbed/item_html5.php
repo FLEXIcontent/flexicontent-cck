@@ -1,5 +1,6 @@
 <?php
 /**
+ * HTML5 Template
  * @version 1.5 stable $Id: item_html5.php 0001 2012-09-23 14:00:28Z Rehne $
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -31,12 +32,12 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 $mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article';
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
-$tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
+$tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';  	
 // Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >
-	
+
     <?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
   	
 	<?php if ($this->item->event->beforeDisplayContent) : /* BOF beforeDisplayContent */ ?>
@@ -51,7 +52,8 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
+	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
     
 	<p class="buttons">
@@ -60,6 +62,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
+		<?php echo $approvalbutton; ?>
 	</p>
 	<?php } /* EOF buttons */ ?>
 
@@ -136,8 +139,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
     <?php if ($this->params->get('show_title', 1)) : ?>
     </header>
     <?php endif; ?>
-    
-    
+
 	<?php
     $tabcount = 6;
     
@@ -190,7 +192,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
             </figure>
 			<?php endforeach; ?>
 		<?php endif; /* EOF image */ ?>
-	
+
 		<?php if (isset($this->item->positions['top'])) : /* BOF top */ ?>
     	<?php 
 		$classTopColsspan = ''; // bootstrap span
@@ -234,7 +236,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 		<?php endforeach; ?>
     </div>
 	<?php endif; /* EOF description */ ?>
-	
+
 	<?php
     $tabcount = 6;
     
@@ -264,7 +266,6 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
                     </div>
                     <?php endforeach; ?>
                 </div>
-                
             </section><!-- tab end -->
              
             <?php endif; /*BOF bottom_tabN block*/ ?>
@@ -285,8 +286,8 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
         $classBottomColsspan = 'span6';
     endif;
 	?>
-	<footer class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols group">
-		<ul class="flexi row">
+	<footer class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols group row">
+		<ul class="flexi">
 			<?php foreach ($this->item->positions['bottom'] as $field) : ?>
 			<li class="flexi <?php echo $classBottomColsspan; ?>">
 				<div>
@@ -302,7 +303,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 	<?php endif;  /* EOF bottom block */ ?>
 
 	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : /* BOF comments */ ?>
-	<section class="comments group">
+	<section class="comments group"> <?php /*?> the 'comment component may be have to be adjusted also to outputs HTML5 code (each comment as article ...)<?php */?>
 	<?php
 		if ($this->params->get('comments') == 1) :
 			if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :

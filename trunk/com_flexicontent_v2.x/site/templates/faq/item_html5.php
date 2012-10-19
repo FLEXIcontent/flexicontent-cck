@@ -29,15 +29,15 @@ $page_classes .= ' type'.$this->item->type_id;
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 
-$mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article'; 		
+$mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article';
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
-$tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
+$tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';  	
 // Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >
-	
+
     <?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
   	
 	<?php if ($this->item->event->beforeDisplayContent) : /* BOF beforeDisplayContent */ ?>
@@ -52,7 +52,8 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
+	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
     
 	<p class="buttons">
@@ -61,9 +62,9 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
+		<?php echo $approvalbutton; ?>
 	</p>
 	<?php } /* EOF buttons */ ?>
-
 
 	<?php if ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title ) : /* BOF page title */ ?>
 	<header>
@@ -251,7 +252,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
             if (isset($this->item->positions[$tabpos_name])):
 			/*BOF bottom_tabNblock*/ ?>
         
-            <section class='tabbertab'><!-- tab start --> 
+            <section class='tabbertab'><!-- tab start -->
                 <header>
                 <h<?php echo ($tabsHeaderLevel+1); ?>><?php echo $tabpos_name; ?></h<?php echo ($tabsHeaderLevel+1); ?>><!-- tab title -->
                 </header>
@@ -264,7 +265,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
                         <div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
                     </div>
                     <?php endforeach; ?>
-                </div> 
+                </div>
             </section><!-- tab end -->
              
             <?php endif; /*BOF bottom_tabN block*/ ?>
@@ -285,8 +286,8 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
         $classBottomColsspan = 'span6';
     endif;
 	?>
-	<footer class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols group">
-		<ul class="flexi row">
+	<footer class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols group row">
+		<ul class="flexi">
 			<?php foreach ($this->item->positions['bottom'] as $field) : ?>
 			<li class="flexi <?php echo $classBottomColsspan; ?>">
 				<div>
