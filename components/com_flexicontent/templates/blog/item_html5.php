@@ -33,7 +33,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' items item'.$this->item->id;
 $page_classes .= ' type'.$this->item->type_id;
 
-$mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article'; 
+$mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article';
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
 // Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
@@ -55,7 +55,8 @@ $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this-
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
+	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
     
 	<p class="buttons">
@@ -64,6 +65,7 @@ $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this-
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
+		<?php echo $approvalbutton; ?>
 	</p>
 	<?php } /* EOF buttons */ ?>
 

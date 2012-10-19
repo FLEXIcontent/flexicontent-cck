@@ -33,11 +33,11 @@ $mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
 $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';  	
-// Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h	
+// Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >
-	
+
     <?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
   	
 	<?php if ($this->item->event->beforeDisplayContent) : /* BOF beforeDisplayContent */ ?>
@@ -52,7 +52,8 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
+	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
     
 	<p class="buttons">
@@ -61,9 +62,9 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
+		<?php echo $approvalbutton; ?>
 	</p>
 	<?php } /* EOF buttons */ ?>
-
 
 	<?php if ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title ) : /* BOF page title */ ?>
 	<header>
@@ -191,7 +192,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
             </figure>
 			<?php endforeach; ?>
 		<?php endif; /* EOF image */ ?>
-        
+
 		<?php if (isset($this->item->positions['top'])) : /* BOF top */ ?>
     	<?php 
 		$classTopColsspan = ''; // bootstrap span
@@ -264,7 +265,7 @@ $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';
                         <div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
                     </div>
                     <?php endforeach; ?>
-                </div>  
+                </div>
             </section><!-- tab end -->
              
             <?php endif; /*BOF bottom_tabN block*/ ?>

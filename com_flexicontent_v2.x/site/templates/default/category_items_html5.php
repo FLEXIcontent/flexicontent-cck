@@ -21,68 +21,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $user =& JFactory::getUser();
-?>
-<script type="text/javascript">
-	function tableOrdering( order, dir, task )
-	{
-		var form = document.getElementById("adminForm");
 
-		form.filter_order.value 	= order;
-		form.filter_order_Dir.value	= dir;
-		
-		var form = document.getElementById("adminForm");
-		
-		adminFormPrepare(form);
-		form.submit( task );
-	}
-	
-	function adminFormPrepare(form) {
-		var extra_action = '';
-		var var_sep = form.action.match(/\?/) ? '&' : '?';
-		
-		for(i=0; i<form.elements.length; i++) {
-			
-			var element = form.elements[i];
-			
-			// No need to add the default values for ordering, to the URL
-			if (element.name=='filter_order' && element.value=='i.title') continue;
-			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
-			
-			var matches = element.name.match(/(filter[.]*|letter|clayout)/);
-			if (matches && element.value != '') {
-			  extra_action += var_sep + element.name + '=' + element.value;
-			  var_sep = '&';
-			}
-		}
-		form.action += extra_action;   //alert(extra_action);
-	}
-	
-	function adminFormClearFilters (form) {
-		for(i=0; i<form.elements.length; i++) {
-			var element = form.elements[i];
-			
-			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
-			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
-			
-			var matches = element.name.match(/(filter[.]*|letter)/);
-			if (matches) {
-				element.value = '';
-			}
-		}
-	}
-</script>
+JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
+?>
+
+<!--script type="text/javascript">
+</script-->
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
 <aside class="group">
 	<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="" class="group well">
 
 	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
-		<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
+	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
 	<?php endif; ?>
 
-	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
+	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : /* BOF filter ans search block */ ?>
 	<div id="fc_filter" class="floattext control-group group">
-		<?php if ($this->params->get('use_search')) : ?>
+		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
 		<div class="fc_fleft">
 			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area input-medium search-query" />
 			<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
@@ -91,8 +47,8 @@ $user =& JFactory::getUser();
 			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 		</div>
-		<?php endif; ?>
-		<?php if ($this->params->get('use_filters', 0) && $this->filters) : ?>
+		<?php endif; /* EOF search */ ?>
+		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
 	
 		<!--div class="fc_fright"-->
 		<?php
@@ -125,9 +81,9 @@ $user =& JFactory::getUser();
 		<?php endif; ?>
 		<!--/div-->
 
-		<?php endif; ?>
+		<?php endif; /* EOF filter */ ?>
 	</div>
-	<?php endif; ?>
+	<?php endif; /* EOF filter ans serch block */ ?>
 	<?php
 	if ($this->params->get('show_alpha', 1)) :
 		echo $this->loadTemplate('alpha_html5');

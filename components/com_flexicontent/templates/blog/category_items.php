@@ -19,45 +19,12 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
+
+JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
 
-<script type="text/javascript">
-	
-	function adminFormPrepare(form) {
-		var extra_action = '';
-		var var_sep = form.action.match(/\?/) ? '&' : '?';
-		
-		for(i=0; i<form.elements.length; i++) {
-			
-			var element = form.elements[i];
-			
-			// No need to add the default values for ordering, to the URL
-			if (element.name=='filter_order' && element.value=='i.title') continue;
-			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
-			
-			var matches = element.name.match(/(filter[.]*|letter|clayout)/);
-			if (matches && element.value != '') {
-				extra_action += var_sep + element.name + '=' + element.value;
-				var_sep = '&';
-			}
-		}
-		form.action += extra_action;   //alert(extra_action);
-	}
-	
-	function adminFormClearFilters (form) {
-		for(i=0; i<form.elements.length; i++) {
-			var element = form.elements[i];
-			
-			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
-			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
-			
-			var matches = element.name.match(/(filter[.]*|letter)/);
-			if (matches) {
-				element.value = '';
-			}
-		}
-	}
-</script>
+<!--script type="text/javascript">
+</script-->
 
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
 	<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
@@ -379,6 +346,12 @@ if ($this->limitstart == 0) :
 						||  $this->params->get('lead_strip_html', 1) == 1 /* option 2, strip-cuts and option 1 also forces read more  */
 					) : ?>
 					<span class="readmore">
+						<?php
+						/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
+						$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
+						echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>';
+						*/
+						?>
 						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
 						<?php
 						if ($items[$i]->params->get('readmore')) :
@@ -388,6 +361,7 @@ if ($this->limitstart == 0) :
 						endif;
 						?>
 						</a>
+						<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$items[$i]->title.'</div>\')</script>'; ?>
 					</span>
 					<?php endif; ?>
 					
@@ -646,6 +620,12 @@ if ($this->limitstart == 0) :
 						||  $this->params->get('intro_strip_html', 1) == 1 /* option 2, strip-cuts and option 1 also forces read more  */
 					) : ?>
 					<span class="readmore">
+						<?php
+						/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
+						$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
+						echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(window.getSize().size.x-150)+\',height:\'+(window.getSize().size.y-150)+\'">\')</script>';
+						*/
+						?>
 						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
 						<?php
 						if ($items[$i]->params->get('readmore')) :
@@ -655,6 +635,7 @@ if ($this->limitstart == 0) :
 						endif;
 						?>
 						</a>
+						<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$items[$i]->title.'</div>\')</script>'; ?>
 					</span>
 					<?php endif; ?>
 					

@@ -52,7 +52,8 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton) {
+	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
 	<p class="buttons">
 		<?php echo $pdfbutton; ?>
@@ -60,6 +61,7 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
+		<?php echo $approvalbutton; ?>
 	</p>
 	<?php } ?>
 	<!-- EOF buttons -->
@@ -74,7 +76,7 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading"><span class='fc_item_title'>
+	<h2 class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
