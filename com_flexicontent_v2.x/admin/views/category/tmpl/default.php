@@ -188,7 +188,7 @@ dump($this->row);
 				<?php
 				$fieldSets = $this->form->getFieldsets('params');
 				foreach ($fieldSets as $name => $fieldSet) :
-					if ($name == 'cat_notifications_conf' && ( !$this->cparams->get('enable_notifications', 0) || !$this->cparams->get('allow_cat_specific_notifications', 0) ) ) continue;
+					if ($name == 'cat_notifications_conf' && ( !$this->cparams->get('enable_notifications', 0) || !$this->cparams->get('nf_allow_cat_specific', 0) ) ) continue;
 					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
 					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :

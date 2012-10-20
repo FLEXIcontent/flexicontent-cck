@@ -166,7 +166,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="new_item_state" type="list" default="-4" label="FLEXI_NEW_ITEM_STATE" description="FLEXI_NEW_ITEM_STATE_DESC" menu="hide">
+			
+			<param name="" type="separator" default="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS" label="" level="level3" menu="hide" />
+			<param name="new_item_state" type="list" default="1" label="FLEXI_BACKEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
 				<option value="1">FLEXI_PUBLISHED</option>
 				<option value="0">FLEXI_UNPUBLISHED</option>
 				<option value="-1">FLEXI_ARCHIVED</option>
@@ -174,6 +176,25 @@
 				<option value="-4">FLEXI_TO_WRITE</option>
 				<option value="-5">FLEXI_IN_PROGRESS</option>
 			</param>
+			<param name="new_item_state_fe" type="list" default="1" label="FLEXI_FRONTEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="-1">FLEXI_ARCHIVED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS" label="" level="level3" menu="hide" />
+			<param name="non_publishers_item_state" type="radio" default="-4" label="FLEXI_BACKEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</param>
+			<param name="non_publishers_item_state_fe" type="radio" default="-3" label="FLEXI_FRONTEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</param>
+			
 			
 		<param name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />
 			<param name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
@@ -385,7 +406,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="nf_send_as_bcc" type="list" default="0" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
+			<param name="nf_send_as_bcc" type="list" default="1" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
@@ -408,21 +429,25 @@
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED_desc" label="" level="level2" menu="hide" />
+			<param name="usergrps_notify_new_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<param name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING_DESC" label="" level="level2" menu="hide" />
+			<param name="usergrps_notify_new_pending_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_new_pending" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_new_pending" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<param name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level2" menu="hide" />
+			<param name="usergrps_notify_existing_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<param name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW_DESC" label="" level="level2" menu="hide" />
+			<param name="usergrps_notify_existing_reviewal_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<param name="text_notify_existing_reviewal" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />

@@ -168,14 +168,35 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="new_item_state" type="list" default="-4" label="FLEXI_NEW_ITEM_STATE" description="FLEXI_NEW_ITEM_STATE_DESC" menu="hide">
+			
+			<field name="" type="separator" default="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS" label="" level="level3" menu="hide" />
+			<field name="new_item_state" type="list" default="1" label="FLEXI_BACKEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
 				<option value="1">FLEXI_PUBLISHED</option>
 				<option value="0">FLEXI_UNPUBLISHED</option>
-				<option value="-1">FLEXI_ARCHIVED</option>
+				<option value="2">FLEXI_ARCHIVED</option>
 				<option value="-3">FLEXI_PENDING</option>
 				<option value="-4">FLEXI_TO_WRITE</option>
 				<option value="-5">FLEXI_IN_PROGRESS</option>
 			</field>
+			<field name="new_item_state_fe" type="list" default="1" label="FLEXI_FRONTEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="2">FLEXI_ARCHIVED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS" label="" level="level3" menu="hide" />
+			<field name="non_publishers_item_state" type="radio" default="-4" label="FLEXI_BACKEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</field>
+			<field name="non_publishers_item_state_fe" type="radio" default="-3" label="FLEXI_FRONTEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</field>
+			
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
@@ -394,7 +415,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="nf_send_as_bcc" type="list" default="0" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
+			<field name="nf_send_as_bcc" type="list" default="1" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

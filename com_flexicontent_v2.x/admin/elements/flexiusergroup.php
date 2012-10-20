@@ -76,6 +76,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		// Initialize variables.
 		$extra_options = array();
 		$allowAll = @$attributes['allowall'];
+		$faGrps = @$attributes['fagrps'];
 
 		// Iterate through the children and build an array of options.
 		foreach ($children as $option)
@@ -101,11 +102,23 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$extra_options[] = $tmp;
 		}
 		
-		if (!FLEXI_J16GE) {
+		$db = & JFactory::getDBO();
+		if ( FLEXI_ACCESS && $faGrps ) {
+			$db->setQuery(
+				'SELECT a.id AS value, a.name AS text, 1 AS level' .
+				' FROM #__flexiaccess_groups AS a' .
+				' ORDER BY a.name ASC'
+			);
+			$options = $db->loadObjectList();
+			for ($i = 0, $n = count($options); $i < $n; $i++)
+			{
+				$options[$i]->text = str_replace('FLEXIACCESS_GR_REGISTERED', '** Registered **', $options[$i]->text);
+				$options[$i]->text = str_replace('FLEXIACCESS_GR_PUBLIC', '** Public **', $options[$i]->text);
+			}
+		} else if (!FLEXI_J16GE) {
 			$acl = & JFactory::getACL();
 			$options = $acl->get_group_children_tree( null, 'USERS', false );
 		} else {
-			$db = & JFactory::getDBO();
 			$db->setQuery(
 				'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 				' FROM #__usergroups AS a' .

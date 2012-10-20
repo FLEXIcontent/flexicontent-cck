@@ -208,7 +208,7 @@ dump($this->row);
 				echo $this->form->render('params', 'rss_feeds');
 				echo $this->pane->endPanel();
 				
-				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('allow_cat_specific_notifications', 0) )
+				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) )
 				{
 					$title = JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_ASSIGNED_ITEM_CONF' );
 					echo $this->pane->startPanel( $title, "params-notifications_conf" );

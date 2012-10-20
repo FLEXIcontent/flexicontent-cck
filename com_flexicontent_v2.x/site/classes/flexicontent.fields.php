@@ -728,7 +728,6 @@ class FlexicontentFields
 	}
 	
 	
-	// 
 	/**
 	 * Method to create field parameters in an optimized way, and also apply Type Customization for CORE fields
 	 *

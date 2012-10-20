@@ -86,18 +86,24 @@ class FlexicontentModelItems extends ParentClassItem
 			// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
 			if (FLEXI_J16GE) {
 				$canedititem = $params->get('access-edit');
+				$caneditstate = $params->get('access-edit-state');
 			} else if ($user->gid >= 25) {
 				$canedititem = true;
+				$caneditstate = true;
 			} else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid );
 				$canedititem = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner);
+				$caneditstate = in_array('publish', $rights) || (in_array('publish', $rights) && $isOwner);
 			} else {
 				$canedititem = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
+				$caneditstate = $user->authorize('com_content', 'publish', 'content', 'all');
 			}
 			
 			// (c) Calculate read access ... 
 			if (FLEXI_J16GE) {
 				$canviewitem = $params->get('access-view');
+			} else if ($user->gid >= 25) {
+				$canviewitem = true;
 			} else {
 				$canviewitem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
 			}
@@ -134,9 +140,10 @@ class FlexicontentModelItems extends ParentClassItem
 			// Calculate if item is active ... and viewable is also it's (current or All) categories are published
 			$item_active          = $item_is_published && !$item_is_scheduled && !$item_is_expired;
 			$item_n_cat_active    = $item_active && $cats_are_published;
-			$ignore_publication   = $canedititem || $isOwner;
-			$inactive_warning_set = false;
+			$ignore_publication   = $canedititem || $caneditstate|| $isOwner;
+			$inactive_notice_set = false;
 			$item_state_pending   = $this->_item->state == -3;
+			$item_state_draft			= $this->_item->state == -4;
 			
 			
 			//*************************************************************************************************************************
@@ -149,45 +156,48 @@ class FlexicontentModelItems extends ParentClassItem
 			//*************************************************************************************************************************
 			
 			// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
-			if ( !$item_is_published && !$inactive_warning_set && !$ignore_publication ) {
+			if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner ) {
+				// SPECIAL workflow case, regardless of (view/edit privilege), allow users to view unpublished owned content, (a) if waiting for approval, or (b) if can request approval
+				$inactive_notice_set = true;
+			} else if ( !$item_is_published && !$ignore_publication ) {
 				// Raise error that the item is unpublished
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str );
-			} else if ( !$item_is_published ) {
+			} else if ( !$item_is_published && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') );
-				$inactive_warning_set = true;
+				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') );
+				$inactive_notice_set = true;
 			}
 			
 			// NOTE: First, we check for expired publication, since if item expired, scheduled publication is meaningless
 			
 			// (b) Check that item has expired publication date
-			if ( $item_is_expired && !$inactive_warning_set && !$ignore_publication ) {
+			if ( $item_is_expired && !$ignore_publication ) {
 				// Raise error that the item is scheduled for publication
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str );
-			} else if ( $item_is_expired ) {
+			} else if ( $item_is_expired && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') );
-				$inactive_warning_set = true;
+				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') );
+				$inactive_notice_set = true;
 			}
 			
 			// (c) Check that item has scheduled publication date
-			if ( $item_is_scheduled && !$inactive_warning_set && !$ignore_publication ) {
+			if ( $item_is_scheduled && !$ignore_publication ) {
 				// Raise error that the item is scheduled for publication
 				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str );
-			} else if ( $item_is_scheduled ) {
+			} else if ( $item_is_scheduled && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
-				JError::raiseWarning( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') );
-				$inactive_warning_set = true;
+				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') );
+				$inactive_notice_set = true;
 			}
 			
 			// (d) Check that current item category or all items categories are published
-			if (!$cats_are_published && !$inactive_warning_set && !$ignore_publication) {
+			if ( !$cats_are_published && !$ignore_publication ) {
 				// Terminate execution with a HTTP not-found Server Error
 				JError::raiseError( 404, $cats_np_err_mssg . $title_str );
-			} else if( !$cats_are_published ) {
+			} else if( !$cats_are_published && !$inactive_notice_set ) {
 				// Item edittable, set warning that item's (ancestor) category is unpublished
-				JError::raiseWarning( 404, $cats_np_err_mssg );
-				$inactive_warning_set = true;
+				JError::raiseNotice( 404, $cats_np_err_mssg );
+				$inactive_notice_set = true;
 			}
 			
 			
@@ -216,16 +226,21 @@ class FlexicontentModelItems extends ParentClassItem
 			
 			// SPECIAL cases for inactive item
 			if ( !$item_n_cat_active ) {
-				if ( !$canedititem && $isOwner )
+				if ( !$caneditstate && ($item_state_pending || item_state_draft) && $isOwner )
+				{
+					// no redirect, SET message to owners, to wait for approval or to request approval of their content
+					$app->enqueueMessage(JText::_( $item_state_pending ? 'FLEXI_ALERT_VIEW_OWN_PENDING_STATE' : 'FLEXI_ALERT_VIEW_OWN_DRAFT_STATE' ), 'notice');
+				}
+				else if ( !$canedititem && !$caneditstate && $isOwner )
 				{
 					// (b) redirect item owner to previous page if user cannot access (read/edit) the item
 					JError::raiseNotice(403, JText::_( $item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED' ) );
 					$app->redirect($referer);
 				}
-				else if ( $canedititem )
+				else if ( $canedititem || $caneditstate )
 				{
-					// SET notice to the editors, that they are viewing unreadable content because they can edit the item
-					$app->enqueueMessage(JText::_('FLEXI_CONTENT_ACCESS_ALLOWED_BECAUSE_EDITABLE'), 'notice');
+					// no redirect, SET notice to the editors, that they are viewing unreadable content because they can edit the item
+					$app->enqueueMessage(JText::_('FLEXI_CONTENT_ACCESS_ALLOWED_BECAUSE_EDITABLE_PUBLISHABLE'), 'notice');
 				} else {
 					$app->enqueueMessage( 'INTERNAL ERROR: item inactive but checks were ignored despite current user not begin item owner or item assigned editor', 'notice');
 					$app->redirect($referer);

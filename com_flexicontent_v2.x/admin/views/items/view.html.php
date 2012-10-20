@@ -239,23 +239,13 @@ class FlexicontentViewItems extends JView {
 			JToolBarHelper::deleteList('Are you sure?', $ctrl_task);
 		}
 		
-		if ( (FLEXI_ACCESS || FLEXI_J16GE) && !$CanPublish && !$CanPublishOwn) {
-			$ctrl_task = FLEXI_J16GE ? 'items.approval' : 'approval';
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
-			JToolBarHelper::customX( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
-		}
-		
 		if(FLEXI_J16GE && $permission->CanConfig) {
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
-		JToolBarHelper::spacer();
-		JToolBarHelper::spacer();
-
+		
 		//Get data from the model
 		$rows     	= & $this->get( 'Data');
 		$pageNav 		= & $this->get( 'Pagination' );

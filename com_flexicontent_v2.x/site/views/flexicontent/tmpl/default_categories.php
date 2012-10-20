@@ -23,6 +23,7 @@ jimport('joomla.filesystem.file');
 <?php
 $showassignated = $this->params->get('showassignated', 0);
 
+$cat_link_title = $this->params->get('cat_link_title', 1);
 $hide_empty_cats = $this->params->get('hide_empty_cats', 0);
 $show_cat_descr = $this->params->get('show_cat_descr', 0);
 $cat_descr_cut = $this->params->get('cat_descr_cut', 100);
@@ -112,12 +113,15 @@ switch ($cols)
 <div class="floattext">
     
 	<h2 class="fccat_title_box cat<?php echo $cat->id; ?>">
-		<a class="fccat_title" href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ); ?>">
-			<?php echo $this->escape($cat->title); ?>
-			<?php if ($showassignated) : ?>
-			<span class="fccat_assigned small"><?php echo $cat->assigneditems != null ? '('.$cat->assigneditems.')' : '(0)'; ?></span>
-			<?php endif; ?>
-		</a>
+		<?php echo $cat_link_title ? '<a class="fccat_title" href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">' : '<span class="fccat_title">'; ?>
+			
+		<?php echo $this->escape($cat->title); ?>
+		
+		<?php if ($showassignated) : ?>
+		<span class="fccat_assigned small"><?php echo $cat->assigneditems != null ? '('.$cat->assigneditems.')' : '(0)'; ?></span>
+		<?php endif; ?>
+		
+	<?php echo $cat_link_title ? '</a>' : '</span>'; ?>
 	</h2>
 	
 	<?php
