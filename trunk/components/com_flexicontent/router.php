@@ -102,7 +102,7 @@ function FLEXIcontentBuildRoute(&$query)
 		//TODO something if needed
 		break;*/
 	case FLEXI_ITEMVIEW:
-		if ( isset($query['cid']) && ($mcid != $query['cid']  ||  $mview != 'category') )	{  // cid EXISTs and doesnot much cid variable of current menu item
+		if ( isset($query['cid']) && ($mcid != (int)$query['cid']  ||  $mview != 'category') )	{  // cid EXISTs and doesnot much cid variable of current menu item
 			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
 			$segments[] = $query['cid'];
 			$segments[] = @$query['id'];  // Required ... 
@@ -112,6 +112,7 @@ function FLEXIcontentBuildRoute(&$query)
 			// EXPLICIT view (will be contained in the url)
 			$segments[] = 'item';
 			$segments[] = @$query['id'];  // Required ...
+			unset($query['cid']);
 			unset($query['id']);
 		}
 		break;
