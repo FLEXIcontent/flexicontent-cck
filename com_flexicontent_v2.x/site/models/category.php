@@ -489,7 +489,7 @@ class FlexicontentModelCategory extends JModel {
 		}
 		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
-		$orderby .= $filter_order!='i.title' ? ', c.title' : '';   // Order by title after default ordering
+		$orderby .= $filter_order!='i.title' ? ', i.title' : '';   // Order by title after default ordering
 		
 		return $orderby;
 	}
