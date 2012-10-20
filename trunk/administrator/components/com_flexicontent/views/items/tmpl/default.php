@@ -469,6 +469,7 @@ window.addEvent('domready', function() {
 		else
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
 		
+		$unpublishableFound = false;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = $this->rows[$i];
@@ -496,6 +497,9 @@ window.addEvent('domready', function() {
 				$canPublish	=	$user->authorize('com_content', 'publish', 'content', 'all');
 				$canPublishOwn= 1; // due to being backend user
 			}
+			$canPublishCurrent = $canPublish || $canPublishOwn;
+			$unpublishableFound = $unpublishableFound || !$canPublishCurrent;
+			
 
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
@@ -724,7 +728,19 @@ window.addEvent('domready', function() {
 				<?php echo $row->id; ?>
 			</td>
 		</tr>
-		<?php $k = 1 - $k; } ?>
+		<?php
+			$k = 1 - $k;
+		}
+		if ( (FLEXI_ACCESS || FLEXI_J16GE) && $unpublishableFound) {
+			$ctrl_task = FLEXI_J16GE ? 'items.approval' : 'approval';
+			JToolBarHelper::spacer();
+			JToolBarHelper::divider();
+			JToolBarHelper::spacer();
+			JToolBarHelper::customX( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+		}
+		JToolBarHelper::spacer();
+		JToolBarHelper::spacer();
+		?>
 	</tbody>
 
 	</table>

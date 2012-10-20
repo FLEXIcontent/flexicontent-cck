@@ -527,6 +527,57 @@ class flexicontent_html
 	
 	
 	/**
+	 * Creates the approval button
+	 *
+	 * @param int $id
+	 * @param array $params
+	 * @since 1.0
+	 */
+	function approvalbutton( $item, &$params)
+	{
+		$user	= & JFactory::getUser();
+		
+		// Skip not-owned items, and items not in draft state
+		if ( $item->state != -4 || $item->created_by != $user->get('id') )  return;
+		
+		// Determine if current user can edit state of the given item
+		if (FLEXI_J16GE) {
+			$asset = 'com_content.article.' . $item->id;
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+			// ALTERNATIVE 1
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+			//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
+		} else if ($user->gid >= 25) {
+			$has_edit_state = true;
+		} else if (FLEXI_ACCESS) {
+			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
+		} else {
+			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
+		}
+		
+		// Create the approval button if user cannot edit the item (**note check at top of this method)
+		if ( !$has_edit_state ) {
+			if ( $params->get('show_icons') ) {
+				$image = JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), ' style="margin:4px;" width="16" align="top" ');
+			} else {
+				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+			}
+			$overlib 	= JText::_( 'FLEXI_APPROVAL_REQUEST_INFO' );
+			$text 		= JText::_( 'FLEXI_APPROVAL_REQUEST' );
+
+			$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
+			$caption = JText::_( 'FLEXI_APPROVAL_REQUEST' );
+			$output	= '<a style="float:right;	padding: 2px 2px 0px 0px !important;" href="'.$link.'" class="fc_bigbutton editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.$caption.'</a>';
+
+			return $output;
+		}
+		
+		return;
+	}	
+	
+	
+	/**
 	 * Creates the edit button
 	 *
 	 * @param int $id

@@ -59,6 +59,10 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="cat_descr_cut" type="text" size="4" default="100" label="FLEXI_DESCRIPTION_MAXLEN" description="FLEXI_DESCRIPTION_MAXLEN_DESC" menu="hide"/>
+			<field name="cat_link_title" type="radio" default="1" label="FLEXI_LINKED_TITLES" description="...">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="show_cat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>

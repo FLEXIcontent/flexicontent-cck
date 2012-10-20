@@ -76,14 +76,15 @@ class FlexicontentControllerItems extends FlexicontentController
 		$config  = & JFactory::getConfig();
 		$session = & JFactory::getSession();
 		$task	   = JRequest::getVar('task');
-		$model   = $this->getModel('item');
-		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
+		$model   = & $this->getModel('item');
+		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
-		// Get component parameters and them merge into them the type parameters
+		// Get component parameters
 		$params  = new JParameter("");
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
+		// Merge the type parameters
 		$tparams = $model->getTypeparams();
 		$tparams = new JParameter($tparams);
 		$params->merge($tparams);
@@ -168,6 +169,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$before_cats = $db->loadObjectList('id');
 			$before_maincat = $model->get('catid');
 		}
+		$before_state = $model->get('state');
 		
 		
 		// ****************************************
@@ -182,11 +184,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Since an error occured, check if (a) the item is new and (b) was not created
 			if ($isnew && !$model->get('id')) {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid=0&typeid='.$post['type_id'];
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'add&cid=0&typeid='.$post['type_id'];
 				$this->setRedirect($link, $msg);
 			} else {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$model->get('id');
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
 			}
 			
@@ -203,10 +205,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		$post['id'] = $isnew ? (int) $model->get('id') : $post['id'];
 		
 		
-		// ************************************************************
-		// First force reloading the item to make sure data are current
-		// ************************************************************
-		$model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		// ********************************************************************************************************************
+		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
+		// ********************************************************************************************************************
+		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
 		// ********************************************************************************************
@@ -254,38 +257,52 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Get needed flags regarding the saved items
 			$approve_version = 2;
 			$pending_approval_state = -3;
+			$draft_state = -4;
 			
-			$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
-			$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
+			$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
+			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
 			
-			// Get notifications configuration and select appropriate emails for current saving case
-			$nConf = & $model->getNotificationsConf($params);
-			//echo "<pre>"; print_r($nConf);
+			// $post variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
+			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish;
+			$needs_publication_approval =  $isnew && ($item->state == $pending_approval_state) && !$canPublish;
 			
-			if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
-			else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
-			else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
-			else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
 			
-			if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
-			else if ($isnew)                   $notify_text = $params->get('text_notify_new');
-			else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
-			else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
-			//print_r($notify_emails);
-			//exit;
+			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+			if (!$draft_from_non_publisher) {
+				// Get notifications configuration and select appropriate emails for current saving case
+				$nConf = & $model->getNotificationsConf($params);
+				//echo "<pre>"; print_r($nConf);
+				
+				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
+				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
+				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+				
+				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
+				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
+				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
+				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
+				//print_r($notify_emails); exit;
+			}
 		}
 		
 		
-		// *****************************************************************************************
-		// If there are emails to notify for current saving case, then send the notifications emails
-		// *****************************************************************************************
-		if ($notify_emails) {
-			// ... we use some strings from administrator part
-			// load english language file for 'com_flexicontent' component then override with current language file
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		// *********************************************************************************************************************
+		// If there are emails to notify for current saving case, then send the notifications emails, but 
+		// *********************************************************************************************************************
+		if ( count($notify_emails) ) {
+			$notify_vars = new stdClass();
+			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
+			$notify_vars->needs_publication_approval = $needs_publication_approval;
+			$notify_vars->isnew         = $isnew;
+			$notify_vars->notify_emails = $notify_emails;
+			$notify_vars->notify_text   = $notify_text;
+			$notify_vars->before_cats   = $before_cats;
+			$notify_vars->after_cats    = $after_cats;
+			$notify_vars->before_state  = $before_state;
 			
-			$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
+			$model->sendNotificationEmails($notify_vars, $params, $manual_approval_request=0);
 		}
 		
 		
@@ -328,17 +345,26 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *******************************************************************************************************
 		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
 		// *******************************************************************************************************
-		if ($isnew && !$canEdit)
+		if (!$canEdit)
 		{
-			// Set notice about creating an item that cannot be changed further
-			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ) );
-		} else if ( !$isnew ) {
-			if ( $cparams->get('items_session_editable', 0) ) {
-				// Allow item to be editable till logoff
-				$session 	=& JFactory::getSession();
-				$session->get('rendered_uneditable', array(),'flexicontent');
-				$rendered_uneditable[$model->get('id')]  = 1;
-				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
+			if ($isnew) {
+				// Do not use parameter 'items_session_editable' for new items, to avoid breaking submitting "behavior"
+				// To avoid not allow message, make sure task is cleared since user cannot edit item further
+				$task = JRequest::setVar('task', '');
+				// Set notice about creating an item that cannot be changed further
+				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ), 'message' );
+			} else {
+				if ( $params->get('items_session_editable', 0) ) {
+					// Set notice for existing item being editable till logoff 
+					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+					// Allow item to be editable till logoff
+					$session->get('rendered_uneditable', array(),'flexicontent');
+					$rendered_uneditable[$model->get('id')]  = 1;
+					$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
+				} else {
+					// To avoid not allow message, make sure task is cleared since user cannot edit item further
+					$task = JRequest::setVar('task', '');
+				}
 			}
 		}
 		
@@ -1150,7 +1176,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 
-
+	
 	/**
 	 * Logic to submit item to approval
 	 *
@@ -1161,60 +1187,18 @@ class FlexicontentControllerItems extends FlexicontentController
 	function approval()
 	{
 		$cid	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$model 	= $this->getModel('items');
-
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
+		} else {
+			$itemmodel = $this->getModel('item');
+			$msg = $itemmodel->approval($cid);
 		}
 		
-		$cids = $model->isUserDraft($cid);
-		
-		$excluded = count($cid) - count($cids);
-		if ($excluded) {
-			$excluded = $excluded . ' ' . JText::_( 'FLEXI_APPROVAL_ITEMS_EXCLUDED' );
-		} else {
-			$excluded = '';
-		}
-		
-		if (count($cids)) {	
-			if (count($cids) < 2) {
-				$msg = JText::_( 'FLEXI_APPROVAL_ITEM_SUBMITTED' ) . ' ' . $excluded;
-
-				$model->setitemstate($cids[0]->id, -3);
-				
-				$validators = $model->getValidators($cids[0]->id, $cids[0]->catid);
-				if ($validators) {
-					$model->sendNotification($validators, $cids[0]);
-				}
-			} else {
-				$msg = count($cids) . ' ' . JText::_( 'FLEXI_APPROVAL_ITEMS_SUBMITTED' ) . ' ' . $excluded;
-				
-				foreach ($cids as $cid) {
-
-					$model->setitemstate($cid->id, -3);
-	
-					$validators = $model->getValidators($cid->id, $cid->catid);
-					if ($validators) {
-						$model->sendNotification($validators, $cid);
-					}
-				}
-			}
-		} else {
-			$msg = JText::_( 'FLEXI_APPROVAL_NO_ITEMS_SUBMITTED' ) . ' ' . $excluded;
-		}
-
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
-			$cache->clean('com_flexicontent_items');
-		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
-		}
-
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
-
+	
+	
 	/**
 	 * Logic to delete items
 	 *

@@ -122,31 +122,31 @@ class FlexicontentController extends JController
 		if(!$isnew) {
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$has_publish = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $model->get('created_by') == $user->get('id'));
-				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canPublish = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 1
-				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
-				$has_publish = true;
-				$has_edit = true;
+				$canPublish = true;
+				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$has_publish = in_array('publish', $rights) || (in_array('publishown', $rights) && $model->get('created_by') == $user->get('id')) ;
-				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canPublish = in_array('publish', $rights) || (in_array('publishown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
-				$has_publish = $user->authorize('com_content', 'publish', 'content', 'all');
-				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-				//$has_publish = ($user->gid >= 21);  // At least J1.5 Publisher
-				//$has_edit = ($user->gid >= 20);  // At least J1.5 Editor
+				$canPublish = $user->authorize('com_content', 'publish', 'content', 'all');
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$canPublish = ($user->gid >= 21);  // At least J1.5 Publisher
+				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
 			// Check if item is editable till logoff
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$has_edit = isset($rendered_uneditable[$model->get('id')]);
+				$canEdit = isset($rendered_uneditable[$model->get('id')]);
 			}
 
 		} else {
@@ -174,10 +174,14 @@ class FlexicontentController extends JController
 			}
 			if ( $allowunauthorize ) $canAdd = true;
 		}
-
-
+		
+		// ... we use some strings from administrator part
+		// load english language file for 'com_flexicontent' component then override with current language file
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		
 		// Check for new content
-		if ( ($isnew && !$canAdd) || (!$isnew && !$has_edit)) {
+		if ( ($isnew && !$canAdd) || (!$isnew && !$canEdit)) {
 			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			return;
 		}
@@ -194,6 +198,7 @@ class FlexicontentController extends JController
 			$before_cats = $db->loadObjectList('id');
 			$before_maincat = $model->get('catid');
 		}
+		$before_state = $model->get('state');
 		
 		
 		// ****************************************
@@ -226,8 +231,8 @@ class FlexicontentController extends JController
 		// Check in model and get item id in case of new item
 		// **************************************************
 		$model->checkin();
+		$post['id'] = $isnew ? (int) $model->get('id') : $post['id'];
 		if($isnew) {
-			$post['id'] = (int) $model->get('id');
 			// Mark item as newly submitted, to allow to a proper "THANKS" message after final save & close operation (since user may have clicked add instead of add & close)
 			$newly_submitted	= $session->get('newly_submitted', array(), 'flexicontent');
 			$newly_submitted[$model->get('id')] = 1;
@@ -235,10 +240,11 @@ class FlexicontentController extends JController
 		}
 		
 		
-		// ************************************************************
-		// First force reloading the item to make sure data are current
-		// ************************************************************
-		$model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		// ********************************************************************************************************************
+		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
+		// ********************************************************************************************************************
+		$item = & $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
 		// ********************************************************************************************
@@ -286,38 +292,52 @@ class FlexicontentController extends JController
 			// Get needed flags regarding the saved items
 			$approve_version = 2;
 			$pending_approval_state = -3;
+			$draft_state = -4;
 			
-			$needs_version_reviewal     = !$isnew && ($post['vstate'] != $approve_version) && !$has_publish;
-			$needs_publication_approval =  $isnew && ($post['state'] == $pending_approval_state) && !$canPublish;
+			$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
+			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
 			
-			// Get notifications configuration and select appropriate emails for current saving case
-			$nConf = & $model->getNotificationsConf($params);
-			//echo "<pre>"; print_r($nConf);
+			// $post variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
+			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish;
+			$needs_publication_approval =  $isnew && ($item->state == $pending_approval_state) && !$canPublish;
 			
-			if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
-			else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
-			else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
-			else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
 			
-			if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
-			else if ($isnew)                   $notify_text = $params->get('text_notify_new');
-			else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
-			else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
-			//print_r($notify_emails);
-			//exit;
+			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+			if (!$draft_from_non_publisher) {
+				// Get notifications configuration and select appropriate emails for current saving case
+				$nConf = & $model->getNotificationsConf($params);
+				//echo "<pre>"; print_r($nConf);
+				
+				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
+				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
+				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+				
+				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
+				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
+				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
+				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
+				//print_r($notify_emails); exit;
+			}
 		}
 		
 		
-		// *****************************************************************************************
-		// If there are emails to notify for current saving case, then send the notifications emails
-		// *****************************************************************************************
-		if ($notify_emails) {
-			// ... we use some strings from administrator part
-			// load english language file for 'com_flexicontent' component then override with current language file
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		// *********************************************************************************************************************
+		// If there are emails to notify for current saving case, then send the notifications emails, but 
+		// *********************************************************************************************************************
+		if ( count($notify_emails) ) {
+			$notify_vars = new stdClass();
+			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
+			$notify_vars->needs_publication_approval = $needs_publication_approval;
+			$notify_vars->isnew         = $isnew;
+			$notify_vars->notify_emails = $notify_emails;
+			$notify_vars->notify_text   = $notify_text;
+			$notify_vars->before_cats   = $before_cats;
+			$notify_vars->after_cats    = $after_cats;
+			$notify_vars->before_state  = $before_state;
 			
-			$model->sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, $params);
+			$model->sendNotificationEmails($notify_vars, $params, $manual_approval_request=0);
 		}
 		
 		
@@ -341,46 +361,52 @@ class FlexicontentController extends JController
 		// ****************************************************************************************************************************
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $model->get('id');
-			$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 			// ALTERNATIVE 1
-			//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 			// ALTERNATIVE 2
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-			//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 		} else if ($user->gid >= 25) {
-			$has_edit = true;
+			$canEdit = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-			$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+			$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 		} else {
-			$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+			$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 		}
 		
 		
 		// *******************************************************************************************************
 		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
 		// *******************************************************************************************************
-		if ($isnew && !$has_edit)
+		if (!$canEdit)
 		{
-			$task = JRequest::setVar('task', '');
-			// Set message about creating an item that cannot be changed further
-			$app->enqueueMessage(JText::_('FLEXI_CANNOT_CHANGE_FURTHER'), 'message' );
-		} else if (!$isnew && !$has_edit) {
-			$task = JRequest::setVar('task', '');
-			
-			// Set notice for existing item being editable till logoff 
-			JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
-			// Allow item to be editable till logoff
-			$session->get('rendered_uneditable', array(),'flexicontent');
-			$rendered_uneditable[$model->get('id')]  = 1;
-			$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
+			if ($isnew) {
+				// Do not use parameter 'items_session_editable' for new items, to avoid breaking submitting "behavior"
+				// To avoid not allow message, make sure task is cleared since user cannot edit item further
+				$task = JRequest::setVar('task', '');
+				// Set notice about creating an item that cannot be changed further
+				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_CHANGE_FURTHER' ), 'message' );
+			} else {
+				if ( $params->get('items_session_editable', 0) ) {
+					// Set notice for existing item being editable till logoff 
+					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
+					// Allow item to be editable till logoff
+					$session->get('rendered_uneditable', array(),'flexicontent');
+					$rendered_uneditable[$model->get('id')]  = 1;
+					$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
+				} else {
+					// To avoid not allow message, make sure task is cleared since user cannot edit item further
+					$task = JRequest::setVar('task', '');
+				}
+			}
 		}
 		
 		
 		// ****************************************
 		// Saving is done, decide where to redirect
 		// ****************************************
-		$task = JRequest::getVar('task');
 		if ($task=='apply') {
 			// Save and reload the item edit form
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
@@ -416,6 +442,34 @@ class FlexicontentController extends JController
 		}
 		
 		$this->setRedirect($link, $msg);
+	}
+	
+	
+	/**
+	 * Logic to submit item to approval
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function approval()
+	{
+		$cid = JRequest::getInt( 'cid', 0 );
+		
+		if ( !$cid ) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
+		} else {
+			// ... we use some strings from administrator part
+			// load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			
+			$itemmodel = $this->getModel( FLEXI_ITEMVIEW );
+			$msg = $itemmodel->approval( array($cid) );
+		}
+		
+		$this->setRedirect( $_SERVER['HTTP_REFERER'], $msg );
 	}
 	
 	
@@ -484,29 +538,29 @@ class FlexicontentController extends JController
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 1
-				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
-				$has_edit = true;
+				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
-				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-				//$has_edit = ($user->gid >= 20);  // At least J1.5 Editor
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
 			// Check if item is editable till logoff
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$has_edit = isset($rendered_uneditable[$model->get('id')]);
+				$canEdit = isset($rendered_uneditable[$model->get('id')]);
 			}
 			
-			if (!$has_edit) {
+			if (!$canEdit) {
 				if ($user->guest) {
 					$uri		= JFactory::getURI();
 					$return		= $uri->toString();
@@ -656,28 +710,28 @@ class FlexicontentController extends JController
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
 				// ALTERNATIVE 1
-				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
-				$has_edit = true;
+				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
-				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 			}
 			
 			// Check if item is editable till logoff
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$has_edit = isset($rendered_uneditable[$model->get('id')]);
+				$canEdit = isset($rendered_uneditable[$model->get('id')]);
 			}
 			
-			if ($has_edit) $model->checkin();
+			if ($canEdit) $model->checkin();
 		}
 		
 		// If the task was edit or cancel, we go back to the form refer

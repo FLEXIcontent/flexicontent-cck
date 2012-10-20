@@ -745,7 +745,7 @@ div#flexicontent.directory h2.fccat_title_box {
 	width: auto;
 }
 
-div#flexicontent.directory a.fccat_title {
+div#flexicontent.directory .fccat_title {
 	border: 2px solid #dddddd;
 	display: block;
 	font-size: 14px;
@@ -755,7 +755,11 @@ div#flexicontent.directory a.fccat_title {
 	position: relative;
 }
 
-div#flexicontent.directory a.fccat_title:hover {
+div#flexicontent.directory span.fccat_title {
+	color: darkred;
+}
+
+div#flexicontent.directory .fccat_title:hover {
 	text-decoration: none;
 }
 
@@ -993,3 +997,18 @@ div#flexicontent table.admintable td.paramlist_key {
 }
 
 div.fancybox-wrap a { background: none!important;}
+
+.fc_bigbutton {
+	border-radius:4px !important;
+	padding: 2px !important;
+	margin-right: 4px !important;
+	border:1px outset gray !important;
+	background: #e0e0e0 !important;
+	text-align: center;
+	display:block;
+}
+
+.fc_bigbutton:hover {
+	border-style: inset !important;
+	text-decoration: none;
+}

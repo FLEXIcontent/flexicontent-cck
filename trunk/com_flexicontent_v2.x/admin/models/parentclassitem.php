@@ -486,9 +486,9 @@ class ParentClassItem extends JModelAdmin
 				$item->text = $item->introtext;
 				$item->text .= JString::strlen( trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
 				
-				//echo "<br>version: ".$version;
-				//echo "<br><b> *** db title:</b> ".$item->title;
-				//echo "<br><b> *** db text:</b> ".$item->text;
+				//echo "<br/>version: ".$version;
+				//echo "<br/><b> *** db title:</b> ".$item->title;
+				//echo "<br/><b> *** db text:</b> ".$item->text;
 				//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
 				
 				// Set number of loaded version, IMPORTANT: zero means load unversioned data
@@ -533,7 +533,7 @@ class ParentClassItem extends JModelAdmin
 								$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field}->value = $field_data->value;
 								$found_languages[$field_data->language_id] = $item_translations->{$field_data->language_id}->name;
 							}
-							//echo "<br>Joom!Fish translations found for: " . implode(",", $found_languages);
+							//echo "<br/>Joom!Fish translations found for: " . implode(",", $found_languages);
 						}
 						
 						foreach ($item_translations as $lang_id => $translation_data)
@@ -573,9 +573,9 @@ class ParentClassItem extends JModelAdmin
 					$fields = $db->loadObjectList();
 					$fields = $fields ? $fields : array();
 					
-					//echo "<br>Overwritting fields with version: $version";
+					//echo "<br/>Overwritting fields with version: $version";
 					foreach($fields as $f) {
-						//echo "<br><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
+						//echo "<br/><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
 						
 						// Use versioned data, by overwriting the item data 
 						$fieldname = $f->name;
@@ -589,11 +589,11 @@ class ParentClassItem extends JModelAdmin
 							$item_lang = substr($item->language ,0,2);
 							foreach ($item_translations as $lang_id => $translation_data)
 							{
-								//echo "<br>Adding values for: ".$translation_data->shortcode;
+								//echo "<br/>Adding values for: ".$translation_data->shortcode;
 								if ( empty($jfdata[$translation_data->shortcode]) ) continue;
 								foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
 								{
-									//echo "<br>".$translation_data->shortcode.": $fieldname => $fieldvalue";
+									//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
 									if ($translation_data->shortcode != $item_lang)
 										$translation_data->fields->$fieldname->value = $fieldvalue;
 									else
@@ -1173,11 +1173,11 @@ class ParentClassItem extends JModelAdmin
 			
 			// Decide default publication state. NOTE this will only be used if user has publish privilege, otherwise items
 			// will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
-			$draft_state = -4;  $pubished_state = 1;  //$pending_approval_state = -3;
+			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
 			if ( $app->isAdmin() ) {
-				$default_state = $cparams->get('new_item_state', $draft_state);  // Use the configured setting for backend items
+				$default_state = $cparams->get('new_item_state', $pubished_state);     // Use the configured setting for backend items
 			} else {
-				$default_state = $pubished_state;  // Use published state for frontend items (for authors that can publish)
+				$default_state = $cparams->get('new_item_state_fe', $pubished_state);  // Use the configured setting for frontend items
 			}
 			
 			// Override defaults values, we assigned all properties, 
@@ -1557,6 +1557,7 @@ class ParentClassItem extends JModelAdmin
 		// *****************************************************************
 		// SECURITY concern: Check form tampering of state related variables
 		// *****************************************************************
+		if ($isnew) $item->catid = $data['catid'];  // Needed for checking edit state permission of new items
 		$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 		
 		// If cannot edit state prevent user from changing state related parameters
@@ -1574,12 +1575,26 @@ class ParentClassItem extends JModelAdmin
 				unset( $data['publish_down'] );
 				unset( $data['ordering'] );
 			}
-			if (!$isnew)                 // Prevent changing state of existing items by users that cannot publish
-				unset( $data['state'] );
-			else if ($autopublished)     // Autopublishing new item via menu configuration
-				$data['state'] = 1;
-			else                         // Force state of -NEW- items as "Pending Approval" for user that CANNOT publish, and autopublish via menu item is disabled
-				$data['state'] = -3;
+			
+			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
+			
+			if (!$isnew) {
+				// Prevent changing state of existing items by users that cannot publish
+				$data['state'] = $item->state;
+				
+			} else if ($autopublished) {
+				// Autopublishing new item via menu configuration
+				$data['state'] = $pubished_state;
+				
+			} else {
+				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
+				if ( $app->isAdmin() ) {
+					$data['state'] = $cparams->get('non_publishers_item_state', $draft_state);     // Use the configured setting for backend items
+				} else {
+					$data['state'] = $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
+				}
+			}
+			
 		}
 		$isSuperAdmin = FLEXI_J16GE ? $user->authorise('core.admin', 'root.1') : ($user->gid >= 25);
 		
@@ -1971,7 +1986,6 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				// Trigger plugin Event 'onBeforeSaveField'
-				//$results = $dispatcher->trigger('onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
 				if ($result===false) {
@@ -2054,7 +2068,7 @@ class ParentClassItem extends JModelAdmin
 							}
 						}
 					}
-					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br />";
+					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br/>";
 					
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
 					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
@@ -2076,7 +2090,6 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				// Trigger onAfterSaveField Event
-				//$results = $dispatcher->trigger('onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
 				// *** $result is ignored
@@ -2293,10 +2306,10 @@ class ParentClassItem extends JModelAdmin
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
 				if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags($jfdata[$fieldname])))) ) continue;   // skip empty content
-				//echo "<br><b>#__jf_content($fieldname) :</b><br>";
+				//echo "<br/><b>#__jf_content($fieldname) :</b><br/>";
 				$query = "INSERT INTO #__jf_content (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote($jfdata[$fieldname]).", '".md5($item->{$fieldname})."', '', '$modified', '$modified_by', 1)";
-				//echo $query."<br>\n";
+				//echo $query."<br/>\n";
 				$db->setQuery($query);
 				$db->query();
 			}
@@ -2307,7 +2320,7 @@ class ParentClassItem extends JModelAdmin
 			$query = "UPDATE #__content SET title=".$db->Quote($item->title).",  alias=".$db->Quote($item->alias).",  introtext=".$db->Quote($item->introtext)
 				.",  `fulltext`=".$db->Quote($item->fulltext).",  images=".$db->Quote($item->images).",  metadesc=".$db->Quote($item->metadesc).",  metakey=".$db->Quote($item->metakey)
 				.", publish_up=".$db->Quote($item->publish_up).",  publish_down=".$db->Quote($item->publish_down).",  attribs=".$db->Quote($item->attribs)." WHERE id=".$db->Quote($item->id);
-			//echo $query."<br>\n";
+			//echo $query."<br/>\n";
 			if (FLEXI_J16GE) {
 				//$query = $db->replacePrefix($query);
 				$query = str_replace("#__", $dbprefix, $query);
@@ -2846,7 +2859,7 @@ class ParentClassItem extends JModelAdmin
 					}
 				}
 				
-				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br>";
+				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br/>";
 				$field->parameters = new JParameter($field->attribs);
 			}
 		}
@@ -3061,15 +3074,19 @@ class ParentClassItem extends JModelAdmin
 		$nConf = new stdClass();
 		
 		// (b) Get Content Type specific notifications (that override global)
-		$nConf->userlist_notify_new         = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_new         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
-		$nConf->userlist_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
+		$nConf->userlist_notify_new            = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new            = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
+		$nConf->usergrps_notify_new_fa         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_fa', array()) );
+		$nConf->userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
+		$nConf->usergrps_notify_new_pending_fa = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending_fa', array()) );
 		
-		$nConf->userlist_notify_existing          = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_existing          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
-		$nConf->userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
+		$nConf->userlist_notify_existing             = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing             = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
+		$nConf->usergrps_notify_existing_fa          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_fa', array()) );
+		$nConf->userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
+		$nConf->usergrps_notify_existing_reviewal_fa = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal_fa', array()) );
 		
 		// (c) Get category specific notifications
 		if ( $params->get('nf_allow_cat_specific') ) 
@@ -3083,45 +3100,48 @@ class ParentClassItem extends JModelAdmin
 				$cat_params = new JParameter($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 				
-				$cats_userlist_notify_new         = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-				$cats_usergrps_notify_new         = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
-				$cats_userlist_notify_new_pending = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-				$cats_usergrps_notify_new_pending = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
+				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
+				$cats_usergrps_notify_new_fa         = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_fa', array()) );
+				$cats_userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
+				$cats_usergrps_notify_new_pending_fa = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending_fa', array()) );
 				
-				$cats_userlist_notify_existing          = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-				$cats_usergrps_notify_existing          = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
-				$cats_userlist_notify_existing_reviewal = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-				$cats_usergrps_notify_existing_reviewal = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
+				$cats_userlist_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
+				$cats_usergrps_notify_existing_fa          = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_fa', array()) );
+				$cats_userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
+				$cats_usergrps_notify_existing_reviewal_fa = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal_fa', array()) );
 				
-				$nConf->userlist_notify_new         = array_unique(array_merge($nConf->userlist_notify_new,         $cats_userlist_notify_new));
-				$nConf->usergrps_notify_new         = array_unique(array_merge($nConf->usergrps_notify_new,         $cats_usergrps_notify_new));
-				$nConf->userlist_notify_new_pending = array_unique(array_merge($nConf->userlist_notify_new_pending, $cats_userlist_notify_new_pending));
-				$nConf->usergrps_notify_new_pending = array_unique(array_merge($nConf->usergrps_notify_new_pending, $cats_usergrps_notify_new_pending));
+				$nConf->userlist_notify_new            = array_unique(array_merge($nConf->userlist_notify_new,            $cats_userlist_notify_new));
+				$nConf->usergrps_notify_new            = array_unique(array_merge($nConf->usergrps_notify_new,            $cats_usergrps_notify_new));
+				$nConf->usergrps_notify_new_fa         = array_unique(array_merge($nConf->usergrps_notify_new_fa,         $cats_usergrps_notify_new_fa));
+				$nConf->userlist_notify_new_pending    = array_unique(array_merge($nConf->userlist_notify_new_pending,    $cats_userlist_notify_new_pending));
+				$nConf->usergrps_notify_new_pending    = array_unique(array_merge($nConf->usergrps_notify_new_pending,    $cats_usergrps_notify_new_pending));
+				$nConf->usergrps_notify_new_pending_fa = array_unique(array_merge($nConf->usergrps_notify_new_pending_fa, $cats_usergrps_notify_new_pending_fa));
 				
-				$nConf->userlist_notify_existing          = array_unique(array_merge($nConf->userlist_notify_existing,          $cats_userlist_notify_existing));
-				$nConf->usergrps_notify_existing          = array_unique(array_merge($nConf->usergrps_notify_existing,          $cats_usergrps_notify_existing));
-				$nConf->userlist_notify_existing_reviewal = array_unique(array_merge($nConf->userlist_notify_existing_reviewal, $cats_userlist_notify_existing_reviewal));
-				$nConf->usergrps_notify_existing_reviewal = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal, $cats_usergrps_notify_existing_reviewal));
+				$nConf->userlist_notify_existing             = array_unique(array_merge($nConf->userlist_notify_existing,             $cats_userlist_notify_existing));
+				$nConf->usergrps_notify_existing             = array_unique(array_merge($nConf->usergrps_notify_existing,             $cats_usergrps_notify_existing));
+				$nConf->usergrps_notify_existing_fa          = array_unique(array_merge($nConf->usergrps_notify_existing_fa,          $cats_usergrps_notify_existing_fa));
+				$nConf->userlist_notify_existing_reviewal    = array_unique(array_merge($nConf->userlist_notify_existing_reviewal,    $cats_userlist_notify_existing_reviewal));
+				$nConf->usergrps_notify_existing_reviewal    = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal,    $cats_usergrps_notify_existing_reviewal));
+				$nConf->usergrps_notify_existing_reviewal_fa = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal_fa, $cats_usergrps_notify_existing_reviewal_fa));
 			}
 		}
+		//echo "<pre>"; print_r($nConf); exit;
 		
-		// (d) Convert user groups to user ids
+		// Construct configuation parameter names
 		$nConf_emails = new stdClass();
-		$ugrps = array(
-			'notify_new'=>'usergrps_notify_new',
-			'notify_new_pending'=>'usergrps_notify_new_pending',
-			'notify_existing'=>'usergrps_notify_existing',
-			'notify_existing_reviewal'=>'usergrps_notify_existing_reviewal'
-		);
+		$notify_types = array('notify_new', 'notify_new_pending', 'notify_existing', 'notify_existing_reviewal');
+		foreach ($notify_types as $ntype) {
+			$ugrps_fa[$ntype] = 'usergrps_'.$ntype.'_fa';
+			$ugrps   [$ntype] = 'usergrps_'.$ntype;
+			$ulist   [$ntype] = 'userlist_'.$ntype;
+		}
 		
-		$ulist = array(
-			'notify_new'=>'userlist_notify_new',
-			'notify_new_pending'=>'userlist_notify_new_pending',
-			'notify_existing'=>'userlist_notify_existing',
-			'notify_existing_reviewal'=>'userlist_notify_existing_reviewal'
-		);
-		
-		foreach ($ugrps as $ntype => $ug)
+		// (e) Get emails, but first convert user groups to user ids
+		foreach ($notify_types as $ntype)
 		{
 			$user_emails = array();
 			
@@ -3132,8 +3152,7 @@ class ParentClassItem extends JModelAdmin
 				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
 				$db->setQuery( $query );
 				$user_emails_ulist = $db->loadResultArray();
-				if ( $db->getErrorNum() ) echo $db->stdError();
-				//print_r($user_emails_ulist);
+				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
 			}
 			
 			$user_emails_ugrps = array();
@@ -3148,27 +3167,66 @@ class ParentClassItem extends JModelAdmin
 				}
 				$db->setQuery( $query );
 				$user_emails_ugrps = $db->loadResultArray();
-				if ( $db->getErrorNum() ) echo $db->stdError();
-				//print_r($user_emails_ugrps);
+				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
+			}
+			
+			$user_emails_ugrps_fa = array();
+			if ( FLEXI_ACCESS && count( $nConf->{$ugrps_fa[$ntype]} ) )
+			{
+				$final_groups = array();
+				foreach ( $nConf->{$ugrps_fa[$ntype]} as $fagrpid ) {
+					$curr_groups = FAccess::mgenfant( $fagrpid );
+					$final_groups = array_unique( array_merge ($final_groups,$curr_groups) );
+				}
+				//print_r($final_groups); exit;
+				
+				// emails for flexiaccess user groups
+				$query = "SELECT DISTINCT email FROM #__users as u"
+					." JOIN #__flexiaccess_groups ugm ON u.username=ugm.name AND ugm.type=2 AND ugm.id IN (".implode(",",$final_groups).")";
+				$db->setQuery( $query );
+				$user_emails_ugrps_fa_individual = $db->loadResultArray();
+				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
+				
+				
+				// emails for flexiaccess user groups
+				$query = "SELECT DISTINCT email FROM #__users as u"
+					." JOIN #__flexiaccess_members ugm ON u.id=ugm.member_id AND ugm.group_id IN (".implode(",",$final_groups).")";
+				$db->setQuery( $query );
+				$user_emails_ugrps_fa_collective = $db->loadResultArray();
+				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
+				
+				$user_emails_ugrps_fa = array_unique( array_merge ($user_emails_ugrps_fa_individual, $user_emails_ugrps_fa_collective) );
+				// if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps_fa); exit; }
 			}
 			
 			// merge them
-			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps) );
+			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps, $user_emails_ugrps_fa) );
 			
 			$nConf_emails->{$ntype} = $user_emails;
 		}
 		
 		$nConf->emails = $nConf_emails;
+		//echo "<pre>"; print_r($nConf); exit;
 		
 		return $nConf;
-	}	
+	}
 
 
 	// *****************************************************************************************
 	// If there are emails to notify for current saving case, then send the notifications emails
 	// *****************************************************************************************
-	function sendNotificationEmails($isnew, $needs_version_reviewal, $needs_publication_approval, $notify_emails, $notify_text, $before_cats, $after_cats, &$params)
+	function sendNotificationEmails(&$notify_vars, &$params, $manual_approval_request=0)
 	{
+		$needs_version_reviewal     = $notify_vars->needs_version_reviewal;
+		$needs_publication_approval = $notify_vars->needs_publication_approval;
+		
+		$isnew         = $notify_vars->isnew;
+		$notify_emails = $notify_vars->notify_emails;
+		$notify_text   = $notify_vars->notify_text;
+		$before_cats   = $notify_vars->before_cats;
+		$after_cats    = $notify_vars->after_cats;
+		$before_state  = $notify_vars->before_state;
+		
 		if ( !count($notify_emails) ) return true;
 		
 		$app     = & JFactory::getApplication();
@@ -3199,26 +3257,36 @@ class ParentClassItem extends JModelAdmin
 			}
 		}
 		
+		
 		// **************
 		// CREATE SUBJECT
 		// **************
-		
-		// (a) ADD INFO of being new or updated
-		$subject  = JText::_( $isnew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
-		
-		// (b) ADD INFO about editor's name and username (or being guest)
-		$subject .= !$user->id ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
-		
-		// (c) (new items) ADD INFO for content needing publication approval
-		if ($isnew) {
-			$subject .= ": ";
-			$subject .= JText::_( $needs_publication_approval ? 'FLEXI_NF_NEEDS_PUBLICATION_APPROVAL' : 'FLEXI_NF_NO_APPROVAL_NEEDED');
-		}
-		
-		// (d) (existing items with versioning) ADD INFO for content needing version reviewal
-		if ( !$isnew && $use_versioning) {
-			$subject .= ": ";
-			$subject .= JText::_( $needs_version_reviewal ? 'FLEXI_NF_NEEDS_VERSION_REVIEWAL' : 'FLEXI_NF_NO_REVIEWAL_NEEDED');
+		$srvname = ereg_replace('www\.','', $_SERVER['SERVER_NAME']);
+		$url     = parse_url($srvname);
+		$domain  = !empty($url["host"]) ? $url["host"] : $url["path"];
+		$subject = '['.$domain.'] - ';
+		if ( !$manual_approval_request ) {
+			
+			// (a) ADD INFO of being new or updated
+			$subject .= JText::_( $isnew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
+			
+			// (b) ADD INFO about editor's name and username (or being guest)
+			$subject .= !$user->id ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
+			
+			// (c) (new items) ADD INFO for content needing publication approval
+			if ($isnew) {
+				$subject .= ": ";
+				$subject .= JText::_( $needs_publication_approval ? 'FLEXI_NF_NEEDS_PUBLICATION_APPROVAL' : 'FLEXI_NF_NO_APPROVAL_NEEDED');
+			}
+			
+			// (d) (existing items with versioning) ADD INFO for content needing version reviewal
+			if ( !$isnew && $use_versioning) {
+				$subject .= ": ";
+				$subject .= JText::_( $needs_version_reviewal ? 'FLEXI_NF_NEEDS_VERSION_REVIEWAL' : 'FLEXI_NF_NO_REVIEWAL_NEEDED');
+			}
+			
+		} else {
+			$subject .= JText::_('FLEXI_APPROVAL_REQUEST');
 		}
 		
 		
@@ -3230,100 +3298,125 @@ class ParentClassItem extends JModelAdmin
 		$nf_extra_properties  = FLEXIUtilities::paramToArray($nf_extra_properties);
 		
 		// ADD INFO for item title
-		$body  = JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . ": ";
-		$body .= $this->get('title'). "<br>\r\n<br>\r\n";
+		$body  = '<u>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</u>: ";
+		$body .= $this->get('title'). "<br/>\r\n<br/>\r\n";
+		
+		// ADD INFO about state
+		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
+		
+		$body .= '<u>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</u>: ";
+		if ( !$isnew )
+		{
+			$body .= JText::_( $state_names[$before_state] ) . " &nbsp; ==> &nbsp; ";
+		}
+		$body .= JText::_( $state_names[$this->get('state')] ) ."<br/><br/>\r\n";
 		
 		// ADD INFO for author / modifier
 		if ( in_array('creator',$nf_extra_properties) )
 		{
-			$body .= JText::_( 'FLEXI_NF_CREATOR_LONG' ) . ": ";
-			$body .= $this->get('creator'). "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATOR_LONG' ) . "</u>: ";
+			$body .= $this->get('creator'). "<br/>\r\n";
 		}
 		if ( in_array('modifier',$nf_extra_properties) && !$isnew )
 		{
-			$body .= JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . ": ";
-			$body .= $this->get('modifier'). "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . "</u>: ";
+			$body .= $this->get('modifier'). "<br/>\r\n";
 		}
-		$body .= "<br>\r\n";
+		$body .= "<br/>\r\n";
 		
 		// ADD INFO about creation / modification times
 		if ( in_array('created',$nf_extra_properties) )
 		{
 			$date_created  =& JFactory::getDate($this->get('created'));
 			$date_created->setOffset($config->getValue('config.offset'));    // Use site's timezone
-			$body .= JText::_( 'FLEXI_NF_CREATION_TIME' ) . ": ";
-			$body .= $date_created->toFormat(). "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</u>: ";
+			$body .= $date_created->toFormat(). "<br/>\r\n";
 		}
 		if ( in_array('modified',$nf_extra_properties) && !$isnew )
 		{
 			$date_modified =& JFactory::getDate($this->get('modified'));
 			$date_modified->setOffset($config->getValue('config.offset'));   // Use site's timezone
-			$body .= JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . ": ";
-			$body .= $date_modified->toFormat(). "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . "</u>: ";
+			$body .= $date_modified->toFormat(). "<br/>\r\n";
 		}
-		$body .= "<br>\r\n";
+		$body .= "<br/>\r\n";
 		
 		// ADD INFO about category assignments
-		$body .= JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS');
+		$body .= '<u>'.JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS').'</u>';
 		if (!$isnew) {
-			$body .= " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br>\r\n &nbsp; ";
+			$body .= " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
+		} else {
+			$body .= " : <br/>\r\n";
 		}
-		$body .= implode("<br>\r\n &nbsp; ", $cats_titles);
+		foreach ($cats_titles as $i => $cats_title) {
+			$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+		}
 		
 		// ADD INFO for category assignments added or removed
 		if ( !empty($cats_added_titles) && count($cats_added_titles) ) {
-			$body .= JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . " : <br>\r\n &nbsp; ";
-			$body .= implode("<br>\r\n &nbsp; ", $cats_added_titles) . "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</u> : <br/>\r\n";
+			foreach ($cats_added_titles as $i => $cats_title) {
+				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+			}
 		}
 		if ( !empty($cats_removed_titles) &&  count($cats_removed_titles) ) {
-			$body .= JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . " : <br>\r\n &nbsp; ";
-			$body .= implode("<br>\r\n &nbsp; ", $cats_removed_titles) . "<br>\r\n";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . "</u> : <br/>\r\n";
+			foreach ($cats_removed_titles as $i => $cats_title) {
+				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+			}
 		}
-		$body .= "<br>\r\n<br>\r\n";
+		$body .= "<br/>\r\n<br/>\r\n";
 		
 		$lang = '&lang='. substr($this->get('language') ,0,2) ;
 		
 		// ADD INFO for custom notify text
-		$subject .= JText::_( $notify_text );
+		$subject .= ' '. JText::_( $notify_text );
 		
 		// ADD INFO for view/edit link
 		if ( in_array('viewlink',$nf_extra_properties) )
 		{
-			$body .= JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid')) . $lang);
-			$body .= $link . "<br>\r\n<br>\r\n";
+			$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )
 		{
-			$body .= JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . " : <br>\r\n &nbsp; ";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$link = JRoute::_( JURI::root(false).'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
-			$body .= $link . "<br>\r\n<br>\r\n";
+			$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkbe',$nf_extra_properties) )
 		{
-			$body .= JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . " : <br>\r\n &nbsp; ";
+			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$fc_ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 			$link = JRoute::_( JURI::root(false).'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
-			$body .= $link . "<br>\r\n<br>\r\n";
+			$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		
 		// ADD INFO for introtext/fulltext
 		if ( $params->get('nf_add_introtext') )
 		{
 			//echo "<pre>"; print_r($this->_item); exit;
-			$body .= ' ************* '.JText::_( 'FLEXI_NF_INTROTEXT_LONG' ) . " ************* <br>\r\n &nbsp; ";
+			$body .= "<br/><br/>\r\n";
+			$body .= "*************************************************************** <br/>\r\n";
+			$body .= JText::_( 'FLEXI_NF_INTROTEXT_LONG' ) . "<br/>\r\n";
+			$body .= "*************************************************************** <br/>\r\n";
 			$body .= flexicontent_html::striptagsandcut( $this->get('introtext'), 200 );
-			$body .= "<br>\r\n *************************************************************** <br>\r\n<br>\r\n";
 		}
 		if ( $params->get('nf_add_fulltext') )
 		{
-			$body .= ' ************* '.JText::_( 'FLEXI_NF_FULLTEXT_LONG' ) . " ************* <br>\r\n &nbsp; ";
+			$body .= "<br/><br/>\r\n";
+			$body .= "*************************************************************** <br/>\r\n";
+			$body .= JText::_( 'FLEXI_NF_FULLTEXT_LONG' ) . "<br/>\r\n";
+			$body .= "*************************************************************** <br/>\r\n";
 			$body .= flexicontent_html::striptagsandcut( $this->get('fulltext'), 200 );
-			$body .= "<br>\r\n *************************************************************** <br>\r\n<br>\r\n";
 		}
-
-
+		
+		
+		// **********
 		// Send email
+		// **********
+		
 		jimport( 'joomla.utilities.utility' );
 		$send_result = JUtility::sendMail(
 			$from = $config->getValue( 'config.mailfrom' ),
@@ -3334,12 +3427,12 @@ class ParentClassItem extends JModelAdmin
 			$attachment=null, $replyto=null, $replytoname=null);
 		
 		$debug_str = ""
-			."<br>FROM: $from"
-			."<br>FROMNAME:  $fromname <br>"
-			."<br>RECIPIENTS: " .implode(",", $recipient)
-			."<br>BCC:". implode(",",$bcc)."<br>"
-			."<br>SUBJECT: $subject <br>"
-			."<br>BODY:<br> $body <br>"
+			."<br/>FROM: $from"
+			."<br/>FROMNAME:  $fromname <br/>"
+			."<br/>RECIPIENTS: " .implode(",", $recipient)
+			."<br/>BCC: ". implode(",",$bcc)."<br/>"
+			."<br/>SUBJECT: $subject <br/>"
+			."<br/><br/>**********<br/>BODY<br/>**********<br/> $body <br/>"
 			;
 		
 		if ($send_result) {
@@ -3397,6 +3490,208 @@ class ParentClassItem extends JModelAdmin
 		
 		return $data;
 	}
+	
+	
+	/**
+	 * Method to build an object with the items submitted to approval
+	 * it also verifies if the item state are correct (draft state is -4) 
+	 * and if it belongs to the user
+	 *
+	 * @access	public
+	 * @params	array
+	 * @return	object
+	 * @since	1.5
+	 */
+	function isUserDraft($cid)
+	{
+		$user 	=& JFactory::getUser();
+
+		if ($cid)
+		{
+			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle from #__content AS c'
+					. ' LEFT JOIN #__categories AS cat on cat.id = c.catid'
+					. ' WHERE c.state = -4'
+					. ' AND c.created_by = ' . (int) $user->get('id')
+					. (FLEXI_J16GE ? ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
+					. ' AND c.id IN ( '. implode(',', $cid).' )'
+					. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
+					;
+			$this->_db->setQuery( $query );
+			$cids = $this->_db->loadObjectList();
+			
+			if (!$this->_db->query()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
+		}
+
+		return $cids;
+	}
+	
+	
+	/**
+	 * Method to find validators for an item
+	 *
+	 * @access	public
+	 * @params	int			the id of the item
+	 * @params	int			the catid of the item
+	 * @return	object		the validators object
+	 * @since	1.5
+	 */
+	function getApprovalRequestReceivers($id, $catid)
+	{
+		$validators = new stdClass();
+		/*if ( FLEXI_ACCESS ) {   // Compatibility with previous flexi versions
+			global $globalcats;
+		
+			$query	= 'SELECT DISTINCT aro from #__flexiaccess_acl'
+					. ' WHERE acosection = ' . $this->_db->Quote('com_content')
+					. ' AND aco = ' . $this->_db->Quote('publish')
+					// first step : get all groups that can publish everything
+					. ' AND ( ( axosection = ' . $this->_db->Quote('content') . ' AND axo = ' . $this->_db->Quote('all') . ' )'
+					// second step : get all groups that can publish in the item's cats (main cat and ancestors)
+					. ' OR 	( axosection = ' . $this->_db->Quote('category') . ' AND axo IN ( ' . $globalcats[$catid]->ancestors . ') )'
+					// third step : get all groups that can publish this specific item
+					. ' OR 	( axosection = ' . $this->_db->Quote('item') . ' AND axo = ' . $id . ' ) )'
+					;
+			$this->_db->setQuery($query);
+			$publishers = $this->_db->loadResultArray();
+		
+			// find all nested groups
+			if ($publishers) {
+				$users = $publishers;
+				foreach ($publishers as $publisher) {
+					$validators = FAccess::mgenfant($publisher);
+					$users = array_merge($users, $validators);
+				}
+			}
+			
+			// get all users from these groups that wants to receive system emails
+			$query	= 'SELECT DISTINCT u.email from #__flexiaccess_members AS m'
+					. ' LEFT JOIN #__users AS u ON u.id = m.member_id'
+					. ' WHERE m.group_id IN ( ' . implode(',', $users) . ' )'
+					. ' AND u.sendEmail = 1'
+					;		
+			$this->_db->setQuery($query);
+			$validators->notify_emails = $this->_db->loadResultArray();
+			$validators->notify_text = '';
+		} else {*/
+			// J1.5 with no FLEXIaccess or J2.5+
+			
+			// Get component parameters and them merge into them the type parameters
+			$params  = new JParameter("");
+			$cparams = JComponentHelper::getParams('com_flexicontent');
+			$params->merge($cparams);
+		
+			$tparams = $this->getTypeparams();
+			$tparams = new JParameter($tparams);
+			$params->merge($tparams);
+			
+			// Get notifications configuration and select appropriate emails for current saving case
+			$nConf = & $this->getNotificationsConf($params);
+		
+			$validators->notify_emails = $nConf->emails->notify_new_pending;
+		
+			$validators->notify_text = '';//$params->get('text_notify_new_pending');
+		//}
+		//print_r($validators); exit;
+		
+		return $validators;
+	}
+	
+	
+	/**
+	 * Logic to submit item to approval
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function approval($cid)
+	{
+		$db = & $this->_db;
+		$approvables = $this->isUserDraft($cid);
+		
+		$submitted = 0;
+		$publishable = array();
+		foreach ($approvables as $approvable) {
+			// Get item setting it into the model, and get publish privilege
+			$item = & $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
+			$canEditState = $this->canEditState( $item, $check_cat_perm=true );
+			if ( $canEditState ) {
+				$publishable[] = $item->title;
+				continue;
+			}
+				
+			// Set to pending approval
+			$this->setitemstate($approvable->id, -3);
+				
+			$validators = $this->getApprovalRequestReceivers($approvable->id, $approvable->catid);
+				
+			if ( !count($validators->notify_emails) ) {
+				$validators->notify_emails[] = JFactory::getApplication()->getCfg('mailfrom');
+			}
+					
+			// Get component parameters and them merge into them the type parameters
+			$params  = new JParameter("");
+			$cparams = JComponentHelper::getParams('com_flexicontent');
+			$params->merge($cparams);
+				
+			$tparams = $this->getTypeparams();
+			$tparams = new JParameter($tparams);
+			$params->merge($tparams);
+					
+			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' WHERE rel.itemid = '.(int) $approvable->id;
+			$db->setQuery( $query );
+			$after_cats = $db->loadObjectList('id');
+					
+			$notify_vars = new stdClass();
+			$notify_vars->needs_version_reviewal     = 0;
+			$notify_vars->needs_publication_approval = 1;
+			$notify_vars->isnew         = 1;
+			$notify_vars->notify_emails = $validators->notify_emails;
+			$notify_vars->notify_text   = $validators->notify_text;
+			$notify_vars->before_cats   = array();
+			$notify_vars->after_cats    = $after_cats;
+			$notify_vars->before_state  = null;
+					
+			$this->sendNotificationEmails($notify_vars, $params, $manual_approval_request=1);
+			$submitted++;
+		}
+		
+		// Number of submitted items
+		if ( $submitted) {
+			$approve_str = submitted > 1 ? 'FLEXI_APPROVAL_ITEMS_SUBMITTED' : 'FLEXI_APPROVAL_ITEM_SUBMITTED';
+			$msg = $submitted . JText::_( $approve_str ) .' '. $msg;
+		} else {
+			$msg = JText::_( 'FLEXI_APPROVAL_NO_ITEMS_SUBMITTED' );
+		}
+			
+		// Number of excluded items, and message that items must be owned and in draft state
+		$excluded = count($cid) - submitted;
+		$msg .= $excluded  ?  ' '. $excluded .' '. JText::_( 'FLEXI_APPROVAL_ITEMS_EXCLUDED' )  :  '';
+		
+		// Message about excluded publishable items, that can be published by the owner
+		if ( count($publishable) ) {
+			$publishable_str = '"'. implode('" , "', $publishable) .'"';
+			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_PUBLISHABLE_EXCLUDED', $publishable_str).'</div>';
+		}
+		
+		
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+		} else {
+			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache->clean();
+		}
+		
+		return $msg;
+	}
+	
+	
 	
 }
 ?>
