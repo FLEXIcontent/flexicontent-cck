@@ -45,13 +45,23 @@ var processstate = new Class(
 
 	dostate: function( state, id ) {
 		var url = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
-		var setstate = new Ajax(url, {
-			method: 'get',
-			evalScripts: false,
-			update: 'row' + id
-			//,onComplete: hider
-		});
-		setstate.request();
+		if (MooTools.version>='1.2.4') {
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				evalScripts: false,
+				update: $('row' + id)
+				//,onComplete: hider
+			}).send();
+		} else {
+			var setstate = new Ajax(url, {
+				method: 'get',
+				evalScripts: false,
+				update: 'row' + id
+				//,onComplete: hider
+			});
+			setstate.request();		
+		}
 		
 		//function hider(response) {
 		//	alert(response);

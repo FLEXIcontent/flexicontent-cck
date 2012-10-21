@@ -3,19 +3,30 @@
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-Object.append(Browser.Features, {
-	inputemail: (function() {
-		var i = document.createElement("input");
-		i.setAttribute("type", "email");
-		return i.type !== "text";
-	})()
-});
+if (MooTools.version>="1.2.4") {  // Instruction browser of new type of fields
+	Object.append(Browser.Features, {
+		inputemail: (function() {
+			var i = document.createElement("input");
+			i.setAttribute("type", "email");
+			return i.type !== "text";
+		})()
+	});
+}
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 var flexi_j16ge = 1;
 var tab_focused;
 var max_cat_assign_fc = 0;
 var existing_cats_fc  = [];
 var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
+var fcflabels = null;
 
 /**
  * Unobtrusive Form Validation library
@@ -260,18 +271,21 @@ var JFormValidator = new Class({
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
 		form.getElements('input,textarea,select,button').each(function(el){
-			el = document.id(el);
+			el = (MooTools.version>="1.2.4")  ?  document.id(el)  :  $(el);
 			if (el.hasClass('required')) {
-				el.set('aria-required', 'true');
 				el.set('required', 'required');
+				if (flexi_j16ge) el.set('aria-required', 'true');
 			}
-			if ((el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit') {
+			var validate_flag = (MooTools.version>="1.2.4")  ?  
+				(el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit'  :
+				(el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit';
+			if (validate_flag) {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}
 			} else {
 				el.addEvent('blur', function(){return document.formvalidator.validate(this);});
-				if (el.hasClass('validate-email') && Browser.Features.inputemail) {
+				if ( MooTools.version>="1.2.4" && el.hasClass('validate-email') && Browser.Features.inputemail ) {
 					el.type = 'email';
 				}
 			}
@@ -401,33 +415,45 @@ var JFormValidator = new Class({
 			}
 		}
 		
+		// Executed only once to retrieve and hash all label via their for property
+		if ( !fcflabels )
+		{
+			fcflabels = new Object;
+			labels = $$('label');
+			labels.each( function(g) {
+				label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
+				if ( label_for )  fcflabels[ label_for ] = g;
+			} );
+			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
+		}
+		
 		// Find the label object for the given field if it exists
-		if (!(el.labelref)) {
-			var labels = $$('label');
-			labels.each(function(label){
-				if (label.get('for') == el.get('id') ||
-						label.get('for') == el.get('name') ||
-						label.get('for')+'[]' == el.get('name')
-				) {
-					el.labelref = label;
-				}
-			});
+		var el_id = (MooTools.version>="1.2.4") ? el.get('id') : el.getProperty('id');
+		if ( !(el.labelref) && el_id )
+		{
+			var lblfor = el_id;
+			if ( !el.labelref )  el.labelref = fcflabels[   lblfor   ];
+			if ( !el.labelref )  el.labelref = fcflabels[   lblfor = lblfor.replace(/_[0-9]+$/, '')   ];
+			if (flexi_j16ge) {
+				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = lblfor.replace(/custom_/, '')   ];
+				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = 'custom_' + lblfor   ];
+			}
 		}
 
 		// Set the element and its label (if exists) invalid state
 		if (state == false) {
 			el.addClass('invalid');
-			el.set('aria-invalid', 'true');
+			if (flexi_j16ge) el.set('aria-invalid', 'true');
 			if (el.labelref) {
 				document.id(el.labelref).addClass('invalid');
-				document.id(el.labelref).set('aria-invalid', 'true');
+				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'true');
 			}
 		} else {
 			el.removeClass('invalid');
-			el.set('aria-invalid', 'false');
+			if (flexi_j16ge) el.set('aria-invalid', 'false');
 			if (el.labelref) {
 				document.id(el.labelref).removeClass('invalid');
-				document.id(el.labelref).set('aria-invalid', 'false');
+				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'false');
 			}
 		}
 	}

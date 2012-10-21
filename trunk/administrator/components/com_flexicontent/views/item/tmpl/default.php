@@ -494,7 +494,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
 									<div class='clear' style='display:block; float:left; clear:both!important'></div>
 									
-									<label for="<?php echo $field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
+									<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 										<?php echo $field->label; ?>
 									</label>
 										
