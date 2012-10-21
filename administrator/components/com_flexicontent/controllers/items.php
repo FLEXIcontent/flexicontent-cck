@@ -375,7 +375,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		switch ($task)
 		{
 			case 'apply' :
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.(int) $model->get('id');
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid='.(int) $model->get('id');
 				break;
 			case 'saveandnew' :
 				if(isset($post['type_id']))

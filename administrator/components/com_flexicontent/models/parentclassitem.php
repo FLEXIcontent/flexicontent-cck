@@ -270,7 +270,10 @@ class ParentClassItem extends JModel
 		// (b1) use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
 		// (b2) or call getItem($pk, $check_view_access=true) passing the item id and maybe also disabling read access checkings, to avoid unwanted messages/errors
 		static $items = array();
-		if ( isset($items[$this->_id]) && $no_cache==false ) {
+		if ( $no_cache ) {
+			// Clear item to make sure it is reloaded
+			$this->_item = null;
+		} else if ( isset($items[$this->_id]) ) {
 			$this->_item = & $items[$this->_id];
 			return (boolean) $this->_item;
 		}
@@ -2091,7 +2094,7 @@ class ParentClassItem extends JModel
 				
 				// Trigger onAfterSaveField Event
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( $field, &$postdata[$field->name], &$files[$field->name] ));
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
 				// *** $result is ignored
 				$searchindex 	.= @$field->search;
 			}
@@ -3261,7 +3264,7 @@ class ParentClassItem extends JModel
 		// **************
 		// CREATE SUBJECT
 		// **************
-		$srvname = ereg_replace('www\.','', $_SERVER['SERVER_NAME']);
+		$srvname = preg_replace('#www\.#','', $_SERVER['SERVER_NAME']);
 		$url     = parse_url($srvname);
 		$domain  = !empty($url["host"]) ? $url["host"] : $url["path"];
 		$subject = '['.$domain.'] - ';
@@ -3421,7 +3424,7 @@ class ParentClassItem extends JModel
 		$send_result = JUtility::sendMail(
 			$from = $config->getValue( 'config.mailfrom' ),
 			$fromname = $config->getValue( 'config.fromname' ),
-			$recipient = $params->get('nf_send_as_bcc', 0) ? $from : $notify_emails,
+			$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails,
 			$subject,	$body, $html_mode=true, $cc=null,
 			$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null,
 			$attachment=null, $replyto=null, $replytoname=null);
