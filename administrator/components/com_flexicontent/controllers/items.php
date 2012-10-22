@@ -770,22 +770,29 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=items';
 		$task  = JRequest::getVar('task');
+		$debug = JRequest::getInt( 'debug', 0 );
 		$mainframe = &JFactory::getApplication();
+		$db    = & JFactory::getDBO();
 		
 		if ($task == 'importcsv')
 		{
-			// Retrieve from configuration for (a) typeid(a) main category, (b) secondaries categories
+			// Retrieve from configuration for (a) typeid, language, main category, secondaries categories, etc
 			$type_id 	= JRequest::getInt( 'type_id', 0 );
+			$language	= JRequest::getVar( 'language', '' );
+			
 			$maincat 	= JRequest::getInt( 'maincat', 0 );
-			$seccats 	= JRequest::getVar( 'seccats', array(0), 'post', 'array' );
-			if( !$maincat ) $maincat = @$seccats[0];
+			$maincat_col = JRequest::getInt( 'maincat_col', 0 );
+			
+			$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
+			$seccats_col = JRequest::getInt( 'seccats_col', 0 );
 			
 			if( !$type_id ) {
 				// Check for the required Content Type Id
 				$this->setRedirect($link, "Please select Content Type for the imported items");
 				return;
 			}
-			if( !$maincat ) {
+			
+			if( !$maincat && !$maincat_col ) {
 				// Check for the required main category
 				$this->setRedirect($link, "Please select main category for the imported items");
 				return;
@@ -814,34 +821,40 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Read & Parse the CSV file according the given format
 			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $field_separator, $enclosure_char, $record_separator);
 			
-			// alternative way of reading / parsing CSV data ...
-			/*require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'DataSource.php');
-			$csv = new File_CSV_DataSource;
-			$csv->load($csvfile);
-			$columns = $csv->getHeaders();
-			
-			$fp  = fopen($csvfile, 'r');
-			$line = fgetcsv($fp, 0, ',', '"');
-			if(count($line)<=0) {
-				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
-				return;
-			}
-			//echo "<xmp>"; var_dump($csv->getRows()); echo "</xmp>";
-			$contents = $csv->connect();*/
-			
 			// Basic error checking, for empty data
 			if(count($contents[0])<=0) {
-				$this->setRedirect($link, "Upload file error! CSV file for mat is not correct 1.");
+				$this->setRedirect($link, "Upload file error! CSV file format is not correct.");
 				return;
 			}
 			
 			// Get field names (from the header line (row 0), and remove it form the data array
 			$columns = flexicontent_html::arrayTrim($contents[0]);
-			unset($contents[0]);  //echo "<pre>"; print_r($columns); exit;
+			unset($contents[0]);
+			$q = "SELECT id, name FROM #__flexicontent_fields";
+			$db->setQuery($q);
+			$thefields = $db->loadObjectList('name');
+			$core_props = array('catid', 'cid', 'language', 'alias');
+			foreach($columns as $colname) {
+				if ( !in_array($colname, $core_props) && !isset($thefields[$colname]) ) {
+					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
+				}
+			}
 			
-			// Check for the (required) title column
+			// Check for the (required) title column and other columns
 			if(!in_array('title', $columns)) {
 				$this->setRedirect($link, "Upload file error! CSV file format is not correct 2.");
+				return;
+			}
+			if ( $maincat_col && !in_array('catid', $columns) ) {
+				$this->setRedirect($link, "CSV file lacks column 'catid' (primary category)");
+				return;
+			}
+			if ( $seccats_col && !in_array('cid', $columns) ) {
+				$this->setRedirect($link, "CSV file lacks column 'cid' (secondary categories)");
+				return;
+			}
+			if ( !$language && !in_array('language', $columns) ) {
+				$this->setRedirect($link, "CSV file lacks column 'language'");
 				return;
 			}
 			
@@ -855,6 +868,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				// Prepare request variable used by the item's Model
 				$data = array();
 				$data['type_id'] = $type_id;
+				$data['language']= $language;
 				$data['catid']   = $maincat;
 				$data['cid']     = $seccats;
 				$data['vstate']  = 2;
@@ -864,7 +878,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				foreach($fields as $col_no => $field_data)
 				{
 					$fieldname = $columns[$col_no];
-					if ($fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
+					if ($fieldname=='title' || $fieldname=='text' || $fieldname=='alias' || $fieldname=='language' || $fieldname=='catid' || $fieldname=='cid') {
 						$field_values = $field_data;
 					} else {
 						// Split multi-value field
@@ -891,30 +905,55 @@ class FlexicontentControllerItems extends FlexicontentController
 					}
 					
 					// Assign array of field values to the item data row
-					if (!FLEXI_J16GE || $fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
+					if ( $fieldname=='language' )
+					{
+						if ( !$language ) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='catid' )
+					{
+						if ($maincat_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='cid' )
+					{
+						if ($seccats_col) $data[$fieldname] = preg_split("/[\s]*,[\s]*/", $field_values);
+					}
+					else if (!FLEXI_J16GE || $fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
 						$data[$fieldname] = $field_values;
-					} else {
+					}
+					else
+					{
 						$data['custom'][$fieldname] = $field_values;
 					}
-					
-					
 				}
-				//echo "<pre>"; print_r($data); exit;
 				
-				// Set/Force id to zero to indicate creation of new item
-				$data['id'] = 0;
 				
-				// Finally try to create the item by using Item Model's store() method
-				if( !$model->store($data) ) {
-					$msg = $cnt . ". Import item with title: '" . $data['title'] . "' error" ;
-					JError::raiseWarning( 500, $msg ." " . $model->getError() );
+				if ( $debug ) {
+					if ($cnt==1) {
+						echo 'Parsing result of the first '.$debug.' records (<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page): <br/><br/>';
+						echo "\n\nCOLUMNS: ". implode(', ', $columns) ."<br />\n";
+					}
+					echo "<pre>\n\n\n\nRECORD no $cnt:\n"; print_r($data); echo "</pre>";
+					if ($cnt==$debug) break;
 				} else {
-					$msg = $cnt . ". Import item with title: '" . $data['title'] . "' success" ;
-					$mainframe->enqueueMessage($msg);
+					// Set/Force id to zero to indicate creation of new item
+					$data['id'] = 0;
+					
+					// Finally try to create the item by using Item Model's store() method
+					if( !$model->store($data) ) {
+						$msg = $cnt . ". Import item with title: '" . $data['title'] . "' error" ;
+						JError::raiseWarning( 500, $msg ." " . $model->getError() );
+					} else {
+						$msg = $cnt . ". Import item with title: '" . $data['title'] . "' success" ;
+						$mainframe->enqueueMessage($msg);
+					}
 				}
 				$cnt++;
 			}
 			//fclose($fp);
+			if ( $debug ) {
+				echo "\n\n\n".'<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page'."\n\n\n";
+				jexit();
+			}
 			
 			// Clean item's cache, but is this needed when adding items ?
 			if (FLEXI_J16GE) {

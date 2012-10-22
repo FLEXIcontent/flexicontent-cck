@@ -185,7 +185,41 @@ $files_tbl_cols = $db->loadResultArray();
 $query = "SHOW COLUMNS FROM #__flexicontent_fields";
 $db->setQuery($query);
 $fields_tbl_cols = $db->loadResultArray();
+
+$query = "SELECT count(*) FROM `#__flexicontent_fields` WHERE field_type IN (`hidden`)";
+$db->setQuery($query);
+$deprecated_fields = $db->loadResult();
 ?>
+
+<?php
+// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
+?>
+		<tr class="row1">
+			<td class="key">Run SQL "UPDATE `...__flexicontent_fields` SET field_type=`text` WHERE field_type IN (`hidden`,`textselect`)"
+			<?php
+			$already = true;
+			$result = false;
+			if( $deprecated_fields ) {
+				$already = false;
+				$query = "UPDATE `#__flexicontent_fields` SET field_type=`text` WHERE field_type IN (`hidden`,`textselect`)";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: No deprecated fields found.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Deprecated Fields converted to 'text' field type.");
+				} else {
+					echo JText::_("UPDATE TABLE command UNSUCCESSFUL.");
+				}
+				?></span>
+			</td>
+		</tr>
 
 <?php
 // Alter DB table flexicontent_files: Add description column
