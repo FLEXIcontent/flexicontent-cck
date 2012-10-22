@@ -172,7 +172,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 
 <div id="flexicontent" class="flexi_edit" >
-<form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm" autocomplete="off">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">

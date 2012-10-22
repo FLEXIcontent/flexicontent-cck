@@ -270,15 +270,14 @@ var JFormValidator = new Class({
 	attachToForm: function(form)
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
-		form.getElements('input,textarea,select,button').each(function(el){
+		var formElements = (MooTools.version>="1.2.4")  ?  form.getElements('input,textarea,select,button')  :  $A(form.elements);
+		formElements.each(function(el){
 			el = (MooTools.version>="1.2.4")  ?  document.id(el)  :  $(el);
 			if (el.hasClass('required')) {
-				el.set('required', 'required');
+				(MooTools.version>="1.2.4") ? el.set('required', 'required') : el.setProperty('required', 'required');
 				if (flexi_j16ge) el.set('aria-required', 'true');
 			}
-			var validate_flag = (MooTools.version>="1.2.4")  ?  
-				(el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit'  :
-				(el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit';
+			var validate_flag = (MooTools.version>="1.2.4")  ?  (el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit'  :  (el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit';
 			if (validate_flag) {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
@@ -438,20 +437,21 @@ var JFormValidator = new Class({
 				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = lblfor.replace(/custom_/, '')   ];
 				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = 'custom_' + lblfor   ];
 			}
+			if ( !el.labelref )   el.labelref = '-1';
 		}
 
 		// Set the element and its label (if exists) invalid state
 		if (state == false) {
 			el.addClass('invalid');
 			if (flexi_j16ge) el.set('aria-invalid', 'true');
-			if (el.labelref) {
+			if (el.labelref && el.labelref!='-1') {
 				document.id(el.labelref).addClass('invalid');
 				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'true');
 			}
 		} else {
 			el.removeClass('invalid');
 			if (flexi_j16ge) el.set('aria-invalid', 'false');
-			if (el.labelref) {
+			if (el.labelref && el.labelref!='-1') {
 				document.id(el.labelref).removeClass('invalid');
 				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'false');
 			}

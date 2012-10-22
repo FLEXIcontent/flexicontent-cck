@@ -82,10 +82,32 @@ class FlexicontentViewImport extends JView {
 		$categories = $globalcats;
 		
 		// build the main category select list
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
+		$actions_allowed = array('core.create');
+		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, true, $actions_allowed);
 		// build the secondary categories select list
-		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
-
+		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, true, $actions_allowed);
+		
+		
+		//build languages list
+		// Retrieve author configuration
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+		if ( $authorparams = $db->loadResult() )
+			$authorparams = new JParameter($authorparams);
+		
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		
+		
+		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
+		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', flexicontent_html::getSiteDefaultLang(), 4, $allowed_langs);
+		} else {
+			$default_lang = flexicontent_html::getSiteDefaultLang();
+			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'FLEXI_DEFAULT' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
+			$lists['languages'] = JHTML::_('select.genericlist', $languages, 'language', $class='', 'value', 'text', $default_lang );
+		}
+		
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('cid'      	, $cid);

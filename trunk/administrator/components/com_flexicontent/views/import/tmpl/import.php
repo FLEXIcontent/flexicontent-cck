@@ -36,7 +36,7 @@ function submitbutton(task) {
 		$("type_id").focus();
 		return;
 	}
-	if( $("maincat").value.length<=0 ) {
+	if( $("maincat").value.length<=0 && !$("maincat_col").checked ) {
 		alert("Please select primary category");
 		$("maincat").focus();
 		return;
@@ -70,6 +70,12 @@ function submitbutton(task) {
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span></label></td>
 						<td><?php echo $this->lists['type_id'];?></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
+						<td><?php echo $this->lists['languages'];?></td>
+						<td><span style='font-weight:bold; color:green'> Keep source language means that your data will include a column with named 'language', with language codes e.g. en-GB, fr-FR, etc</span></td>
 					</tr>
 				</table>
 			</fieldset>
@@ -84,8 +90,15 @@ function submitbutton(task) {
 						<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
 						<td><?php echo $this->lists['maincat']; ?></td>
 						<td>&nbsp;</td>
-						<td class="key"><label class="fcimport" for="seccat"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
+						<td class="key"><label class="fcimport" for="seccats"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
 						<td><?php echo $this->lists['seccats']; ?></td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="maincat_col">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label><br />(Use 'catid' column, e.g. 54)</label></td>
+						<td><input type="checkbox" id="maincat_col" name="maincat_col" value="1" /></td>
+						<td>&nbsp;</td>
+						<td class="key"><label class="fcimport" for="seccats_col">File override <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label><br />(Use 'cid' column, e.g. 54,14,51)</td>
+						<td><input type="checkbox" id="seccats_col" name="seccats_col" value="1" /></td>
 					</tr>
 				</table>
 			</fieldset>
@@ -133,6 +146,15 @@ function submitbutton(task) {
 						</td>
 						<td>
 							<input type="file" name="csvfile" id="csvfile" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<label class="fcimport" for="csvfile"><span style="color:red;">Debug first records</span>
+							</label>
+						</td>
+						<td>
+							<input type="text" name="debug" id="debug" value="0" /> &nbsp; <span style='font-weight:bold; color:green'> Leave zero for no debugging, print the first nn records (items), without trying to insert any data </span>
 						</td>
 					</tr>
 				</table>
