@@ -48,6 +48,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			$this->registerTask( 'accessspecial', 	'access' );
 		}
 		$this->registerTask( 'copy', 				'copy' );
+		$this->registerTask( 'copy_wvalues', 	'copy' );
 	}
 
 	/**
@@ -543,6 +544,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$model = $this->getModel('fields');
 		$user  =& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$task  = JRequest::getVar( 'task', 'copy' );
 		
 		// calculate access
 		if (FLEXI_J16GE) {
@@ -590,13 +592,21 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		// Try to copy fields
-		if(!$model->copy( $auth_cid )) {
+		$ids_map = $model->copy( $auth_cid );
+		if ( !$ids_map ) {
 			$msg = JText::_( 'FLEXI_FIELDS_COPY_FAILED' );
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
+			if ($task == 'copy_wvalues') {
+				// Also copy field values assigned to items
+				$model->copyvalues( $ids_map );
+			}
 			$msg = '';
-			if (count($auth_cid)) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($auth_cid)) . ' ';
+			if (count($ids_map)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($ids_map)) . ' ';
+			}
+			if ( count($auth_cid)-count($ids_map) ) {
+				//$msg .= JText::sprintf('FLEXI_FIELDS_SKIPPED_DURING_COPY', count($auth_cid)-count($ids_map)) . ' ';
 			}
 			if (count($core_cid)) {
 				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($core_cid)) . ' ';

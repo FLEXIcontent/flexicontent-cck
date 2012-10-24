@@ -91,6 +91,7 @@ class FlexicontentViewFields extends JView {
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
 		if ($permission->CanCopyFields) {
 			JToolBarHelper::customX( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+			JToolBarHelper::customX( $contrl.'copy_wvalues', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
 		}
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
