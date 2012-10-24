@@ -509,25 +509,67 @@ class FlexicontentModelFields extends JModel
 	 */
 	function copy($cid = array())
 	{
-		if (count( $cid ))
-		{
-			foreach ($cid as $id) {
-				// only non core fields
-				if ($id > 14) {
-					$field  =& $this->getTable('flexicontent_fields', '');
-					$field->load($id);
-					$field->id = 0;
-					$field->name = 'field' . ($this->_getLastId() + 1);
-					$field->label = $field->label . ' [copy]';
-					$field->check();
-					$field->store();
-				}				
-			}
-			return true;
+		if ( !count( $cid ) ) return false;
+		
+		$ids_map = array();
+		foreach ($cid as $id) {
+			// only non core fields
+			if ($id > 14) {
+				$field  =& $this->getTable('flexicontent_fields', '');
+				$field->load($id);
+				if ( in_array($field->field_type, array('image')) ) {
+					$params = new JParameter($field->attribs);
+					if ($params->get('image_source')) {
+						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
+						continue;
+					}
+				}
+				$field->id = 0;
+				$field->name = 'field' . ($this->_getLastId() + 1);
+				$field->label = $field->label . ' [copy]';
+				$field->check();
+				$field->store();
+				$ids_map[$id] = $field->id;
+			}				
 		}
-		return false;
+		
+		if ( !count( $ids_map ) ) return false; 
+		return $ids_map;
 	}
-
+	
+	
+	/**
+	 * Method to copy field values of duplicated (copied) fields
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function copyvalues($ids_map = array())
+	{
+		if ( !count( $ids_map ) ) return false;
+		
+		foreach ($ids_map as $source_id => $target_id) {
+			// Copy field - content type assignments
+			$query = 'INSERT INTO #__flexicontent_fields_type_relations (field_id, type_id, ordering)'
+				.' SELECT '.$target_id.', type_id, ordering FROM #__flexicontent_fields_type_relations as rel'
+				.' WHERE rel.field_id='.$source_id;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			
+			// Copy field values assigned to items
+			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, value)'
+				.' SELECT '.$target_id.',item_id, valueorder, value FROM #__flexicontent_fields_item_relations as rel'
+				.' WHERE rel.field_id='.$source_id;
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+		}
+		return true;
+	}
+	
+	
 	/**
 	 * Method to get types list when performing an edit action
 	 * 
