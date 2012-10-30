@@ -19,14 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsRelateditems extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsRelateditems( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_relateditems', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsRelateditems::onDisplayField($field, $item);
-	}
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		global $globalcats;
@@ -331,18 +340,9 @@ window.addEvent( 'domready', function() {
 		$doc = & JFactory::getDocument();
 		$doc->addScriptDeclaration( $js );
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'relateditems') return;
-		if(!$post) return;
-		
-		//$post = serialize($post);
-	}
-
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		$field->label = JText::_($field->label);
@@ -491,12 +491,37 @@ window.addEvent( 'domready', function() {
 		}
 	}
 	
-	/**
-	 * Build the order clause
-	 *
-	 * @access private
-	 * @return string
-	 */
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'relateditems') return;
+		if(!is_array($post) && !strlen($post)) return;
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
+	//  Build the order clause
 	function _buildItemOrderBy($order)
 	{
 		$params = & $field->parameters;

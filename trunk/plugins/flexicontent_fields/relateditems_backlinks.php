@@ -4,14 +4,7 @@
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.relateditems_backlinks
- * @license GNU/GPL v2
- *
- * Orignal file : selectmultiple.php
- * @version 1.0 $Id: selectmultiple.php 175 2009-11-07 10:24:30Z vistamedia $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.selectmultiple
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @copyright (C) 2011 ggppdk
  * @license GNU/GPL v2
  *
  * FLEXIcontent is distributed in the hope that it will be useful,
@@ -27,13 +20,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsRelateditems_backlinks( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        JPlugin::loadLanguage('plg_flexicontent_fields_relateditems_backlinks', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_relateditems_backlinks', JPATH_ADMINISTRATOR);
 	}
-
 	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
 		// execute the code only if the field type match the plugin type
@@ -171,60 +174,8 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 		}
 	}
 	
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'relateditems_backlinks') return;
-		if(!$post) return;
-		
-		// create the fulltext search index
-		$searchindex = '';
-		
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
-		$reverse_field		= $field->parameters->get( 'reverse_field', 0) ;
-		
-		if($pretext) 	{ $pretext 	= $remove_space ? '' : $pretext . ' '; }
-		if($posttext) 	{ $posttext	= $remove_space ? '' : ' ' . $posttext; }
-
-		if ($reverse_field) {
-			
-			$db =& JFactory::getDBO();
-			$field_elements= 'SELECT DISTINCT id as value, title as text'
-							 .' FROM #__content as i'
-							 .' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON i.id=rel.item_id'
-							 .' WHERE rel.field_id='.$reverse_field
-							 .' AND i.state=1';
-							 ;
-			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
-			$db->setQuery($query);
-			$results = $db->loadObjectList();
-
-			if (!$results) {
-				$display = '';
-			
-			} else {
-
-				$display = array();
-				foreach($results as $result) {
-					for($n=0, $c=count($post); $n<$c; $n++) {
-						if ($result->value == $post[$n]) {
-							$display[] = $pretext . $result->text . $posttext;
-						}
-					}
-				}
-				$searchindex	 = implode(' ', $display);
-				$searchindex	.= ' | ';
-				$field->search = $field->issearch ? $searchindex : '';
-			}
-
-		} else { 
-			$field->html = JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
-		}			
-	}
-
-
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 	
@@ -365,8 +316,84 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 		}
 		
 	}
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'relateditems_backlinks') return;
+		if(!is_array($post) && !strlen($post)) return;
+		
+		// create the fulltext search index
+		$searchindex = '';
+		
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
+		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
+		$reverse_field		= $field->parameters->get( 'reverse_field', 0) ;
+		
+		if($pretext) 	{ $pretext 	= $remove_space ? '' : $pretext . ' '; }
+		if($posttext) 	{ $posttext	= $remove_space ? '' : ' ' . $posttext; }
 
+		if ($reverse_field) {
+			
+			$db =& JFactory::getDBO();
+			$field_elements= 'SELECT DISTINCT id as value, title as text'
+							 .' FROM #__content as i'
+							 .' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON i.id=rel.item_id'
+							 .' WHERE rel.field_id='.$reverse_field
+							 .' AND i.state=1';
+							 ;
+			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			$db->setQuery($query);
+			$results = $db->loadObjectList();
 
+			if (!$results) {
+				$display = '';
+			
+			} else {
+
+				$display = array();
+				foreach($results as $result) {
+					for($n=0, $c=count($post); $n<$c; $n++) {
+						if ($result->value == $post[$n]) {
+							$display[] = $pretext . $result->text . $posttext;
+						}
+					}
+				}
+				$searchindex	 = implode(' ', $display);
+				$searchindex	.= ' | ';
+				$field->search = $field->issearch ? $searchindex : '';
+			}
+
+		} else { 
+			$field->html = JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
+		}			
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='')
 	{
 		/* execute the code only if the field type match the plugin type
@@ -402,5 +429,5 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 		} else {
 			$field->html = JText::_('FLEXI_FIELD_NO_TYPE_SELECTED');
 		}*/
-		}
+	}
 }

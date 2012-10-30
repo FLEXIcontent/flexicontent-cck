@@ -236,22 +236,88 @@ var JFormValidator = new Class({
 			}
 		);
 
-		this.setHandler('selmul',
-			function (par) {
+		this.setHandler('sellimitations',
+			function (el) {
 				var nl, i;
-				if (par.parentNode == null) {
+				if (el == null) {
 					return true;
 				} else {
-					var options = par.parentNode.getElementsByTagName('option');
-			
+					var options = el.getElementsByTagName('option');
+					
 					var count = 0;
 					for (i=0, nl = options; i<nl.length; i++) {
 						if (nl[i].selected) count++;
 					}
+					
+					min_values = el.getAttribute("min_values");
+					min_values = min_values ? parseInt( min_values, 10 ) : 0;
 			
+					max_values = el.getAttribute("max_values");
+					max_values = max_values ? parseInt( max_values, 10 ) : 0;
+			
+					exact_values = el.getAttribute("exact_values");
+					exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
+					
+					js_popup_err = el.getAttribute("js_popup_err");
+					js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
+					
 					// Check maximum number of selected options
-					if(count <= max_sel) return true;
-					return false;
+					if ( min_values && count < min_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+						return false;
+					}
+					if ( max_values && count > max_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+						return false;
+					}
+					if ( exact_values && count != exact_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+						return false;
+					}
+					return true;
+				}
+			}
+		);
+		
+		this.setHandler('cboxlimitations',
+			function (el) {
+				var nl, i;
+				if (el.parentNode.parentNode == null) {
+					return true;
+				} else {
+					var options = el.parentNode.parentNode.getElementsByTagName('input');
+			
+					var count = 0;
+					for (i=0, nl = options; i<nl.length; i++) {
+						if (nl[i].checked) count++;
+					}
+					
+					min_values = el.getAttribute("min_values");
+					min_values = min_values ? parseInt( min_values, 10 ) : 0;
+			
+					max_values = el.getAttribute("max_values");
+					max_values = max_values ? parseInt( max_values, 10 ) : 0;
+			
+					exact_values = el.getAttribute("exact_values");
+					exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
+					
+					js_popup_err = el.getAttribute("js_popup_err");
+					js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
+					
+					// Check maximum number of selected options
+					if ( min_values && count < min_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+						return false;
+					}
+					if ( max_values && count > max_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+						return false;
+					}
+					if ( exact_values && count != exact_values) {
+						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+						return false;
+					}
+					return true;
 				}
 			}
 		);
@@ -304,7 +370,33 @@ var JFormValidator = new Class({
 			el_value = el.getValue();
 		}
 		el_name = el.get('name');
-
+		
+		// Executed only once to retrieve and hash all label via their for property
+		if ( !fcflabels )
+		{
+			fcflabels = new Object;
+			labels = $$('label');
+			labels.each( function(g) {
+				label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
+				if ( label_for )  fcflabels[ label_for ] = g;
+			} );
+			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
+		}
+		
+		// Find the label object for the given field if it exists
+		var el_id = (MooTools.version>="1.2.4") ? el.get('id') : el.getProperty('id');
+		if ( !(el.labelref) && el_id )
+		{
+			var lblfor = el_id;
+			if ( !el.labelref )  el.labelref = fcflabels[   lblfor   ];
+			if ( !el.labelref )  el.labelref = fcflabels[   lblfor = lblfor.replace(/_[0-9]+$/, '')   ];
+			if (flexi_j16ge) {
+				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = lblfor.replace(/custom_/, '')   ];
+				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = 'custom_' + lblfor   ];
+			}
+			if ( !el.labelref )   el.labelref = '-1';
+		}
+		
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
 		if(el.get('disabled')) {
 			this.handleResponse(true, el);
@@ -338,7 +430,14 @@ var JFormValidator = new Class({
 		
 		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
-	  if(!(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox")){
+		
+	  if (handler == "sellimitations" || handler == "cboxlimitations") {
+			// Execute the validation handler and return result
+			if (this.handlers[handler].exec(el) != true) {
+				this.handleResponse(false, el);
+				return false;
+			}
+	  } else if( !(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox") ){
 	  	if ( typeof auto_filled[el_name] != 'undefined' ) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el) != true) {
@@ -412,32 +511,6 @@ var JFormValidator = new Class({
 				var tabno = (tabid.search(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/) != -1) ? tabid.match(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/)[2] : "";
 				fctabber[tabset.attr('id')].tabShow(tabno);
 			}
-		}
-		
-		// Executed only once to retrieve and hash all label via their for property
-		if ( !fcflabels )
-		{
-			fcflabels = new Object;
-			labels = $$('label');
-			labels.each( function(g) {
-				label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
-				if ( label_for )  fcflabels[ label_for ] = g;
-			} );
-			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
-		}
-		
-		// Find the label object for the given field if it exists
-		var el_id = (MooTools.version>="1.2.4") ? el.get('id') : el.getProperty('id');
-		if ( !(el.labelref) && el_id )
-		{
-			var lblfor = el_id;
-			if ( !el.labelref )  el.labelref = fcflabels[   lblfor   ];
-			if ( !el.labelref )  el.labelref = fcflabels[   lblfor = lblfor.replace(/_[0-9]+$/, '')   ];
-			if (flexi_j16ge) {
-				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = lblfor.replace(/custom_/, '')   ];
-				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = 'custom_' + lblfor   ];
-			}
-			if ( !el.labelref )   el.labelref = '-1';
 		}
 
 		// Set the element and its label (if exists) invalid state

@@ -142,47 +142,45 @@ if ($use_fields && count($fields)) {
 	</thead>
 	<tbody>	
 	<?php
+	$img_field_size = $params->get('image_size');
+	$img_field_size = $img_field_size ? $img_field_size : 'l';
 	foreach ($this->items as $item) :
+		$src = '';
 		$thumb = '';
 		if ($image_source) {
-			$src = '';
 			if (!empty($item->image)) {
 				$image	= unserialize($item->image);
-				$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+				if ( $midata->params->get('image_source') && empty($midata->value[0]['is_default_value'] ) ) {
+					$dir	 = $midata->params->get('dir') .'/'. 'item_'.$item->id.'_field_'.$image_source;
+				} else {
+					$dir	 = $midata->params->get('dir');
+				}
+				//$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
+				$src	= JURI::base(true) . '/' . $dir . '/'.$img_field_size.'_' . $image['originalname'];
 			} else if (!empty($midata->default_image_filepath)) {
 				$src	= $midata->default_image_filepath;
 			}
 				
-			if ($src) {
-				$h		= '&amp;h=' . $img_height;
-				$w		= '&amp;w=' . $img_height;
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
-			
-				$thumb 	= JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-			}
 		} else {
-			$articleimage = flexicontent_html::extractimagesrc($item);
-			if ($articleimage) {
-			  $src	= $articleimage;
-			
-				$h		= '&amp;h=' . $img_height;
-				$w		= '&amp;w=' . $img_width;
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
-			
-				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-			}
+			$src = flexicontent_html::extractimagesrc($item);
+			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+			$src = $base_url . $src;
 		}
+		
+		if ( $src && (!$params->get('image_size') || !$image_source) )
+		{
+			$h		= '&amp;h=' . $img_height;
+			$w		= '&amp;w=' . $img_width;
+			$aoe	= '&amp;aoe=1';
+			$q		= '&amp;q=95';
+			$zc		= $img_method ? '&amp;zc=' . $img_method : '';
+			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			
+			$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+		}
+		
 		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 	?>
 		<tr class="sectiontableentry" >

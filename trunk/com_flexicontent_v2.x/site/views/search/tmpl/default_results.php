@@ -10,25 +10,28 @@
 					<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 						<?php echo $this->pagination->limitstart + $result->count.'. ';?>
 					</span>
+					
 					<?php if ( $result->href ) :
 						if ($result->browsernav == 1 ) : ?>
 							<a href="<?php echo JRoute::_($result->href); ?>" target="_blank">
 						<?php else : ?>
 							<a href="<?php echo JRoute::_($result->href); ?>">
-						<?php endif;
+						<?php endif; ?>
+					<?php endif; ?>
 
 						echo $this->escape($result->title);
 
-						if ( $result->href ) : ?>
+					<?php if ( $result->href ) : ?>
 							</a>
-						<?php endif;
-						if ($this->params->get( 'show_section', 0 ) && $result->section ) : ?>
-							<br />
-							<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-								(<?php echo $this->escape($result->section); ?>)
-							</span>
-						<?php endif; ?>
 					<?php endif; ?>
+					
+					<?php if ($this->params->get( 'show_section', 0 ) && $result->section ) : ?>
+						<br />
+						<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+							(<?php echo $this->escape($result->section); ?>)
+						</span>
+					<?php endif; ?>
+					
 				</div>
 				<?php if ( $this->params->get( 'show_text', 1 )) : ?>
 				<div>

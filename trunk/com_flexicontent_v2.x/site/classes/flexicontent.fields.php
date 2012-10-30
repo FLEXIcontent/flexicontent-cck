@@ -905,5 +905,372 @@ class FlexicontentFields
 		return $field;
 	}
 	
+	
+	/**
+	 * Common method to get ALL items that have matching search values for the given field id
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function onFLEXIAdvSearch( &$field )
+	{
+		$db = &JFactory::getDBO();
+		
+		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
+			$field->html	= 'Field type: '.$field->field_type.' can be used as search filter' ;
+			return;
+		}
+		
+		$indexable_fields = array('categories', 'tags', 'select', 'selectmultiple', 'checkbox', 'checkboximage', 'radio', 'radioimage');
+		
+		$field_vals = JRequest::getVar($field->name,'');
+		$field_vals = is_array($field_vals) ? $field_vals : array($field_vals);
+		
+		$values = array();
+		foreach ($field_vals as $val) {
+			$val = trim($val);
+			if ( strlen($val) ) $values[] = $val;
+		}
+		if ( !count($values) ) return;
+		
+		// EITHER MATCH TEXT or VALUE IDs
+		if ( in_array($field->field_type, $indexable_fields) ) {
+			$match_criteria_str = " ai.value_id IN ( '". implode("', '", $values) ."')";
+		} else {
+			$match_criteria_str = " ai.search_index LIKE '%". implode("%' OR LIKE '%", $values) ."%'";
+		}
+		
+		// Get ALL items that have such values for the given field
+		$query = "SELECT ai.search_index, ai.item_id "
+			." FROM #__flexicontent_advsearch_index as ai"
+			." WHERE ai.field_id='{$field->id}' "
+			."	AND ai.extratable='{$field->field_type}' "
+			."	AND ".$match_criteria_str
+			;
+		$db->setQuery($query);
+		$objs = $db->loadObjectList();
+		
+		// Check reusult making sure it is an array
+		if ($objs===false) continue;
+		$objs = is_array($objs) ? $objs : array($objs);
+		
+		// Create search results for found ALL items
+		$resultfields = array();
+		foreach($objs as $o) {
+			$obj = new stdClass;
+			$obj->item_id = $o->item_id;
+			$obj->label = $field->label;
+			$obj->value = $o->search_index;
+			$resultfields[] = $obj;
+		}
+		$field->results = $resultfields;
+	}
+	
+	
+	/**
+	 * Common method to create (insert) advanced search index DB records for various fields,
+	 * this can be called by fields or copied inside the field to allow better customization
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	{
+		// Remove old search values from the DB
+		$db = &JFactory::getDBO();
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='".$field->field_type."';";
+		$db->setQuery($query);
+		$db->query();
+		
+		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
+			return;
+		}
+		
+		// A null indicates to retrieve values
+		if ($values===null) $values = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
+		
+		// Make sure posted data is an array 
+		$values = !is_array($values) ? array($values) : $values;
+		
+		// Add new values
+		$i = 0;
+		foreach($values as $vi => $v) {
+			// Make sure multi-property data are unserialized
+			$data = @ unserialize($v);
+			$v = ($v === 'b:0;' || $data !== false) ? $data : $v;
+			
+			// Check value that current should be inclued in search index
+			if ( !$v ) continue;
+			foreach ($required_props as $cp) if (!@$v[$cp]) return;
+			
+			// Create search value
+			$search_value = array();
+			foreach ($search_props as $sp) {
+				if ( isset($v[$sp]) && strlen($v[$sp]) ) $search_value[] = $v[$sp];
+			}
+			
+			if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
+			$search_value = (count($search_props))  ?  implode($props_spacer, $search_value)  :  $v;
+			$search_value = $filter_func ? $filter_func($search_value) : $search_value;
+			
+			// Add new search value into the DB
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','".$field->field_type."','{$i}', ".$db->Quote($search_value).", ".$db->Quote($vi).");";
+			$db->setQuery($query);
+			$db->query();
+			$i++;
+		}
+		
+		//echo $field->name . ": "; print_r($values);echo "<br/>";
+		//echo @$search_value ."<br/><br/>";
+		return true;
+	}
+	
+	
+	/**
+	 * Common method to create basic search index for various fields (added as the property field->search),
+	 * this can be called by fields or copied inside the field to allow better customization
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	{
+		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
+			$field->search = '';
+			return;
+		}
+		
+		// A null indicates to retrieve values
+		if ($values===null) $values = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
+		
+		// Make sure posted data is an array 
+		$values = !is_array($values) ? array($values) : $values;
+		
+		// Create the new search data
+		$searchindex = array();
+		foreach($values as $i => $v)
+		{
+			// Make sure multi-property data are unserialized
+			$data = @ unserialize($v);
+			$v = ($v === 'b:0;' || $data !== false) ? $data : $v;
+			
+			// Check value that current should be included in search index
+			if ( !$v ) continue;
+			foreach ($required_props as $cp) if (!@$v[$cp]) return;
+			
+			// Create search value
+			$search_value = array();
+			foreach ($search_props as $sp) {
+				if ( @$v[$sp] ) $search_value[] = $v[$sp];
+			}
+			
+			if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
+			$searchindex[$i] = (count($search_props))  ?  implode($props_spacer, $search_value)  :  $v;
+			if ($filter_func) {
+				$searchindex[$i] = $filter_func ? $filter_func($searchindex[$i]) : $searchindex[$i];
+			}
+		}
+		$field->search = implode(' | ', $searchindex);
+		
+		//echo $field->name . ": "; print_r($values);echo "<br/>";
+		//echo $field->search ."<br/><br/>";
+		return true;
+	}
+	
+	
+	/**
+	 * Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function indexedField_getElements(&$field, $item, $extra_props=array())
+	{
+		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
+		
+		if ($sql_mode) {  // SQL mode, parameter field_elements contains an SQL query
+			
+			$db =& JFactory::getDBO();
+			$jAp=& JFactory::getApplication();
+			
+			// Get/verify query string and replace item properties in it
+			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
+			$query = FlexicontentFields::doQueryReplacements($field_elements, $item);
+			$db->setQuery($query);
+			$results = $db->loadObjectList();
+			
+			if (!$query || !is_array($results)) {
+				return false;
+			}
+			
+		} else { // Elements mode, parameter field_elements contain list of allowed values
+			
+			// Parse the elements used by field unsetting last element if empty
+			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+			if ( empty($listelements[count($listelements)-1]) ) {
+				unset($listelements[count($listelements)-1]);
+			}
+			
+			// Split elements into their properties: value, label, extra_prop1, extra_prop2
+			$listarrays = array();
+			$results = array();
+			$n = 0;
+			foreach ($listelements as $listelement) {
+				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
+				$results[$n] = new stdClass();
+				$results[$n]->value = $listelement_props[0];
+				$results[$n]->text  = $listelement_props[1];  // the text label
+				$el_prop_count = 2;
+				foreach ($extra_props as $extra_prop) {
+					$results[$n]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
+					$el_prop_count++;
+				}
+				$n++;
+			}
+			
+		}
+		
+		$elements = array();
+		if ($results) foreach($results as $result) {
+			$elements[$result->value] = $result;
+		}
+		
+		return $elements;
+	}	
+	
+	/**
+	 * Common method to map element value INDEXES to value objects for fields that use indexed values
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function indexedField_getValues(&$field, $elements, $value_indexes, $prepost_prop='text')
+	{
+		// Check for empty values
+		if ( !is_array($value_indexes) && !strlen($value_indexes) ) return array();
+		// Make sure indexes is an array 
+		$value_indexes = !is_array($value_indexes) ? array($value_indexes) : $value_indexes;
+		
+		$pretext=''; $posttext='';
+		if ( $prepost_prop ) {
+			$pretext  = $field->parameters->get( 'pretext', '' ) ;
+			$posttext = $field->parameters->get( 'posttext', '' ) ;
+			$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+			
+			$pretext 	= $remove_space ? $pretext  : $pretext . ' ';
+			$posttext	= $remove_space ? $posttext : ' ' . $posttext;
+		}
+		
+		// Get the labels of used values in an display[] array
+		$values = array();
+		foreach($value_indexes as $val_index) {
+			if ( !$val_index ) continue;
+			if ( !isset($elements[$val_index]) ) continue;
+			$values[$val_index] = get_object_vars($elements[$val_index] );
+			//print_r($values[$val_index]); echo "<br/>\n";
+			if ($prepost_prop) {
+				$values[$val_index][$prepost_prop] = $pretext . $values[$val_index][$prepost_prop] . $posttext;
+			}
+		}
+		
+		return $values;
+	}
+	
+	
+	/**
+	 * Common method to retrieve field values to be used for creating search indexes 
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function & searchIndex_getFieldValues(&$field, &$item)
+	{
+		$db = &JFactory::getDBO();
+		
+		// Create DB query to retrieve field values
+		$values = null;
+		if ($field->field_type == 'tags')
+		{
+			$query  = 'SELECT t.id AS value_id, t.name AS value'
+				.' FROM #__flexicontent_tags AS t'
+				.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
+				.' WHERE rel.itemid='.$field->item_id;
+			$db->setQuery($query);
+			$data = $db->loadObjectList('value_id');
+			$values = array();
+			foreach ($data as $v) $values[$v->value_id] = $v->value;
+		}
+		else if ($field->field_type == 'categories')
+		{
+			$query  = 'SELECT c.id AS value_id, c.title AS value'
+				.' FROM #__categories AS c'
+				.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
+				.' WHERE rel.itemid='.$field->item_id;
+			$db->setQuery($query);
+			$data = $db->loadObjectList('value_id');
+			$values = array();
+			foreach ($data as $v) $values[$v->value_id] = $v->value;
+		}
+		else if ($field->field_type == 'maintext')
+		{
+			$query  = 'SELECT CONCAT_WS(\' \', c.introtext, c.fulltext) AS value'
+				.' FROM #__content AS c'
+				.' WHERE c.id='.$field->item_id;
+		}
+		else if ($field->iscore)
+		{
+			$query  = 'SELECT *'
+				.' FROM #__content AS c'
+				.' WHERE c.id='.$field->item_id;
+			$db->setQuery($query);
+			$data = $db->loadObject();
+			$values = isset( $data->{$field->name} ) ? array($data->{$field->name}) : array();
+		}
+		else
+		{
+			$query = 'SELECT value'
+				.' FROM #__flexicontent_fields_item_relations as rel'
+				.' JOIN #__content as i ON i.id=rel.item_id'
+				.' WHERE rel.field_id='.$field->id.' AND rel.item_id='.$field->item_id;
+		}
+		
+		// Execute query if not already done
+		if ($values === null) {
+			$db->setQuery($query);
+			$values = $db->loadResultArray();
+		}
+		return $values;
+	}
+	
+	
+	/**
+	 * Common method to replace item properties for the SQL value mode for various fields
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.5
+	 */
+	function doQueryReplacements(&$query, &$item)
+	{
+		// replace item properties
+		preg_match_all("/{item->[^}]+}/", $query, $matches);
+		foreach ($matches[0] as $replacement_tag) {
+			$replacement_value = '$'.substr($replacement_tag, 1, -1);
+			eval ("\$replacement_value = \" $replacement_value\";");
+			$query = str_replace($replacement_tag, $replacement_value, $query);
+		}
+		// replace current user language
+		$query = str_replace("{curr_userlang_shorttag}", flexicontent_html::getUserCurrentLang(), $query);
+		$query = str_replace("{curr_userlang_fulltag}", flexicontent_html::getUserCurrentLang(), $query);
+		return $query;
+	}
+	
 }
 ?>

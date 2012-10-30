@@ -91,9 +91,9 @@ class FLEXIcontentViewSearch extends JView
 		foreach ($fields as $field) {
 			$field->parameters->set( 'use_html', 0 );
 			$field->parameters->set( 'allow_multiple', 0 );
-			if( ($field->field_type == 'title') || ($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
+			/*if( ($field->field_type == 'title') || ($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
 				$field->field_type = 'text';
-			}
+			}*/
 			$label = $field->label;
 			$fieldsearch = !FLEXI_J16GE ? JRequest::getVar($field->name, array()) : @$custom[$field->name];
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );

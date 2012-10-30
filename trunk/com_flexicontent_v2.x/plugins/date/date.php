@@ -18,19 +18,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsDate extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsDate( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
 	}
 	
 	
-	function onAdvSearchDisplayField(&$field, &$item)
-	{
-		plgFlexicontent_fieldsDate::onDisplayField($field, $item);
-	}
 	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
 	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
@@ -105,6 +109,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -115,20 +122,25 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					} else {
+						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					}
+					
 					thisNewField.getFirst().setProperty('value','');
 
 					thisNewField.injectAfter(thisField);
 
 					var input = thisNewField.getFirst();
-					input.id = '".$field->name."_'+uniqueRowNum".$field->id.";
+					input.id = '".$elementid."_'+uniqueRowNum".$field->id.";
 					var img = input.getNext();
-					img.id = '".$field->name."_' +uniqueRowNum".$field->id." +'_img';
-		
+					img.id = '".$elementid."_' +uniqueRowNum".$field->id." +'_img';
+
 					Calendar.setup({
-        				inputField:		'".$field->name."_'+uniqueRowNum".$field->id.",
+        				inputField:	input.id,
         				ifFormat:		'%Y-%m-%d',
-        				button:			'".$field->name."_' +uniqueRowNum".$field->id." +'_img',
+        				button:			img.id,
         				align:			'Tl',
         				singleClick:	true
 					});
@@ -159,13 +171,17 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				{
 					var field	= $(el);
 					var row		= field.getParent();
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					} else {
+						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+					}
 					
 					fx.start({
 						'height': 0,
 						'opacity': 0
 						}).chain(function(){
-							row.destroy();
+							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 						});
 					rowCount".$field->id."--;
 				}
@@ -201,6 +217,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$document->addStyleDeclaration($css);
 		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
 		$field->html = array();
 		$n = 0;
 		$skipped_vals = array();
@@ -222,7 +241,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				if ($value) $skipped_vals[] = $value;
 				$date = '';
 			}
-			$calendar = JHTML::_('calendar', $date, 'custom['.$field->name.'][]', $field->name.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
+			$calendar = JHTML::_('calendar', $date, $fieldname, $elementid.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
 			
 			$field->html[] =
 				$calendar.'
@@ -251,13 +270,20 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
+	
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'date') return;
-		if(!$post) return;
+		if(!is_array($post) && !strlen($post)) return;
 		
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
@@ -280,13 +306,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 		}
 		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		
+		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		
-		if(!is_array($post)) $post = array ($post);
 		foreach ($post as $n=>$v)
 		{
-			if ($post[$n] != '')
+			if ($post[$n] !== '')
 			{
 				// Check if dates are allowed to have time part
 				@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
@@ -319,45 +347,22 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 		}
 		$post = $newpost;
-		
-		// create the fulltext search index
-		$searchindex = '';
-		
-		foreach ($post as $v)
-		{
-			$searchindex .= $v;
-			$searchindex .= ' ';
-		}
-
-		$searchindex .= ' | ';
-
-		$field->search = $field->issearch ? $searchindex : '';
-
-		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
-			plgFlexicontent_fieldsDate::onIndexAdvSearch($field, $post);
-		}
 	}
 	
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'date') return;
-		$db = &JFactory::getDBO();
-		$post = is_array($post)?$post:array($post);
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='date';";
-		$db->setQuery($query);
-		$db->query();
-		$i = 0;
-		foreach($post as $v) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','date','{$i}', ".$db->Quote($v).");";
-			$db->setQuery($query);
-			$db->query();
-			$i++;
-		}
-		return true;
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-
-
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
@@ -494,8 +499,27 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ( !$field->{$prop} && $show_no_value ) $field->{$prop} = JText::_($no_value_msg);
 	}
-
-
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'date') return;
+		
+		$field_type = $field->field_type;
+		$field->field_type = 'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type = 'date';
+	}
+	
+	
+	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='')
 	{
 		// execute the code only if the field type match the plugin type
@@ -526,26 +550,38 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	}
 	
 	
-	function onFLEXIAdvSearch(&$field, $fieldsearch) {
-		if($field->field_type!='date') return;
-		$db = &JFactory::getDBO();
-		$resultfields = array();
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.extratable='date' AND ai.search_index like '%{$fsearch}%';";
-			$db->setQuery($query);
-			$objs = $db->loadObjectList();
-			if ($objs===false) continue;
-			$objs = is_array($objs)?$objs:array($objs);
-			foreach($objs as $o) {
-				$obj = new stdClass;
-				$obj->item_id = $o->item_id;
-				$obj->label = $field->label;
-				$obj->value = $fsearch;
-				$resultfields[] = $obj;
-			}
-		}
-		$field->results = $resultfields;
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item) {
+		if ($field->field_type != 'date') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'date') return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+		
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='date') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 
 }

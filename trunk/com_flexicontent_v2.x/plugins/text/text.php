@@ -19,24 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsText extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsText( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 	
-	function onAdvSearchDisplayField(&$field, &$item)
-	{
-		if($field->field_type != 'text') return;
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-	}
 	
-	// This function is called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
-	{
-	}
 	
-	// This function is called to display the field in item edit/submit form
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
@@ -94,7 +93,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					} else {
+						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					}
 					
 					thisNewField.getFirst().setProperty('value','');  /* First element is the text input field, second is e.g remove button */
 
@@ -126,13 +129,17 @@ class plgFlexicontent_fieldsText extends JPlugin
 				{
 					var field	= $(el);
 					var row		= field.getParent();
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					} else {
+						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+					}
 					
 					fx.start({
 						'height': 0,
 						'opacity': 0
 						}).chain(function(){
-							row.destroy();
+							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 						});
 					rowCount".$field->id."--;
 				}
@@ -165,13 +172,14 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$document->addStyleDeclaration($css);
 		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
 		$field->html = array();
 		$n = 0;
 		foreach ($field->value as $value) {
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-			
 			$field->html[] = '
-				<input name="'.$fieldname.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
+				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
 				'.$remove_button.'
 				'.$move2.'
 				';
@@ -188,70 +196,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->html = '<div>'.$field->html[0].'</div>';
 		}
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'text') return;
-		if(!$post) return;
-		
-		// reformat the post
-		$newpost = array();
-		$new = 0;
-		
-		// make sure posted data is an array 
-		$post = !is_array($post) ? array($post) : $post;
-		
-		foreach ($post as $n=>$v)
-		{
-			if ($post[$n] != '')
-			{
-				$newpost[$new] = $post[$n];
-			}
-			$new++;
-		}
-		$post = $newpost;
-		
-		// create the fulltext search index
-		if ($field->issearch) {
-			$searchindex = '';
-			
-			foreach($post as $i => $v)
-			{
-				$searchindex .= $v;
-				$searchindex .= ' ';
-			}
-			$searchindex .= ' | ';
-			$field->search = $searchindex;
-		} else {
-			$field->search = '';
-		}
-		
-		$data	= JRequest::getVar('jform', array(), 'post', 'array');
-		if($field->isadvsearch && $data['vstate']==2) {
-			plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post);
-		}
-	}
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'text') return;
-		$db = &JFactory::getDBO();
-		$post = is_array($post)?$post:array($post);
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='text';";
-		$db->setQuery($query);
-		$db->query();
-		$i = 0;
-		foreach($post as $v) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','text','{$i}', ".$db->Quote($v).");";
-			$db->setQuery($query);
-			$db->query();
-			$i++;
-		}
-		return true;
-	}
-
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
@@ -357,8 +304,63 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 		}
 	}
-
-
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'text') return;
+		if(!is_array($post) && !strlen($post)) return;
+		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		
+		// Reformat the posted data
+		$newpost = array();
+		$new = 0;
+		foreach ($post as $n=>$v)
+		{
+			if ($post[$n] !== '')
+			{
+				$newpost[$new] = $post[$n];
+			}
+			$new++;
+		}
+		$post = $newpost;
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'text') return;
+		
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+	}
+	
+	
+	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='')
 	{
 		// execute the code only if the field type match the plugin type
@@ -388,27 +390,39 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 	}
 	
-	function onFLEXIAdvSearch(&$field, $fieldsearch)
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item) {
+		if ($field->field_type != 'text') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if($field->field_type!='text') return;
-		$db = &JFactory::getDBO();
-		$resultfields = array();
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.extratable='text' AND ai.search_index like '%{$fsearch}%';";
-			$db->setQuery($query);
-			$objs = $db->loadObjectList();
-			if ($objs===false) continue;
-			$objs = is_array($objs)?$objs:array($objs);
-			foreach($objs as $o) {
-				$obj = new stdClass;
-				$obj->item_id = $o->item_id;
-				$obj->label = $field->label;
-				$obj->value = $fsearch;
-				$resultfields[] = $obj;
-			}
-		}
-		$field->results = $resultfields;
+		if ($field->field_type != 'text') return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+		
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='selectmultiple') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 	
 }

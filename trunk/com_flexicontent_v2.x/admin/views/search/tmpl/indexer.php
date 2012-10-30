@@ -43,8 +43,7 @@ jQuery(document).ready(function() {
 		fieldindex = Math.floor((looper-1)/items.length)%fields.length;
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
-			//url: "index.php?option=com_flexicontent&task=search.index&fieldid="+fields[fieldindex]+"&itemid="+items[itemindex],
-			url: "index.php?option=com_flexicontent&task=search.index&items_per_call="+items_per_call+"&itemcnt="+looper,
+			url: "index.php?option=com_flexicontent&task=search.index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
 			success: function(response, status2, xhr2) {
 				var arr = response.split('|');
 				if(arr[0]=='fail') {

@@ -74,7 +74,8 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 				<input type="hidden" name="itemid" value="<?php echo $this->itemid; ?>" />
 				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
-				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
+				<input type="hidden" name="secure" value="0" />
+				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 			</form>
 			<?php
 			echo $this->pane->endPanel();
@@ -225,5 +226,6 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 	<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 	<input type="hidden" name="itemid" value="<?php echo $this->itemid; ?>" />
 	<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
+	<input type="hidden" name="secure" value="0" />
 	<input type="hidden" name="filename" value="" />
 </form>

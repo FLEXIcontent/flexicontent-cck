@@ -19,19 +19,31 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsFcloadmodule( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_fcloadmodule', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsFcloadmodule::onDisplayField($field, $item);
-	}
+		
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'fcloadmodule') return;
 	}
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
@@ -82,7 +94,13 @@ echo '</xmp>';
 	
 		$field->{$prop} = $display;
 	}
-
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	function _getModuleObject($id)
 	{
 		$db =& JFactory::getDBO();

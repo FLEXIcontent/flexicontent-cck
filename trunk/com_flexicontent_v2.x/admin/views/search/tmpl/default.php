@@ -17,22 +17,47 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 ?>
 
-<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
-<?php	/*<div class="form-filter" style="float: left;">
-		<label for="filter_search"><?php echo JText::sprintf('FINDER_SEARCH_LABEL', JText::_('FINDER_ITEMS')); ?></label>
-		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->get('filter.search'); ?>" class="text_area" onchange="document.adminForm.submit();" />
-		<button onclick="this.form.submit();"><?php echo JText::_('FINDER_SEARCH_GO'); ?></button>
-		<button onclick="document.getElementById('filter_search').value='';document.getElementById('filter_type').value='0';document.getElementById('filter_state').value='*';this.form.submit();"><?php echo JText::_('FINDER_SEARCH_RESET'); ?></button>
-	</div>
+<script language="javascript" type="text/javascript">
 
-	<div class="form-filter" style="float: right;">
-		<?php echo JText::sprintf('FINDER_FILTER_BY', JText::_('FINDER_ITEMS')); ?>
-		<?php echo JHTML::_('finder.typeslist', $this->state->get('filter.type')); ?>
-		<?php echo JHTML::_('finder.statelist', $this->state->get('filter.state')); ?>
-	</div>
-*/ ?>
+// the function overloads joomla standard event
+function submitform(pressbutton)
+{
+	form = document.adminForm;
+	
+	// Store the button task into the form
+	if (pressbutton) {
+		form.task.value=pressbutton;
+	}
+
+	// Execute onsubmit
+	if (typeof form.onsubmit == "function") {
+		form.onsubmit();
+	}
+	// Submit the form
+	form.submit();
+}
+
+// delete active filter
+function delFilter(name)
+{
+	var myForm = $('adminForm');
+	if ($(name).type=='checkbox')
+		$(name).checked = '';
+	else
+		$(name).setProperty('value', '');
+}
+
+function delAllFilters() {
+	delFilter('filter_fieldtype'); delFilter('filter_itemtype'); delFilter('filter_itemstate');
+	delFilter('search_index'); delFilter('search_itemtitle'); delFilter('search_itemid');
+}
+</script>
+<form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
+
 	<table class="adminlist" style="clear: both;">
 		<thead>
 			<tr>
@@ -43,26 +68,96 @@ defined('_JEXEC') or die('Restricted access');
 					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX'), 'l.title', 'ASC', 'f.field_id'); ?>
-				</th>
-				<th nowrap="nowrap" width="20%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'l.state', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_TABLE'), 'l.type_id', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+				<th nowrap="nowrap" width="20%">
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+				<th nowrap="nowrap" width="10%">
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'ai.extratable', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th nowrap="nowrap" width="5%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_EXTRA_PK_ID'), 'l.url', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th nowrap="nowrap">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), 'l.indexdate', 'ASC', 'f.field_id'); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), 'ai.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+				<th nowrap="nowrap">
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 			</tr>
+			
+			
+			<tr id="filterline">
+				<!--td class="left col_title" colspan="4">
+					<span class="radio"><?php echo $this->lists['scope']; ?></span>
+					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+				</td-->
+				<td class="left"></td>
+				<td class="left"></td>
+				<td class="left"></td>
+				<td class="left"></td>
+				<td class="left">
+					<?php echo '<b class="'.($this->f_active['search_itemtitle'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TITLE').':</b> '; ?> &nbsp;
+					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+					<?php echo '<b class="'.($this->f_active['search_itemid'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_ID').':</b> '; ?> &nbsp;
+					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+					<br/>
+					<?php echo '<b class="'.($this->f_active['filter_itemtype'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').':</b> '; ?> &nbsp;
+					<?php echo $this->lists['filter_itemtype']; ?>
+					<?php echo '<b class="'.($this->f_active['filter_itemstate'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_STATE').':</b> '; ?> &nbsp;
+					<?php echo $this->lists['filter_itemstate']; ?>
+				</td>
+				
+				<td class="left col_fieldtype" >
+					<?php echo '<b class="'.($this->f_active['filter_fieldtype'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_FILTER').':</b> '; ?> &nbsp; <br/>
+					<?php echo $this->lists['filter_fieldtype']; ?>
+				</td>
+				
+				<td class="left"></td>
+				<td class="left col_search_index">
+					<?php echo '<b class="'.($this->f_active['search_index'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_FILTER').':</b> '; ?> &nbsp; <br/>
+					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+				</td>
+				<td class="left"></td>
+			</tr>
+
+			<tr>
+				<td colspan="9" class="filterbuttons">
+					<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<?php if (isset($this->lists['filter_stategrp'])) : ?>
+						<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
+					<?php endif; ?>
+	
+					<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
+					<?php
+					?>
+					</div>
+	
+	<!--
+					<span style="float:right;">
+						<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+						<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+						
+						<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+						<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+					</span>
+	-->
+				</td>
+			</tr>
+
+
 		</thead>
 		<tbody>
+
+			
 			<?php if (count($this->data) == 0): ?>
 			<tr class="row0">
-				<td align="center" colspan="7">
+				<td align="center" colspan="9">
 					<?php
 					if ($this->total == 0) {
 						echo JText::_('FLEXI_NO_DATA');
@@ -89,21 +184,32 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo $this->escape($row->label); ?>
 				</td>
 				<td>
-					<?php echo $this->escape($row->title); ?>
+					<?php echo $this->escape($row->name); ?>
 				</td>
-				<td nowrap="nowrap" style="text-align: center">
+				<td>
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<?php
+						$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
+						echo '<a target="_blank" href="'.$link.'">'.$this->escape($row->title).'</a>';
+					?>
+					</span>
+				</td>
+				<td nowrap="nowrap" style="text-align: center" class="col_fieldtype">
 					<?php echo $row->extratable; ?>
 				</td>
 				<td nowrap="nowrap" style="text-align: center;">
 					<?php echo $row->extraid; ?>
 				</td>
-				<td style="text-align: left;">
+				<td style="text-align: left;" class="col_search_index">
 					<?php
 						if(iconv_strlen($row->search_index, "UTF-8")>200)
 							echo iconv_substr($row->search_index, 0, 200, "UTF-8").'...';
 						else
 							echo $row->search_index;
 					?>
+				</td>
+				<td nowrap="nowrap" style="text-align: center;">
+					<?php echo $row->value_id; ?>
 				</td>
 				<?php /*<td nowrap="nowrap" style="text-align: center;">
 					<?php //echo JHtml::date($row->indexdate, '%Y-%m-%d %H:%M:%S'); ?>
@@ -115,7 +221,7 @@ defined('_JEXEC') or die('Restricted access');
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="7" nowrap="nowrap">
+				<td colspan="9" nowrap="nowrap">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>

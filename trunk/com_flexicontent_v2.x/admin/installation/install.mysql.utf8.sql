@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `extratable` varchar(255) NOT NULL,
   `extraid` int(11) NOT NULL,
   `search_index` longtext NOT NULL,
+  `value_id` varchar(255) NULL,
   PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 

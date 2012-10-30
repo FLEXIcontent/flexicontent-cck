@@ -19,28 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsCore extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsCore( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 	}
-
-	function onAdvSearchDisplayField(&$field, &$item) {
-		if($field->iscore != 1) return;
-		$mainframe = &JFactory::getApplication();
-		$cparams = & $mainframe->getParams('com_flexicontent');
-		
-		$filter_types = $cparams->get('filter_types', 'createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple');
-		$filter_types = explode(',', $filter_types);
-		if ( in_array ($field->name, $filter_types) ) {
-			$value = JRequest::get($field->name, '');
-			plgFlexicontent_fieldsCore::onDisplayFilter($field, $value, $field->name);
-		} else {
-			$value = JRequest::get($field->name, '');
-			$field->html	= '<input name="'.$field->name.'[]" id="'.$field->name.'" class="inputbox" type="text" size="30" value="'.$value.'" />';
-		}
-	}
 	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
 	{
 		// this function is a mess and need complete refactoring
@@ -241,102 +236,59 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				break;
 		}
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if($field->iscore != 1) return;
-		if(!$post) return;
-		
-		switch ($field->field_type)
-		{
-			case 'title': // title
-				if ($field->issearch) {
-					$field->search = $post . ' | ';
-				} else {
-					$field->search = '';
-				}
-			break;
-
-			case 'maintext': // maintext
-				if ($field->issearch) {
-					$field->search = flexicontent_html::striptagsandcut($post) . ' | ';
-				} else {
-					$field->search = '';
-				}
-			break;
-		}
-
-		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
-			plgFlexicontent_fieldsCore::onIndexAdvSearch($field, $post);
-		}
+		if(!is_array($post) && !strlen($post)) return;
 	}
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
 		if($field->iscore != 1) return;
+		$mainframe = &JFactory::getApplication();
+		$cparams = & $mainframe->getParams('com_flexicontent');
 		
-		$db = &JFactory::getDBO();
-		$post = is_array($post)?$post:array($post);
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='{$field->field_type}';";
-		$db->setQuery($query);
-		$db->query();
-		$i = 0;
-		foreach($post as $v) {
-			$v = is_array($v) ? serialize($v) : $v;
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','{$field->field_type}','{$i}', ".$db->Quote(strip_tags($v)).");";
-			$db->setQuery($query);
-			$db->query();
-			$i++;
+		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
+			$field->html	= 'Field type: '.$field->field_type.' can be used as search filter' ;
+			return;
 		}
-		return true;
+		
+		if ( in_array ($field->field_type, array('categories', 'tags')) ) {
+			$value = JRequest::getVar($field->name);
+			plgFlexicontent_fieldsCore::onDisplayFilter($field, $value, $field->name);
+		} else {
+			$value = JRequest::getVar($field->name, '');
+			$field->html	= '<input name="'.$field->name.'" id="'.$field->name.'" class="inputbox" type="text" size="30" value="'.$value.'" />';
+		}
 	}
 	
-	function onFLEXIAdvSearch(&$field, $fieldsearch) {
-		if($field->iscore != 1) return; // performance check
-		$db = &JFactory::getDBO();
-		
-		switch ($field->field_type)
-		{
-			case 'tags': // Tags
-				$query 	= ' SELECT * '
-						. ' FROM #__flexicontent_tags'
-						. ' ORDER BY name ASC'
-						;
-				$db->setQuery($query);
-				$tag_data = $db->loadObjectList('id');
-				break;
-			default:
-				break;
-		}
-					
-		$resultfields = array();
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.extratable='{$field->field_type}' AND ai.search_index like '%{$fsearch}%';";
-			$db->setQuery($query);
-			//echo $query;
-			$objs = $db->loadObjectList();
-			if (($objs===false) || ($objs===NULL)) continue;
-			//echo "<pre>"; print_r($objs);echo "</pre>"; 
-			$objs = is_array($objs)?$objs:array($objs);
-			foreach($objs as $o) {
-				$obj = new stdClass;
-				$obj->item_id = $o->item_id;
-				$obj->label = $field->label;
-				/*if ($field->field_type=='tags' && isset($tag_data[$fsearch]->name) ) {
-					//echo $fsearch. " ";
-					$obj->value = $tag_data[$fsearch]->name;
-				} else*/
-					$obj->value = $fsearch;
-				$resultfields[] = $obj;
-			}
-		}
-		$field->results = $resultfields;
-		//return $resultfields;
-	}
-		
 	
+	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formfieldname='')
 	{
 		if($filter->iscore != 1) return; // performance check
@@ -474,6 +426,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
 				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	= str_replace('&lt;sup&gt;|_&lt;/sup&gt;', '\'-', $filter->html);
 			break;
 
 			case 'tags': // Tags
@@ -501,5 +454,41 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 		}
+	}
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ( !$field->iscore ) return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ( !$field->iscore ) return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if($field->iscore != 1) return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 }

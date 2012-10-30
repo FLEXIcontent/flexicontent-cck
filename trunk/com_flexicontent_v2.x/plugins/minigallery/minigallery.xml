@@ -28,6 +28,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="FLEXI_FIELD_GALLERY_IMAGES" type="separator" hr="false" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" menu="hide" />
 			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
 				<option value="1">FLEXI_FIELD_GALLERY_TOP</option>

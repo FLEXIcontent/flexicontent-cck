@@ -1,15 +1,25 @@
 <?php
 defined("_JEXEC") or die("Restricted Access");
 
-class plgFlexicontent_fieldsGroupmarker extends JPlugin{
-
+class plgFlexicontent_fieldsGroupmarker extends JPlugin
+{
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsGroupmarker( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_groupmarker', JPATH_ADMINISTRATOR);
 	}
-
-
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
 		if ($field->field_type != 'groupmarker') return;
