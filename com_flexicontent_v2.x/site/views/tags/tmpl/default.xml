@@ -29,6 +29,22 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="image_source" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+			<field name="link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+				<option value="">FLEXI_USE_PARAMS</option>
+				<option value="s">FLEXI_SMALL</option>
+				<option value="m">FLEXI_MEDIUM</option>
+				<option value="l">FLEXI_LARGE</option>
+			</field>
+			<field name="image_width" type="text" size="4" default="90" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="image_height" type="text" size="4" default="90" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="image_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
 			
 			<field name="sep_moddate" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
 			<field name="show_modify_date" type="radio" default="0" label="FLEXI_SHOW" description="...">

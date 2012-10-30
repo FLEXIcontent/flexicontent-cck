@@ -160,6 +160,13 @@ if ($error) {
 	</tbody>
 </table>
 
+<?php
+// Delete orphan entries ?
+$query="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
+$db->setQuery($query);
+$result = $db->query();
+?>
+
 <h3><?php echo JText::_('Actions'); ?></h3>
 <table class="adminlist">
 	<thead>
@@ -186,6 +193,10 @@ $query = "SHOW COLUMNS FROM #__flexicontent_fields";
 $db->setQuery($query);
 $fields_tbl_cols = $db->loadResultArray();
 
+$query = "SHOW COLUMNS FROM #__flexicontent_advsearch_index";
+$db->setQuery($query);
+$advsearch_index_tbl_cols = $db->loadResultArray();
+
 $query = "SELECT count(*) FROM `#__flexicontent_fields` WHERE field_type IN (`hidden`)";
 $db->setQuery($query);
 $deprecated_fields = $db->loadResult();
@@ -194,7 +205,7 @@ $deprecated_fields = $db->loadResult();
 <?php
 // Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 ?>
-		<tr class="row1">
+		<tr class="row0">
 			<td class="key">Run SQL "UPDATE `...__flexicontent_fields` SET field_type=`text` WHERE field_type IN (`hidden`,`textselect`)"
 			<?php
 			$already = true;
@@ -220,7 +231,37 @@ $deprecated_fields = $db->loadResult();
 				?></span>
 			</td>
 		</tr>
-
+		
+<?php
+// Alter DB table flexicontent_advsearch_index: Add value_id column
+?>
+		<tr class="row1">
+			<td class="key">Run SQL "ALTER TABLE `..._flexicontent_advsearch_index` ADD `value_id` TEXT NULL AFTER `search_index`"
+			<?php
+			$already = true;
+			$result = false;
+			if(!in_array('value_id', $advsearch_index_tbl_cols)) {
+				$already = false;
+				$query = "ALTER TABLE `#__flexicontent_advsearch_index` ADD `value_id` TEXT NULL AFTER `search_index`";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'value_id' already exists.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'value_id' added.");
+				} else {
+					echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+				}
+				?></span>
+			</td>
+		</tr>
+		
 <?php
 // Alter DB table flexicontent_files: Add description column
 ?>

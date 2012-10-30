@@ -19,22 +19,32 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsToolbar extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsToolbar( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_toolbar', JPATH_ADMINISTRATOR);
 	}
-
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
-		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'toolbar') return;
 	}
-
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'toolbar') return;
 		if(JRequest::getCmd('print')) return;
 
@@ -74,7 +84,9 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// define a global variable to be sure the script is loaded only once
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
-		if ($load_css) $document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/toolbar/toolbar.css');
+		if ($load_css) {
+			$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/toolbar.css');
+		}
 		
 		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
 
@@ -160,16 +172,17 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			$display .= "
 			<div class=\"flexi-voice toolbar-element\">";
-			if($lang=='th') {//may be la=laos,and Bhutan languages in the future(NECTEC support these languges).
-			$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar/th.js');
-			$display .="
-				<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-			";
-			}else{
-			$document->addScript('http://vozme.com/get_text.js');
-			$display .="
-				<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-			";
+			if ($lang=='th') {
+				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
+				$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
+				$display .="
+					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
+				";
+			} else {
+				$document->addScript('http://vozme.com/get_text.js');
+				$display .="
+					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
+				";
 			}
 			$display .="
 			</div>
@@ -221,14 +234,34 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 
 		$field->{$prop} = $display;
 	}
-
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField($field, &$post, $file)
 	{
-		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'toolbar') return;
-		
-		return;
 	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
 	
 	function _getCommentsCount($id)
 	{

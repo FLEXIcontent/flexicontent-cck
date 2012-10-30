@@ -19,15 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFile extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsFile( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
-
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsFile::onDisplayField($field, $item);
-	}
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
@@ -35,24 +43,25 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($field->field_type != 'file') return;
 
 		// some parameter shortcuts
-		$size		= $field->parameters->get( 'size', 30 ) ;
-						
-		$document	=& JFactory::getDocument();
-		$app		=& JFactory::getApplication();
-		$prefix		= $app->isSite() ? 'administrator/' : '';
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$document		= & JFactory::getDocument();
+		$size				= $field->parameters->get( 'size', 30 ) ;
+		
+		$app				= & JFactory::getApplication();
+		$prefix			= $app->isSite() ? 'administrator/' : '';
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
-		$dummy_required_form_field = "<input type=\"text\" class=\"{$required}\" name=\"{$field->name}[]\" value=\"\" style=\"display:none;\"/>";
-
+		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		
 		$js = "
 		
-		var req_container_innerHTML='".$dummy_required_form_field."';
 		var value_counter=".count($field->value).";
-		
+
 		function qfSelectFile".$field->id."(id, file) {
 		  value_counter++;
-		  var req_container = $('req_container_{$field->id}');
-		  req_container.innerHTML = '';
+		  
+		  var valcounter = $('".$field->name."');
+			valcounter.value = value_counter;
 		  
 			var name 	= 'a_name'+id;
 			var ixid 	= 'a_id'+id;			
@@ -82,7 +91,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			txt.value	= file;
 			
 			hid.type = 'hidden';
-			hid.name = 'custom[".$field->name."][]';
+			hid.name = '".$fieldname."';
 			hid.value = id;
 			hid.id = ixid;
 			
@@ -100,24 +109,29 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				'constrain': true,
 				'clone': true,
 				'handle': '.fcfield-drag'
-			});			
-		
+			});
 		}
+		
 		function deleteField".$field->id."(el) {
-		  var req_container = $('req_container_{$field->id}');
 		  value_counter--;
-		  if (value_counter<=0)
-		    req_container.innerHTML = req_container_innerHTML;
 		  
+		  var valcounter = $('".$field->name."');
+			if ( value_counter > 0 ) valcounter.value = value_counter;
+			else valcounter.value = '';
+			
 			var field	= $(el);
 			var row		= field.getParent();
-			var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+			if (MooTools.version>='1.2.4') {
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+			} else {
+				var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+			}
 			
 			fx.start({
 				'height': 0,
 				'opacity': 0			
 			}).chain(function(){
-				row.destroy();
+				(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 			});
 		}
 		";
@@ -151,21 +165,21 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-		$field->html = "<span id='req_container_{$field->id}'>".(($field->value) ? "":$dummy_required_form_field)."</span>";
 		$i = 0;
-		$field->html .= '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
+		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
 				$filedata = $this->getFileData( $file );
-				$field->html .= "<input size=\"".$size."\" class=\"{$required}\" style=\"background: #ffffff;\" type=\"text\" id=\"a_name".$i."\" value=\"".$filedata->filename."\" disabled=\"disabled\" />";
-				$field->html .= "<input type=\"hidden\" id=\"a_id".$i."\" name=\"custom[".$field->name."][]\" value=\"".$file."\" />";
-				$field->html .= "<input class=\"inputbox fcfield-button\" type=\"button\" onclick=\"deleteField".$field->id."(this);\" value=\"".JText::_( 'FLEXI_REMOVE_FILE' )."\" />";
-				$field->html .= "<span class=\"fcfield-drag\">".$move."</span>";
+				$field->html .= '  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$filedata->filename.'" disabled="disabled" />';
+				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
+				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
+				$field->html .= '  <span class="fcfield-drag">'.$move.'</span>';
 				$field->html .= '</li>';
 				$i++;
 			}
 		}
+		
 		$files = implode(":", $field->value);
 		$user = & JFactory::getUser();
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
@@ -174,12 +188,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		</ul>
 		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'">';
 	}
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		$field->label = JText::_($field->label);
@@ -188,7 +205,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		$mainframe =& JFactory::getApplication();
+		$mainframe = & JFactory::getApplication();
 
 		// some parameter shortcuts
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
@@ -313,12 +330,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 	}
 	
-
-	function onBeforeSaveField($field, &$post, &$file)
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'file') return;
-		if(!$post) return;
+		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();
 		
@@ -331,15 +354,30 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		$post = array_unique($newpost);
 	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
 
 
 	function getFileData( $value )
 	{
 		$db =& JFactory::getDBO();
 		$session = & JFactory::getSession();
-		jimport('joomla.database.table');
-		
-		$sessiontable = JTable::getInstance('session');
+		if (FLEXI_J16GE) {
+			jimport('joomla.database.table');
+			$sessiontable = JTable::getInstance('session');
+		} else {
+			jimport('joomla.database.table.session');
+			$sessiontable = new JTableSession( $db );
+		}
 		$sessiontable->load($session->getId());
 		$and = '';
 		if(!$sessiontable->client_id) 
@@ -354,7 +392,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		return $filedata;
 	}
 	
-
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	function addIcon( &$file )
 	{
 		switch ($file->ext)

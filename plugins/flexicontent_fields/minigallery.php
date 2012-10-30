@@ -19,33 +19,43 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsMinigallery extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsMinigallery( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsMinigallery::onDisplayField($field, $item);
-	}
-
-	function onDisplayField(&$field, $item)
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
+	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
 
 		// some parameter shortcuts
-		$size				= $field->parameters->get( 'size', 30 ) ;
-
 		$document		= & JFactory::getDocument();
-		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
-		$app			= & JFactory::getApplication();
+		$size				= $field->parameters->get( 'size', 30 ) ;
+		
+		$flexiparams=& JComponentHelper::getParams('com_flexicontent');
+		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		$app				= & JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
-		$clientpref		= $app->isAdmin() ? '' : 'administrator/';
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$clientpref	= $app->isAdmin() ? '' : 'administrator/';
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
-
+		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		
 		$js = "
 		function randomString() {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
@@ -57,8 +67,15 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 			return randomstring;
 		}
+		
+		var value_counter=".count($field->value).";
 
 		function qfSelectFile".$field->id."(id, file) {
+		  value_counter++;
+		  
+		  var valcounter = $('".$field->name."');
+			valcounter.value = value_counter;
+		  
 			var name 	= 'a_name'+id;
 			var ixid 	= randomString();			
 			var li 		= document.createElement('li');
@@ -86,12 +103,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			hid.type = 'hidden';
-			hid.name = '".$field->name."[]';
+			hid.name = '".$fieldname."';
 			hid.value = id;
 			hid.id = ixid;
 			
 			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move3.png';
-			img.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
+			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
 			
 			filelist.appendChild(li);
 			li.appendChild(thumb);
@@ -104,25 +121,35 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				'constrain': true,
 				'clone': true,
 				'handle': '.fcfield-drag'
-			});			
+			});
 		}
 		
-			function deleteField".$field->id."(el) {
-				var field	= $(el);
-				var row		= field.getParent();
-				var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0			
-				}).chain(function(){
-					row.remove();
-				});
+		function deleteField".$field->id."(el) {
+		  value_counter--;
+		  
+		  var valcounter = $('".$field->name."');
+			if ( value_counter > 0 ) valcounter.value = value_counter;
+			else valcounter.value = '';
+			
+			var field	= $(el);
+			var row		= field.getParent();
+			if (MooTools.version>='1.2.4') {
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+			} else {
+				var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 			}
+			
+			fx.start({
+				'height': 0,
+				'opacity': 0			
+			}).chain(function(){
+				(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+			});
+		}
 		";
 		$document->addScriptDeclaration($js);
 
-			//add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
@@ -141,7 +168,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				list-style: none;
 				height: 130px;
 				width: 100px;
-				margin: 8px 0px 0px 12px;
+				margin: 8px 0px 0px 12px !important;
 				float:left;
 			}
 			#sortables_'.$field->id.' li img.thumbs {
@@ -157,10 +184,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 				
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
-
+		
 		$i = 0;
 		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
-		
 		if($field->value) {
 			foreach($field->value as $file) {
 				$field->html .= '<li>';
@@ -171,27 +197,29 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= ' <img class="thumbs" src="'.$src.'"/>';
-				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$field->name.'[]" value="'.$file.'" />';
+				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
 				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
 				$field->html .= '  <span class="fcfield-drag">'.$move.'</span>';
 				$field->html .= '</li>';
 				$i++;
 			}
 		}
-
+		
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'">';
 	}
-
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		$field->label = JText::_($field->label);
@@ -200,7 +228,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 		
-		$mainframe = &JFactory::getApplication();
+		$mainframe = & JFactory::getApplication();
 		
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
@@ -302,7 +330,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					".( ($thumbposition != 3) ? "margin-top:".(4) : "" )."px;
 				}
 				";
-		
+				
 				if ($thumbposition == 1 || $thumbposition == 3) {
 					$css .= "#thumbnails { width: ".$w_l."px; }";
 				}
@@ -311,6 +339,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				}
 	
 				$document->addStyleDeclaration($css);
+				
 			}
 			
 			$display = array();
@@ -357,19 +386,40 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		}
 	}
 	
-
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'minigallery') return;
-		if(!$post) return;
+		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();
 		
 		$post = array_unique($post);
 	}
-
-
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	function getFileName( $value )
 	{
 		$db =& JFactory::getDBO();

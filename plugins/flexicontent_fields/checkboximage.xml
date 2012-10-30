@@ -57,6 +57,15 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
+
+		<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+		<param name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
+		<param name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
+		<param name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</param>
+
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_checkboximage.ini</language>

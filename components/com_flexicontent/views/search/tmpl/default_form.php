@@ -174,6 +174,7 @@ $fields = &$this->fields;
 					<label class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_OTHER_CONTENT'); ?>::<?php echo JText::_('FLEXI_SEARCH_OTHER_CONTENT_TIP'); ?>'>
 						<?php echo JText::_( 'FLEXI_SEARCH_OTHER_CONTENT' );?>:
 					</label>
+				</td>
 				<td colspan="2" class="fc_search_option_cell">
 					
 				<?php // DISABLE search areas 'content' and old 'flexisearch' ?>
@@ -221,19 +222,20 @@ $fields = &$this->fields;
 
 <br />
 <?php if($this->total > 0) : ?>
-<div align="center">
+<div align="center" style="float:right; clear:both; width:100%;">
 	<div style="float: right;">
 		<label for="limit">
 			<?php echo JText::_( 'Display Num' ); ?>
 		</label>
 		<?php echo $this->pagination->getLimitBox( ); ?>
 	</div>
-	<div>
-		<?php //echo $this->pagination->getPagesCounter(); ?>
+	<div class="pageslinks" style="float: right;">
+		<?php echo $this->pagination->getPagesCounter(); ?>
 		<?php echo $this->pagination->getPagesLinks(); ?>
 	</div>
 </div>
 <?php endif; ?>
+
 <?php if(!$show_searchphrase) {
 $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 ?>

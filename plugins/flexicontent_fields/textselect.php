@@ -57,12 +57,12 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		$field->field_type = 'text';
-		plgFlexicontent_fieldsText::onBeforeSaveField($field, $item, $file);
+		plgFlexicontent_fieldsText::onBeforeSaveField($field, $post, $file, $item);
 		$field->field_type = 'textselect';
 	}
 

@@ -1966,14 +1966,14 @@ class ParentClassItem extends JModelAdmin
 		// ***************************************************************************************************************************		
 		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0);
 		
-		
-		// ******************************************************************************************************************
-		// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
-		// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
-		// ******************************************************************************************************************
-		
+		$searchindex = '';
 		if ($fields)
 		{	
+			// ******************************************************************************************************************
+			// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
+			// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
+			// ******************************************************************************************************************
+			
 			foreach($fields as $field)
 			{
 				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
@@ -1982,10 +1982,12 @@ class ParentClassItem extends JModelAdmin
 				// In J1.6 field's posted values have different location if not CORE (aka custom field)
 				if ( $get_untraslatable_values && $field->untranslatable ) {
 					$postdata[$field->name] = $field->value;
-				} else if ($field->iscore || !FLEXI_J16GE) {
-					$postdata[$field->name] = @$data[$field->name];  // Value may not be used in form or may have been been skipped to maintain current value
+				} else if ($field->iscore) {
+					// Values have been bind to the item object and will be retrieved for it
+					$postdata[$field->name] = null;
 				} else {
-					$postdata[$field->name] = @$data['custom'][$field->name];
+					// Value may not be used in form or may have been been skipped to maintain current value
+					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['custom'][$field->name];
 				}
 				
 				// Trigger plugin Event 'onBeforeSaveField'
@@ -2000,7 +2002,30 @@ class ParentClassItem extends JModelAdmin
 				// Get vstate property from the field object back to the data array
 				$data['vstate'] = $field->item_vstate;
 			}
+			
+			
+			// ****************************************************************************************************************************
+			// Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
+			//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
+			// ****************************************************************************************************************************
+			
+			foreach($fields as $field)
+			{
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				
+				if ( $data['vstate']==2 )
+				{
+					// Trigger plugin Event 'onIndexAdvSearch' to update item records in advanced search index
+					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexAdvSearch', array( &$field, &$postdata[$field->name], &$item ));
+				}
+				
+				// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record  (*** MAYBE we do not need to create this if item will not be saved ???)
+				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$postdata[$field->name], &$item ));
+				$searchindex .= @$field->search;
+				$searchindex .= @$field->search ? ' | ' : '';
+			}
 		}
+		
 		// Check if vstate was set to 1 (no approve new version) while versioning is disabled
 		if (!$use_versioning && $data['vstate']!=2) {
 			$data['vstate'] = 2;
@@ -2024,8 +2049,6 @@ class ParentClassItem extends JModelAdmin
 		// *******************************************************************************************
 		if ($fields)
 		{
-			$searchindex = '';
-			
 			foreach($fields as $field)
 			{
 				// Delete field values in all translating items, if current field is untranslatable and current item version is approved
@@ -2096,7 +2119,6 @@ class ParentClassItem extends JModelAdmin
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
 				// *** $result is ignored
-				$searchindex 	.= @$field->search;
 			}
 			
 			// **************************************************************

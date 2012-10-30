@@ -19,19 +19,14 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsTextarea extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsTextarea( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
-	}
-	
-	function onAdvSearchDisplayField(&$field, &$item) {
-		if($field->field_type != 'textarea') return;
-		$field_type = $field->field_type;
-		$field->field_type =  'text';
-		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-		$field->field_type =  'textarea';
 	}
 	
 	
@@ -103,6 +98,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 	}
 	
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		$field->label = JText::_($field->label);
@@ -141,13 +144,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->value = array();
 				$field->value[0] = '';
 			}
-			$field_name = $field->name;
-			$field_idtag = $field->name;
+			$field_name = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			$field_idtag = FLEXI_J16GE ? 'custom_'.$field->name :  $field->name;
 			$skip_buttons_arr = array('pagebreak', 'readmore');
 		} else if ($field->field_type == 'maintext') {
 			if ( !is_array($field->name) ) {
-				$field_name = $field->name;
-				$field_idtag = $field->name;
+				$field_name = FLEXI_J16GE ? 'jform['.$field->name.']' : $field->name;
+				$field_idtag = FLEXI_J16GE ? 'jform_'.$field->name : $field->name;
 			} else {
 				foreach ( $field->name as $i => $ffname) {
 					if ($i==0) {
@@ -257,59 +260,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			}
 		}
 		
-		/*if ($use_html) {
-			$field->value[0] = htmlspecialchars( $field->value[0], ENT_NOQUOTES, 'UTF-8' );
-			$field->html	 = $editor->display( $field->name, $field->value[0], '100%', $height, $cols, $rows, array('pagebreak', 'readmore') );
-		} else {
-			$field->html	 = '<textarea name="' . $field->name . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">';
-			$field->html	.= $field->value[0];
-			$field->html	.= '</textarea>';
-		}*/
-	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file ) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'textarea') return;
-		if ( !FLEXI_J16GE && $field->parameters->get( 'use_html', 0 ) ) {
-			$rawdata = JRequest::getVar($field->name, '', 'post', 'string', JREQUEST_ALLOWRAW);
-			if ($rawdata) $post = $rawdata;
-		}
-		if(!$post) return;
-
-		// Reconstruct value if it has splitted up e.g. to tabs
-		if (is_array($post)) {
-			$tabs_text = '';
-			foreach($post as $tab_text) {
-				$tabs_text .= $tab_text;
-			}
-			$post = & $tabs_text;
-		}
-		//print_r($post); exit();
-		
-		// create the fulltext search index
-		$searchindex = flexicontent_html::striptagsandcut($post) . ' | ';		
-		$field->search = $field->issearch ? $searchindex : '';
-		
-		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
-			$this->onIndexAdvSearch($field, $post);
-		}
 	}
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'textarea') return;
-		$db = &JFactory::getDBO();
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='textarea';";
-		$db->setQuery($query);
-		$db->query();
-		$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','textarea','0', ".$db->Quote($post).");";
-		$db->setQuery($query);
-		$db->query();
-		return true;
-	}
 
-
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
@@ -357,26 +311,96 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 	}
 	
-	function onFLEXIAdvSearch(&$field, $fieldsearch) {
-		if($field->field_type!='textarea') return;
-		$db = &JFactory::getDBO();
-		$resultfields = array();
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.extratable='textarea' AND ai.search_index like '%{$fsearch}%';";
-			$db->setQuery($query);
-			$objs = $db->loadObjectList();
-			if ($objs===false) continue;
-			$objs = is_array($objs)?$objs:array($objs);
-			foreach($objs as $o) {
-				$obj = new stdClass;
-				$obj->item_id = $o->item_id;
-				$obj->label = $field->label;
-				$obj->value = $fsearch;
-				$resultfields[] = $obj;
-			}
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item ) {
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'textarea') return;
+		if ( !FLEXI_J16GE && $field->parameters->get( 'use_html', 0 ) ) {
+			$rawdata = JRequest::getVar($field->name, '', 'post', 'string', JREQUEST_ALLOWRAW);
+			if ($rawdata) $post = $rawdata;
 		}
-		$field->results = $resultfields;
-		//return $resultfields;
+		if(!is_array($post) && !strlen($post)) return;
+
+		// Reconstruct value if it has splitted up e.g. to tabs
+		if (is_array($post)) {
+			$tabs_text = '';
+			foreach($post as $tab_text) {
+				$tabs_text .= $tab_text;
+			}
+			$post = & $tabs_text;
+		}
 	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'textarea') return;
+		
+		$field_type = $field->field_type;
+		$field->field_type =  'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type =  'textarea';
+	}
+	
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item) {
+		if ($field->field_type != 'textarea') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'textarea') return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='textarea') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
+	}
+		
 }

@@ -21,9 +21,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.plugin.plugin' );
 
-require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
 
 
 /**
@@ -73,7 +74,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 	 * used in a common display routine: href, title, section, created, text,
 	 * browsernav
 	 * @param string Target search string
-	 * @param string mathcing option, exact|any|all
+	 * @param string matching option, exact|any|all
 	 * @param string ordering option, newest|oldest|popular|alpha|category
 	 * @param mixed An array if restricted to areas, null if search all
 	 */
@@ -115,10 +116,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
-		require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
-		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
-		
 		if (is_array( $areas )) {
 			if (!array_intersect( $areas, array_keys( $this->onContentSearchAreas() ) )) {
 				return array();
@@ -134,12 +131,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
-		//$limit 			= $pluginParams->def( 'search_limit', 50 );
-		$limit 			= $pluginParams->get( 'search_limit', 50 );
-		$limitstart = JRequest::getVar('limitstart', 0);
-		//$filter_lang 	= $pluginParams->def( 'filter_lang', 1 );
+		$limit        = $pluginParams->get( 'search_limit', 50 );
+		$limitstart   = JRequest::getVar('limitstart', 0);
 		$filter_lang 	= $pluginParams->get( 'filter_lang', 1 );
-		//$browsernav 	= (int)$pluginParams->def( 'browsernav', 2 );
 		$browsernav 	= (int)$pluginParams->get( 'browsernav', 2 );
 		
 		// Dates for publish up & down items
@@ -148,8 +142,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$now = $date->toMySQL();
 		
 		$text = trim( $text );
-		JRequest::setVar('title', array($text));
-		//if ( $text == '' ) {	return array();	}
 		
 		$searchFlexicontent = JText::_( 'FLEXICONTENT' );
 		if($text!='') {
@@ -157,7 +149,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 			switch ($phrase)
 			{
 				case 'exact':
-					//$text		= $db->Quote( '"'.$db->getEscaped( $text, true ).'"', false );
 					$text		= $db->Quote( '"'.$db->getEscaped( $text, false ).'"', false );
 					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 					break;
@@ -165,19 +156,19 @@ class plgSearchFlexiadvsearch extends JPlugin
 				case 'all':
 					$words = explode( ' ', $text );
 					$newtext = '+' . implode( ' +', $words );
-					//$text		= $db->Quote( $db->getEscaped( $newtext, true ), false );
 					$text		= $db->Quote( $db->getEscaped( $newtext, false ), false );
 					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 					break;
 				
 				case 'any':
 				default:
-					//$text		= $db->Quote( $db->getEscaped( $text, true ), false );
 					$text		= $db->Quote( $db->getEscaped( $text, false ), false );
 					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
 					break;
 			}
-		} else $where = '0';
+		} else {
+			$where = '0';
+		}
 		
 		switch ( $ordering )
 		{
@@ -246,8 +237,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		;
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
+		$fields = is_array($fields) ? $fields : array();
 		
-		$fields = is_array($fields)?$fields:array();
 		$CONDITION = '';
 		$OPERATOR = JRequest::getVar('operator', 'OR');
 		$FOPERATOR = JRequest::getVar('foperator', 'OR');
@@ -256,39 +247,45 @@ class plgSearchFlexiadvsearch extends JPlugin
 		if (FLEXI_J16GE) {
 			$custom = JRequest::getVar('custom', array());
 		}
+		
 		JPluginHelper::importPlugin( 'flexicontent_fields');
 		$foundfields = array();
-		foreach($fields as $field) {
+		foreach($fields as $field)
+		{
 			// Once per (advanced searchable) field TYPE
 			$field->parameters = new JParameter($field->attribs);
-			$fieldsearch = JRequest::getVar($field->name, array());
-			$fieldsearch = is_array($fieldsearch)?$fieldsearch:array(trim($fieldsearch));
-			if(isset($fieldsearch[0]) && (strlen(trim($fieldsearch[0]))>0)) {
-				$foundfields[$field->id] = array();
-				//var_dump($field->id, $fieldsearch[0]);echo "<br />";
-				$fieldsearch = $fieldsearch[0];
-				//echo $fieldsearch ."<br>";
-				$fieldsearch = explode(" ", $fieldsearch);
-				$dispatcher->trigger( 'onFLEXIAdvSearch', array(&$field, $fieldsearch));
-				if(isset($field->results) && (count($field->results)>0)) {
-					//echo "<pre>"; print_r($results);echo "</pre>"; 
-					foreach($field->results as $r) {
-						if($r) {
-							$items[] = $r->item_id;
-							$foundfields[$field->id][] = $r->item_id;
-							$resultfields[$r->item_id][] = $r;
-						}
+			
+			$foundfields[$field->id] = array();
+			
+			//echo "Field name:". $field->name;
+			$fieldname = $field->iscore ? 'core' : $field->field_type;
+			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onFLEXIAdvSearch', array( &$field ));
+			
+			
+			if(isset($field->results) && (count($field->results)>0))
+			{
+				//echo "<pre>"; print_r($field->results);echo "</pre>"; 
+				foreach($field->results as $r) {
+					if($r) {
+						$items[] = $r->item_id;
+						$foundfields[$field->id][] = $r->item_id;
+						$resultfields[$r->item_id][] = $r;
 					}
 				}
 			}
+			echo "<br/>";			
+			
 		}
+		//echo "<pre>foundfields: "; print_r($foundfields);echo "</pre>";
+		//echo "<pre>resultfields: "; print_r($resultfields);echo "</pre>";
 		
-		if(count($items)) {
-			if($FOPERATOR=='OR') {
+		if ( count($items) )
+		{
+			if ($FOPERATOR=='OR') {
 				$items = array_unique($items);
 				$items = "'".implode("','", $items)."'";
 				$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
-			}else{
+			} else {
 				$codestr = "\$items = array_intersect(";
 				$codestr_a = array();
 				foreach($foundfields as $k=>$a) {
@@ -297,10 +294,10 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$codestr .= implode(", ", $codestr_a);
 				$codestr .= ");";
 				$items = array();
-				if(count($codestr_a)==1) {
+				if (count($codestr_a)==1) {
 					$items = $foundfields[$k];
 					$items = "'".implode("','", $foundfields[$k])."'";
-				}elseif(count($codestr_a)>1) {
+				} elseif(count($codestr_a)>1) {
 					eval($codestr);
 					$items = "'".implode("','", $items)."'";
 				}

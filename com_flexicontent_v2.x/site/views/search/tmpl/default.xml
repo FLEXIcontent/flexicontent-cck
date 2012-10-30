@@ -65,12 +65,10 @@
 		</field>
 		
 	<field name="" type="separator" level="level1" default="Search Results Configuration" />
-<!--
-		<field name="show_section" type="radio" default="0" label="Show section" description="Display section for each result. Note, this usually should be disabled since all FLEXIcontent items are placed in a single section">
+		<!--field name="show_section" type="radio" default="0" label="Show section" description="Display section for each result. Note, this usually should be disabled since all FLEXIcontent items are placed in a single section">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</field>
--->
+		</field-->
 		<field name="show_text" type="radio" default="1" label="Show description" description="Display for each result its description text">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

@@ -19,24 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsEmail extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsEmail( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 	}
 	
-	function onAdvSearchDisplayField(&$field, &$item)
-	{
-		if($field->field_type != 'email') return;
-		plgFlexicontent_fieldsEmail::onDisplayField($field, $item);
-	}
 	
-	// This function is called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
-	{
-	}
 	
-	// This function is called to display the field in item edit/submit form
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
@@ -84,6 +83,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$document->addScriptDeclaration($js);
 
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
@@ -95,10 +95,15 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					} else {
+						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					}
 					
 					thisNewField.getElements('input.emailaddr').setProperty('value','');
 					thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
+					thisNewField.getElements('input.emailaddr').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
 					";
 					
 			if ($usetitle) $js .= "
@@ -135,13 +140,17 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				{
 					var field	= $(el);
 					var row		= field.getParent();
-					var fx		= row.effects({duration: 300, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					} else {
+						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+					}
 					
 					fx.start({
 						'height': 0,
 						'opacity': 0
 						}).chain(function(){
-							row.remove();
+							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 						});
 					rowCount".$field->id."--;
 				}
@@ -192,6 +201,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				$value = array('addr' => $value, 'text' => '');
 			}
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			$addr = '
 				<label class="legende" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
@@ -222,88 +232,9 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->html = '<div>'.$field->html[0].'</div>';
 		}
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'email') return;
-		if(!$post) return;
-		
-		// reformat the post
-		$newpost = array();
-		$new = 0;
-		
-		// make sure posted data is an array 
-		$post = !is_array($post) ? array($post) : $post;
-		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-		foreach ($post as $n=>$v)
-		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
-				} else {
-					$post[$n] = array('addr' => $post[$n], 'text' => '');
-				}
-			}
-			
-			if ($post[$n]['addr'] != '')
-			{
-				$newpost[$new] = $post[$n];
-				$newpost[$new]['addr'] = $post[$n]['addr'];
-				$newpost[$new]['text'] = strip_tags(@$post[$n]['text']);
-				$new++;
-			}
-		}
-		$post = $newpost;
-		
-		// create the fulltext search index
-		if ($field->issearch) {
-			$searchindex = '';
-			
-			foreach($post as $i => $v)
-			{
-				$searchindex .= $v['addr'];
-				$searchindex .= ' ';
-				$searchindex .= $v['text'];
-				$searchindex .= ' ';
-			}
-			$searchindex .= ' | ';
-			$field->search = $searchindex;
-		} else {
-			$field->search = '';
-		}
-		
-		if($field->isadvsearch && JRequest::getVar('vstate', 0)==2) {
-			plgFlexicontent_fieldsEmail::onIndexAdvSearch($field, $post);
-		}
-		
-		// Serialize multiproperty data before storing into the DB
-		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
-		}
-	}
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'email') return;
-		$db = &JFactory::getDBO();
-		$post = is_array($post)?$post:array($post);
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='email';";
-		$db->setQuery($query);
-		$db->query();
-		$i = 0;
-		foreach($post as $v) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','email','{$i}', ".$db->Quote($v).");";
-			$db->setQuery($query);
-			$db->query();
-			$i++;
-		}
-		return true;
-	}
-
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
@@ -395,27 +326,116 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		}
 	}
 	
-	function onFLEXIAdvSearch(&$field, $fieldsearch)
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if($field->field_type!='email') return;
-		$db = &JFactory::getDBO();
-		$resultfields = array();
-		foreach($fieldsearch as $fsearch) {
-			$query = "SELECT ai.search_index, ai.item_id FROM #__flexicontent_advsearch_index as ai"
-				." WHERE ai.field_id='{$field->id}' AND ai.extratable='email' AND ai.search_index like '%{$fsearch}%';";
-			$db->setQuery($query);
-			$objs = $db->loadObjectList();
-			if ($objs===false) continue;
-			$objs = is_array($objs)?$objs:array($objs);
-			foreach($objs as $o) {
-				$obj = new stdClass;
-				$obj->item_id = $o->item_id;
-				$obj->label = $field->label;
-				$obj->value = $fsearch;
-				$resultfields[] = $obj;
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'email') return;
+		if(!is_array($post) && !strlen($post)) return;
+		
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		
+		// Reformat the posted data
+		$newpost = array();
+		$new = 0;
+		foreach ($post as $n=>$v)
+		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($post[$n]) ) {
+				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
+					$post[$n] = unserialize($post[$n]);
+				} else {
+					$post[$n] = array('addr' => $post[$n], 'text' => '');
+				}
+			}
+			
+			if ($post[$n]['addr'] !== '')
+			{
+				$newpost[$new] = $post[$n];
+				$newpost[$new]['addr'] = $post[$n]['addr'];
+				$newpost[$new]['text'] = strip_tags(@$post[$n]['text']);
+				$new++;
 			}
 		}
-		$field->results = $resultfields;
+		$post = $newpost;
+		
+		// Serialize multi-property data before storing them into the DB
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
+		}
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'email') return;
+		
+		$field_type = $field->field_type;
+		$field->field_type = 'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type = 'email';
+	}
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'email') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'email') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='date') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 	
 }

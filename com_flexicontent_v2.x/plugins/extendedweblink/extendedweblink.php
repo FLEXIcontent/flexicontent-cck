@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: extendedweblink.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.0 $Id: extendedweblink.php 1495 2012-09-24 23:01:13Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.extendedweblink
@@ -19,24 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsExtendedWeblink( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
 	}
 	
-	function onAdvSearchDisplayField(&$field, &$item)
-	{
-		if($field->field_type != 'extendedweblink') return;
-		plgFlexicontent_fieldsExtendedWeblink::onDisplayField($field, $item);
-	}
 	
-	// This function is called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item)
-	{
-	}
 	
-	// This function is called to display the field in item edit/submit form
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
@@ -96,6 +95,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$document->addScriptDeclaration($js);
 
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
@@ -107,10 +107,15 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 					var thisField 	 = $(el).getPrevious().getLast();
 					var thisNewField = thisField.clone();
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+					} else {
+						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+					}
 					
 					thisNewField.getElements('input.urllink').setProperty('value','".$default_link."');
 					thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+					thisNewField.getElements('input.urllink').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
 					";
 					
 			if ($usetitle) $js .= "
@@ -137,7 +142,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					thisNewField.getElements('input.urlhits').setProperty('value','0');
 					thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 					
-					thisNewField.getElements('span span').set('html','0');  // Set hits to zero for new row value
+					// Set hits to zero for new row value
+					if (MooTools.version>='1.2.4') {
+						thisNewField.getElements('span span').set('html','0');
+					} else {
+						thisNewField.getElements('span span').setHTML('0');
+					}
 
 					thisNewField.injectAfter(thisField);
 		
@@ -167,13 +177,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				{
 					var field	= $(el);
 					var row		= field.getParent();
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					if (MooTools.version>='1.2.4') {
+						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+					} else {
+						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+					}
 					
 					fx.start({
 						'height': 0,
 						'opacity': 0
 						}).chain(function(){
-							row.destroy();
+							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 						});
 					rowCount".$field->id."--;
 				}
@@ -214,13 +228,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$has_prefix = preg_match("#^http|^https|^ftp#i", $value['link']);
 			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
-			$link = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td><td><input class="urllink '.$required.'" name="'.$fieldname.'[link]" type="text" size="'.$size.'" value="'.$value['link'].'" /></td></tr>';
+			$link = '<tr><td class="key">'.JText::_( 'FLEXI_FIELD_URL' ).':</td><td><input class="urllink '.$required.'" id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[link]" type="text" size="'.$size.'" value="'.$value['link'].'" /></td></tr>';
 			
 			if ($allow_relative_addrs==2) $autoprefix =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ).  ':</td><td>
-					<label class="legende" for="'.$fieldname.'[autoprefix][0]">'.JText::_('FLEXI_NO').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix][0]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
-					<label class="legende" for="'.$fieldname.'[autoprefix][1]">'.JText::_('FLEXI_YES').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix][1]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
+					<label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
+					<label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
 				</td></tr>';
 			
 			if ($usetitle) $title =
@@ -264,99 +279,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$field->html = $field->html[0];
 		}
 	}
-
-
-	function onBeforeSaveField( $field, &$post, &$file )
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'extendedweblink') return;
-		if(!$post) return;
-		
-		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		
-		// reformat the post
-		$newpost = array();
-		$new = 0;
-		
-		// make sure posted data is an array 
-		$post = !is_array($post) ? array($post) : $post;
-		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-		foreach ($post as $n=>$v)
-		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
-				} else {
-					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
-				}
-			}
-			
-			if ($post[$n]['link'] != '')
-			{
-				if ( $allow_relative_addrs ==1 || ($allow_relative_addrs==2 && @$post[$n]['autoprefix']) ) {
-					$http_prefix = '';
-				} else {
-					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
-				}
-				$newpost[$new]['link']		= $http_prefix.$post[$n]['link'];
-				$newpost[$new]['title']		= strip_tags(@$post[$n]['title']);
-				$newpost[$new]['id']			= strip_tags(@$post[$n]['id']);
-				$newpost[$new]['class']		= strip_tags(@$post[$n]['class']);
-				$newpost[$new]['linktext']= strip_tags(@$post[$n]['linktext']);
-				$newpost[$new]['hits']		= (int) $post[$n]['hits'];
-				$new++;
-			}
-		}
-		$post = $newpost;
-		
-		// create the fulltext search index
-		if ($field->issearch) {
-			$searchindex = '';
-			
-			foreach($post as $i => $v)
-			{
-				$searchindex .= $v['link'];
-				$searchindex .= ' ';
-				$searchindex .= $v['title'];
-				$searchindex .= ' ';
-			}
-			$searchindex .= ' | ';
-			$field->search = $searchindex;
-		} else {
-			$field->search = '';
-		}
-		
-		$data	= JRequest::getVar('jform', array(), 'post', 'array');
-		if($field->isadvsearch && $data['vstate']==2) {
-			plgFlexicontent_fieldsExtendedweblink::onIndexAdvSearch($field, $post);
-		}
-		
-		// Serialize multiproperty data before storing into the DB
-		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
-		}
-	}
 	
-	function onIndexAdvSearch(&$field, $post) {
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'extendedweblink') return;
-		$db = &JFactory::getDBO();
-		$post = is_array($post)?$post:array($post);
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id='{$field->id}' AND item_id='{$field->item_id}' AND extratable='extendedweblink';";
-		$db->setQuery($query);
-		$db->query();
-		$i = 0;
-		foreach($post as $v) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES('{$field->id}','{$field->item_id}','extendedweblink','{$i}', ".$db->Quote($v['link'].":".$v['title']).");";
-			$db->setQuery($query);
-			$db->query();
-			$i++;
-		}
-		return true;
-	}
-
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
@@ -464,7 +389,134 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$field->{$prop} = '';
 		}
 	}
-
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'extendedweblink') return;
+		if(!is_array($post) && !strlen($post)) return;
+		
+		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		
+		// Reformat the posted data
+		$newpost = array();
+		$new = 0;
+		foreach ($post as $n => $v)
+		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($post[$n]) ) {
+				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
+					$post[$n] = unserialize($post[$n]);
+				} else {
+					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
+				}
+			}
+			
+			if ($post[$n]['link'] !== '')
+			{
+				if ( $allow_relative_addrs ==1 || ($allow_relative_addrs==2 && !@$post[$n]['autoprefix']) ) {
+					$http_prefix = '';
+				} else {
+					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
+				}
+				$newpost[$new]['link']		= $http_prefix.$post[$n]['link'];
+				$newpost[$new]['title']		= strip_tags(@$post[$n]['title']);
+				$newpost[$new]['id']			= strip_tags(@$post[$n]['id']);
+				$newpost[$new]['class']		= strip_tags(@$post[$n]['class']);
+				$newpost[$new]['linktext']= strip_tags(@$post[$n]['linktext']);
+				$newpost[$new]['hits']		= (int) $post[$n]['hits'];
+				$new++;
+			}
+		}
+		$post = $newpost;
+		
+		// Serialize multi-property data before storing them into the DB
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
+		}
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item)
+	{
+		if($field->field_type != 'extendedweblink') return;
+		
+		$field_type = $field->field_type;
+		$field->field_type = 'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type = 'extendedweblink';
+	}	
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'extendedweblink') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('link'), $search_properties=array('link','title'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'extendedweblink') return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link'), $search_properties=array('link','title'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='date') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	function cleanurl($url)
 	{
 		$prefix = array("http://", "https://", "ftp://");

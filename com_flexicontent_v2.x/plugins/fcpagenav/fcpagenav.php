@@ -16,25 +16,34 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 class plgFlexicontent_fieldsFcpagenav extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsFcpagenav( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_fcpagenav', JPATH_ADMINISTRATOR);
 	}
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsFcpagenav::onDisplayField($field, $item);
-	}
+	
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'fcpagenav') return;
 	}
-
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type

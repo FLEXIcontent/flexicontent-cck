@@ -89,8 +89,9 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		$options  = array();
 		foreach ($items as $id => $val)
 		{
+			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 			$checked  = in_array($id, $field->value) ? ' checked="checked"' : null;
-			$options[] = '<label><input type="checkbox" class="'.$required.'" name="custom['.$field->name.'][]" value="'.$id.'" id="'.$field->name.'_'.$id.'"'.$checked.' />'.$id.'</label>';			 
+			$options[] = '<label><input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$id.'" id="'.$field->name.'_'.$id.'"'.$checked.' />'.$id.'</label>';
 		}			
 			
 		$field->html = implode($separator, $options);
@@ -127,11 +128,11 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	}
 
 
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'linkslist') return;
-		if(!$post) return;
+		if(!is_array($post) && !strlen($post)) return;
 		
 		// create the fulltext search index
 		if ($field->issearch) {

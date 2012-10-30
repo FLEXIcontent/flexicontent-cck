@@ -19,16 +19,23 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsImage extends JPlugin
 {
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsImage( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
 	}
 	
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsImage::onDisplayField($field, $item);
-	}
 	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
 		if($field->field_type != 'image') return;
@@ -68,16 +75,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		if ( !$common_js_css_added ) {
 			$js = "
-				function fx_img_toggle_required (obj_changed, obj_req_toggle) {
-					if (obj_changed.value!='') {
-						obj_changed.className='';
-						obj_req_toggle.className='';
-					} else {
-						obj_changed.className='required';
-						obj_req_toggle.className='required';
-					}
-				}
-				
 				function fx_toggle_upload_select_tbl (obj_changed, obj_disp_toggle) {
 					if (obj_changed.checked)
 						obj_disp_toggle.setStyle('display', 'table');
@@ -89,7 +86,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					targetid = target.getParent().getParent().getParent().getElement('.existingname').id;
 					linkfsel = '".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1'."';
 					linkfsel = linkfsel + '&field='+fieldid+'&itemid='+itemid+'&targetid='+targetid+'&thumb_w='+thumb_w+'&thumb_h='+thumb_h+'&autoassign=".$autoassign."';
-					//alert(linkfsel);
 					return linkfsel;
 				}
 				";
@@ -149,8 +145,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					
 					thisNewField.getElements('input.originalname').setProperty('value','');
 					thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
+					thisNewField.getElements('input.originalname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
 					
 					thisNewField.getElements('.existingname').setProperty('value','');
+					thisNewField.getElements('.existingname').addClass('no_value_selected');
 					thisNewField.getElements('.existingname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
 					thisNewField.getElements('.existingname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
 					
@@ -250,13 +248,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					addField".$field->id."(field.getParent().getParent().getParent().getElement('input.fcfield-addvalue'));
 				}
 				
+				var fp = field.getParent();
+				if ( fp.getElements('input.originalname').getProperty('value')!='' || fp.getElements('.existingname').getProperty('value')!='' ) {
+					var valcounter = $('".$field->name."');
+					if ( !valcounter.value || valcounter.value=='1' ) valcounter.value = '';
+					else valcounter.value = parseInt(valcounter.value) - 1;
+				}
+				
 				if(rowCount".$field->id." > 0)
 				{
 					var row		= field.getParent();
 					if (MooTools.version>='1.2.4') {
 						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
 					} else {
-						var fx = row.effects(row, {duration: 300, transition: Fx.Transitions.linear});
+						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 					}
 					
 					fx.start({
@@ -269,25 +274,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 			
-			function qmAssignFile".$field->id."(tagid, file, file_url) {
-				var obj = $(tagid).getParent().getParent().getParent().getElement('.existingname');
-				var prv_obj = $(tagid.replace('existingname','preview_image'));
-				var elementid = tagid.replace('_existingname','');
-				
-				if (file != '') obj.value = file;
-				
-				if (prv_obj) {
-					if (MooTools.version>='1.2.4') {
-						var tmpDiv = new Element('div',{html:'<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />'});
-						tmpDiv.getFirst().replaces( prv_obj );
-					} else {
-						var tmpDiv = new Element('div', {}).setHTML('<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />');
-						tmpDiv.getFirst().injectAfter( prv_obj );
-						prv_obj.remove();
-					}
-				}
-				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
-			}
 			";
 			
 			$css = '
@@ -317,24 +303,68 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Common JS/CSS
 		$js .= "
 			function qmAssignFile".$field->id."(tagid, file, file_url) {
-				var obj = $(tagid).getParent().getParent().getParent().getElement('.existingname');
+				
+				var originalname = $( tagid.replace('_existingname','_originalname') ).getProperty('value');
+				var existingname = $( tagid ).getProperty('value');
+				var valcounter = $('".$field->name."');
+				
+				if (file=='') {  // DB-mode
+				
+					if ( $( tagid ).hasClass('no_value_selected') && existingname!='' ) {
+						var modify = originalname=='';
+						$( tagid ).removeClass('no_value_selected');
+					} else if ( !$( tagid ).hasClass('no_value_selected') && existingname=='' ) {
+						var modify = -1;
+						$( tagid ).addClass('no_value_selected');
+					} else {
+						var modify = 0;
+					}
+					
+					if (modify>0) {
+						if ( valcounter.value=='' ) valcounter.value = '1';
+						else valcounter.value = parseInt(valcounter.value) + modify;
+					} else if (modify<0) {
+						if ( valcounter.value=='1' ) valcounter.value = '';
+						else valcounter.value = parseInt(valcounter.value) + modify;
+					}
+					
+				} else {  // Folder mode
+				
+					if ( originalname=='' && existingname=='' ) {
+						if ( valcounter.value=='' ) valcounter.value = '1';
+						else valcounter.value = parseInt(valcounter.value) + 1;
+					}
+				}
+				
+				var existing_obj = $(tagid).getParent().getParent().getParent().getElement('.existingname');
+				var original_obj = $(tagid.replace('_existingname','_originalname'));
+				
 				var prv_obj = $(tagid.replace('existingname','preview_image'));
 				var elementid = tagid.replace('_existingname','');
 				
-				if (file != '') obj.value = file;
+				if (file != '') {
+					existing_obj.setProperty('value', file);
+				}
+				original_obj.setProperty('value', '');
 				
 				if (prv_obj) {
+					if (file || !$( tagid ).hasClass('no_value_selected') ) {
+						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />';
+					} else {
+						var preview_container = '<div class=\"empty_image\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>';
+					}
+
 					if (MooTools.version>='1.2.4') {
-						var tmpDiv = new Element('div',{html:'<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />'});
+						var tmpDiv = new Element('div',{html:preview_container});
 						tmpDiv.getFirst().replaces( prv_obj );
 					} else {
-						var tmpDiv = new Element('div', {}).setHTML('<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />');
+						var tmpDiv = new Element('div', {}).setHTML(preview_container);
 						tmpDiv.getFirst().injectAfter( prv_obj );
 						prv_obj.remove();
 					}
 				}
 				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
-			}		
+			}
 		";
 		
 		$document->addScriptDeclaration($js);
@@ -348,21 +378,24 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$class = ' class="'.$required.' "';
 		$onchange= ' onchange="';
-		$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
+		//$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
+		$onchange .= ($required) ? '' : '';
+		
 		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
 		$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 		$onchange .= ' "';
 		$thumb_w = $field->parameters->get( 'w_small', 120 );
 		$thumb_h = $field->parameters->get( 'h_small', 90 );
 		
-		$n = 0;
-		$count_vals = 0;
+		$i = -1;  // Count DB values (may contain invalid entries)
+		$n = 0;   // Count sortable records added (the verified values or a single empty record if no good values)
+		$count_vals = 0;  // Count non-empty sortable records added
 		$image_added = false;
 		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
 			$value = unserialize($value);
-			$count_vals++;
+			$i++;
 			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
@@ -374,7 +407,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<div class=\"blank\">
 						<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_ADD_FILE' )."\"
 							href=\"#\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",".$item->id.",".$thumb_w.",".$thumb_h.")\"
-							rel=\"{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+							rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 					</div>
 				</div>
 				";
@@ -391,11 +424,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if ($image_name) $skipped_vals[] = $image_name;
 				
 				// Skip current value but add and an empty image container if no other image exists
-				if ($image_added || $count_vals < count($field->value) ) {
+				if ($image_added || ($i+1) < count($field->value) ) {
 					continue;
 				} else {
 					$image_name = '';
 				}
+			} else {
+				$count_vals++;
 			}
 			
 			// Add current image or add an empty image container
@@ -416,7 +451,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$change = '<input class="imgchange" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;" />';
 				$change .= '<label style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_FIELD_CHANGE_VALUE' ).'</label>';
 				
-				$originalname = '<input name="'.$fieldname.'[originalname]" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
+				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
 				$img_link  = $adminprefix.$field->parameters->get('dir');
 				$img_link .= ($image_source ? '/item_'.$item->id . '_field_'.$field->id : "");
@@ -425,7 +460,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 			} else {
 				
-				$originalname = '';
+				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="" />';
 				$imgpreview = '<div class="empty_image" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
 			
@@ -478,7 +513,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'['.$n.']" id="'.$field->name.'_newfile"  class="newfile '.$required.'" '.$onchange.' type="file" /></td>
+						<td><input name="'.$field->name.'['.$n.']" id="'.$field->name.'_newfile"  class="newfile" '.$onchange.' type="file" /></td>
 					</tr>'  :  '')
 					.'
 					<tr>
@@ -509,10 +544,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->html = $field->html[0];
 		}
 		
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'">';
+		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
-
+	
+	
+	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		$field->label = JText::_($field->label);
@@ -800,6 +839,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$i = -1;
 		$field->{$prop} = array();
+		$field->thumbs_src['backend'] = array();
+		$field->thumbs_src['small'] = array();
+		$field->thumbs_src['medium'] = array();
+		$field->thumbs_src['large'] = array();
 		foreach ($values as $value)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -871,11 +914,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			
 			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
-			$field->{"display_backend_src"} = JURI::root().$srcb;
-			$field->{"display_small_src"} = JURI::root().$srcs;
-			$field->{"display_medium_src"} = JURI::root().$srcm;
-			$field->{"display_large_src"} = JURI::root().$srcl;
+			if ($i==0) {
+				$field->{"display_backend_src"} = JURI::root().$srcb;
+				$field->{"display_small_src"} = JURI::root().$srcs;
+				$field->{"display_medium_src"} = JURI::root().$srcm;
+				$field->{"display_large_src"} = JURI::root().$srcl;
+			}
+			$field->thumbs_src['backend'][] = JURI::root().$srcb;
+			$field->thumbs_src['small'][] = JURI::root().$srcs;
+			$field->thumbs_src['medium'][] = JURI::root().$srcm;
+			$field->thumbs_src['large'][] = JURI::root().$srcl;
 			
+			$field->thumbs_path['backend'][] = JPATH_SITE.'/'.$srcb;
+			$field->thumbs_path['small'][] = JPATH_SITE.'/'.$srcs;
+			$field->thumbs_path['medium'][] = JPATH_SITE.'/'.$srcm;
+			$field->thumbs_path['large'][] = JPATH_SITE.'/'.$srcl;
 			
 			// Suggest image for external use, e.g. for Facebook etc
 			if (!$isItemsManager && $useogp) {
@@ -953,7 +1006,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if ($url_target=='multibox') {  // (a) Link to URL that opens inside a popup
 					$field->{$prop}[] = '
-					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(window.getSize().x-150)+\',height:\'+(window.getSize().y-150)+\'">\')</script>
+					<script>document.write(\'<a href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>=\'1.2.4\' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>=\'1.2.4\' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>
 						'.$img_legend.'
 					<script>document.write(\'</a>\')</script>
 					<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
@@ -1034,12 +1087,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	}
 	
 	
-	function onBeforeSaveField($field, &$post, &$file)
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
-		if(!$post) return;
-
+		if(!is_array($post) && !strlen($post)) return;
+		
 		$app = &JFactory::getApplication();
 		
 		// Rearrange file array so that file properties are group per image number
@@ -1050,92 +1108,133 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		}
 		
-		//echo "<pre>"; print_r($file);
-		//echo "<pre>"; print_r($post); exit;
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+		//echo "<pre>"; print_r($post);
 		
-		// Handle uploading / removing / deleting / replacing image files
-		$n = 0;
-		
-		// reformat the post
+		// Reformat the posted data & handle uploading / removing / deleting / replacing image files
 		$newpost = array();
 		$new = 0;
-    foreach ($post as $i => $data)
+    foreach ($post as $n => $v)
     {
 			// (a) Handle uploading a new original file
-			if ( isset($files[$i]) ) $this->uploadOriginalFile($field, $data, $files[$i]);
+			if ( isset($files[$n]) ) $this->uploadOriginalFile($field, $v, $files[$n]);
 			
 			// Defaut values for unset required properties of values
-			$data['originalname'] = isset($data['originalname']) ? $data['originalname'] : '';
-			$data['delete'] = isset($data['delete']) ? $data['delete'] : false;
-			$data['remove'] = isset($data['remove']) ? $data['remove'] : false;
+			$v['originalname'] = isset($v['originalname']) ? $v['originalname'] : '';
+			$v['existingname'] = isset($v['existingname']) ? $v['existingname'] : '';
+			$v['delete'] = isset($v['delete']) ? $v['delete'] : false;
+			$v['remove'] = isset($v['remove']) ? $v['remove'] : false;
 			
-			if ( $data['originalname'] || $data['existingname'] ) {
+			if ( $v['originalname'] || $v['existingname'] ) {
+				//echo $v['originalname'] ." ". $v['existingname'] ."<br>";
+				
 				// (b) Handle removing image assignment OR deleting the image file
-				if ($data['originalname'])
-				{
-					if ( $data['delete'] )
-					{
-						$filename = $data['originalname'];
+				if ($v['originalname']) {
+					if ( $v['delete'] ) {
+						$filename = $v['originalname'];
 						$this->removeOriginalFile( $field, $filename );
-						//$app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Deleted image from server storage'));
-					}
-					elseif ( $data['remove'] )
-					{
-						//if ( !$data['existingname'] ) $app->enqueueMessage($field->label . ' ['.$i.'] : ' . JText::_('Removed image assignment to the field'));
+						//$app->enqueueMessage($field->label . ' ['.$n.'] : ' . JText::_('Deleted image from server storage'));
+					} elseif ( $v['remove'] && $v['existingname'] ) {
+						//$app->enqueueMessage($field->label . ' ['.$n.'] : ' . JText::_('Removed image assignment to the field'));
 					}
 				}
 				
 				// (c) Handle replacing image with a new existing image
-				if ( $data['existingname'] ) {
-					//echo "<pre>"; print_r($data); exit;
-					$data['originalname'] = $data['existingname'];
-					unset($data['existingname']);
-				} else if ( $data['delete'] || $data['remove'] ) {
-					$data = '';
+				if ( $v['existingname'] ) {
+					$v['originalname'] = $v['existingname'];
+					$v['existingname'] = '';
+				} else if ( $v['delete'] || $v['remove'] ) {
+					$v = '';
 				}
 				
 			} else {
 				// No original file posted discard current image row
-				$data = '';
+				$v = '';
 			}
 			
 			// Add image entry to a new array skipping empty image entries
-			if ($data) {
-				$newpost[$new] = $data;
+			if ($v) {
+				$newpost[$new] = $v;
 				$new++;
 			}
 		}
 		$post = $newpost;
 		
-		// create the fulltext search index
-		if ($field->issearch) {
-			$searchindex = '';
-			foreach ($post as $value) {
-				if ( !$value ) continue;
-				
-				$searchindex .= @$value['alt'];
-				$searchindex .= ' ';
-				$searchindex .= @$value['title'];
-				$searchindex .= ' ';
-				$searchindex .= @$value['desc'];
-				$searchindex .= ' | ';
-			}
-			$field->search = $searchindex;
-		} else {
-			$field->search = '';
-		}
-		
-		$data	= JRequest::getVar('jform', array(), 'post', 'array');
-		if($field->isadvsearch && $data['vstate']==2) {
-			plgFlexicontent_fieldsExtendedweblink::onIndexAdvSearch($field, $post);
-		}
-		
-		// Serialize multiproperty data before storing into the DB
+		// Serialize multi-property data before storing them into the DB
 		foreach($post as $i => $v) {
 			$post[$i] = serialize($v);
 		}
 	}
 	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
+	}
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayField(&$field, &$item) {
+		if($field->field_type != 'image') return;
+		
+		$field_type = $field->field_type;
+		$field->field_type = 'text';
+		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		$field->field_type = 'image';
+	}
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'image') return;
+		if ( !$field->isadvsearch ) return;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ($field->field_type != 'image') return;
+		if ( !$field->issearch ) return;
+		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+		
+	// Method to get ALL items that have matching search values for the current field id
+	function onFLEXIAdvSearch(&$field)
+	{
+		if ($field->field_type!='selectmultiple') return;
+		
+		FlexicontentFields::onFLEXIAdvSearch($field);
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
 	
 	function uploadOriginalFile($field, &$post, $file)
 	{
@@ -1564,10 +1663,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $new_values;
 		
 		// Create attributes of the drop down field for selecting existing images
-		$class = ' class="existingname"';
+		$class = ' class="existingname no_value_selected"';
 		
 		$onchange = ' onchange="';
-		$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'_newfile\')); ' : '';
+		$onchange .= ($required) ? '' : '';
 		$onchange .= " qmAssignFile".$field->id."(this.id, '', '".$adminprefix.$field->parameters->get('dir')."/s_'+this.value);";
 		$onchange .= ' "';
 		

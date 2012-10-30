@@ -55,9 +55,11 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		@ob_end_clean();
 		//if($typeid_for_advsearch) {
+			$indexer = JRequest::getVar('indexer','advanced');
+			
 			$itemmodel = $this->getModel('items');
 			//$fields = & $itemmodel->getAdvSearchFields($typeid_for_advsearch, 'id');
-			$fields = & $itemmodel->getAdvSearchFields('id');
+			$fields = & $itemmodel->getSearchFields('id', $indexer);
 			$keys = array_keys($fields);
 			//$items	= & $itemmodel->getFieldsItems($keys, $typeid_for_advsearch);
 			$items	= & $itemmodel->getFieldsItems($keys);
@@ -76,10 +78,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 	function index()
 	{
 		@ob_end_clean();
+		$indexer = JRequest::getVar('indexer','advanced');
+		
 		$items_per_call = JRequest::getVar('items_per_call', 50);  // Number of item to index per HTTP request
 		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		$itemmodel = $this->getModel('items');
-		$fields = & $itemmodel->getAdvSearchFields('id');          // Retrieve fields, that are assigned as (advanced) searchable
+		$fields = & $itemmodel->getSearchFields('id', $indexer);          // Retrieve fields, that are assigned as (advanced) searchable
 		$fieldid_arr = array_keys($fields);                        // Get the field ids of the (advanced) searchable fields
 		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);  // Get the items ids that have value for any of the searchable fields
 
@@ -91,11 +95,15 @@ class FlexicontentControllerSearch extends FlexicontentController
 			if ($cnt >= count($itemid_arr)) break; 
 			$itemid = $itemid_arr[$cnt];
 			
+			$item = & JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$item->load( $itemid );
+			if ($indexer == 'basic') $searchindex = '';
+			
 			// For current item: Loop though all searchable fields according to their type
 			foreach($fieldid_arr as $fieldid)
 			{
 				if(!isset($fields[$fieldid])) {
-					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND isadvsearch=1';
+					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND '.($indexer=='advanced' ? 'isadvsearch' : 'issearch').'=1';
 					$db->setQuery($query);
 					if(!$fields[$fieldid] = $db->loadObject()) {
 						echo "fail|1";
@@ -106,59 +114,23 @@ class FlexicontentControllerSearch extends FlexicontentController
 				$field->item_id = $itemid;
 				$field->parameters = new JParameter($field->attribs);
 				
-				// Create DB query to retrieve field values
+				// Indicate that the indexing fuction should retrieve the values
 				$values = null;
-				if ($field->field_type == 'tags')
-				{
-					$query  = 'SELECT CONCAT_WS(\':\', t.id, t.name) AS value'
-						.' FROM #__flexicontent_tags AS t'
-						.' JOIN #__flexicontent_tags_item_relations AS rel ON t.id=rel.tid'
-						.' WHERE rel.itemid='.$itemid;
-				}
-				else if ($field->field_type == 'categories')
-				{
-					$query  = 'SELECT CONCAT_WS(\':\', c.id, c.title) AS value'
-						.' FROM #__flexicontent_categories AS c'
-						.' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
-						.' WHERE rel.itemid='.$itemid;
-				}
-				else if ($field->field_type == 'maintext')
-				{
-					$query  = 'SELECT CONCAT_WS(\' \', c.introtext, c.fulltext) AS value'
-						.' FROM #__content AS c'
-						.' WHERE c.id='.$itemid;
-				}
-				else if ($field->iscore)
-				{
-					$query  = 'SELECT *'
-						.' FROM #__content AS c'
-						.' WHERE c.id='.$itemid;
-					$db->setQuery($query);
-					$data = $db->loadObject();
-					$values = isset( $data->{$field->name} ) ? array($data->{$field->name}) : array();
-				}
-				else
-				{
-					$query = 'SELECT value'
-						.' FROM #__flexicontent_fields_item_relations as rel'
-						.' JOIN #__content as i ON i.id=rel.item_id'
-						.' WHERE rel.field_id='.$fieldid.' AND rel.item_id='.$itemid;
-				}
-				
-				// Execute query if not already done
-				if ($values === null) {
-					$db->setQuery($query);
-					$values = $db->loadResultArray();
-					$values = is_array($values) ? $values : array($values);
-				}
 				
 				// Add values to advanced search index
-				$dispatcher =& JDispatcher::getInstance();
-				JPluginHelper::importPlugin('flexicontent_fields');
-				if(count($values)==1)
-					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values[0]));
-				elseif(count($values)>1)
-					$results = $dispatcher->trigger( 'onIndexAdvSearch', array(&$field, $values));
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				if ($indexer == 'advanced') {
+					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexAdvSearch', array( &$field, &$values, &$item ));
+				} else if ($indexer == 'basic') {
+					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$values, &$item ));
+					$searchindex .= @$field->search;
+					$searchindex .= @$field->search ? ' | ' : '';
+				}
+			}
+			// search_index was updated
+			if ($indexer == 'basic') {
+				$item->search_index = $searchindex;
+				$item->store();
 			}
 		}
 		echo "success";
