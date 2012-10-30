@@ -11,19 +11,15 @@
 						<?php echo $this->pagination->limitstart + $result->count.'. ';?>
 					</span>
 					
-					<?php if ( $result->href ) :
-						if ($result->browsernav == 1 ) : ?>
-							<a href="<?php echo JRoute::_($result->href); ?>" target="_blank">
-						<?php else : ?>
-							<a href="<?php echo JRoute::_($result->href); ?>">
-						<?php endif; ?>
-					<?php endif; ?>
-
+					<?php
+						if ( $result->href ) {
+							echo '<a href="'.JRoute::_($result->href).'" '.(($result->browsernav == 1) ? 'target="_blank"' : '').' >';
+						}
 						echo $this->escape($result->title);
-
-					<?php if ( $result->href ) : ?>
-							</a>
-					<?php endif; ?>
+						if ( $result->href ) {
+							echo '</a>';
+						}
+					?>
 					
 					<?php if ($this->params->get( 'show_section', 0 ) && $result->section ) : ?>
 						<br />
@@ -50,7 +46,8 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<div align="center">
+			<div class="pageslinks" align="center">
+				<?php echo $this->pagination->getPagesCounter(); ?>
 				<?php echo $this->pagination->getPagesLinks(); ?>
 			</div>
 		</td>
