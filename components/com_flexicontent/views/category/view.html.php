@@ -120,8 +120,9 @@ class FlexicontentViewCategory extends JView
 		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
-			$authordescr_item = & $this->get('AuthorDescrItem');
-			list($authordescr_item) = FlexicontentFields::getFields($authordescr_item, 'items', $params, $aid);
+			$authordescr_itemid = $params->get('authordescr_itemid');
+			//$authordescr_item = & $this->get('AuthorDescrItem');
+			//list($authordescr_item) = FlexicontentFields::getFields($authordescr_item, 'items', $params, $aid);
 		}
 		
 		// Bind Fields
@@ -294,7 +295,9 @@ class FlexicontentViewCategory extends JView
 		
 		$authordescr_item_html = false;
 		if ($authordescr_item) {
-			
+			$flexi_html_helper = new flexicontent_html();
+			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
+			/*
 			//echo "<pre>"; print_r($authordescr_item);exit();
 			$ilayout = $authordescr_item->params->get('ilayout', '');
 			if ($ilayout==='') {
@@ -308,10 +311,15 @@ class FlexicontentViewCategory extends JView
 			
 			// start capturing output into a buffer
 			$this->item = & $authordescr_item; 
-			$this->params_saved = $this->params;
+			$this->params_saved = @ $this->params;
 			$this->params = & $authordescr_item->params;
 			$this->tmpl = '.item.'.$ilayout;
 			$this->print_link = JRoute::_('index.php?view=items&id='.$authordescr_item->slug.'&pop=1&tmpl=component');
+			$this->pageclass_sfx = '';
+			$this->item->event->beforeDisplayContent = '';
+			$this->item->event->afterDisplayTitle = '';
+			$this->item->event->afterDisplayContent = '';
+			$this->fields = & $this->item->fields;
 			
 			ob_start();
 			// include the requested template filename in the local scope
@@ -328,7 +336,7 @@ class FlexicontentViewCategory extends JView
 			$authordescr_item_html = ob_get_contents();
 			ob_end_clean();
 			$this->params = $this->params_saved;
-		}
+		}*/
 		//echo $authordescr_item_html; exit();
 		
 		if ($clayout) {

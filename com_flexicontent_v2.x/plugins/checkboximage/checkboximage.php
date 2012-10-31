@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$min_values		= $field->parameters->get( 'min_values', 0 ) ;
 		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
 		if ($required && !$min_values) $min_values = 1;
-		if ($exact_values) $max_values = $min_values = 0;
+		if ($exact_values) $max_values = $min_values = $exact_values;
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 		
 		switch($separator)
@@ -119,9 +119,12 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		$class = '';//$required;
 		$attribs = '';
-		if ($max_values)    $attribs .= ' max_values="'.$max_values.'" ';
-		if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
-		if ($exact_values)  $attribs .= ' exact_values="'.$exact_values.'" ';
+		if ($exact_values)  {
+			$attribs .= ' exact_values="'.$exact_values.'" ';
+		} else {
+			if ($max_values)    $attribs .= ' max_values="'.$max_values.'" ';
+			if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
+		}
 		if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
 		if ($max_values || $min_values || $exact_values)  $class .= ' validate-cboxlimitations ';
 		if ($class)  $attribs .= ' class="'.$class.'" ';
@@ -138,16 +141,23 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				$i++;
 			}
 			$field->html = $options;
-			return;
+			
+		// (b) Display as drop-down select ...
+		} else {
+			$options = array();
+			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+			foreach ($elements as $element) {
+				$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+			}
+			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value, $elementid);
 		}
 		
-		// (b) Display as drop-down select ...
-		$options = array();
-		if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+		// Add message box about allowed # values
+		if ($exact_values) {
+			$field->html = '<div class="fc_mini_note_box">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="clear"></div>'. $field->html;
+		} else if ($max_values || $min_values > 1) {
+			$field->html = '<div class="fc_mini_note_box">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="clear"></div>'. $field->html;
 		}
-		$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value, $elementid);
 	}
 	
 	

@@ -23,11 +23,71 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 
 class flexicontent_html
 {
+	function escape($str) {
+		return addslashes($str);
+	}
+
 	/**
-	 * joomla version specific strings
-	 * @access	protected
-	 * @var		string
+	 * Function to reand the item view of a given item id
+	 *
+	 * @param 	int 		$item_id
+	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
+	 * @since 1.5
 	 */
+	function renderItem($item_id) {
+		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		require_once("components/com_flexicontent/classes/flexicontent.fields.php");
+		require_once("components/com_flexicontent/classes/flexicontent.helper.php");
+		require_once("components/com_flexicontent/models/".FLEXI_ITEMVIEW.".php");
+		 
+		$mainframe = & JFactory::getApplication();
+		
+		$itemmodel = new FlexicontentModelItems();
+		$item = $itemmodel->getItem($item_id, $check_view_access=false);
+		
+		$user = & JFactory::getUser();
+		$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		list($item) = FlexicontentFields::getFields($item, 'items', $item->parameters, $aid);
+		
+		$ilayout = $item->parameters->get('ilayout', '');
+		if ($ilayout==='') {
+			$type = & JTable::getInstance('flexicontent_types', '');
+			$type->id = $item->type_id;
+			$type->load();
+			$type->params = new JParameter($type->attribs);
+			$ilayout = $type->params->get('ilayout', 'default');
+		}
+		
+		$this->item = & $item;
+		$this->params_saved = @$this->params;
+		$this->params = & $item->parameters;
+		$this->tmpl = '.item.'.$ilayout;
+		$this->print_link = JRoute::_('index.php?view=items&id='.$item->slug.'&pop=1&tmpl=component');
+		$this->pageclass_sfx = '';
+		$this->item->event->beforeDisplayContent = '';
+		$this->item->event->afterDisplayTitle = '';
+		$this->item->event->afterDisplayContent = '';
+		$this->fields = & $this->item->fields;
+		
+		// start capturing output into a buffer
+		ob_start();
+		// Include the requested template filename in the local scope (this will execute the view logic).
+		if ( file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
+			include JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
+		else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
+			include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
+		else
+			include JPATH_COMPONENT.DS.'templates'.DS.'default'.DS.'item.php';
+		
+		// done with the requested template; get the buffer and clear it.
+		$item_html = ob_get_contents();
+		ob_end_clean();
+		$this->params = $this->params_saved;
+		
+		return $item_html;
+	}
+	
 	
 	/**
 	 * Escape a string so that it can be used directly by JS source code
