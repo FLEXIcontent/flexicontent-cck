@@ -3051,7 +3051,7 @@ class ParentClassItem extends JModelAdmin
 					if ( !empty($tmpl_params->_xml['_default']) )  // check if parameters group is empty
 					{
 						foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
-							if (isset($p->_attributes['name']))
+							if (!empty($p->_attributes['name']))
 								$item->attribs->set($p->_attributes['name'], null);
 						}
 					}

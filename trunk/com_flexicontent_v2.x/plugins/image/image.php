@@ -48,6 +48,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$maxval     = $field->parameters->get( 'max_values', 0 ) ;
 		$image_source= $field->parameters->get( 'image_source', 0 ) ;
 		
+		// TODO work around limitation of unsaved item (no item id yet)
+		if ($image_source) {
+			$field->html = '<div class="fc_mini_note_box">Current content must be saved ONCE (submitted) before you can add images</div>';
+			return;
+		}
+		
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		$autoupload = $field->parameters->get('autoupload', 0);
@@ -141,7 +147,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 					
 					thisNewField.getElements('input.newfile').setProperty('value','');
+					thisNewField.getElements('.existingname').addClass('no_value_selected');
 					thisNewField.getElements('input.newfile').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+']');
+					thisNewField.getElements('input.newfile').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
 					
 					thisNewField.getElements('input.originalname').setProperty('value','');
 					thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
@@ -303,21 +311,46 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Common JS/CSS
 		$js .= "
 			function qmAssignFile".$field->id."(tagid, file, file_url) {
+				var replacestr = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
+				var elementid = tagid.replace(replacestr,'');
 				
-				var originalname = $( tagid.replace('_existingname','_originalname') ).getProperty('value');
-				var existingname = $( tagid ).getProperty('value');
+				var originalname = $( elementid + '_originalname' ).getProperty('value');
+				var existingname = $( elementid + '_existingname' ).getProperty('value');
+				
 				var valcounter = $('".$field->name."');
 				
 				if (file=='') {  // DB-mode
 				
-					if ( $( tagid ).hasClass('no_value_selected') && existingname!='' ) {
-						var modify = originalname=='';
-						$( tagid ).removeClass('no_value_selected');
-					} else if ( !$( tagid ).hasClass('no_value_selected') && existingname=='' ) {
-						var modify = -1;
-						$( tagid ).addClass('no_value_selected');
+					var newfilename  = $( elementid + '_newfile' ).getProperty('value');
+					
+					if ( replacestr == '_newfile' ) {
+					
+						if ( $( elementid + '_newfile' ).hasClass('no_value_selected') && newfilename!='' ) {
+							var modify = ( originalname=='' && existingname=='' );
+							$( elementid + '_newfile' ).removeClass('no_value_selected');
+						} else if ( !$( elementid + '_newfile' ).hasClass('no_value_selected') && newfilename=='' ) {
+							var modify = -1;
+							$( elementid + '_newfile' ).addClass('no_value_selected');
+						} else {
+							var modify = 0;
+						}
+						
+						$( elementid + '_existingname' ).setProperty('value', '');
+						$( elementid + '_existingname' ).addClass('no_value_selected');
 					} else {
-						var modify = 0;
+					
+						if ( $( elementid + '_existingname' ).hasClass('no_value_selected') && existingname!='' ) {
+							var modify = ( originalname=='' && newfilename=='' );
+							$( elementid + '_existingname' ).removeClass('no_value_selected');
+						} else if ( !$( elementid + '_existingname' ).hasClass('no_value_selected') && existingname=='' ) {
+							var modify = -1;
+							$( elementid + '_existingname' ).addClass('no_value_selected');
+						} else {
+							var modify = 0;
+						}
+						
+						$( elementid + '_newfile' ).setProperty('value', '');
+						$( elementid + '_newfile' ).addClass('no_value_selected');
 					}
 					
 					if (modify>0) {
@@ -336,11 +369,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 				}
 				
-				var existing_obj = $(tagid).getParent().getParent().getParent().getElement('.existingname');
-				var original_obj = $(tagid.replace('_existingname','_originalname'));
+				//alert(valcounter.value);
 				
-				var prv_obj = $(tagid.replace('existingname','preview_image'));
-				var elementid = tagid.replace('_existingname','');
+				var existing_obj = $( elementid + '_existingname' ).getParent().getParent().getParent().getElement('.existingname');
+				var original_obj = $( elementid + '_originalname' );
+				
+				var prv_obj = $(  elementid + '_preview_image' );
 				
 				if (file != '') {
 					existing_obj.setProperty('value', file);
@@ -348,10 +382,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				original_obj.setProperty('value', '');
 				
 				if (prv_obj) {
-					if (file || !$( tagid ).hasClass('no_value_selected') ) {
+					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />';
 					} else {
-						var preview_container = '<div class=\"empty_image\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>';
+						var preview_container = '<div class=\"empty_image\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
+						if ( replacestr == '_newfile' && newfilename!='' ) preview_container = preview_container + '<br/>&nbsp; File selected<br/>&nbsp; for uploading';
+						preview_container = preview_container + '</div>';
 					}
 
 					if (MooTools.version>='1.2.4') {
@@ -379,8 +415,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$class = ' class="'.$required.' "';
 		$onchange= ' onchange="';
 		//$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
-		$onchange .= ($required) ? '' : '';
 		
+		$onchange .= " qmAssignFile".$field->id."(this.id, '', '');";
 		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
 		$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 		$onchange .= ' "';
@@ -513,7 +549,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					<tr>
 						<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
-						<td><input name="'.$field->name.'['.$n.']" id="'.$field->name.'_newfile"  class="newfile" '.$onchange.' type="file" /></td>
+						<td><input name="'.$field->name.'['.$n.']" id="'.$elementid.'_newfile"  class="newfile no_value_selected" '.$onchange.' type="file" /></td>
 					</tr>'  :  '')
 					.'
 					<tr>
