@@ -263,7 +263,7 @@ if ($this->items) :
                 
                     <section class="tabbertab"><!-- tab start -->
                         <header>
-                            <h3><?php echo $tabpos_name; ?></h3><!-- tab title -->
+                            <h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
                         </header>
                         <div class="flexi lineinfo <?php echo $tabpos_name; ?>">
                             <?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
@@ -368,7 +368,7 @@ if ($this->items) :
                     <section class="tabbertab"><!-- tab start -->
                         
                         <header>
-                        <h3><?php echo $tabpos_name; ?></h3><!-- tab title -->
+                        <h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
                         </header>
                         
                         <div class="flexi lineinfo <?php echo $tabpos_name; ?>">
