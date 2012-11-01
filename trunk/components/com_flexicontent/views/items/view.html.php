@@ -463,6 +463,8 @@ class FlexicontentViewItems extends JView
 		// new item and ownership variables
 		$isnew = !$item->id;
 		$isOwner = ( $item->created_by == $user->get('id') );
+		// A unique item id
+		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
 		if (!$isnew) {
 			// EDIT action

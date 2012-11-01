@@ -897,6 +897,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 		<input type="hidden" name="views" value="items" />
 		<?php if ( $isnew ) echo $this->submitConf; ?>
+		
+		<input type="hidden" name="unique_tmp_itemid" value="<?php echo JRequest::getVar( 'unique_tmp_itemid' );?>" />
+
 	</form>
 </div>
 

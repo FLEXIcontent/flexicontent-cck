@@ -85,6 +85,8 @@ class FlexicontentViewItem extends JView
 		// Get item id and new flag
 		$cid = $model->getId();
 		$isnew = ! $cid;
+		// A unique item id
+		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
 		$version = $row->loaded_version;
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);

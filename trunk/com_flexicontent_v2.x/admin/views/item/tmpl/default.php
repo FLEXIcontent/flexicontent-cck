@@ -1003,6 +1003,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="item" />
 <input type="hidden" name="task" value="" />
+<input type="hidden" name="unique_tmp_itemid" value="<?php echo JRequest::getVar( 'unique_tmp_itemid' );?>" />
 <?php echo $this->form->getInput('hits'); ?>
 </form>
 
