@@ -49,10 +49,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$image_source= $field->parameters->get( 'image_source', 0 ) ;
 		
 		// TODO work around limitation of unsaved item (no item id yet)
-		if ($image_source) {
+		/*if ($image_source) {
 			$field->html = '<div class="fc_mini_note_box">Current content must be saved ONCE (submitted) before you can add images</div>';
 			return;
-		}
+		}*/
+		
+		// Get a unique id to use as item id if current item is new
+		$user = & JFactory::getUser();
+		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
 		
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -442,7 +446,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<div class=\"fcfield-button-add\">
 					<div class=\"blank\">
 						<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_ADD_FILE' )."\"
-							href=\"#\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",".$item->id.",".$thumb_w.",".$thumb_h.")\"
+							href=\"#\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w.",".$thumb_h.")\"
 							rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 					</div>
 				</div>
@@ -490,7 +494,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
 				$img_link  = $adminprefix.$field->parameters->get('dir');
-				$img_link .= ($image_source ? '/item_'.$item->id . '_field_'.$field->id : "");
+				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
 				$img_link .= '/s_'.$value['originalname'];
 				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
 				
@@ -1135,6 +1139,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if(!is_array($post) && !strlen($post)) return;
 		
 		$app = &JFactory::getApplication();
+		
+		// New items had no item id during submission, thus we need to rename then temporary name of images upload folder
+		$image_source = $field->parameters->get('image_source', 0);
+		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
+		$dir = $field->parameters->get('dir');
+		
+		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
+		if ( empty($unique_tmp_itemid) ) {
+			$app->enqueueMessage( 'WARNING, field: '.$field->label.' requires variable -unique_tmp_itemid- please update your '.($app->isSite() ? 'form.php':'default.php'), 'warning');
+		}
+		
+		// Rename temporary name of images upload folder to include the item_id
+		if ( $unique_tmp_itemid && $item != $unique_tmp_itemid && $image_source ) {
+			$temppath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$unique_tmp_itemid. '_field_'.$field->id .DS );
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$field->item_id   . '_field_'.$field->id .DS );
+			JFolder::move($temppath, $destpath);
+		}
 		
 		// Rearrange file array so that file properties are group per image number
 		$files = array();
