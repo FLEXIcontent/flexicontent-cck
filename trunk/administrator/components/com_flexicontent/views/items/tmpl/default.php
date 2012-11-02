@@ -221,8 +221,11 @@ window.addEvent('domready', function() {
 					$types = & $this->get( 'Typeslist' );
 					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
 				?>
-				<input id="button-bind" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
+				<br/>
+				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
+				<input id="button-bind" type="submit" class="fc_select_button" style='float:none; display:inline-block;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
 				onclick="	this.form.action += '&typeid='+this.form.elements['typeid'].options[this.form.elements['typeid'].selectedIndex].value;
+									this.form.action += '&default_cat='+this.form.elements['default_cat'].options[this.form.elements['default_cat'].selectedIndex].value;
 									this.form.action += '&extdata='+this.form.elements['extdata'].options[this.form.elements['extdata'].selectedIndex].value;" />
 				<div id="log-bind"></div>
 			</td>

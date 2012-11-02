@@ -267,22 +267,27 @@ class FlexicontentModelItems extends JModel
 		$status = array();
 		
 		$query 	= 'SELECT c.id FROM #__content as c'
-					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
-					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
+					. (FLEXI_J16GE ?  ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
 				;
 		$this->_db->setQuery($query);
 		$allids = $this->_db->loadResultArray();
 		$allids = is_array($allids)?$allids:array();// !important
+		//echo count($allids); exit;
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
 		$this->_db->setQuery($query);
 		$allext = $this->_db->loadResultArray();
 		$allext = is_array($allext)?$allext:array();// !important
 
-		$query 	= 'SELECT DISTINCT itemid FROM #__flexicontent_cats_item_relations';
+		$query 	= 'SELECT DISTINCT c.id FROM #__content as c'
+						. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+						. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" ')
+						. ' AND c.catid<>0 AND cat.id IS NOT NULL';
 		$this->_db->setQuery($query);
 		$allcat = $this->_db->loadResultArray();
 		$allcat = is_array($allcat)?$allcat:array();// !important
+		//echo count($allcat); exit;
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
 				. ' GROUP BY item_id'
@@ -300,6 +305,7 @@ class FlexicontentModelItems extends JModel
 		$status['nocat'] 		= array_diff($allids,$allcat);
 		$status['countnocat'] 	= count($status['nocat']);
 		$status['no'] 			= array_unique(array_merge($status['noext'],$status['nocat']));
+		//print_r($status['no']); exit;
 		$status['countno'] 		= count($status['no']);
 		
 		return $status;
@@ -320,8 +326,8 @@ class FlexicontentModelItems extends JModel
 			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state'
 					. (FLEXI_J16GE ? ', c.language' : '')
 					. ' FROM #__content as c'
-					. (FLEXI_J16GE ? ' JOIN #__categories as cat ON c.catid=cat.id' : '')
-					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'"')
+					. (FLEXI_J16GE ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
+					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
 					. $and
 					;
 			$this->_db->setQuery($query, 0, $limit);
@@ -344,10 +350,15 @@ class FlexicontentModelItems extends JModel
 	{
 		if (!$rows) return;
 		
+		$default_lang = flexicontent_html::getSiteDefaultLang();
+		$typeid = JRequest::getVar('typeid',1);
+		$default_cat = (int)JRequest::getVar('default_cat', '');
+		
 		// insert items to category relations
 		$catrel = array();
 		foreach ($rows as $row) {
-			$catrel[] = '('.(int)$row->catid.', '.(int)$row->id.')';
+			$row_catid = $row->catid ? (int)$row->catid : $default_cat;
+			$catrel[] = '('.$row_catid.', '.(int)$row->id.')';
 			// append the text property to the object
 			if (JString::strlen($row->fulltext) > 1) {
 				$row->text = $row->introtext = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
@@ -359,17 +370,23 @@ class FlexicontentModelItems extends JModel
 
 		$nullDate	= $this->_db->getNullDate();
 		
+		$query = 'UPDATE #__content SET catid=' .$default_cat. ' WHERE catid=0' ;
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		$query = 'UPDATE #__content SET language=' .$this->_db->Quote($default_lang). ' WHERE language=""' ;
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
 		$query = 'REPLACE INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . $catrel;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 
 		// insert items_ext datas
 		$itemext = array();
-		$typeid = JRequest::getVar('typeid',1);
-		$lang = flexicontent_html::getSiteDefaultLang();
 		foreach ($rows as $row) {
-			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $lang;
-			else $ilang = $lang;  // J1.5 has no language setting
+			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $default_lang;
+			else $ilang = $default_lang;  // J1.5 has no language setting
 			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
 			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
 			$this->_db->setQuery($query);
