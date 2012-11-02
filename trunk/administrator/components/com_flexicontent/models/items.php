@@ -283,7 +283,7 @@ class FlexicontentModelItems extends JModel
 		$query 	= 'SELECT DISTINCT c.id FROM #__content as c'
 						. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 						. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" ')
-						. ' AND c.catid<>0 AND cat.id IS NOT NULL';
+						. ' AND cat.id IS NOT NULL';
 		$this->_db->setQuery($query);
 		$allcat = $this->_db->loadResultArray();
 		$allcat = is_array($allcat)?$allcat:array();// !important
@@ -354,10 +354,19 @@ class FlexicontentModelItems extends JModel
 		$typeid = JRequest::getVar('typeid',1);
 		$default_cat = (int)JRequest::getVar('default_cat', '');
 		
+		// Get invalid cats
+		$query = 'SELECT DISTINCT c.catid '
+					.' FROM jos_content as c '
+					.' LEFT JOIN jos_categories as cat ON c.catid=cat.id'
+					.' WHERE cat.id IS NULL';
+		$this->_db->setQuery($query);
+		$badcats = $this->_db->loadResultArray();
+		$badcats = array_flip($badcats);
+		
 		// insert items to category relations
 		$catrel = array();
 		foreach ($rows as $row) {
-			$row_catid = $row->catid ? (int)$row->catid : $default_cat;
+			$row_catid = !isset($badcats[$row->catid]) ? (int)$row->catid : $default_cat;
 			$catrel[] = '('.$row_catid.', '.(int)$row->id.')';
 			// append the text property to the object
 			if (JString::strlen($row->fulltext) > 1) {
@@ -370,7 +379,10 @@ class FlexicontentModelItems extends JModel
 
 		$nullDate	= $this->_db->getNullDate();
 		
-		$query = 'UPDATE #__content SET catid=' .$default_cat. ' WHERE catid=0' ;
+		$query = 'UPDATE jos_content as c '
+					.' LEFT JOIN jos_categories as cat ON c.catid=cat.id'
+					.' SET c.catid=' .$default_cat
+					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
