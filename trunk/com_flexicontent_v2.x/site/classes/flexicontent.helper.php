@@ -2875,7 +2875,9 @@ class FLEXIUtilities
 			// Log the visit into the hits logging db table
 			if(empty($count))
 			{
-				$query = "REPLACE INTO #__flexicontent_hits_log (item_id, timestamp, ip) VALUES (".$db->quote($item->id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")";
+				$query = "INSERT INTO #__flexicontent_hits_log (item_id, timestamp, ip) "
+						."  VALUES (".$db->quote($item->id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
+						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
 				$db->setQuery($query);
 				$result = $db->query();
 				if ($db->getErrorNum()) {
