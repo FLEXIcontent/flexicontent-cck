@@ -348,7 +348,7 @@ class FlexicontentModelItems extends JModel
 	 */
 	function addFlexiData($rows)
 	{
-		if (!$rows) return;
+		if (!$rows || !count($rows)) return;
 		
 		$default_lang = flexicontent_html::getSiteDefaultLang();
 		$typeid = JRequest::getVar('typeid',1);
@@ -390,21 +390,26 @@ class FlexicontentModelItems extends JModel
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
-		$query = 'REPLACE INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . $catrel;
+		$query = "INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) "
+				."  VALUES ".$catrel
+				." ON DUPLICATE KEY UPDATE ordering=ordering";
 		$this->_db->setQuery($query);
 		$this->_db->query();
 
-		// insert items_ext datas
-		$itemext = array();
+		// insert items_ext datas,
+		// NOTE: we will not use a single query for creating multiple records,
+		// because of the column search_index which can be quite long
 		foreach ($rows as $row) {
 			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $default_lang;
 			else $ilang = $default_lang;  // J1.5 has no language setting
 			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
-			$query = 'REPLACE INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`) VALUES ' . $itemext;
+			$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`)"
+					." VALUES " . $itemext
+					." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
-
+		
 		return;
 	}
 
