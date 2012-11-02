@@ -303,6 +303,8 @@ class FlexicontentViewItems extends JView {
 		//build authors select list
 		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="inputbox" size="1" onchange="submitform( );"');
 
+		$lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
+		
 		//search filter
 		$scopes = array();
 		$scopes[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_TITLE' ) );
