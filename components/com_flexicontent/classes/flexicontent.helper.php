@@ -43,7 +43,10 @@ class flexicontent_html
 		 
 		$mainframe = & JFactory::getApplication();
 		
-		$itemmodel = new FlexicontentModelItems();
+		if (FLEXI_J16GE)
+			$itemmodel = new FlexicontentModelItems();
+		else
+			$itemmodel = new FlexicontentModelItem();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 		
 		$user = & JFactory::getUser();

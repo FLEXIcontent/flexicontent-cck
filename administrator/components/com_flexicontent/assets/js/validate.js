@@ -3,7 +3,14 @@
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-if (MooTools.version>="1.2.4") {  // Instruction browser of new type of fields
+var flexi_j16ge = 0;
+var tab_focused;
+var max_cat_assign_fc = 0;
+var existing_cats_fc  = [];
+var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
+var fcflabels = null;
+
+if (flexi_j16ge) {  // Instruction browser of new type of fields
 	Object.append(Browser.Features, {
 		inputemail: (function() {
 			var i = document.createElement("input");
@@ -21,12 +28,6 @@ Object.size = function(obj) {
     return size;
 };
 
-var flexi_j16ge = 0;
-var tab_focused;
-var max_cat_assign_fc = 0;
-var existing_cats_fc  = [];
-var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
-var fcflabels = null;
 
 /**
  * Unobtrusive Form Validation library
