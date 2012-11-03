@@ -164,11 +164,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
 <div id="flexicontent" class="<?php echo $page_classes; ?>" style="font-size:90%;<?php echo $this->params->get('form_container_css_fe'); ?>">
 
-    <?php if ($this->params->def( 'show_page_title', 1 )) : ?>
-    <h1 class="componentheading">
-        <?php echo $this->params->get('page_title'); ?>
-    </h1>
-    <?php endif; ?>
+	<?php if ($this->params->def( 'show_page_title', 1 )) : ?>
+	<h1 class="componentheading">
+		<?php echo $this->params->get('page_title'); ?>
+	</h1>
+	<?php endif; ?>
 
 	<?php
 	$allowbuttons_fe = $this->params->get('allowbuttons_fe');
@@ -308,12 +308,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	
 	<?php if ($typeid==0) : ?>
 	
-			<div class="flexi_formblock">
-				<label id="type_id-lbl" for="type_id" class="flexi_label" >
-					<?php echo JText::_( 'FLEXI_TYPE' ); ?>
-				</label>
-				<?php echo $this->lists['type']; ?>
-			</div>
+		<div class="flexi_formblock">
+			<label id="type_id-lbl" for="type_id" class="flexi_label" >
+				<?php echo JText::_( 'FLEXI_TYPE' ); ?>
+			</label>
+		<?php echo $this->lists['type']; ?>
+		</div>
 			
 	<?php endif; ?>
 
@@ -422,7 +422,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
-					<span class="editlinktip hasTip" title="::<?php echo JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' );?>">
+					<span class="editlinktip hasTip" title="::<?php echo $this->escape(JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ));?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 					</span>
 				</label>
@@ -687,9 +687,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	
 	<?php if ($this->perms[$publication_priv] && $this->params->get('usepublicationdetails_fe', 1)) : ?>
 	
-		<?php		
-		$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
-		echo JHtml::_('sliders.panel', $title, 'details-options');
+		<?php
+			
+			$title = JText::_( 'FLEXI_PUBLICATION_DETAILS' );
+			echo JHtml::_('sliders.panel', $title, 'details-options');
 		?>
 		<fieldset class="panelform">
 			<div class='fc_mini_note_box'>
@@ -840,10 +841,13 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		?>
 		</fieldset>
 	<?php endforeach; ?>
-
-	<?php echo JHtml::_('sliders.end'); ?>	
 	
-<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
+	<?php
+		// we need to close sliders to place some parameters outside sliders
+		echo JHtml::_('sliders.end');
+	?>
+	
+	<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
 		
 	<?php
 		$type_default_layout = $this->tparams->get('ilayout');
@@ -863,7 +867,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php
 		if ( $this->params->get('selecttheme_fe') == 2 ) :
 			echo JHtml::_('sliders.start','template-sliders-'.$this->item->id, array('useCookie'=>1));
-			
 			foreach ($this->tmpls as $tmpl) :
 				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 				echo JHtml::_('sliders.panel', $title,  $tmpl->name."-attribs-options");
@@ -875,11 +878,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					endforeach;
 				?> </fieldset> <?php
 			endforeach;
+			echo !FLEXI_J16GE ? $this->pane->endPane() : JHtml::_('sliders.end');
 		endif;
-		echo JHtml::_('sliders.end');
 	?>
 	
-<?php endif; // end cantemplate and selecttheme_fe ?>
+	<?php endif; // end cantemplate and selecttheme_fe ?>
 
 	
 <?php	endif; // end of existing item ?>

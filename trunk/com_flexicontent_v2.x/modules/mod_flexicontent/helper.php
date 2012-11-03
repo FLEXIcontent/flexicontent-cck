@@ -1385,12 +1385,11 @@ class modFlexicontentHelper
 				$catdata->description = flexicontent_html::striptagsandcut($catdata->description, $catconf->cutdescr);
 			}
 			
-			
 			// Category Links (title and image links)
-			if ($catconf->link_title || $catconf->link_image) {
+			if ($catconf->link_title || $catconf->link_image || $catconf->readmore) {
 				$catlink = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($catdata->categoryslug));
-				if ($catconf->link_title) $catdata->titlelink = $catlink;
-				if ($catconf->link_image) $catdata->imagelink = $catlink;
+				$catdata->titlelink = $catlink;
+				$catdata->imagelink = $catlink;
 			}
 			
 			$catdata_arr[$i] = $catdata;

@@ -336,7 +336,8 @@ class FlexicontentViewCategory extends JView
 			$authordescr_item_html = ob_get_contents();
 			ob_end_clean();
 			$this->params = $this->params_saved;
-		}*/
+			*/
+		}
 		//echo $authordescr_item_html; exit();
 		
 		if ($clayout) {
