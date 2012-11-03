@@ -24,7 +24,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 class flexicontent_html
 {
 	function escape($str) {
-		return addslashes($str);
+		return addslashes(htmlspecialchars($str, ENT_COMPAT, 'UTF-8'));
 	}
 
 	/**
@@ -547,7 +547,7 @@ class flexicontent_html
 				<li class="topLevel">
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<div id="row'.$item->id.'">
-						<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$publish_info.'">
+						<span class="editlinktip hasTip" title="'.flexicontent_html::escape(JText::_('FLEXI_PUBLISH_INFORMATION')).'::'.flexicontent_html::escape($publish_info).'">
 							'.$stateicon.'
 						</span>
 					</div>

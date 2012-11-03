@@ -44,25 +44,21 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'relateditems') return;
 		
-		// SCOPE OPTIONS
+		// SCOPE PARAMETERS
+		
 		// categories scope parameters
 		$method_cat = $field->parameters->get('method_cat', 1);
-		if (FLEXI_J16GE) {
-			$catids = $field->parameters->get('catids', '');
-			$catids = explode("|", $catids);
-		} else {
-			$catids = $field->parameters->get('catids', array());
-		}
-		$usesubcats 			= $field->parameters->get('usesubcats', 0 );
+		$usesubcats = $field->parameters->get('usesubcats', 0 );
+		
+		if ( empty($catids) )							$catids = array();
+		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
 				
 		// types scope parameters
 		$method_types = $field->parameters->get('method_types', 1);
-		if (FLEXI_J16GE) {
-			$types = $field->parameters->get('types', '' );
-			$types = explode("|", $types);
-		} else {
-			$types = $field->parameters->get('types', array() );
-		}
+		
+		$types = $field->parameters->get('types');
+		if ( empty($types) )							$types = array();
+		else if ( ! is_array($types) )		$types = !FLEXI_J16GE ? array($types) : explode("|", $types);
 		
 		// other limits of scope parameters
 		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
@@ -71,6 +67,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		// EDITING OPTIONS
 		// Ordering
 		$order = $field->parameters->get( 'orderby', 'alpha' );
+		
 		// Field height
 		$size				= $field->parameters->get( 'size', 12 ) ;
 		$size	 	= $size ? ' size="'.$size.'"' : '';
@@ -82,7 +79,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// initialise property
 		$default_values		= '';
-		if($item->version < 2 && $default_values) {
+		if( !$field->value && $item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();
@@ -90,6 +87,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
 			$field->value = ( $field_data = @unserialize($field->value[0]) ) ? $field_data : $field->value;
 		}
+		
 		$fieldval = array();
 		foreach($field->value as $i=>$val) {
 			list ($itemid,$catid) = explode(":", $val);
