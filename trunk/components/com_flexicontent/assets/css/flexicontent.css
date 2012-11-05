@@ -1,9 +1,9 @@
 /* FLEXIcontent base CSS */
 
-div#flexicontent {
+#flexicontent {
 }
 
-div#flexicontent .clear {
+#flexicontent .clear {
 	border: 0;
 	clear: both;
 	float: none;
@@ -15,7 +15,7 @@ div#flexicontent .clear {
 	visibility: hidden;
 }
 
-div#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
+#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
 	clear: both;
 	content: ".";
 	display: block;
@@ -23,16 +23,16 @@ div#flexicontent .floattext:after { /* ie fix in conditional comments (html sour
 	visibility: hidden;
 }
 
-div#flexicontent .floattext {
+#flexicontent .floattext {
 	display: block;
 	margin: 0 0 0.5em; /* safari */
 }
 
-div#flexicontent .label {
+#flexicontent .label {
 	font-weight: bold;
 }
 
-div#flexicontent .label {
+#flexicontent .label {
 	font-weight: bold;
 }
 
@@ -41,18 +41,18 @@ div#flexicontent .label {
  *
  * print, pdf, ...
  */
-div#flexicontent .buttons {
+#flexicontent .buttons {
 	display: block;
 	float: right;
 	margin: 0px;
 	padding: 0px;
 }
 
-div#flexicontent .buttons img {
+#flexicontent .buttons img {
 	border: none;
 }
 
-div#flexicontent .buttons a {
+#flexicontent .buttons a {
 	height: 16px;
 	line-height: 16px;
 	padding: 0 0 0 5px;
@@ -62,10 +62,10 @@ div#flexicontent .buttons a {
  * @section headlines
  *
  */
-div#flexicontent h2 {
+#flexicontent h2 {
 }
 
-div#flexicontent h2 img {
+#flexicontent h2 img {
 	border: none;
 }
 
@@ -118,7 +118,7 @@ div.pageslinks ul li a {
 	text-decoration: none;
 }
 
-div#flexicontent .pagescounter {
+#flexicontent .pagescounter {
 	text-align: center;
 }
 
@@ -126,23 +126,23 @@ div#flexicontent .pagescounter {
  * @section Categoryview
  *
  */
-div#flexicontent .catimg {
+#flexicontent .catimg {
 	float: left;
 	margin: 0 0.5em 0.5em 0;
 	position: relative;
 }
 
-div#flexicontent .catimg p {
+#flexicontent .catimg p {
 	font-size: 0.9em;
 	line-height: 180%;
 	margin: 0 0 0.5em 0;
 }
 
-div#flexicontent .catdescription {
+#flexicontent .catdescription {
 	margin: 0 0 0.5em 0;
 }
 
-div#flexicontent .subcategories {
+#flexicontent .subcategories {
 	border-bottom: 2px solid #dddddd;
 	/* font-size: 1.2em; font-weight: bold; */
 	margin: 0.8em 0;
@@ -157,7 +157,7 @@ div.subcategorieslist {
  * @section FLEXIcontent Item
  *
  */
-div#flexicontent .taglist {
+#flexicontent .taglist {
 	margin: 5px 0 10px;
 	padding: 0 5px;
 }
@@ -166,7 +166,7 @@ div#flexicontent .taglist {
  * @section FLEXIcontent Table
  *
  */
-div#flexicontent table.flexitable {
+#flexicontent table.flexitable {
 	border: 1px solid #e5e5e5;
 	border-collapse: collapse;
 	clear: both;
@@ -175,7 +175,7 @@ div#flexicontent table.flexitable {
 	width: 99%;
 }
 
-div#flexicontent table.flexitable th {
+#flexicontent table.flexitable th {
 	background-color: #efefef;
 	border-bottom: 1px solid #e5e5e5;
 	border-right: 1px solid #e5e5e5;
@@ -185,30 +185,30 @@ div#flexicontent table.flexitable th {
 	text-align: left;
 }
 
-div#flexicontent table.flexitable th.table-titles {
+#flexicontent table.flexitable th.table-titles {
 	background-color: inherit;
 	font-weight: normal;
 }
 
-div#flexicontent table.flexitable th img {
+#flexicontent table.flexitable th img {
 	border: none;
 	margin: 0 0 5px 5px;
 	vertical-align: middle;
 }
 
-div#flexicontent table.flexitable td {
+#flexicontent table.flexitable td {
 	border-bottom: 1px solid #e5e5e5;
 	border-right: 1px solid #e5e5e5;
 	padding: 0.4em;
 	vertical-align: top;
 }
 
-div#flexicontent table.flexitable tr.sectiontableentry2 td {
+#flexicontent table.flexitable tr.sectiontableentry2 td {
 	background: #f4f4f4;
 }
 
-div#flexicontent table.flexitable tr:hover td, 
-div#flexicontent table.flexitable tr:hover th {
+#flexicontent table.flexitable tr:hover td, 
+#flexicontent table.flexitable tr:hover th {
 	background: #f8f8f8;
 }
 
@@ -217,34 +217,34 @@ div#flexicontent table.flexitable tr:hover th {
  *
  */
 
-div#flexicontent #fc_filter {
+#flexicontent #fc_filter {
 	border: solid 1px #dddddd;
 	margin: 0 0 1em 0;
 	padding: 0.5em;
 }
 
-div#flexicontent .fc_fleft {
+#flexicontent .fc_fleft {
 	float: left;
 }
 
-div#flexicontent .fc_fright {
+#flexicontent .fc_fright {
 	float: right;
 }
 
-div#flexicontent .filter {
+#flexicontent .filter {
 	display: block;
 	float: left;
 	margin: -6px 0px 6px 10px;
 }
 
-div#flexicontent .filter .filter_label {
+#flexicontent .filter .filter_label {
 	clear: both;
 	display: block;
 	float: left;
 	font-size: 100%;
 }
 
-div#flexicontent .filter .filter_field {
+#flexicontent .filter .filter_field {
 	clear: both;
 	display: block;
 	float: left;
@@ -258,20 +258,20 @@ div.flexi_edit .flexi_buttons {
 	margin: 2px 2px 8px;
 }
 
-div.flexi_edit .flexi_buttons button {
+#flexicontent button, div.flexi_edit .flexi_buttons button {
 	border-radius: 8px !important;
 	border: 1px solid #cccccc !important;
 	background: #eeeeee !important;
 	color: white !important;	
-	margin-left:6px;
-	padding:2px 4px;
+	margin: 2px 6px 2px 0px;
+	padding:1px 4px 1px 2px;
 }
 
-div.flexi_edit .flexi_buttons button:hover {
+#flexicontent button:hover, div.flexi_edit .flexi_buttons button:hover {
 	background: #cccccc !important;
 }
 
-.fcbutton_apply, .fcbutton_save, .fcbutton_cancel, .fcbutton_preview, .fcbutton_preview_save {
+.fcbutton_apply, .fcbutton_save, .fcbutton_cancel, .fcbutton_preview, .fcbutton_preview_save, .fcbutton_go, .fcbutton_reset {
 	padding-left: 18px!important;
 	display: inline-block !important;
 	min-height: 16px !important;
@@ -281,7 +281,17 @@ div.flexi_edit .flexi_buttons button:hover {
 .fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: blue !important; }
 .fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: blue !important; }
 .fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: green !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
 
+button.fc_button {
+}
+
+#flexicontent #filter {
+	border: 1px solid gray;
+	border-radius: 4px;
+	margin: 2px 0px;
+}
 
 
 /* Access */
@@ -340,7 +350,7 @@ div#tags {
 
 
 /** rating bar **/
-div#flexicontent .qf_ratingbarcontainer {
+#flexicontent .qf_ratingbarcontainer {
 	border: 1px solid #999999;
 	display: block;
 	height: 10px;
@@ -348,7 +358,7 @@ div#flexicontent .qf_ratingbarcontainer {
 	width: 60px;
 }
 
-div#flexicontent .qf_ratingbar {
+#flexicontent .qf_ratingbar {
 	background-color: #c0c0c0;
 	display: block;
 	height: 10px;
@@ -594,6 +604,16 @@ div.current dd {
 	line-height:1em;
 }
 
+.fc_filters_label {
+	display: inline-block;
+	float:left;
+	font-weight:bold;
+}
+
+.fc_search_label {
+	font-weight:bold;
+}
+
 .fc_search_label_cell {
 	text-align:right;
 	padding: 4px 6px 4px 4px;
@@ -646,16 +666,6 @@ fieldset#fc_search_set_search_behavior legend {
 	font-weight:bold;
 }
 
-button.fc_button {
-	margin: 1px solid gray;
-	padding: 2px;
-	margin: 0px;
-	overflow: visible;
-	font-size: 90%;
-	font-weight: bold;
-}
-
-
 /* Items Total */
 .item_total {
 }
@@ -674,7 +684,7 @@ button.fc_button {
 /*******************/
 /* CSS HACKS START */
 /*******************/
-div#flexicontent .fc_inline_block {
+#flexicontent .fc_inline_block {
 	*display: inline !important; /* Hack for IE 7 and less */
 	_height: 1%; /* Hack for IE6 */
 	display: inline-block !important; /* For modern browsers */
@@ -684,24 +694,24 @@ div#flexicontent .fc_inline_block {
 	zoom: 1; /* Hack for IE */
 }
 
-div#flexicontent .fc_block {
+#flexicontent .fc_block {
 	display: block !important;
 }
 
-div#flexicontent .fc_inline {
+#flexicontent .fc_inline {
 	display: inline !important;
 }
 
-div#flexicontent .fc_inline_clear {
+#flexicontent .fc_inline_clear {
 	display: inline!important;
 }
 
-div#flexicontent .fc_inline_clear:after {
+#flexicontent .fc_inline_clear:after {
 	content: "\a";
 	white-space: pre-wrap;
 }
 
-div#flexicontent .fc_clearfix {
+#flexicontent .fc_clearfix {
 	clear: both;
 }
 /*****************/
@@ -730,13 +740,13 @@ table.admintable td {
 
 
 /* DIRECTORY VIEW */
-div#flexicontent.directory .fccatcolumn {
+#flexicontent.directory .fccatcolumn {
 	float: left;
 	margin: 0% 1% 0% 0% !important;
 	padding: 0px !important;
 }
 
-div#flexicontent.directory h2.fccat_title_box {
+#flexicontent.directory h2.fccat_title_box {
 	background-color: #dddddd;
 	border: 0px 1px 0px 1px solid #ffffff;
 	color: #ffffff;
@@ -745,7 +755,7 @@ div#flexicontent.directory h2.fccat_title_box {
 	width: auto;
 }
 
-div#flexicontent.directory .fccat_title {
+#flexicontent.directory .fccat_title {
 	border: 2px solid #dddddd;
 	display: block;
 	font-size: 14px;
@@ -755,18 +765,18 @@ div#flexicontent.directory .fccat_title {
 	position: relative;
 }
 
-div#flexicontent.directory span.fccat_title {
+#flexicontent.directory span.fccat_title {
 	color: darkred;
 }
 
-div#flexicontent.directory .fccat_title:hover {
+#flexicontent.directory .fccat_title:hover {
 	text-decoration: none;
 }
 
-div#flexicontent.directory .fccat_assigned {
+#flexicontent.directory .fccat_assigned {
 }
 
-div#flexicontent.directory .fccat_image {
+#flexicontent.directory .fccat_image {
 	border: 1px solid #dddddd;
 	border-radius: 6px;
 	float: left;
@@ -774,38 +784,38 @@ div#flexicontent.directory .fccat_image {
 	padding: 1px;
 }
 
-div#flexicontent.directory .fccat_descr {
+#flexicontent.directory .fccat_descr {
 }
 
-div#flexicontent.directory ul.fcsubcats_list {
+#flexicontent.directory ul.fcsubcats_list {
 	border-top: 1px dashed #dddddd !important;
 	list-style: none;
 	margin: 3px 0 7px;
 	padding: 0 7px;
 }
 
-div#flexicontent.directory li.fcsubcat {
+#flexicontent.directory li.fcsubcat {
 	border-bottom: 1px dashed #dddddd !important;
 	margin: 2px 0px 2px 0px !important;
 }
 
-div#flexicontent.directory li.fcsubcat.odd {
+#flexicontent.directory li.fcsubcat.odd {
 }
 
-div#flexicontent.directory li.fcsubcat.even {
+#flexicontent.directory li.fcsubcat.even {
 }
 
-div#flexicontent.directory a.fcsubcat_title {
+#flexicontent.directory a.fcsubcat_title {
 }
 
-div#flexicontent.directory a.fcsubcat_title:hover {
+#flexicontent.directory a.fcsubcat_title:hover {
 	text-decoration: none;
 }
 
-div#flexicontent.directory .fcsubcat_assigned {
+#flexicontent.directory .fcsubcat_assigned {
 }
 
-div#flexicontent.directory .fcsubcat_image {
+#flexicontent.directory .fcsubcat_image {
 	border: 1px solid #dddddd;
 	border-radius: 6px;
 	float: left;
@@ -813,7 +823,7 @@ div#flexicontent.directory .fcsubcat_image {
 	padding: 1px;
 }
 
-div#flexicontent.directory .fcsubcat_descr {
+#flexicontent.directory .fcsubcat_descr {
 }
 
 /***********************************************/
@@ -821,7 +831,7 @@ div#flexicontent.directory .fcsubcat_descr {
 /***********************************************/
 
 /* Fixes for JCE EDITOR BUTTONS */
-div#flexicontent #editor-xtd-buttons a {
+#flexicontent #editor-xtd-buttons a {
 	margin:0px !important;
 	padding:0 24px 0 6px !important;
 	border:0 none !important;
@@ -829,7 +839,7 @@ div#flexicontent #editor-xtd-buttons a {
 	font-weight: normal !important;
 }
 
-div#flexicontent #editor-xtd-buttons .button2-left {
+#flexicontent #editor-xtd-buttons .button2-left {
 	margin:4px 0px 0px 4px !important;
 }
 
@@ -838,66 +848,66 @@ div#flexicontent #editor-xtd-buttons .button2-left {
 /**************************************/
 
 /* PANELs */
-div#flexicontent .pane-slider ul.adminformlist,
-div#flexicontent ul#rules, div#flexicontent ul#rules ul {
+#flexicontent .pane-slider ul.adminformlist,
+#flexicontent ul#rules, #flexicontent ul#rules ul {
 	list-style-type: none !important;
 	margin: 0px !important;
 	padding: 2px !important;
 }
 
-div#flexicontent .pane-sliders .panel {
+#flexicontent .pane-sliders .panel {
 	margin-top: 8px;
 }
 
-div#flexicontent .pane-sliders .pane-toggler span {
+#flexicontent .pane-sliders .pane-toggler span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
     padding-left: 20px;
 }
-div#flexicontent .pane-sliders .pane-toggler-down span {
+#flexicontent .pane-sliders .pane-toggler-down span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;
     padding-left: 20px;
 }
 
-div#flexicontent .pane-sliders .panel .pane-slider {
+#flexicontent .pane-sliders .panel .pane-slider {
 	padding: 0px !important;
 }
 
-div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
+#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
 	margin: 4px !important;
 	border: 1px solid lightgray !important;
 }
 
-div#flexicontent .panel h3 a {
+#flexicontent .panel h3 a {
 	padding:0px 0px 4px 0px;
 }
 
 /* FIELDs */
-div#flexicontent fieldset.adminform fieldset.radio,
-div#flexicontent fieldset.panelform fieldset.radio,
-div#flexicontent fieldset.adminform-legacy fieldset.radio {
+#flexicontent fieldset.adminform fieldset.radio,
+#flexicontent fieldset.panelform fieldset.radio,
+#flexicontent fieldset.adminform-legacy fieldset.radio {
 	border: 0 none;
 	float: left;
 	margin: 2px 0px 5px 2px;
 	padding: 0;
 }
 
-div#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform select {
+#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform select {
 	min-width: 200px;
 	font-size: 90%;
 }
 
 /* Field containing TABLE */
-div#flexicontent table.admintable td {
+#flexicontent table.admintable td {
 	margin: 0px;
 	padding: 0.2em 0.4em;
 }
 
-div#flexicontent table.admintable table td {
+#flexicontent table.admintable table td {
 	margin: 0px;
 	padding: 0px;
 }
 
-div#flexicontent table.admintable td.paramlist_key {
+#flexicontent table.admintable td.paramlist_key {
 	padding: 0px 4px 0px 4px;
 }
 
@@ -1011,4 +1021,33 @@ div.fancybox-wrap a { background: none!important;}
 .fc_bigbutton:hover {
 	border-style: inset !important;
 	text-decoration: none;
+}
+
+
+select.cidtarget , select.fcfilter {
+	border: 1px solid gray;
+	color: black;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 4px;
+	margin: 4px 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	/*box-shadow: 2px 2px 2px 2px #330033;*/
+}
+
+#flexicontent .catimg img {
+	padding: 1px;
+	border: 1px solid lightgray;
+	border-radius: 8px;
+}
+
+#flexicontent .fc_splitter_line {
+	width:100%;
+	clear:both;
+	float:left;
+	margin-top:16px;
+	margin-bottom:16px;
+	border-bottom:1px dashed lightgray!important;
 }

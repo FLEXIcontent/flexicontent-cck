@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
+$user =& JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
@@ -29,71 +30,74 @@ JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/as
 <?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
 <form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
 
-<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
+	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
 	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
-<?php endif; ?>
+	<?php endif; ?>
 
-<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : ?>
-<div id="fc_filter" class="floattext">
-	<?php if ($this->params->get('use_search')) : ?>
-	<div class="fc_fleft">
-		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" />
-		<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
-		  <br>
+	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : /* BOF filter ans search block */ ?>
+	<div id="fc_filter" class="floattext">
+		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
+		<div class="fc_fleft">
+			<span class="fc_search_label"><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
+			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" />
+			<button class="fc_button" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+			<button class="fc_button" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
+		</div>
+		<?php endif; /* EOF search */ ?>
+
+		<?php if ( $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
+		<div class="fc_splitter_line"></div>
 		<?php endif; ?>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-	</div>
-	<?php endif; ?>
-	<?php if ($this->params->get('use_filters', 0) && $this->filters) : ?>
-	
-	<!--div class="fc_fright"-->
-	<?php
-	foreach ($this->filters as $filt) :
-		if (empty($filt->html)) continue;
-		// Add form preparation
-		if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-			$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
-		} else {
-			$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
-		}
-	?>
-		<span class="filter" style='white-space: nowrap;'>
+
+		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
+		<span class="fc_filters_label"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
+		<!--div class="fc_fright"-->
+		<?php
+		foreach ($this->filters as $filt) :
+			if (empty($filt->html)) continue;
+			// Add form preparation
+			if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
+				$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
+			} else {
+				$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
+			}
+		?>
+			<span class="filter" style="white-space: nowrap;">
 			
-			<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
-				<span class="filter_label">
-				<?php echo $filt->label; ?>
+				<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
+					<span class="filter_label">
+					<?php echo $filt->label; ?>
+					</span>
+				<?php endif; ?>
+			
+				<span class="filter_field">
+				<?php echo $filt->html; ?>
 				</span>
-			<?php endif; ?>
 			
-			<span class="filter_field">
-			<?php echo $filt->html; ?>
 			</span>
-			
-		</span>
-	<?php endforeach; ?>
+		<?php endforeach; ?>
 	
-	<?php if (!$this->params->get('use_search')) : ?>
-		<button onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-	<?php endif; ?>
-	<!--/div-->
-	
-	<?php endif; ?>
-</div>
-<?php endif; ?>
-<?php
-if ($this->params->get('show_alpha', 1)) :
-	echo $this->loadTemplate('alpha');
-endif;
-?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-<input type="hidden" name="filter_order_Dir" value="" />
-<input type="hidden" name="view" value="category" />
-<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
-<input type="hidden" name="task" value="" />
-<input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
-<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
+		<?php if (!$this->params->get('use_search')) : ?>
+			<button onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+		<?php endif; ?>
+		<!--/div-->
+
+		<?php endif; /* EOF filter */ ?>
+	</div>
+	<?php endif; /* EOF filter ans serch block */ ?>
+	<?php
+	if ($this->params->get('show_alpha', 1)) :
+		echo $this->loadTemplate('alpha');
+	endif;
+	?>
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
+	<input type="hidden" name="filter_order_Dir" value="" />
+	<input type="hidden" name="view" value="category" />
+	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
+	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 </form>
 <?php endif; ?>
 
@@ -164,35 +168,43 @@ foreach ($cat_items as $catid => $items) :
 
 		<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?>">
 			
-		<!-- BOF subcategory title -->
 		<div class="flexi-cat">
-			<a href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>">
-				<?php if (!empty($sub->image) && $this->params->get('show_description_image', 1)) : ?>
-				<div class="catimg">
-					<img src='images/stories/<?php echo $sub->image ?>' alt='<?php echo $this->escape($sub->title) ?>' height='24' />
-				</div>
-				<?php endif; ?>				
-				<?php
-					echo $sub->title;
-					if ($catid!=$currcatid) {
-						$subsubcount = count($sub->subcats);
-						if ($this->params->get('show_itemcount', 1)) echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
-					}
-				?>
-			</a>
+			
+			<!-- BOF subcategory image -->
+			<?php if (!empty($sub->image) && $this->params->get(($catid!=$currcatid? 'show_description_image_subcat' : 'show_description_image'), 1)) : ?>
+			<div class="catimg">
+				<?php echo $sub->image; ?>
+			</div>
+			<?php endif; ?>
+			<!-- EOF subcategory image -->
+			
+			<!-- BOF subcategory title -->
+			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
+				<?php echo $sub->title; ?>
+			<?php if ($catid!=$currcatid) { ?> </a> <?php } else { echo "</span>"; } ?>
+			<!-- EOF subcategory title -->
+			
+			<!-- BOF subcategory assigned/subcats_count  -->
+			<?php
+				if ($catid!=$currcatid) {
+					$subsubcount = count($sub->subcats);
+					if ($this->params->get('show_itemcount', 1)) echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
+				}
+			?>
+			<!-- EOF subcategory assigned/subcats_count -->
+
+			<!-- BOF subcategory description  -->
+			<?php if ($this->params->get(($catid!=$currcatid? 'show_description_subcat' : 'show_description'), 1)) : ?>
+			<div class="catdescription">
+				<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get(($catid!=$currcatid? 'description_cut_text_subcat' : 'description_cut_text'), 120) ); ?>
+			</div>
+			<?php endif; ?>
+			<!-- EOF subcategory description -->
+			
 		</div>
-		<!-- EOF subcategory title -->
-
-		<!-- BOF subcategory description  -->
-		<?php if ($this->params->get('show_description', 1)) : ?>
-		<div class="catdescription">
-			<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get('description_cut_text', 120) ); ?>
-		</div>
-		<?php endif; ?>
-		<!-- EOF subcategory description -->
-
-
-		<!-- BOF subcategory items -->
+		
+		
+<!-- BOF subcategory items -->
 			
 <?php
 	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns['aftertitle'])) :
@@ -274,7 +286,7 @@ foreach ($cat_items as $catid => $items) :
 		<?php endif; ?>
 			
 		</li>
-		<!-- EOF subcategory items -->
+<!-- EOF subcategory items -->
 		
 <?php endforeach; ?>
 

@@ -184,19 +184,19 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<div class="flexi_buttons" style="font-size:90%;">
 			
 		<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) ) : ?>
-			<button class="button" type="button" onclick="return Joomla.submitbutton('apply');">
+			<button class="fc_button" type="button" onclick="return Joomla.submitbutton('apply');">
 				<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 			</button>
 		<?php endif; ?>
 			
 		<?php if ( $typeid ) : ?>
 		
-			<button class="button" type="button" onclick="return Joomla.submitbutton('save');">
+			<button class="fc_button" type="button" onclick="return Joomla.submitbutton('save');">
 				<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 			</button>
 			
 		<?php if (in_array( 'save_preview', $allowbuttons_fe) ) : ?>
-			<button class="button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
+			<button class="fc_button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
 				<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 			</button>
 		<?php endif; ?>
@@ -208,7 +208,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 		<?php if (in_array( 'preview_latest', $allowbuttons_fe) ) : ?>
 			<?php if ( !$isnew ) : ?>
-			<button class="button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
+			<button class="fc_button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 				<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 			</button>
 			<?php endif; ?>
@@ -216,7 +216,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 		<?php endif; ?>
 			
-			<button class="button" type="button" onclick="return Joomla.submitbutton('cancel')">
+			<button class="fc_button" type="button" onclick="return Joomla.submitbutton('cancel')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 			

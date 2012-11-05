@@ -290,7 +290,12 @@ class FlexicontentHelperRoute
 					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
 				}
 
-				if ( @$menuitem->query['view'] == $needle && @$menuitem->query['cid'] == $cid ) {
+				if (
+					@$menuitem->query['view'] == $needle &&
+					@$menuitem->query['cid'] == $cid &&
+					@$menuitem->query['layout'] == @$urlvars['layout'] && // match layout "author", "my items", etc, limited to the specific category
+					@$menuitem->query['authorid'] == @$urlvars['authorid'] // match "authorid"
+				) {
 					
 					// Try to match optional url variables, if these were specified
 					$all_matched = true;
