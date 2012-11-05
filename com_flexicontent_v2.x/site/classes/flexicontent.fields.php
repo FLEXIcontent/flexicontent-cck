@@ -466,7 +466,7 @@ class FlexicontentFields
 					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
 					
 					// Set template position field data
-					if (isset($field->display) && $field->display) {
+					if (isset($field->display) && strlen($field->display)) {
 						$items[$i]->positions[$pos->position]->{$f}->id				= $field->id;
 						$items[$i]->positions[$pos->position]->{$f}->name			= $field->name;
 						$items[$i]->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';

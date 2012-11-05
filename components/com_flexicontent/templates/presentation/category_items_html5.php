@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
+$user =& JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
@@ -41,16 +42,19 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 	<div id="fc_filter" class="floattext control-group group">
 		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
 		<div class="fc_fleft">
+			<span class="fc_search_label"><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
 			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area input-medium search-query" />
-			<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
-				<br />
-			<?php endif; ?>
-			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
 		</div>
 		<?php endif; /* EOF search */ ?>
+
+		<?php if ( $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
+		<div class="fc_splitter_line"></div>
+		<?php endif; ?>
+
 		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
-	
+		<span class="fc_filters_label"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
 		<!--div class="fc_fright"-->
 		<?php
 		foreach ($this->filters as $filt) :
@@ -78,7 +82,7 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 		<?php endforeach; ?>
 	
 		<?php if (!$this->params->get('use_search')) : ?>
-			<button class="btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><i class="icon-refresh"></i><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			<button class="btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
 		<?php endif; ?>
 		<!--/div-->
 

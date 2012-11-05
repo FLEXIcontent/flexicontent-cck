@@ -38,16 +38,19 @@ JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/as
 	<div id="fc_filter" class="floattext">
 		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
 		<div class="fc_fleft">
+			<span class="fc_search_label"><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
 			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" />
-			<?php if ( $this->params->get('show_filter_labels', 0) && $this->params->get('use_filters', 0) && $this->filters ) : ?>
-				<br />
-			<?php endif; ?>
-			<button class="fc_button" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-			<button class="fc_button" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			<button class="fc_button" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+			<button class="fc_button" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
 		</div>
 		<?php endif; /* EOF search */ ?>
+
+		<?php if ( $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
+		<div class="fc_splitter_line"></div>
+		<?php endif; ?>
+
 		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
-	
+		<span class="fc_filters_label"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
 		<!--div class="fc_fright"-->
 		<?php
 		foreach ($this->filters as $filt) :
