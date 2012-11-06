@@ -152,7 +152,7 @@ class FlexicontentModelTypes extends JModel
 					. ' WHERE type_id = t.id'
 					;
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, g.name AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, g.name AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
 					. ' FROM #__flexicontent_types AS t'
 					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id'
 					. ' LEFT JOIN #__groups AS g ON g.id = t.access'

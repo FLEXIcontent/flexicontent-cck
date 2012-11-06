@@ -39,6 +39,7 @@ class JElementFilters extends JElement
 	 * @access	protected
 	 * @var		string
 	 */
+	
 	var	$_name = 'Filters';
 
 	function fetchElement($name, $value, &$node, $control_name)
@@ -100,11 +101,26 @@ class JElementFilters extends JElement
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		$attribs = ' style="float:left;" ';
-		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
-			$attribs .= ' multiple="true" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="multiple" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
+			$onclick = ""
+				."${element_id} = document.getElementById(\"${element_id}\");"
+				."if (${element_id}.size<20) {"
+				."	${element_id}_oldsize = ${element_id}.size;"
+				."	${element_id}.size=20;"
+				."} else {"
+				."	${element_id}.size = ${element_id}_oldsize;"
+				."}"
+				."parent = ${element_id}.getParent(); upcnt=0;"
+				."while(upcnt<10 && !parent.hasClass(\"jpane-slider\")) {"
+				."	upcnt++; parent = parent.getParent();"
+				."}"
+				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
+			;
+			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
+			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($fields, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
@@ -118,3 +134,4 @@ class JElementFilters extends JElement
 		return $html.$maximize_link;
 	}
 }
+?>

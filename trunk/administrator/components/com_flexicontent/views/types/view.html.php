@@ -78,6 +78,9 @@ class FlexicontentViewTypes extends JView {
 
 		//Get data from the model
 		$rows             = & $this->get( 'Data');
+		foreach($rows as $type) {
+			$type->config = new JParameter($type->config);
+		}
 		$this->pagination = & $this->get( 'Pagination' );
 
 		$lists = array();

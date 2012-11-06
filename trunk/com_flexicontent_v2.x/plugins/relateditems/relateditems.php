@@ -115,8 +115,9 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		}
 		//ob_start();		print_r($field->value);		$field->html = ob_get_contents();    ob_end_clean();
 		
-		// CATEGORY SCOPE
 		$where = "";
+		
+		// CATEGORY SCOPE
 		$allowed_cats = $disallowed_cats = false;
 		
 		if(!is_array($catids)) $catids = explode(",", $catids);
@@ -149,13 +150,18 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		}
 		
 		// TYPE SCOPE
-		$types	= is_array($types) ? implode(',', $types) : $types;
-		if ($method_types == 2) { // exclude method
-			$where .= ($where=="") ? "" : " AND ";
-			$where .= ' ie.type_id NOT IN (' . $types . ')';		
-		} else if ($method_types == 3) { // include method
-			$where .= ($where=="") ? "" : " AND ";
-			$where .= ' ie.type_id IN (' . $types . ')';		
+		if ( $types && ( !count($types) || empty($types[0]) ) ) $types = false;
+		if ($types) {
+			if ($method_types == 2) { // exclude method
+				$where .= ($where=="") ? "" : " AND ";
+				$where .= ' ie.type_id NOT IN (' . implode(',', $types) . ')';		
+			} else if ($method_types == 3) { // include method
+				$where .= ($where=="") ? "" : " AND ";
+				$where .= ' ie.type_id IN (' . implode(',', $types) . ')';		
+			}
+		} else if ($method_types == 2 || $method_types == 3) {
+			$field->html = 'Content Type scope is set to include/exclude but no Types are selected in field configuration, please set to "ALL" or select types to include/exclude'; 
+			return;
 		}
 		
 		// OTHER SCOPE LIMITS

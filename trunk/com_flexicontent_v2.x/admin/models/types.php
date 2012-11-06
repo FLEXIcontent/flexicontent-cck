@@ -109,7 +109,7 @@ class FlexicontentModelTypes extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				't.*, u.name AS editor, g.title AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned'
+				't.*, u.name AS editor, g.title AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
 			)
 		);
 		

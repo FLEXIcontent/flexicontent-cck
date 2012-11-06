@@ -499,6 +499,22 @@ class ParentClassItem extends JModelAdmin
 				// Set the loaded version
 				$item->loaded_version = $version ? $version : $current_version;
 				
+				
+				// *************************************************************************************************
+				// -- Retrieve all active site languages, and create empty item translation objects for each of them
+				// *************************************************************************************************
+				if ( FLEXI_FISH /*|| FLEXI_J16GE*/ )
+				{
+					$site_languages = FLEXIUtilities::getlanguageslist();
+					$item_translations = new stdClass();
+					foreach($site_languages as $lang_id => $lang_data)
+					{
+						if ( !$lang_id && $item->language!='*' ) continue;
+						$lang_data->fields = new stdClass();
+						$item_translations->{$lang_id} = $lang_data; 
+					}
+				}
+				
 				// **********************************
 				// Retrieve and prepare JoomFish data
 				// **********************************
@@ -516,16 +532,6 @@ class ParentClassItem extends JModelAdmin
 						$app->enqueueMessage("You can enable Joom!Fish translations editting or disable this warning in Global configuration",'message');
 					} else {
 						if  ( !FLEXI_J16GE && $db->getErrorNum() )  $app->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-						
-						// -- Retrieve all active site languages, and create empty item translation objects for each of them
-						$site_languages = FLEXIUtilities::getlanguageslist();
-						$item_translations = new stdClass();
-						foreach($site_languages as $lang_id => $lang_data)
-						{
-							if ( !$lang_id && $item->language!='*' ) continue;
-							$lang_data->fields = new stdClass();
-							$item_translations->{$lang_id} = $lang_data; 
-						}
 						
 						// -- Parse translation data according to their language
 						if ( $translated_fields )
@@ -612,6 +618,17 @@ class ParentClassItem extends JModelAdmin
 							// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
 							$item->$fieldname = $f->value;
 						}
+					}
+					// The text field is stored in the db as to seperate fields: introtext & fulltext
+					// So we search for the {readmore} tag and split up the text field accordingly.
+					$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
+					$tagPos	= preg_match($pattern, $item->text);
+					if ($tagPos == 0)	{
+						$item->introtext = $item->text;
+						$item->fulltext  = '';
+					} else 	{
+						list($item->introtext, $item->fulltext) = preg_split($pattern, $item->text, 2);
+						$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
 					}
 				}
 				
@@ -1979,14 +1996,26 @@ class ParentClassItem extends JModelAdmin
 				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 				$field->item_vstate = $data['vstate'];
 				
-				// In J1.6 field's posted values have different location if not CORE (aka custom field)
-				if ( $get_untraslatable_values && $field->untranslatable ) {
+				// FORM HIDDEN FIELDS (FRONTEND/BACKEND): maintain their DB value ...
+				if (
+					( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
+				) {
 					$postdata[$field->name] = $field->value;
+					
+				// UNTRANSLATABLE (CUSTOM) FIELDS: maintain their DB value ...
+				} else if ( $get_untraslatable_values && $field->untranslatable ) {
+					$postdata[$field->name] = $field->value;
+					
+				// CORE FIELDS: if not set maintain their DB value ...
 				} else if ($field->iscore) {
-					// Values have been bind to the item object and will be retrieved for it
-					$postdata[$field->name] = null;
+					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['jform'][$field->name];
+					if ( is_array($postdata[$field->name]) && !count($postdata[$field->name])  ||  !is_array($postdata[$field->name]) && !strlen(trim($postdata[$field->name])) ) {
+						$postdata[$field->name] = $field->value;
+					}
+					
+				// OTHER CUSTOM FIELDS (not hidden and not untranslatable)
 				} else {
-					// Value may not be used in form or may have been been skipped to maintain current value
 					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['custom'][$field->name];
 				}
 				
@@ -2060,14 +2089,6 @@ class ParentClassItem extends JModelAdmin
 							$this->_db->query();
 						}
 					}
-				}
-				
-				// Check for frontend/backend form hidden fields fields and maintain their DB value ...
-				if (
-					( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
-				) {
-					$postdata[$field->name] = $field->value;
 				}
 				
 				// Skip fields not having value
@@ -3452,7 +3473,7 @@ class ParentClassItem extends JModelAdmin
 			."<br/>FROM: $from"
 			."<br/>FROMNAME:  $fromname <br/>"
 			."<br/>RECIPIENTS: " .implode(",", $recipient)
-			."<br/>BCC: ". implode(",",$bcc)."<br/>"
+			."<br/>BCC: ". ($bcc ? implode(",",$bcc) : '')."<br/>"
 			."<br/>SUBJECT: $subject <br/>"
 			."<br/><br/>**********<br/>BODY<br/>**********<br/> $body <br/>"
 			;

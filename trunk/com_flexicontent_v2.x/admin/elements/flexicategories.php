@@ -46,7 +46,7 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput()
 	{
 		static $function_added = false;
-		$doc 		=& JFactory::getDocument();
+		$doc	= & JFactory::getDocument();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());
@@ -54,7 +54,7 @@ class JFormFieldFlexicategories extends JFormField
 		} else {
 			$attributes = & $node->_attributes;
 		}
-				
+		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
@@ -81,12 +81,27 @@ class JFormFieldFlexicategories extends JFormField
 			$doc->addScriptDeclaration($js);
 		}*/
 		
-		$attribs = 'style="float:left;"';
+		$attribs = ' style="float:left;" ';
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
-			$attribs .=' multiple="multiple"';
+			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<40) { ${element_id}_oldsize=$element_id.size; $element_id.size=40;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
+			$onclick = ""
+				."${element_id} = document.getElementById(\"${element_id}\");"
+				."if (${element_id}.size<40) {"
+				."	${element_id}_oldsize = ${element_id}.size;"
+				."	${element_id}.size=40;"
+				."} else {"
+				."	${element_id}.size = ${element_id}_oldsize;"
+				."}"
+				."parent = ${element_id}.getParent(); upcnt=0;"
+				."while(upcnt<10 && !parent.hasClass(\"jpane-slider\")) {"
+				."	upcnt++; parent = parent.getParent();"
+				."}"
+				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
+			;
+			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
+			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";
 		} else {
 			$maximize_link = '';
 		}
