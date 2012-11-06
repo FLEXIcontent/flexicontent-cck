@@ -13,11 +13,11 @@
 	<files>
 		<filename module="mod_flexicontent">mod_flexicontent.php</filename>
 		<filename>index.html</filename>
-        <filename>helper.php</filename>
-        <folder>elements</folder>
-        <folder>classes</folder>
-        <folder>tmpl</folder>
-        <folder>tmpl_common</folder>
+		<filename>helper.php</filename>
+		<folder>elements</folder>
+		<folder>classes</folder>
+		<folder>tmpl</folder>
+		<folder>tmpl_common</folder>
 	</files>
 	
 	<languages>
@@ -26,7 +26,6 @@
 	
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
-		
 		<fieldset name="basic">
 			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
 						description="FLEXI_CHOOSE_TMPL_DESC" 

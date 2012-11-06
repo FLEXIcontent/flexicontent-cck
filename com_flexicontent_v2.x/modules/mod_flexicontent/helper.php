@@ -1235,8 +1235,8 @@ class modFlexicontentHelper
 		
 		if (!isset($multiquery_cats)) $multiquery_cats = array("");
 		foreach($multiquery_cats as $cat_where) {
-			$query = str_replace('__CID_WHERE__', $cat_where, $query);
-			$db->setQuery($query, 0, $count);
+			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $query);
+			$db->setQuery($per_cat_query, 0, $count);
 			$rows = $db->loadObjectList();
 			if ( $db->getErrorNum() ) {
 				$jAp=& JFactory::getApplication();

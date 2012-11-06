@@ -517,18 +517,33 @@ class FlexicontentFields
 	 */
 	function _getTags($items)
 	{
+		// This is fix for versioned field of creator in items view when previewing
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
+		
 		$db =& JFactory::getDBO();
-		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }		
 
-		$query 	= 'SELECT DISTINCT t.name, i.itemid,'
+		if ($versioned_item) {
+			if (!count($items[0]->tags)) return array();
+			$tids = $items[0]->tags;
+			$query 	= 'SELECT DISTINCT t.name, ' . $items[0]->id .' as itemid, '
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
-				. ' LEFT JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
+				. " WHERE t.id IN ('" . implode("','", $tids) . "')"
+				. ' AND t.published = 1'
+				. ' ORDER BY t.name'
+				;
+		} else {
+			$cids = array();
+			foreach ($items as $item) { array_push($cids, $item->id); }
+			$query 	= 'SELECT DISTINCT t.name, i.itemid,'
+				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+				. ' FROM #__flexicontent_tags AS t'
+				. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
 				. " WHERE i.itemid IN ('" . implode("','", $cids) . "')"
 				. ' AND t.published = 1'
-				. ' ORDER BY i.itemid, t.name'
+				. ' ORDER BY t.name'
 				;
+		}
 		$db->setQuery( $query );
 		$tags = $db->loadObjectList();
 		
@@ -549,16 +564,28 @@ class FlexicontentFields
 	 */
 	function _getCategories($items)
 	{
+		// This is fix for versioned field of creator in items view when previewing
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
+		
 		$db =& JFactory::getDBO();
-		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }		
-
-		$query 	= 'SELECT DISTINCT c.id, c.title, rel.itemid,'
+		
+		if ($versioned_item) {
+			$catids = $items[0]->categories;
+			$query 	= 'SELECT DISTINCT c.id, c.title, ' . $items[0]->id .' as itemid, '
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. " WHERE c.id IN ('" . implode("','", $catids) . "')"
+				;
+		} else {
+			$cids = array();
+			foreach ($items as $item) { array_push($cids, $item->id); }		
+			$query 	= 'SELECT DISTINCT c.id, c.title, rel.itemid,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+				. ' FROM #__categories AS c'
+				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. " WHERE rel.itemid IN ('" . implode("','", $cids) . "')"
 				;
+		}
 		$db->setQuery( $query );
 		$cats = $db->loadObjectList();
 
@@ -629,7 +656,7 @@ class FlexicontentFields
 	function _getModifiers($items)
 	{
 		// This is fix for versioned field of modifier in items view when previewing
-		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->modified_by) && $items[0]->id==JRequest::getInt('id');
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->modified_by);
 		
 		$db =& JFactory::getDBO();
 		$cids = array();
@@ -655,7 +682,7 @@ class FlexicontentFields
 	function _getAuthors($items)
 	{
 		// This is fix for versioned field of creator in items view when previewing
-		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by) && $items[0]->id==JRequest::getInt('id');
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by);
 		
 		$db =& JFactory::getDBO();
 		$cids = array();
