@@ -573,7 +573,7 @@ class ParentClassItem extends JModelAdmin
 					$db->setQuery($query);
 					$db->query();
 					
-					$query = "SELECT f.id, f.name, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
+					$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 						." FROM #__flexicontent_items_versions as iv "
 						." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
 						." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$this->_id."'"
@@ -588,7 +588,10 @@ class ParentClassItem extends JModelAdmin
 						
 						// Use versioned data, by overwriting the item data 
 						$fieldname = $f->name;
-						if( $fieldname=='categories'|| $fieldname=='tags' ) {
+						if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting') {
+							// skip fields that should not have been versioned: hits, state, voting
+							continue;
+						} else if( $fieldname=='categories'|| $fieldname=='tags' ) {
 							// categories and tags must have been serialized but some earlier versions did not do it,
 							// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
 							$item->$fieldname = ($array = @unserialize($f->value)) ? $array : explode(",", $f->value);
@@ -1756,8 +1759,11 @@ class ParentClassItem extends JModelAdmin
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
-		// Force item approval on when versioning disabled
+		// (a) Force item approval when versioning disabled
 		$data['vstate'] = ( !$use_versioning ) ? 2 : $data['vstate'];
+		
+		// (b) Force item approval when item is not yet visible (is in states (a) Draft or (b) Pending Approval)
+		$data['vstate'] = ( $item->state==-3 || $item->state==-4 ) ? 2 : $data['vstate'];
 		
 		// Decide new current version for the item, this depends if versioning is ON and if versioned is approved
 		if ( !$use_versioning ) {
@@ -2099,8 +2105,8 @@ class ParentClassItem extends JModelAdmin
 				$i = 1;
 				foreach ($postvalues as $postvalue) {
 					
-					// -- a. Add versioning values, but do not version the 'hits' field
-					if ($field->field_type!='hits' && $field->field_type!='hits') {
+					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
+					if ($field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
 						$obj = new stdClass();
 						$obj->field_id 		= $field->id;
 						$obj->item_id 		= $item->id;

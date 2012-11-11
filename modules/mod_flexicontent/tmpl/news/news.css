@@ -209,7 +209,7 @@
 	float:left;
 	clear:left;
 	margin-right:8px;
-	border:bottom: 1px solid silver;
+	border-bottom: 1px dashed silver;
 	text-align: left;
 }
 .news.mod_flexicontent_wrapper .field_value {

@@ -25,144 +25,58 @@ $user =& JFactory::getUser();
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
 
-<!--script type="text/javascript">
-</script-->
-
-<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
 <aside class="group">
-	<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="" class="group well">
+<?php
+	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+?>
 
-	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
-	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
-	<?php endif; ?>
-
-	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : /* BOF filter ans search block */ ?>
-	<div id="fc_filter" class="floattext control-group group">
-		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
-		<div class="fc_fleft">
-			<span class="fc_search_label"><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
-			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area input-medium search-query" />
-			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
-			<button class="fc_button btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
-		</div>
-		<?php endif; /* EOF search */ ?>
-
-		<?php if ( $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
-		<div class="fc_splitter_line"></div>
-		<?php endif; ?>
-
-		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
-		<span class="fc_filters_label"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
-		<!--div class="fc_fright"-->
-		<?php
-		foreach ($this->filters as $filt) :
-			if (empty($filt->html)) continue;
-			// Add form preparation
-			if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-				$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
-			} else {
-				$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
-			}
-		?>
-			<span class="filter" style="white-space: nowrap;">
-			
-				<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
-					<span class="filter_label">
-					<?php echo $filt->label; ?>
-					</span>
-				<?php endif; ?>
-			
-				<span class="filter_field">
-				<?php echo $filt->html; ?>
-				</span>
-			
-			</span>
-		<?php endforeach; ?>
-	
-		<?php if (!$this->params->get('use_search')) : ?>
-			<button class="btn" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
-		<?php endif; ?>
-		<!--/div-->
-
-		<?php endif; /* EOF filter */ ?>
-	</div>
-	<?php endif; /* EOF filter ans serch block */ ?>
-	<?php
-	if ($this->params->get('show_alpha', 1)) :
-		echo $this->loadTemplate('alpha_html5');
-	endif;
-	?>
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="" />
-	<input type="hidden" name="view" value="category" />
-	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
-	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
-	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
-</form>
-<?php endif; ?>
-
-	<?php
-    if ($this->items) :
-        $currcatid = $this->category->id;
-        $cat_items[$currcatid] = array();
-        $sub_cats[$currcatid] = & $this->category;
-        foreach ($this->categories as $subindex => $sub) :
-            $cat_items[$sub->id] = array();
-            $sub_cats[$sub->id] = & $this->categories[$subindex];
-        endforeach;
-        
-        $items = & $this->items;
-        for ($i=0; $i<count($items); $i++) :
-            foreach ($items[$i]->cats as $cat) :
-                if (isset($cat_items[$cat->id])) :
-                    $cat_items[$cat->id][] = & $items[$i];
-                endif;
-            endforeach;
-        endfor;
-    
-        // routine to determine all used columns for this table
-        $layout = $this->params->get('clayout', 'default');
-        $fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
-        $columns['aftertitle'] = array();
-        foreach ($this->items as $item) :
-            if (isset($item->positions['aftertitle'])) :
-                foreach ($fbypos['aftertitle']->fields as $f) :
-                    if (!in_array($f, $columns['aftertitle'])) :
-                        $columns['aftertitle'][$f] = @$item->fields[$f]->label;
-                    endif;
-                endforeach;
-            endif;
-        endforeach;
-    
-    $classnum = '';
-	$classspan = ''; // bootstrap span
-    if ($this->params->get('tmpl_cols', 2) == 1) :
-       $classnum = 'one';
-	   $classspan = 'span12';
-    elseif ($this->params->get('tmpl_cols', 2) == 2) :
-       $classnum = 'two';
-	   $classspan = 'span6';
-    elseif ($this->params->get('tmpl_cols', 2) == 3) :
-       $classnum = 'three';
-	   $classspan = 'span4';
-    elseif ($this->params->get('tmpl_cols', 2) == 4) :
-       $classnum = 'four';
-	   $classspan = 'span3';
-    endif;
-    ?>
-
-
-    <!-- BOF items total-->
-    <?php if ($this->params->get('show_item_total', 1)) : ?>
-    <div id="item_total" class="item_total group">
-        <?php	//echo $this->pageNav->getResultsCounter(); // Alternative way of displaying total (via joomla pagination class) ?>
-        <?php echo $this->resultsCounter; // custom Results Counter ?>
-    </div>
-    <?php endif; ?>
-    <!-- BOF items total-->
 </aside>
+<div class="clear"></div>
+
+<?php
+if ($this->items) :
+	$currcatid = $this->category->id;
+	$cat_items[$currcatid] = array();
+	$sub_cats[$currcatid] = & $this->category;
+	foreach ($this->categories as $subindex => $sub) :
+		$cat_items[$sub->id] = array();
+		$sub_cats[$sub->id] = & $this->categories[$subindex];
+	endforeach;
+	
+	$items = & $this->items;
+	for ($i=0; $i<count($items); $i++) :
+		foreach ($items[$i]->cats as $cat) :
+			if (isset($cat_items[$cat->id])) :
+				$cat_items[$cat->id][] = & $items[$i];
+			endif;
+		endforeach;
+	endfor;
+	
+	// routine to determine all used columns for this table
+	$layout = $this->params->get('clayout', 'default');
+	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
+	$columns['aftertitle'] = array();
+	foreach ($this->items as $item) :
+		if (isset($item->positions['aftertitle'])) :
+			foreach ($fbypos['aftertitle']->fields as $f) :
+				if (!in_array($f, $columns['aftertitle'])) :
+					$columns['aftertitle'][$f] = @$item->fields[$f]->label;
+				endif;
+			endforeach;
+		endif;
+	endforeach;
+	
+	//added to intercept more columns (see also css changes)
+	$tmpl_cols = $this->params->get('tmpl_cols', 2);
+	$tmpl_cols_classes = array(1=>'one',2=>'two',3=>'three',4=>'four');
+	$classnum = $tmpl_cols_classes[$intro_cols];
+	
+	// bootstrap span
+	$tmpl_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
+	$classspan = $tmpl_cols_spanclasses[$intro_cols];
+?>
 
 <ul class="faqblock <?php echo $classnum; ?> row group">	
 

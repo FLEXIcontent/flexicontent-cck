@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
 			$display	.= '
 			<div class="flexi-email toolbar-element">
-				<span class="email-legend flexi-legend"><a href="'. JRoute::_($url) .'" class="editlinktip" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
+				<span class="email-legend flexi-legend"><a rel="nofollow" href="'. JRoute::_($url) .'" class="editlinktip" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
 			</div>
 			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
@@ -161,7 +161,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$js_link  	 = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$display	.= '
 			<div class="flexi-print toolbar-element">
-				<span class="print-legend flexi-legend"><a href="'. $print_link .'" '.$js_link.' class="editlinktip"  title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
+				<span class="print-legend flexi-legend"><a rel="nofollow" href="'. $print_link .'" '.$js_link.' class="editlinktip"  title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
 			</div>
 			<div class="toolbar-spacer"'.$spacer.'></div>
 			';

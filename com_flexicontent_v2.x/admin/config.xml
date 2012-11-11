@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 	<fields addfieldpath="/administrator/components/com_flexicontent/elements">
+	
 		<fieldset name="component" label="Options" description="">
 		
 		<field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide" />
-				<!--option value="com_content">com_content Categories</option-->
-			<!--/field-->
 			<!--field name="search_mode" type="list" default="" label="FLEXI_SELECT_SEARCH_MODE" description="FLEXI_SELECT_SEARCH_MODE_DESC"  menu="hide">
 				<option value="0">FLEXI_PLEASE_SELECT</option>
 				<option value="1">FLEXI_JOOMLA_CONTENT_SEARCH</option>
@@ -44,7 +43,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-
+			<field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" />
+			
 		<field name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
@@ -145,166 +145,8 @@
 			
 		<field name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" label="" level="level1" menu="hide" />
 			
-			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
 			<field name="login_page" type="text" size="50" default="index.php?option=com_users&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" menu="hide" />
 			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" menu="hide" />
-			
-			
-		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level1" menu="hide" />
-			
-		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level2" menu="hide" />
-			<field name="copytask_allow_uneditable" type="radio" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="items_session_editable" type="radio" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS" label="" level="level3" menu="hide" />
-			<field name="new_item_state" type="list" default="1" label="FLEXI_BACKEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
-				<option value="1">FLEXI_PUBLISHED</option>
-				<option value="0">FLEXI_UNPUBLISHED</option>
-				<option value="2">FLEXI_ARCHIVED</option>
-				<option value="-3">FLEXI_PENDING</option>
-				<option value="-4">FLEXI_TO_WRITE</option>
-				<option value="-5">FLEXI_IN_PROGRESS</option>
-			</field>
-			<field name="new_item_state_fe" type="list" default="1" label="FLEXI_FRONTEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
-				<option value="1">FLEXI_PUBLISHED</option>
-				<option value="0">FLEXI_UNPUBLISHED</option>
-				<option value="2">FLEXI_ARCHIVED</option>
-				<option value="-3">FLEXI_PENDING</option>
-				<option value="-4">FLEXI_TO_WRITE</option>
-				<option value="-5">FLEXI_IN_PROGRESS</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS" label="" level="level3" menu="hide" />
-			<field name="non_publishers_item_state" type="radio" default="-4" label="FLEXI_BACKEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
-				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
-				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
-			</field>
-			<field name="non_publishers_item_state_fe" type="radio" default="-3" label="FLEXI_FRONTEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
-				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
-				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
-			</field>
-			
-			
-		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />
-			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
-			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" menu="hide">
-				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
-				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
-				<option value="type_name">FLEXI_ITEMS_MANAGER_ORDER_CONTENT_TYPE</option>
-				<option value="i.access">FLEXI_ITEMS_MANAGER_ORDER_ACCESS_SCOPE</option>
-				<option value="i.title">FLEXI_ITEMS_MANAGER_ORDER_TITLE</option>
-				<option value="i.ordering">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ORDERING_FIELD</option>
-				<option value="i.created">FLEXI_ITEMS_MANAGER_ORDER_CREATION_DATE</option>
-				<option value="i.modified">FLEXI_ITEMS_MANAGER_ORDER_MODIFICATION_DATE</option>
-				<option value="i.hits">FLEXI_ITEMS_MANAGER_ORDER_MOST_HITS</option>
-				<option value="i.id">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ID</option>
-			</field>
-			<field name="items_manager_order_dir" type="list" default="ASC" label="FLEXI_ITEMS_MANAGER_ORDER_DIR" description="FLEXI_ITEMS_MANAGER_ORDER_DIR_DESC" menu="hide">
-				<option value="ASC">FLEXI_ITEMS_MANAGER_ORDER_DIR_NORMAL</option>
-				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
-			</field>
-			
-	</fieldset>
-	<fieldset name="content_display_conf" label="FLEXI_CONTENT_DISPLAY" description="" >
-		
-		<field name="" type="separator" default="FLEXI_PAGE_CONF" label="" level="level1" menu="hide" />
-			
-		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" menu="hide" />
-			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<!--field name="show_pdf_icon" type="radio" default="1" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field-->
-			<field name="show_print_icon" type="radio" default="1" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="show_email_icon" type="radio" default="1" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="show_feed_icon" type="radio" default="1" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			
-		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" label="" level="level2" menu="hide" />
-			<field name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
-			</field>
-			<field name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_JCOMMENTS</option>
-				<option value="2">FLEXI_JOMCOMMENTS</option>
-			</field>
-			
-			
-		<field name="" type="separator" default="FLEXI_CATS_CONF" label="" level="level1" menu="hide" />
-			
-			<field name="limit" type="text" size="4" default="10" label="FLEXI_LIST_LIMIT" description="FLEXI_LIST_LIMIT_DESC" menu="hide"/>
-			<field name="catlimit" type="text" size="4" default="100" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" menu="hide"/>
-			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" menu="hide">
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
-			</field>
-			<field name="trigger_onprepare_content_cat" type="radio" default="1" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" />
-			
-			
-		<field name="" type="separator" default="FLEXI_CATS_FEED_CONF" label="" level="level1" menu="hide" />
-			
-			<field name="feed_summary" type="radio" default="0" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" menu="hide">
-				<option value="0">FLEXI_INTRO_TEXT</option>
-				<option value="1">FLEXI_FULL_TEXT</option>
-			</field>
-			<field name="feed_summary_cut" type="text" size="4" default="200" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" menu="hide"/>
-			<field name="feed_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="feed_image_source" type="fcimage" valcolumn="id" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" menu="hide"/>
-			<field name="feed_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="feed_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide">
-				<option value="0">FLEXI_SCALE</option>
-				<option value="1">FLEXI_CROP</option>
-			</field>		
-			<field name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH"  menu="hide"/>
-			<field name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT"  menu="hide"/>
 			
 			
 		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level1" menu="hide" />
@@ -350,6 +192,229 @@
 			</field>
 			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
 			
+	</fieldset>
+	<fieldset name="content_display_conf" label="FLEXI_CONTENT_DISPLAY" description="" >
+		
+		<field name="" type="separator" default="FLEXI_PAGE_CONF" label="" level="level1" menu="hide" />
+			
+		<field name="" type="separator" default="FLEXI_ITEM_VIEW" description="" level="level2" hr="false" menu="hide" />
+			
+			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level3" menu="hide" />
+			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<!--field name="show_pdf_icon" type="radio" default="1" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field-->
+			<field name="show_print_icon" type="radio" default="1" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="show_email_icon" type="radio" default="1" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" label="" level="level3" menu="hide" />
+			<field name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="comments" type="list" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_JCOMMENTS</option>
+				<option value="2">FLEXI_JOMCOMMENTS</option>
+			</field>
+			
+		<field name="" type="separator" default="FLEXI_VARIOUS_VIEWS" description="" level="level2" hr="false" menu="hide" />
+		
+			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		<field name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level1" menu="hide" />
+		
+			<field name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
+				<option value="">FLEXI_USE_VIEW_DEFAULT</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
+			</field>
+			<field name="catlimit" type="text" size="4" default="100" label="FLEXI_DIRECTORY_CAT_LIST_LIMIT" description="FLEXI_DIRECTORY_CAT_LIST_LIMIT_DESC" menu="hide"/>
+			
+			
+		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" label="" level="level3" menu="hide" />
+			<field name="trigger_onprepare_content_cat" type="radio" default="1" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level3" menu="hide" />
+			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="show_feed_icon" type="radio" default="1" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			
+			
+		<field name="" type="separator" default="FLEXI_FEED_LIST_CONF" label="" level="level3" menu="hide" />
+			
+			<field name="feed_summary" type="radio" default="0" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" menu="hide">
+				<option value="0">FLEXI_INTRO_TEXT</option>
+				<option value="1">FLEXI_FULL_TEXT</option>
+			</field>
+			<field name="feed_summary_cut" type="text" size="4" default="200" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" menu="hide"/>
+			<field name="feed_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="feed_image_source" type="fcimage" valcolumn="id" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" menu="hide"/>
+			<field name="feed_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="feed_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>		
+			<field name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH"  menu="hide"/>
+			<field name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT"  menu="hide"/>
+			
+			
+	</fieldset>
+	<fieldset name="content_lists_conf" label="FLEXI_CONTENT_LISTS_CONF" description="" >
+			
+		<field name="" type="separator" default="FLEXI_ITEM_LIST_CREATION_CONF" label="" level="level1" menu="hide" />
+		
+			<field name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" level="level2" menu="hide" />
+			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide"/>
+			<field name="orderby" type="list" default="alpha" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
+				<option value="">FLEXI_USE_VIEW_DEFAULT</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</field>
+			
+			<field name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" menu="hide">
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
+			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_ITEM_FILTERING_CONF" description="" level="level1" hr="false" menu="hide" />
+		
+			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" hr="false" menu="hide" />
+			<field name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" menu="hide" />
+			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" menu="hide" />
+			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" menu="hide" />
+			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" menu="hide" />
+			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" menu="hide" />
+			<field name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level2" hr="false" menu="hide" />
+			<field name="use_search" type="radio" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_search_label" type="radio" default="1" label="FLEXI_SEARCH_LABEL" description="FLEXI_SEARCH_LABEL_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_search_tip" type="radio" default="1" label="FLEXI_SEARCH_TIP" description="FLEXI_SEARCH_TIP_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="show_search_go" type="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_search_reset" type="radio" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="compact_search_with_filters" type="radio" default="1" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" menu="hide" />
+			<field name="use_filters" type="radio" default="0" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_filters_list_label" type="radio" default="1" label="FLEXI_SHOW_FILTERS_LIST_LABEL" description="FLEXI_SHOW_FILTERS_LIST_LABEL_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_filters_list_tip" type="radio" default="1" label="FLEXI_FILTERS_LIST_TIP" description="FLEXI_FILTERS_LIST_TIP_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="limit_filter_values" type="list" default="0" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC" menu="hide" >
+				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
+				<!--option value="1">FLEXI_CURRCAT_FIELD_VALUES</option-->
+				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
+			</field>
+			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
+			
+		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" hr="false" menu="hide" />
+			<field name="limit_override" type="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" >
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />
+			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" menu="hide" />
+			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
+				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order"
+				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
+
 	</fieldset>
 	<fieldset name="item_form_conf" label="FLEXI_ITEM_FORM" description="" >
 			
@@ -403,8 +468,76 @@
 			<field name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" menu="hide" />
 		
 	</fieldset>
-	<fieldset name="notifications_conf" label="FLEXI_EMAIL_NOTIFICATIONS_CONF" description="" >
+	<fieldset name="backend_tabs_conf" label="FLEXI_BACKEND_TABS_CONF" description="" >
 	
+		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level1" menu="hide" />
+			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level2" menu="hide" />
+			<field name="copytask_allow_uneditable" type="list" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="items_session_editable" type="list" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="autoflogin" type="list" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" menu="hide" />
+			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" menu="hide">
+				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
+				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
+				<option value="type_name">FLEXI_ITEMS_MANAGER_ORDER_CONTENT_TYPE</option>
+				<option value="i.access">FLEXI_ITEMS_MANAGER_ORDER_ACCESS_SCOPE</option>
+				<option value="i.title">FLEXI_ITEMS_MANAGER_ORDER_TITLE</option>
+				<option value="i.ordering">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ORDERING_FIELD</option>
+				<option value="i.created">FLEXI_ITEMS_MANAGER_ORDER_CREATION_DATE</option>
+				<option value="i.modified">FLEXI_ITEMS_MANAGER_ORDER_MODIFICATION_DATE</option>
+				<option value="i.hits">FLEXI_ITEMS_MANAGER_ORDER_MOST_HITS</option>
+				<option value="i.id">FLEXI_ITEMS_MANAGER_ORDER_ITEM_ID</option>
+			</field>
+			<field name="items_manager_order_dir" type="radio" default="ASC" label="FLEXI_ITEMS_MANAGER_ORDER_DIR" description="FLEXI_ITEMS_MANAGER_ORDER_DIR_DESC" menu="hide">
+				<option value="ASC">FLEXI_ITEMS_MANAGER_ORDER_DIR_NORMAL</option>
+				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
+			</field>
+			
+	</fieldset>
+	<fieldset name="workflow_n_notifications_conf" label="FLEXI_WORKFLOW_AND_NOTIFICATIONS_CONF" description="" >
+	
+		<field name="" type="separator" default="FLEXI_WORKFLOW_CONF" label="" level="level1" menu="hide" />
+
+			<field name="" type="separator" default="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS" label="" level="level3" menu="hide" />
+			<field name="new_item_state" type="list" default="1" label="FLEXI_BACKEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="2">FLEXI_ARCHIVED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+			</field>
+			<field name="new_item_state_fe" type="list" default="1" label="FLEXI_FRONTEND" description="FLEXI_DEFAULT_STATE_FOR_NEW_ITEMS_DESC" menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="2">FLEXI_ARCHIVED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS" label="" level="level3" menu="hide" />
+			<field name="non_publishers_item_state" type="radio" default="-4" label="FLEXI_BACKEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</field>
+			<field name="non_publishers_item_state_fe" type="radio" default="-3" label="FLEXI_FRONTEND" description="FLEXI_FORCED_ITEM_STATE_FOR_NON_PUBLISHERS_DESC" menu="hide">
+				<option value="-3">FLEXI_IMMEDIATE_APPROVAL_REQUEST_PENDING_APPROVAL</option>
+				<option value="-4">FLEXI_MANUAL_APPROVAL_REQUEST_DRAFT</option>
+			</field>
+
 		<field name="" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="enable_notifications" type="list" default="1" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" menu="hide">

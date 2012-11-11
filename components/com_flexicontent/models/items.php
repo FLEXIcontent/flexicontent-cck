@@ -376,6 +376,7 @@ class FlexicontentModelItems extends ParentClassItem
 		// b. Merge parameters from current category
 		$catParams = new JParameter($catParams);
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
+		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
 		// c. Merge TYPE parameters into the page configuration
@@ -396,6 +397,10 @@ class FlexicontentModelItems extends ParentClassItem
 			$params->merge($accessperms);
 		}
 		
+		// J1.6+ : Covert metadata property string to parameters object
+		if (isset($this->_item->metadata)) {
+			$this->_item->metadata = new JParameter($this->_item->metadata);
+		}
 		
 		// *********************************************
 		// Finally set 'parameters' property of the item

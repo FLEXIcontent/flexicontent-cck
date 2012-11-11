@@ -287,16 +287,16 @@ class FlexicontentViewItems extends JView
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
 		
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$item->params, 0));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, 0));
 		else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$item->params, 0));
-		else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, 0));
+		else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (&$item, &$params, $limitstart));
 		$item->event->beforeDisplayContent = trim(implode("\n", $results));
 
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$item->params, 0));
-		else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
+		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, 0));
+		else              $results = $dispatcher->trigger('onAfterDisplayContent', array (&$item, &$params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 		
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
@@ -307,7 +307,16 @@ class FlexicontentViewItems extends JView
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
 		
 		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
+		foreach($item->positions as $pos_fields) {
+			foreach($pos_fields as $pos_field) {
+				if ($pos_field->name!=='text') continue;
+				$pos_field->display = & $item->text;
+			}
+		}
 		$item->fields['text']->display = & $item->text;
+		
+		// (TOC) TABLE OF Contents has been created inside description field (named 'text') by
+		// the pagination plugin, this should be assigned to item as a property with same name
 		if(isset($item->fields['text']->toc)) {
 			$item->toc = &$item->fields['text']->toc;
 		}

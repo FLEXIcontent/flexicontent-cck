@@ -26,82 +26,13 @@ JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/as
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 ?>
 
-<!--script type="text/javascript">
-</script-->
+<?php
+	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
+?>
 
-<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search')) || ($this->params->get('show_alpha', 1))) : ?>
-<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
-
-	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
-	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
-	<?php endif; ?>
-
-	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : /* BOF filter ans search block */ ?>
-	<div id="fc_filter" class="floattext">
-		<?php if ($this->params->get('use_search')) : /* BOF search */ ?>
-		<div class="fc_fleft">
-			<span class="fc_search_label"><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
-			<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area" />
-			<button class="fc_button" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
-			<button class="fc_button" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
-		</div>
-		<?php endif; /* EOF search */ ?>
-
-		<?php if ( $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
-		<div class="fc_splitter_line"></div>
-		<?php endif; ?>
-
-		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
-		<span class="fc_filters_label"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
-		<!--div class="fc_fright"-->
-		<?php
-		foreach ($this->filters as $filt) :
-			if (empty($filt->html)) continue;
-			// Add form preparation
-			if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-				$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
-			} else {
-				$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
-			}
-		?>
-			<span class="filter" style="white-space: nowrap;">
-			
-				<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
-					<span class="filter_label">
-					<?php echo $filt->label; ?>
-					</span>
-				<?php endif; ?>
-			
-				<span class="filter_field">
-				<?php echo $filt->html; ?>
-				</span>
-			
-			</span>
-		<?php endforeach; ?>
-	
-		<?php if (!$this->params->get('use_search')) : ?>
-			<button onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-		<?php endif; ?>
-		<!--/div-->
-
-		<?php endif; /* EOF filter */ ?>
-	</div>
-	<?php endif; /* EOF filter ans serch block */ ?>
-	<?php
-	if ($this->params->get('show_alpha', 1)) :
-		echo $this->loadTemplate('alpha');
-	endif;
-	?>
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="" />
-	<input type="hidden" name="view" value="category" />
-	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
-	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="id" value="<?php echo $this->category->id; ?>" />
-	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
-</form>
-<?php endif; ?>
+<div class="clear"></div>
 
 <?php
 if ($this->items) :
@@ -120,9 +51,9 @@ if ($this->items) :
 	endforeach;
 ?>
 
-<?php $items = & $this->items; ?>
-
 <?php
+$items = & $this->items;
+
 	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
 		echo "<span style='font-weight:bold; color:red;'>No columns selected forcing the display of item title. Please:<br>\n
 		1. enable display of item title in category parameters<br>\n

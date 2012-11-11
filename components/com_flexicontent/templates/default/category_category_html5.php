@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $catTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('show_cat_title', 1) ) ? '2' : '1'; 
+// Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
 <div class="floattext group">

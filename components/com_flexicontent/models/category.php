@@ -425,18 +425,30 @@ class FlexicontentModelCategory extends JModel {
 	 */
 	function _buildItemOrderBy()
 	{
+		$mainframe = &JFactory::getApplication();
 		$params = $this->_params;
 		
+		// NOTE: *** 'filter_order' AND 'filter_order_dir' are the real ORDERING DB column names
+		
+		// Get ordering columns set in state
 		$filter_order     = $this->getState('filter_order');
 		$filter_order_dir = $this->getState('filter_order_dir');
 		
+		// If ordering columns state were not set in state use ASCENDING title as fall back default
 		$filter_order     = $filter_order     ? $filter_order      :  'i.title';
 		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
-
-		if ($params->get('orderby')) {
-			$order = $params->get('orderby');
-			
-			switch ($order) {
+		
+		// NOTE: *** 'orderby' is a symbolic order variable ***
+		
+		// Get user setting, and if not set, then fall back to category / global configuration setting
+		$orderby = $mainframe->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
+		
+		// A symbolic order name to indicate using the category / global ordering setting
+		$orderby = $orderby=='_preconfigured_' ? $params->get('orderby') : $orderby;
+		
+		if ($orderby)
+		{
+			switch ($orderby) {
 				case 'date' :
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'ASC';
@@ -500,10 +512,11 @@ class FlexicontentModelCategory extends JModel {
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemWhere( )
+	function _buildItemWhere( $no_alpha=0 )
 	{
 		global $globalcats, $currcat_data;
-		if ( !empty($currcat_data['where']) ) return $currcat_data['where'];
+		if ( $no_alpha && isset($currcat_data['where_no_alpha']) ) return $currcat_data['where_no_alpha'];
+		if ( isset($currcat_data['where']) ) return $currcat_data['where'];
 		
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -623,6 +636,20 @@ class FlexicontentModelCategory extends JModel {
 			}
 		}
 		
+		// Featured items, this item property exists in J1.6+ only
+		if (FLEXI_J16GE) {
+			$featured = $cparams->get('featured');
+			switch ($featured) {
+				case 'show': $where .= ' AND i.featured=1'; break;
+				case 'hide': $where .= ' AND i.featured=0'; break;
+				default: break;
+			}
+		}
+		
+		// In case alpha parsing fails ...
+		$currcat_data['where_no_alpha'] = $where;
+		$currcat_data['where'] = $where;
+		
 		$alpha = JRequest::getVar('letter', NULL, 'request');
 		/*if($alpha===NULL) {
 			$alpha =  $session->get($option.'.category.letter');
@@ -686,20 +713,10 @@ class FlexicontentModelCategory extends JModel {
 			if ($alpha == '0') {
 				$where .= ' AND ( CONVERT (( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
 				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
-			}		
+			}
 			elseif (!empty($alpha)) {
 				$where .= ' AND ( CONVERT (LOWER( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
 				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
-			}
-		}
-		
-		// Featured items, this item property exists in J1.6+ only
-		if (FLEXI_J16GE) {
-			$featured = $cparams->get('featured');
-			switch ($featured) {
-				case 'show': $where .= ' AND i.featured=1'; break;
-				case 'hide': $where .= ' AND i.featured=0'; break;
-				default: break;
 			}
 		}
 		
@@ -1075,7 +1092,14 @@ class FlexicontentModelCategory extends JModel {
 				}
 			}
 			
-			
+			// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
+			$flexi = JComponentHelper::getComponent('com_flexicontent');
+			$params = new JParameter($flexi->params);
+			if ($menu) {
+				// some parameters not belonging to category overriden parameters
+				$params->set( 'item_depth', $menuParams->get('item_depth') );
+			}
+			/*
 			// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 			$params = clone($mainframe->getParams('com_flexicontent'));
 			
@@ -1083,6 +1107,7 @@ class FlexicontentModelCategory extends JModel {
 			if (FLEXI_J16GE && $menu) {
 				$params->merge($menuParams);
 			}
+			*/
 			
 			// b. Merge category parameters
 			$cparams = new JParameter($catparams);
@@ -1286,7 +1311,7 @@ class FlexicontentModelCategory extends JModel {
 	 */
  	function getAlphaindex()
 	{
-		$where  = $this->_buildItemWhere();
+		$where  = $this->_buildItemWhere($no_alpha=1);
 		
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 				. ' FROM #__content AS i'

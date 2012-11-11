@@ -26,7 +26,6 @@ if ($html5) {  /* BOF html5  */
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' category cat'.$this->category->id;
-
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
@@ -97,18 +96,16 @@ $page_classes .= ' category cat'.$this->category->id;
 
 <!-- BOF pagination -->
 	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-	<div class="pageslinks">
-		<?php echo $this->pageNav->getPagesLinks(); ?>
-	</div>
+		<div class="pageslinks">
+			<?php echo $this->pageNav->getPagesLinks(); ?>
+		</div>
 
-	<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-	<p class="pagescounter">
-		<?php echo $this->pageNav->getPagesCounter(); ?>
-	</p>
-	<?php
-		endif;
-	endif; 
-	?>
+		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
+		<p class="pagescounter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</p>
+		<?php endif; ?>
+	<?php endif; ?>
 <!-- EOF pagination -->
 
 </div>

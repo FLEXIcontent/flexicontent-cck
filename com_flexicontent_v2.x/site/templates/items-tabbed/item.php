@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: item.php 1370 2012-07-08 01:24:53Z ggppdk $
+ * @version 1.5 stable $Id: item.php 1538 2012-11-05 02:44:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -76,7 +76,7 @@ JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent
 
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading"><span class='fc_item_title'>
+	<h2 class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -164,7 +164,7 @@ if (@$createtabs) :
 			
 			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
 			
-			<div class="flexi lineinfo <?php echo $tabpos_name; ?>">
+			<div class="flexi lineinfo <?php echo  $tabpos_label; ?>">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
 				<div class="flexi element">
 					<?php if ($field->label) : ?>
@@ -270,7 +270,7 @@ if (@$createtabs) :
 			
 			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
 			
-			<div class="flexi lineinfo <?php echo $tabpos_name; ?>">
+			<div class="flexi lineinfo <?php echo  $tabpos_label; ?>">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
 				<div class="flexi element">
 					<?php if ($field->label) : ?>

@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$mparams		= array('style'=>$style);
 		
 		if ($module_method == 1) { // module case
-			if (!$mymodule) { $field->{$prop} = 'Pauvre tâche !!!'; return; }
+			if (!$mymodule) { $field->{$prop} = 'Please select a module'; return; }
 /*
 echo '<xmp>';
 print_r($mymodule);
@@ -86,7 +86,7 @@ echo '</xmp>';
 			$display = $renderer->render($mod, $mparams);
 
 		} else { // position case		
-			if (!$position) { $field->{$prop} = 'Erreur'; return; }
+			if (!$position) { $field->{$prop} = 'Error'; return; }
 			foreach (JModuleHelper::getModules($position) as $mod)  {
 				$display .= $renderer->render($mod, $mparams);
 			}

@@ -97,17 +97,17 @@ $page_classes .= ' category cat'.$this->category->id;
 
 <!-- BOF pagination -->
 	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-    <div class="group">
-	<div class="pageslinks">
-		<?php echo $this->pageNav->getPagesLinks(); ?>
-	</div>
+		<footer class="group">
+		<div class="pageslinks">
+			<?php echo $this->pageNav->getPagesLinks(); ?>
+		</div>
 
-	<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-	<p class="pagescounter">
-		<?php echo $this->pageNav->getPagesCounter(); ?>
-	</p>
-	<?php endif; ?>
-	</div>
+		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
+		<p class="pagescounter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</p>
+		<?php endif; ?>
+		</footer>
 	<?php endif; ?>
 <!-- EOF pagination -->
 

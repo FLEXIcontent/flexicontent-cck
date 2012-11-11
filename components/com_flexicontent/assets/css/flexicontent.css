@@ -1,8 +1,12 @@
 /* FLEXIcontent base CSS */
 
+/******************************************
+ * Flexicontent General Utility CSS Classes
+ ******************************************/
 #flexicontent {
 }
 
+#flexicontent .fcclear,
 #flexicontent .clear {
 	border: 0;
 	clear: both;
@@ -32,15 +36,11 @@
 	font-weight: bold;
 }
 
-#flexicontent .label {
-	font-weight: bold;
-}
 
-/**
- * @section buttons
- *
- * print, pdf, ...
- */
+
+/**********************************************************************
+ * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
+ **********************************************************************/
 #flexicontent .buttons {
 	display: block;
 	float: right;
@@ -58,24 +58,42 @@
 	padding: 0 0 0 5px;
 }
 
-/**
- * @section headlines
- *
- */
+/* Used for approval button and maybe for others */
+.fc_bigbutton {
+	border-radius:4px !important;
+	padding: 2px !important;
+	margin-right: 4px !important;
+	border:1px outset gray !important;
+	background: #e0e0e0 !important;
+	text-align: center;
+	display:block;
+}
+
+.fc_bigbutton:hover {
+	border-style: inset !important;
+	text-decoration: none;
+}
+
+
+
+/************************
+ * FLEXIcontent headlines
+ ************************/
 #flexicontent h2 {
+	margin: 0 0 0.5em;
 }
 
 #flexicontent h2 img {
 	border: none;
 }
 
-h2.flexicontent {
-	margin: 0 0 0.5em;
-}
 
-/** 
- * @pagination css trick to center the div without having a fixed width
- * see http://www.cssplay.co.uk/menus/centered.html
+
+/*****************
+ * Pagination CSS
+ *****************
+ * NOTE: some are prefixed by the flexicontent id to force a more correct behavior,
+ * other pagination CSS rules are not prefixed so that joomla templates can style them
  */
 div.pagination {
 	float: left;
@@ -99,12 +117,11 @@ div.pageslinks {
 	text-align: center;
 }
 
-/* prefixed by the flexicontent id to force a more correct behavior,
-other pagination are not prefixed so that joomla templates can style them */
-#flexicontent div.pageslinks ul li {
+/* Commented out because it conflicts with various joomla templates */
+/*#flexicontent div.pageslinks ul li {
 	display: inline-block;
 	margin: 0px 4px 0px 4px;
-}
+}*/
 
 /* Commented out because it conflicts with various joomla templates */
 /*#flexicontent div.pageslinks ul li span, #flexicontent div.pageslinks ul li a {
@@ -122,10 +139,11 @@ div.pageslinks ul li a {
 	text-align: center;
 }
 
-/**
- * @section Categoryview
- *
- */
+
+
+/****************************
+ * FLEXIcontent category view
+ ****************************/
 #flexicontent .catimg {
 	float: left;
 	margin: 0 0.5em 0.5em 0;
@@ -136,6 +154,12 @@ div.pageslinks ul li a {
 	font-size: 0.9em;
 	line-height: 180%;
 	margin: 0 0 0.5em 0;
+}
+
+#flexicontent .catimg img {
+	padding: 1px;
+	border: 1px solid lightgray;
+	border-radius: 8px;
 }
 
 #flexicontent .catdescription {
@@ -149,23 +173,15 @@ div.pageslinks ul li a {
 	padding: 0.5em 0.3em;
 }
 
-div.subcategorieslist {
+#flexicontent .subcategorieslist {
 	margin: 0 0 1em 0;
 }
 
-/**
- * @section FLEXIcontent Item
- *
- */
-#flexicontent .taglist {
-	margin: 5px 0 10px;
-	padding: 0 5px;
-}
 
-/**
- * @section FLEXIcontent Table
- *
- */
+
+/*********************
+ * FLEXIcontent Tables
+ *********************/
 #flexicontent table.flexitable {
 	border: 1px solid #e5e5e5;
 	border-collapse: collapse;
@@ -212,47 +228,247 @@ div.subcategorieslist {
 	background: #f8f8f8;
 }
 
-/**
- * @section flexicontent Table Filter Form
- *
- */
 
+
+/********************************************************************************************************
+ * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
+ ********************************************************************************************************/
+
+/* some helper or compatibility classes */
+#flexicontent .fc_fleft  { display: inline-block; float: left; }
+#flexicontent .fc_fright { display: inline-block; float: right; }
+
+/*
+ * Container of form elements for listings, including:
+ * (a) text search, (b) field filters, but also of (c) alpha-index,
+ * (d) pagination totals, per page limit selector and order selector
+*/
 #flexicontent #fc_filter {
+	display: block;
+	clear: both;
 	border: solid 1px #dddddd;
 	margin: 0 0 1em 0;
 	padding: 0.5em;
 }
 
-#flexicontent .fc_fleft {
+
+/*******************/
+/* (a) TEXT SEARCH */
+/*******************/
+
+/* Container of text search (label,form element,buttons) */
+#flexicontent .fc_text_filter_box {
+	display: block;
 	float: left;
+	margin: 0px 24px 0px 0px;
 }
 
-#flexicontent .fc_fright {
-	float: right;
+/* The label of text search form element */
+#flexicontent .fc_text_filter_label {
+	display:inline-block;
+	float:none;
+	font-weight:bold;
+	margin: 0px 4px 1px 1px;
 }
 
+/* The text search form element */
+#flexicontent .fc_text_filter {
+	display:inline-block;
+	float:none;
+	border: 1px solid gray;
+	border-radius: 4px;
+	margin: 1px 4px 1px 1px;
+}
+
+/* Container of submit / reset buttons */
+#flexicontent .fc_text_filter_buttons {
+	display:inline-block;
+	float:none;
+}
+
+/* The splitter line between search text and field filters (frontend FC templates) */
+#flexicontent .fc_text_filter_splitter  {
+	width:100%;
+	display:inline-block;
+	clear:both;
+	float:none;
+	padding:0px;
+	margin: 16px 0px 16px 0px;
+	border-bottom:1px dashed lightgray!important;
+}
+
+
+/*********************/
+/* (b) FIELD FILTERs */
+/*********************/
+
+/* The LABEL of field filters LIST CONTAINER */
+#flexicontent .fc_field_filters_list_label {
+	display: inline-block;
+	float: none;
+	font-weight:bold;
+	margin: 0px 8px 0px 0px;
+}
+
+/* Container of tooltip icon for filters list */
+#flexicontent .fc_field_filters_list_tipicon {
+	display:inline-block;
+	*margin-bottom:10px;
+}
+
+/* Container of each individual field filter (both label and html) */
 #flexicontent .filter {
-	display: block;
-	float: left;
-	margin: -6px 0px 6px 10px;
+	display: inline-block;
+	float: none;
+	margin: 0px 10px 6px 0px;
+	white-space: nowrap;
 }
 
+/* Container of each individual field filter LABEL */
 #flexicontent .filter .filter_label {
-	clear: both;
-	display: block;
-	float: left;
-	font-size: 100%;
+	display: inline-block;
+	float: none;
+	font-size: 90%;
+	border-bottom:1px dashed black;
+	margin: 0px 4px 0px 0px;
+	*margin: 0px 4px 6px 0px;
+	/*font-style: italic;*/
 }
 
-#flexicontent .filter .filter_field {
-	clear: both;
-	display: block;
-	float: left;
+/* Container of each individual field filter HTML */
+#flexicontent .filter .filter_html {
+	display: inline-block;
+	float: none;
 	font-size: 90%;
 }
 
-/** Item submission Form **/
+/* The form element(s) of each field filter inside filter's HTML */
+#flexicontent select.fc_field_filter {
+	border: 1px solid gray;
+	color: black;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 4px;
+	margin: 4px 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+
+/*******************/
+/* (c) Alpha Index */
+/*******************/
+
+/* Top Container */
+#fc_alpha {
+	clear: both;
+	float: left;
+	margin: 0 0 12px 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+/* A group of alpha-index character elements */
+#fc_alpha .aichargrp {
+	clear: both;
+	float: left;
+	left: 50%;
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+/* Default groups of  alpha-index character elements */
+#fc_alpha .letters, #fc_alpha .numbers {
+}
+
+/* An enabled individual alpha-index character element */
+#fc_alpha .fc_alpha_index {
+	background: #efefef;
+	border: 1px solid #c0c0c0;
+	float: left;
+	margin-right: 2px;
+	padding: 1px 2px;
+	position: relative;
+	right: 50%;
+	text-decoration: none;
+}
+
+/* A disabled individual alpha-index character element */
+#fc_alpha span.fc_alpha_index {
+	color: #c0c0c0;
+}
+
+/* Seperator */
+#fc_alpha .fc_alpha_index_sep {
+	background: none;
+	border: 0px solid silver;
+	float: left;
+	margin-right: 0px;
+	padding: 1px 0px;
+	position: relative;
+	right: 50%;
+	text-decoration: none;
+}
+
+/* The active (selected) individual alpha-index character element */
+#fc_alpha .fc_alpha_index.current {
+	margin-left:12px;
+	margin-right:12px;
+	color: darkred;
+}
+
+
+
+/*******************************************************/
+/* (d) ITEMs TOTAL Container, also contains selectors: */
+/* for (a) # pages per limit AND (b) items order by    */
+/*******************************************************/
+
+#flexicontent .item_total {
+	border: 1px solid lightgray;
+	margin: 0px 0px 16px 0px;
+	padding: 1px 4px;
+	clear: both;
+}
+
+#flexicontent .item_total .item_total_label {
+	display: inline-block;
+	font-weight: bold;
+}
+
+#flexicontent .item_total .item_total_value {
+	display: inline-block;
+	margin-right: 24px;
+}
+
+/* Containers of per page limit selector and order by selector */
+#flexicontent .item_total .fc_limit_label,
+#flexicontent .item_total .fc_orderby_label {
+	display:inline-block;
+	float:none;
+}
+
+
+
+/********************************
+ * Flexicontent buttons for Forms
+ *******************************/
+
+/* IE6 fix */
+html button {
+	*overflow: visible; /* remove padding from left/right */
+	*width:0; /*remove the remaining space in IE6*/
+}
  
+/* IE7 fix */
+:first-child+html button {
+	*overflow: visible; /* remove padding from left/right */
+	*width:auto !important;
+}
+
 div.flexi_edit .flexi_buttons {
 	float: right;
 	margin: 2px 2px 8px;
@@ -265,6 +481,8 @@ div.flexi_edit .flexi_buttons {
 	color: white !important;	
 	margin: 2px 6px 2px 0px;
 	padding:1px 4px 1px 2px;
+	font-weight:bold;
+	font-size:11px;
 }
 
 #flexicontent button:hover, div.flexi_edit .flexi_buttons button:hover {
@@ -282,19 +500,16 @@ div.flexi_edit .flexi_buttons {
 .fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: blue !important; }
 .fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
 .fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: green !important; }
-.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
+.fcbutton_reset { background: url(../images/arrow_rotate_clockwise.png) no-repeat !important;  color: darkorange !important; }
 
-button.fc_button {
-}
-
-#flexicontent #filter {
-	border: 1px solid gray;
-	border-radius: 4px;
-	margin: 2px 0px;
-}
+button.fc_button {}
 
 
-/* Access */
+
+/****************
+ * Access related
+ ****************/
+ 
 fieldset.flexiaccess legend {
 	background: url(../../../../administrator/components/com_flexicontent/assets/images/toggle_blue.png) no-repeat 98% 50%;
 	padding-right: 22px;
@@ -308,9 +523,17 @@ fieldset.flexiaccess {
 }
 
 
-/** Tags **/
 
-div#tags {
+/*******************
+ * FLEXIcontent Tags
+ *******************/
+
+#flexicontent .taglist {
+	margin: 5px 0 10px;
+	padding: 0 5px;
+}
+
+#flexicontent div#tags {
 	margin: 3px;
 }
 
@@ -349,7 +572,11 @@ div#tags {
 }
 
 
-/** rating bar **/
+
+/*************************
+ * FLEXIcontent rating bar
+ *************************/
+
 #flexicontent .qf_ratingbarcontainer {
 	border: 1px solid #999999;
 	display: block;
@@ -365,7 +592,11 @@ div#tags {
 }
 
 
-/* Favourites */
+
+/*************************
+ * FLEXIcontent Favourites
+ *************************/
+
 .fav-block {
 	clear: both;
 }
@@ -381,9 +612,12 @@ div#tags {
 .fcfav img {
 }
 
-/**
- * Comments for JComments only ;-)
- */
+
+
+/***********
+ * JComments
+ ***********/
+
 div.comments {
 	margin-top: 15px;
 }
@@ -453,7 +687,6 @@ div.comments {
 	background: url(../images/information.png) #dfeeff no-repeat 4px 50%;
 }
 
-/* Tab comments */
 .comments .votes {
 	margin-left: -4px;
 }
@@ -462,8 +695,11 @@ div.comments {
 	margin: 5px 0 15px;
 }
 
-/**
+
+
+/***********
  * Tabs CSS
+ ***********
  * taken from the general.css in the backend
  */
 dl.tabs {
@@ -506,59 +742,15 @@ div.current dd {
 	width: 373px;
 }
 
-/* Alpha Index */
-
-#fc_alpha {
-	clear: both;
-	float: left;
-	margin: 0 0 1em 0;
-	overflow: hidden;
-	width: 100%;
-}
-
-#fc_alpha .aichargrp {
-	clear: both;
-	float: left;
-	left: 50%;
-	margin-bottom: 5px;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-}
-
-/* default alpha character group classes */
-#fc_alpha .letters, #fc_alpha .numbers {
-}
-   
-/* class of individual alpha characters */
-#fc_alpha .fc_alpha_index {
-	background: #efefef;
-	border: 1px solid #c0c0c0;
-	float: left;
-	margin-right: 2px;
-	padding: 1px 2px;
-	position: relative;
-	right: 50%;
-	text-decoration: none;
-}
-
-#fc_alpha span.fc_alpha_index {
-	color: #c0c0c0;
-}
-
-#fc_alpha .fc_alpha_index_sep {
-	background: none;
-	border: 0px solid silver;
-	float: left;
-	margin-right: 0px;
-	padding: 1px 0px;
-	position: relative;
-	right: 50%;
-	text-decoration: none;
-}
 
 
-/* File Field Plugin */
+
+
+/**************************************
+ * File / image Field and other Plugins
+ **************************************/
+
+/* File field (item form) */
 .icon-mime {
 	vertical-align: middle;
 }
@@ -568,6 +760,7 @@ div.current dd {
 	margin: 0;
 }
 
+/* Empty image container for image field (item form) */
 .empty_image {
 	display: block;
 	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
@@ -575,7 +768,14 @@ div.current dd {
 	margin-bottom:3px;
 }
 
-/* Buttons */
+/* Styling for image field (frontend FC templates) */
+.fc_field_image {
+	padding: 1px !important;
+	border: 1px solid lightgray !important;
+	border-radius: 4px !important;
+}
+
+/* ADD button used by fields (item form) */
 .button-add a {
 	display: inline-block;
 	padding: 1px 8px;
@@ -590,12 +790,7 @@ div.current dd {
 	text-decoration: none;
 }
 
-#fc_alpha .fc_alpha_index.current {
-	margin-left:12px;
-	margin-right:12px;
-	color: darkred;
-}
-
+/* Styling for image field tooltips (frontend FC templates) */
 .fc_img_tooltip_title {
 	line-height:1em;
 	font-weight:bold;
@@ -604,16 +799,13 @@ div.current dd {
 	line-height:1em;
 }
 
-.fc_filters_label {
-	display: inline-block;
-	float:left;
-	font-weight:bold;
-}
 
-.fc_search_label {
-	font-weight:bold;
-}
 
+/************************************
+ * FLEXIcontent Advanced Search View
+ ************************************/
+
+/* Container of TEXT search label */
 .fc_search_label_cell {
 	text-align:right;
 	padding: 4px 6px 4px 4px;
@@ -621,69 +813,64 @@ div.current dd {
 	background-color:#eeeeee;
 }
 
+/* Container of TEXT search form field */
 .fc_search_option_cell {
 	padding: 4px 4px 4px 6px;
 }
 
+/* Search Filter ROW */
 .fc_search_row_0 td {
 	background-color: #eeeeee;
 }
 
+/* Search Filter CELL */
 .fc_search_row_1 td {
 	background-color: #dddddd;
 }
 
-
+/* CONTAINER of search (field) filters */
 fieldset.fc_search_set {
 	border: 1px outset black;
 	padding: 8px 8px 8px 16px;
 	margin-top:12px;
 }
 
+/* TITLE of CONTAINER of search (field) filters */
 fieldset.fc_search_set legend {
-	margin-left: 6x;
+	margin-left: 6px;
 	padding-left: 4px;
 }
 
+/* Search (field) filters TABLE */
 table#basicfields, 
 table#extrafields, 
 table#resultoptions {
 	border-collapse: separate!important;
-	border-spacing: 1;
+	border-spacing: 1px;
 	width:auto;
 }
 
+/* Search (field) filters CELLs */
 table#basicfields td, 
 table#extrafields td, 
 table#resultoptions td {
 	border: 1px solid white; 
-	border-spacing: 1;
+	border-spacing: 1px;
 	width:auto;
 }
 
+/* CONTAINER of form fields related Search View BEHAVIOR */
 fieldset#fc_search_set_search_behavior legend {
 	color:darkred;
 	font-weight:bold;
 }
 
-/* Items Total */
-.item_total {
-}
- 
-.item_total .item_total_label {
-	display: inline-block;
-	font-weight: bold;
-}
-
-.item_total .item_total_value {
-	display: inline-block;
-	margin-right: 24px;
-}
 
 
-/*******************/
-/* CSS HACKS START */
-/*******************/
+/************************************************************************
+ * Frontend templates: Some CSS HACKS/RULES (to fix alignment & wrapping)
+ ************************************************************************/
+
 #flexicontent .fc_inline_block {
 	*display: inline !important; /* Hack for IE 7 and less */
 	_height: 1%; /* Hack for IE6 */
@@ -714,9 +901,12 @@ fieldset#fc_search_set_search_behavior legend {
 #flexicontent .fc_clearfix {
 	clear: both;
 }
-/*****************/
-/* CSS HACKS END */
-/*****************/
+
+
+
+/****************************
+ * ITEM FORM: Some CSS rules
+ ****************************/
 
 table.admintable {
 	border-collapse:separate !important;
@@ -738,8 +928,18 @@ table.admintable td {
 	padding: 6px 4px 6px 4px;
 }
 
+/* CONTAINER of message for item having default content template layout */
+#__content_type_default_layout__ {
+	margin: 12px 4px 4px 32px;
+	padding:0px;
+}
 
-/* DIRECTORY VIEW */
+
+
+/****************
+ * Directory view
+ ****************/
+
 #flexicontent.directory .fccatcolumn {
 	float: left;
 	margin: 0% 1% 0% 0% !important;
@@ -748,7 +948,7 @@ table.admintable td {
 
 #flexicontent.directory h2.fccat_title_box {
 	background-color: #dddddd;
-	border: 0px 1px 0px 1px solid #ffffff;
+	border: 1px solid #ffffff;
 	color: #ffffff;
 	margin: -3px 0 0;
 	padding: 1px 0;
@@ -826,9 +1026,11 @@ table.admintable td {
 #flexicontent.directory .fcsubcat_descr {
 }
 
-/***********************************************/
-/* JCE EDITOR FIXES (most frontend templates?) */
-/***********************************************/
+
+
+/*********************************************
+ * JCE EDITOR FIXES (most frontend templates?) 
+ *********************************************/
 
 /* Fixes for JCE EDITOR BUTTONS */
 #flexicontent #editor-xtd-buttons a {
@@ -843,9 +1045,11 @@ table.admintable td {
 	margin:4px 0px 0px 4px !important;
 }
 
-/**************************************/
-/* BOF: item form css fixes for j1.6+ */
-/**************************************/
+
+
+/********************************
+ * ITEM FORM: CSS FIXES for J1.6+
+ ********************************/
 
 /* PANELs */
 #flexicontent .pane-slider ul.adminformlist,
@@ -911,12 +1115,12 @@ table.admintable td {
 	padding: 0px 4px 0px 4px;
 }
 
-/**************************************/
-/* EOF: item form css fixes for j1.6+ */
-/**************************************/
 
 
-/*** state toggler ***/
+/****************
+ * State Toggler
+ ****************/
+
 .statetoggler {
 	float: right !important;
 	display: inline-block !important;
@@ -960,17 +1164,12 @@ table.admintable td {
 	margin: 0px !important;
 }
 
-/*** container of message for item having default content template layout ***/
-#__content_type_default_layout__ {
-	margin: 12px 4px 4px 32px;
-	padding:0px;
-}
-
-#editor-xtd-buttons {
-}
 
 
-/* Rules for frontend basic tabbing in templates */
+/******************************************************
+ * Frontend Templates Rules for frontend basic tabbing
+ ******************************************************/
+
 #flexicontent .tabberlive {
 	margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
 }
@@ -997,57 +1196,18 @@ table.admintable td {
 	border-bottom: 1px solid #777788 !important;
 	font: bold 12px Verdana,sans-serif !important;
 	margin: 0 !important;
-	padding: 3px 0px 0px 0px !important;
+	padding: 3px !important;
 }
 
-.fc_field_image {
-	padding: 1px !important;
-	border: 1px solid lightgray !important;
-	border-radius: 4px !important;
-}
+
+
+/***************************
+ * Other unsorted CSS Rules
+ ***************************/
 
 div.fancybox-wrap a { background: none!important;}
 
-.fc_bigbutton {
-	border-radius:4px !important;
-	padding: 2px !important;
-	margin-right: 4px !important;
-	border:1px outset gray !important;
-	background: #e0e0e0 !important;
-	text-align: center;
-	display:block;
-}
-
-.fc_bigbutton:hover {
-	border-style: inset !important;
-	text-decoration: none;
-}
-
-
-select.cidtarget , select.fcfilter {
-	border: 1px solid gray;
-	color: black;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 4px;
-	margin: 4px 2px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	/*box-shadow: 2px 2px 2px 2px #330033;*/
-}
-
-#flexicontent .catimg img {
-	padding: 1px;
-	border: 1px solid lightgray;
-	border-radius: 8px;
-}
-
-#flexicontent .fc_splitter_line {
-	width:100%;
+#flexicontent .contentttt {
+	float:none;
 	clear:both;
-	float:left;
-	margin-top:16px;
-	margin-bottom:16px;
-	border-bottom:1px dashed lightgray!important;
 }

@@ -600,8 +600,12 @@ window.addEvent('domready', function() {
     
 			<td align="center">
 		    <?php
-		    unset( $field->{$field->methodname} );                    // Clear display HTML just in case
-		    $field_value = & $row->extra_field_value[$field->name];   // Field value for current item
+		    // Clear display HTML just in case
+		    if (isset($field->{$field->methodname}))
+		    	unset( $field->{$field->methodname} );
+		    
+		    // Field value for current item
+		    $field_value = & $row->extra_field_value[$field->name];
 		    
 		    if ( !empty($field_value) )
 		    {

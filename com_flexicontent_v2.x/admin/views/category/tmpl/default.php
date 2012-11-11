@@ -136,7 +136,7 @@ dump($this->row);
 				</table>
 				
 			</td>
-			<td valign="top" width="430" style="padding: 0px 0 0 5px;vertical-align:top;">
+			<td valign="top" width="480" style="padding: 0px 0 0 5px;vertical-align:top;">
 				<?php
 				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));

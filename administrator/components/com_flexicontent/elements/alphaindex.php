@@ -61,10 +61,14 @@ class JElementAlphaindex extends JElement
 		}
 		
 		$options = array();
-		$options[0] = new stdClass();  $options[1] = new stdClass();  $options[2] = new stdClass();
-		$options[0]->text=JTEXT::_("FLEXI_HIDE"); $options[0]->value=0;
-		$options[1]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[1]->value=1;
-		$options[2]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[2]->value=2;
+		$i=-1;
+		if (@$attributes['use_global']) {
+			$options[++$i] = new stdClass();
+			$options[$i]->text=JTEXT::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
+		}
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_HIDE"); $options[$i]->value=0;
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
 		
 		$value  = FLEXI_J16GE ? $this->value : $value;
 		

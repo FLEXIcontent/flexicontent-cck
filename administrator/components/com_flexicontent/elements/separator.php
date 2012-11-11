@@ -37,20 +37,94 @@ class JElementSeparator extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$level = $node->attributes('level');
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		$level = $attributes['level'];
+		$description = @$attributes['description'];
 		
-		if ($level == 'level2') {
+		if (FLEXI_J16GE && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
+		
+		static $tab_js_css_added = false;
+		static $initial_tbl_hidden = false;
+		
+		if (!$tab_js_css_added && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) {
+			$tab_js_css_added = true;
+			$document = & JFactory::getDocument();
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
+			$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/tabber.css');
+			$document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
+		}
+		
+		
+		
+		if ($level == 'tblbreak') {
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #ffffff; color: darkred; font-size: 16px!important; font-weight: bold; margin: 24px 0% 2px 0%; width:auto; display: block; float: left; border: 1px solid lightgray; font-family:tahoma; font-size:12px;';
+		} else if ($level == 'level2') {
 			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
-			$style = 'padding: 2px 6% 4px 6%; margin-top:6px; font-weight: bold; clear:both; width:auto; display: block; float: left; border:1px dashed gray;';
-		} else {
+			$pad_left = FLEXI_J16GE ? 'left:20%;' : 'left:0%;';
+			$style = 'padding: 2px 6% 4px 6%; margin-top:6px; font-weight: bold; clear:both; width:auto; display: block; float: left; position:relative; '.$pad_left.' border:1px dashed gray; background:#eeeeee;';
+		} else if ($level == 'level1') {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
+		} else {
+			$style = '';
 		}
 		
 		$class = ""; $title = "";
-		if ($node->attributes('description')) {
+		if ($description) {
 			$class = "hasTip";
-			$title = JText::_($value)."::".JText::_($node->attributes('description'));
+			$title = JText::_($value)."::".JText::_($description);
+		}
+		
+		if ($level == 'tabs_start') {
+			$html = '';
+			if (!$initial_tbl_hidden) {
+				$initial_tbl_hidden = true;
+				$html = '<style> table.paramlist.admintable {display:none;} table.paramlist.admintable.flexi {display:table;} div.tabberlive {margin-top:0px;}</style>';
+			}
+			return $html.'
+			</td></tr>
+			</table>
+			<div class="fctabber">
+				<div class="tabbertab">
+					<h3>'.str_replace('&', ' - ', JText::_($value)).'</h3>
+					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
+					<tr><td>
+			';
+		} else if ($level == 'tab_close_open') {
+			return '
+					</td></tr>
+					</table>
+				</div>
+				<div class="tabbertab">
+					<h3>'.str_replace('&', ' - ', JText::_($value)).'</h3>
+					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
+					<tr><td>
+				';
+		} else if ($level == 'tabs_end') {
+			return'
+					</td></tr>
+					</table>
+				</div>
+			</div>
+				<table width="100%" cellspacing="1" class="paramlist admintable flexi">
+				<tr><td>
+			';
+		} else if ($level == 'tblbreak') {
+			return '
+			</td></tr>
+			</table>
+			'
+			.'<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>'.
+			'
+			<table width="100%" cellspacing="1" class="paramlist admintable flexi">
+			<tr><td>
+			';
 		}
 		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>';
 	}

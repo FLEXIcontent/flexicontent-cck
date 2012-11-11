@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1370 2012-07-08 01:24:53Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1505 2012-10-01 17:16:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -96,20 +96,18 @@ $page_classes .= ' category cat'.$this->category->id;
 
 <!-- BOF pagination -->
 	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-	<div class="pageslinks">
-		<?php echo $this->pageNav->getPagesLinks(); ?>
-	</div>
+		<div class="pageslinks">
+			<?php echo $this->pageNav->getPagesLinks(); ?>
+		</div>
 
-	<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-	<p class="pagescounter">
-		<?php echo $this->pageNav->getPagesCounter(); ?>
-	</p>
-	<?php
-		endif;
-	endif; 
-	?>
+		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
+		<p class="pagescounter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</p>
+		<?php endif; ?>
+	<?php endif; ?>
 <!-- EOF pagination -->
 
 </div>
 
-<?php } /* EOF html5  */ ?>
+<?php } /* EOF if html5  */ ?>

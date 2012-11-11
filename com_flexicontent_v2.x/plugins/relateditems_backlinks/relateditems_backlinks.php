@@ -423,7 +423,7 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 				foreach($results as $result) {
 					$options[] = JHTML::_('select.option', $result->value, $result->text);
 				}
-				$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			}
 
 		} else {
