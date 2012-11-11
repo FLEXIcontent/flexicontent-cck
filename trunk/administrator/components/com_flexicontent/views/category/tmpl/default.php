@@ -133,7 +133,7 @@ dump($this->row);
 				</table>
 				
 			</td>
-			<td valign="top" width="430" style="padding: 7px 0 0 5px">
+			<td valign="top" width="480" style="padding: 7px 0 0 5px">
 				<?php
 				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
 				$title = JText::_( 'FLEXI_ACCESS' );
@@ -194,18 +194,18 @@ dump($this->row);
 				echo $this->pane->endPanel();
 
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
-				echo $this->pane->startPanel( $title, "params-item_list_creation" );
-				echo $this->form->render('params', 'item_list_creation');
+				echo $this->pane->startPanel( $title, "params-cat_items_list" );
+				echo $this->form->render('params', 'cat_items_list');
 				echo $this->pane->endPanel();
 				
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );
-				echo $this->pane->startPanel( $title, "params-item_filtering" );
-				echo $this->form->render('params', 'item_filtering');
+				echo $this->pane->startPanel( $title, "params-cat_item_filtering" );
+				echo $this->form->render('params', 'cat_item_filtering');
 				echo $this->pane->endPanel();
 				
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_RSS_FEEDS' );
-				echo $this->pane->startPanel( $title, "params-rss_feeds" );
-				echo $this->form->render('params', 'rss_feeds');
+				echo $this->pane->startPanel( $title, "params-cat_rss_feeds" );
+				echo $this->form->render('params', 'cat_rss_feeds');
 				echo $this->pane->endPanel();
 				
 				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) )

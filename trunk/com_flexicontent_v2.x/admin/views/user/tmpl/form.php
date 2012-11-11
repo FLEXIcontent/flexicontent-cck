@@ -434,18 +434,18 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 					echo $this->pane->endPanel();
 		
 					$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
-					echo $this->pane->startPanel( $title, "params-item_list_creation" );
-					echo $this->params_authorcat->render('authorcatparams', 'item_list_creation');
+					echo $this->pane->startPanel( $title, "params-cat_items_list" );
+					echo $this->params_authorcat->render('authorcatparams', 'cat_items_list');
 					echo $this->pane->endPanel();
 						
 					$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );
-					echo $this->pane->startPanel( $title, "params-item_filtering" );
-					echo $this->params_authorcat->render('authorcatparams', 'item_filtering');
+					echo $this->pane->startPanel( $title, "params-cat_item_filtering" );
+					echo $this->params_authorcat->render('authorcatparams', 'cat_item_filtering');
 					echo $this->pane->endPanel();
 						
 					$title = JText::_( 'FLEXI_PARAMETERS_CAT_RSS_FEEDS' );
-					echo $this->pane->startPanel( $title, "params-rss_feeds" );
-					echo $this->params_authorcat->render('authorcatparams', 'rss_feeds');
+					echo $this->pane->startPanel( $title, "params-cat_rss_feeds" );
+					echo $this->params_authorcat->render('authorcatparams', 'cat_rss_feeds');
 					echo $this->pane->endPanel();
 						
 					echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';

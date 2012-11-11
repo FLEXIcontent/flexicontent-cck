@@ -1,6 +1,6 @@
 <?php
 /**
-* HTML5 Template
+ * HTML5 Template
  * @version 1.5 stable $Id: item_html5.php 0001 2012-09-23 14:00:28Z Rehne $
  * @package Joomla
  * @subpackage FLEXIcontent

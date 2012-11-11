@@ -28,6 +28,7 @@
 		</param>
 		<param name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
 		<param name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
+		<param name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
 	</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcloadmodule.ini</language>

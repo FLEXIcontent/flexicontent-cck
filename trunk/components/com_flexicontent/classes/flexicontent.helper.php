@@ -34,7 +34,7 @@ class flexicontent_html
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
 	 * @since 1.5
 	 */
-	function renderItem($item_id) {
+	function renderItem($item_id, $view=FLEXI_ITEMVIEW) {
 		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once("components/com_flexicontent/classes/flexicontent.fields.php");
@@ -51,7 +51,7 @@ class flexicontent_html
 		
 		$user = & JFactory::getUser();
 		$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
-		list($item) = FlexicontentFields::getFields($item, 'items', $item->parameters, $aid);
+		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 		
 		$ilayout = $item->parameters->get('ilayout', '');
 		if ($ilayout==='') {
@@ -91,6 +91,57 @@ class flexicontent_html
 		return $item_html;
 	}
 	
+	
+	function limit_selector(&$params, $formname='adminForm', $autosubmit=1)
+	{
+		if ( !$params->get('limit_override') ) return '';
+		
+		$mainframe	= &JFactory::getApplication();
+		//$orderby = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+		$limit = $mainframe->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
+		
+		$class    = ' class="inputbox fc_field_filter" ';
+		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
+		$attribs  = $class . $onchange;
+		
+		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
+		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
+		
+		$limiting = array();
+		foreach($limit_options as $limit_option) {
+			$limiting[] = JHTML::_('select.option', $limit_option, $limit_option);
+		}
+		
+		return JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
+	}
+	
+	function ordery_selector(&$params, $formname='adminForm', $autosubmit=1)
+	{
+		if ( !$params->get('orderby_override') ) return '';
+		
+		$mainframe	= &JFactory::getApplication();
+		//$orderby = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+		$orderby = $mainframe->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
+		
+		$class    = ' class="inputbox fc_field_filter" ';
+		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
+		$attribs  = $class . $onchange;
+		
+		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','order'));
+		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
+		
+		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL','date'=>'FLEXI_ORDER_OLDEST_FIRST','rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
+		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST','alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL','ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
+		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
+		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS','order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
+		
+		foreach ($orderby_options as $orderby_option) {
+			if ($orderby_option=='__SAVED__') continue;
+			$ordering[] = JHTML::_('select.option',  $orderby_option, 	JText::_( $orderby_names[$orderby_option] ) );
+		}
+		
+		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
+	}
 	
 	/**
 	 * Escape a string so that it can be used directly by JS source code

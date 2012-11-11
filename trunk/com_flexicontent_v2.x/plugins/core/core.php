@@ -324,7 +324,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 
 			case 'modifiedby': // Modified by
@@ -352,7 +352,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 
 			case 'type': // Type
@@ -377,7 +377,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 
 			case 'state': // State
@@ -397,7 +397,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 
 			case 'categories': // Categories
@@ -425,7 +425,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 				$filter->html	= str_replace('&lt;sup&gt;|_&lt;/sup&gt;', '\'-', $filter->html);
 			break;
 
@@ -451,7 +451,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, 'onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" " onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 			break;
 		}
 	}

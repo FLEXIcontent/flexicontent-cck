@@ -18,7 +18,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-// SEO
+
 $catTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('show_cat_title', 1) ) ? '2' : '1'; 
 // Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
@@ -33,9 +33,9 @@ $catTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->
 	<?php endif; ?>
 
 	<?php if ($this->params->get('show_description_image', 1) && $this->category->image) : ?>
-	<div class="catimg">
+	<figure class="catimg">
 		<?php echo $this->category->image; ?>
-	</div>
+	</figure>
 	<?php endif; ?>
 	
 	<?php if ($this->params->get('show_description', 1) && $this->category->description) : ?>

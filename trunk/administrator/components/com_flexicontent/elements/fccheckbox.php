@@ -54,12 +54,12 @@ class JElementFccheckbox extends JElement
 		$split_char = ",";
 		
 		// Get options and values
-		$checkoptions = explode($split_char, $attributes['checkoptions']);
-		$checkvals = explode($split_char, $attributes['checkvals']);
-		$defaultvals = explode($split_char, @$attributes['defaultvals']);
+		$checkoptions = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkoptions']);
+		$checkvals = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkvals']);
+		$defaultvals = preg_split("/[\s]*".$split_char."[\s]*/", @$attributes['defaultvals']);
 		
 		// Verify defaultvals option
-		if ( empty($defaultvals[0]) ) $defaultvals = array();
+		if ( count($defaultvals)==1 && empty($defaultvals[0]) ) $defaultvals = array();
 		if ( count($defaultvals) && @$attributes['display_useglobal'] ) {
 			$defaultvals = array();
 			echo "Cannot use field option 'defaultvals' together with 'display_useglobal' 'defaultvals' cleared";
@@ -83,6 +83,8 @@ class JElementFccheckbox extends JElement
 		
 		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px">';
 		
+		$inline_style  = "float:left; white-space:nowrap; margin-right:12px; ";
+		$inline_style .= FLEXI_J16GE ? "clear:both; " : "";
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';
@@ -90,17 +92,17 @@ class JElementFccheckbox extends JElement
 				$check_global = ' checked="checked" ';
 				$disable_all = ' disabled="disabled" ';
 			}
-			$html .= '<input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label>';
+			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
+			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label></div>';
 		}
 
 		// Create checkboxes
 		foreach($checkoptions as $i => $o) {
 			$curr_element_id = $element_id.$i;
-			$html .= '<input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
+			$html .= '<div style="'.$inline_style.'" ><input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
 			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
 			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
-			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>';
+			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label></div>';
 			$html .= FLEXI_J16GE ? ' &nbsp; ' : '';
 		}
 

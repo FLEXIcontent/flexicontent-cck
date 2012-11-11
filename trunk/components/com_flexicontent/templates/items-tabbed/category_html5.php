@@ -19,8 +19,8 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $page_classes  = '';
-$page_classes .= $this->pageclass_sfx ? 'page'.$this->pageclass_sfx : '';
-$page_classes .= 'cat'.$this->category->id;
+$page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
+$page_classes .= ' category cat'.$this->category->id;
 ?>
 
 <?php echo ( ($this->params->get( 'show_page_heading', 1 ) || $this->params->get('show_cat_title', 1) ) ? '<section' : '<div'); ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >
@@ -97,16 +97,17 @@ $page_classes .= 'cat'.$this->category->id;
 
 <!-- BOF pagination -->
 	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-    <div class="group">
-        <div class="pageslinks">
-            <?php echo $this->pageNav->getPagesLinks(); ?>
-        </div>
+		<footer class="group">
+		<div class="pageslinks">
+			<?php echo $this->pageNav->getPagesLinks(); ?>
+		</div>
+
 		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-        <p class="pagescounter">
-            <?php echo $this->pageNav->getPagesCounter(); ?>
-        </p>
-        <?php endif; ?>
-	</div>
+		<p class="pagescounter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</p>
+		<?php endif; ?>
+		</footer>
 	<?php endif; ?>
 <!-- EOF pagination -->
 

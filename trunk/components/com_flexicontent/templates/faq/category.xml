@@ -53,7 +53,7 @@
 		<group readonly="true">subcategory_title</group>
 		<group readonly="true">subcategory_description</group>
 		<group>aftertitle</group>
-	</fieldgroups>	
+	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>
 	</csscategory>

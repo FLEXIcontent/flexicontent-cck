@@ -33,6 +33,7 @@ $mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
 $tabsHeaderLevel =	( $itemTitleHeaderLevel == 2 ) ? '3' : '2';  	
+// Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >

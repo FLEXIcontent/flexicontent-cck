@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 974 2011-11-23 09:28:28Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: category.php 1505 2012-10-01 17:16:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -16,7 +16,6 @@
  * GNU General Public License for more details.
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
 
 // USE HTML5 or XHTML
 $html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
@@ -97,18 +96,16 @@ $page_classes .= ' category cat'.$this->category->id;
 
 <!-- BOF pagination -->
 	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-	<div class="pageslinks">
-		<?php echo $this->pageNav->getPagesLinks(); ?>
-	</div>
+		<div class="pageslinks">
+			<?php echo $this->pageNav->getPagesLinks(); ?>
+		</div>
 
-	<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-	<p class="pagescounter">
-		<?php echo $this->pageNav->getPagesCounter(); ?>
-	</p>
-	<?php
-		endif;
-	endif; 
-	?>
+		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
+		<p class="pagescounter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</p>
+		<?php endif; ?>
+	<?php endif; ?>
 <!-- EOF pagination -->
 
 </div>

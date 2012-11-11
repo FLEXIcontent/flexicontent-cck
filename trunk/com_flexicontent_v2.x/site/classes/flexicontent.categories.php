@@ -362,6 +362,8 @@ class flexicontent_cats
 		else if ($force=='limit') $limit_filter_values=1;
 		else $limit_filter_values = $currcat_data['params']->get('limit_filter_values', 0);
 		
+		$limit_filter_values = $limit_filter_values && isset($currcat_data['where']);
+		
 		$query = 'SELECT DISTINCT fi.value as value, fi.value as text'
 		. ' FROM #__content AS i'
 		. ' LEFT JOIN #__flexicontent_fields_item_relations AS fi ON i.id = fi.item_id'
