@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="module" version="1.5.0" method="upgrade">
-	<name>FLEXIcontent Module</name>
+	<name>FLEXIcontent Universal Content Module</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>12/04/2011</creationDate>
 	<copyright>(C) 2009 Emmanuel Danan</copyright>

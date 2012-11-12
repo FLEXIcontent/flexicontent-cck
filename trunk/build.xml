@@ -50,6 +50,27 @@
 			</fileset>
 		</copy>
 
+		<copy file="modules/mod_flexifilter/helper.php" tofile="flexipack/modules/mod_flexifilter/helper.php" />
+		<copy file="modules/mod_flexifilter/index.html" tofile="flexipack/modules/mod_flexifilter/index.html" />
+		<copy file="modules/mod_flexifilter/mod_flexifilter.php" tofile="flexipack/modules/mod_flexifilter/mod_flexifilter.php" />
+		<copy file="modules/mod_flexifilter/mod_flexifilter.xml" tofile="flexipack/modules/mod_flexifilter/mod_flexifilter.xml" />
+		<copy file="language/en-GB/en-GB.mod_flexifilter.ini" tofile="flexipack/modules/mod_flexifilter/languages/en-GB.mod_flexifilter.ini" />
+		<copy todir="flexipack/modules/mod_flexifilter/elements" >
+			<fileset dir="modules/mod_flexifilter/elements">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexifilter/tmpl" >
+			<fileset dir="modules/mod_flexifilter/tmpl">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexifilter/tmpl_common" >
+			<fileset dir="modules/mod_flexifilter/tmpl_common">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+
 		<copy file="modules/mod_flexitagcloud/helper.php" tofile="flexipack/modules/mod_flexitagcloud/helper.php" />
 		<copy file="modules/mod_flexitagcloud/index.html" tofile="flexipack/modules/mod_flexitagcloud/index.html" />
 		<copy file="modules/mod_flexitagcloud/mod_flexitagcloud.php" tofile="flexipack/modules/mod_flexitagcloud/mod_flexitagcloud.php" />

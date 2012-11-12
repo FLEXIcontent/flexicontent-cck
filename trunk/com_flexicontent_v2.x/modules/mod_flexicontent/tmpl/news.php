@@ -86,7 +86,8 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$twocols = $params->get('item_columns', 1) == 2;
+	$item_columns = $params->get('item_columns', 1);
+	$twocols = $item_columns == 2;
 	
 	foreach ($ordering as $ord) :
   	echo $separator;
@@ -112,7 +113,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 			<?php $rowtoggler = !$rowtoggler; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler)?'odd':'even'; ?>">
+			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler)? 'odd' : 'even'; ?>">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -237,11 +238,18 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
-			<?php foreach ($list[$ord]['standard'] as $item) : ?>
-			<?php $rowcount++; ?>
+			<?php
+			$oe_class = $rowtoggler ? 'odd' : 'even';
+			foreach ($list[$ord]['standard'] as $item) : ?>
+			<?php
+				if ($rowcount%$item_columns==0) {
+					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+				}
+				$rowcount++;
+			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo ($rowcount%4==1 || $rowcount%4==2)?'odd':'even'; ?>"
+			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?>"
 				onmouseover=""
 				onmouseout=""
 			>

@@ -829,7 +829,7 @@ class modFlexicontentHelper
 				$cid = $cid ? $cid : $curitem->catid;
 				
 				// retrieve extra categories, such children or parent categories
-				$catids_arr = modFlexicontentHelper::getExtraCats($cid, $treeinclude, $curritemcats);
+				$catids_arr = modFlexicontentHelper::getExtraCats(array($cid), $treeinclude, $curritemcats);
 				
 				if ($behaviour_cat == 1) {
 					if (!$apply_config_per_category) {

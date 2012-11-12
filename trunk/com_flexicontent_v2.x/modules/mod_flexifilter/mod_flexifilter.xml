@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="1.7" client="site" method="upgrade">
+	<name>FLEXIcontent Content Lists Filter Module</name>
+	<author>George Papadakis</author>
+	<creationDate>November 2012</creationDate>
+	<copyright>Copyright © 2012 George Papadakis</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail></authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Content lists filter module for the FLEXIcontent Component</description>
+	
+	<files>
+		<filename module="mod_flexifilter">mod_flexifilter.php</filename>
+		<filename>index.html</filename>
+		<filename>helper.php</filename>
+		<folder>elements</folder>
+		<folder>tmpl</folder>
+		<folder>tmpl_common</folder>
+	</files>
+	
+	<languages>
+		<language tag="en-GB">languages/en-GB.mod_flexifilter.ini</language>
+	</languages>
+	
+	<config>
+	<fields name="params" addfieldpath="/modules/mod_flexifilter/elements">
+		<fieldset name="basic">
+			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
+			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexicontent/tmpl"
+					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
+					autosubmit
+			<field name="autosubmit" type="radio" default="0" label="FLEXI_AUTOSUBMIT" description="FLEXI_AUTOSUBMIT_DESC">
+				<option value="0">FLEXI_NO_SHOW_SUBMIT_BUTTON</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
+			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_CATEGORY" description="FLEXI_FILTER_SINGLE_CATEGORY_DESC" />
+			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_DISPLAY_CATEGORY_LIST" description="FLEXI_FILTER_DISPLAY_CATEGORY_LIST_DESC" >
+				<option value="0">FLEXI_FILTER_NO_USE_ABOVE_SELECTED_CATEGORY</option>
+				<option value="1">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
+				<option value="2">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
+			</field>
+			<field name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" />
+			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_DISPLAYED_CATS" description="FLEXI_FILTER_DISPLAYED_CATS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FILTER_FIELD_FILTERS" level="level1" menu="hide" />
+			<field name="display_filter_list" type="list" default="0" label="FLEXI_FILTER_DISPLAYED_FILTERS" description="FLEXI_FILTER_DISPLAYED_FILTERS_DESC" >
+				<option value="0">FLEXI_FILTER_DISPLAYED_FILTERS_ALL</option>
+				<option value="1">FLEXI_FILTER_DISPLAYED_FILTERS_SET_IN_CAT_PARAMS</option>
+				<option value="2">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
+				<option value="3">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
+			</field>
+			<field name="filterids" type="filters" multiple="true" label="FLEXI_FILTERS" description="FLEXI_FILTERS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_EXTRA_FORM_FIELDS" level="level1" menu="hide" />
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_SHOW_ORDERBY" description="FLEXI_SHOW_ORDERBY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="limit_override" type="radio" default="1" label="FLEXI_SHOW_LIMIT" description="FLEXI_SHOW_LIMIT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		
+	</fields>
+	</config>
+</extension>
