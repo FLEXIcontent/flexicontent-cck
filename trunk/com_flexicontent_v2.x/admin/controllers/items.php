@@ -98,7 +98,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
 			
 			// Validate Form data for core fields and for parameters
-			$form = $model->getForm($data, false);
+			$model->setId((int) $data['id']);   // Set data id into model in case some function tries to get a property and item gets loaded
+			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
 			$post = & $model->validate($form, $data);
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
@@ -208,7 +209,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ********************************************************************************************************************
 		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
 		// ********************************************************************************************************************
-		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		$item = & $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
 		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
@@ -268,12 +269,15 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
 			
-			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
 			if (!$draft_from_non_publisher) {
+				// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+				$nConf = false;
+			} else {
 				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = & $model->getNotificationsConf($params);
-				//echo "<pre>"; print_r($nConf);
-				
+				$nConf = & $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
+			}
+			
+			if ($nConf) {
 				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
 				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
 				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
@@ -291,7 +295,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *********************************************************************************************************************
 		// If there are emails to notify for current saving case, then send the notifications emails, but 
 		// *********************************************************************************************************************
-		if ( count($notify_emails) ) {
+		if ( !empty($notify_emails) && count($notify_emails) ) {
 			$notify_vars = new stdClass();
 			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
 			$notify_vars->needs_publication_approval = $needs_publication_approval;

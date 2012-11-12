@@ -54,32 +54,6 @@
 border: none;
 }
 
-/** 
- * @pagination css trick to center the div without having a fixed width
- * see http://www.cssplay.co.uk/menus/centered.html
- */
-div.pagination {
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-	float: left;
-	left: 50%;
-}
-div.pagination div.tab,
-div.pagination div.page-block {
-	position: relative;
-	right: 50%;
-}
-div.pageslinks {
-	overflow: hidden;
-	clear: both;
-	float: left;
-	width: 100%;
-}
-#flexicontent .pagescounter {
-	text-align: center;
-}
-
 
 /**
  * @section Categoryview

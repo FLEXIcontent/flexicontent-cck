@@ -69,11 +69,13 @@ class FlexicontentController extends JController
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($app->getParams('com_flexicontent'));
 		
-		if ($menu) {
-			$menuParams = new JParameter($menu->params);
-			// In J1.6+ the above function does not merge current menu item parameters,
-			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $params->merge($menuParams);
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE) {
+			if ($menu = JSite::getMenu()->getActive()) {
+				$menuParams = new JRegistry;
+				$menuParams->loadJSON($menu->params);
+				$params->merge($menuParams);
+			}
 		}
 		
 		// Merge the type parameters
@@ -93,7 +95,8 @@ class FlexicontentController extends JController
 			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
 			
 			// Validate Form data for core fields and for parameters
-			$form = $model->getForm($data, false);
+			$model->setId((int) $data['id']);   // Set data id into model in case some function tries to get a property and item gets loaded
+			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
 			$post = & $model->validate($form, $data);
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
@@ -232,7 +235,7 @@ class FlexicontentController extends JController
 		// **************************************************
 		$model->checkin();
 		$post['id'] = $isnew ? (int) $model->get('id') : $post['id'];
-		if($isnew) {
+		if ($isnew) {
 			// Mark item as newly submitted, to allow to a proper "THANKS" message after final save & close operation (since user may have clicked add instead of add & close)
 			$newly_submitted	= $session->get('newly_submitted', array(), 'flexicontent');
 			$newly_submitted[$model->get('id')] = 1;
@@ -303,12 +306,15 @@ class FlexicontentController extends JController
 			
 			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
 			
-			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
 			if (!$draft_from_non_publisher) {
+				// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+				$nConf = false;
+			} else {
 				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = & $model->getNotificationsConf($params);
-				//echo "<pre>"; print_r($nConf);
-				
+				$nConf = & $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
+			}
+			
+			if ($nConf) {
 				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
 				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
 				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
@@ -326,7 +332,7 @@ class FlexicontentController extends JController
 		// *********************************************************************************************************************
 		// If there are emails to notify for current saving case, then send the notifications emails, but 
 		// *********************************************************************************************************************
-		if ( count($notify_emails) ) {
+		if ( !empty($notify_emails) && count($notify_emails) ) {
 			$notify_vars = new stdClass();
 			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
 			$notify_vars->needs_publication_approval = $needs_publication_approval;

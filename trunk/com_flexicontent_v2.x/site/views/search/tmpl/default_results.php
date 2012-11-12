@@ -44,12 +44,12 @@
 		<?php endforeach; ?>
 		</td>
 	</tr>
-	<tr>
-		<td colspan="3">
-			<div class="pageslinks" align="center">
-				<?php echo $this->pagination->getPagesCounter(); ?>
-				<?php echo $this->pagination->getPagesLinks(); ?>
-			</div>
-		</td>
-	</tr>
 </table>
+
+<!-- BOF pagination -->
+<?php
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'pagination.php');
+?>
+<!-- EOF pagination -->
+

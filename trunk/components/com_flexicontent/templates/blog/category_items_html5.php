@@ -344,7 +344,7 @@ if ($leadnum) :
 		for ($i=$leadnum; $i<$count; $i++) :
 			$li_item_classes  = $i%2 ? 'even' : 'odd';
 			$li_item_classes .= ' col'.($i%$intro_cols + 1);
-			$li_item_classes .= ' '.%classspan;
+			$li_item_classes .= ' '.$classspan;
 		?>
 		<li class="<?php echo $li_item_classes; ?>">
 			<?php if ($this->params->get('show_title', 1)) : ?>
