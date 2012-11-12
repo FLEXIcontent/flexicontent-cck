@@ -1813,6 +1813,12 @@ class ParentClassItem extends JModelAdmin
 		if( $isnew )
 		{
 			$this->applyCurrentVersion($item, $data, $createonly=true);
+		} else {
+			// Make sure the data of the model are correct,
+			// e.g. a getFrom() used to validate input data may have set an empty item and empty id
+			// e.g. type_id of item may have been altered by authorized users
+			$this->_id   = $item->id;
+			$this->_item = & $item;
 		}
 		
 		

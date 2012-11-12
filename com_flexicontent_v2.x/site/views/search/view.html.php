@@ -299,7 +299,7 @@ class FLEXIcontentViewSearch extends JView
 		
 		$this->assignRef('print_link',  $print_link);
 		$this->assignRef('pageclass_sfx',  $pageclass_sfx);
-		$this->assignRef('pagination',  $pagination);
+		$this->assignRef('pageNav',  $pagination);
 		$this->assignRef('fields',		$fields);
 		$this->assignRef('results',		$results);
 		$this->assignRef('lists',		$lists);

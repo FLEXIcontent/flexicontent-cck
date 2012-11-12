@@ -96,19 +96,10 @@ $page_classes .= ' category cat'.$this->category->id;
 <!-- BOF item list display -->
 
 <!-- BOF pagination -->
-	<?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-		<footer class="group">
-		<div class="pageslinks">
-			<?php echo $this->pageNav->getPagesLinks(); ?>
-		</div>
-
-		<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-		<p class="pagescounter">
-			<?php echo $this->pageNav->getPagesCounter(); ?>
-		</p>
-		<?php endif; ?>
-		</footer>
-	<?php endif; ?>
+<?php
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'pagination.php');
+?>
 <!-- EOF pagination -->
 
 

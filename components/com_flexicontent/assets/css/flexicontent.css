@@ -92,46 +92,21 @@
 /*****************
  * Pagination CSS
  *****************
- * NOTE: some are prefixed by the flexicontent id to force a more correct behavior,
- * other pagination CSS rules are not prefixed so that joomla templates can style them
+ * NOTE: WE AVOID setting styling here to allow Joomla templates to style the pagination area
  */
-div.pagination {
-	float: left;
-	left: 50%;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
-}
-
-div.pagination div.tab,
-div.pagination div.page-block {
-	position: relative;
-	right: 50%;
-}
-
-div.pageslinks {
-	clear: both;
-	float: left;
-	overflow: hidden;
-	width: 100%;
+#flexicontent .pagination {
 	text-align: center;
 }
 
-/* Commented out because it conflicts with various joomla templates */
-/*#flexicontent div.pageslinks ul li {
-	display: inline-block;
-	margin: 0px 4px 0px 4px;
-}*/
+#flexicontent .pageslinks {
+	text-align: center;
+}
 
-/* Commented out because it conflicts with various joomla templates */
-/*#flexicontent div.pageslinks ul li span, #flexicontent div.pageslinks ul li a {
-	padding: 2px 6px 2px 6px;
-	border: 1px solid #dddddd;
-	border-radius: 6px;
-	background: none;
-}*/
+#flexicontent .pageslinks ul {
+	text-align: center;
+}
 
-div.pageslinks ul li a {
+#flexicontent .pageslinks ul li a {
 	text-decoration: none;
 }
 
