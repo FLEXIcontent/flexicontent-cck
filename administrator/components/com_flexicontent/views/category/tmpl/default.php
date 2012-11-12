@@ -211,8 +211,8 @@ dump($this->row);
 				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) )
 				{
 					$title = JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_ASSIGNED_ITEM_CONF' );
-					echo $this->pane->startPanel( $title, "params-notifications_conf" );
-					echo $this->form->render('params', 'notifications_conf');
+					echo $this->pane->startPanel( $title, "params-cat_notifications_conf" );
+					echo $this->form->render('params', 'cat_notifications_conf');
 					echo $this->pane->endPanel();
 				}
 				
