@@ -137,7 +137,9 @@ class flexicontent_html
 		
 		foreach ($orderby_options as $orderby_option) {
 			if ($orderby_option=='__SAVED__') continue;
-			$ordering[] = JHTML::_('select.option',  $orderby_option, 	JText::_( $orderby_names[$orderby_option] ) );
+			$value = ($orderby_option!='_preconfigured_') ? $orderby_option : '';
+			$text = JText::_( $orderby_names[$orderby_option] );
+			$ordering[] = JHTML::_('select.option',  $value,  $text);
 		}
 		
 		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );

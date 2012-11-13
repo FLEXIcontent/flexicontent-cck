@@ -9,14 +9,9 @@
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="sep_appearance" type="separator" hr="false" default="Appearance" description="" level="level1" menu="hide" />
+			<field name="" type="separator" hr="false" default="FLEXI_FIELDS" description="" level="level1" menu="hide" />
 			
-			<field name="use_search" type="radio" default="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="sep_image" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" menu="hide" />
+			<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" menu="hide" />
 			<field name="use_image" type="radio" default="1" label="FLEXI_SHOW" description="...">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -39,7 +34,7 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
-			<field name="sep_moddate" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" hr="false" default="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" level="level2" menu="hide" />
 			<field name="show_modify_date" type="radio" default="1" label="FLEXI_SHOW" description="...">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -53,14 +48,14 @@
 			</field>
 			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
 			
-			<field name="sep_extrafields" type="separator" hr="false" default="FLEXI_EXTRA_FIELDS" description="FLEXI_EXTRA_FIELDS_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" hr="false" default="FLEXI_EXTRA_FIELDS" description="FLEXI_EXTRA_FIELDS_DESC" level="level2" menu="hide" />
 			<field name="use_fields" type="radio" default="0" label="FLEXI_SHOW" description="...">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="fields" type="textarea" cols="30" rows="3" default="" label="FLEXI_EXTRA_FIELDS_LIST" description="FLEXI_EXTRA_FIELDS_LIST_DESC" />
 
-			<field name="sep_pagination" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
+			<field name="" type="separator" hr="false" default="Pagination" description="" level="level1" menu="hide" />
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="list" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
 				<option value="0">FLEXI_HIDE</option>
@@ -72,7 +67,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="sep_items_order" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" hr="false" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />
 			<field name="orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 				<option value="">FLEXI_ORDER_DEFAUKT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
@@ -96,7 +91,108 @@
 				<option value="1">FLEXI_INT</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" />
+			<field name="limit_override" type="radio" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="orderby_override" type="radio" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
+			<field name="limit_options" type="text" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
+			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="1"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
+				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals=""
+				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
+			
 		</fieldset>
+
+		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<!--field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" />
+			<field name="show_alpha" type="alphaindex" default="1" use_global="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
+			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
+			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
+			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
+			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
+			<field name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field!-->
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level2" />
+			<field name="use_search" type="radio" default="" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_search_label" type="radio" default="" label="FLEXI_SEARCH_LABEL" description="FLEXI_SEARCH_LABEL_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_search_tip" type="radio" default="" label="FLEXI_SEARCH_TIP" description="FLEXI_SEARCH_TIP_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_search_reset" type="radio" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="compact_search_with_filters" type="hidden" default="0" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC" />
+			<!--field name="compact_search_with_filters" type="radio" default="" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" />
+			<field name="use_filters" type="radio" default="" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_filters_list_label" type="radio" default="" label="FLEXI_SHOW_FILTERS_LIST_LABEL" description="FLEXI_SHOW_FILTERS_LIST_LABEL_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_filters_list_tip" type="radio" default="" label="FLEXI_FILTERS_LIST_TIP" description="FLEXI_FILTERS_LIST_TIP_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="show_filter_labels" type="radio" default="" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="limit_filter_values" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
+				<option value="1">FLEXI_CURRCAT_FIELD_VALUES</option>
+				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
+			</field>
+			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
+			<!--field name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
+			
+		</fieldset>
+
 	</fields>
 	
 </metadata>

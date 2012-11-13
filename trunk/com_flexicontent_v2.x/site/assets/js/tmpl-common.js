@@ -23,7 +23,7 @@
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/(filter[.]*|letter|clayout|cid|limit|orderby)/);
+			var matches = element.name.match(/(filter[.]*|letter|clayout|limit|orderby)/);
 			if (matches && element.value != '') {
 				extra_action += var_sep + element.name + '=' + element.value;
 				var_sep = '&';

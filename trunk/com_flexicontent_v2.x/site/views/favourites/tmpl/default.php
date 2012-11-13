@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1310 2012-05-16 06:40:55Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1544 2012-11-12 02:50:17Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -99,22 +99,23 @@ if ($use_fields && count($fields)) {
 }
 ?>
 
-<?php if ($this->params->get('use_search')) : ?>
 <form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
-<div id="fc_filter" class="floattext">
-	<div class="fc_fleft">
-		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area"/>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-	</div>
-</div>
+
+<?php
+	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it
+	$this->params->set('show_alpha',0);   // Currently not supported by the view, disable it
+	
+	// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
+?>
+
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 <input type="hidden" name="filter_order_Dir" value="" />
 <input type="hidden" name="view" value="favourites" />
 <input type="hidden" name="task" value="" />
 </form>
-<?php endif; ?>
 
 <table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>">
 	<thead>
@@ -157,8 +158,10 @@ if ($use_fields && count($fields)) {
 			}
 		} else {
 			$src = flexicontent_html::extractimagesrc($item);
-			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-			$src = $base_url . $src;
+			if ( !empty($src) ) {
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+				$src = $base_url . $src;
+			}
 		}
 		
 		if ( $src && (!$params->get('image_size') || !$image_source) )
@@ -184,6 +187,8 @@ if ($use_fields && count($fields)) {
 				<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
 				<img src="<?php echo $thumb; ?>" />
 				</a>
+				<?php else : ?>
+				<small><i><?php echo JText::_('FLEXI_NO_IMAGE'); ?></i></small>
 				<?php endif; ?>
 			</td>
 		<?php endif; ?>

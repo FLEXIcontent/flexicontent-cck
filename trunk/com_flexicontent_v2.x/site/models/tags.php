@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1312 2012-05-17 01:08:16Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1408 2012-08-01 16:36:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -263,8 +263,8 @@ class FlexicontentModelTags extends JModel
 			;
 		return $query;
 	}
-
-
+	
+	
 	/**
 	 * Build the order clause
 	 *
@@ -273,14 +273,29 @@ class FlexicontentModelTags extends JModel
 	 */
 	function _buildItemOrderBy()
 	{
+		$mainframe = &JFactory::getApplication();
 		$params = & $this->_params;
-				
-		$filter_order		= $this->getState('filter_order');
-		$filter_order_dir	= $this->getState('filter_order_dir');
-
-		if ($params->get('orderby')) {
-			$order = $params->get('orderby');
-			
+		
+		// NOTE: *** 'filter_order' AND 'filter_order_dir' are the real ORDERING DB column names
+		
+		// Get ordering columns set in state
+		$filter_order     = $this->getState('filter_order');
+		$filter_order_dir = $this->getState('filter_order_dir');
+		
+		// If ordering columns state were not set in state use ASCENDING title as fall back default
+		$filter_order     = $filter_order     ? $filter_order      :  'i.title';
+		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
+		
+		// NOTE: *** 'orderby' is a symbolic order variable ***
+		
+		// Get user setting, and if not set, then fall back to category / global configuration setting
+		$request_orderby = JRequest::getVar('orderby');
+		
+		// A symbolic order name to indicate using the category / global ordering setting
+		$order = $request_orderby ? $request_orderby : $params->get('orderby');
+		
+		if ($order)
+		{
 			switch ($order) {
 				case 'date' :
 				$filter_order		= 'i.created';
@@ -326,17 +341,19 @@ class FlexicontentModelTags extends JModel
 			
 		}
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-		if ($params->get('orderbycustomfieldid', 0) != 0)
+		if (empty($request_orderby) && $params->get('orderbycustomfieldid', 0) != 0)
 		{
 			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 			$filter_order		= 'f.value'.$int;
 			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
 		}
 		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
-
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
+		$orderby .= $filter_order!='i.title' ? ', i.title' : '';   // Order by title after default ordering
+		
 		return $orderby;
 	}
+	
 	
 	/**
 	 * Method to build the WHERE clause

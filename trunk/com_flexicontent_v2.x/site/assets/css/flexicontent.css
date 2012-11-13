@@ -409,6 +409,12 @@
 	clear: both;
 }
 
+#flexicontent .item_total .fc_item_total_data {
+	display:inline-block;
+	float:none;
+	margin-right:32px;
+}
+
 #flexicontent .item_total .item_total_label {
 	display: inline-block;
 	font-weight: bold;
