@@ -426,7 +426,7 @@ class FlexicontentModelCategory extends JModel {
 	function _buildItemOrderBy()
 	{
 		$mainframe = &JFactory::getApplication();
-		$params = $this->_params;
+		$params = & $this->_params;
 		
 		// NOTE: *** 'filter_order' AND 'filter_order_dir' are the real ORDERING DB column names
 		
@@ -441,14 +441,14 @@ class FlexicontentModelCategory extends JModel {
 		// NOTE: *** 'orderby' is a symbolic order variable ***
 		
 		// Get user setting, and if not set, then fall back to category / global configuration setting
-		$orderby = $mainframe->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
+		$request_orderby = JRequest::getVar('orderby');
 		
 		// A symbolic order name to indicate using the category / global ordering setting
-		$orderby = $orderby=='_preconfigured_' ? $params->get('orderby') : $orderby;
+		$order = $request_orderby ? $request_orderby : $params->get('orderby');
 		
-		if ($orderby)
+		if ($order)
 		{
-			switch ($orderby) {
+			switch ($order) {
 				case 'date' :
 				$filter_order		= 'i.created';
 				$filter_order_dir	= 'ASC';
@@ -493,7 +493,7 @@ class FlexicontentModelCategory extends JModel {
 			
 		}
 		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-		if ($params->get('orderbycustomfieldid', 0) != 0)
+		if (empty($request_orderby) && $params->get('orderbycustomfieldid', 0) != 0)
 		{
 			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 			$filter_order		= 'f.value'.$int;
@@ -505,7 +505,8 @@ class FlexicontentModelCategory extends JModel {
 		
 		return $orderby;
 	}
-
+	
+	
 	/**
 	 * Method to build the WHERE clause
 	 *

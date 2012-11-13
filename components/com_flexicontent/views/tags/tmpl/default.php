@@ -24,7 +24,7 @@ $db     =& JFactory::getDBO();
 $flexiparams =& JComponentHelper::getParams('com_flexicontent');
 
 // Date configuration
-$use_date   = $params->get( 'show_modify_date', 0 ) ;
+$use_date   = $params->get( 'show_modify_date', 1 ) ;
 $dateformat = $params->get( 'date_format', 'DATE_FORMAT_LC2' ) ;
 $customdate = $params->get( 'custom_date', '' ) ;
 $dateformat = ($dateformat != "DATE_FORMAT_CUSTOM") ? $dateformat : $customdate;
@@ -103,15 +103,17 @@ if ($use_fields && count($fields)) {
 }
 ?>
 
-<?php if ($this->params->get('use_search')) : ?>
 <form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
-<div id="fc_filter" class="floattext">
-	<div class="fc_fleft">
-		<input type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" class="text_area"/>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-		<button class='fc_button' onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-	</div>
-</div>
+
+<?php
+	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it
+	$this->params->set('show_alpha',0);   // Currently not supported by the view, disable it
+	
+	// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
+?>
+
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 <input type="hidden" name="filter_order_Dir" value="" />
@@ -119,7 +121,6 @@ if ($use_fields && count($fields)) {
 <input type="hidden" name="task" value="" />
 <input type="hidden" name="id" value="<?php echo $this->tag->id; ?>" />
 </form>
-<?php endif; ?>
 
 <table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->escape($this->tag->name); ?>">
 	<thead>
@@ -160,11 +161,12 @@ if ($use_fields && count($fields)) {
 			} else if (!empty($midata->default_image_filepath)) {
 				$src	= $midata->default_image_filepath;
 			}
-				
 		} else {
 			$src = flexicontent_html::extractimagesrc($item);
-			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-			$src = $base_url . $src;
+			if ( !empty($src) ) {
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+				$src = $base_url . $src;
+			}
 		}
 		
 		if ( $src && (!$params->get('image_size') || !$image_source) )
@@ -190,6 +192,8 @@ if ($use_fields && count($fields)) {
 				<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
 				<img src="<?php echo $thumb; ?>" />
 				</a>
+				<?php else : ?>
+				<small><i><?php echo JText::_('FLEXI_NO_IMAGE'); ?></i></small>
 				<?php endif; ?>
 			</td>
 		<?php endif; ?>
