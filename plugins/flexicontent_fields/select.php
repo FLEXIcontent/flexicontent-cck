@@ -192,7 +192,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
 		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
 		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
-		$field->html = '';
+		$filter->html = '';
 		
 		
 		// *** Retrieve values
@@ -222,7 +222,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			
 			// !! CHECK: DB query produced no data, do not create the filter
 			if (!$results) {
-				$field->html = '';
+				$filter->html = '';
 				return;
 			}
 

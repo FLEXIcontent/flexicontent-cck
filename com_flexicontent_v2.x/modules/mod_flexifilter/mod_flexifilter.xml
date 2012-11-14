@@ -51,6 +51,12 @@
 				<option value="2">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
 				<option value="3">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
 			</field>
+			<field name="show_filter_labels" type="radio" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
+				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
+				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
+			</field>
 			<field name="filterids" type="filters" multiple="true" label="FLEXI_FILTERS" description="FLEXI_FILTERS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_FORM_FIELDS" level="level1" menu="hide" />

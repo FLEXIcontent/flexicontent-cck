@@ -79,7 +79,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 				?>
 				<span class="filter" >
 				
-					<?php if ( $this->params->get('show_filter_labels', 0) ) : ?>
+					<?php if ( $this->params->get('show_filter_labels', 1)==1 ) : ?>
 						<span class="filter_label">
 							<?php echo $filt->label; ?>
 						</span>

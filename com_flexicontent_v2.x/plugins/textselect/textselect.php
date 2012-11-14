@@ -86,4 +86,12 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin {
 		$filter->field_type = 'textselect';
 	}	
 	
+	function getFiltered($field_id, $value, $field_type = '')
+	{
+		// execute the code only if the field type match the plugin type
+		if($field_type != 'textselect' ) return;
+		$field_type = 'text';
+		plgFlexicontent_fieldsText::getFiltered($field_id, $value, $field_type);
+		$field_type = 'textselect';
+	}	
 }

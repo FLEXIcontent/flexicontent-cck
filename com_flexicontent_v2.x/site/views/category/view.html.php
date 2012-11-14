@@ -632,8 +632,15 @@ class FlexicontentViewCategory extends JView
 					$value  = JRequest::getString('filter_'.$filtre->id, '', 'default');
 				}
 				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
+				
+				// make sure filter HTML is cleared, and create it
+				$display_label_filter_saved = $filtre->parameters->get('display_label_filter');
+				if ( $params->get('show_filter_labels',1)>0 ) $filtre->parameters->set('display_label_filter', 0); // suppress labels inside filter's HTML (hide or show all labels externally)
+				// else ... filter default label behavior
+				$filtre->html = '';  // make sure filter HTML display is cleared
 				$fieldname = $filtre->iscore ? 'core' : $filtre->field_type;
 				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filtre, $value ) );
+				$filtre->parameters->set('display_label_filter', $display_label_filter_saved);
 				$lists['filter_' . $filtre->id] = $value;
 			}
 		}

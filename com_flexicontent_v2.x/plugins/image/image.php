@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		$n = 0;
-		$field->html = '';
+		$filter->html = '';
 		
 		// Make sure value is an array of values
 		if ( !$field->value ) {
