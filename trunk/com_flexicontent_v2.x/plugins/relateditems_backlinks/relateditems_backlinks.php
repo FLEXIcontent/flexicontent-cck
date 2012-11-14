@@ -414,7 +414,7 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 			$results = $db->loadObjectList();
 			echo $db->getErrorMsg();
 			if (!$results) {
-				$field->html = '';
+				$filter->html = '';
 			
 			} else {
 			

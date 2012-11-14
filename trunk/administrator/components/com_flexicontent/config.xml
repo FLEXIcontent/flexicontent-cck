@@ -385,9 +385,10 @@
 				<option value="1">FLEXI_SHOW</option>
 			</param>
 			
-			<param name="show_filter_labels" type="radio" default="1" label="FLEXI_SHOW_FILTER_LABELS" description="FLEXI_SHOW_FILTER_LABELS_DESC" menu="hide" >
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<param name="show_filter_labels" type="radio" default="1" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC" menu="hide" >
+				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
+				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
+				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
 			</param>
 			
 			<param name="limit_filter_values" type="list" default="0" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC" menu="hide" >

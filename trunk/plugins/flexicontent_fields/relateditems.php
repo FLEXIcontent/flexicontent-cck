@@ -194,7 +194,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		if (!$items_arr) $items_arr = array();
 		if($db->getErrorNum()) {
 			echo $db->getErrorMsg();
-			$field->html = '';
+			$filter->html = '';
 			return false;
 		}
 		

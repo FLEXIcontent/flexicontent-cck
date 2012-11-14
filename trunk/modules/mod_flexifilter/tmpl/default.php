@@ -38,7 +38,10 @@ foreach ($filters as $filter_name => $filter) :
 	if ( !isset($filter_html[$filter->id]) ) continue;
 ?>
 
-	<span class="fc_filter_label"><?php echo $filter->label; ?> : </span>
+	<?php if ( $params->get('show_filter_labels', 1)==1 ) : ?>
+		<span class="fc_filter_label"><?php echo $filter->label; ?> : </span>
+	<?php endif; ?>
+	
 	<span class="fc_filter_selector"><?php echo $filter_html[$filter->id]; ?></span>
 	<span class="fc_filter_clear"></span>
 
