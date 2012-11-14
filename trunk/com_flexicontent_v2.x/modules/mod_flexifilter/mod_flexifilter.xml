@@ -27,18 +27,17 @@
 	<fields name="params" addfieldpath="/modules/mod_flexifilter/elements">
 		<fieldset name="basic">
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
-			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexicontent/tmpl"
+			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
-					autosubmit
-			<field name="autosubmit" type="radio" default="0" label="FLEXI_AUTOSUBMIT" description="FLEXI_AUTOSUBMIT_DESC">
-				<option value="0">FLEXI_NO_SHOW_SUBMIT_BUTTON</option>
+			<field name="autosubmit" type="radio" default="0" label="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS" description="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS_DESC">
+				<option value="0">FLEXI_NO_FORCES_GO_BUTTON</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
-			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_CATEGORY" description="FLEXI_FILTER_SINGLE_CATEGORY_DESC" />
+			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_OR_DEFAULT_CATEGORY" description="FLEXI_FILTER_SINGLE_CATEGORY_DESC" />
 			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_DISPLAY_CATEGORY_LIST" description="FLEXI_FILTER_DISPLAY_CATEGORY_LIST_DESC" >
-				<option value="0">FLEXI_FILTER_NO_USE_ABOVE_SELECTED_CATEGORY</option>
+				<option value="0">FLEXI_FILTER_NO_USE_SINGLE_CAT_OR_CURR_CAT</option>
 				<option value="1">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
 				<option value="2">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
 			</field>

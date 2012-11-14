@@ -1,4 +1,4 @@
-.mod_flexifilter_wrapper select.fc_field_filter {
+.mod_flexifilter_wrapper .fc_field_filter {
 	border: 1px solid gray;
 	color: black;
 	font-size: 11px;
@@ -63,4 +63,9 @@
 	display:block;
 	float:none;
 	clear:both;
+}
+
+.mod_flexifilter_wrapper .cid_loading {
+	color:darkred;
+	font-weight:bold;
 }

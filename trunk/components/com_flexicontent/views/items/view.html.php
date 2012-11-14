@@ -307,10 +307,12 @@ class FlexicontentViewItems extends JView
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
 		
 		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
-		foreach($item->positions as $pos_fields) {
-			foreach($pos_fields as $pos_field) {
-				if ($pos_field->name!=='text') continue;
-				$pos_field->display = & $item->text;
+		if ( !empty($item->positions) ) {
+			foreach($item->positions as $pos_fields) {
+				foreach($pos_fields as $pos_field) {
+					if ($pos_field->name!=='text') continue;
+					$pos_field->display = & $item->text;
+				}
 			}
 		}
 		$item->fields['text']->display = & $item->text;
@@ -362,8 +364,9 @@ class FlexicontentViewItems extends JView
 		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 		
 		// Set remaining META keys
-		$mdata = new JParameter($item->metadata);
-		$mdata = $mdata->toArray();
+		//$mdata = new JParameter($item->metadata);
+		//$mdata = $mdata->toArray();
+		$mdata = $item->metadata->toArray();
 		foreach ($mdata as $k => $v)
 		{
 			if ($v)  $document->setMetadata($k, $v);
@@ -737,7 +740,7 @@ class FlexicontentViewItems extends JView
 			// NOTE: (2 params from 2 item table columns, and then multiple params from item table column 'metadata')
 			$formparams->set('description', $item->metadesc);
 			$formparams->set('keywords', $item->metakey);
-			$formparams->loadINI($item->metadata);
+			$formparams->loadINI($item->metadata->toString());
 			
 			// Now create the sliders object,
 			// And also push the Form Parameters object into the template (Template Parameters object is seperate)

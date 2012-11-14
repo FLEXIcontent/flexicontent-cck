@@ -108,6 +108,7 @@ class flexicontent_html
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 		
 		$limiting = array();
+		$limiting[] = JHTML::_('select.option', '', JText::_('Default'));
 		foreach($limit_options as $limit_option) {
 			$limiting[] = JHTML::_('select.option', $limit_option, $limit_option);
 		}

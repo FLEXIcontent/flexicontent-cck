@@ -397,7 +397,7 @@ class FlexicontentModelItem extends ParentClassItem
 			$params->merge($accessperms);
 		}
 		
-		// J1.6+ : Covert metadata property string to parameters object
+		// Covert metadata property string to parameters object
 		if (isset($this->_item->metadata)) {
 			$this->_item->metadata = new JParameter($this->_item->metadata);
 		}

@@ -45,6 +45,30 @@ class FlexicontentController extends JController
 	
 	
 	/**
+	 * Logic to create SEF urls via AJAX requests
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function getsefurl() {
+		$view = JRequest::getVar('view');
+		if ($view=='category') {
+			$cid = (int) JRequest::getVar('cid');
+			if ($cid) {
+				$db = & JFactory::getDBO();
+				$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+					.' FROM #__categories AS c WHERE c.id = '.$cid;
+				$db->setQuery( $query );
+				$categoryslug = $db->loadResult();
+				echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
+			}
+		}
+		exit;
+	}
+	
+	
+	/**
 	 * Logic to save an item
 	 *
 	 * @access public

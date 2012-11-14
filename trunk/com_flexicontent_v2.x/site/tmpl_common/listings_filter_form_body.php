@@ -63,11 +63,18 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 			<?php
 			foreach ($this->filters as $filt) :
 				if (empty($filt->html)) continue;
-				// Add form preparation
+				// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
 				if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-					$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\'));', $filt->html);
+					if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
+						// Autosubmit detected inside onChange event, prepend the event with form preparation function call
+						$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\')); ', $filt->html);
+					} else {
+						// The onChange Event, has no autosubmit, force GO button (in case GO button was not already inside search box)
+						$force_go = true;
+					}
 				} else {
-					$filt->html = preg_replace('/<(select|input)/i', '<${1} onchange="adminFormPrepare(document.getElementById(\'adminForm\'));"', $filt->html);
+					// Filter has no onChange event and thus no autosubmit, force GO button  (in case GO button was not already inside search box)
+					$force_go = true;
 				}
 				?>
 				<span class="filter" >
@@ -85,8 +92,18 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 				</span>
 			<?php endforeach; ?>
 			
-			<?php if (!$this->params->get('use_search')) : ?>
-				<button onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			<?php 
+			$go_added = $this->params->get('use_search') && $this->params->get('show_search_go', 1);
+			$reset_added = $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
+			?>
+			
+			<?php if (!empty($force_go) && !$go_added) : ?>
+			<span class="fc_text_filter_buttons">
+				<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+				<?php if (!$reset_added) : ?>
+				<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
+				<?php endif; ?>
+			</span>
 			<?php endif; ?>
 		
 		<?php endif; /* EOF filter */ ?>

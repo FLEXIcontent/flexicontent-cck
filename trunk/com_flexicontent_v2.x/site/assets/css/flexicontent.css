@@ -318,7 +318,7 @@
 }
 
 /* The form element(s) of each field filter inside filter's HTML */
-#flexicontent select.fc_field_filter {
+#flexicontent .fc_field_filter {
 	border: 1px solid gray;
 	color: black;
 	font-size: 11px;
@@ -1191,4 +1191,11 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .contentttt {
 	float:none;
 	clear:both;
+}
+
+/* field container inside a tabbed position */
+.tabbertab  .flexi.element {
+ display: block;
+ float: left;
+ clear:both;
 }
