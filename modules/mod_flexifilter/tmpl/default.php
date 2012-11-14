@@ -8,7 +8,15 @@ defined('_JEXEC') or die('Restricted access');
 
 <?php
 // 3. Prepare remaining form parameters
-$form_target = "index.php?option=com_flexicontent&amp;view=category";
+$form_target = '';
+if ($catid) {
+	$db = & JFactory::getDBO();
+	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+		.' FROM #__categories AS c WHERE c.id = '.$catid;
+	$db->setQuery( $query );
+	$categoryslug = $db->loadResult();
+	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
+}
 $form_id = $form_name;
 $form_method = 'POST';   // DO NOT CHANGE THIS
 
@@ -16,12 +24,15 @@ $form_method = 'POST';   // DO NOT CHANGE THIS
 ?>
 <form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' >
 
-<?php if ($cats_select_field) : ?>
-	<span class="fc_cid_label"><?php echo JText::_('FLEXI_FILTER_CATEGORY'); ?> : </span>
+<?php if ( !empty($cats_select_field) ) : ?>
+	<span class="fc_cid_label"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo JText::_('FLEXI_FILTER_CATEGORY'); ?> : </span>
 	<span class="fc_cid_selector"><?php echo $cats_select_field; ?></span>
 	<span class="fc_cid_clear"></span>
+<?php elseif ( !empty($cat_hidden_field) ): ?>
+	<?php echo $cat_hidden_field; ?>
 <?php endif; ?>
 
+<span id="fc_filter_mod_elements_<?php echo $module->id; ?>" style="<?php echo !$catid ? 'display:none;' : ''; ?>" >
 <?php
 foreach ($filters as $filter_name => $filter) :
 	if ( !isset($filter_html[$filter->id]) ) continue;
@@ -48,8 +59,12 @@ foreach ($filters as $filter_name => $filter) :
 		<span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
 		<span class="fc_orderby_clear"></span>
 	<?php endif; ?>
+	
+	<?php if (!empty($force_go) || !$autosubmit) :?>
 	<button class="fc_button button_go hasTip" title="<?php echo JText::_( 'FLEXI_FILTER_GO' ); ?>::<?php echo JText::_( 'FLEXI_FILTER_GO_INFO' ); ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>');                                     adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_FILTER_GO' ); ?></span></button>
 	<button class="fc_button button_reset hasTip" title="<?php echo JText::_( 'FLEXI_FILTER_RESET' ); ?>::<?php echo JText::_( 'FLEXI_FILTER_RESET_INFO' ); ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_FILTER_RESET' ); ?></span></button>
+	<?php endif; ?>
+</span>
 </form>
 <?php //endif; ?>
 

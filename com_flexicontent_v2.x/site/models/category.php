@@ -137,7 +137,7 @@ class FlexicontentModelCategory extends JModel {
 		$params = $this->_params;
 
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$limit			= JRequest::getVar('limit', $params->get('limit'), '', 'int');
+		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -1282,11 +1282,11 @@ class FlexicontentModelCategory extends JModel {
 				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).(FLEXI_J16GE ? DS.strtolower($field_type) : "").'.php';
 				if(file_exists($path)) require_once($path);
 				require_once($path);
-				$mexists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");
-				if($mexists) {
+				$method_exists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");
+				if ($method_exists) {
 					$filtered = array();
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'getFiltered', array( &$field_id, &$value, &$filtered ));
-				}else{
+				} else {
 					$query  = 'SELECT item_id'
 						. ' FROM #__flexicontent_fields_item_relations'
 						. ' WHERE field_id = ' . $field_id
