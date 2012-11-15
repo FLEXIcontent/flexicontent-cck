@@ -219,13 +219,23 @@ div.comments {
    margin-left: 1%
 }
 
+figure.image.right, 
 div.image.right {
 	float: right;
-	margin-left: 10px;
+	margin: 8px 2px 0px 10px;
 }
+figure.image.left,
 div.image.left {
 	float: left;
-	margin-right: 10px;
+	margin: 8px 10px 0px 2px;
+}
+
+figure.image.right img, 
+figure.image.left img, 
+div.image.right img,
+div.image.left img {
+	padding: 1px;
+	border: 1px solid lightgray;
 }
 
 /* lines */

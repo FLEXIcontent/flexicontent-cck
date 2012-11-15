@@ -169,8 +169,9 @@ if ($use_fields && count($fields)) {
 			}
 		}
 		
-		if ( $src && (!$params->get('image_size') || !$image_source) )
-		{
+		$RESIZE_FLAG = !$image_source || !$img_field_size;
+		if ( $src && $RESIZE_FLAG ) {
+			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 			$h		= '&amp;h=' . $img_height;
 			$w		= '&amp;w=' . $img_width;
 			$aoe	= '&amp;aoe=1';
@@ -181,6 +182,9 @@ if ($use_fields && count($fields)) {
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
 			$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+		} else {
+			// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+			$thumb = $src;
 		}
 		
 		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
@@ -189,11 +193,17 @@ if ($use_fields && count($fields)) {
 		<?php if ($this->params->get('use_image', 1)) : ?>
 			<td headers="fc_image" align="center">
 				<?php if (!empty($src)) : ?>
-				<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
-				<img src="<?php echo $thumb; ?>" />
-				</a>
+				
+					<?php if ($this->params->get('link_image', 1)) { ?>
+						<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
+							<img src="<?php echo $thumb; ?>" />
+						</a>
+					<?php } else { ?>
+						<img src="<?php echo $thumb; ?>" />
+					<?php } ?>
+					
 				<?php else : ?>
-				<small><i><?php echo JText::_('FLEXI_NO_IMAGE'); ?></i></small>
+					<small><i><?php echo JText::_('FLEXI_NO_IMAGE'); ?></i></small>
 				<?php endif; ?>
 			</td>
 		<?php endif; ?>

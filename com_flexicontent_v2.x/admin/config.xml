@@ -254,6 +254,9 @@
 			<field name="catlimit" type="text" size="4" default="100" label="FLEXI_DIRECTORY_CAT_LIST_LIMIT" description="FLEXI_DIRECTORY_CAT_LIST_LIMIT_DESC" menu="hide"/>
 			
 			
+		<field name="" type="separator" default="FLEXI_TAGS_VIEW_CONF" label="" level="level1" menu="hide" />
+			<field name="tags_view_default_menu_itemid" type="text" default="" label="FLEXI_TAGS_DEFAULT_MENU_ITEMID" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC" />
+		
 		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_DESCRIPTION" label="" level="level3" menu="hide" />
