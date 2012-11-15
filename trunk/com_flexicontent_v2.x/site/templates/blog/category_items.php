@@ -119,7 +119,9 @@ if ($leadnum) :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
 						
-						if (!$this->params->get('lead_image_size') || !$this->params->get('lead_image')) :
+						$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
+						if ( $src && $RESIZE_FLAG ) {
+							// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 							$w		= '&amp;w=' . $this->params->get('lead_width', 200);
 							$h		= '&amp;h=' . $this->params->get('lead_height', 200);
 							$aoe	= '&amp;aoe=1';
@@ -131,9 +133,10 @@ if ($leadnum) :
 							
 							$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 							$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-						else :
+						} else {
+							// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 							$thumb = $src;
-						endif;
+						}
 						
 						if ($src) : // case source
 					?>
@@ -145,7 +148,6 @@ if ($leadnum) :
 						<?php else : ?>
 						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 						<?php endif; ?>
-						<div class="clear"></div>
 					</div>
 					<?php
 						endif; // case source
@@ -391,7 +393,9 @@ if ($leadnum) :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
 						
-						if (!$this->params->get('intro_image_size') || !$this->params->get('intro_image')) :
+						$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
+						if ( $src && $RESIZE_FLAG ) {
+							// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 							$w		= '&amp;w=' . $this->params->get('intro_width', 200);
 							$h		= '&amp;h=' . $this->params->get('intro_height', 200);
 							$aoe	= '&amp;aoe=1';
@@ -403,9 +407,10 @@ if ($leadnum) :
 							
 							$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 							$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-						else :
+						} else {
+							// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 							$thumb = $src;
-						endif;
+						}
 						
 						if ($src) : // case source
 					?>
@@ -415,9 +420,8 @@ if ($leadnum) :
 							<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 						</a>
 					<?php else : ?>
-					<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
+						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
 					<?php endif; ?>
-					<div class="clear"></div>
 				</div>
 					<?php
 						endif; // case source

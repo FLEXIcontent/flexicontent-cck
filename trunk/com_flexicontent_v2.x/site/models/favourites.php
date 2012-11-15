@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: favourites.php 1306 2012-05-15 00:04:30Z ggppdk $
+ * @version 1.5 stable $Id: favourites.php 1548 2012-11-13 02:24:26Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,7 +46,7 @@ class FlexicontentModelFavourites extends JModel
 	var $_total = null;
 	
 	/**
-	 * Favourites view parameters via menu or ...
+	 * Favourites view parameters via menu item
 	 *
 	 * @var object
 	 */
@@ -67,8 +67,8 @@ class FlexicontentModelFavourites extends JModel
 		
 		$params = & $this->_params;
 		
-		//get the number of events from database
-		$limit      = JRequest::getInt('limit', $params->get('limit'));
+		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
+		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
 		$limitstart = JRequest::getInt('limitstart');
 
 		$this->setState('limit', $limit);
@@ -422,17 +422,33 @@ class FlexicontentModelFavourites extends JModel
 		
 		$mainframe =& JFactory::getApplication();
 
-		// Get the PAGE/COMPONENT parameters
-		$params = clone( $mainframe->getParams('com_flexicontent') );
-		
-		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
+		// Retrieve menu parameters
+		$menu = JSite::getMenu()->getActive();
+		if ($menu) {
+			if (FLEXI_J16GE) {
+				$menuParams = new JRegistry;
 				$menuParams->loadJSON($menu->params);
+			} else {
+				$menuParams = new JParameter($menu->params);
 			}
+		}
+		
+		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
+		$flexi = JComponentHelper::getComponent('com_flexicontent');
+		$params = new JParameter($flexi->params);
+		
+		// Merge current menu item (could be tags specific or the Globally Configured Default Tags Menu Item)
+		$params->merge($menuParams);
+		
+		/*
+		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
 			$params->merge($menuParams);
 		}
+		*/
 		
 		$this->_params = & $params;
 	}

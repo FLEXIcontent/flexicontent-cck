@@ -188,6 +188,11 @@ class FlexicontentHelperRoute
 	}
 	
 	function getTagRoute($id, $Itemid = 0) {
+		static $_tags_default_menuitem_id = null;
+		if ($_tags_default_menuitem_id === null) {
+			$params = JComponentHelper::getParams('com_flexicontent');
+			$_tags_default_menuitem_id = $params->get('tags_view_default_menu_itemid', false);
+		}
 		
 		$needles = array(
 			'tags' => (int) $id
@@ -198,8 +203,10 @@ class FlexicontentHelperRoute
 
 		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
-		} else if($menuitem = FlexicontentHelperRoute::_findTag($needles)) {
+		} else if ($menuitem = FlexicontentHelperRoute::_findTag($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
+		} else if ($_tags_default_menuitem_id) {
+			$link .= '&Itemid='.$_tags_default_menuitem_id;
 		} else {
 			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
 			if($component_default_menuitem_id)

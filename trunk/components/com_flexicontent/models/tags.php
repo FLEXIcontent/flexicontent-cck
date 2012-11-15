@@ -52,7 +52,7 @@ class FlexicontentModelTags extends JModel
 	var $_total = null;
 	
 	/**
-	 * Tags view parameters via menu or via tag cloud module or ...
+	 * Tags view parameters via menu item or via tag cloud module or ... via global configuration selected menu item
 	 *
 	 * @var object
 	 */
@@ -73,8 +73,8 @@ class FlexicontentModelTags extends JModel
 		
 		$params = & $this->_params;
 		
-		//get the number of events from database
-		$limit      = JRequest::getInt('limit', $params->get('limit'));
+		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
+		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
 		$limitstart = JRequest::getInt('limitstart');
 
 		$this->setState('limit', $limit);
@@ -438,21 +438,36 @@ class FlexicontentModelTags extends JModel
 		
 		$mainframe =& JFactory::getApplication();
 
-		if ( !JRequest::getInt('module', 0 ) )
-		{
-			// Get the PAGE/COMPONENT parameters
-			$params = clone( $mainframe->getParams('com_flexicontent') );
-			
-			// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
+		// Retrieve menu parameters
+		$menu = JSite::getMenu()->getActive();
+		if ($menu) {
 			if (FLEXI_J16GE) {
 				$menuParams = new JRegistry;
-				if ($menu = JSite::getMenu()->getActive()) {
-					$menuParams->loadJSON($menu->params);
-				}
-				$params->merge($menuParams);
+				$menuParams->loadJSON($menu->params);
+			} else {
+				$menuParams = new JParameter($menu->params);
 			}
 		}
-		else
+		
+		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
+		$flexi = JComponentHelper::getComponent('com_flexicontent');
+		$params = new JParameter($flexi->params);
+		
+		// Merge current menu item (could be tags specific or the Globally Configured Default Tag Menu Item)
+		$params->merge($menuParams);
+		
+		/*
+		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($mainframe->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) {
+			$params->merge($menuParams);
+		}
+		*/
+		
+		// IF module id is in the HTTP request then get this (tags cloud) module configuration and override current configuration
+		if ( JRequest::getInt('module', 0 ) )
 		{
 			// Higher Priority: prefer module configuration requested in URL
 			jimport( 'joomla.application.module.helper' );
