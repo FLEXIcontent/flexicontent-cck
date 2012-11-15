@@ -356,8 +356,8 @@ class FlexicontentModelItems extends JModel
 		
 		// Get invalid cats
 		$query = 'SELECT DISTINCT c.catid '
-					.' FROM jos_content as c '
-					.' LEFT JOIN jos_categories as cat ON c.catid=cat.id'
+					.' FROM #__content as c '
+					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
 		$badcats = $this->_db->loadResultArray();
@@ -380,8 +380,8 @@ class FlexicontentModelItems extends JModel
 
 		$nullDate	= $this->_db->getNullDate();
 		
-		$query = 'UPDATE jos_content as c '
-					.' LEFT JOIN jos_categories as cat ON c.catid=cat.id'
+		$query = 'UPDATE #__content as c '
+					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 					.' SET c.catid=' .$default_cat
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
