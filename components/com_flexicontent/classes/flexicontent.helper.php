@@ -1329,15 +1329,23 @@ class flexicontent_html
 		$mainframe =& JFactory::getApplication();
 		$db =& JFactory::getDBO();
 		
+		$selected_found = false;
 		$all_langs = FLEXIUtilities::getlanguageslist();
 		$user_langs = array();
 		if ($allowed_langs) {
 			foreach ($all_langs as $index => $lang)
-				if ( in_array($lang->code, $allowed_langs) )
-					$user_langs[$index] = $lang;
+				if ( in_array($lang->code, $allowed_langs) ) {
+					$user_langs[] = $lang;
+					// Check if selected language was added to the user langs
+					$selected_found = ($lang->code == $selected) ? true : $selected_found;
+				}
 		}	else {
 			$user_langs = & $all_langs;
+			$selected_found = true;
 		}
+		if ( !count($user_langs) )  return "user is not allowed to use any language";
+		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
+		
 		
 		$langs = array();
 		switch ($type)
