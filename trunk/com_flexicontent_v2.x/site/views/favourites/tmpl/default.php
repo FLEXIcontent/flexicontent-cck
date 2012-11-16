@@ -99,7 +99,7 @@ if ($use_fields && count($fields)) {
 }
 ?>
 
-<form action="<?php echo htmlentities($this->action); ?>" method="POST" id="adminForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" onsubmit="">
 
 <?php
 	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it

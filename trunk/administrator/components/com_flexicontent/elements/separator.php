@@ -68,7 +68,8 @@ class JElementSeparator extends JElement
 			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
 			$pad_left = FLEXI_J16GE ? 'left:20%;' : 'left:0%;';
-			$style = 'padding: 2px 6% 4px 6%; margin-top:6px; font-weight: bold; clear:both; width:auto; display: block; float: left; position:relative; '.$pad_left.' border:1px dashed gray; background:#eeeeee;';
+			$width_val = FLEXI_J16GE ? 'width:64%;' : 'width:auto;';
+			$style = 'padding: 2px 2% 4px 6%; margin-top:6px; font-weight: bold; clear:both; '.$width_val.' display: block; float: left; position:relative; '.$pad_left.' border:1px dashed gray; background:#eeeeee;';
 		} else if ($level == 'level1') {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
 		} else {

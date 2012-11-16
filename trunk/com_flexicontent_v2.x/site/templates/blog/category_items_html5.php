@@ -344,7 +344,7 @@ if ($leadnum) :
 	<ul class="introblock <?php echo $classnum; ?> group row">	
 		<?php 
 		for ($i=$leadnum; $i<$count; $i++) :
-			$li_item_classes  = $i%2 ? 'even' : 'odd';
+			$li_item_classes  = ($i-$leadnum)%2 ? 'even' : 'odd';
 			$li_item_classes .= ' col'.($i%$intro_cols + 1);
 			$li_item_classes .= ' '.$classspan;
 		?>
