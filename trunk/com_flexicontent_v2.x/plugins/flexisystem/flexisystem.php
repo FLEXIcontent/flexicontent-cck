@@ -235,26 +235,48 @@ class plgSystemFlexisystem extends JPlugin
 		$view		= JRequest::getCMD('view');
 		$db 		= & JFactory::getDBO();
 		
-		if($option == 'com_content' && $view == 'article' )
+		// Let's Redirect Joomla's article view & form to FLEXIcontent item view & form respectively !!
+		// NOTE: we do not redirect Joomla's category views (blog,list,featured for J2.5 etc),
+		//       thus site administrator can still utilize them
+		if($option == 'com_content' && ($view == 'article' || (FLEXI_J16GE && $view=='form')) )
 		{
+			// For J1.5 both article view and edit form are view==article, for J1.5 
 			$id 		= JRequest::getInt('id');
 			
 			if (!FLEXI_J16GE) {
+				// In J1.5, both article view & form use: -- view=article --
 				$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
 				$section = $db->loadResult();
 				$in_limits = ($section == $flexisection);
 			} else {
-				$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
-				$maincat = $db->loadResult();
-				$in_limits = ($maincat>=FLEXI_LFT_CATEGORY && $maincat<=FLEXI_RGT_CATEGORY);
+				// In J2.5, we have both view 'article' and 'form'
+				
+				// Set id via a_id URL variable if we are in form
+				$id = ($view=='form') ? JRequest::getInt('a_id') : $id;
+				
+				// Get article category id, if it is not already in url
+				$catid 	= JRequest::getInt('catid');
+				if (!$catid) {
+					$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
+					$catid = $db->loadResult();
+				}
+				$in_limits = ($catid>=FLEXI_LFT_CATEGORY && $catid<=FLEXI_RGT_CATEGORY);
 			}
 			
-			if (!$in_limits) return;
+			if ( empty($in_limits) ) return;
 			
 			if ($this->params->get('redirect_method_fe', 1) == 1)
 			{
+				$new_view = $view=='article' ? FLEXI_ITEMVIEW : 'form';
+				$new_id = $id;  // this is not set for J2.5 form, since it uses a_id
+				
 	      // Set new request variables
-	      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+				// NOTE: In J2.5, we have both views 'article' & 'form', so we need to handle them seperately
+	      if ($view=='article') {
+		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+		    } else {
+		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $new_id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+		    }
 	      JRequest::set( $newRequest, 'get');
 	     
 	      // Set variable also in the router, for best compatibility
@@ -263,12 +285,16 @@ class plgSystemFlexisystem extends JPlugin
 				
 				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
 	    } else {
-				$itemslug 	= JRequest::getVar('id');
-				$catslug	= JRequest::getVar('catid');
-			
-				// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs
-				$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
-				$urlItem 	= JRoute::_($urlItem);
+	    	if ($view=='form') {
+	    		$urlItem = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
+	    	} else {
+					$itemslug 	= JRequest::getVar('id');
+					$catslug	= JRequest::getVar('catid');
+				
+					// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs
+					$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
+					$urlItem 	= JRoute::_($urlItem);
+				}
 				
 				//$app->enqueueMessage( "Redirected to com_flexicontent item view instead of com_content article view", 'message');
 				$app->redirect($urlItem);
