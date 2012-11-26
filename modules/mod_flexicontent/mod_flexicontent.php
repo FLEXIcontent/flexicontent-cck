@@ -51,15 +51,16 @@ $height 				= $params->get('height');
 
 // get module basic fields parameters
 // standard
-$display_title 	= $params->get('display_title');
-$link_title 		= $params->get('link_title');
-$display_date 	= $params->get('display_date');
-$display_text 	= $params->get('display_text');
-$display_hits		= $params->get('display_hits');
-$display_voting	= $params->get('display_voting');
-$mod_readmore	 	= $params->get('mod_readmore');
-$mod_use_image 	= $params->get('mod_use_image');
-$mod_link_image = $params->get('mod_link_image');
+$display_title 		= $params->get('display_title');
+$link_title 			= $params->get('link_title');
+$display_date 		= $params->get('display_date');
+$display_text 		= $params->get('display_text');
+$display_hits			= $params->get('display_hits');
+$display_voting		= $params->get('display_voting');
+$display_comments	= $params->get('display_comments');
+$mod_readmore	 		= $params->get('mod_readmore');
+$mod_use_image	 	= $params->get('mod_use_image');
+$mod_link_image		= $params->get('mod_link_image');
 
 // featured
 $display_title_feat 	= $params->get('display_title_feat');
@@ -68,6 +69,7 @@ $display_date_feat		= $params->get('display_date_feat');
 $display_text_feat 		= $params->get('display_text_feat');
 $display_hits_feat 		= $params->get('display_hits_feat');
 $display_voting_feat	= $params->get('display_voting_feat');
+$display_comments_feat= $params->get('display_comments_feat');
 $mod_readmore_feat		= $params->get('mod_readmore_feat');
 $mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
@@ -116,6 +118,12 @@ if ($itemid_force==1) {
 	$forced_itemid = 0;
 }
 $params->set('forced_itemid', $forced_itemid);
+
+// Disable output of comments if comments component not installed
+if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+	$display_comments_feat = $display_comments = 0;
+	$params->set('display_comments_feat', 0);	$params->set('display_comments', 0);
+}
 
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');

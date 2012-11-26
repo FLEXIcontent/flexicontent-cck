@@ -59,6 +59,7 @@ class modFlexicontentHelper
 		$display_text 		= $params->get('display_text');
 		$display_hits			= $params->get('display_hits');
 		$display_voting		= $params->get('display_voting');
+		$display_comments	= $params->get('display_comments');
 		$mod_readmore	 		= $params->get('mod_readmore');
 		$mod_cut_text 		= $params->get('mod_cut_text');
 		$mod_do_stripcat	= $params->get('mod_do_stripcat', 1);
@@ -78,6 +79,7 @@ class modFlexicontentHelper
 		$display_text_feat 		= $params->get('display_text');
 		$display_hits_feat 		= $params->get('display_hits_feat');
 		$display_voting_feat	= $params->get('display_voting_feat');
+		$display_comments_feat= $params->get('display_comments_feat');
 		$mod_readmore_feat		= $params->get('mod_readmore_feat');
 		$mod_cut_text_feat 		= $params->get('mod_cut_text_feat');
 		$mod_do_stripcat_feat	= $params->get('mod_do_stripcat_feat', 1);
@@ -254,6 +256,11 @@ class modFlexicontentHelper
 				$lists[$ord]	= array();
 			}
 			
+			// Get comments information if needed
+			if ($display_comments_feat || $display_comments) {
+				$commentsInfo = modFlexicontentHelper::getCommentsInfo($rows);
+			}
+			
 			$ord = "__start__";
 			foreach ( $rows as $row )  // Single pass of rows
 			{
@@ -371,15 +378,22 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
-					$lists[$ord]['featured'][$i]->hits	= $row->hits;
 					if ($display_hits_feat) {
-						$lists[$ord]['featured'][$i]->hits_rendered  = JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
-						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.' '.JTEXT::_('FLEXI_HITS').')';
+						FlexicontentFields::loadFieldConfig($hitsfield, $row);
+						$lists[$ord]['featured'][$i]->hits_rendered = $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).':</span> ' : '';
+						$lists[$ord]['featured'][$i]->hits_rendered .= JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
+						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					if ($display_voting_feat) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$lists[$ord]['featured'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
-						$lists[$ord]['featured'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1));
+						$lists[$ord]['featured'][$i]->voting = $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).':</span> ' : '';
+						$lists[$ord]['featured'][$i]->voting .= '<span class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</span>';
+					}
+					if ($display_comments_feat) {
+						$lists[$ord]['featured'][$i]->comments = $commentsInfo[$row->id]->total;
+						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
+						$lists[$ord]['featured'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS' ));
+						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$commentsInfo[$row->id]->total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
@@ -512,13 +526,21 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
 					if ($display_hits) {
-						$lists[$ord]['standard'][$i]->hits_rendered  = JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
-						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.' '.JTEXT::_('FLEXI_HITS').')';
+						FlexicontentFields::loadFieldConfig($hitsfield, $row);
+						$lists[$ord]['standard'][$i]->hits_rendered = $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).':</span> ' : '';
+						$lists[$ord]['standard'][$i]->hits_rendered .= JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					if ($display_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$lists[$ord]['standard'][$i]->voting  =  $params->get('voting_label_feat',1) ? $votingfield->label : '';
-						$lists[$ord]['standard'][$i]->voting .= flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1));
+						$lists[$ord]['standard'][$i]->voting = $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).':</span> ' : '';
+						$lists[$ord]['standard'][$i]->voting .= '<span class="voting_value">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</span>';
+					}
+					if ($display_comments) {
+						$lists[$ord]['standard'][$i]->comments = $commentsInfo[$row->id]->total;
+						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
+						$lists[$ord]['standard'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$commentsInfo[$row->id]->total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
@@ -1432,5 +1454,39 @@ class modFlexicontentHelper
 		return array_unique($all_cats);
 	}
 	
+	
+	// Find and return comment information about give item ids
+	function getCommentsInfo ( & $items )
+	{
+		// handle jcomments integration
+		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+			return array();
+		}
+		
+		if (!$items || !count($items)) return array();
+		$item_ids = array();
+		foreach ($items as $item) $item_ids[] = $item->id;
+		
+		$db =& JFactory::getDBO();
+		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
+		      . ' FROM #__jcomments AS com'
+		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
+		      . ' AND com.object_group = ' . $db->Quote('com_flexicontent')
+		      . ' AND com.published = 1'
+		      . ' GROUP BY com.object_id'
+		      ;
+		$db->setQuery($query);
+		$comments = $db->loadObjectList('item_id');
+		
+		// create non-existing records
+		foreach ($items as $item) {
+			if ( !isset($comments[$item->id]) ) {
+				$comments[$item->id] = new stdClass();
+				$comments[$item->id]->item_id = $item->id;
+				$comments[$item->id]->total = 0;
+			}
+		}
+		return $comments;
+	}	
 }
 

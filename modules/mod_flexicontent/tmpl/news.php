@@ -154,7 +154,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				<!-- BOF current item's image -->
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
+				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured">
 					
 					<?php if ($display_date_feat && $item->date_created) : ?>
@@ -185,6 +185,14 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
+					<?php if ($display_comments_feat) : ?>
+					<div class="fc_block">
+						<div class="fc_inline fcitem_comments">
+							<?php echo $item->comments_rendered; ?>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -290,7 +298,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				<!-- BOF current item's image -->	
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date || $display_text || $display_hits || $display_voting || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<?php if ($display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard">
 					
 					<?php if ($display_date && $item->date_created) : ?>
@@ -321,6 +329,14 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>
+						</div>
+					</div>
+					<?php endif; ?>
+					
+					<?php if ($display_comments) : ?>
+					<div class="fc_block">
+						<div class="fc_inline fcitem_comments">
+							<?php echo $item->comments_rendered; ?>
 						</div>
 					</div>
 					<?php endif; ?>

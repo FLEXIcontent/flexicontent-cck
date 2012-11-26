@@ -191,7 +191,7 @@
 			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" />
 			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" />
 			
-			<field name="behaviour_dates" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+			<field name="behaviour_dates" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_SERVER_OR_ITEM</option>
 				<option value="1">FLEXI_OFFSET</option>
 				<option value="2">FLEXI_SAME_MONTH</option>
@@ -207,7 +207,7 @@
 				<option value="2">FLEXI_DATE_PUBLISH_UP</option>
 				<option value="3">FLEXI_CUSTOM_DATE_FIELD</option>
 			</field>
-			<field name="date_compare" type="radio" default="0" label="FLEXI_DATE_COMPARE" description="FLEXI_DATE_COMPARE_DESC">
+			<field name="date_compare" type="radio" default="0" label="FLEXI_DATE_COMPARE_DYNAMIC" description="FLEXI_DATE_COMPARE_DESC">
 				<option value="0">FLEXI_CURRENT_SERVER_DATE</option>
 				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
@@ -359,8 +359,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
@@ -369,8 +370,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</field>
 			
 			
@@ -381,8 +383,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</field>
 			<field name="vote_stars" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
@@ -403,8 +406,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</field>
 			<field name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
@@ -418,6 +422,31 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+
+			<field name="" type="separator" default="FLEXI_COMMENTS_PARAMS" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<field name="display_comments" type="radio" default="1" label="FLEXI_DISPLAY_COMMENTS" description="FLEXI_DISPLAY_COMMENTS_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<field name="display_comments_feat" type="radio" default="1" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_comments_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
+			</field>
+			
 			
 			<field name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />

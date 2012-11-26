@@ -198,6 +198,34 @@
 }
 
 
+/* CONTAINER of item hits, voting, comments */
+.news.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block !important; }
+.news.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block !important; }
+.news.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block !important; }
+
+.news.mod_flexicontent_wrapper .fcitem_hits img,
+.news.mod_flexicontent_wrapper .fcitem_comments img {
+	float:left;
+	margin:0px 4px 0px 0px;
+}
+
+.news.mod_flexicontent_wrapper .hits_label,
+.news.mod_flexicontent_wrapper .voting_label, 
+.news.mod_flexicontent_wrapper .comments_label {
+	display:inline;
+	color: black;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+/* force voting to display in same row as label */
+.news.mod_flexicontent_wrapper .voting_value .voting {
+	display: inline-block;
+}
+
+
 /* CONTAINER of other item fields */
 .news.mod_flexicontent_wrapper .fcitem_fields {
 }
