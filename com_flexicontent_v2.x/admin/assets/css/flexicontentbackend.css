@@ -653,7 +653,11 @@ div#result table.versionlist th {
 }
 
 div label.lang_box {
-	white-space:nowrap; display:inline-block!important; float:none!important; margin:0px 2px 0px 0px !important; padding:0px!important;
+	white-space:nowrap;
+	display:inline-block!important;
+	float:none!important;
+	margin: 0px 2px 0px 0px !important;
+	padding: 0px!important;
 }
 
 /* Import view */
@@ -776,7 +780,7 @@ div.flexi_box_right {
 	float: right;
 }
 
-/** FLEXIcontent radio buttons **/
+/** FLEXIcontent radio/checkbox buttons **/
 .flexi_radiotab {
 	display: inline-block !important;
 	padding: 1px 6px !important;

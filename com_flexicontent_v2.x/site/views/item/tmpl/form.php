@@ -570,7 +570,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			foreach ($this->fields as $field) {
 				
 				// SKIP frontend hidden fields from this listing
-				if ( ($field->iscore && $field->field_type!='maintext')  ||  $field->parameters->get('frontend_hidden')  ||  in_array($field->field_type, $hidden)  ||  in_array($field->formhidden, array(1,3)) ) continue;
+				if (
+					($field->iscore && $field->field_type!='maintext')  ||
+				  $field->parameters->get('frontend_hidden')  ||
+				  (in_array($field->field_type, $hidden) && empty($field->html)) ||
+				  in_array($field->formhidden, array(1,3))
+				 ) continue;
 				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
