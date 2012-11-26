@@ -20,8 +20,8 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="frontend_hidden" type="hidden" default="1" />
-			<field name="backend_hidden" type="hidden" default="1" />
+			<!--field name="frontend_hidden" type="hidden" default="1" /-->
+			<!--field name="backend_hidden" type="hidden" default="1" /-->
 		</fieldset>
 		<fieldset name="group-fcloadmodule">
 			<field name="module_method" type="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC">
@@ -31,6 +31,7 @@
 			<field name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
 			<field name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
 			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
+			<field name="mod_params" type="textarea" rows="8" cols="50" default="" label="Customize module parameters per item (not for position mode)" description="You can - try - to customize some module parameters by allowing user to enter values for them in item form. &lt;br/&gt;&lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; You need to examine XML file of target module to find parameter names  &lt;br/&gt;&lt;br/&gt; &lt;b&gt;Example:&lt;/b&gt;  &lt;br/&gt; param_label1!!param_name1 %% param_label2!!param_name2 %% param_label3!!param_name3 " />
 		</fieldset>
 	</fields>
 	</config>
