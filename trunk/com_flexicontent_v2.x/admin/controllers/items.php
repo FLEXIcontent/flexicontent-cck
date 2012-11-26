@@ -783,20 +783,22 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			// Retrieve from configuration for (a) typeid, language, main category, secondaries categories, etc
 			$type_id 	= JRequest::getInt( 'type_id', 0 );
+			$id_col = JRequest::getInt( 'id_col', 0 );
+			
 			$language	= JRequest::getVar( 'language', '' );
 			$state = JRequest::getVar( 'state', '' );
-			
-			$created_col = JRequest::getInt( 'created_col', 0 );
-			$created_by_col = JRequest::getInt( 'created_by_col', 0 );
-			
-			$metadesc_col = JRequest::getInt( 'metadesc_col', 0 );
-			$metakey_col = JRequest::getInt( 'metakey_col', 0 );
 			
 			$maincat 	= JRequest::getInt( 'maincat', 0 );
 			$maincat_col = JRequest::getInt( 'maincat_col', 0 );
 			
 			$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
 			$seccats_col = JRequest::getInt( 'seccats_col', 0 );
+			
+			$created_col = JRequest::getInt( 'created_col', 0 );
+			$created_by_col = JRequest::getInt( 'created_by_col', 0 );
+			
+			$metadesc_col = JRequest::getInt( 'metadesc_col', 0 );
+			$metakey_col = JRequest::getInt( 'metakey_col', 0 );
 			
 			$ignore_unused_columns = JRequest::getInt( 'ignore_unused_columns', 0 );
 			
@@ -875,69 +877,88 @@ class FlexicontentControllerItems extends FlexicontentController
 			$thefields = $db->loadObjectList('name');
 			
 			
-			// **************************
-			// Check for REQUIRED columns
-			// **************************
+			// ******************************************************************
+			// Check for REQUIRED columns and decide CORE property columns to use
+			// ******************************************************************
+			$core_props = array();
+			if ( $id_col && !in_array('id', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'id\' (Item ID)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($id_col) $core_props[] = 'id';
+			
 			if(!in_array('title', $columns)) {
 				echo "<script>alert ('CSV file lacks column \'title\'');";
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
 			}
-			if ( $created_col && !in_array('created', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'created\' (Creation date)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			if ( $created_by_col && !in_array('created_by', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'created_by\' (Creator - Author)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			if ( $metadesc_col && !in_array('metadesc', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'metadesc\' (META Description)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			if ( $metakey_col && !in_array('metakey', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'metakey\' (META Keywords)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			if ( $maincat_col && !in_array('catid', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'catid\' (primary category)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			if ( $seccats_col && !in_array('cid', $columns) ) {
-				echo "<script>alert ('CSV file lacks column \'cid\' (secondary categories)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
+			
+			$core_props[] = 'title';
+			$core_props[] = 'text';
+			$core_props[] = 'alias';
+			
 			if ( !$language && !in_array('language', $columns) ) {
 				echo "<script>alert ('CSV file lacks column \'language\'');";
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
-			}
+			} else if (!$language) $core_props[] = 'language';
+			
 			if ( !strlen($state) && !in_array('state', $columns) ) {
 				echo "<script>alert ('CSV file lacks column \'state\'');";
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
-			}
+			} else if ( !strlen($state) ) $core_props[] = 'state';
+			
+			if ( $maincat_col && !in_array('catid', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'catid\' (primary category)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($maincat_col) $core_props[] = 'catid';
+			
+			if ( $seccats_col && !in_array('cid', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'cid\' (secondary categories)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($seccats_col) $core_props[] = 'cid';
+			
+			if ( $created_col && !in_array('created', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'created\' (Creation date)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($created_col) $core_props[] = 'created';
+			
+			if ( $created_by_col && !in_array('created_by', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'created_by\' (Creator - Author)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($created_by_col) $core_props[] = 'created_by';
+			
+			if ( $metadesc_col && !in_array('metadesc', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'metadesc\' (META Description)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($metadesc_col) $core_props[] = 'metadesc';
+			
+			if ( $metakey_col && !in_array('metakey', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'metakey\' (META Keywords)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($metakey_col) $core_props[] = 'metakey';
 			
 			
 			// *********************************************************
 			// Verify that all non core property columns are field names
 			// *********************************************************
-			$core_props = array('title', 'text', 'alias', 'language', 'catid', 'cid', 'created', 'created_by', 'metadesc', 'metakey');
 			$unused_columns = array();
 			foreach($columns as $colname) {
 				if ( !in_array($colname, $core_props) && !isset($thefields[$colname]) ) {
@@ -950,6 +971,40 @@ class FlexicontentControllerItems extends FlexicontentController
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
+			}
+			
+			
+			// **********************************************************
+			// Verify that custom specified item ids do not already exist
+			// **********************************************************
+			if ( $id_col ) {
+				// Get 'id' column no
+				$id_col_no = 0;
+				foreach($columns as $col_no => $column) {
+					if ( $columns[$col_no] == 'id' ) {
+						$id_col_no = $col_no;
+						break;
+					}
+				}
+				
+				// Get custom IDs in csv file
+				$custom_id_arr = array();
+				foreach($contents as $fields)
+				{
+					$custom_id_arr[] = $fields[$id_col_no];
+				}
+				$custom_id_list = "'" . implode("','", $custom_id_arr) ."'";
+				
+				// Cross check them if they already exist in the DB
+				$q = "SELECT id FROM #__content WHERE id IN (".$custom_id_list.")";
+				$db->setQuery($q);
+				$existing_ids = $db->loadResultArray();
+				if ( $existing_ids && count($existing_ids) ) {
+					echo "<script>alert ('File has ".count($existing_ids)." item IDs that already exist: \'".implode("\' , \'",$existing_ids)."\', please fix or set to ignore \'id\' column');";
+					echo "window.history.back();";
+					echo "</script>";
+					jexit();
+				}
 			}
 
 			// *********************************************************************************
@@ -1001,13 +1056,29 @@ class FlexicontentControllerItems extends FlexicontentController
 					}
 					
 					// Assign array of field values to the item data row
-					if ( $fieldname=='language' )
+					if ( $fieldname=='id' )
+					{
+						if ( $id_col ) $data[$fieldname] = $field_values;
+					}
+					else if ($fieldname=='title' || $fieldname=='text' || $fieldname=='alias')
+					{
+						$data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='language' )
 					{
 						if ( !$language ) $data[$fieldname] = $field_values;
 					}
 					else if ( $fieldname=='state' )
 					{
-						if ( !strlen($language) ) $data[$fieldname] = $field_values;
+						if ( !strlen($state) ) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='catid' )
+					{
+						if ($maincat_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='cid' )
+					{
+						if ($seccats_col) $data[$fieldname] = preg_split("/[\s]*,[\s]*/", $field_values);
 					}
 					else if ( $fieldname=='created' )
 					{
@@ -1025,19 +1096,14 @@ class FlexicontentControllerItems extends FlexicontentController
 					{
 						if ($metakey_col) $data[$fieldname] = $field_values;
 					}
-					else if ( $fieldname=='catid' )
+					else if ( !FLEXI_J16GE )
 					{
-						if ($maincat_col) $data[$fieldname] = $field_values;
-					}
-					else if ( $fieldname=='cid' )
-					{
-						if ($seccats_col) $data[$fieldname] = preg_split("/[\s]*,[\s]*/", $field_values);
-					}
-					else if (!FLEXI_J16GE || $fieldname=='title' || $fieldname=='text' || $fieldname=='alias') {
+						// Custom Fields for J1.5
 						$data[$fieldname] = $field_values;
 					}
 					else
 					{
+						// Custom Fields for J1.6+
 						$data['custom'][$fieldname] = $field_values;
 					}
 				}
@@ -1051,7 +1117,8 @@ class FlexicontentControllerItems extends FlexicontentController
 					echo "<pre>\n\n\n\nRECORD no $cnt:\n"; print_r($data); echo "</pre>";
 					if ($cnt==$debug) break;
 				} else {
-					// Set/Force id to zero to indicate creation of new item
+					// Set/Force id to zero to indicate creation of new item, in case item 'id' column is being used
+					$c_item_id = @$data['id'];
 					$data['id'] = 0;
 					
 					// Finally try to create the item by using Item Model's store() method
@@ -1061,6 +1128,47 @@ class FlexicontentControllerItems extends FlexicontentController
 					} else {
 						$msg = $cnt . ". Import item with title: '" . $data['title'] . "' success" ;
 						$mainframe->enqueueMessage($msg);
+						
+						// Try to rename entry if id column is being used
+						if ( $id_col && $c_item_id )
+						{
+							$item_id = $model->getId();
+							$q = "UPDATE #__content SET id='".$c_item_id."' WHERE id='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_items_ext SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_items_versions SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_versions SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							$q = "UPDATE #__flexicontent_favourites SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
+							$db->setQuery($q);
+							$db->query();
+							
+							if (FLEXI_J16GE) {
+								$q = "UPDATE #__assets SET id='".$c_item_id."' WHERE id='".$item_id."'";
+							} else {
+								$q = "UPDATE #__flexiaccess_acl SET axo='".$c_item_id."'"
+									. " WHERE acosection = ". $db->Quote('com_content')
+									. " AND axosection = ". $db->Quote('item')
+									. " AND axo='".$item_id."'";
+							}
+							$db->setQuery($q);
+							$db->query();
+						}
 					}
 				}
 				$cnt++;
