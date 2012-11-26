@@ -97,6 +97,28 @@ function submitbutton(task) {
 						</td>
 					</tr>
 					<tr valign="top">
+						<td class="key"><label class="fcimport" for="ignore_unused_columns">Ignore unused columns</label></td>
+						<td><input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" /> &nbsp; (Enable this if you have redudant columns. <b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b></td>
+					</tr>
+					
+					<tr valign="top">
+						<td class="key"> &nbsp; </td>
+						<td>-------------------------------</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"> &nbsp; </td>
+						<td><span style="color:darkgreen; font-weight:bold;">CUSTOM COLUMNS</span></td>
+					</tr>
+					<tr valign="top">
+						<td class="key"> &nbsp; </td>
+						<td>-------------------------------</td>
+					</tr>
+					
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="id_col">Custom ITEM 'id'</label></td>
+						<td><input type="checkbox" id="id_col" name="id_col" value="1" /> &nbsp; (ID of newly created items will be updated to match the 'id' column. ALL item ids of the column are checked if they already exist, before first item creation is done</td>
+					</tr>
+					<tr valign="top">
 						<td class="key"><label class="fcimport" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
 						<td>
 							<?php echo str_replace('<br />', '', $this->lists['languages']); ?>
@@ -107,10 +129,6 @@ function submitbutton(task) {
 						<td>
 							<?php echo str_replace('<br />', '', $this->lists['states']); ?>
 						</td>
-					</tr>
-					<tr valign="top">
-						<td class="key"><label class="fcimport" for="ignore_unused_columns">Ignore unused columns</label></td>
-						<td><input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" /> &nbsp; (Enable this if you have redudant columns. <b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b></td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="created_col">Creation date</label></td>
