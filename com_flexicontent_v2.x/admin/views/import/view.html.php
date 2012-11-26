@@ -81,12 +81,18 @@ class FlexicontentViewImport extends JView {
 
 		$categories = $globalcats;
 		
-		// build the main category select list
-		$actions_allowed = array('core.create');
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, true, $actions_allowed);
-		// build the secondary categories select list
-		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, true, $actions_allowed);
-		
+		if (FLEXI_J16GE) {
+			// build the main category select list
+			$actions_allowed = array('core.create');
+			$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, true, $actions_allowed);
+			// build the secondary categories select list
+			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, true, $actions_allowed);
+		} else {
+			// build the main category select list
+			$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
+			// build the secondary categories select list
+			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
+		}
 		
 		//build languages list
 		// Retrieve author configuration
@@ -101,12 +107,14 @@ class FlexicontentViewImport extends JView {
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', flexicontent_html::getSiteDefaultLang(), 4, $allowed_langs);
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', flexicontent_html::getSiteDefaultLang(), 6, $allowed_langs);
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
 			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'FLEXI_DEFAULT' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
 			$lists['languages'] = JHTML::_('select.genericlist', $languages, 'language', $class='', 'value', 'text', $default_lang );
 		}
+		
+		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);
 		
 		//assign data to template
 		$this->assignRef('lists'      	, $lists);

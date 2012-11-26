@@ -1400,7 +1400,7 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}	
-					$list 	.= '</label><br />';
+					$list 	.= '&nbsp;</label><br />';
 				}
 				break;
 			case 5:
@@ -1419,6 +1419,25 @@ class flexicontent_html
 					$list 	.= '</label><br />';
 				}
 				break;
+			case 6:
+				$list		= '';
+				foreach ($user_langs as $lang) {
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					if($lang->shortcode=="*") {
+						$list 	.= JText::_("All");  // Can appear in J1.6+ only
+					} else if (@$lang->imgsrc) {
+						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+					} else {
+						$list 	.= $lang->name;
+					}	
+					$list 	.= '&nbsp;</label><br />';
+				}
+				$list 	.= '<label class="lang_box hasTip" for="lang9999" title="'.JText::_('FLEXI_USE_LANGUAGE_COLUMN').'::'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'">';
+				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" />';
+				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
+				$list 	.= '</label><br />';
+				break;
 		}
 		return $list;
 	}
@@ -1429,7 +1448,7 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	function buildstateslist($name, $class, $selected)
+	function buildstateslist($name, $class, $selected, $type=1)
 	{
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_DO_NOT_CHANGE' ) );
 		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
@@ -1439,9 +1458,35 @@ class flexicontent_html
 		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), JText::_( 'FLEXI_ARCHIVED' ) );
 		$state[] = JHTML::_('select.option',  -2, JText::_( 'FLEXI_TRASHED' ) );
-
-		$list = JHTML::_('select.genericlist', $state, $name, $class, 'value', 'text', $selected );
-	
+		
+		if ($type==1) {
+			$list = JHTML::_('select.genericlist', $state, $name, $class, 'value', 'text', $selected );
+		} else if ($type==2) {
+			
+			$state_ids   = array(1, -5, 0, -3, -4);
+			$state_ids[] = FLEXI_J16GE ? 2:-1;
+			$state_ids[]  = -2;
+			
+			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
+			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
+			$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
+			
+			$list = '';
+			foreach ($state_ids as $i => $state_id) {
+				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.JText::_( $state_names[$state_id] ).'" >';
+				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" />';
+				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$state_id] ).'" />';
+				$list 	.= '</label>';
+			}
+			$list 	.= '<label class="state_box hasTip" for="state9999" title="'.JText::_('FLEXI_USE_STATE_COLUMN').'::'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'">';
+			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" />';
+			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
+			$list 	.= '</label>';
+		} else {
+			$list = 'Bad type in buildstateslist()';
+		}
+		
 		return $list;
 	}
 	

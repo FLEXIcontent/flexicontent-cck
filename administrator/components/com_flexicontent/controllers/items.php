@@ -773,6 +773,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=items';
+		//$link  = $_SERVER['HTTP_REFERER'];
 		$task  = JRequest::getVar('task');
 		$debug = JRequest::getInt( 'debug', 0 );
 		$mainframe = &JFactory::getApplication();
@@ -783,6 +784,13 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Retrieve from configuration for (a) typeid, language, main category, secondaries categories, etc
 			$type_id 	= JRequest::getInt( 'type_id', 0 );
 			$language	= JRequest::getVar( 'language', '' );
+			$state = JRequest::getVar( 'state', '' );
+			
+			$created_col = JRequest::getInt( 'created_col', 0 );
+			$created_by_col = JRequest::getInt( 'created_by_col', 0 );
+			
+			$metadesc_col = JRequest::getInt( 'metadesc_col', 0 );
+			$metakey_col = JRequest::getInt( 'metakey_col', 0 );
 			
 			$maincat 	= JRequest::getInt( 'maincat', 0 );
 			$maincat_col = JRequest::getInt( 'maincat_col', 0 );
@@ -790,16 +798,22 @@ class FlexicontentControllerItems extends FlexicontentController
 			$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
 			$seccats_col = JRequest::getInt( 'seccats_col', 0 );
 			
+			$ignore_unused_columns = JRequest::getInt( 'ignore_unused_columns', 0 );
+			
 			if( !$type_id ) {
 				// Check for the required Content Type Id
-				$this->setRedirect($link, "Please select Content Type for the imported items");
-				return;
+				echo "<script>alert ('Please select Content Type for the imported items');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			if( !$maincat && !$maincat_col ) {
 				// Check for the required main category
-				$this->setRedirect($link, "Please select main category for the imported items");
-				return;
+				echo "<script>alert ('Please select main category for the imported items');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			// Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
@@ -811,15 +825,19 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			if( $field_separator=='' || $record_separator=='' ) {
 				// Check for the (required) title column
-				$this->setRedirect($link, "CSV format not valid, please enter Field Separator and Item Separator");
-				return;
+				echo "<script>alert ('CSV format not valid, please enter Field Separator and Item Separator');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			// Retrieve the uploaded CSV file
 			$csvfile = @$_FILES["csvfile"]["tmp_name"];
 			if(!is_file($csvfile)) {
-				$this->setRedirect($link, "Upload file error!");
-				return;
+				echo "<script>alert ('Upload file error!');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			// Read & Parse the CSV file according the given format
@@ -827,8 +845,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// Basic error checking, for empty data
 			if(count($contents[0])<=0) {
-				$this->setRedirect($link, "Upload file error! CSV file format is not correct.");
-				return;
+				echo "<script>alert ('Upload file error! CSV file format is not correct!');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			// Get field names (from the header line (row 0), and remove it form the data array
@@ -837,33 +857,82 @@ class FlexicontentControllerItems extends FlexicontentController
 			$q = "SELECT id, name FROM #__flexicontent_fields";
 			$db->setQuery($q);
 			$thefields = $db->loadObjectList('name');
-			$core_props = array('catid', 'cid', 'language', 'alias');
+			$core_props = array('catid', 'cid', 'language', 'alias', 'created', 'created_by', 'metadesc', 'metakey');
+			$unused_columns_count = 0;
 			foreach($columns as $colname) {
 				if ( !in_array($colname, $core_props) && !isset($thefields[$colname]) ) {
+					$unused_columns_count++;
 					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
 				}
 			}
 			
+			// Check for unused columns
+			if ($unused_columns_count && !$ignore_unused_columns) {
+				echo "<script>alert ('File has unused columns, please enable: Ignoring of unused columns');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			
 			// Check for the (required) title column and other columns
 			if(!in_array('title', $columns)) {
-				$this->setRedirect($link, "Upload file error! CSV file format is not correct 2.");
-				return;
+				echo "<script>alert ('CSV file lacks column \'title\'');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			if ( $created_col && !in_array('created', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'created\' (Creation date)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			if ( $created_by_col && !in_array('created_by', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'created_by\' (Creator - Author)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			if ( $metadesc_col && !in_array('metadesc', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'metadesc\' (META Description)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			if ( $metakey_col && !in_array('metakey', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'metakey\' (META Keywords)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			if ( $maincat_col && !in_array('catid', $columns) ) {
-				$this->setRedirect($link, "CSV file lacks column 'catid' (primary category)");
-				return;
+				echo "<script>alert ('CSV file lacks column \'catid\' (primary category)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			if ( $seccats_col && !in_array('cid', $columns) ) {
-				$this->setRedirect($link, "CSV file lacks column 'cid' (secondary categories)");
-				return;
+				echo "<script>alert ('CSV file lacks column \'cid\' (secondary categories)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			if ( !$language && !in_array('language', $columns) ) {
-				$this->setRedirect($link, "CSV file lacks column 'language'");
-				return;
+				echo "<script>alert ('CSV file lacks column \'language\'');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+			if ( !strlen($state) && !in_array('state', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'state\'');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
 			}
 			
 			// Handle each row (item) using store() method of the item model to create the items
 			$cnt = 1;
+			$raw_props = array('title', 'text', 'alias', 'language', 'catid', 'cid', 'created' , 'created_by', 'metadesc', 'metakey');
 			foreach($contents as $line)
 			{
 				// Trim item's data
@@ -876,13 +945,13 @@ class FlexicontentControllerItems extends FlexicontentController
 				$data['catid']   = $maincat;
 				$data['cid']     = $seccats;
 				$data['vstate']  = 2;
-				$data['state']   = -4;
+				$data['state']   = $state;
 				
 				// Handle each field of the item
 				foreach($fields as $col_no => $field_data)
 				{
 					$fieldname = $columns[$col_no];
-					if ($fieldname=='title' || $fieldname=='text' || $fieldname=='alias' || $fieldname=='language' || $fieldname=='catid' || $fieldname=='cid') {
+					if ( in_array($fieldname, $raw_props) ) {
 						$field_values = $field_data;
 					} else {
 						// Split multi-value field
@@ -912,6 +981,26 @@ class FlexicontentControllerItems extends FlexicontentController
 					if ( $fieldname=='language' )
 					{
 						if ( !$language ) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='state' )
+					{
+						if ( !strlen($language) ) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='created' )
+					{
+						if ($created_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='created_by' )
+					{
+						if ($created_by_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='metadesc' )
+					{
+						if ($metadesc_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='metakey' )
+					{
+						if ($metakey_col) $data[$fieldname] = $field_values;
 					}
 					else if ( $fieldname=='catid' )
 					{
