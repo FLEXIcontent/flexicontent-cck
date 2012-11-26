@@ -976,7 +976,7 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='', $vote_stars=5, $allow_vote=true, $vote_counter='default' )
+ 	function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='', $vote_stars=5, $allow_vote=true, $vote_counter='default', $show_counter_label=true )
 	{
 		$document =& JFactory::getDocument();
 		
@@ -1051,7 +1051,7 @@ class flexicontent_html
 	  				if ( $counter != 0 ) {
 							$html .= "(";
 							$html .= $rating_count ? $rating_count : "0";
-							$html .= " ".JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' );
+							if ($show_counter_label) $html .= " ".JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' );
 		 	 				$html .= ")";
 						}
 					}

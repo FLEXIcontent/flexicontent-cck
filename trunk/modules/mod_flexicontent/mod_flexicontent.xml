@@ -347,8 +347,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
@@ -357,8 +358,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</param>
 			
 			
@@ -369,8 +371,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</param>
 			<param name="vote_stars" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
@@ -391,8 +394,9 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
 			</param>
 			<param name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
@@ -406,6 +410,31 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			
+
+			<param name="" type="separator" default="FLEXI_COMMENTS_PARAMS" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
+			<param name="display_comments" type="radio" default="1" label="FLEXI_DISPLAY_COMMENTS" description="FLEXI_DISPLAY_COMMENTS_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_FEAT" level="level2" menu="hide" />
+			<param name="display_comments_feat" type="radio" default="1" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_comments_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_NO</option>
+			</param>
+			
 			
 			<param name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 			<param name="" type="separator" default="FLEXI_STD" level="level2" menu="hide" />
