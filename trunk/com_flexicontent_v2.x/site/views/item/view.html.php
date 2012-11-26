@@ -740,7 +740,8 @@ class FlexicontentViewItem extends JView
 			// NOTE: (2 params from 2 item table columns, and then multiple params from item table column 'metadata')
 			$formparams->set('description', $item->metadesc);
 			$formparams->set('keywords', $item->metakey);
-			$formparams->loadINI($item->metadata->toString());
+			if ( !empty($item->metadata) )
+				$formparams->loadINI($item->metadata->toString());
 			
 			// Now create the sliders object,
 			// And also push the Form Parameters object into the template (Template Parameters object is seperate)

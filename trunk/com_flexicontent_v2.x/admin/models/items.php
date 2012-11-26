@@ -361,7 +361,7 @@ class FlexicontentModelItems extends JModel
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
 		$badcats = $this->_db->loadResultArray();
-    if (!$badcats) $badcats = array();
+		if (!$badcats) $badcats = array();
 		$badcats = array_flip($badcats);
 		
 		// insert items to category relations
