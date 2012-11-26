@@ -36,8 +36,31 @@ function submitbutton(task) {
 		$("type_id").focus();
 		return;
 	}
+	
+	radio_ischecked = 0;
+	for (i = 0; i < document.getElementsByName('language').length; i++) {
+		if (document.getElementsByName('language')[i].checked) {
+			radio_ischecked = 1;
+		}
+	}
+	if( !radio_ischecked ) {
+		alert("Please select item language.");
+		return;
+	}
+
+	radio_ischecked = 0;
+	for (i = 0; i < document.getElementsByName('state').length; i++) {
+		if (document.getElementsByName('state')[i].checked) {
+			radio_ischecked = 1;
+		}
+	}
+	if( !radio_ischecked ) {
+		alert("Please select item state.");
+		return;
+	}
+	
 	if( $("maincat").value.length<=0 && !$("maincat_col").checked ) {
-		alert("Please select primary category");
+		alert("Please select a primary category or select to use 'catid' column");
 		$("maincat").focus();
 		return;
 	}
@@ -65,17 +88,51 @@ function submitbutton(task) {
 		<tr>
 			<td value="top" colspan="2">
 			<fieldset>
-				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE' ); ?></legend>
+				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE_AND_CORE_PROPS' ); ?></legend>
 				<table>
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span></label></td>
-						<td><?php echo $this->lists['type_id'];?></td>
-						<td>&nbsp;</td>
+						<td>
+							<?php echo $this->lists['type_id'];?>
+						</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
-						<td><?php echo $this->lists['languages'];?></td>
-						<td><span style='font-weight:bold; color:green'> Keep source language means that your data will include a column with named 'language', with language codes e.g. en-GB, fr-FR, etc</span></td>
+						<td>
+							<?php echo str_replace('<br />', '', $this->lists['languages']); ?>
+						</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="created_col">State</label></td>
+						<td>
+							<?php echo str_replace('<br />', '', $this->lists['states']); ?>
+						</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="ignore_unused_columns">Ignore unused columns</label></td>
+						<td><input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" /> &nbsp; (Enable this if you have redudant columns. <b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b></td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="created_col">Creation date</label></td>
+						<td>
+							<input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> <label for="created_col0">a. Current Date</label> &nbsp; &nbsp;
+							<input type="radio" id="created_col1" name="created_col" value="1" /> <label for="created_col1">b. Use 'created' column with a valid date, e.g. 17/10/2012</label>
+						</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="created_by_col">Creator (Author)</label></td>
+						<td>
+							<input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> <label for="created_by_col0">a. Current User</label> &nbsp; &nbsp;
+							<input type="radio" id="created_by_col1" name="created_by_col" value="1" /> <label for="created_by_col1">b. Use 'created_by' column containing USER IDs, e.g. 457</label>
+						</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="metadesc_col">Meta Description</label></td>
+						<td><input type="checkbox" id="created_by_col" name="metadesc_col" value="1" /> &nbsp; (Use 'metadesc' column containing METADATA Description)</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fcimport" for="metakey_col">Meta Keywords</label></td>
+						<td><input type="checkbox" id="created_by_col" name="metakey_col" value="1" /> &nbsp; (Use 'metakey' column containing METADATA Keywords)</td>
 					</tr>
 				</table>
 			</fieldset>
@@ -178,11 +235,11 @@ function submitbutton(task) {
 CSV example Format:
 <?php echo "<pre style='font-size:11px;'>"; ?>
 title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field22 ~~ multi_value_field24
-~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-email-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03
-~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-email-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06
-~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-email-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09
-~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-addr-]=www.somedomaind.com!![-text-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12
-~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-addr-]=www.somedomaine.com!![-text-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15
+~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-addr-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03
+~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-addr-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06
+~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-addr-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09
+~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-link-]=www.somedomaind.com!![-title-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12
+~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-link-]=www.somedomaine.com!![-title-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15
 <?php echo "</pre>"; ?>
 <br/>
 			</fieldset>
