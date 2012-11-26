@@ -779,7 +779,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							descClassName: 'multiBoxDesc',//the class name of the description divs
 							path: './Files/',//path to mp3 and flv players
 							useOverlay: true,//use a semi-transparent background. default: false;
-							maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
+							maxSize: {w:4000, h:3000},//max dimensions (width,height) - set to null to disable resizing
 							addDownload: false,//do you want the files to be downloadable?
 							pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
 							addRollover: true,//add rollover fade to each multibox link
@@ -1282,7 +1282,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to get ALL items that have matching search values for the current field id
 	function onFLEXIAdvSearch(&$field)
 	{
-		if ($field->field_type!='selectmultiple') return;
+		if ($field->field_type!='image') return;
 		
 		FlexicontentFields::onFLEXIAdvSearch($field);
 	}

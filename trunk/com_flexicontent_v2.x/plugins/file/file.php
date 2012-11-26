@@ -365,8 +365,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	function onBeforeDeleteField(&$field, &$item) {
 	}
 	
-
-
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	function getFileData( $value )
 	{
 		$db =& JFactory::getDBO();
@@ -379,24 +383,19 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$sessiontable = new JTableSession( $db );
 		}
 		$sessiontable->load($session->getId());
-		$and = '';
-		if(!$sessiontable->client_id) 
-			$and = ' AND published = 1';
+		
+		$and = (!$sessiontable->client_id) ? ' AND published = 1' : '';
 		$query = 'SELECT * ' //filename, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
-				. ' WHERE id = '. (int) $value . $and
+				. ' WHERE id = '. (int) $value
+				. $and
 				;
 		$db->setQuery($query);
 		$filedata = $db->loadObject();
-
+		
 		return $filedata;
 	}
 	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
 	
 	function addIcon( &$file )
 	{

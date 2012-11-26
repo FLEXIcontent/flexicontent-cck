@@ -40,8 +40,41 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'fcloadmodule') return;
+		
+		$field->label = JText::_($field->label);
+		
+		// initialise property
+		if ( empty($field->value[0]) ) {
+			$field->value[0] = '';
+		}
+		
+		$document	= & JFactory::getDocument();
+		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
+		$mod_params	= $field->parameters->get( 'mod_params', '') ;
+		$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
+		
+		if ( empty($mod_params[0]) ) return;
+		
+		$field->html = array();
+		$n = 0;
+		$value = unserialize($field->value[0]);
+		foreach ($mod_params as $mod_param) {
+			list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
+			
+			$param_value = @$value[$param_name];
+			
+			$field->html[] = $param_label.
+				': <input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="inputbox" type="text" size="40" value="'.$param_value.'" />'
+				;
+			$n++;
+		}
+		
+		$field->html = '<div>'. implode('<br/', $field->html) .'</div>';
 	}
-	
+
 	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
@@ -51,6 +84,11 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		
 		global $addthis;
 		$mainframe =& JFactory::getApplication();
+		
+		$values = $values ? $values : $field->value;
+		if ( empty($values[0]) ) {
+			$values[0] = '';
+		}
 		
 		// parameters shortcuts
 		$module_method_oldname = $field->parameters->get('module-method', 1);
@@ -71,13 +109,30 @@ echo '<xmp>';
 print_r($mymodule);
 echo '</xmp>';
 */
-			$object  = $this->_getModuleObject((int)$mymodule);			
+			$object  = $this->_getModuleObject((int)$mymodule);
 /*
 echo '<xmp>';
 print_r($object);
 echo '</xmp>';
 */
 			$mod	 = JModuleHelper::getModule(substr(@$object->module, 4), @$object->title);
+			
+			// Set module parameter per item 
+			$mod_params	= $field->parameters->get( 'mod_params', '') ;
+			$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
+			$mod_params = !empty($mod_params[0]) ? $mod_params : array();
+			
+			$value = unserialize($values[0]);
+			$custom_mod_params = array();
+			foreach ($mod_params as $mod_param)
+			{
+				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
+				$custom_mod_params[ $param_name ] = $value[$param_name];
+			}
+			$_mod_params = new JParameter($mod->params);
+			foreach ($custom_mod_params as $i => $v) $_mod_params->set($i,$v);
+			$mod->params = $_mod_params ->toString();
+
 /*
 echo '<xmp>';
 print_r($mod);
@@ -93,6 +148,33 @@ echo '</xmp>';
 		}
 	
 		$field->{$prop} = $display;
+	}
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'fcloadmodule') return;
+		if(!is_array($post) && !strlen($post)) return;
+		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+	}
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	}
+	
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
 	}
 	
 	
