@@ -800,6 +800,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			$ignore_unused_columns = JRequest::getInt( 'ignore_unused_columns', 0 );
 			
+			
+			// ********************************************************************************************
+			// Obligatory form fields, js validation should have prevented form submission but check anyway
+			// ********************************************************************************************
 			if( !$type_id ) {
 				// Check for the required Content Type Id
 				echo "<script>alert ('Please select Content Type for the imported items');";
@@ -807,7 +811,6 @@ class FlexicontentControllerItems extends FlexicontentController
 				echo "</script>";
 				jexit();
 			}
-			
 			if( !$maincat && !$maincat_col ) {
 				// Check for the required main category
 				echo "<script>alert ('Please select main category for the imported items');";
@@ -816,13 +819,20 @@ class FlexicontentControllerItems extends FlexicontentController
 				jexit();
 			}
 			
+			
+			// ******************************************************************************************************
 			// Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
+			// ******************************************************************************************************
 			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/ie';
 			$replace = 'eval(\'return "$1";\')';
 			$field_separator  = preg_replace($pattern, $replace, JRequest::getVar('field_separator'));  
 			$enclosure_char   = preg_replace($pattern, $replace, JRequest::getVar('enclosure_char'));  ;
 			$record_separator = preg_replace($pattern, $replace, JRequest::getVar('record_separator'));  
 			
+			
+			// ****************************************************************************************************************
+			// Check for proper CSV file format variables, js validation should have prevented form submission but check anyway
+			// ****************************************************************************************************************
 			if( $field_separator=='' || $record_separator=='' ) {
 				// Check for the (required) title column
 				echo "<script>alert ('CSV format not valid, please enter Field Separator and Item Separator');";
@@ -840,7 +850,10 @@ class FlexicontentControllerItems extends FlexicontentController
 				jexit();
 			}
 			
+			
+			// ****************************************************
 			// Read & Parse the CSV file according the given format
+			// ****************************************************
 			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $field_separator, $enclosure_char, $record_separator);
 			
 			// Basic error checking, for empty data
@@ -851,30 +864,20 @@ class FlexicontentControllerItems extends FlexicontentController
 				jexit();
 			}
 			
+			
+			// ********************************************************************************
 			// Get field names (from the header line (row 0), and remove it form the data array
+			// ********************************************************************************
 			$columns = flexicontent_html::arrayTrim($contents[0]);
 			unset($contents[0]);
 			$q = "SELECT id, name FROM #__flexicontent_fields";
 			$db->setQuery($q);
 			$thefields = $db->loadObjectList('name');
-			$core_props = array('catid', 'cid', 'language', 'alias', 'created', 'created_by', 'metadesc', 'metakey');
-			$unused_columns_count = 0;
-			foreach($columns as $colname) {
-				if ( !in_array($colname, $core_props) && !isset($thefields[$colname]) ) {
-					$unused_columns_count++;
-					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
-				}
-			}
 			
-			// Check for unused columns
-			if ($unused_columns_count && !$ignore_unused_columns) {
-				echo "<script>alert ('File has unused columns, please enable: Ignoring of unused columns');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
 			
-			// Check for the (required) title column and other columns
+			// **************************
+			// Check for REQUIRED columns
+			// **************************
 			if(!in_array('title', $columns)) {
 				echo "<script>alert ('CSV file lacks column \'title\'');";
 				echo "window.history.back();";
@@ -930,9 +933,29 @@ class FlexicontentControllerItems extends FlexicontentController
 				jexit();
 			}
 			
+			
+			// *********************************************************
+			// Verify that all non core property columns are field names
+			// *********************************************************
+			$core_props = array('title', 'text', 'alias', 'language', 'catid', 'cid', 'created', 'created_by', 'metadesc', 'metakey');
+			$unused_columns = array();
+			foreach($columns as $colname) {
+				if ( !in_array($colname, $core_props) && !isset($thefields[$colname]) ) {
+					$unused_columns[] = $colname;
+					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
+				}
+			}
+			if ( count($unused_columns) && !$ignore_unused_columns) {
+				echo "<script>alert ('File has unused ".count($unused_columns)." columns \'".implode("\' , \'",$unused_columns)."\', please enable: Ignoring of unused columns');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+
+			// *********************************************************************************
 			// Handle each row (item) using store() method of the item model to create the items
+			// *********************************************************************************
 			$cnt = 1;
-			$raw_props = array('title', 'text', 'alias', 'language', 'catid', 'cid', 'created' , 'created_by', 'metadesc', 'metakey');
 			foreach($contents as $line)
 			{
 				// Trim item's data
@@ -951,7 +974,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				foreach($fields as $col_no => $field_data)
 				{
 					$fieldname = $columns[$col_no];
-					if ( in_array($fieldname, $raw_props) ) {
+					if ( in_array($fieldname, $core_props) ) {
 						$field_values = $field_data;
 					} else {
 						// Split multi-value field
