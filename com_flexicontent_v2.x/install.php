@@ -96,8 +96,8 @@ for ($i = 0; $i < count($extensions); $i++) {
 	}
 }
 
-// rollback on installation errors
-if ($error) {
+// rollback on installation errors, FOR J1.6+ commented out until we can test as the Joomla installer interface was changed
+/*if ($error) {
 	$this->parent->abort(JText::_('Component').' '.JText::_('Install').': '.JText::_('Error'), 'component');
 	for ($i = 0; $i < count($extensions); $i++) { 
 		if ($extensions[$i]['status']) {
@@ -105,7 +105,7 @@ if ($error) {
 			$extensions[$i]['status'] = false;
 		}
 	}
-}
+}*/
 
 ?>
 <table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">
