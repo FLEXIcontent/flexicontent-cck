@@ -90,6 +90,7 @@
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
+		</fieldset>
 	</fields>
 	</config>
 	<languages>

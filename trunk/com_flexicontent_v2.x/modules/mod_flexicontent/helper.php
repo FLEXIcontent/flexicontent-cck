@@ -399,6 +399,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? JString::substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
+					$lists[$ord]['featured'][$i]->alias	= $row->alias;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 					$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
 					$lists[$ord]['featured'][$i]->typename 	= $row->typename;
@@ -546,6 +547,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? JString::substr($row->title, 0, $cuttitle) . '...' : $row->title;
+					$lists[$ord]['standard'][$i]->alias	= $row->alias;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 					$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
 					$lists[$ord]['standard'][$i]->typename 	= $row->typename;
@@ -842,7 +844,7 @@ class modFlexicontentHelper
 				return;
 			} else {	
 				
-				if ($behaviour_cat == 2 && apply_config_per_category) {
+				if ($behaviour_cat == 2 && $apply_config_per_category) {
 					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
 					return;
 				}

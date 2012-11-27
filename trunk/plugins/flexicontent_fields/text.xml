@@ -84,7 +84,6 @@
 				<option value="2">FLEXI_IN_SELECT</option>
 			</param>
 		</params>
-		
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_text.ini</language>
 	</languages>
