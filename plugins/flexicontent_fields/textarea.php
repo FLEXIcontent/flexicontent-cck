@@ -355,15 +355,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayField(&$field, &$item)
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($field->field_type != 'textarea') return;
+		if($filter->field_type != 'textarea') return;
 		
-		$field_type = $field->field_type;
-		$field->field_type =  'text';
-		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-		$field->field_type =  'textarea';
+		$filter->field_type =  'text';
+		$filter->parameters->set( 'size', $filter->parameters->get( 'adv_size', 30 ) );
+		plgFlexicontent_fieldsText::onAdvSearchDisplayFilter($filter, $value, $formName);
+		$filter->field_type =  'textarea';
 	}
 	
 	

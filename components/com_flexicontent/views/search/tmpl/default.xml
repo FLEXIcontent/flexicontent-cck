@@ -10,53 +10,88 @@
 		<description>STANDARD SEARCH LAYOUT DESC</description>
 		<params addpath="/administrator/components/com_flexicontent/elements">
 		
-			<param name="" type="separator" level="level1" default="Search Form Configuration" />
-				<param name="" type="separator" level="level2" default="Basic Search Parameters" />
-				<param name="" type="separator" level="level3" default="Search words" />
-				<param name="show_searchphrase" type="radio" default="1" label="Show combination methods" description="Display the methods of combining the search words, so that user can set his/her prefered method">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</param>
-				<param name="default_searchphrase" type="list" default="all" label="Default combination method" description="Default method of combining the search words">
-					<option value="all">FLEXI_ALL_WORDS</option>
-					<option value="any">FLEXI_ANY_WORDS</option>
-					<option value="exact">FLEXI_EXACT_SENTENCE</option>
-				</param>
-				<param name="minchars" type="text" default="3" label="Minimum length" description="Minimum character length the search words are allowed to have" />
-				<param name="maxchars" type="text" default="20" label="Maxmum length" description="Maximum characters length the search words are allowed to have" />
-				<param name="" type="separator" level="level3" default="Content types" description="Content types to search in"/>
-				<param name="cantypes" type="radio" default="1" label="Allow users to select" description="Allow users the content types they want to include in their search">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</param>
-				<param name="fieldtypes" type="types" default="" label="Limit to types" description="What content types the search will include. NOTE: the above option will be LIMITED to display ONLY the type selected here" multiple="true" />
-		
-			<param name="" type="separator" level="level2" default="Advanced Search Parameters" />
-				<param name="autodisplayextrafields" type="radio" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
+			<param name="" type="separator" level="level1" default="Search Form: Basic Search" />
+				<param name="" type="separator" level="level2" default="Text Search" />
+				<param name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. any, all, exact phrase">
 					<option value="0">FLEXI_HIDE</option>
 					<option value="1">FLEXI_SHOW</option>
 				</param>
-				<param name="listfields" type="fields" default="" label="Add Field" description="Please select fields to help you with 'Fields' textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
-				<param name="search_fields" type="textarea" default="" label="Advanced Search Fields" description="Enter extra field names, that you want to be included in the your search form. The will appear in the advanced search box. You can separate each field by comma(,)." cols="40" rows="3" />
-			<param name="" type="separator" level="level2" default="Search Form behavior" />
-				<param name="" type="separator" level="level3" default="Basic/Advanced Combination" />
-				<param name="show_operator" type="radio" default="1" label="Allow users to select" description="Allow user to select how to combine the Basic and Advanced Search Boxes. Options will be ANY (logical or) and BOTH (logical and)">
+				<param name="default_searchphrase" type="radio" default="all" label="Default combination" description="Default (preselected) method of combining the search words">
+					<option value="all">FLEXI_ALL_WORDS</option>
+					<option value="any">FLEXI_ANY_WORDS</option>
+					<option value="exact">FLEXI_EXACT_PHRASE</option>
+				</param>
+				<param name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
+				<param name="maxchars" type="text" default="20" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />
+				
+
+				<param name="" type="separator" default="Results Limit (# per page)" description=".." level="level2" />
+				<param name="limit" type="text" size="4" default="10" label="Default Limit" description="FLEXI_NUM_PER_PAGE_DESC"/>
+				<param name="limit_override" type="radio" default="1" label="Limit Selector" description="Display frontend selection to allow to override default setting">
+					<option value="0">FLEXI_HIDE</option>
+					<option value="1">FLEXI_SHOW</option>
+				</param>
+				<param name="limit_options" type="text" default="" size="52" label="Allowed Options" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
+				
+				<param name="" type="separator" default="Results Ordering" description="..." level="level2" />
+				<param name="orderby" type="list" default="rdate" label="Default Order" description="FLEXI_PRIMARY_ORDER_DESC">
+					<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+					<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+					<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+					<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+					<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+					<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+					<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+					<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+					<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+					<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+				</param>
+				<param name="orderby_override" type="radio" default="1" label="Ordering Selector" description="Display frontend selection to allow to override default setting">
+					<option value="0">FLEXI_HIDE</option>
+					<option value="1">FLEXI_SHOW</option>
+				</param>
+				<param name="orderby_options" type="fccheckbox" default="" display_useglobal="1"
+					checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
+					checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals=""
+					label="Allowed Options" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
+		
+				<param name="" type="separator" level="level1" default="Search Form: Advanced Search" />
+				<param name="autodisplayadvoptions" type="list" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
+					<option value="0">FLEXI_DISABLE</option>
+					<option value="1">FLEXI_YES_INITIALLY_DISABLED</option>
+					<option value="2">FLEXI_YES_INITIALLY_ENABLED</option>
+				</param>
+				
+				<param name="" type="separator" level="level2" default="Attribute Filters (Fields)" />
+				<param name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
+					<option value="0">FLEXI_HIDE</option>
+					<option value="1">FLEXI_SHOW</option>
+				</param>
+				<param name="default_filtersop" type="radio" default="all" label="Default combination" description="Default (preselected) method of combining the search filters">
+					<option value="OR">FLEXI_ANY</option>
+					<option value="AND">FLEXI_ALL</option>
+				</param>
+				
+				<param name="advsearch_fieldlist" type="fields" default="" label="Add Filter (below)" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
+				<param name="search_fields" type="textarea" default="" label="Attribute Filters" description="Enter Content Attibute Filters used to limit the text search result list, these will be included in the search form, and will appear inside advanced search options box. You can separate each field by comma(,)." cols="40" rows="3" />
+				
+				<param name="" type="separator" level="level2" default="Optional selections" description="Optional selection parameters like content types and Other Search Areas of Site (non FC Content Data)"/>
+				<param name="" type="separator" level="level3" default="Content types" description=""/>
+				<param name="cantypes" type="radio" default="1" label="Show selection" description="Allow users to select content types they want to include in their search">
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</param>
-				<param name="default_operator" type="radio" default="OR" label="Default value" description="Default behavior for combining the Basic and Advanced Search boxes. Select ANY (logical or) orBOTH (logical and). NOTE: this can be overriden by the user of the form.">
-					<option value="OR">ANY</option>
-					<option value="AND">BOTH</option>
-				</param>
-				<param name="" type="separator" level="level3" default="Results Ordering" />
-				<param name="show_searchordering" type="radio" default="1" label="Allow users to select" description="Allow users to select the ordering of the search results">
+				<param name="contenttypes" type="types" default="" label="Searchable Types" description="The content types the search will include. NOTE: if user is allowed to select Content Types, then the selection list will be LIMITED to display ONLY the types selected here" multiple="true" />
+				
+				<param name="" type="separator" level="level3" default="Search Areas (non-FC Content)" description=""/>
+				<param name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</param>
-				<param name="show_searchareas" type="radio" default="0" label="Show ALL Search Areas" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
+				<param name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" multiple="true" >
+					<option value="">FLEXI_ALL</option>
 				</param>
+				
 				<param name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
 					<option value="newest">FLEXI_ADV_NEWEST_FIRST</option>
 					<option value="oldest">FLEXI_ADV_OLDEST_FIRST</option>
@@ -64,13 +99,13 @@
 					<option value="alpha">FLEXI_ADV_ALPHA</option>
 					<option value="category">FLEXI_ADV_SEARCH_SEC_CAT</option>
 				</param>
-			
-			<param name="" type="separator" level="level1" default="Search Results Configuration" />
+				
+			<param name="" type="separator" level="level1" default="Search Results" />
 				<param name="show_section" type="radio" default="0" label="Show section" description="Display section for each result. Note, this usually should be disabled since all FLEXIcontent items are placed in a single section">
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</param>
-				<param name="show_text" type="radio" default="1" label="Show description" description="Display for each result its description text">
+				<param name="show_text" type="radio" default="1" label="Show matching information" description="Display for each result its matching information, showing what words or filters were matched during search">
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</param>

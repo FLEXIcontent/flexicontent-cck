@@ -42,14 +42,22 @@ class FLEXIcontentViewSearch extends JView
 		$uri      =& JFactory::getURI();
 		$dispatcher = & JDispatcher::getInstance();
 		$document 	= & JFactory::getDocument();
-
+		
+		JHTML::_('behavior.mootools');
+		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
+			$document->addScript('administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+		}
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners.js' );
+		
 		$error	= '';
 		$rows	= null;
 		$total	= 0;
 
 		// Get some data from the model
-		$areas      = &$this->get('areas');
-		$state 		= &$this->get('state');
+		$areas	= & $this->get('areas');
+		$state	= & $this->get('state');
 		$searchword = $state->get('keyword');
 
 		$params = &$mainframe->getParams();
@@ -70,14 +78,10 @@ class FLEXIcontentViewSearch extends JView
 			$itemmodel = !FLEXI_J16GE ? new FlexicontentModelItems() : new FlexicontentModelItem();
 		}
 		
-		if (!FLEXI_J16GE) {
-			$item = new stdClass;
-			$item->version = 0;
-		} else {
-			$item = new JForm('item');
-			$item->setValue('version', 0);
-		}
-
+		// Dummy object for passing to onDisplayField of some fields
+		$item = new stdClass;
+		$item->version = 0;
+		
 		$search_fields = $params->get('search_fields', '');
 		$search_fields = explode(",", $search_fields);
 		$search_fields = "'".implode("','", array_unique($search_fields))."'";
@@ -95,13 +99,14 @@ class FLEXIcontentViewSearch extends JView
 				$field->field_type = 'text';
 			}*/
 			$label = $field->label;
-			$fieldsearch = !FLEXI_J16GE ? JRequest::getVar($field->name, array()) : @$custom[$field->name];
-			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.serch.'.$field->name, $field->name, array(), 'array' );
-			$field->value = isset($fieldsearch[0])?$fieldsearch:array();
+			$fieldsearch = JRequest::getVar('filter_'.$field->id, array(), 'array');
+			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.search.'.'filter_'.$field->id, 'filter_'.$field->id, array(), 'array' );
+			$field->value = isset($fieldsearch[0]) ? $fieldsearch : array();
+			//echo "FIELD value: "; print_r($field->value);
 			
-			//$results = $dispatcher->trigger('onAdvSearchDisplayField', array( &$field, &$item ));
+			//$results = $dispatcher->trigger('onAdvSearchDisplayFilter', array( &$field, &$item ));
 			$fieldname = $field->iscore ? 'core' : $field->field_type;
-			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAdvSearchDisplayField', array( &$field, &$item ));
+			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAdvSearchDisplayFilter', array( &$field, $field->value, 'searchForm'));
 			
 			$field->label = $label;
 		}
@@ -176,25 +181,57 @@ class FLEXIcontentViewSearch extends JView
 		}		
 		
 		
-
 		// Get the parameters of the active menu item
 		$params	= &$mainframe->getParams();
 		$lists = array();
-		$fieldtypes_a = $params->get('fieldtypes', array());
-		if((count($fieldtypes_a)>0) && !is_array($fieldtypes_a)) $fieldtypes_a = array($fieldtypes_a);
-		if($params->get('cantypes', 1) && (count($fieldtypes_a)>0)) {
+		
+		// Get Content Types allowed for user selection in the Search Form
+		$search_contenttypes = $params->get('contenttypes', array());
+		if ( $search_contenttypes && !is_array($search_contenttypes) ) {
+			$search_contenttypes = array($search_contenttypes);
+		}
+		
+		if( $params->get('cantypes', 1) && count($search_contenttypes) )
+		{
+			$search_contenttypes_list = !count($search_contenttypes) ? "" : "'". implode("','", $search_contenttypes)."'";
+			
+			// Get Content Types currently selected in the Search Form
+			$form_contenttypes = JRequest::getVar('contenttypes', array());
+			if ( !$form_contenttypes || !count($form_contenttypes) ) {
+				$form_contenttypes = $search_contenttypes;
+			}
+			
 			$db =& JFactory::getDBO();
-			$fieldtypes = "'".implode("','", $fieldtypes_a)."'";
-			$query = 'SELECT id AS value, name AS text'
-			. ' FROM #__flexicontent_types'
-			. ' WHERE published = 1 AND id IN ('.$fieldtypes.')'
-			. ' ORDER BY name ASC, id ASC'
+			$query = "SELECT id AS value, name AS text"
+			. " FROM #__flexicontent_types"
+			. " WHERE published = 1"
+			. ($search_contenttypes_list ? " AND id IN (". $search_contenttypes_list .")"  :  "")
+			. " ORDER BY name ASC, id ASC"
 			;
 			$db->setQuery($query);
 			$types = $db->loadObjectList();
-			$lists['fieldtypes'] = JHTML::_('select.genericlist', $types, 'fieldtypes[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $fieldtypes_a, 'fieldtypes');
+			
+			//$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $form_contenttypes, 'contenttypes');
+			$fieldname = 'contenttypes[]';
+			$lists['contenttypes'] = '';
+			foreach($types as $type) {
+				$checked = in_array($type->value, $form_contenttypes);
+				$checked_attr = $checked ? 'checked=checked' : '';
+				$checked_class = $checked ? 'highlight' : '';
+				$lists['contenttypes'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="fieldtype_'.$type->value.'">';
+				$lists['contenttypes'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="fieldtype_'.$type->value.'" type="checkbox" name="'.$fieldname.'" value="'.$type->value.'" '.$checked_attr.' />';
+				$lists['contenttypes'] .= '<span style="float:left; display:inline-block;" >'.JText::_($type->text).'</span>';
+				$lists['contenttypes'] .= '</label>';
+			}
 		}
 		
+		
+		// FLEXIcontent Results Ordering
+		if($orderby_override = $params->get('orderby_override', 1)) {
+			$lists['orderby'] = flexicontent_html::ordery_selector( $params, 'searchForm', $autosubmit=0 );
+		}
+		
+		// Non-FLEXIcontent Results Ordering
 		if($show_searchordering = $params->get('show_searchordering', 1)) {
 			$default_searchordering = $params->get('default_searchordering', 'newest');
 			// built select lists
@@ -205,23 +242,62 @@ class FLEXIcontentViewSearch extends JView
 			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
 			$orders[] = JHTML::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
 			$lists['ordering'] = JHTML::_('select.genericlist',   $orders, 'ordering', 'class="inputbox"', 'value', 'text', $state->get('ordering', $default_searchordering) );
-		}
+		}		
+		
+		
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
-			$searchphrases 		= array();
-			$searchphrases[]    = JHTML::_('select.option',  'all', JText::_( 'FLEXI_ALL_WORDS' ) );
-			$searchphrases[]    = JHTML::_('select.option',  'any', JText::_( 'FLEXI_ANY_WORDS' ) );
-			$searchphrases[]    = JHTML::_('select.option',  'exact', JText::_( 'FLEXI_EXACT_SENTENCE' ) );
-			$lists['searchphrase' ]= JHTML::_('select.radiolist',  $searchphrases, 'searchphrase', '', 'value', 'text', $state->get('match', $default_searchphrase) );
+			$searchphrase = JRequest::getVar('searchphrase', $default_searchphrase);
+			$searchphrase_names = array('all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
+			$lists['searchphrase'] = '';
+			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
+				$checked = $searchphrase_value == $searchphrase;
+				$checked_attr = $checked ? 'checked=checked' : '';
+				$checked_class = $checked ? 'highlight' : '';
+				$lists['searchphrase'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="searchphrase_'.$searchphrase_value.'">';
+				$lists['searchphrase'] .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\');" id="searchphrase_'.$searchphrase_value.'" type="radio" name="searchphrase" value="'.$searchphrase_value.'" '.$checked_attr.' />';
+				$lists['searchphrase'] .=  '<span style="float:left; display:inline-block;" >'.JText::_($searchphrase_name).'</span>';
+				$lists['searchphrase'] .= '</label>';
+			}
 		}
-		if($show_operator = $params->get('show_operator', 1)) {
-			$default_operator = $params->get('default_operator', 'OR');
-			$operator = JRequest::getVar('operator', $default_operator);
-			$operators 		= array();
-			$operators[] 	= JHTML::_('select.option',  'OR', JText::_( 'FLEXI_SEARCH_COMBINATION_OR' ) );
-			$operators[] 	= JHTML::_('select.option',  'AND', JText::_( 'FLEXI_SEARCH_COMBINATION_AND' ) );
-			$lists['operator']= JHTML::_('select.radiolist',  $operators, 'operator', '', 'value', 'text', $operator );
+		if($show_filtersop = $params->get('show_filtersop', 1)) {
+			$default_filtersop = $params->get('default_filtersop', 'all');
+			$filtersop = JRequest::getVar('operator', $default_filtersop);
+			$filtersop_arr		= array();
+			$filtersop_arr[] = JHTML::_('select.option',  'all', JText::_( 'FLEXI_SEARCH_ALL' ) );
+			$filtersop_arr[] = JHTML::_('select.option',  'any', JText::_( 'FLEXI_SEARCH_ANY' ) );
+			$lists['filtersop']= JHTML::_('select.radiolist',  $filtersop_arr, 'filtersop', '', 'value', 'text', $filtersop );
 		}
+		
+		
+		
+		if( $params->get('show_searchareas', 0) )
+		{
+			// Get Content Types currently selected in the Search Form
+			$form_areas = JRequest::getVar('areas', array());
+			if ( !$form_areas || !count($form_areas) ) {
+				$form_areas = array('flexicontent');
+			}
+			
+			//$lists['areas'] = JHTML::_('select.genericlist', $types, 'areas[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $form_areas, 'areas');
+			$fieldname = 'areas[]';
+			$lists['areas'] = '';
+			
+			// DISABLE search areas 'content' and old 'flexisearch', TODO more for flexisearch
+			unset($this->searchareas['search']['content']);
+			unset($this->searchareas['search']['flexisearch']);
+			
+			foreach($areas['search'] as $area_name => $area_label) {
+				$checked = in_array($area_name, $form_areas);
+				$checked_attr = $checked ? 'checked=checked' : '';
+				$checked_class = $checked ? 'highlight' : '';
+				$lists['areas'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="area_'.$area_name.'">';
+				$lists['areas'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="area_'.$area_name.'" type="checkbox" name="'.$fieldname.'" value="'.$area_name.'" '.$checked_attr.' />';
+				$lists['areas'] .= '<span style="float:left; display:inline-block;" >'.JText::_($area_label).'</span>';
+				$lists['areas'] .= '</label>';
+			}
+		}
+		
 		// log the search
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
@@ -254,37 +330,51 @@ class FLEXIcontentViewSearch extends JView
 			//require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
+			if ($state->get('match') == 'exact') {
+				$searchwords = array($searchword);
+				//$needle = $searchword;
+			} else {
+				$searchwords = preg_split("/\s+/u", $searchword);
+				//print_r($searchwords);
+			}
+			
 			for ($i=0; $i < count($results); $i++) {
 				$row = &$results[$i]->text;
-				if($searchword) {
-					if ($state->get('match') == 'exact') {
-						$searchwords = array($searchword);
-						$needle = $searchword;
-					}else{
-						$searchwords = preg_split("/\s+/u", $searchword);
-						$needle = $searchwords[0];
+				if( strlen($searchwords[0]) )
+				{
+					$parts = FLEXIadvsearchHelper::prepareSearchContent( $row, 200, $searchwords );
+					//if( count($parts)>1 ) { echo "<pre>"; print_r($parts); exit;}
+					
+					foreach ($parts as $word_found => $part) {
+						if (!$word_found) continue;
+						$searchRegex = '#('. preg_quote($word_found, '#') .')#iu';
+						$parts[$word_found] = preg_replace($searchRegex, '<span class="highlight">\0</span>', $part );
 					}
-
-					$row = FLEXIadvsearchHelper::prepareSearchContent( $row, 200, $needle );
-					$searchwords = array_unique( $searchwords );
-					$searchRegex = '#(';
-					$x = 0;
-					foreach ($searchwords as $k => $hlword) {
-						$searchRegex .= ($x == 0 ? '' : '|');
-						$searchRegex .= preg_quote($hlword, '#');
-						$x++;
+					$row = implode($parts, " <br/> ");
+					
+					// Add some message about matches
+					if ( $state->get('match')=='any' ) {
+						$text_search_header = "<u><b>".JText::sprintf('Text Search matched %d %% (%d out of %d words)', count($parts)/count($searchwords) * 100, count($parts), count($searchwords)).": </b></u><br/>";
+					} else if ( $state->get('match')=='all' ) {
+						$text_search_header = "<u><b>".JText::sprintf('Text Search (all %d words required)', count($searchwords)).": </b></u><br/>";
+					} else {
+						$text_search_header = "<u><b>".JText::_('Text Search (exact phrase)').": </b></u><br/>";
 					}
-					$searchRegex .= ')#iu';
-
-					$row = preg_replace($searchRegex, '<span class="highlight">\0</span>', $row );
+					$results[$i]->text = $text_search_header . $results[$i]->text;
 				}
-				$results[$i]->text = str_replace('[span=highlight]', '<span class="highlight">', $results[$i]->text);
-				$results[$i]->text = str_replace('[/span]', '</span>', $results[$i]->text);
-				$results[$i]->text = str_replace('[br /]', '<br />', $results[$i]->text);
+				
+				if ( !empty($results[$i]->fields_text) ) {
+					$results[$i]->text .= "<br/><u><b>".JText::_('Attribute filters matched')." : </b></u>";
+					$results[$i]->fields_text = str_replace('[span=highlight]', '<span class="highlight">', $results[$i]->fields_text);
+					$results[$i]->fields_text = str_replace('[/span]', '</span>', $results[$i]->fields_text);
+					$results[$i]->fields_text = str_replace('[br /]', '<br />', $results[$i]->fields_text);
+					$results[$i]->text .= $results[$i]->fields_text;
+				}
+				
 				$result =& $results[$i];
 				if ($result->created) {
 					$created = JHTML::Date( $result->created );
-				}else {
+				} else {
 					$created = '';
 				}
 
@@ -315,11 +405,8 @@ class FLEXIcontentViewSearch extends JView
 		$this->assign('action', 	    $uri->toString());
 		
 		$this->assign('searchkeywordlabel', 	    $searchkeywordlabel);
-		
-		$this->assignRef('fieldtypes', $fieldtypes_a);
-		
 		$this->assignRef('document', $document);
-
+		
 		parent::display($tpl);
 	}
 }

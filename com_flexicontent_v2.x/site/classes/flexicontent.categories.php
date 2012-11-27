@@ -355,6 +355,7 @@ class flexicontent_cats
 	 */
 	function getFilterValues (&$filter, $force='default') {
 		
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 		global $currcat_data;
 		$db =& JFactory::getDBO();
 		

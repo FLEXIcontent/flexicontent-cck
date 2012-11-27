@@ -4,11 +4,14 @@
 	<tr>
 		<td>
 		<?php
-		foreach( $this->results as $result ) : ?>
-			<fieldset>
-				<div>
+		$count = -1;
+		foreach( $this->results as $result ) :
+		$count++;
+		?>
+			<fieldset class="fc_search_result <?php echo $count%2 ? 'odd' : 'even'; ?>">
+				<div class="fc_search_result_title">
 					<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-						<?php echo $this->pagination->limitstart + $result->count.'. ';?>
+						<?php echo $this->pageNav->limitstart + $result->count.'. ';?>
 					</span>
 					
 					<?php
@@ -30,14 +33,16 @@
 					
 				</div>
 				<?php if ( $this->params->get( 'show_text', 1 )) : ?>
-				<div>
+				<div class="fc_search_result_text">
 					<?php echo $result->text; ?>
 				</div>
 				<?php endif;?>
 				<?php
 					if ( $this->params->get( 'show_date', 1 )) : ?>
-				<div class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-					<?php echo $result->created; ?>
+				<div class="fc_search_result_fields">
+					<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+						<?php echo $result->created; ?>
+					</span>
 				</div>
 				<?php endif; ?>
 			</fieldset>

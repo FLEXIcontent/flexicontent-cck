@@ -507,20 +507,16 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayField(&$field, &$item)
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($field->field_type != 'date') return;
+		if($filter->field_type != 'date') return;
 		
-		$field_type = $field->field_type;
-		$field->field_type = 'text';
-		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-		$field->field_type = 'date';
+		plgFlexicontent_fieldsDate::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'date') return;
@@ -546,7 +542,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
 		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-		
 	}
 	
 	

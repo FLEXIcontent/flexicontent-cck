@@ -123,16 +123,42 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	function prepareSearchContent( $text, $length = 200, $searchword )
+	function prepareSearchContent( $text, $length = 200, $searchword_arr )
 	{
-		// strips tags won't remove the actual jscript
-		$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
-		$text = preg_replace( '/{.+?}/', '', $text);
-		//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
-		// replace line breaking tags with whitespace
-		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
-
-		return FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword );
+		foreach ($searchword_arr as $searchword) {
+			// strips tags won't remove the actual jscript
+			$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
+			$text = preg_replace( '/{.+?}/', '', $text);
+			//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
+			// replace line breaking tags with whitespace
+			$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
+		}
+		
+		if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
+			$start_part = JString::substr($text, 0, $wordpos) . '&nbsp;...';
+		} else {
+			$start_part = JString::substr($text, 0, $length);
+		}
+		
+		$parts = array();
+		foreach ($searchword_arr as $searchword) {
+			$part = FLEXIadvsearchHelper::_smartSubstr( strip_tags( $text ), $length, $searchword, $pos);
+			if ($pos !== false) {
+				$parts[$searchword] = $part;
+				$positions[$pos] = $searchword;
+			}
+		}
+		
+		if ( count($parts) ) {
+			$oparts = array();
+			ksort($positions);
+			foreach ($positions as $pos => $searchword) {
+				$oparts[ $searchword ] = $parts[$searchword];
+			}
+			return $oparts;
+		} else {
+			return array('' => $start_part);
+		}
 	}
 
 	/**
@@ -175,7 +201,7 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	function _smartSubstr($text, $length = 200, $searchword)
+	function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
 	{
 		$textlen = JString::strlen($text);
 		$lsearchword = JString::strtolower($searchword);

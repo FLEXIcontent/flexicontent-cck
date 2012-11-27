@@ -352,16 +352,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayField(&$field, &$item)
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($field->field_type != 'text') return;
+		if($filter->field_type != 'text') return;
 		
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		plgFlexicontent_fieldsText::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'text') return;
@@ -372,23 +372,37 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$filter->html = '';
 		
 		
-		// *** Retrieve values
-		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-		$results = flexicontent_cats::getFilterValues($filter);
-		
-		
-		// *** Create the select form field used for filtering
-		$options = array();
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		
-		foreach($results as $result) {
-			if (!trim($result->value)) continue;
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		if ( !$filter->parameters->get( 'range', 0 ) ) {
+			
+			// *** Retrieve values
+			// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+			$force = JRequest::getVar('view')=='search' ? 'all' : 'default';
+			$results = flexicontent_cats::getFilterValues($filter, $force);
+			
+			
+			// *** Create the select form field used for filtering
+			$options = array();
+			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+			
+			foreach($results as $result) {
+				if (!trim($result->value)) continue;
+				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+			}
+			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
+			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+		} else {
+			//print_r($value);
+			$size = (int)($filter->parameters->get( 'size', 30 ) / 2);
+			$filter->html	.='<input name="filter_'.$filter->id.'[1]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
+			$filter->html	.='<input name="filter_'.$filter->id.'[2]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
 		}
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-		
 	}
+	
+	
+	/*function getFiltered($field_id, $value, $field_type = '')
+	{
+		return array();
+	}*/
 	
 	
 	
@@ -420,7 +434,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to get ALL items that have matching search values for the current field id
 	function onFLEXIAdvSearch(&$field)
 	{
-		if ($field->field_type!='selectmultiple') return;
+		if ($field->field_type != 'text') return;
 		
 		FlexicontentFields::onFLEXIAdvSearch($field);
 	}

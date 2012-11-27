@@ -102,12 +102,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ***********************************************
 		
 		if($cantypes = $params->get('cantypes', 1)) {
-			$fieldtypes = JRequest::getVar('fieldtypes', array());
+			$contenttypes = JRequest::getVar('contenttypes', array());
 		}
-		if(!$cantypes || (count($fieldtypes)<=0)) {
-			$fieldtypes = $params->get('fieldtypes', array());
+		if(!$cantypes || (count($contenttypes)<=0)) {
+			$contenttypes = $params->get('contenttypes', array());
 		}
-		if((count($fieldtypes)>0) && !is_array($fieldtypes)) $fieldtypes = array($fieldtypes);
+		if((count($contenttypes)>0) && !is_array($contenttypes)) $contenttypes = array($contenttypes);
 		$dispatcher =& JDispatcher::getInstance();
 		
 		// define section
@@ -142,6 +142,17 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$now = $date->toMySQL();
 		
 		$text = trim( $text );
+		
+		// FORCE LOGICAL 'AND' between (a) text search and (b) search filters.
+		// If no text search words are given, then force operator to be OR to ignore text search having no results
+		$SEARCH_FILTERS_OP_TEXT_SEARCH = strlen($text) ? 'AND' : 'OR';
+		
+		// Require any OR all Filters ... this can be user selectable, but just to be insane check if it is allowed to the user
+		$show_filtersop = $params->get('show_filtersop', 1);
+		$default_filtersop = $params->get('default_filtersop', 'all');
+		$FILTERSOP = !$show_filtersop ? $default_filtersop : JRequest::getVar('filtersop', $default_filtersop);
+		
+		if ( strlen($text)==0 ) {$SEARCH_FILTERS_OP_TEXT_SEARCH = 'OR';}
 		
 		$searchFlexicontent = JText::_( 'FLEXICONTENT' );
 		if($text!='') {
@@ -223,15 +234,15 @@ class plgSearchFlexiadvsearch extends JPlugin
 		) {
 			$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
-		$fieldtypes_str = "'".implode("','", $fieldtypes)."'";
+		$contenttypes_str = "'".implode("','", $contenttypes)."'";
 		$search_fields = $params->get('search_fields', '');
-		$search_fields = "'".str_replace(",", "','", $search_fields)."','title'";
-		$query = "SELECT f.* " //f.id,f.field_type,f.name,f.label,f.attribs" // .", fir.value,fir.item_id"
+		$search_fields = "'".preg_replace("/\s*,\s*/u", "','", $search_fields)."'";
+		$query = "SELECT f.* "
 			//." FROM #__flexicontent_fields_item_relations as fir "
 			//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
 			//." LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id"
 			." FROM #__flexicontent_fields as f " //." ON f.id=fir.field_id"
-			//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$fieldtypes_str})"
+			//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$contenttypes_str})"
 			." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
 			//." GROUP BY fir.field_id,fir.item_id"
 		;
@@ -240,68 +251,71 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$fields = is_array($fields) ? $fields : array();
 		
 		$CONDITION = '';
-		$OPERATOR = JRequest::getVar('operator', 'OR');
-		$FOPERATOR = JRequest::getVar('foperator', 'OR');
 		$items = array();
-		$resultfields = array();
+		$field_results_arr = array();
 		if (FLEXI_J16GE) {
 			$custom = JRequest::getVar('custom', array());
 		}
 		
+		
+		// *************************************************************************************************
+		// Once per (advanced searchable) field TYPE we will search for ITEMs having specified field value(s)
+		// *************************************************************************************************
+		
 		JPluginHelper::importPlugin( 'flexicontent_fields');
-		$foundfields = array();
+		$fields_matched_arr = array();
 		foreach($fields as $field)
 		{
-			// Once per (advanced searchable) field TYPE
 			$field->parameters = new JParameter($field->attribs);
 			
-			$foundfields[$field->id] = array();
+			//echo "<br/>Field name:". $field->name;
 			
-			//echo "Field name:". $field->name;
+			// Call advanced search 
 			$fieldname = $field->iscore ? 'core' : $field->field_type;
 			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onFLEXIAdvSearch', array( &$field ));
 			
+			// A not SET results property, indicates field filter was not used in the search, skip it
+			if( !isset($field->results) ) continue;
 			
-			if(isset($field->results) && (count($field->results)>0))
-			{
-				//echo "<pre>"; print_r($field->results);echo "</pre>"; 
-				foreach($field->results as $r) {
-					if($r) {
-						$items[] = $r->item_id;
-						$foundfields[$field->id][] = $r->item_id;
-						$resultfields[$r->item_id][] = $r;
-					}
+			//echo "<pre>"; print_r($field->results);echo "</pre>"; 
+			
+			// Add field to fields that were used in the search
+			$fields_matched_arr[$field->id] = array();
+			foreach($field->results as $r) {
+				if($r) {
+					$items[] = $r->item_id;
+					$fields_matched_arr[$field->id][] = $r->item_id;
+					$field_results_arr[$r->item_id][] = $r;
 				}
 			}
-			echo "<br/>";			
-			
 		}
-		//echo "<pre>foundfields: "; print_r($foundfields);echo "</pre>";
-		//echo "<pre>resultfields: "; print_r($resultfields);echo "</pre>";
+		//echo "<pre>foundfields: "; print_r($fields_matched_arr);echo "</pre>";
+		//echo "<pre>foundfields: "; print_r($fields_matched_arr);echo "</pre>";
+		//echo "<pre>resultfields: "; print_r($field_results_arr);echo "</pre>";
 		
 		if ( count($items) )
 		{
-			if ($FOPERATOR=='OR') {
+			if ($FILTERSOP == 'OR') {
 				$items = array_unique($items);
 				$items = "'".implode("','", $items)."'";
-				$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
+				$CONDITION = " {$SEARCH_FILTERS_OP_TEXT_SEARCH} a.id IN ({$items}) ";
 			} else {
-				$codestr = "\$items = array_intersect(";
-				$codestr_a = array();
-				foreach($foundfields as $k=>$a) {
-					$codestr_a[] = "\$foundfields[{$k}]";
+				$itemid_arr = array();
+				
+				// Count number of time each item was matched by search filters
+				foreach($fields_matched_arr as $fieldid => $itemid_matched_arr) {
+					foreach ($itemid_matched_arr as $itemid_matched) 
+						$itemid_match_count[$itemid_matched] = !isset($itemid_match_count[$itemid_matched]) ? 1 : $itemid_match_count[$itemid_matched] + 1;
 				}
-				$codestr .= implode(", ", $codestr_a);
-				$codestr .= ");";
+				
+				// Only accept items that were matched by all search filters
+				$ffcount = count($fields_matched_arr);
 				$items = array();
-				if (count($codestr_a)==1) {
-					$items = $foundfields[$k];
-					$items = "'".implode("','", $foundfields[$k])."'";
-				} elseif(count($codestr_a)>1) {
-					eval($codestr);
-					$items = "'".implode("','", $items)."'";
+				foreach ($itemid_match_count as $itemid_matched => $infields_count) {
+					if ($infields_count == $ffcount) $items[] = $itemid_matched;
 				}
-				$CONDITION = " {$OPERATOR} a.id IN ({$items}) ";
+				$items = "'".implode("','", $items)."'";
+				$CONDITION = " {$SEARCH_FILTERS_OP_TEXT_SEARCH} a.id IN ({$items}) ";
 			}
 		}
 		$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
@@ -326,7 +340,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
 			. $andaccess
 			. $andlang
-			. (count($fieldtypes)?" AND ie.type_id IN ({$fieldtypes_str})":"")
+			. (count($contenttypes)?" AND ie.type_id IN ({$contenttypes_str})":"")
 			. ' ORDER BY '. $order
 		;
 		$db->setQuery( $query, $limitstart, $limit );
@@ -334,10 +348,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$list = $db->loadObjectList();
 		if(isset($list)) {
 			foreach($list as $key => $row) {
+				$list[$key]->fields_text = '';
 				if( FLEXI_J16GE || $row->sectionid==FLEXI_SECTION ) {
-					if(isset($resultfields[$row->id])) {
-						foreach($resultfields[$row->id] as $r) {
-							$list[$key]->text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
+					if(isset($field_results_arr[$row->id])) {
+						foreach($field_results_arr[$row->id] as $r) {
+							//$list[$key]->text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
+							$list[$key]->fields_text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
 						}
 					}
 					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
