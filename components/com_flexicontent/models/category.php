@@ -92,7 +92,13 @@ class FlexicontentModelCategory extends JModel {
 	 */
 	var $_layout = 'category';
 	
-
+	/**
+	 * Comments information for cat's items
+	 *
+	 * @var string
+	 */
+	var $_comments = null;
+	
 	/**
 	 * Constructor
 	 *
@@ -164,6 +170,7 @@ class FlexicontentModelCategory extends JModel {
 			$this->_data_cats = null;
 			$this->_total     = null;
 			$this->_params    = null;
+			$this->_comments = null;
 		}
 		$this->_id = $cid;
 	}		
@@ -1100,6 +1107,8 @@ class FlexicontentModelCategory extends JModel {
 				// some parameters not belonging to category overriden parameters
 				$params->set( 'item_depth', $menuParams->get('item_depth') );
 			}
+			$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
+			$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists			
 			/*
 			// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 			$params = clone($mainframe->getParams('com_flexicontent'));
@@ -1332,6 +1341,45 @@ class FlexicontentModelCategory extends JModel {
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 		}
 		return $alpha;
+	}
+	
+	
+	function & getCommentsInfo ( $_item_ids = false)
+	{
+		// handle jcomments integration
+		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+			return array();
+		}
+		
+		// Normal case, item ids not given, we will retrieve comments information of cat/sub items
+		if ( !$_item_ids ) {
+			// Return existing data
+			if ($this->_comments!==null) return $this->_comments;
+			
+			// Make sure item data have been retrieved
+			$this->getData();
+			
+			// Get item ids
+			$item_ids = array();
+			foreach ($this->_data as $item) $item_ids[] = $item->id;
+		} else {
+			$item_ids = & $_item_ids;
+		}
+		
+		$db =& JFactory::getDBO();
+		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
+		      . ' FROM #__jcomments AS com'
+		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
+		      . ' AND com.object_group = ' . $db->Quote('com_flexicontent')
+		      . ' AND com.published = 1'
+		      . ' GROUP BY com.object_id'
+		      ;
+		$db->setQuery($query);
+		$comments = $db->loadObjectList('item_id');
+		
+		if ( !$_item_ids ) $this->_comments = & $comments;
+		
+		return $comments;
 	}
 }
 ?>

@@ -60,7 +60,6 @@
 
 /* Used for approval button and maybe for others */
 .fc_bigbutton {
-	border-radius:4px !important;
 	padding: 2px !important;
 	margin-right: 4px !important;
 	border:1px outset gray !important;
@@ -134,7 +133,9 @@
 #flexicontent .catimg img {
 	padding: 1px;
 	border: 1px solid lightgray;
-	border-radius: 8px;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 
 #flexicontent .catdescription {
@@ -251,7 +252,6 @@
 	display:inline-block;
 	float:none;
 	border: 1px solid gray;
-	border-radius: 4px;
 	margin: 1px 4px 1px 1px;
 }
 
@@ -325,9 +325,9 @@
 	font-weight: normal;
 	padding: 2px 4px;
 	margin: 4px 2px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 
 
@@ -456,7 +456,9 @@ div.flexi_edit .flexi_buttons {
 }
 
 #flexicontent button, div.flexi_edit .flexi_buttons button {
-	border-radius: 8px !important;
+	border-radius:5px !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px !important;
 	border: 1px solid #cccccc !important;
 	background: #eeeeee !important;
 	color: white !important;	
@@ -468,6 +470,7 @@ div.flexi_edit .flexi_buttons {
 
 #flexicontent button:hover, div.flexi_edit .flexi_buttons button:hover {
 	background: #cccccc !important;
+	border: 1px solid gray !important;
 }
 
 .fcbutton_apply, .fcbutton_save, .fcbutton_cancel, .fcbutton_preview, .fcbutton_preview_save, .fcbutton_go, .fcbutton_reset {
@@ -753,7 +756,9 @@ div.current dd {
 .fc_field_image {
 	padding: 1px !important;
 	border: 1px solid lightgray !important;
-	border-radius: 4px !important;
+	border-radius:5px !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px !important;
 }
 
 /* ADD button used by fields (item form) */
@@ -786,27 +791,43 @@ div.current dd {
  * FLEXIcontent Advanced Search View
  ************************************/
 
+/* Search view content header, float it left to allow placing print, etc buttons at the right */
+.flexicontent.search  h2.contentheading {
+	float: left;
+	display: block;
+}
+
+/* search form */
+#flexicontent form#searchForm {
+	clear: both;
+	float: none;
+}
+
 /* Container of TEXT search label */
 .fc_search_label_cell {
 	text-align:right;
 	padding: 4px 6px 4px 4px;
 	font-weight:bold;
 	background-color:#eeeeee;
+	font-size: 11px !important;
+	font-family: tahoma;
 }
 
 /* Container of TEXT search form field */
 .fc_search_option_cell {
 	padding: 4px 4px 4px 6px;
+	font-size: 11px !important;
+	font-family: tahoma;
 }
 
 /* Search Filter ROW */
 .fc_search_row_0 td {
-	background-color: #eeeeee;
+	background-color: #f0f0f0;
 }
 
 /* Search Filter CELL */
 .fc_search_row_1 td {
-	background-color: #dddddd;
+	background-color: #e7e7e7;
 }
 
 /* CONTAINER of search (field) filters */
@@ -823,29 +844,68 @@ fieldset.fc_search_set legend {
 }
 
 /* Search (field) filters TABLE */
-table#basicfields, 
-table#extrafields, 
-table#resultoptions {
-	border-collapse: separate!important;
-	border-spacing: 1px;
-	width:auto;
+table.fc_search_tbl {
+	border-collapse: separate !important;
+	border-spacing: 1px !important;
+	width: auto;
 }
 
 /* Search (field) filters CELLs */
-table#basicfields td, 
-table#extrafields td, 
-table#resultoptions td {
-	border: 1px solid white; 
-	border-spacing: 1px;
-	width:auto;
+table.fc_search_tbl td {
+	border-width: 0px !important;
+	border-spacing: 1px !important;
+	width: auto !important;
 }
 
 /* CONTAINER of form fields related Search View BEHAVIOR */
 fieldset#fc_search_set_search_behavior legend {
-	color:darkred;
-	font-weight:bold;
 }
 
+div.flexicontent.search .inputbox {
+	border: 1px solid lightgray;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	padding: 2px;
+	height: auto;
+}
+
+div.flexicontent.search  fieldset.fc_search_result {
+	padding: 4px 4px 4px 4px;
+	margin: 0px 12px 0px 12px;
+	border: 1px solid transparent;
+}
+
+div.flexicontent.search  fieldset.fc_search_result.odd {
+	background-color: #f7f7f7;
+}
+
+div.flexicontent.search  fieldset.fc_search_result.even {
+	background-color: #f0f0f0;
+}
+
+div.flexicontent.search  fieldset.fc_search_result:hover {
+	background-color: #e0e0e0 !important;
+	border: 1px dashed gray;
+}
+
+div.flexicontent.search  .fc_search_result_title {
+}
+div.flexicontent.search  .fc_search_result_text {
+}
+div.flexicontent.search  .fc_search_result_filters {
+}
+div.flexicontent.search  .fc_search_result_fields {
+}
+div.flexicontent.search  .highlight {
+	background: none repeat scroll 0 0 #FFFFAA;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	color: #3D3D3D;
+	font-weight: bold;
+	padding: 3px 5px;
+}
 
 
 /************************************************************************
@@ -959,7 +1019,9 @@ table.admintable td {
 
 #flexicontent.directory .fccat_image {
 	border: 1px solid #dddddd;
-	border-radius: 6px;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -998,7 +1060,9 @@ table.admintable td {
 
 #flexicontent.directory .fcsubcat_image {
 	border: 1px solid #dddddd;
-	border-radius: 6px;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -1182,6 +1246,37 @@ table.admintable td {
 
 
 
+/*************************************
+ * FLEXIcontent radio/checkbox buttons
+ *************************************/
+.flexi_radiotab {
+	display: inline-block !important;
+	padding: 1px 6px !important;
+	margin: 2px 0px 2px 8px !important;
+	border-radius:5px !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px !important;
+	border: 1px solid #aaaaaa !important;
+	text-decoration: none !important;
+	font-weight: bold;
+	cursor: pointer !important;
+	float: left;
+	
+	background-color: white !important;
+	color: black !important;
+}
+
+.flexi_radiotab.highlight {
+	background-color: lightgray !important;
+	color: darkred !important;
+}
+
+.flexi_radiotab input {
+	float: left;
+}
+
+
+
 /***************************
  * Other unsorted CSS Rules
  ***************************/
@@ -1198,4 +1293,18 @@ div.fancybox-wrap a { background: none!important;}
  display: block;
  float: left;
  clear:both;
+}
+
+
+#flexicontent .rc5 {
+	border-radius:5px !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px !important;
+}
+
+.fc_comments_count {
+	background: url(../images/comments.png) no-repeat !important; color: green;
+	padding-left: 20px;
+	height: 16px;
+	margin: 2px 4px;
 }

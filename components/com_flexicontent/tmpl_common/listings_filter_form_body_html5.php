@@ -27,7 +27,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 				<span class="hasTip" <?php echo $search_tip_title;?> ><?php echo $infoimage; ?></span>
 			<?php endif; ?>
 			
-			<input class="fc_text_filter input-medium search-query" type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" />
+			<input class="fc_text_filter rc5 input-medium search-query" type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" />
 			<?php echo $this->params->get('compact_search_with_filters', 1) ? '<br/>' : ''; ?>
 			
 			<?php if ($this->params->get('show_search_go', 1) || $this->params->get('show_search_reset', 1)) : ?>

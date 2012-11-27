@@ -75,12 +75,17 @@ class FlexicontentViewCategory extends JView
 			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
 		}
 		
-		// Get data from the model		
-		$category   = & $this->get('Category');
+		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
+		$category = & $this->get('Category');
+		$params   = & $category->parameters;
+		
+		// Get remainging data from the model, TODO use parameters to retireve these only when needed
 		$categories = & $this->get('Childs');
 		$items    = & $this->get('Data');
 		$total    = & $this->get('Total');
 		$filters  = & $this->get('Filters');
+		if ($params->get('show_comments_count', 0))
+			$comments = & $this->get('CommentsInfo');
 		$alpha    = & $this->get('Alphaindex');
 		$model    = & $this->getModel();
 		
@@ -88,8 +93,6 @@ class FlexicontentViewCategory extends JView
 		$limitstart = JRequest::getInt('limitstart');
 		$format     = JRequest::getVar('format', null);
 		
-		// Set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
-		$params	= & $category->parameters;
 		
 		// ************************
 		// CATEGORY LAYOUT handling
@@ -672,6 +675,7 @@ class FlexicontentViewCategory extends JView
 		$this->assignRef('pageNav' , 		$pageNav);
 		$this->assignRef('resultsCounter' ,	$resultsCounter);
 		$this->assignRef('filters' ,	 	$filters);
+		$this->assignRef('comments'	,		@$comments);
 		$this->assignRef('lists' ,	 		$lists);
 		$this->assignRef('alpha' ,	 		$alpha);
 		$this->assignRef('tmpl' ,				$tmpl);

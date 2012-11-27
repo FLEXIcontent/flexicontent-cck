@@ -55,34 +55,21 @@ if ($this->items) :
 $items = & $this->items;
 
 	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
-		echo "<span style='font-weight:bold; color:red;'>No columns selected forcing the display of item title. Please:<br>\n
-		1. enable display of item title in category parameters<br>\n
-		2. OR add fields to the category Layout of the template assigned to this category<br>\n
-		3. OR set category parameters to display 0 items per page</span>";
+		echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
 		$this->params->set('show_title', 1);
 	endif;
 ?>
-	
-		<!-- BOF items total-->
-		<?php if ($this->params->get('show_item_total', 1)) : ?>
-		<div id="item_total" class="item_total">
-			<?php	//echo $this->pageNav->getResultsCounter(); // Alternative way of displaying total (via joomla pagination class) ?>
-			<?php echo $this->resultsCounter; // custom Results Counter ?>
-		</div>
-		<?php endif; ?>
-		<!-- BOF items total-->
-    		
-		
-<div class='fctabber' class='".$class."'><!-- tabber start -->
+
+
+<div class="fctabber group"><!-- tabber start -->
 	
 	<?php foreach ($items as $item) : ?>
 					
- <div class='tabbertab'><!-- tab start -->
-	<h3><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
-	
+	<div class="tabbertab"><!-- tab start -->
+			<h3><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
 	  <!-- BOF beforeDisplayContent -->
 	  <?php if ($item->event->beforeDisplayContent) : ?>
-			<div class='fc_beforeDisplayContent' style='clear:both;'>
+			<div class="fc_beforeDisplayContent group">
 				<?php echo $item->event->beforeDisplayContent; ?>
 			</div>
 		<?php endif; ?>
@@ -91,7 +78,7 @@ $items = & $this->items;
 		<!-- BOF buttons -->
 		<?php
 		$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
-		$mailbutton = flexicontent_html::mailbutton( 'items', $this->params, null , $item->slug );
+		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $item->slug );
 		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 		$editbutton = flexicontent_html::editbutton( $item, $this->params );
 		if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {
@@ -106,9 +93,17 @@ $items = & $this->items;
 			<!-- EOF buttons -->
 		
 
+	<?php if ($this->params->get('show_comments_count')) : ?>
+		<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
+			<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+				<?php echo $this->comments[ $item->id ]->total; ?>
+			</div>
+		<?php endif; ?>
+	<?php endif; ?>
+
 	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading"><span class='fc_item_title'>
+	<h2 class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -122,7 +117,7 @@ $items = & $this->items;
 	
   <!-- BOF afterDisplayTitle -->
   <?php if ($item->event->afterDisplayTitle) : ?>
-		<div class='fc_afterDisplayTitle' style='clear:both;'>
+		<div class="fc_afterDisplayTitle group">
 			<?php echo $item->event->afterDisplayTitle; ?>
 		</div>
 	<?php endif; ?>
@@ -130,7 +125,7 @@ $items = & $this->items;
 	
 	<!-- BOF subtitle1 block -->
 	<?php if (isset($item->positions['subtitle1'])) : ?>
-	<div class="flexi lineinfo subtitle1">
+	<div class="flexi lineinfo subtitle1 group">
 		<?php foreach ($item->positions['subtitle1'] as $field) : ?>
 		<div class="flexi element">
 			<?php if ($field->label) : ?>
@@ -145,7 +140,7 @@ $items = & $this->items;
 	
 	<!-- BOF subtitle2 block -->
 	<?php if (isset($item->positions['subtitle2'])) : ?>
-	<div class="flexi lineinfo subtitle2">
+	<div class="flexi lineinfo subtitle2 group">
 		<?php foreach ($item->positions['subtitle2'] as $field) : ?>
 		<div class="flexi element">
 			<?php if ($field->label) : ?>
@@ -160,7 +155,7 @@ $items = & $this->items;
 	
 	<!-- BOF subtitle3 block -->
 	<?php if (isset($item->positions['subtitle3'])) : ?>
-	<div class="flexi lineinfo subtitle3">
+	<div class="flexi lineinfo subtitle3 group">
 		<?php foreach ($item->positions['subtitle3'] as $field) : ?>
 		<div class="flexi element">
 			<?php if ($field->label) : ?>
@@ -191,9 +186,9 @@ $items = & $this->items;
 	<!-- BOF top block -->
 		<?php if (isset($item->positions['top'])) : ?>
 		<div class="flexi infoblock <?php echo $this->params->get('top_cols', 'two'); ?>cols">
-			<ul class='flexi'>
+			<ul class="flexi">
 				<?php foreach ($item->positions['top'] as $field) : ?>
-				<li class='flexi'>
+				<li class="flexi">
 					<div>
 						<?php if ($field->label) : ?>
 						<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
@@ -220,7 +215,7 @@ $items = & $this->items;
 	
 	<!-- BOF description -->
 	<?php if (isset($item->positions['description'])) : ?>
-	<div class="description">
+	<div class="description group">
 		<?php foreach ($item->positions['description'] as $field) : ?>
 			<?php if ($field->label) : ?>
 		<div class="desc-title"><?php echo $field->label; ?></div>
@@ -233,24 +228,24 @@ $items = & $this->items;
 	
 	<div class="clear"></div>
 	
-	<!-- BOF bottom block -->
-	<?php if (isset($item->positions['bottom'])) : ?>
-	<div class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols">
-		<ul class='flexi'>
-			<?php foreach ($item->positions['bottom'] as $field) : ?>
-			<li class='flexi'>
-				<div>
-					<?php if ($field->label) : ?>
-					<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-				</div>
-			</li>
-			<?php endforeach; ?>
-		</ul>
-	</div>
-	<?php endif; ?>
-	<!-- EOF bottom block -->
+		<!-- BOF bottom block -->
+		<?php if (isset($item->positions['bottom'])) : ?>
+		<div class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols">
+			<ul class="flexi">
+				<?php foreach ($item->positions['bottom'] as $field) : ?>
+				<li class="flexi">
+					<div>
+						<?php if ($field->label) : ?>
+						<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+						<?php endif; ?>
+						<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					</div>
+				</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php endif; ?>
+		<!-- EOF bottom block -->
 
 
 			<?php if (
@@ -272,13 +267,13 @@ $items = & $this->items;
 			    
 	    <!-- BOF afterDisplayContent -->
 	    <?php if ($item->event->afterDisplayContent) : ?>
-				<div class='afterDisplayContent' style='clear:both;'>
+				<div class="fc_afterDisplayContent group">
 					<?php echo $item->event->afterDisplayContent; ?>
 				</div>
 			<?php endif; ?>
 	    <!-- EOF afterDisplayContent -->
 			
- </div><!-- tab end -->
+	</div><!-- tab end -->
 
 	<?php endforeach; ?>
 		

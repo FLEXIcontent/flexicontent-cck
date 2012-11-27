@@ -83,8 +83,9 @@ foreach ($cat_items as $catid => $items) :
 	if ($catid!=$currcatid) $count_cat++;
 ?>
 
-		<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?>">
-			
+<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?>">
+	
+		
 		<div class="flexi-cat">
 			
 			<!-- BOF subcategory image -->
@@ -119,8 +120,7 @@ foreach ($cat_items as $catid => $items) :
 			<!-- EOF subcategory description -->
 			
 		</div>
-		
-		
+
 <!-- BOF subcategory items -->
 			
 <?php
@@ -132,13 +132,13 @@ foreach ($cat_items as $catid => $items) :
 
 		<?php if ( $this->params->get('show_title', 1) || count($columns['aftertitle']) ) : ?>
 		
-			<ul class='flexi-itemlist'>
+			<ul class="flexi-itemlist">
 			<?php foreach ($items as $item) : ?>
-				<li class='flexi-item'>
+				<li class="flexi-item">
 					
 				  <!-- BOF beforeDisplayContent -->
 				  <?php if ($item->event->beforeDisplayContent) : ?>
-						<div class='fc_beforeDisplayContent' style='clear:both;'>
+						<div class="fc_beforeDisplayContent" style='clear:both;'>
 							<?php echo $item->event->beforeDisplayContent; ?>
 						</div>
 					<?php endif; ?>
@@ -150,29 +150,35 @@ foreach ($cat_items as $catid => $items) :
 						<div style="float:left;"><?php echo $editbutton;?></div>
 					<?php endif; ?>
 				<?php endif; ?>
+
+				<?php if ($this->params->get('show_comments_count')) : ?>
+					<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
+						<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+							<?php echo $this->comments[ $item->id ]->total; ?>
+						</div>
+					<?php endif; ?>
+				<?php endif; ?>
 					
 				<!-- BOF item title -->
-				<ul class='flexi-fieldlist'>
+				<ul class="flexi-fieldlist">
 				<?php if ($this->params->get('show_title', 1)) : ?>
-		   		<li class='flexi-field flexi-title'>
-		   			<?php if ($this->params->get('link_titles', 0)) : ?>
-		   			<a class='fc_item_title' href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
-		   			<?php
-		   			else :
-		   			echo $item->title;
-		   			endif;
-		    			?>
+		   		<li class="flexi-field flexi-title">
+						<?php if ($this->params->get('link_titles', 0)) : ?>
+		   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+		   			<?php else : ?>
+							<?php echo $item->title; ?>
+						<?php endif; ?>
+
+						<!-- BOF afterDisplayTitle -->
+						<?php if ($item->event->afterDisplayTitle) : ?>
+							<div class="fc_afterDisplayTitle" style='clear:both;'>
+								<?php echo $item->event->afterDisplayTitle; ?>
+							</div>
+						<?php endif; ?>
+						<!-- EOF afterDisplayTitle -->
 					</li>
 				<?php endif; ?>
 				<!-- BOF item title -->
-	    				
-			  <!-- BOF afterDisplayTitle -->
-			  <?php if ($item->event->afterDisplayTitle) : ?>
-					<div class='fc_afterDisplayTitle' style='clear:both;'>
-						<?php echo $item->event->afterDisplayTitle; ?>
-					</div>
-				<?php endif; ?>
-			  <!-- EOF afterDisplayTitle -->
 						  
 				<!-- BOF item fields block aftertitle -->
 				<?php
@@ -181,28 +187,28 @@ foreach ($cat_items as $catid => $items) :
 					if ($item->fields[$name]->parameters->get('display_label', 0)) :
 						$label_str = $label.': ';
 					endif; ?>
-					<li class='flexi-field'>
+					<li class="flexi-field">
 					<?php echo $label_str.( isset($item->positions['aftertitle']->{$name}->display) ? $item->positions['aftertitle']->{$name}->display : ''); ?>
 					</li>
 				<?php endforeach; ?>
 				</ul>
 				<!-- EOF item fields block aftertitle -->
 			    
-		    <!-- BOF afterDisplayContent -->
-		    <?php if ($item->event->afterDisplayContent) : ?>
-					<div class='afterDisplayContent' style='clear:both;'>
+				<!-- BOF afterDisplayContent -->
+				<?php if ($item->event->afterDisplayContent) : ?>
+					<div class="fc_afterDisplayContent" style='clear:both;'>
 						<?php echo $item->event->afterDisplayContent; ?>
 					</div>
 				<?php endif; ?>
-		    <!-- EOF afterDisplayContent -->
+				<!-- EOF afterDisplayContent -->
 				
 				</li>
 			<?php endforeach; ?>
 			</ul>
 			
 		<?php endif; ?>
-			
-		</li>
+
+</li>
 <!-- EOF subcategory items -->
 		
 <?php endforeach; ?>
