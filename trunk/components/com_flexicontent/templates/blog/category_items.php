@@ -69,6 +69,14 @@ if ($leadnum) :
 				<?php endif; ?>
 			<?php endif; ?>
 					
+			<?php if ($this->params->get('show_comments_count')) : ?>
+				<?php if ( isset($this->comments[ $items[$i]->id ]->total) ) : ?>
+					<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+						<?php echo $this->comments[ $items[$i]->id ]->total; ?>
+					</div>
+				<?php endif; ?>
+			<?php endif; ?>
+			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
@@ -300,7 +308,7 @@ if ($leadnum) :
 					
 					<!-- BOF afterDisplayContent -->
 					<?php if ($items[$i]->event->afterDisplayContent) : ?>
-						<div class="afterDisplayContent group">
+						<div class="fc_afterDisplayContent group">
 							<?php echo $items[$i]->event->afterDisplayContent; ?>
 						</div>
 					<?php endif; ?>
@@ -341,6 +349,14 @@ if ($leadnum) :
 						<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
 						<?php if ($editbutton) : ?>
 							<div style="float:left;"><?php echo $editbutton;?></div>
+						<?php endif; ?>
+					<?php endif; ?>
+					
+					<?php if ($this->params->get('show_comments_count')) : ?>
+						<?php if ( isset($this->comments[ $items[$i]->id ]->total )) : ?>
+							<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+								<?php echo $this->comments[ $items[$i]->id ]->total; ?>
+							</div>
 						<?php endif; ?>
 					<?php endif; ?>
 					
@@ -574,7 +590,7 @@ if ($leadnum) :
 					
 					<!-- BOF afterDisplayContent -->
 					<?php if ($items[$i]->event->afterDisplayContent) : ?>
-						<div class="afterDisplayContent group">
+						<div class="fc_afterDisplayContent group">
 							<?php echo $items[$i]->event->afterDisplayContent; ?>
 						</div>
 

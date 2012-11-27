@@ -1709,6 +1709,20 @@ class FlexicontentModelItems extends JModel
 		}
 		
 		
+		// **********************************
+		// Delete favoured record of the item
+		// **********************************
+		$query = 'DELETE FROM #__flexicontent_favourites'
+				. ' WHERE itemid IN ('. $cids .')'
+				;
+		$this->_db->setQuery( $query );
+
+		if(!$this->_db->query()) {
+			$this->setError($this->_db->getErrorMsg());
+			return false;
+		}
+		
+		
 		// *****************************
 		// Delete item asset/ACL records
 		// *****************************

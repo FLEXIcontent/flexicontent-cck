@@ -398,8 +398,10 @@ class FlexicontentModelItems extends ParentClassItem
 		}
 		
 		// Covert metadata property string to parameters object
-		if (isset($this->_item->metadata)) {
+		if ( !empty($this->_item->metadata) ) {
 			$this->_item->metadata = new JParameter($this->_item->metadata);
+		} else {
+			$this->_item->metadata = new JParameter();
 		}
 		
 		// *********************************************

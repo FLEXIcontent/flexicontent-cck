@@ -59,7 +59,8 @@ class FLEXIcontentModelSearch extends JModel
 	 *
 	 * @since 1.5
 	 */
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 
 		$mainframe = &JFactory::getApplication();

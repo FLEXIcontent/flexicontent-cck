@@ -64,6 +64,14 @@ if ( $user->id && $this->params->get('show_editbutton', 0) ) :
 		endif;
 	endforeach;
 endif;
+
+// Decide whether to show the comments column
+$comments_non_zero = false;
+if ( $this->params->get('show_comments_count', 0) ) :
+	if ( isset($this->comments) && count($this->comments) ) :
+		$comments_non_zero = true;
+	endif;
+endif;
 ?>
 
 <?php
@@ -80,7 +88,7 @@ endif;
    		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
 			<thead>
 				<tr>
-		   		<?php if ($edit_button_exists || $this->params->get('show_title', 1)) : ?>
+		   		<?php if ($edit_button_exists || $comments_non_zero || $this->params->get('show_title', 1)) : ?>
 					<th id="flexi_title" scope="col">
 						<?php echo $this->params->get('show_title', 1) ? JText::_( 'FLEXI_ITEMS' ) : ''; ?>
 					</th>
@@ -99,7 +107,7 @@ endif;
 				<tr class="sectiontableentry">
 				
 				<!-- BOF item title -->
-				<?php if ($edit_button_exists || $this->params->get('show_title', 1)) : ?>
+				<?php if ($edit_button_exists || $comments_non_zero || $this->params->get('show_title', 1)) : ?>
 		   		<th scope="row" class="table-titles">
 						<?php if ($this->params->get('show_title', 1)) : ?>
 			   			<?php if ($this->params->get('link_titles', 0)) : ?>
@@ -107,6 +115,15 @@ endif;
 			   			<?php else : echo $item->title; endif; ?>
 		   			<?php endif; ?>
 		   			<?php echo !empty($item->editbutton) ? $item->editbutton : ''; ?>
+						
+						<?php if ($this->params->get('show_comments_count')) : ?>
+							<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
+								<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+									<?php echo $this->comments[ $item->id ]->total; ?>
+								</div>
+							<?php endif; ?>
+						<?php endif; ?>
+						
 					</th>
 				<?php endif; ?>
 				<!-- BOF item title -->

@@ -685,7 +685,7 @@ class flexicontent_html
 
 			$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
 			$caption = JText::_( 'FLEXI_APPROVAL_REQUEST' );
-			$output	= '<a style="float:right;	padding: 2px 2px 0px 0px !important;" href="'.$link.'" class="fc_bigbutton editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.$caption.'</a>';
+			$output	= '<a style="float:right;	padding: 2px 2px 0px 0px !important;" href="'.$link.'" class="fc_bigbutton rc5  editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.$caption.'</a>';
 
 			return $output;
 		}
