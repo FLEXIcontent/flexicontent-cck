@@ -951,7 +951,7 @@ class FlexicontentFields
 		
 		$indexable_fields = array('categories', 'tags', 'select', 'selectmultiple', 'checkbox', 'checkboximage', 'radio', 'radioimage');
 		
-		$field_vals = JRequest::getVar($field->name,'');
+		$field_vals = JRequest::getVar('filter_'.$field->id,'');
 		$field_vals = is_array($field_vals) ? $field_vals : array($field_vals);
 		
 		$values = array();
@@ -960,6 +960,7 @@ class FlexicontentFields
 			if ( strlen($val) ) $values[] = $val;
 		}
 		if ( !count($values) ) return;
+		//echo " &nbsp; :: &nbsp; "; print_r($values);
 		
 		// EITHER MATCH TEXT or VALUE IDs
 		if ( in_array($field->field_type, $indexable_fields) ) {

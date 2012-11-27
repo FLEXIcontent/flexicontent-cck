@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 	function plgFlexicontent_fieldsCheckbox( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -249,16 +249,16 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayField(&$field, &$item)
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($field->field_type != 'checkbox') return;
+		if($filter->field_type != 'checkbox') return;
 		
-		plgFlexicontent_fieldsCheckbox::onDisplayField($field, $item);
+		plgFlexicontent_fieldsCheckbox::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'checkbox') return;
@@ -321,7 +321,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		
 		
 		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-		$results = array_intersect_key($results, flexicontent_cats::getFilterValues($filter));
+		$view = JRequest::getVar('view');
+		$force_all = $view!='category';
+		$results = array_intersect_key($results, flexicontent_cats::getFilterValues($filter, $force_all));
 		
 		
 		// *** Create the select form field used for filtering
@@ -333,8 +335,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 		}
 		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
-		
+		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 	}
 	
 	

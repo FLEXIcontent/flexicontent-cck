@@ -1241,14 +1241,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayField(&$field, &$item) {
-		if($field->field_type != 'image') return;
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		if($filter->field_type != 'image') return;
 		
-		$field_type = $field->field_type;
-		$field->field_type = 'text';
-		$field->parameters->set( 'size', $field->parameters->get( 'adv_size', 30 ) );
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-		$field->field_type = 'image';
+		$size = (int)$filter->parameters->get( 'size', 30 );
+		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[0].'" />';
 	}
 	
 	

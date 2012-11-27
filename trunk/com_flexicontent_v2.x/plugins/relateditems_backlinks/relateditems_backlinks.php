@@ -394,7 +394,7 @@ class plgFlexicontent_fieldsRelateditems_backlinks extends JPlugin
 	// *********************************
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		/* execute the code only if the field type match the plugin type
 		if($filter->field_type != 'relateditems_backlinks') return;

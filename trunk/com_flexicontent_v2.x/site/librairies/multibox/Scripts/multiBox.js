@@ -14,7 +14,7 @@
 						  descClassName: 'multiBoxDesc',//the class name of the description divs
 						  path: './Files/',//path to mp3 and flv players
 						  useOverlay: true,//use a semi-transparent background. default: false;
-						  maxSize: {w:600, h:400},//max dimensions (width,height) - set to null to disable resizing
+						  maxSize: {w:1600, h:400},//max dimensions (width,height) - set to null to disable resizing
 						  addDownload: true,//do you want the files to be downloadable?
 						  pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
 						  addRollover: true,//add rollover fade to each multibox link

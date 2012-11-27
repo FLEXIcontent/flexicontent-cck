@@ -14,12 +14,10 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsLinkslist extends JPlugin
 {
-	
 	/**
 	 * Default attributes
 	 *
@@ -27,30 +25,39 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	 */
 	protected $_attribs = array();
 
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsLinkslist( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_linkslist', JPATH_ADMINISTRATOR);
 	}
 	
-	function onAdvSearchDisplayField(&$field, &$item) {
-		plgFlexicontent_fieldsLinkslist::onDisplayField($field, $item);
-	}
-
+	
+	
+	// *******************************************
+	// DISPLAY methods, item form & frontend views
+	// *******************************************
+	
+	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'linkslist') return;
+		
+		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
-		$field_elements		= $field->parameters->get( 'field_elements' ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
-		$default_values		= $field->parameters->get( 'default_values', '' ) ;
-
-		$required 			= $field->parameters->get( 'required', 0 ) ;
+		$default_values	= $field->parameters->get( 'default_values', '' ) ;
+		
+		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 
+		
 		switch($separator)
 		{
 			case 0:
@@ -69,6 +76,10 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			$separator = ',&nbsp;';
 			break;
 
+			//case 4:  // could cause problem in item form ?
+			//$separatorf = $closetag . $opentag;
+			//break;
+
 			default:
 			$separator = '&nbsp;';
 			break;
@@ -77,11 +88,11 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		// initialise property
 		if($item->version < 2 && $default_values) {
 			$field->value = explode(",", $default_values);
-		} elseif (!$field->value) {
+		} else if (!$field->value) {
 			$field->value = array();
 			$field->value[0] = '';
 		}
-
+		
 		if(strlen($field_elements) === 0) return $field->html = '<div id="fc-change-error" class="fc-error">Please enter at least one item. Example: <pre style="display:inline-block; margin:0">{"item1":{"name":"Item1"},"item2":{"name":"Item2"}}</pre></div>';
 		
 		$items = $this->prepare($field_elements);
@@ -97,37 +108,54 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		$field->html = implode($separator, $options);
 	}
 	
-	private function prepare($field_elements)
+	
+	// Method to create field's HTML display for frontend views
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$listelements = array_map('trim', explode('::', $field_elements));
-		$items = $matches = array();
-		foreach($listelements as $listelement)
+		$field->label = JText::_($field->label);
+		// execute the code only if the field type match the plugin type
+		if($field->field_type != 'linkslist') return;
+
+		$values = $values ? $values : $field->value;
+
+		// some parameter shortcuts
+		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
+		$type				= $field->parameters->get( 'list_type', 'ul' ) ;
+		$class				= $field->parameters->get( 'list_class', false ) ;
+		if($class) $class	= ' class="'.$class.'"';
+		$id					= $field->parameters->get( 'list_id', false ) ;
+		if($id) $id			= ' id="'.$id.'"';
+
+		$elements = $this->prepare($field_elements);
+		$items = array('<'.$type.$class.$id.'>');
+		foreach($elements as $name => $item)
 		{
-			preg_match("/\[(.*)\]/i", $listelement, $matches);
-			$name = trim(preg_replace("/\[(.*)\]/i", '', $listelement));
-			if(isset($matches[1]))
+			if(!in_array($name, $values)) continue;
+			$attr = $item;
+			$prefix = '';
+			$suffix = '';
+			if(isset($attr['href']))
 			{
-				$attribs	  = array();
-				$parts  	  = explode('"', str_replace('="', '"', $matches[1]));
-				$length		  = count($parts);
-				$range		  = range(0, $length, 2);
-				foreach($range as $i)
-				{
-					if(!isset($parts[$i+1])) continue;
-					$attribs[trim($parts[$i])] = $parts[$i+1];
-				}
-				$items[$name] = array_merge($this->_attribs, $attribs);
+				$prefix = '<a href="'.$attr['href'].'">';
+				$suffix = '</a>';
+				unset($attr['href']);
 			}
-			else
-			{
-				$items[$name] = $this->_attribs;
-			}
+			array_walk($attr, array($this, 'walk'), $name);
+			$attr = $attr ? ' '.implode(' ', $attr) : null;
+			$items[$name] = '<li'.$attr.'>'.$prefix.$name.$suffix.'</li>';
 		}
-		
-		return $items;
+		$items[] = '</'.$type.'>';
+		return $field->{$prop} = implode($items);
+		$field->{$prop} = implode($separatorf, $items);
 	}
-
-
+	
+	
+	
+	// **************************************************************
+	// METHODS HANDLING before & after saving / deleting field events
+	// **************************************************************
+	
+	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
@@ -168,54 +196,35 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			$field->search = '';
 		}
 	}
-
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
-	{
-		$field->label = JText::_($field->label);
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'linkslist') return;
-
-		$values = $values ? $values : $field->value;
-
-		// some parameter shortcuts
-		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
-		$type				= $field->parameters->get( 'list_type', 'ul' ) ;
-		$class				= $field->parameters->get( 'list_class', false ) ;
-		if($class) $class	= ' class="'.$class.'"';
-		$id					= $field->parameters->get( 'list_id', false ) ;
-		if($id) $id			= ' id="'.$id.'"';
-
-		$elements = $this->prepare($field_elements);
-		$items = array('<'.$type.$class.$id.'>');
-		foreach($elements as $name => $item)
-		{
-			if(!in_array($name, $values)) continue;
-			$attr = $item;
-			$prefix = '';
-			$suffix = '';
-			if(isset($attr['href']))
-			{
-				$prefix = '<a href="'.$attr['href'].'">';
-				$suffix = '</a>';
-				unset($attr['href']);
-			}
-			array_walk($attr, array($this, 'walk'), $name);
-			$attr = $attr ? ' '.implode(' ', $attr) : null;
-			$items[$name] = '<li'.$attr.'>'.$prefix.$name.$suffix.'</li>';
-		}
-		$items[] = '</'.$type.'>';
-		return $field->{$prop} = implode($items);
-		$field->{$prop} = implode($separatorf, $items);
+	
+	
+	// Method to take any actions/cleanups needed after field's values are saved into the DB
+	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
 	
-	function walk(&$value, $key)
-	{
-		if($key == 'href') $value = false;
-		$value = $key.'="'.$value.'"';
+	
+	// Method called just before the item is deleted to remove custom item data related to the field
+	function onBeforeDeleteField(&$field, &$item) {
 	}
-
-
-	function onDisplayFilter(&$filter, $value='')
+	
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		if($filter->field_type != 'linkslist') return;
+		
+		$size = (int)$filter->parameters->get( 'size', 30 );
+		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[0].'" />';
+	}
+	
+	
+	// Method to display a category filter for the category view
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'linkslist') return;
@@ -241,4 +250,48 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			
 		$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
 	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
+	private function prepare($field_elements)
+	{
+		$listelements = array_map('trim', explode('::', $field_elements));
+		$items = $matches = array();
+		foreach($listelements as $listelement)
+		{
+			preg_match("/\[(.*)\]/i", $listelement, $matches);
+			$name = trim(preg_replace("/\[(.*)\]/i", '', $listelement));
+			if(isset($matches[1]))
+			{
+				$attribs	  = array();
+				$parts  	  = explode('"', str_replace('="', '"', $matches[1]));
+				$length		  = count($parts);
+				$range		  = range(0, $length, 2);
+				foreach($range as $i)
+				{
+					if(!isset($parts[$i+1])) continue;
+					$attribs[trim($parts[$i])] = $parts[$i+1];
+				}
+				$items[$name] = array_merge($this->_attribs, $attribs);
+			}
+			else
+			{
+				$items[$name] = $this->_attribs;
+			}
+		}
+		
+		return $items;
+	}	
+	
+	
+	function walk(&$value, $key)
+	{
+		if($key == 'href') $value = false;
+		$value = $key.'="'.$value.'"';
+	}
+	
 }
