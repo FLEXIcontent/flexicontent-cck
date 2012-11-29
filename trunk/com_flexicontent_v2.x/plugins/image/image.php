@@ -660,7 +660,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$default_image = $field->parameters->get( 'default_image', '');
 		if ( $default_image ) {
 			$default_image_val = array();
-			$default_image_val['is_default_image'] = true;
+			$default_image_val['is_default_value'] = true;
 			$default_image_val['default_image'] = $default_image;
 			$default_image_val['originalname'] = basename($default_image);
 			$default_image_val['alt'] = $default_alt;
@@ -891,7 +891,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$i++;
 			
 			// Create path to the image file
-			if ( !$image_source || !empty($value['is_default_image']) ) {
+			if ( !$image_source || !empty($value['is_default_value']) ) {
 				$img_folder  = $dir;
 				$img_urlpath = $dir;
 			} else {
@@ -1582,7 +1582,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ******************************
 		// Find out path to original file
 		// ******************************
-		if (empty($value['is_default_image'])) {
+		if (empty($value['is_default_value'])) {
 			
 			if ( $image_source ) {
 				$onlypath  = JPath::clean( JPATH_SITE .DS. $dir .DS. 'item_'.$field->item_id . '_field_'.$field->id .DS. 'original' .DS );
