@@ -137,7 +137,9 @@ class FlexicontentViewFlexicontent extends JView
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			if (FLEXI_J16GE)
-				$initialpermission	= $model->checkInitialPermission();  // For J1.7
+				$initialpermission	= $model->checkInitialPermission();  // For J1.6+
+			else
+				$model->checkExtraAclRules();  // For J1.5
 		}
 		
 		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER

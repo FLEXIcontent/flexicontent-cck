@@ -183,6 +183,7 @@ class FlexicontentModelItemelement extends JModel
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$user = JFactory::getUser();
 		
 		$langparent_item = $mainframe->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
 		$type_id         = $mainframe->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
@@ -249,15 +250,23 @@ class FlexicontentModelItemelement extends JModel
 			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
 		}
 		
-		/*$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
+		/*if (FLEXI_J16GE) {
 			$isAdmin = JAccess::check($user->id, 'core.admin', 'root.1');
 		} else {
 			$isAdmin = $user->gid >= 24;
 		}*/
 		
-		if ($langparent_item && $created_by) {
-			$where[] = ' i.created_by='.$created_by;
+		if ( FLEXI_J16GE )
+			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+		else if (FLEXI_ACCESS)
+			$assocanytrans = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'assocanytrans', 'users', $user->gmid) : 1;
+		else
+			$assocanytrans = $user->gid >= 24;  // is at least admin
+		
+		if ( !$assocanytrans ) {
+			if ($langparent_item && $created_by) {
+				$where[] = ' i.created_by='.$created_by;
+			}
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

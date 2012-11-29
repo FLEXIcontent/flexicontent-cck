@@ -109,7 +109,7 @@ class FlexicontentViewField extends JView {
 		// ADVANCED SEARCHABLE FIELDS
 		$core_advsearch = array('title', 'maintext', 'tags', 'categories');
 		
-		if($row->field_type)
+		if ($row->field_type)
 		{
 			// load plugin's english language file then override with current language file
 			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
@@ -127,6 +127,7 @@ class FlexicontentViewField extends JView {
 			}
 			
 			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
+			$supportvalueseditable = !$row->iscore;
 		}
 				
 		//build selectlists
@@ -137,7 +138,14 @@ class FlexicontentViewField extends JView {
 		$formhidden[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_BACKEND' ) );
 		$formhidden[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_BOTH' ) );
 		$formhidden_fieldname = FLEXI_J16GE ? 'jform[formhidden]' : 'formhidden';
-		$lists['formhidden'] = JHTML::_('select.genericlist',   $formhidden, $formhidden_fieldname, '', 'value', 'text', $row->formhidden );
+		$lists['formhidden'] = JHTML::_('select.radiolist',   $formhidden, $formhidden_fieldname, '', 'value', 'text', $row->formhidden );
+		
+		if (FLEXI_ACCESS) {
+			$valueseditable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_EDITOR' ) );
+			$valueseditable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_PERMISSION' ) );
+			$valueseditable_fieldname = FLEXI_J16GE ? 'jform[valueseditable]' : 'valueseditable';
+			$lists['valueseditable'] = JHTML::_('select.radiolist',   $valueseditable, $valueseditable_fieldname, '', 'value', 'text', $row->valueseditable );
+		}
 		
 		//build type select list
 		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
@@ -181,7 +189,9 @@ class FlexicontentViewField extends JView {
 		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
 		if (FLEXI_ACCESS) {
-			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+			$lang = & JFactory::getLanguage();
+			$lang->_strings['FLEXIACCESS_PADD'] = 'Edit-Value';
+			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 1, 0, 1, 0, 1, 0, 1, 1 );
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
 		}
@@ -220,7 +230,8 @@ class FlexicontentViewField extends JView {
 		$this->assignRef('supportsearch'           , $supportsearch);
 		$this->assignRef('supportadvsearch'        , $supportadvsearch);
 		$this->assignRef('supportfilter'           , $supportfilter);
-		$this->assignRef('supportuntranslatable'  , $supportuntranslatable);
+		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
+		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
 
 		parent::display($tpl);
 	}

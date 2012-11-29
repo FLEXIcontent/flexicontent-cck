@@ -106,6 +106,19 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('formhidden'); ?>
 						</td>
 					</tr>
+					
+					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+					<tr<?php echo !$this->supportvalueseditable?' style="display:none;"':'';?>>
+						<td class="key">
+							<?php echo $this->form->getLabel('valueseditable').':'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('valueseditable'); ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+					
+					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('access').':'; ?>
@@ -114,6 +127,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('access'); ?>
 						</td>
 					</tr>
+					<?php endif; ?>
+					
 					<?php if ($this->form->getValue("iscore") == 0) : ?>
 					<tr>
 						<td class="key">

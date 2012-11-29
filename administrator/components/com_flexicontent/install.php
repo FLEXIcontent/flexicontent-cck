@@ -305,7 +305,7 @@ $deprecated_fields = $db->loadResult();
 			$result = false;
 			if(!in_array('untranslatable', $fields_tbl_cols)) {
 				$already = false;
-				$query = "ALTER TABLE`#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
+				$query = "ALTER TABLE `#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
 				$db->setQuery($query);
 				$result = $db->query();
 			}
@@ -335,7 +335,7 @@ $deprecated_fields = $db->loadResult();
 			$result = false;
 			if(!in_array('formhidden', $fields_tbl_cols)) {
 				$already = false;
-				$query = "ALTER TABLE`#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
+				$query = "ALTER TABLE `#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
 				$db->setQuery($query);
 				$result = $db->query();
 			}
@@ -354,5 +354,36 @@ $deprecated_fields = $db->loadResult();
 				?></span>
 			</td>
 		</tr>
+
+<?php
+// Alter DB table flexicontent_fields: Add valueseditable column
+?>
+		<tr class="row1">
+			<td class="key">Run SQL "ALTER TABLE `...__flexicontent_fields` ADD `valueseditable` TEXT NOT NULL AFTER `formhidden`"
+			<?php
+			$already = true;
+			$result = false;
+			if(!in_array('valueseditable', $fields_tbl_cols)) {
+				$already = false;
+				$query = "ALTER TABLE `#__flexicontent_fields` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			?>
+			</td>
+			<td>
+				<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+				<span style="<?php echo $style; ?>"><?php
+				if($already) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'valueseditable' already exists.");
+				} elseif($result) {
+					echo JText::_("Task <b>SUCCESSFUL</b>: Column 'valueseditable' added.");
+				} else {
+					echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+				}
+				?></span>
+			</td>
+		</tr>
+
 	</tbody>
 </table>

@@ -1965,6 +1965,7 @@ class ParentClassItem extends JModelAdmin
 		$app = & JFactory::getApplication();
 		$dispatcher = & JDispatcher::getInstance();
 		$cparams =& $this->_cparams;
+		$user = & JFactory::getUser();
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
 
@@ -2008,10 +2009,18 @@ class ParentClassItem extends JModelAdmin
 				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 				$field->item_vstate = $data['vstate'];
 				
-				// FORM HIDDEN FIELDS (FRONTEND/BACKEND): maintain their DB value ...
+				if (FLEXI_J16GE)
+					$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+				else if (FLEXI_ACCESS && $user->gid < 25)
+					$is_editable = !$field->valueseditable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'field', $field->id);
+				else
+					$is_editable = 1;
+				
+				// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
 				if (
 					( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) )
+					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
+					!$is_editable
 				) {
 					$postdata[$field->name] = $field->value;
 					

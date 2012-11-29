@@ -852,7 +852,7 @@ div.col {
 }
 
 div fieldset label.radiobtn {
-	padding-right:12px;
+	padding-right: 8px;
 	min-width:0px;
 	margin: 0px 0px 0px 2px;
 	float: left;
@@ -894,7 +894,7 @@ div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl {
 }
 
 div fieldset label {
-	margin:2px;
+	margin: 2px 8px 2px 2px;
 	clear: none;
 }
 div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
@@ -993,13 +993,13 @@ div table.admintable td {
 	padding: 2px 4px 2px 8px;
 }
 div table.admintable td.key, div table.admintable td.paramlist_key {
-    background-color: #F6F6F6;
-    border-bottom: 1px solid #E9E9E9;
-    border-right: 1px solid #E9E9E9;
-    color: #666666;
-    font-weight: bold;
-    text-align: right;
-    width: 140px;
+	background-color: #F6F6F6;
+	border-bottom: 1px solid #E9E9E9;
+	border-right: 1px solid #E9E9E9;
+	color: #666666;
+	font-weight: bold;
+	text-align: right;
+	width: 140px;
 	padding: 2px 4px 2px 4px;
 }
 
@@ -1008,6 +1008,13 @@ div div#element-box div.m {
 }
 
 fieldset.adminform fieldset.radio, fieldset.panelform fieldset.radio, fieldset.adminform-legacy fieldset.radio {
+    border: 0 none;
+    float: left;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+table.admintable fieldset {
     border: 0 none;
     float: left;
     margin: 0 !important;

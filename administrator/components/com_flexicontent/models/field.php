@@ -193,6 +193,7 @@ class FlexicontentModelField extends JModel
 			$field->isadvsearch		= 0;
 			$field->untranslatable= 0;
 			$field->formhidden		= 0;
+			$field->valueseditable= 0;
 			$field->positions			= array();
 			$field->published			= 1;
 			$field->attribs				= null;

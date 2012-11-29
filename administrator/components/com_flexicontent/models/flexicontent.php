@@ -716,8 +716,48 @@ class FlexicontentModelFlexicontent extends JModel
 		return false;
 	}
 
-
-
+	/**
+	 * Method to check and add some extra FLEXIcontent specific ACL rules
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function checkExtraAclRules()
+	{
+		if (FLEXI_ACCESS)
+		{
+			$db = & $this->_db;
+			
+			// COMMENTED out, instead we will use field's 'submit' privilege
+			/*$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editvalue' AND axosection='fields'";
+			$db->setQuery($query);
+			$editvalue_rule = $db->loadResult();
+			
+			if (!$editvalue_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'editvalue', 'fields', '', 'Edit Field Values', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
+			}*/
+			
+			$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='associate_any_item'";
+			$db->setQuery($query);
+			$associate_any_item_rule = $db->loadResult();
+			
+			if (!$associate_any_item_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'associateanyitem', '', '', 'Associate any translation', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
+			}
+		}
+	}
+	
+	
 	/**
 	 * Fetch the version from the flexicontent.org server
 	 * TODO: Cleanup

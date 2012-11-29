@@ -707,8 +707,48 @@ class FlexicontentModelFlexicontent extends JModel
 		return false;
 	}
 
-
-
+	/**
+	 * Method to check and add some extra FLEXIcontent specific ACL rules
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function checkExtraAclRules()
+	{
+		if (FLEXI_ACCESS)
+		{
+			$db = & $this->_db;
+			
+			// COMMENTED out, instead we will use field's 'submit' privilege
+			/*$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editvalue' AND axosection='fields'";
+			$db->setQuery($query);
+			$editvalue_rule = $db->loadResult();
+			
+			if (!$editvalue_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'editvalue', 'fields', '', 'Edit Field Values', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
+			}*/
+			
+			$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
+			$db->setQuery($query);
+			$assocanytrans_rule = $db->loadResult();
+			
+			if (!$assocanytrans_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'assocanytrans', '', '', 'Associate any translation', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
+			}
+		}
+	}
+	
+	
 	/**
 	 * Fetch the version from the flexicontent.org server
 	 * TODO: Cleanup
@@ -1619,6 +1659,7 @@ class FlexicontentModelFlexicontent extends JModel
 			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
 				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
+			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  //CanEditFieldValues
 		}
 		
 		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...
