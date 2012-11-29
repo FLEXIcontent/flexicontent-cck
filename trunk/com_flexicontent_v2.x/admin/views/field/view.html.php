@@ -110,7 +110,7 @@ class FlexicontentViewField extends JView {
 		// ADVANCED SEARCHABLE FIELDS
 		$core_advsearch = array('title', 'maintext', 'tags', 'categories');
 		
-		if($row->field_type)
+		if ($row->field_type)
 		{
 			// load plugin's english language file then override with current language file
 			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
@@ -128,6 +128,7 @@ class FlexicontentViewField extends JView {
 			}
 			
 			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
+			$supportvalueseditable = !$row->iscore;
 		}
 
 		//build field_type list
@@ -177,7 +178,8 @@ class FlexicontentViewField extends JView {
 		$this->assignRef('supportsearch'           , $supportsearch);
 		$this->assignRef('supportadvsearch'        , $supportadvsearch);
 		$this->assignRef('supportfilter'           , $supportfilter);
-		$this->assignRef('supportuntranslatable'  , $supportuntranslatable);
+		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
+		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
 
 		parent::display($tpl);
 	}

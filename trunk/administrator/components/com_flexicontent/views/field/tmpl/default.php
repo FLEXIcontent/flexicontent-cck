@@ -139,7 +139,21 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->lists['formhidden']; ?>
 						</td>
 					</tr>
-					<?php if (!FLEXI_ACCESS) : ?>
+					
+					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+					<tr<?php echo !$this->supportvalueseditable?' style="display:none;"':'';?>>
+						<td class="key">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_VALUES_EDITABLE_BY').'::'.JText::_('FLEXI_VALUES_EDITABLE_BY_DESC');?>">
+								<?php echo JText::_( 'FLEXI_VALUES_EDITABLE_BY' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['valueseditable']; ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+					
+					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
 							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_ACCESS_LEVEL').'::'.JText::_('FLEXI_FIELD_ACCESSLEVEL_DESC');?>">
@@ -151,6 +165,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					<?php endif; ?>
+					
 					<?php if ($this->row->iscore == 0) : ?>
 					<tr>
 						<td class="key">

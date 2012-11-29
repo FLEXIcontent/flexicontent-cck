@@ -14,11 +14,15 @@
 	<field name="isadvsearch" type="booleanlist" default="1" label="FLEXI_FIELD_IS_ADVANCED_SEARCHABLE" description ="FLEXI_FIELD_IS_ADVSEARCH_DESC" class="inputbox" />
 	<field name="untranslatable" type="booleanlist" default="0" label="FLEXI_FIELD_UNTRANSLATABLE" description ="FLEXI_FIELD_UNTRANSLATABLE_DESC" class="inputbox" />
 
-	<field name="formhidden" type="list" default="0" label="FLEXI_FORM_HIDDEN" description="FLEXI_FORM_HIDDEN_DESC">
+	<field name="formhidden" type="radio" default="0" label="FLEXI_FORM_HIDDEN" description="FLEXI_FORM_HIDDEN_DESC">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_FRONTEND</option>
 		<option value="2">FLEXI_BACKEND</option>
 		<option value="3">FLEXI_BOTH</option>
+	</field>
+	<field name="valueseditable" type="radio" default="0" label="FLEXI_VALUES_EDITABLE_BY" description="FLEXI_VALUES_EDITABLE_BY_DESC">
+		<option value="0">FLEXI_ANY_EDITOR</option>
+		<option value="1">FLEXI_USE_ACL_PERMISSION</option>
 	</field>
 
 	<field name="published" type="booleanlist" default="1" label="FLEXI_PUBLISHED" description ="FLEXI_FIELD_PUBLISHED_DESC" class="inputbox" />

@@ -26,10 +26,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewField extends JView {
-
+class FlexicontentViewField extends JView
+{
 	function display($tpl = null) {
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 		$user 		= & JFactory::getUser();
 
 		JHTML::_('behavior.tooltip');
@@ -39,30 +39,45 @@ class FlexicontentViewField extends JView {
 		$field_type = JRequest::getVar( 'field_type', 0 );
 		
 		//Get data from the model
-		$model			= & $this->getModel();
-		$row     			= & $this->get( 'Field' );
-		//var_dump($model);
-		//Import File system
-		jimport('joomla.filesystem.file');
+		$model = & $this->getModel();
+		if (FLEXI_J16GE) {
+			$form = $this->get('Form');
+			
+			//Import File system
+			jimport('joomla.filesystem.file');
 		
-		// Create the form
-		$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
-		if (JFile::exists( $pluginpath )) {
-			$form = new JParameter('', $pluginpath);
+			// Create the form
+			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
+			if (JFile::exists( $pluginpath )) {
+				$form = new JParameter('', $pluginpath);
+			} else {
+				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
+			}
+			$form->loadINI($row->attribs);
+			
 		} else {
-			$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
+			$row = & $this->get( 'Field' );
 		}
-		$form->loadINI($row->attribs);
+		
+		$isnew = FLEXI_J16GE ? !$form->getValue('id') : !$row->id;
+		
 		// fail if checked out not by 'me'
-		if ($row->id) {
+		if ( !$isnew ) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
+		
 		if ($field_type)
 		{
-			echo $form->render('params', 'group-' . $field_type );
+			if (!FLEXI_J16GE) {
+				echo $form->render('params', 'group-' . $field_type );
+			} else {
+				foreach ($form->getFieldset('group-' . $field_type) as $field) {
+					echo '<fieldset class="panelform">' . $field->label . $field->input . '</fieldset>' . "\n";
+				}
+			}
 		} else {
 			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 		}

@@ -23,6 +23,7 @@
 		<action name="flexicontent.orderitems" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
 		<action name="flexicontent.paramsitem" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; set params" description="Allow users in the group to change the parameters of editable items." />
 		<action name="flexicontent.versioning" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; use versions" description="Allow users in the group to use multiple Versions per Item" />
+		<action name="flexicontent.assocanytrans" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; associate any translation" description="Allow users in the group to associate translations (items) authored by any user" />
 		
 		<!-- CATEGORIES: management tab and usage -->
 		<action name="flexicontent.managecats" title="&lt;b&gt;Categories: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the Category Management. NOTE: the inherited privileges of each category are in effect. Thus the user can only perform specific actions on specific categories" />		
@@ -46,7 +47,8 @@
 		<action name="flexicontent.copyfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Copy Task" description="Allow users in the group to use the Field Copy Task (in fields management)" />
 		<action name="flexicontent.orderfields" title="&lt;b&gt;Fields (&lt;span style&#61;&#34;color:darkred&#34;&gt;Backend Tab&lt;/span&gt;):&lt;/b&gt; Reorder" description="Allow users in the group to change the ordering of fields (in fields management)" />
 		<action name="flexicontent.createfield" title="&lt;b&gt;Fields:&lt;/b&gt; create" description="Allow users in the group to create fields" />
-		<action name="flexicontent.editfield" title="&lt;b&gt;Fields:&lt;/b&gt; edit" description="Allow users in the group to edit fields" />
+		<action name="flexicontent.editfieldvalues" title="&lt;b&gt;Fields:&lt;/b&gt; edit values" description="Allow users in the group to edit field values" />
+		<action name="flexicontent.editfield" title="&lt;b&gt;Fields:&lt;/b&gt; edit configuration" description="Allow users in the group to edit fields" />
 		<action name="flexicontent.publishfield" title="&lt;b&gt;Fields:&lt;/b&gt; publish" description="Allow users in the group to publish fields" />
 		<action name="flexicontent.deletefield" title="&lt;b&gt;Fields:&lt;/b&gt; delete" description="Allow users in the group to delete fields" />
 		
@@ -85,9 +87,10 @@
 	</section>
 	
 	<section name="field">
-		<action name="flexicontent.editfield" title="edit" description="This field can be edited by members of this user group" />
-		<action name="flexicontent.deletefield" title="delete" description="This field can be deleted by members of this user group" />
-		<action name="flexicontent.publishfield" title="publish" description="This field can be publiished by members of this user group" />
+		<action name="flexicontent.editfieldvalues" title="edit values" description="This field's -values- (item form) can be edited by members of this user group" />
+		<action name="flexicontent.editfield" title="edit configuration" description="This field can be edited by members of this user group" />
+		<action name="flexicontent.deletefield" title="delete field" description="This field can be deleted by members of this user group" />
+		<action name="flexicontent.publishfield" title="publish field" description="This field can be publiished by members of this user group" />
 	</section>
 	
 </access>

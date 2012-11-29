@@ -110,7 +110,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		}
 		
 		if (!$viewtree) {
-			$field->html = 'User not allowed to see category tree';
+			$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_VIEW_CATEGORY_TREE') . '</div>';
 			return;
 		}
 		//ob_start();		print_r($field->value);		$field->html = ob_get_contents();    ob_end_clean();
