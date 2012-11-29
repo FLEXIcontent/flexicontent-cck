@@ -187,6 +187,9 @@ $result = $db->query();
 	<tbody>
 
 <?php
+$deprecated_fields_arr = "`hidden`";
+$deprecated_fields = "`". implode("`,`", $deprecated_fields_arr) ."`";
+
 // Get DB table information
 
 $query = "SHOW COLUMNS FROM #__flexicontent_files";
@@ -201,7 +204,7 @@ $query = "SHOW COLUMNS FROM #__flexicontent_advsearch_index";
 $db->setQuery($query);
 $advsearch_index_tbl_cols = $db->loadResultArray();
 
-$query = "SELECT count(*) FROM `#__flexicontent_fields` WHERE field_type IN (`hidden`)";
+$query = "SELECT count(*) FROM `#__flexicontent_fields` WHERE field_type IN (".$deprecated_fields.")";
 $db->setQuery($query);
 $deprecated_fields = $db->loadResult();
 ?>
@@ -210,13 +213,13 @@ $deprecated_fields = $db->loadResult();
 // Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 ?>
 		<tr class="row0">
-			<td class="key">Run SQL "UPDATE `...__flexicontent_fields` SET field_type=`text` WHERE field_type IN (`hidden`,`textselect`)"
+			<td class="key">Run SQL "UPDATE `...__flexicontent_fields` SET field_type=`text` WHERE field_type IN (<?php echo $deprecated_fields; ?>)"
 			<?php
 			$already = true;
 			$result = false;
 			if( $deprecated_fields ) {
 				$already = false;
-				$query = "UPDATE `#__flexicontent_fields` SET field_type=`text` WHERE field_type IN (`hidden`,`textselect`)";
+				$query = "UPDATE `#__flexicontent_fields` SET field_type=`text` WHERE field_type IN (".$deprecated_fields.")";
 				$db->setQuery($query);
 				$result = $db->query();
 			}

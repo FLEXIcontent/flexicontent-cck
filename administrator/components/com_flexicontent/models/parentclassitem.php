@@ -1746,7 +1746,7 @@ class ParentClassItem extends JModel
 		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
 			$lang_parent_id = $item->lang_parent_id;
 			$item->lang_parent_id = $isnew ? 0 : $item->id;
-			if ( $item->lang_parent_id != $lang_parent_id ) {
+			if ( $item->lang_parent_id != $lang_parent_id && $lang_parent_id ) {
 				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'message' );
 			}
 		}
@@ -3718,14 +3718,14 @@ class ParentClassItem extends JModel
 		
 		// Number of submitted items
 		if ( $submitted) {
-			$approve_str = submitted > 1 ? 'FLEXI_APPROVAL_ITEMS_SUBMITTED' : 'FLEXI_APPROVAL_ITEM_SUBMITTED';
-			$msg = $submitted . JText::_( $approve_str ) .' '. $msg;
+			$approve_str = $submitted > 1 ? 'FLEXI_APPROVAL_ITEMS_SUBMITTED' : 'FLEXI_APPROVAL_ITEM_SUBMITTED';
+			$msg = ($submitted > 1 ? $submitted : '') . JText::_( $approve_str );
 		} else {
 			$msg = JText::_( 'FLEXI_APPROVAL_NO_ITEMS_SUBMITTED' );
 		}
 			
 		// Number of excluded items, and message that items must be owned and in draft state
-		$excluded = count($cid) - submitted;
+		$excluded = count($cid) - $submitted;
 		$msg .= $excluded  ?  ' '. $excluded .' '. JText::_( 'FLEXI_APPROVAL_ITEMS_EXCLUDED' )  :  '';
 		
 		// Message about excluded publishable items, that can be published by the owner

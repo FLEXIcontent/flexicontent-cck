@@ -336,12 +336,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			// ALTERNATIVE 2
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-		} else if ($user->gid >= 25) {
-			$canEdit = true;
-		} else if (FLEXI_ACCESS) {
+		} else if (FLEXI_ACCESS && $user->gid < 25) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
 			$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 		} else {
+			// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
 			$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 		}
 		
@@ -517,6 +516,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else if (FLEXI_ACCESS) {
 			$canCopy = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
 		} else {
+			// no global privilege we will check edit privilege bellow (for backend users it will be always true)
 			$canCopy = 1;
 		}
 		
@@ -545,12 +545,14 @@ class FlexicontentControllerItems extends FlexicontentController
 					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn = in_array('edit.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				} else if (!FLEXI_ACCESS || $user->gid > 24) {
-					$canEdit = $canEditOwn = true;
-				} else if (FLEXI_ACCESS) {
+				} else if (FLEXI_ACCESS && $user->gid < 25) {
 					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('editown', $rights) && $itemdata[$id]->created_by == $user->id;
+				} else {
+					// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
+					$canEdit = $user->authorize('com_content', 'edit', 'content', 'all');
+					$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id');
 				}
 					
 				if ( $canEdit || $canEditOwn ) {
@@ -620,6 +622,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else if (FLEXI_ACCESS) {
 			$canCopy = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
 		} else {
+			// no global privilege we will check edit privilege bellow (for backend users it will be always true)
 			$canCopy = 1;
 		}
 		
@@ -648,14 +651,16 @@ class FlexicontentControllerItems extends FlexicontentController
 					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn = in_array('edit.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				} else if (!FLEXI_ACCESS || $user->gid > 24) {
-					$canEdit = $canEditOwn = true;
-				} else if (FLEXI_ACCESS) {
+				} else if (FLEXI_ACCESS && $user->gid < 25) {
 					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('editown', $rights) && $itemdata[$id]->created_by == $user->id;
+				} else {
+					// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
+					$canEdit = $user->authorize('com_content', 'edit', 'content', 'all');
+					$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id');
 				}
-					
+				
 				if ( $canEdit || $canEditOwn ) {
 					$auth_cid[] = $id;
 				} else {
@@ -1224,6 +1229,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				} else if (FLEXI_ACCESS) {
 					$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
 				} else {
+					// Only admin or super admin can check-in
 					$canCheckin = $user->gid >= 24;
 				}
 				if ( !$canCheckin && $table->checked_out != $user->id) {
@@ -1384,11 +1390,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					// ...
 					$permission = FlexicontentHelperPerm::getPerm();
 					$has_archive    = $permission->CanArchives;
-				} else if ($user->gid >= 25) {
-					$has_edit_state = true;
-					$has_delete     = true;
-					$has_archive    = true;
-				} else if (FLEXI_ACCESS) {
+				} else if (FLEXI_ACCESS && $user->gid < 25) {
 					$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
 					$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $itemdata[$id]->created_by == $user->get('id')) ;
 					$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $itemdata[$id]->created_by == $user->get('id')) ;
@@ -1500,12 +1502,13 @@ class FlexicontentControllerItems extends FlexicontentController
 					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
 					$canDelete 		= in_array('delete', $rights);
 					$canDeleteOwn = in_array('delete.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				} else if (!FLEXI_ACCESS || $user->gid > 24) {
-					$canDelete = $canDeleteOwn = true;
-				} else if (FLEXI_ACCESS) {
+				} else if (FLEXI_ACCESS && $user->gid < 25) {
 					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $itemdata[$id]->id, $itemdata[$id]->catid);
 					$canDelete 		= in_array('delete', $rights);
 					$canDeleteOwn	= in_array('deleteown', $rights) && $itemdata[$id]->created_by == $user->id;
+				} else {
+					$canDelete    = $user->gid >= 23; // is at least manager
+					$canDeleteOwn = $user->gid >= 23; // is at least manager
 				}
 				
 				if ( $canDelete || $canDeleteOwn ) {
@@ -1779,6 +1782,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$CanNewTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'newtags', 'users', $user->gmid) : 1;
 			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
 		} else {
+			// no FLEXIAccess everybody can create / use tags
 			$CanNewTags = 1;
 			$CanUseTags = 1;
 		}
@@ -1973,6 +1977,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else if (FLEXI_ACCESS) {
 			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
 		} else {
+			// no FLEXIAccess everybody can create / use tags
 			$CanUseTags = 1;
 		}
 		if($CanUseTags) {
@@ -2015,9 +2020,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			$auth_delete   = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
 			$auth_archive  = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 		} else {
-			$auth_publish = 1;
-			$auth_delete  = 1;
-			$auth_archive = 1;
+			$auth_publish = $user->authorize('com_content', 'publish', 'content', 'all');
+			$auth_delete  = $user->gid >= 23; // is at least manager
+			$auth_archive = $user->gid >= 23; // is at least manager
 		}
 		
 		if($auth_publish || $auth_archive || $auth_delete) {
