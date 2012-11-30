@@ -79,7 +79,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		// initialise property
 		$default_values		= '';
-		if( !$field->value && $item->version < 2 && $default_values) {
+		if( $item->version == 0 && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();

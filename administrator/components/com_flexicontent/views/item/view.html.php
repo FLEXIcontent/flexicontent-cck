@@ -138,13 +138,13 @@ class FlexicontentViewItem extends JView
 		// Common Buttons
 		if (FLEXI_J16GE) {
 			JToolBarHelper::apply('items.apply');
-			JToolBarHelper::save('items.save');
-			JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			if (!$isnew || $row->version) JToolBarHelper::save('items.save');
+			if (!$isnew || $row->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 			JToolBarHelper::cancel('items.cancel');
 		} else {
 			JToolBarHelper::apply();
-			JToolBarHelper::save();
-			JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			if (!$isnew || $row->version) JToolBarHelper::save();
+			if (!$isnew || $row->version) JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 			JToolBarHelper::cancel();
 		}
 		

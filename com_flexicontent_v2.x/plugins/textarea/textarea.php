@@ -137,7 +137,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// initialise property
 		if($field->field_type == 'textarea') {
-			if($item->version < 2 && $default_value) {
+			if($item->version == 0 && $default_value) {
 				$field->value = array();
 				$field->value[0] = JText::_($default_value);
 			} elseif (!$field->value) {

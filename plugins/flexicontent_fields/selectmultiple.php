@@ -63,7 +63,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 
 		// initialise property
-		if($item->version < 2 && $default_values) {
+		if(!$field->value && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();

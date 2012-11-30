@@ -86,8 +86,11 @@ var itemscreen = new Class(
 
 	reseter: function( task, id, div, url )
 	{
+		var doname = div;
+		var loader_html = '<p class="qf_centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>';
 	  var url = url+'&format=raw&task='+task+'&id='+id;
 		if (MooTools.version>='1.2.4') {
+			$(doname).set('html', loader_html);
 			new Request.HTML({
 				url: url,
 				method: 'get',
@@ -95,6 +98,7 @@ var itemscreen = new Class(
 				evalScripts: false
 			}).send();
 		} else {
+			$(doname).setHTML(loader_html);
 			var resetajax = new Ajax(url, {
 				method: 'get',
 				update: $(div),

@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 	function plgFlexicontent_fieldsCheckbox( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-        	JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_checkbox', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		}
 
 		// initialise property
-		if($item->version < 2 && $default_values) {
+		if(!$field->value && $default_values) {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
 			$field->value = array();

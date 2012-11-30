@@ -599,6 +599,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<?php
 				} else if ($this->row->id == 0) {
 				?>
+					<input name="jform[type_id_not_set]" value="1" type="hidden" />
 					<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 				<?php
 				} else {

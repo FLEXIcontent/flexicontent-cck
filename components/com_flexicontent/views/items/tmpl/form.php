@@ -678,6 +678,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	</fieldset>
 
 <?php elseif ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+		<input name="type_id_not_set" value="1" type="hidden" />
 		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 <?php else : // existing item that has no custom fields, warn the user ?>
 		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>

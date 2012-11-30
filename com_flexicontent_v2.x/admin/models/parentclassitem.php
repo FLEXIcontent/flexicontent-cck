@@ -1773,6 +1773,9 @@ class ParentClassItem extends JModelAdmin
 			// using versioning, increment last version numbering, or keep current version number if new version was not approved
 			$item->version = $isnew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
 		}
+		// *** Item version should be zero when form was loaded with no type id,
+		// *** thus next item form load will load default values of custom fields
+		$item->version = ($isnew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
 		
 		
 		// *********************************************************************************************
@@ -1906,7 +1909,7 @@ class ParentClassItem extends JModelAdmin
 		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id			= (int)$item->id;
-			$v->version_id	= (int)$last_version+1;
+			$v->version_id	= ($isnew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
 			$v->created			= $item->created;
 			$v->created_by	= $item->created_by;
 			if ($item->modified != $nullDate) {
@@ -2099,6 +2102,9 @@ class ParentClassItem extends JModelAdmin
 		// *******************************************************************************************
 		if ($fields)
 		{
+			// Do not save if versioning disabled or item has no type (version 0)
+			$record_versioned_data = $use_versioning && $item->version;
+			
 			foreach($fields as $field)
 			{
 				// Delete field values in all translating items, if current field is untranslatable and current item version is approved
@@ -2120,20 +2126,21 @@ class ParentClassItem extends JModelAdmin
 				$i = 1;
 				foreach ($postvalues as $postvalue) {
 					
+					// Create field obj for DB insertion
+					$obj = new stdClass();
+					$obj->field_id 		= $field->id;
+					$obj->item_id 		= $item->id;
+					$obj->valueorder	= $i;
+					$obj->version			= (int)$last_version+1;
+					
+					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
+					$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
+					
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
-					if ($field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
-						$obj = new stdClass();
-						$obj->field_id 		= $field->id;
-						$obj->item_id 		= $item->id;
-						$obj->valueorder	= $i;
-						$obj->version			= (int)$last_version+1;
-						
-						// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
-						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
-						if ($use_versioning) {
-							if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
-								$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							}
+					if ($record_versioned_data && 
+						$field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting' ) {
+						if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
+							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 						}
 					}
 					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br/>";
@@ -2168,7 +2175,7 @@ class ParentClassItem extends JModelAdmin
 			// **************************************************************
 			
 			// a. Save a version of item properties that do not have a corresponding CORE Field
-			if ($use_versioning) {
+			if ( $record_versioned_data ) {
 				$obj = new stdClass();
 				$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
 				$obj->item_id 		= $item->id;
@@ -2188,7 +2195,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
-			if ( FLEXI_FISH && !empty($data['jfdata']) && $use_versioning )
+			if ( FLEXI_FISH && !empty($data['jfdata']) && $record_versioned_data )
 			{
 				$obj = new stdClass();
 				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Joomfish translated item data
