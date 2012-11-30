@@ -219,7 +219,8 @@ var JFormValidator = new Class({
 				//console.log(values);
 				//console.log(existing_cats_fc);
 				
-				var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) >= 0) )  ?  0 : 1;
+				// Check if maincat is not in already selected secondary cats
+				var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) == -1) ) ? 1 : 0;
 				
 				// Check if the number of categories is over the allowed limit for current user
 				if (max_cat_assign_fc && (values.length+add_val) > max_cat_assign_fc) {
