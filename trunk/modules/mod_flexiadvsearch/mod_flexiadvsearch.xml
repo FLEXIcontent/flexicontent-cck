@@ -21,44 +21,67 @@
 	</languages>
 	
 	<params>
-		<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
-		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="width" type="text" default="20" label="FLEXI_BOX_WIDTH" description="FLEXI_BOX_WIDTH_DESC" />
-		<param name="text" type="text" default="" label="FLEXI_TEXT" description="FLEXI_TEXT_DESC" />
-		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="button" type="radio" default="" label="FLEXI_SEARCH_BUTTON" description="FLEXI_SEARCH_BUTTON_DESC">
-			<option value="">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="button_pos" type="list" default="right" label="FLEXI_BUTTON_POSITION" description="FLEXI_BUTTON_POSITION_DESC">
-			<option value="right">FLEXI_BUTTON_RIGHT</option>
-			<option value="left">FLEXI_BUTTON_LEFT</option>
-			<option value="top">FLEXI_BUTTON_TOP</option>
-			<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
-		</param>
-		<param name="imagebutton" type="radio" default="" label="FLEXI_BUTTON_IMAGE" description="FLEXI_BUTTON_IMAGE_DESC">
-			<option value="">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="button_text" type="text" default="" label="FLEXI_BUTTON_TEXT" description="FLEXI_BUTTON_TEXT_DESC" />
-		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="useitemid" type="radio" default="0" label="FLEXI_MENU_ITEM" description="FLEXI_MENU_ITEM_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="set_itemid" type="text" default="" label="FLEXI_MENU_ITEMID" description="FLEXI_MENU_ITEMID_DESC" />
-		<param name="linkadvsearch" type="radio" default="1" label="FLEXI_ADV_SEARCH" description="FLEXI_ADV_SEARCH_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="FLEXI_ADV_SEARCH_TEXT" description="FLEXI_ADV_SEARCH_TEXT_DESC" />
+
+			<param name="" type="separator" default="FLEXI_MODULE_DISPLAY_RULES" description="FLEXI_MODULE_DISPLAY_RULES_DESC" level="level1" menu="hide" />
+			<param name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
+				<option value="OR">FLEXI_OR</option>
+				<option value="AND">FLEXI_AND</option>
+			</param>
+
+			<param name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" menu="hide" />
+			<param name="show_in_views" type="fccheckbox" default=""
+					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V" checkvals="category,item,favourites,tags,search,others"
+					defaultvals="category,item,favourites,tags,search,others"
+					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
+			/>
+			
+			<param name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" menu="hide" />
+			<param name="enable_php_rule" type="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_EXPRESSION" description="FLEXI_PHP_EXPRESSION_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
+
+			<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
+			<param name="@spacer" type="spacer" default="" label="" description="" />
+			<param name="width" type="text" default="20" label="FLEXI_BOX_WIDTH" description="FLEXI_BOX_WIDTH_DESC" />
+			<param name="text" type="text" default="" label="FLEXI_TEXT" description="FLEXI_TEXT_DESC" />
+			<param name="@spacer" type="spacer" default="" label="" description="" />
+			<param name="button" type="radio" default="" label="FLEXI_SEARCH_BUTTON" description="FLEXI_SEARCH_BUTTON_DESC">
+				<option value="">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="button_pos" type="list" default="right" label="FLEXI_BUTTON_POSITION" description="FLEXI_BUTTON_POSITION_DESC">
+				<option value="right">FLEXI_BUTTON_RIGHT</option>
+				<option value="left">FLEXI_BUTTON_LEFT</option>
+				<option value="top">FLEXI_BUTTON_TOP</option>
+				<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
+			</param>
+			<param name="imagebutton" type="radio" default="" label="FLEXI_BUTTON_IMAGE" description="FLEXI_BUTTON_IMAGE_DESC">
+				<option value="">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="button_text" type="text" default="" label="FLEXI_BUTTON_TEXT" description="FLEXI_BUTTON_TEXT_DESC" />
+			<param name="@spacer" type="spacer" default="" label="" description="" />
+			<param name="useitemid" type="radio" default="0" label="FLEXI_MENU_ITEM" description="FLEXI_MENU_ITEM_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="set_itemid" type="text" default="" label="FLEXI_MENU_ITEMID" description="FLEXI_MENU_ITEMID_DESC" />
+			<param name="linkadvsearch" type="radio" default="1" label="FLEXI_ADV_SEARCH" description="FLEXI_ADV_SEARCH_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="FLEXI_ADV_SEARCH_TEXT" description="FLEXI_ADV_SEARCH_TEXT_DESC" />
 	</params>
 
 	<params group="advanced">
-		<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
-			<option value="1">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO_CACHING</option>
-		</param>
-		<param name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
+			<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
+				<option value="1">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO_CACHING</option>
+			</param>
+			<param name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
 	</params>
 </install>
