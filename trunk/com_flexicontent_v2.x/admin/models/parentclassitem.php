@@ -2581,7 +2581,13 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function resetVotes($id)
 	{
+		// Delete main vote type
 		$query = 'DELETE FROM #__content_rating WHERE content_id = '.$id;
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		// Delete extra vote types
+		$query = 'DELETE FROM #__flexicontent_items_extravote WHERE content_id = '.$id;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 	}
