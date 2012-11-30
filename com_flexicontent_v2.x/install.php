@@ -187,7 +187,7 @@ $result = $db->query();
 	<tbody>
 
 <?php
-$deprecated_fields_arr = "`hidden`";
+$deprecated_fields_arr = array('hidden');
 $deprecated_fields = "`". implode("`,`", $deprecated_fields_arr) ."`";
 
 // Get DB table information
