@@ -25,7 +25,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
-		<param name="" type="separator" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
+		<param name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
 		<param name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
 			<option value="1">FLEXI_FIELD_GALLERY_TOP</option>
 			<option value="2">FLEXI_FIELD_GALLERY_LEFT</option>
@@ -37,7 +37,7 @@
 		<param name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" />
 		<param name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
  		
-		<param name="" type="separator" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
+		<param name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
 		<param name="controller" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_CONTROLS" description="FLEXI_FIELD_DISPLAY_CONTROLS_DESC">
 			<option value="1">FLEXI_YES</option>
 			<option value="0">FLEXI_NO</option>
