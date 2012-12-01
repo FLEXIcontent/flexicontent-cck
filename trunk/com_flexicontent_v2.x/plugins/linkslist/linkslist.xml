@@ -21,21 +21,6 @@
 			</field>
 		</fieldset>
 		<fieldset name="group-linkslist">
-			<field type="spacer" name="test" default="&lt;script type=&quot;text/javascript&quot;&gt; window.addEvent('domready', function(){
-		
-			var label 		= $('paramsfield_elements-lbl'),
-				labelcell   = label.getParent().getParent(),
-				destination = labelcell.getParent().getPrevious().getElement('.paramlist_key');
-				
-			/*destination.removeClass('paramlist_key');*/
-				
-			labelcell.remove();
-			label.inject(destination);
-			/*destination.setStyle('text-align', 'left');*/
-			
-			$('paramsfield_elements').getParent().setProperty('colspan', 2).addClass('paramlist_key'); 
-		
-		}); &lt;/script&gt;" />
 			<field name="field_elements" type="textarea" default="Title[link=&quot;#&quot; class=&quot;list link&quot;] :: Title2[id=&quot;myID&quot;]" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_ELEMENTS_DESC" />
 			<field name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
 				<option value="ul">Unordered list</option>

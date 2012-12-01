@@ -42,10 +42,12 @@ class FlexicontentViewField extends JView
 		$model = & $this->getModel();
 		if (FLEXI_J16GE) {
 			$form = $this->get('Form');
+		} else {
+			$row = & $this->get( 'Field' );
 			
 			//Import File system
 			jimport('joomla.filesystem.file');
-		
+			
 			// Create the form
 			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
 			if (JFile::exists( $pluginpath )) {
@@ -54,9 +56,6 @@ class FlexicontentViewField extends JView
 				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
 			}
 			$form->loadINI($row->attribs);
-			
-		} else {
-			$row = & $this->get( 'Field' );
 		}
 		
 		$isnew = FLEXI_J16GE ? !$form->getValue('id') : !$row->id;
