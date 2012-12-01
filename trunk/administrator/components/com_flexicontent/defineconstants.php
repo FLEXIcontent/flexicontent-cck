@@ -30,7 +30,9 @@ if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 	date_default_timezone_set('UTC');
 
 // Set jQuery to load in views that use it
-define('FLEXI_JQUERY_VER', '1.7.2.min' );
+define('FLEXI_JQUERY_VER', '1.8.3.min' );
+define('FLEXI_JQUERY_UI_VER', '1.9.2.min' );
+define('FLEXI_JQUERY_UI_CSS_VER', '1.9.2' );
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 0 );
@@ -39,8 +41,8 @@ if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 0 );
 
 // Set file manager paths
 $params =& JComponentHelper::getParams('com_flexicontent');
-if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads'));
-if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias'));
+if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		JPath::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
+if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPath::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
 $view = JRequest::getCmd('view',null);
@@ -86,5 +88,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'images/M_images/');
 
 // Version constants
 define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'RC9b (r1573)');
+define('FLEXI_RELEASE',	'RC9b (r1574)');
 ?>

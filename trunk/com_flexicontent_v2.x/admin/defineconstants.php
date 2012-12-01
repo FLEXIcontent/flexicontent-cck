@@ -30,7 +30,9 @@ if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 	date_default_timezone_set('UTC');
 
 // Set jQuery to load in views that use it
-define('FLEXI_JQUERY_VER', '1.7.2.min' );
+define('FLEXI_JQUERY_VER', '1.8.3.min' );
+define('FLEXI_JQUERY_UI_VER', '1.9.2.min' );
+define('FLEXI_JQUERY_UI_CSS_VER', '1.9.2' );
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 1 );
@@ -86,5 +88,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/'
 
 // Version constants
 define('FLEXI_VERSION',	'2.0.0');
-define('FLEXI_RELEASE',	'RC9b (r1573)');
+define('FLEXI_RELEASE',	'RC9b (r1574)');
 ?>

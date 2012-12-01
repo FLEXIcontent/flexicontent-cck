@@ -146,6 +146,29 @@ class flexicontent_html
 		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
 	}
 	
+	
+	/**
+	 * Utility function to add JQuery to current Document
+	 *
+	 * @param 	string 		$text
+	 * @param 	int 		$nb
+	 * @return 	string
+	 * @since 1.5
+	 */
+	function loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1 )
+	{
+		$document = & JFactory::getDocument();
+		if ( $add_jquery && !JPluginHelper::isEnabled('system', 'jquerysupport') )
+		{
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
+			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+		}
+		if ( $add_jquery_ui )     $document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
+		if ( $add_jquery_ui_css ) $document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
+	}
+	
+	
 	/**
 	 * Escape a string so that it can be used directly by JS source code
 	 *

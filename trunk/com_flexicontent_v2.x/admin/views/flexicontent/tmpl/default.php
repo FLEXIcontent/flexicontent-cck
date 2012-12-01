@@ -33,11 +33,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 }
 
 JHTML::_('behavior.mootools');
-if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-	$this->document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-	// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-	//$this->document->addCustomTag('<script>jQuery.noConflict();</script>');
-}
+flexicontent_html::loadJQuery();
 
 $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
