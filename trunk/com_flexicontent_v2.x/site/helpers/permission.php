@@ -26,10 +26,21 @@ class FlexicontentHelperPerm {
 			// handle jcomments integration
 			if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
 				$Comments_Enabled 	= 1;
-				$dest 			= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins'.DS.'com_flexicontent.plugin.php';
+				$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
+				$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
 				$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
+				
 				if (!JFile::exists($dest)) {
-					JFile::copy($source, $dest);
+					if (!JFolder::exists($destpath)) { 
+						if (!JFolder::create($destpath)) { 
+							JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to create jComments plugin folder'));
+						}
+					}
+					if (!JFile::copy($source, $dest)) {
+						JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
+					} else {
+						$mainframe->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
+					}
 				}
 			} else {
 				$Comments_Enabled 	= 0;

@@ -88,5 +88,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'media/system/images/'
 
 // Version constants
 define('FLEXI_VERSION',	'2.0.0');
-define('FLEXI_RELEASE',	'RC9b (r1574)');
+define('FLEXI_RELEASE',	'RC9b (r1576)');
 ?>

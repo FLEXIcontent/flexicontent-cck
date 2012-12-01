@@ -238,20 +238,22 @@ class plgSystemFlexisystem extends JPlugin
 		// Let's Redirect Joomla's article view & form to FLEXIcontent item view & form respectively !!
 		// NOTE: we do not redirect Joomla's category views (blog,list,featured for J2.5 etc),
 		//       thus site administrator can still utilize them
-		if($option == 'com_content' && ($view == 'article' || (FLEXI_J16GE && $view=='form')) )
-		{
+		if ( $option == 'com_content' && (
+	      $view == 'article'       ||  // a. CASE :  com_content ARTICLE link that is redirected to its corresponding flexicontent link
+	      $view == FLEXI_ITEMVIEW  ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
+		    $view == 'form'              // c. CASE :  com_content link to article edit form (J2.5 only)
+				)
+		) {
 			// For J1.5 both article view and edit form are view==article, for J1.5 
-			$id 		= JRequest::getInt('id');
+			$id = JRequest::getInt('id');
 			
 			if (!FLEXI_J16GE) {
-				// In J1.5, both article view & form use: -- view=article --
+				// In J1.5
 				$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
 				$section = $db->loadResult();
 				$in_limits = ($section == $flexisection);
 			} else {
-				// In J2.5, we have both view 'article' and 'form'
-				
-				// Set id via a_id URL variable if we are in form
+				// In J2.5, in case of form we need to use a_id instead of id, this will also be set in HTTP Request too and JRouter too
 				$id = ($view=='form') ? JRequest::getInt('a_id') : $id;
 				
 				// Get article category id, if it is not already in url
@@ -267,15 +269,21 @@ class plgSystemFlexisystem extends JPlugin
 			
 			if ($this->params->get('redirect_method_fe', 1) == 1)
 			{
-				$new_view = $view=='article' ? FLEXI_ITEMVIEW : 'form';
-				$new_id = $id;  // this is not set for J2.5 form, since it uses a_id
-				
-	      // Set new request variables
-				// NOTE: In J2.5, we have both views 'article' & 'form', so we need to handle them seperately
-	      if ($view=='article') {
+	      // Set new request variables:
+	      // NOTE: we only need to set REQUEST variable that must be changed,
+	      //       but setting any other variables to same value will not hurt
+	      if (
+		      $view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is redirected to its corresponding flexicontent link
+		      $view == FLEXI_ITEMVIEW   // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
+		    ) {
 		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+		    } else if (
+			    $view == 'form'           // c. CASE :  com_content link to article edit form (J2.5 only)
+		    ) {
+		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
 		    } else {
-		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $new_id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+		    	// Unknown CASE ?? unreachable ?
+		    	return;
 		    }
 	      JRequest::set( $newRequest, 'get');
 	     
@@ -288,7 +296,7 @@ class plgSystemFlexisystem extends JPlugin
 	    	if ($view=='form') {
 	    		$urlItem = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
 	    	} else {
-					$itemslug 	= JRequest::getVar('id');
+					$itemslug	= JRequest::getVar('id');
 					$catslug	= JRequest::getVar('catid');
 				
 					// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs

@@ -1115,6 +1115,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 			if ( ($showtitle && $title ) || ($showdesc && $desc) )
 				$field->{$prop}[$i] .= '</div>';
+			
+			$field->{$prop}[$i] = $pretext. $field->{$prop}[$i] .$posttext;
 		}
 		
 		// Apply seperator and open/close tags
