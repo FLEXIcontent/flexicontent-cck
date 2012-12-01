@@ -44,11 +44,7 @@ class FLEXIcontentViewSearch extends JView
 		$document 	= & JFactory::getDocument();
 		
 		JHTML::_('behavior.mootools');
-		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-			$document->addScript('administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-		}
+		flexicontent_html::loadJQuery();
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners.js' );
 		
 		$error	= '';

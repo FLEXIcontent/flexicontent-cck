@@ -59,11 +59,7 @@ class FlexicontentViewItem extends JView
 		}
 		
 		JHTML::_('behavior.mootools');
-		if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-			$document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-		}
+		flexicontent_html::loadJQuery();
 		
 		//JHTML::_('behavior.formvalidation'); // we use custom validation class
 		JHTML::_('behavior.tooltip');

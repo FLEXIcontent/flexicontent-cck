@@ -40,20 +40,10 @@ class FlexicontentViewTemplate extends JView {
 		$user     = JFactory::getUser();
 		
 		JHTML::_('behavior.mootools');
-		$use_jquery_sortable = FLEXI_J16GE ? true : false;
-		
+		$use_jquery_sortable = true; //FLEXI_J16GE ? true : false;
 		
 		if ($use_jquery_sortable) {
-			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-				$document->addScript('components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-			}
-		
-			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.core.js");
-			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.widget.js");
-			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.mouse.js");
-			$document->addScript(JURI::base()."components/com_flexicontent/assets/js/jquery.ui.sortable.js");
+			flexicontent_html::loadJQuery();
 		} else {
 			// mootools sortable
 			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
