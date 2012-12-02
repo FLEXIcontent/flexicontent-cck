@@ -121,7 +121,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				JError::raiseNotice(100, JText::_($err));
 				// REDIRECT
 				if ($return) {
-					$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+					$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 				}
 				return;
 			}
@@ -142,7 +142,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
 				// REDIRECT
 				if ($return) {
-					$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+					$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 				}
 				return;
 			}
@@ -210,7 +210,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			} else {
 				$mainframe->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
 				if ( !$return ) return;  // No return URL
-				$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".JUtility::getToken()."=1");
+				$mainframe->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 			}
 				
 		}
@@ -248,7 +248,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARNFILEURLFORM' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+				$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 			}
 			return;
 		}
@@ -293,7 +293,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// REDIRECT
 		if ($return) {
-			$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+			$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 		}
 	}
 
@@ -350,7 +350,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILE_DIR' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+				$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 			}
 			return;
 		}
@@ -415,7 +415,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		} else {
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILES_IN_DIR' ));
 			if ($return) {
-				$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+				$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 			}
 			return;
 		}
@@ -423,7 +423,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					
 		// REDIRECT
 		if ($return) {
-			$mainframe->redirect(base64_decode($return)."&".JUtility::getToken()."=1");
+			$mainframe->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 		}
 	}
 

@@ -20,7 +20,7 @@
 defined('_JEXEC') or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
-class FLEXIcontentViewSearch extends JView
+class FLEXIcontentViewSearch extends JViewLegacy
 {
 	function display($tpl = null) {
 		$layout = JRequest::getVar('layout', 'default');
@@ -153,7 +153,7 @@ class FLEXIcontentViewSearch extends JView
 	function indexer($tpl) {
 		$document = JFactory::getDocument();
 		
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		
 		parent::display($tpl);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
 	<name>FLEXIcontent - Related Items - BackLinks</name>
 	<author>Clément Peyrel</author>
 	<creationDate>2010-07-14</creationDate>

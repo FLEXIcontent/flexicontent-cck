@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.7" client="site" method="upgrade">
+<extension type="module" version="1.6" client="site" method="upgrade">
 	<name>FLEXIcontent Tag Cloud</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>09/11/2009</creationDate>

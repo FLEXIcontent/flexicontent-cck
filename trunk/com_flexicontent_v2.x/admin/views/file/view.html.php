@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFile extends JView {
+class FlexicontentViewFile extends JViewLegacy {
 
 	function display($tpl = null) {
 		$mainframe = &JFactory::getApplication();

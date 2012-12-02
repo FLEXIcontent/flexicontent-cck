@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport( 'joomla.application.component.view');
 
-class FlexicontentViewTypes extends JView{
+class FlexicontentViewTypes extends JViewLegacy{
 	
 	function display( $tpl = null ) {
 		
@@ -38,7 +38,7 @@ class FlexicontentViewTypes extends JView{
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
 		foreach($itemtypes as $itemtype) {
 			$css = "width:auto; margin:0px 1% 12px 1%; padding:1%; ";
-			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$itemtype->id."&".JUtility::getToken()."=1";
+			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$itemtype->id."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 			$icon = "components/com_flexicontent/assets/images/layout_add.png";
 	?>
 			<a style="<?php echo $css; ?>" class="fc_select_button" href="<?php echo $link; ?>" target="_parent">

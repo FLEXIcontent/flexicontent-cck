@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.6" type="plugin" group="search" method="upgrade">
+<extension type="plugin" version="1.6" group="search" method="upgrade">
 	<name>PLG_SEARCH_FLEXISEARCH</name>
 	<author>Emmanuel Danan, Aazam</author>
 	<creationDate>oct 2011</creationDate>
@@ -54,4 +54,4 @@
 		</fieldset>
 	</fields>
 	</config>
-</install>
+</extension>

@@ -28,7 +28,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewStats extends JView
+class FlexicontentViewStats extends JViewLegacy
 {
 	/**
 	 * Creates the Entrypage

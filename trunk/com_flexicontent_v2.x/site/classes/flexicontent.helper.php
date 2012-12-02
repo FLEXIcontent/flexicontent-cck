@@ -755,7 +755,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 			$text 		= JText::_( 'FLEXI_EDIT' );
 
-			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit'.'&cid='.$item->categoryslug.'&id='.$item->slug; //.'&'.JUtility::getToken().'=1'.'&typeid='.$item->type_id
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit'.'&cid='.$item->categoryslug.'&id='.$item->slug; //.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1'.'&typeid='.$item->type_id
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
@@ -1017,7 +1017,7 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
-			JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$css 	= JURI::base(true) .'/components/com_flexicontent/assets/css/fcvote.css';
 			$js		= JURI::base(true) .'/components/com_flexicontent/assets/js/fcvote.js';
@@ -1140,7 +1140,7 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added)
 	 	{
-			JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$document->addScript( JURI::base(true) .'/components/com_flexicontent/assets/js/fcfav.js' );
 			

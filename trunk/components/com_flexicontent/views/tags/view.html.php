@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTags extends JView
+class FlexicontentViewTags extends JViewLegacy
 {
 	/**
 	 * Creates the item page

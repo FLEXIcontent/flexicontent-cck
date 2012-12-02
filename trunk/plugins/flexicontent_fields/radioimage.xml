@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="flexicontent_fields" method="upgrade">
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
 	<name>FLEXIcontent - Radio (or Single Select) Image</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>

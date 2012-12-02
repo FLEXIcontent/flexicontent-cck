@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
+if (FLEXI_J16GE) jimport('joomla.access.accessrules');
 
 /**
  * FLEXIcontent Component Model
@@ -28,7 +29,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFlexicontent extends JModel
+class FlexicontentModelFlexicontent extends JModelLegacy
 {
 	/**
 	 * Constructor
@@ -373,9 +374,15 @@ class FlexicontentModelFlexicontent extends JModel
 	{
 		static $return;
 		if ($return === NULL) {
-			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-			$result_lang_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
-			$result_tgrp_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
+			if (FLEXI_J30GE) {
+				$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
+				$result_lang_col = array_key_exists('language', $columns) ? true : false;
+				$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
+			} else {
+				$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
+				$result_lang_col = array_key_exists('language', $fields['#__flexicontent_items_ext']) ? true : false;
+				$result_tgrp_col = array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext']) ? true : false;
+			}
 			$return = $result_lang_col && $result_tgrp_col;
 		}
 		return $return;
@@ -493,6 +500,8 @@ class FlexicontentModelFlexicontent extends JModel
 	function getOldBetaFiles() {
 		static $return;
 		if ($return!==null) return $return;
+		
+		jimport('joomla.filesystem.folder');
 		$files 	= array (
 			'author.xml',
 			'author.php',

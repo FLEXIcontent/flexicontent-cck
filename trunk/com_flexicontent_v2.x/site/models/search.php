@@ -24,7 +24,7 @@ jimport('joomla.application.component.model');
  * @subpackage	Search
  * @since 1.5
  */
-class FLEXIcontentModelSearch extends JModel
+class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
 	 * Sezrch data array

@@ -25,7 +25,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage	Users
  * @since 1.0
  */
-class FlexicontentViewUsers extends JView
+class FlexicontentViewUsers extends JViewLegacy
 {
 	function display($tpl = null)
 	{

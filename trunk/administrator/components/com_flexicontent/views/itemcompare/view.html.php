@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItemcompare extends JView {
+class FlexicontentViewItemcompare extends JViewLegacy {
 
 	function display($tpl = null)
 	{

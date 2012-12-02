@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFields extends JModel
+class FlexicontentModelFields extends JModelLegacy
 {
 	/**
 	 * Field data

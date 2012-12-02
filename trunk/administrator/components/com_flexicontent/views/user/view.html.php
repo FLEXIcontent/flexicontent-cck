@@ -25,7 +25,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage	Users
  * @since 1.0
  */
-class FlexicontentViewUser extends JView
+class FlexicontentViewUser extends JViewLegacy
 {
 	function display($tpl = null)
 	{
@@ -118,7 +118,7 @@ class FlexicontentViewUser extends JView
 		jimport('joomla.html.pane');
 		
 		// Load tooltips
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 		
 		// Add css to document

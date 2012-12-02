@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItemelement extends JView {
+class FlexicontentViewItemelement extends JViewLegacy {
 
 	function display($tpl = null)
 	{
@@ -73,7 +73,7 @@ class FlexicontentViewItemelement extends JView {
 		
 		JLoader::import('joomla.application.component.model');
 		JLoader::import( 'qfcategoryelement', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' );
-		$cats_model = & JModel::getInstance('qfcategoryelement', 'FlexicontentModel');
+		$cats_model = & JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
 		$categories = $cats_model->getData();
 		//echo "<pre>"; var_dump($categories); echo "</pre>"; 
 		for ($i=0; $i<count($categories); $i++) {

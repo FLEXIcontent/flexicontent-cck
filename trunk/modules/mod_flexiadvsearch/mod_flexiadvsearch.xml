@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install type="module" version="1.5.0" method="upgrade">
+<install type="module" version="1.5" method="upgrade">
 	<name>FLEXIadvsearch Module</name>
 	<author>Suriya Kaewmungmuang</author>
 	<creationDate>29/06/2011</creationDate>

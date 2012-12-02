@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItemelement extends JView {
+class FlexicontentViewItemelement extends JViewLegacy {
 
 	function display($tpl = null)
 	{

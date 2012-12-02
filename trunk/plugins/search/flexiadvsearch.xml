@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install version="1.5" type="plugin" group="search" method="upgrade">
+<install type="plugin" version="1.5" group="search" method="upgrade">
 	<name>PLG_SEARCH_FLEXIADVSEARCH</name>
 	<author>Suriya Kaewmungmuang</author>
 	<creationDate>29 June 2011</creationDate>

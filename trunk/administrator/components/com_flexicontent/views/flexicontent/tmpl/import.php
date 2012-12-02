@@ -24,7 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('import-log').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&controller=items&task=import&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&controller=items&task=import&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',

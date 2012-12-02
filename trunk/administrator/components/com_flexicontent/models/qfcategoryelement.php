@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelQfcategoryelement extends JModel
+class FlexicontentModelQfcategoryelement extends JModelLegacy
 {
 	/**
 	 * Category data

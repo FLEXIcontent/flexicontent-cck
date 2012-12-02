@@ -28,7 +28,7 @@ jimport( 'joomla.html.parameter' );
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class ParentClassItem extends JModel
+class ParentClassItem extends JModelLegacy
 {
 	var $_name = 'ParentClassItem';
 	

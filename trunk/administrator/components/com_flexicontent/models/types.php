@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelTypes extends JModel
+class FlexicontentModelTypes extends JModelLegacy
 {
 	/**
 	 * Type data

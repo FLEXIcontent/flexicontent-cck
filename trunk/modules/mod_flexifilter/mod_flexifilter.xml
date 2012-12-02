@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install type="module" version="1.5.0" method="upgrade">
+<install type="module" version="1.5" method="upgrade">
 	<name>FLEXIcontent Content Lists Filter Module</name>
 	<author>George Papadakis</author>
 	<creationDate>November 2012</creationDate>
