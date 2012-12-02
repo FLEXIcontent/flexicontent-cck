@@ -326,9 +326,19 @@ class FlexicontentController extends JControllerLegacy
 		$db->setQuery("DELETE FROM #__menu WHERE menutype='flexihiddenmenu' ");	
 		$db->query();
 		
-		$query 	=	"INSERT INTO #__menu (`menutype`,`name`,`alias`,`link`,`type`,`published`,`parent`,`componentid`,`sublevel`,`ordering`,`checked_out`,`checked_out_time`,`pollid`,`browserNav`,`access`,`utaccess`,`params`,`lft`,`rgt`,`home`)
-		VALUES ".
-		"('flexihiddenmenu','Site Content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'rootcat=0',0,0,0)";
+		if (FLEXI_J30GE) {
+			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`)
+			VALUES ".
+			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0)";
+		} else if (FLEXI_J16GE) {
+			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`ordering`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`)
+			VALUES ".
+			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0)";
+		} else {
+			$query 	=	"INSERT INTO #__menu (`menutype`,`name`,`alias`,`link`,`type`,`published`,`parent`,`componentid`,`sublevel`,`ordering`,`checked_out`,`checked_out_time`,`pollid`,`browserNav`,`access`,`utaccess`,`params`,`lft`,`rgt`,`home`)
+			VALUES ".
+			"('flexihiddenmenu','Site Content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,0,$flexi_comp_id,0,1,0,'0000-00-00 00:00:00',0,0,0,0,'rootcat=0',0,0,0)";
+		}
 		
 		$db->setQuery($query);
 		$result = $db->query();
@@ -908,6 +918,17 @@ VALUES
 		}
 	}
 	
+	function initialPermission() {
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$model = $this->getModel('flexicontent');
+		if ($model->initialPermission()) {
+			echo '<span class="install-ok"></span>';
+		} else {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="initialpermission" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		}
+	}
 	
 	function fversioncompare() {
 		// Check for request forgeries
