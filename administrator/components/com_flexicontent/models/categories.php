@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategories extends JModel
+class FlexicontentModelCategories extends JModelLegacy
 {
 	/**
 	 * Pagination object

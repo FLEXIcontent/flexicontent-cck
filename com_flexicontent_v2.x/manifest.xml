@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
 <extension type="component" version="1.6.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>1 December 2012</creationDate>
+	<creationDate>2 December 2012</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<copyright>(C) 2009-2012 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.0.0 RC9b r1576</version>
+	<version>2.0.0 RC9b r1577</version>
 	<description>A flexible content management system for Joomla! J1.5/J2.5</description>
 
 	<languages folder="site/language">
@@ -146,21 +145,22 @@
 	<plugin name="textselect"      folder="plugins/textselect"      instfolder="flexicontent_fields">TextSelect field</plugin>
 	<plugin name="toolbar"         folder="plugins/toolbar"         instfolder="flexicontent_fields">Article toolbar field</plugin>
 	<plugin name="weblink"         folder="plugins/weblink"         instfolder="flexicontent_fields">Weblink field</plugin>
-
+	
 	<plugin name="flexinotify"     folder="plugins/flexicontent"    instfolder="flexicontent">Notifications plugin for FLEXIcontent (new!!!)</plugin>
-
+	
 	<plugin name="flexisearch"     folder="plugins/flexisearch"     instfolder="search">Search plugin for FLEXIcontent</plugin>
 	<plugin name="flexiadvsearch"  folder="plugins/flexiadvsearch"  instfolder="search">Advanced search plugin for flexicontent.</plugin>
 	<plugin name="flexisystem"     folder="plugins/flexisystem"     instfolder="system">System plugin for FLEXIcontent</plugin>
 	<plugin name="flexiadvroute"   folder="plugins/flexiadvroute"   instfolder="system">System plugin for advanced FLEXIcontent routing</plugin>
-
+	
 	<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal content module for the FLEXIcontent Component</module>
 	<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content lists filter module for the FLEXIcontent Component</module>
 	<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud Module for the FLEXIcontent Component</module>
 	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced search module for the FLEXIcontent Component</module>
 </additional>
 
-<installfile>install.php</installfile>
-<uninstallfile>uninstall.php</uninstallfile>
+	<!--installfile>install.php</installfile-->
+	<!--uninstallfile>uninstall.php</uninstallfile-->
+	<scriptfile>script.php</scriptfile>
 
 </extension>

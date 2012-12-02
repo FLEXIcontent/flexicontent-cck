@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JView
+class FlexicontentViewCategory extends JViewLegacy
 {
 	function display($tpl = null)
 	{
@@ -143,7 +143,7 @@ class FlexicontentViewCategory extends JView
 		jimport('joomla.html.pane');
 		
 		// Load tooltips
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 		
 		// Add css to document

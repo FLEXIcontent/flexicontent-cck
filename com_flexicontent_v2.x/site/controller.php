@@ -27,7 +27,7 @@ jimport('joomla.application.component.controller');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentController extends JController
+class FlexicontentController extends JControllerLegacy
 {
 	/**
 	 * Constructor
@@ -240,11 +240,11 @@ class FlexicontentController extends JController
 			// Since an error occured, check if (a) the item is new and (b) was not created
 			if ($isnew && !$model->get('id')) {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'add&id=0&typeid='.$post['type_id'].'&'. JUtility::getToken() .'=1';
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'add&id=0&typeid='.$post['type_id'].'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
 				$this->setRedirect($link, $msg);
 			} else {
 				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&id='.$model->get('id').'&'. JUtility::getToken() .'=1';
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&id='.$model->get('id').'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
 				$this->setRedirect($link, $msg);
 			}
 			
@@ -440,7 +440,7 @@ class FlexicontentController extends JController
 		if ($task=='apply') {
 			// Save and reload the item edit form
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. JUtility::getToken() .'=1';
+			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
 			
 			// Important pass refer back to avoid making the form itself the refer
 			$refer = JRequest::getString('referer', '', 'post');

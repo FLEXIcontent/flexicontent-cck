@@ -23,6 +23,7 @@ defined('_JEXEC') or die('Restricted access');
  * @since		1.0
  */
 jimport('joomla.database.tablenested');
+jimport('joomla.access.accessrules');
 class flexicontent_categories extends JTableNested
 {
 	/** @var int Primary key */

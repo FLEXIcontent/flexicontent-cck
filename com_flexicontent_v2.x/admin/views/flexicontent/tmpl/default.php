@@ -32,7 +32,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	return false;
 }
 
-JHTML::_('behavior.mootools');
+FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 flexicontent_html::loadJQuery();
 
 $ctrl = FLEXI_J16GE ? 'items.' : '';
@@ -190,19 +190,18 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			</td>
 			<td valign="top" width="420px" style="padding: 7px 0 0 5px">
 			<?php
-			echo $this->pane->startPane( 'stat-pane' );
+			echo JHtml::_('sliders.start');
 			if (!$this->dopostinstall || !$this->allplgpublish) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
-				echo $this->pane->startPanel( $title, 'postinstall' );
+				echo JHtml::_('sliders.panel', $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
-				echo $this->pane->endPanel();
 			}
 			?>
 			
 			
 			<?php
 			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
-			echo $this->pane->startPanel( $title, 'pending' );
+			echo JHtml::_('sliders.panel', $title, 'pending' );
 			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
 			echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 			?>
@@ -246,12 +245,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
-				<?php echo $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
-				echo $this->pane->startPanel( $title, 'revised' );
+				echo JHtml::_('sliders.panel', $title, 'revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=RV';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
@@ -295,12 +293,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
-				<?php echo $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
-				echo $this->pane->startPanel( $title, 'inprogress' );
+				echo JHtml::_('sliders.panel', $title, 'inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=IP';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
@@ -344,12 +341,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
-				<?php echo $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
-				echo $this->pane->startPanel( $title, 'draft' );
+				echo JHtml::_('sliders.panel', $title, 'draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=OQ';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
@@ -393,7 +389,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>		
-				<?php echo $this->pane->endPanel(); ?>
 				
 				
 			<?php
@@ -413,7 +408,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 							jQuery('#displayfversion').html('<p class=\"qf_centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
+								url: 'index.php?option=com_flexicontent&task=fversioncompare&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1',
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');
@@ -423,13 +418,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					});
 				});
 				");
-				echo $this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
+				echo JHtml::_('sliders.panel', JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
 				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
-				echo $this->pane->endPanel();
 			}
 			?>
 				
-				<?php echo $this->pane->endPane();?>
+				<?php echo JHtml::_('sliders.end'); ?>
 				<div class="credits">
 					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
@@ -442,7 +436,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.">www.marvelic.co.th</a>
 					<br /><br />
 					Georgios Papadakis<br />
-					<a class="hasTip" href="mailto:ggppdk@..." title="Send me an email::Please no support request!!!">ggppdk AT ...com</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a></p>

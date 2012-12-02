@@ -26,7 +26,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existfields-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createdefaultfields&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createdefaultfields&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -44,7 +44,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existmenuitems-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createMenuItems&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createMenuItems&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -62,7 +62,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existtype-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createdefaultype&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createdefaultype&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -80,7 +80,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('publishplugins-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=publishplugins&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=publishplugins&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -98,7 +98,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existlang-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createlangcolumn&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createlangcolumn&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -116,7 +116,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existversions-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createversionstbl&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createversionstbl&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -134,7 +134,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existversionsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=populateversionstbl&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=populateversionstbl&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -152,7 +152,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('existauthors-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=createauthorstbl&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=createauthorstbl&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -170,7 +170,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('cachethumb-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=cachethumbchmod&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -188,7 +188,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('oldbetafiles-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=deleteoldfiles&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -206,7 +206,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('oldfieldsdata-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=cleanupoldtables&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',
@@ -224,7 +224,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			$('missingversion-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
 			e = new Event(e).stop();
 
-			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo JUtility::getToken();?>=1&format=raw";
+			var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
  
 			var ajax = new Ajax(url, {
 				method: 'get',

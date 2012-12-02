@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewField extends JView {
+class FlexicontentViewField extends JViewLegacy {
 
 	function display($tpl = null)
 	{
@@ -44,7 +44,7 @@ class FlexicontentViewField extends JView {
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//add js function to overload the joomla submitform
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 		

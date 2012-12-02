@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItem extends JView
+class FlexicontentViewItem extends JViewLegacy
 {
 
 	
@@ -58,7 +58,7 @@ class FlexicontentViewItem extends JView
 			$pane 		= & JPane::getInstance('sliders');
 		}
 		
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		
 		//JHTML::_('behavior.formvalidation'); // we use custom validation class

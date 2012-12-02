@@ -28,7 +28,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFileselement extends JView
+class FlexicontentViewFileselement extends JViewLegacy
 {
 	/**
 	 * Creates the Filemanagerview

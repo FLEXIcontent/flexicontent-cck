@@ -25,6 +25,82 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	ini_set('display_errors',1);
 }
 
+// Joomla version variables
+if (!defined('FLEXI_J16GE')) {
+	//define('FLEXI_J16GE' , 1 );
+	jimport( 'joomla.version' );  $jversion = new JVersion;
+	define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
+	define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
+}
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+
+if ( !class_exists('JControllerLegacy') )
+{
+	jimport('joomla.application.component.controller');
+	class JControllerLegacy extends JController {}
+}
+
+if ( !class_exists('JModelLegacy') )
+{
+	jimport('joomla.application.component.model');
+	class JModelLegacy extends JModel {}
+}
+
+if ( !class_exists('JViewLegacy') )
+{
+	jimport('joomla.application.component.view');
+	class JViewLegacy extends JView {}
+}
+
+if( FLEXI_J30GE )
+{
+	class JParameter{
+		var $params = null;
+		
+		function __construct($string = ''){
+			if(is_array($string)){
+				$this->params = $string;
+			}else{
+				$this->setParams($string);
+			}
+		}
+		
+		function get($k, $v = null){
+			if(array_key_exists($k, $this->params)){
+				return $this->params[$k];
+			}else{
+				return $v;
+			}
+		}
+		
+		function set($k, $v){
+			$this->params[$k] = $v;
+		}
+		
+		function setParams($string = ''){
+			if(strlen(trim(($string))) > 0){
+				$data = json_decode($string, true);
+				$this->params = $data;
+			}else{
+				$this->params = array();
+			}
+		}
+		
+		function toString(){
+			return json_encode($this->params);
+		}
+		
+		function toArray(){
+			return $this->params;
+		}
+		
+		function toObject(){
+			return json_decode(json_encode($this->params));
+		}
+	}
+}
+
 // Set a default timezone if web server provider has not done so
 if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 	date_default_timezone_set('UTC');
@@ -33,11 +109,6 @@ if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 define('FLEXI_JQUERY_VER', '1.8.3.min' );
 define('FLEXI_JQUERY_UI_VER', '1.9.2.min' );
 define('FLEXI_JQUERY_UI_CSS_VER', '1.9.2' );
-
-// Joomla version variables
-if (!defined('FLEXI_J16GE'))			define('FLEXI_J16GE'			, 0 );
-//jimport( 'joomla.version' );  $jversion = new JVersion;
-//define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 
 // Set file manager paths
 $params =& JComponentHelper::getParams('com_flexicontent');
@@ -82,11 +153,11 @@ if ( FLEXI_FISH ) {
 	$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
 	define('FLEXI_FISH_22GE', (boolean) count($db->loadObjectList()) );
 }
-if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'		, 1 );
-if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'		, 'items' );
-if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH', 'images/M_images/');
+if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'	, 1 );
+if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' : 'items' );
+if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );
 
 // Version constants
-define('FLEXI_VERSION',	'1.5.6');
-define('FLEXI_RELEASE',	'RC9b (r1576)');
+define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.0' : '1.5.6');
+define('FLEXI_RELEASE',	'RC9b (r1577)');
 ?>

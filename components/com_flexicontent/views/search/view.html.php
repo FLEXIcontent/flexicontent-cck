@@ -29,7 +29,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage	Weblinks
  * @since 1.0
  */
-class FLEXIcontentViewSearch extends JView
+class FLEXIcontentViewSearch extends JViewLegacy
 {
 	function display($tpl = null)
 	{
@@ -43,7 +43,7 @@ class FLEXIcontentViewSearch extends JView
 		$dispatcher = & JDispatcher::getInstance();
 		$document 	= & JFactory::getDocument();
 		
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners.js' );
 		

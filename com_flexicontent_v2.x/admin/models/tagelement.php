@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelTagelement extends JModel
+class FlexicontentModelTagelement extends JModelLegacy
 {
 	/**
 	 * Tags data

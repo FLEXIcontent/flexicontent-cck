@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTemplate extends JView {
+class FlexicontentViewTemplate extends JViewLegacy {
 
 	function display($tpl = null)
 	{
@@ -39,7 +39,7 @@ class FlexicontentViewTemplate extends JView {
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		
-		JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		$use_jquery_sortable = true; //FLEXI_J16GE ? true : false;
 		
 		if ($use_jquery_sortable) {

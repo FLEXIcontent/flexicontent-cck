@@ -28,7 +28,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFlexicontent extends JView
+class FlexicontentViewFlexicontent extends JViewLegacy
 {
 	/**
 	 * Creates the Entrypage
@@ -97,7 +97,8 @@ class FlexicontentViewFlexicontent extends JView
 		
 		//initialise variables
 		$document	= & JFactory::getDocument();
-		$pane   	= & JPane::getInstance('sliders');
+		if (!FLEXI_J16GE)
+			$pane = & JPane::getInstance('sliders');
 		$template	= $mainframe->getTemplate();
 		$user		= & JFactory::getUser();		
 		// Get data from the model
@@ -228,12 +229,13 @@ class FlexicontentViewFlexicontent extends JView
 
 		// Get the default copyright values to populate the form automatically
 		$config =& JFactory::getConfig();
-		$mailfrom 	= $config->getValue('config.mailfrom');
-		$fromname 	= $config->getValue('config.fromname');
-		$website 	= $config->getValue('config.live_site');
+		$mailfrom = FLEXI_J30GE ?  $config->get('config.mailfrom') : $config->getValue('config.mailfrom');
+		$fromname = FLEXI_J30GE ?  $config->get('config.fromname') : $config->getValue('config.fromname');
+		$website 	= FLEXI_J30GE ?  $config->get('config.live_site') : $config->getValue('config.live_site');
 
 				
-		$this->assignRef('pane'			, $pane);
+		if (!FLEXI_J16GE)
+			$this->assignRef('pane'			, $pane);
 		$this->assignRef('pending'		, $pending);
 		$this->assignRef('revised'		, $revised);
 		$this->assignRef('draft'		, $draft);

@@ -35,7 +35,7 @@ if ( JFactory::getApplication()->isSite() ) {
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFileselement extends JModel
+class FlexicontentModelFileselement extends JModelLegacy
 {
 	/**
 	 * file data

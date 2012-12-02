@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItem extends JView
+class FlexicontentViewItem extends JViewLegacy
 {
 	var $_type = '';
 	var $_name = FLEXI_ITEMVIEW;

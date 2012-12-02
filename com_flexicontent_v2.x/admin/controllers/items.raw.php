@@ -180,7 +180,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		<?php
 			foreach($state as $shortname => $statedata) {
 				$css = "width:28%; margin:0px 1% 12px 1%; padding:1%; color:".$statedata['color'].";";
-				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".JUtility::getToken()."=1";
+				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>
 				<a	style="<?php echo $css; ?>" class="fc_select_button" href="javascript:;"

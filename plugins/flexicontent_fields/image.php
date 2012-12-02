@@ -747,7 +747,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					&&	(  ($linkto_url && $url_target=='multibox')  ||  ($usepopup && $popuptype == 1)  )
 			 )
 		{
-			JHTML::_('behavior.mootools');
+			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 			
 			// Multibox integration use different version for FC v2x
 			if (FLEXI_J16GE) {

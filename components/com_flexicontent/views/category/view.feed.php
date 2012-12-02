@@ -28,7 +28,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JView
+class FlexicontentViewCategory extends JViewLegacy
 {
 	/**
 	 * Creates the RSS for the View

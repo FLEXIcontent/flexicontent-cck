@@ -120,7 +120,7 @@ if( !$controller && isset($view2ctrl[$view]) ) {
 
 if (FLEXI_J16GE) {
 	//Create the controller
-	$controller	= JController::getInstance('Flexicontent');
+	$controller	= JControllerLegacy::getInstance('Flexicontent');
 } else {
 	// Require specific controller if requested
 	if( $controller = JRequest::getWord('controller') ) {

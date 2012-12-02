@@ -32,7 +32,7 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	return false;
 }
 
-JHTML::_('behavior.mootools');
+FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 flexicontent_html::loadJQuery();
 
 $ctrl = FLEXI_J16GE ? 'items.' : '';
@@ -413,7 +413,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 							jQuery('#displayfversion').html('<p class=\"qf_centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=fversioncompare&".JUtility::getToken()."=1',
+								url: 'index.php?option=com_flexicontent&task=fversioncompare&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1',
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');
@@ -442,7 +442,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<a class="hasTip" href="http://www.marvelic.co.th" target="_blank" title="Marvelic Engine::Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.">www.marvelic.co.th</a>
 					<br /><br />
 					Georgios Papadakis<br />
-					<a class="hasTip" href="mailto:ggppdk@..." title="Send me an email::Please no support request!!!">ggppdk AT ...com</a>
 					</p>
 					<p>Logo and icons : Greg Berthelot<br />
 					<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a></p>

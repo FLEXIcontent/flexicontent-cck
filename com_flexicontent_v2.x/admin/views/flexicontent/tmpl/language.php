@@ -31,7 +31,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
 				e = e.stop();
 				
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -43,7 +43,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')
@@ -59,7 +59,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
 				e = e.stop();
 				
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -71,7 +71,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=create&code=" + lang.value;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')
@@ -101,7 +101,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
 				e = e.stop();
 				
-				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
+				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
 				new Request.HTML({
 					url: url,
 					method: 'get',
@@ -113,7 +113,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
 				e = new Event(e).stop();
 
-				var url = "index.php?option=com_flexicontent&format=raw&<?php echo JUtility::getToken();?>=1&task=langfiles&method=zip" + params;
+				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
 				var ajax = new Ajax(url, {
 					method: 'get',
 					update: $('log')

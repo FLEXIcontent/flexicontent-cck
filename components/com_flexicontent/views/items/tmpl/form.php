@@ -33,7 +33,7 @@ if ($return) {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
 }
 
-JHTML::_('behavior.mootools');
+FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 flexicontent_html::loadJQuery();
 
 // add extra css for the edit form
@@ -58,7 +58,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=items&task=viewtags&format=raw&".JUtility::getToken()."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=items&task=viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
 				width: 260,
 				max: 100,
 				matchContains: false,
@@ -143,7 +143,7 @@ function addtag(id, tagname) {
 	}
 	if(id) return;
 	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo JUtility::getToken();?>=1');
+	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');
 }
 
 function deleteTag(obj) {
