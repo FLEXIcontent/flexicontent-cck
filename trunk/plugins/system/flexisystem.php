@@ -473,7 +473,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		if($result)
 		{
-			JPluginHelper::importPlugin('user');		
+			JPluginHelper::importPlugin('user');
+			$response = new stdClass();
 			$response->username = $username;
 			$response->password = $password;
 			$response->language = '';

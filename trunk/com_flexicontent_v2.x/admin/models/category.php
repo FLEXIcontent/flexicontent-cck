@@ -528,8 +528,9 @@ class FlexicontentModelCategory extends JModelAdmin
 			jimport('joomla.utilities.date');
 			
 			$site_zone = JFactory::getApplication()->getCfg('offset');
-			$user_zone = JFactory::getUser->getParam('timezone', $site_zone);
-			$tz = FLEXI_J16GE ? $user_zone : $site_zone ;
+			$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
+			$tz_string = FLEXI_J16GE ? $user_zone : $site_zone ;
+			$tz = new DateTimeZone( $tz_string );
 			
 			if (intval($result->created_time)) {
 				$date = new JDate($result->created_time);

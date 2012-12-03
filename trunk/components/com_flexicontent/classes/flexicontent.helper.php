@@ -2155,6 +2155,8 @@ class flexicontent_tmpl
 		jimport('joomla.filesystem.file');
 		jimport('joomla.form.form');
 		$themes = new stdClass();
+		$themes->items = new stdClass();
+		$themes->category = new stdClass();
 		
 		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$templates = JFolder::folders($tmpldir);
@@ -2175,6 +2177,7 @@ class flexicontent_tmpl
 					$document = & $xml->document;
 				}
 				
+				$themes->items->{$tmpl} = new stdClass();
 				$themes->items->{$tmpl}->name 		= $tmpl;
 				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
@@ -2213,6 +2216,7 @@ class flexicontent_tmpl
 					$cssfile = & $css->file;
 					if ($cssfile) {
 						for ($n=0; $n<count($cssfile); $n++) {
+							$themes->items->{$tmpl}->css = new stdClass();
 							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->getName();
 						}
 					}
@@ -2220,6 +2224,7 @@ class flexicontent_tmpl
 					$jsfile	= & $js->file;
 					if ($jsfile) {
 						for ($n=0; $n<count($jsfile); $n++) {
+							$themes->items->{$tmpl}->js = new stdClass();
 							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->getName();
 						}
 					}
@@ -2245,6 +2250,7 @@ class flexicontent_tmpl
 					$cssfile = & $css->file;
 					if ($cssfile) {
 						for ($n=0; $n<count($cssfile); $n++) {
+							$themes->items->{$tmpl}->css = new stdClass();
 							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 						}
 					}
@@ -2252,6 +2258,7 @@ class flexicontent_tmpl
 					$jsfile	=& $js->file;
 					if ($jsfile) {
 						for ($n=0; $n<count($jsfile); $n++) {
+							$themes->items->{$tmpl}->js = new stdClass();
 							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 						}
 					}
@@ -2272,6 +2279,7 @@ class flexicontent_tmpl
 					$document = & $xml->document;
 				}
 				
+				$themes->category->{$tmpl} = new stdClass();
 				$themes->category->{$tmpl}->name 		= $tmpl;
 				$themes->category->{$tmpl}->view 		= 'category';
 				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
@@ -2310,6 +2318,7 @@ class flexicontent_tmpl
 					$cssfile = & $css->file;
 					if ($cssfile) {
 						for ($n=0; $n<count($cssfile); $n++) {
+							$themes->category->{$tmpl}->css = new stdClass();
 							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->getName();
 						}
 					}
@@ -2317,6 +2326,7 @@ class flexicontent_tmpl
 					$jsfile = & $js->file;
 					if ($jsfile) {
 						for ($n=0; $n<count($jsfile); $n++) {
+							$themes->category->{$tmpl}->js = new stdClass();
 							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->getName();
 						}
 					}
@@ -2341,6 +2351,7 @@ class flexicontent_tmpl
 						$cssfile	=& $css->file;
 						if ($cssfile) {
 							for ($n=0; $n<count($cssfile); $n++) {
+								$themes->category->{$tmpl}->css = new stdClass();
 								$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 							}
 						}
@@ -2348,6 +2359,7 @@ class flexicontent_tmpl
 						$jsfile	=& $js->file;
 						if ($jsfile) {
 							for ($n=0; $n<count($jsfile); $n++) {
+								$themes->category->{$tmpl}->js = new stdClass();
 								$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 							}
 						}
