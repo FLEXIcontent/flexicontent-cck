@@ -956,7 +956,7 @@ class FlexicontentFields
 		
 		$values = array();
 		foreach ($field_vals as $val) {
-			$val = trim($val);
+			$val = $db->getEscaped( trim( $val ) );
 			if ( strlen($val) ) $values[] = $val;
 		}
 		if ( !count($values) ) return;
@@ -966,7 +966,7 @@ class FlexicontentFields
 		if ( in_array($field->field_type, $indexable_fields) ) {
 			$match_criteria_str = " ai.value_id IN ( '". implode("', '", $values) ."')";
 		} else {
-			$match_criteria_str = " ai.search_index LIKE '%". implode("%' OR LIKE '%", $values) ."%'";
+			$match_criteria_str = " ai.search_index LIKE '%". implode("%' OR ai.search_index LIKE '%", $values) ."%'";
 		}
 		
 		// Get ALL items that have such values for the given field
@@ -978,6 +978,9 @@ class FlexicontentFields
 			;
 		$db->setQuery($query);
 		$objs = $db->loadObjectList();
+		if ($db->getErrorNum()) {
+			echo $db->getErrorMsg();
+		}
 		
 		// Check reusult making sure it is an array
 		if ($objs===false) continue;

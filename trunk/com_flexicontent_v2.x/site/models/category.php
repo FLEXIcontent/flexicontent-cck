@@ -658,7 +658,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$currcat_data['where_no_alpha'] = $where;
 		$currcat_data['where'] = $where;
 		
-		$alpha = JRequest::getVar('letter', NULL, 'request');
+		$alpha = JRequest::getVar('letter', NULL, 'request', 'string');
+		
+		// Security check, just refuse any quotes
+		$alpha = preg_match ("/'|\"/u", $alpha) ? "" : $alpha;
+		
 		/*if($alpha===NULL) {
 			$alpha =  $session->get($option.'.category.letter');
 		} else {
