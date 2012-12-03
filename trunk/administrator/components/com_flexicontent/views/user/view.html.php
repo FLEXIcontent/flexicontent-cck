@@ -291,7 +291,7 @@ class FlexicontentViewUser extends JViewLegacy
 				. ' WHERE member_id = '.(int) $cid[0]
 				;
 				$db->setQuery( $query );
-				$usergroups = $db->loadResultArray();
+				$usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			}
 			else
 			{
@@ -330,7 +330,7 @@ class FlexicontentViewUser extends JViewLegacy
 				$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
 				$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
 				$db->setQuery( $query );
-				$usergroups = $db->loadResultArray();
+				$usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ($db->getErrorMsg())	echo $db->getErrorMsg();
 			}
 		}

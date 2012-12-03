@@ -226,7 +226,7 @@ class FlexicontentModelItems extends JModelLegacy
 		       .'   AND v.field_id = '.$field->id
 		       .' ORDER BY v.valueorder';
 		    $this->_db->setQuery($query);
-		    $values = $this->_db->loadResultArray();
+		    $values = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				/*if ($this->_db->getErrorNum()) {
 					$jAp=& JFactory::getApplication();
 					$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
@@ -271,13 +271,13 @@ class FlexicontentModelItems extends JModelLegacy
 					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
 				;
 		$this->_db->setQuery($query);
-		$allids = $this->_db->loadResultArray();
+		$allids = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		$allids = is_array($allids)?$allids:array();// !important
 		//echo count($allids); exit;
 
 		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
 		$this->_db->setQuery($query);
-		$allext = $this->_db->loadResultArray();
+		$allext = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		$allext = is_array($allext)?$allext:array();// !important
 
 		$query 	= 'SELECT DISTINCT c.id FROM #__content as c'
@@ -285,7 +285,7 @@ class FlexicontentModelItems extends JModelLegacy
 						. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" ')
 						. ' AND cat.id IS NOT NULL';
 		$this->_db->setQuery($query);
-		$allcat = $this->_db->loadResultArray();
+		$allcat = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		$allcat = is_array($allcat)?$allcat:array();// !important
 		//echo count($allcat); exit;
 
@@ -294,7 +294,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
 				;
 		$this->_db->setQuery($query);
-		$allfi = $this->_db->loadResultArray();
+		$allfi = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		$allfi = is_array($allfi)?$allfi:array();
 		
 		$status['allids'] 		= $allids;
@@ -360,7 +360,7 @@ class FlexicontentModelItems extends JModelLegacy
 					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
-		$badcats = $this->_db->loadResultArray();
+		$badcats = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		if (!$badcats) $badcats = array();
 		$badcats = array_flip($badcats);
 		
@@ -468,7 +468,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
-		$nowDate = $this->_db->Quote(JFactory::getDate()->toMySQL());
+		$nowDate = $this->_db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
 		
 		$ver_specific_joins = '';
 		if (FLEXI_J16GE) {
@@ -817,8 +817,8 @@ class FlexicontentModelItems extends JModelLegacy
 				$row->hits 			= 0;
 				$row->version 	= 1;
 				$datenow 				=& JFactory::getDate();
-				$row->created 		= $datenow->toMySQL();
-				$row->publish_up	= $datenow->toMySQL();
+				$row->created 		= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
+				$row->publish_up	= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
 				$row->modified 		= $nullDate = $this->_db->getNullDate();
 				$row->state			= $state ? $state : $row->state;
 				$lang_from			= substr($row->language,0,2);
@@ -990,7 +990,7 @@ class FlexicontentModelItems extends JModelLegacy
 						. ' WHERE itemid = '. $sourceid
 						;
 				$this->_db->setQuery($query);
-				$cats = $this->_db->loadResultArray();
+				$cats = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				
 				foreach($cats as $cat)
 				{
@@ -1009,7 +1009,7 @@ class FlexicontentModelItems extends JModelLegacy
 							. ' WHERE itemid = '. $sourceid
 							;
 					$this->_db->setQuery($query);
-					$tags = $this->_db->loadResultArray();
+					$tags = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			
 					foreach($tags as $tag)
 					{
@@ -1178,7 +1178,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ' WHERE itemid = '.$itemid
 					;
 			$this->_db->setQuery($query);
-			$seccats = $this->_db->loadResultArray();
+			$seccats = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 
 		// Add the primary cat to the array if it's not already in
@@ -1606,7 +1606,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			$assetids = $this->_db->loadResultArray();
+			$assetids = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			$assetidslist = implode(',', $assetids );
 		}
 		
@@ -2083,7 +2083,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($use_all_items == true) {
 			$query = "SELECT id FROM #__content";
 			$this->_db->setQuery($query);
-			return $this->_db->loadResultArray();
+			return FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		
 		// Find item having tags
@@ -2091,7 +2091,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($get_items_with_tags == true) {
 			$query  = 'SELECT DISTINCT itemid FROM #__flexicontent_tags_item_relations';
 			$this->_db->setQuery($query);
-			$items_with_tags = $this->_db->loadResultArray();
+			$items_with_tags = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		
 		// Find items having values for non core fields
@@ -2105,7 +2105,7 @@ class FlexicontentModelItems extends JModelLegacy
 			;
 			//echo $query;
 			$this->_db->setQuery($query);
-			$items_with_noncore = $this->_db->loadResultArray();
+			$items_with_noncore = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		
 		$item_list = array_merge($items_with_tags,$items_with_noncore);

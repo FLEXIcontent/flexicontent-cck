@@ -1272,7 +1272,7 @@ class FlexicontentFields
 		// Execute query if not already done
 		if ($values === null) {
 			$db->setQuery($query);
-			$values = $db->loadResultArray();
+			$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		}
 		return $values;
 	}

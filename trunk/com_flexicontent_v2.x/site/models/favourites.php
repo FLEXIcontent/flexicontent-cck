@@ -364,7 +364,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$now		= $mainframe->get('requestTime');
-		$now			= JFactory::getDate()->toMySQL();
+		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 
 		// First thing we need to do is to select only the requested FAVOURED items

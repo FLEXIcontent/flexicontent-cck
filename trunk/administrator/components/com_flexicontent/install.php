@@ -190,17 +190,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		
 		$query = "SHOW COLUMNS FROM #__flexicontent_files";
 		$db->setQuery($query);
-		$tbl_cols = $db->loadResultArray();
+		$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		foreach ($tbl_cols as $tbl_col) $files_tbl_cols[$tbl_col] = 1;
 		
 		$query = "SHOW COLUMNS FROM #__flexicontent_fields";
 		$db->setQuery($query);
-		$tbl_cols = $db->loadResultArray();
+		$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		foreach ($tbl_cols as $tbl_col) $fields_tbl_cols[$tbl_col] = 1;
 		
 		$query = "SHOW COLUMNS FROM #__flexicontent_advsearch_index";
 		$db->setQuery($query);
-		$tbl_cols = $db->loadResultArray();
+		$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		foreach ($tbl_cols as $tbl_col) $advsearch_index_tbl_cols[$tbl_col] = 1;
 		
 		$query = "SELECT COUNT(*) FROM `#__flexicontent_fields` WHERE field_type IN (".$deprecated_fields.")";

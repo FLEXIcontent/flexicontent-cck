@@ -242,7 +242,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				.' ORDER BY valueorder'
 				;
 		$this->_db->setQuery($query);
-		$field_value = $this->_db->loadResultArray();
+		$field_value = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		return $field_value;
 	}
@@ -263,7 +263,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				.' ORDER BY valueorder'
 				;
 		$this->_db->setQuery($query);
-		$field_versionvalue = $this->_db->loadResultArray();
+		$field_versionvalue = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 
 		return $field_versionvalue;
 	}

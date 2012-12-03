@@ -223,10 +223,10 @@ class FlexicontentViewItems extends JViewLegacy {
 			
 			if ($CanCopy) {
 				$ctrl_task = FLEXI_J16GE ? 'items.copy' : 'copy';
-				JToolBarHelper::customX( $ctrl_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+				JToolBarHelper::custom( $ctrl_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
 				$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 				if ($enable_translation_groups) {
-					JToolBarHelper::customX( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
+					JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
 				}
 			}
 		}

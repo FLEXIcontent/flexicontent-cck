@@ -38,6 +38,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	function display( $tpl = null )
 	{
 		$mainframe = &JFactory::getApplication();
+		$config = & JFactory::getConfig();
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		
 		// Special displaying when getting flexicontent version
@@ -228,10 +229,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$lists['missing_lang'] = $model->processlanguagefiles();
 
 		// Get the default copyright values to populate the form automatically
-		$config =& JFactory::getConfig();
-		$mailfrom = FLEXI_J30GE ?  $config->get('config.mailfrom') : $config->getValue('config.mailfrom');
-		$fromname = FLEXI_J30GE ?  $config->get('config.fromname') : $config->getValue('config.fromname');
-		$website 	= FLEXI_J30GE ?  $config->get('config.live_site') : $config->getValue('config.live_site');
+		$mailfrom = $mainframe->getCfg('mailfrom');
+		$fromname = $mainframe->getCfg('fromname');
+		$website 	= $mainframe->getCfg('live_site');
 
 				
 		if (!FLEXI_J16GE)

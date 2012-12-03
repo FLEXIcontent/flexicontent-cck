@@ -359,7 +359,7 @@ class FlexicontentModelField extends JModelLegacy
 				. ' FROM #__flexicontent_types'
 				;
 			$this->_db->setQuery($query);
-			$types = $this->_db->loadResultArray();
+			$types = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		
 		// Store field to types relations
@@ -377,7 +377,7 @@ class FlexicontentModelField extends JModelLegacy
 			. ' WHERE field_id = '.$field->id
 			;
 		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
+		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 		foreach($types as $type)
 		{
@@ -428,7 +428,7 @@ class FlexicontentModelField extends JModelLegacy
 	{
 		$query = 'SELECT DISTINCT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int)$this->_id;
 		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
+		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		return $used;
 	}
 	

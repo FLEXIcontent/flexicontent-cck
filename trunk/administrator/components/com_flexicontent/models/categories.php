@@ -118,7 +118,7 @@ class FlexicontentModelCategories extends JModelLegacy
 					. $where
 					;
 			$this->_db->setQuery( $query );
-			$search_rows = $this->_db->loadResultArray();					
+			$search_rows = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
 		}
 		
 		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config '

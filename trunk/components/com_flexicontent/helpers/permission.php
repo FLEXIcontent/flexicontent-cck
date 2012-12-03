@@ -217,7 +217,7 @@ class FlexicontentHelperPerm {
 				. ' AND axosection = ' . $db->Quote('category')
 				;
 		$db->setQuery($query);
-		$usercats = $db->loadResultArray();
+		$usercats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		$usercats = $usercats ? $usercats : array();
 		// we add all descendent to the array

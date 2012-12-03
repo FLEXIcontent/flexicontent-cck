@@ -1003,7 +1003,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				// Cross check them if they already exist in the DB
 				$q = "SELECT id FROM #__content WHERE id IN (".$custom_id_list.")";
 				$db->setQuery($q);
-				$existing_ids = $db->loadResultArray();
+				$existing_ids = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $existing_ids && count($existing_ids) ) {
 					echo "<script>alert ('File has ".count($existing_ids)." item IDs that already exist: \'".implode("\' , \'",$existing_ids)."\', please fix or set to ignore \'id\' column');";
 					echo "window.history.back();";

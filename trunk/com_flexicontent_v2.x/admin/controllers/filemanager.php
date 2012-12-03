@@ -164,8 +164,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$user	= &JFactory::getUser();
 				$config = &JFactory::getConfig();
 
-				$tzoffset = $config->getValue('config.offset');
-				$date = & JFactory::getDate( 'now', -$tzoffset);
+				$date = & JFactory::getDate( 'now' );
 
 				$obj = new stdClass();
 				$obj->filename 			= $filename;
@@ -175,7 +174,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$obj->ext			= $ext;
 				$obj->hits			= 0;
 				$obj->description		= $filedesc;
-				$obj->uploaded			= $date->toMySQL();
+				$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 				$obj->uploaded_by		= $user->get('id');
 					
 				// Insert file record in DB
@@ -260,8 +259,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$user	= &JFactory::getUser();
 		$config = &JFactory::getConfig();
 
-		$tzoffset = $config->getValue('config.offset');
-		$date = & JFactory::getDate( 'now', -$tzoffset);
+		$date = & JFactory::getDate( 'now' );
 
 		$obj = new stdClass();
 		$obj->filename 			= $filename;
@@ -271,7 +269,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->ext			= $ext;
 		$obj->description		= $filedesc;
 		$obj->hits			= 0;
-		$obj->uploaded			= $date->toMySQL();
+		$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 		$obj->uploaded_by		= $user->get('id');
 
 		$db->insertObject('#__flexicontent_files', $obj);
@@ -319,7 +317,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$db 		=& JFactory::getDBO();
 		$user		=& JFactory::getUser();
 		$config 	=& JFactory::getConfig();
-		$tzoffset 	= $config->getValue('config.offset');
 		
 		$filedesc	=  JRequest::getVar( 'file-desc', '' );
 
@@ -368,7 +365,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						// Copy the file
 						if (JFile::copy($source, $destination))
 						{
-							$date =& JFactory::getDate( 'now', -$tzoffset);
+							$date =& JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
@@ -378,7 +375,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 							$obj->ext			= $ext;
 							$obj->description		= $filedesc;
 							$obj->hits			= 0;
-							$obj->uploaded			= $date->toMySQL();
+							$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 							$obj->uploaded_by		= $user->get('id');
 
 							// Add the record to the DB
@@ -390,7 +387,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						// Move the file
 						if (JFile::move($source, $destination))
 						{
-							$date =& JFactory::getDate( 'now', -$tzoffset);
+							$date =& JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
@@ -400,7 +397,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 							$obj->ext			= $ext;
 							$obj->description		= $filedesc;
 							$obj->hits			= 0;
-							$obj->uploaded			= $date->toMySQL();
+							$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 							$obj->uploaded_by		= $user->get('id');
 
 							// Add the record to the DB

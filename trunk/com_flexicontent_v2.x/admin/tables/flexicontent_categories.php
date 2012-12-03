@@ -267,12 +267,12 @@ class flexicontent_categories extends JTableNested
 
 		if ($this->id) {
 			// Existing category
-			$this->modified_time	= $date->toMySQL();
+			$this->modified_time	= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 			$this->modified_user_id	= $user->get('id');
 			$is_new = false;
 		} else {
 			// New category
-			$this->created_time		= $date->toMySQL();
+			$this->created_time		= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 			$this->created_user_id	= $user->get('id');
 			$is_new = true;
 		}

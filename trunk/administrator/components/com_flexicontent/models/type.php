@@ -342,7 +342,7 @@ class FlexicontentModelType extends JModelLegacy
 				. ' WHERE iscore = 1'
 				;
 		$this->_db->setQuery($query);
-		$corefields = $this->_db->loadResultArray();
+		$corefields = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 		return $corefields;
 	}

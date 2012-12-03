@@ -321,7 +321,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 			. ' GROUP BY f.id'
 			;
 			$db->setQuery($query);
-			$items = $db->loadResultArray();
+			$items = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			$items = $items?$items:array();
 			return $items;
 		}

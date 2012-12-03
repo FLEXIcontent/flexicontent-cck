@@ -526,12 +526,15 @@ class FlexicontentModelCategory extends JModelAdmin
 
 			// Convert the created and modified dates to local user time for display in the form.
 			jimport('joomla.utilities.date');
-			$tz	= new DateTimeZone(JFactory::getApplication()->getCfg('offset'));
-
+			
+			$site_zone = JFactory::getApplication()->getCfg('offset');
+			$user_zone = JFactory::getUser->getParam('timezone', $site_zone);
+			$tz = FLEXI_J16GE ? $user_zone : $site_zone ;
+			
 			if (intval($result->created_time)) {
 				$date = new JDate($result->created_time);
 				$date->setTimezone($tz);
-				$result->created_time = $date->toMySQL(true);
+				$result->created_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
 			} else {
 				$result->created_time = null;
 			}
@@ -539,7 +542,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			if (intval($result->modified_time)) {
 				$date = new JDate($result->modified_time);
 				$date->setTimezone($tz);
-				$result->modified_time = $date->toMySQL(true);
+				$result->modified_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
 			} else {
 				$result->modified_time = null;
 			}

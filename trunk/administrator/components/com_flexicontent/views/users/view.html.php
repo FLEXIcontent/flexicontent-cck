@@ -260,7 +260,7 @@ class FlexicontentViewUsers extends JViewLegacy
 			if (FLEXI_J16GE) {
 				$query = sprintf( $ugrps_qtmpl, intval( $row->id ) );
 				$db->setQuery( $query );
-				$row->usergroups = $db->loadResultArray();
+				$row->usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ($db->getErrorMsg())	echo $db->getErrorMsg();
 			}
 		}

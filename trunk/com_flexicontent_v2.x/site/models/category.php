@@ -414,7 +414,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			;
 		
 		$this->_db->setQuery($query);
-		$this->_data_cats = $this->_db->loadResultArray();
+		$this->_data_cats = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		if ( $this->_db->getErrorNum() ) {
 			$jAp=& JFactory::getApplication();
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
@@ -534,7 +534,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$now		= $mainframe->get('requestTime');
-		$now			= JFactory::getDate()->toMySQL();
+		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 		
 		$cparams = & $this->_params;                      // Get the category parameters
@@ -866,7 +866,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				;
 		
 		$this->_db->setQuery($query);
-		$assigneditems = count($this->_db->loadResultArray());
+		$assigneditems = count(FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray());
 		if ( $this->_db->getErrorNum() ) {
 			$jAp=& JFactory::getApplication();
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
@@ -1266,13 +1266,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 					. ' WHERE ' . $where
 					;
 				$this->_db->setQuery($query);
-				$filtered1 = $this->_db->loadResultArray();
+				$filtered1 = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				$query  = 'SELECT itemid'
 					. ' FROM #__flexicontent_cats_item_relations'
 					. ' WHERE ' . $where
 					;
 				$this->_db->setQuery($query);
-				$filtered2 = $this->_db->loadResultArray();
+				$filtered2 = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				$filtered = array_unique(array_merge($filtered1, $filtered2));
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break;
@@ -1283,7 +1283,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' WHERE tid = ' . $this->_db->Quote($value)
 						;
 				$this->_db->setQuery($query);
-				$filtered = $this->_db->loadResultArray();
+				$filtered = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break;
 			
@@ -1303,7 +1303,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' GROUP BY item_id'
 					;
 					$this->_db->setQuery($query);
-					$filtered = $this->_db->loadResultArray();
+					$filtered = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				}
 				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
 			break; 
@@ -1335,7 +1335,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				. ' ORDER BY alpha ASC'
 				;
 		$this->_db->setQuery($query);
-		$alpha = $this->_db->loadResultArray();
+		$alpha = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		if ($this->_db->getErrorNum()) {
 			$jAp=& JFactory::getApplication();
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
