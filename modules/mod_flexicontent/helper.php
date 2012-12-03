@@ -353,6 +353,7 @@ class modFlexicontentHelper
 			    		}
 						}
 					}
+					$lists[$ord]['featured'][$i] = new stdClass();
 					$lists[$ord]['featured'][$i]->id = $row->id;
 					//date
 					if ($display_date_feat == 1) {
@@ -501,6 +502,7 @@ class modFlexicontentHelper
 			    		}
 						}
 					}
+					$lists[$ord]['standard'][$i] = new stdClass();
 					$lists[$ord]['standard'][$i]->id = $row->id;
 					//date
 					if ($display_date == 1) {
